@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import { useUpdateUserMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
@@ -50,6 +52,8 @@ export function EditUserModal({
   const { t } = useTranslation(['device_settings', 'shared']) as {
     t: TFunction
   }
+  const dispatch = useDispatch()
+  const loggedInUsername = useUsernameForRobot(robotName)
   const documentationState = useDocumentationState(undefined, robotName)
   const { updateUser, isLoading: isSaving } =
     useUpdateUserMutation(documentationState)
@@ -94,6 +98,7 @@ export function EditUserModal({
   }
 
   const onSubmit = (): void => {
+    const didChangeRole = accountType !== user.accountType
     void updateUser({
       username: user.username,
       request: {
@@ -104,13 +109,16 @@ export function EditUserModal({
           ...(trimmedFullName !== user.fullName
             ? { fullName: trimmedFullName }
             : {}),
-          ...(accountType !== user.accountType ? { accountType } : {}),
+          ...(didChangeRole ? { accountType } : {}),
         },
       },
     })
       .then(() => {
         onUserUpdated?.()
         handleClose()
+        if (didChangeRole && loggedInUsername === user.username) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(error => {
         const formError = mapAuthUserMutationError<FormValues>(error, t)
