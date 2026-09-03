@@ -423,27 +423,30 @@ class RunOrchestratorStore:
         else:
             raise RunConflictError("Current run is not idle or stopped.")
 
-        run_data = await self.run_coordinator.get_state_summary()
-        # commands = await self.run_coordinator.get_all_commands()
+        try:
+            run_data = await self.run_coordinator.get_state_summary()
 
-        command_length = await self.run_coordinator.get_length()
-        commands: List[Command] = []
-        while command_length > 0:
-            latest_commands = await self.run_coordinator.get_command_slice(
-                cursor=max(0, command_length - 100),
-                length=100,
-                include_fixit_commands=True,
+            command_length = await self.run_coordinator.get_length()
+            commands: List[Command] = []
+            while command_length > 0:
+                latest_commands = await self.run_coordinator.get_command_slice(
+                    cursor=max(0, command_length - 100),
+                    length=100,
+                    include_fixit_commands=True,
+                )
+                await self.run_coordinator.delete_command_slice_end(100)
+                commands[:0] = latest_commands.commands
+                command_length = await self.run_coordinator.get_length()
+
+            run_time_parameters = await self.run_coordinator.get_run_time_parameters()
+            command_annotations = (
+                await self.run_coordinator.get_all_command_annotations()
             )
-            await self.run_coordinator.delete_command_slice_end(100)
-            commands[:0] = latest_commands.commands
-            command_length -= len(latest_commands.commands)
+            preconditions = await self.run_coordinator.get_preconditions()
 
-        run_time_parameters = await self.run_coordinator.get_run_time_parameters()
-        command_annotations = await self.run_coordinator.get_all_command_annotations()
-        preconditions = await self.run_coordinator.get_preconditions()
-
-        if feature_flags.protocol_subprocess_enabled():
-            self._run_process_pyro_provider.set_active_process_as_used()
+        finally:
+            if feature_flags.protocol_subprocess_enabled():
+                self._run_process_pyro_provider.set_active_process_as_used()
 
         if self._run_coordinator is not None:
             await self._run_coordinator.clear_command_history()
@@ -502,7 +505,29 @@ class RunOrchestratorStore:
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start the run."""
-        return await self.run_coordinator.run(deck_configuration=deck_configuration)
+        engine_result = await self.run_coordinator.run(
+            deck_configuration=deck_configuration
+        )
+
+        # Collect the command list but don't delete it yet, to prevent conflicts with the cleanup steps
+        command_length = await self.run_coordinator.get_length()
+        commands: List[Command] = []
+        while command_length > 0:
+            latest_commands = await self.run_coordinator.get_command_slice(
+                cursor=len(commands),
+                length=100,
+                include_fixit_commands=True,
+            )
+            commands.extend(latest_commands.commands)
+            command_length = command_length - len(latest_commands.commands)
+
+        return RunResult(
+            commands=commands,
+            state_summary=engine_result.state_summary,
+            parameters=engine_result.parameters,
+            command_annotations=await self.run_coordinator.get_all_command_annotations(),
+            command_preconditions=engine_result.command_preconditions,
+        )
 
     async def pause(self) -> None:
         """Pause the run."""
@@ -554,6 +579,10 @@ class RunOrchestratorStore:
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
         return self._most_recent_finalized_command
+
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        return await self.run_coordinator.get_commands_deleted()
 
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool

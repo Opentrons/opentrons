@@ -42,7 +42,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import RunResult
+from opentrons.protocol_runner.protocol_runner import EngineRunResult
 from opentrons.types import NozzleMapInterface
 
 
@@ -87,7 +87,7 @@ class AbstractRunCoordinator(ABC):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         ...
 
@@ -190,6 +190,9 @@ class AbstractRunCoordinator(ABC):
 
     @abstractmethod
     async def get_length(self) -> int: ...
+
+    @abstractmethod
+    async def get_commands_deleted(self) -> int: ...
 
     @abstractmethod
     async def delete_command_slice_end(self, length: int) -> None: ...

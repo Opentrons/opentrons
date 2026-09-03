@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
+from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot.types import RobotType
@@ -94,7 +95,7 @@ class ProtocolAnalyzer:
         assert self._coordinator is not None
         try:
             try:
-                result = await self._coordinator.run(
+                engine_result = await self._coordinator.run(
                     deck_configuration=[],
                 )
             except BaseException as error:
@@ -116,11 +117,15 @@ class ProtocolAnalyzer:
                 )
                 await self._coordinator.delete_command_slice_end(100)
                 commands[:0] = latest_commands.commands
-                command_length -= len(latest_commands.commands)
+                command_length = await self._coordinator.get_length()
 
-            result.commands = commands
-
-            log.info(f'Completed analysis "{analysis_id}".')
+            result = RunResult(
+                commands=commands,
+                state_summary=engine_result.state_summary,
+                parameters=engine_result.parameters,
+                command_annotations=await self._coordinator.get_all_command_annotations(),
+                command_preconditions=engine_result.command_preconditions,
+            )
 
             await self._analysis_store.update(
                 analysis_id=analysis_id,
@@ -180,19 +185,21 @@ class ProtocolAnalyzer:
         are stopped timely and do not block server shutdown.
         """
         if self._coordinator is not None:
-            okay_to_clear = await self._coordinator.get_is_okay_to_clear()
-            if okay_to_clear:
-                await self._coordinator.stop()
+            try:
+                okay_to_clear = await self._coordinator.get_is_okay_to_clear()
+                if okay_to_clear:
+                    await self._coordinator.stop()
+                else:
+                    log.warning(
+                        "Analyzer is no longer in use but orchestrator is busy. "
+                        "Cannot stop the orchestrator currently."
+                    )
+                self._coordinator = None
+            finally:
                 if feature_flags.protocol_subprocess_enabled():
                     self._run_process_pyro_provider.set_active_process_as_used(
                         simulator=True
                     )
-            else:
-                log.warning(
-                    "Analyzer is no longer in use but orchestrator is busy. "
-                    "Cannot stop the orchestrator currently."
-                )
-            self._coordinator = None
 
 
 def create_protocol_analyzer(
