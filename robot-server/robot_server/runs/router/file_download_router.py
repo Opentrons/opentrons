@@ -5,7 +5,7 @@ from textwrap import dedent
 from typing import Annotated, List, Optional, Tuple, Union
 
 from fastapi import Depends, Query, Response, status
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -19,7 +19,6 @@ from robot_server.data_files.zip_utils import (
     collect_existing_run_output_csvs,
     create_download_staging_dir,
     run_zip_generator,
-    write_zip_for_download,
 )
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.persistence.fastapi_dependencies import (
@@ -170,7 +169,7 @@ async def download_run_files(
         staging_dir.cleanup()
         raise
 
-    headers = {f"Content-Disposition": 'attachment; filename="{zip_filename}"'}
+    headers = {"Content-Disposition": f'attachment; filename="{zip_filename}"'}
 
     return StreamingResponse(
         content=run_zip_generator(entries=zip_entries, staging_dir=staging_path),
