@@ -39,6 +39,7 @@ import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
+import { VerifyVacuumInstall } from './VerifyVacuumInstall'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -438,6 +439,24 @@ export function ModuleWizardFlows(
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.VERIFY_VACUUM:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <VerifyVacuumInstall
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )

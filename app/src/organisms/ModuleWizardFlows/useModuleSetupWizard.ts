@@ -62,6 +62,7 @@ export interface UseModuleSetupWizardResult {
     isExiting: boolean
     sendIdentifyModule: SendIdentifyModule
     updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
+    setExitCleanupCommands: (commands: CreateCommand[]) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -157,6 +158,9 @@ export function useModuleSetupWizard(
     setIsDoorOpenError(false)
   }
   const [isExiting, setIsExiting] = useState<boolean>(false)
+  const [exitCleanupCommands, setExitCleanupCommands] = useState<
+    CreateCommand[]
+  >([])
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       dispatch({
@@ -197,7 +201,10 @@ export function useModuleSetupWizard(
       )
       chainRunCommands(
         maintenanceRunId,
-        [{ commandType: 'home' as const, params: {} }],
+        [
+          ...exitCleanupCommands,
+          { commandType: 'home' as const, params: {} },
+        ],
         true
       )
         .then(() => {
@@ -273,6 +280,7 @@ export function useModuleSetupWizard(
     isExiting,
     sendIdentifyModule,
     updateDeckConfiguration,
+    setExitCleanupCommands,
   }
 
   const buildFlowForSelectedModule = (
