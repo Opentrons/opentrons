@@ -259,19 +259,19 @@ export function Toast(props: ToastProps): ReactNode {
     return combinedDuration
   }
 
+  const isClosingRef = useRef<boolean>(false)
   const animationTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
 
   // Handle dismissal of toast when no timer is set.
   const onCloseHandler = useCallback((): void => {
-    setIsClosed(prevIsClosed => {
-      if (prevIsClosed) return prevIsClosed
-      animationTimerRef.current = setTimeout(() => {
-        onCloseRef.current?.()
-      }, TOAST_ANIMATION_DURATION - 50)
-      return true
-    })
+    if (isClosingRef.current) return
+    isClosingRef.current = true
+    setIsClosed(true)
+    animationTimerRef.current = setTimeout(() => {
+      onCloseRef.current?.()
+    }, TOAST_ANIMATION_DURATION - 50)
   }, [])
 
   const isAutomaticAnimationExit = !disableTimeout || exitNow
