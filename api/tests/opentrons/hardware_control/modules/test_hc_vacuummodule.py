@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import replace
 from typing import AsyncGenerator, List, Optional, Union
 from unittest import mock
 
@@ -11,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from . import require_live_data_real_string
+from opentrons.config import feature_flags as ff
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.errors import (
     PressureNotReached,
@@ -155,6 +157,7 @@ async def test_wait_for_target_subject(
             manual_control=True,
         )
     )
+    decoy.when(await mock_driver.get_waste_configs()).then_return(DEFAULT_WASTE_CONFIG)
 
     await poller.start()
     try:
@@ -200,6 +203,7 @@ async def subject(
             "reset_reason": "0",
         }
     )
+    decoy.when(await mock_driver.get_waste_configs()).then_return(DEFAULT_WASTE_CONFIG)
 
     await poller.start()
     try:
@@ -966,6 +970,68 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
             slew_end_fraction=pid.slew_end_fraction,
         ),
     )
+
+
+def _idle_vacuum_state() -> VacuumState:
+    return VacuumState(
+        target_gauge_pressure=0,
+        current_gauge_pressure=0,
+        pressure_abs_a=0,
+        pressure_abs_b=0,
+        pressure_atm=0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.CLOSED,
+    )
+
+
+def _idle_pump_state() -> PumpState:
+    return PumpState(
+        target_rpm=0,
+        current_rpm=0,
+        target_pwm=0,
+        current_pwm=0,
+        pump_running=False,
+        manual_control=False,
+    )
+
+
+async def test_read_reconfigures_waste_detection_when_host_flag_changes(
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Poller read should push waste detection when the host flag disagrees with cache."""
+    monkeypatch.setattr(ff, "vacuum_module_waste_detection_disabled", lambda: True)
+    reader = VacuumModuleReader(driver=mock_driver)
+    reader.initialized = True
+    reader._waste_config = replace(DEFAULT_WASTE_CONFIG, waste_detection_enabled=True)
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(_idle_vacuum_state())
+    decoy.when(await mock_driver.get_pump_state()).then_return(_idle_pump_state())
+
+    await reader.read()
+
+    decoy.verify(await mock_driver.set_waste_configs(False))
+    assert reader._waste_config.waste_detection_enabled is False
+    assert DEFAULT_WASTE_CONFIG.waste_detection_enabled is True
+
+
+async def test_read_does_not_reconfigure_waste_detection_when_already_in_sync(
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Poller read should not rewrite waste config when the host cache already matches."""
+    monkeypatch.setattr(ff, "vacuum_module_waste_detection_disabled", lambda: False)
+    reader = VacuumModuleReader(driver=mock_driver)
+    reader.initialized = True
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(_idle_vacuum_state())
+    decoy.when(await mock_driver.get_pump_state()).then_return(_idle_pump_state())
+
+    await reader.read()
+
+    decoy.verify(await mock_driver.set_waste_configs(matchers.Anything()), times=0)
+    decoy.verify(await mock_driver.get_waste_configs(), times=0)
 
 
 async def test_stop_vacuum_stops_pressure_and_pump_and_clears_targets(
