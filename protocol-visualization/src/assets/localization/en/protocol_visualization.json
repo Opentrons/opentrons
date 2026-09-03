@@ -29,6 +29,7 @@
   "number_of_labware_in_stacker": "Number of labware in stacker",
   "open": "Open",
   "pause": "Pause",
+  "playback_speed": "Playback speed",
   "percent_complete": "{{percent}}% complete",
   "pipette": "Pipette",
   "play": "Play",
