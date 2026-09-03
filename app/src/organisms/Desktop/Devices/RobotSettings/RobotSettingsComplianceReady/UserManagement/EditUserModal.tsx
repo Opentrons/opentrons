@@ -74,9 +74,14 @@ export function EditUserModal({
       name: t(`desktop_user_role_${type}`),
       value: type,
     }))
+  const fallbackAccountType = MANAGEABLE_USER_ACCOUNT_TYPES[0] ?? 'admin'
+  const fallbackOption: DropdownOption = {
+    name: t(`desktop_user_role_${fallbackAccountType}`),
+    value: fallbackAccountType,
+  }
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
-    accountTypeOptions[0]!
+    fallbackOption
 
   const trimmedUsername = username.trim()
   const trimmedFullName = fullName.trim()
@@ -97,22 +102,26 @@ export function EditUserModal({
     onClose()
   }
 
-  const onSubmit = (): void => {
-    const didChangeRole = accountType !== user.accountType
-    void updateUser({
+  const onSubmit = (data: FormValues): void => {
+    const didChangeRole = data.accountType !== user.accountType
+    const submittedTrimmedUsername = data.username.trim()
+    const submittedTrimmedFullName = data.fullName.trim()
+
+    const updatePromise = updateUser({
       username: user.username,
       request: {
         data: {
-          ...(trimmedUsername !== user.username
-            ? { username: trimmedUsername }
+          ...(submittedTrimmedUsername !== user.username
+            ? { username: submittedTrimmedUsername }
             : {}),
-          ...(trimmedFullName !== user.fullName
-            ? { fullName: trimmedFullName }
+          ...(submittedTrimmedFullName !== user.fullName
+            ? { fullName: submittedTrimmedFullName }
             : {}),
-          ...(didChangeRole ? { accountType } : {}),
+          ...(didChangeRole ? { accountType: data.accountType } : {}),
         },
       },
     })
+    updatePromise
       .then(() => {
         onUserUpdated?.()
         handleClose()
@@ -131,6 +140,7 @@ export function EditUserModal({
   return createPortal(
     <ModalShell
       width="31.25rem"
+      overflow="visible"
       header={
         <WizardHeader
           title={t('desktop_edit_user')}
@@ -141,7 +151,11 @@ export function EditUserModal({
       }
     >
       <div className={styles.modal_content}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form
+          onSubmit={event => {
+            void handleSubmit(onSubmit)(event)
+          }}
+        >
           <div className={styles.form_fields}>
             <UserAccountIdentityFormFields
               autoFocusFirstField
