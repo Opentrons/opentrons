@@ -156,15 +156,12 @@ class WasteConfigParameters:
     """Get the waste config parameters"""
 
     waste_detection_enabled: bool
-    p_window_start: float
-    p_window_end: float
-    baseline_fast_factor: float
-    max_delta_per_tick: float
-    max_rise_per_tick: float
-    max_cummulative_rise: float
     p_filter_alpha: float
-    min_window_time: float
-    max_window_time: float
+    g_sealed_max: float
+    flowing_dp_mbar: float
+    stable_hold_ms: float
+    stable_hold_deep_ms: float
+    min_waste_depth_mbar: float
 
 
 @dataclass
