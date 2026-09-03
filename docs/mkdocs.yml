@@ -17,9 +17,12 @@ nav:
       - Thermocycler Module: '!include thermocycler/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
-  - Protocol Designer: '!include protocol-designer/mkdocs.yml'
+  - Software:
+      - Software home: software/index.md
+      - Protocol Designer: '!include protocol-designer/mkdocs.yml'
+      - Compliance Ready Software: '!include compliance-ready-software/mkdocs.yml'
+      - Python Protocol API: python-api/index.md
   - Python API: '!include python-api/mkdocs.yml'
-  - Compliance-Ready Software: '!include compliance-ready-software/mkdocs.yml'
 
 exclude_docs: |
   python-api/liquid-class-tables/*.md
@@ -43,7 +46,7 @@ plugins:
             modernize_annotations: true
             line_length: 80
             group_by_category: false
-            filters: 
+            filters:
               - "public"
               - "!^__"
               - "!broker"

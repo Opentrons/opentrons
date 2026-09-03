@@ -26,13 +26,13 @@
 
     [:octicons-arrow-right-24: View all modules](modules/index.md)
 
--   :opentrons-protocol-designer:{ .xl .middle } __Protocol Designer__
+-   :opentrons-laptop-outline:{ .xl .middle } __Opentrons Software__
 
     ---
 
-    Our no-code, web-based tool for developing protocols for Flex or OT-2.
+    Tools for creating protocols and running them on your Opentrons robot.
 
-    [:octicons-arrow-right-24: Instruction Manual](protocol-designer/index.md)
+    [:octicons-arrow-right-24: View all software](software/index.md)
 
 -   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
 
