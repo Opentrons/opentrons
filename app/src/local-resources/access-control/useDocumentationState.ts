@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext, useMemo, useRef } from 'react'
 
 import {
   useAccessControlEnabledQuery,
@@ -45,6 +45,8 @@ export function useDocumentationState(
   const foundName = useCurrentRobotName()
   const currentRobotName = robotName ?? foundName
   const currentUsername = useUsernameForRobot(currentRobotName)
+  const usernameRef = useRef<string | null>(currentUsername)
+  usernameRef.current = currentUsername
 
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
@@ -76,7 +78,7 @@ export function useDocumentationState(
       initialDocreport?: DocumentationReport,
       usernameOverride?: string
     ) => {
-      let username = usernameOverride ?? currentUsername
+      let username = usernameOverride ?? usernameRef.current
       if (username == null || username.length === 0) {
         console.log('calling requireLogin', currentRobotName)
         const loginResult = await requireLogin({
@@ -101,7 +103,6 @@ export function useDocumentationState(
     },
     [
       currentRobotName,
-      currentUsername,
       onPromptForDocumentation,
       minLengthOfReasonForInteraction,
       providedActionsToDocument,

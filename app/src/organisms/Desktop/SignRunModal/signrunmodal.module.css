@@ -9,24 +9,28 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: var(--spacing-4);
+  gap: var(--spacing-8);
 }
 
 .signature_field {
   display: flex;
   width: 100%;
+  height: 5.125rem;
   flex-direction: column;
+  justify-content: flex-end;
   padding: var(--spacing-8) var(--spacing-24);
   border: 1px solid transparent;
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
+  gap: var(--spacing-4);
 }
 
 .signature_field:focus-within {
   border-color: var(--blue-50);
 }
 
-.signature_field_error {
+.signature_field_error,
+.signature_field_error:focus-within {
   border-color: var(--red-50);
   background-color: var(--red-30);
 }
@@ -34,30 +38,41 @@
 .signature_input_wrap {
   display: flex;
   width: 100%;
-  height: 3.25rem;
+  flex: 1;
   flex-direction: column;
   justify-content: flex-end;
+  padding: var(--spacing-6) 0;
+  border: none;
   border-bottom: 2px solid var(--grey-60);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
 }
 
-.signature_input {
-  width: 100%;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--black-90);
-  font-size: var(--font-size-13);
+.signature_text {
+  color: var(--grey-60);
+  font-size: var(--font-size-p);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
-  outline: none;
 }
 
-.signature_input::placeholder {
-  color: var(--grey-60);
+.signature_text_signed {
+  color: var(--black-90);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+  text-align: center;
+}
+
+.signature_name {
+  color: var(--grey-50);
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-16);
 }
 
 .signature_error_text {
-  color: var(--red-60);
+  color: var(--red-50);
   font-size: var(--font-size-10);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
@@ -81,6 +96,7 @@
   display: flex;
   width: 100%;
   flex-direction: row;
-  justify-content: flex-end;
-  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-24) var(--spacing-24);
 }

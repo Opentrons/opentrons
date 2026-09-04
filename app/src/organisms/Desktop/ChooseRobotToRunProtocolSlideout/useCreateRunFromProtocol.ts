@@ -8,6 +8,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
+import { getProtocolOrRunCreationErrorMessage } from '/app/local-resources/access-control/utils'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -43,7 +44,7 @@ export function useCreateRunFromProtocol(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const { t } = useTranslation('shared')
+  const { t } = useTranslation(['shared', 'access_control'])
 
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
@@ -95,16 +96,18 @@ export function useCreateRunFromProtocol(
     host
   )
 
-  let error =
-    protocolError != null || runError != null
-      ? (protocolError?.response?.data?.errors?.[0]?.detail ??
-        protocolError?.response?.data ??
-        runError?.response?.data?.errors?.[0]?.detail ??
-        runError?.response?.data ??
-        t('protocol_run_general_error_msg'))
+  const mutationError = protocolError ?? runError
+  if (mutationError != null) {
+    console.error(mutationError)
+  }
+  const error =
+    mutationError != null
+      ? getProtocolOrRunCreationErrorMessage(
+          mutationError,
+          t('protocol_run_general_error_msg') as string,
+          t('access_control:send_protocol_admin_credentials_required') as string
+        )
       : null
-  error != null && console.error(error)
-  error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
   const errorCode =
     protocolError?.response?.status ?? runError?.response?.status ?? null

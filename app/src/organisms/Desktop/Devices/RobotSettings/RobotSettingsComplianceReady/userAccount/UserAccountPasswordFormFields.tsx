@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import { hasOnlyAllowedCredentialCharacters } from '/app/resources/auth/credentialCharacters'
+
 import { PasswordInputField } from '../PasswordInputField'
 import styles from './userAccountForm.module.css'
 
@@ -26,16 +28,27 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
     <div className={styles.fields_row}>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_password')}
+          {t('desktop_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
             control={control}
             name={'password' as Path<T>}
+            rules={{
+              validate: value => {
+                const password = value as string
+                if (password === '') {
+                  return true
+                }
+                return (
+                  hasOnlyAllowedCredentialCharacters(password) ||
+                  (t('desktop_password_invalid_characters') as string)
+                )
+              },
+            }}
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -46,7 +59,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
       </div>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_confirm_password')}
+          {t('desktop_confirm_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -54,15 +67,12 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             name={'confirmPassword' as Path<T>}
             rules={{
               validate: value =>
-                (password as string) === '' ||
-                (value as string) === '' ||
                 (value as string) === (password as string) ||
                 (t('desktop_password_mismatch') as string),
             }}
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}

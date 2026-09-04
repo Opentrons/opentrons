@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   DropdownMenu,
@@ -13,6 +14,8 @@ import { useUpdateUserMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
+import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
 import {
@@ -49,6 +52,8 @@ export function EditUserModal({
   const { t } = useTranslation(['device_settings', 'shared']) as {
     t: TFunction
   }
+  const dispatch = useDispatch()
+  const loggedInUsername = useUsernameForRobot(robotName)
   const documentationState = useDocumentationState(undefined, robotName)
   const { updateUser, isLoading: isSaving } =
     useUpdateUserMutation(documentationState)
@@ -69,9 +74,14 @@ export function EditUserModal({
       name: t(`desktop_user_role_${type}`),
       value: type,
     }))
+  const fallbackAccountType = MANAGEABLE_USER_ACCOUNT_TYPES[0] ?? 'admin'
+  const fallbackOption: DropdownOption = {
+    name: t(`desktop_user_role_${fallbackAccountType}`),
+    value: fallbackAccountType,
+  }
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
-    accountTypeOptions[0]!
+    fallbackOption
 
   const trimmedUsername = username.trim()
   const trimmedFullName = fullName.trim()
@@ -85,31 +95,39 @@ export function EditUserModal({
     !hasChanges ||
     trimmedUsername === '' ||
     trimmedFullName === '' ||
-    trimmedUsername.length > USERNAME_MAX_LENGTH
+    getUsernameValidationError(trimmedUsername, USERNAME_MAX_LENGTH) != null
 
   const handleClose = (): void => {
     clearErrors()
     onClose()
   }
 
-  const onSubmit = (): void => {
-    void updateUser({
+  const onSubmit = (data: FormValues): void => {
+    const didChangeRole = data.accountType !== user.accountType
+    const submittedTrimmedUsername = data.username.trim()
+    const submittedTrimmedFullName = data.fullName.trim()
+
+    const updatePromise = updateUser({
       username: user.username,
       request: {
         data: {
-          ...(trimmedUsername !== user.username
-            ? { username: trimmedUsername }
+          ...(submittedTrimmedUsername !== user.username
+            ? { username: submittedTrimmedUsername }
             : {}),
-          ...(trimmedFullName !== user.fullName
-            ? { fullName: trimmedFullName }
+          ...(submittedTrimmedFullName !== user.fullName
+            ? { fullName: submittedTrimmedFullName }
             : {}),
-          ...(accountType !== user.accountType ? { accountType } : {}),
+          ...(didChangeRole ? { accountType: data.accountType } : {}),
         },
       },
     })
+    updatePromise
       .then(() => {
         onUserUpdated?.()
         handleClose()
+        if (didChangeRole && loggedInUsername === user.username) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(error => {
         const formError = mapAuthUserMutationError<FormValues>(error, t)
@@ -122,6 +140,7 @@ export function EditUserModal({
   return createPortal(
     <ModalShell
       width="31.25rem"
+      overflow="visible"
       header={
         <WizardHeader
           title={t('desktop_edit_user')}
@@ -132,7 +151,11 @@ export function EditUserModal({
       }
     >
       <div className={styles.modal_content}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form
+          onSubmit={event => {
+            void handleSubmit(onSubmit)(event)
+          }}
+        >
           <div className={styles.form_fields}>
             <UserAccountIdentityFormFields
               autoFocusFirstField

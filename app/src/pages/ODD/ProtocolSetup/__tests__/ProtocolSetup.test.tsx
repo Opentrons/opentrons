@@ -255,7 +255,11 @@ describe('ProtocolSetup', () => {
       .calledWith(ROBOT_NAME)
       .thenReturn(FLEX_ROBOT_TYPE)
     when(vi.mocked(useRunControls))
-      .calledWith(RUN_ID)
+      .calledWith(
+        RUN_ID,
+        undefined,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
       .thenReturn({
         play: mockPlay,
         pause: () => {},

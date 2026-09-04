@@ -32,6 +32,14 @@ export function mapAuthUserMutationError<T extends FieldValues>(
         message: t('desktop_personal_account_settings_username_exists_error'),
       },
     }
+  } else if (errorId === 'usernameContainsInvalidCharacters') {
+    return {
+      field: 'username' as Path<T>,
+      error: {
+        type: 'server',
+        message: t('desktop_username_invalid_characters'),
+      },
+    }
   } else if (errorId === 'passwordTooShort') {
     const requiredLength = preferredError?.meta?.requiredLength ?? null
 
@@ -53,6 +61,14 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       error: {
         type: 'server',
         message: t('desktop_password_missing_special_characters'),
+      },
+    }
+  } else if (errorId === 'passwordContainsInvalidCharacters') {
+    return {
+      field: 'password' as Path<T>,
+      error: {
+        type: 'server',
+        message: t('desktop_password_invalid_characters'),
       },
     }
   } else if (errorId === 'passwordPreviouslyUsed') {
@@ -93,6 +109,10 @@ export function mapSetNewPasswordError(error: unknown, t: TFunction): string {
     return t('must_include_at_least_one_special_character', {
       ns: 'access_control',
     })
+  } else if (errorId === 'passwordContainsInvalidCharacters') {
+    return t('password_invalid_characters', {
+      ns: 'access_control',
+    })
   } else if (errorId === 'passwordPreviouslyUsed') {
     return t('desktop_password_previously_used')
   } else {
@@ -125,13 +145,19 @@ function getAuthErrorItems(error: unknown): AuthErrorItem[] {
 }
 
 /**
- * Prefer length failures over special-character failures when both are present.
+ * Prefer length failures, then disallowed characters, then special-character failures.
  */
 function getPreferredAuthErrorItem(error: unknown): AuthErrorItem | null {
   const items = getAuthErrorItems(error)
   const tooShort = items.find(item => item.id === 'passwordTooShort')
   if (tooShort != null) {
     return tooShort
+  }
+  const invalidCharacters = items.find(
+    item => item.id === 'passwordContainsInvalidCharacters'
+  )
+  if (invalidCharacters != null) {
+    return invalidCharacters
   }
   const missingSpecialCharacters = items.find(
     item => item.id === 'passwordMissingSpecialCharacters'

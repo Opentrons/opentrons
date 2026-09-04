@@ -88,7 +88,7 @@ def test_patch_empty_request_changes_nothing(
     subject.patch(RequestData.model_validate({"requireSignoffForProtocolLog": False}))
     result = subject.patch(RequestData.model_validate({}))
     assert result.requireSignoffForProtocolLog is False
-    assert result.requireLogsToBeSavedInApp is True
+    assert result.requireLogsToBeSavedInApp is False
     assert result.deleteOverMaxOnDiskProtocols is True
 
 

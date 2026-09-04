@@ -83,8 +83,20 @@ describe('getFieldValuesFromSettings', () => {
 describe('getAuthInputPatch', () => {
   it('should patch maxNumberOfLoginAttempts input', () => {
     expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '10', BASE_FIELD_VALUES)
-    ).toEqual({ data: { maxNumberOfLoginAttempts: 10 } })
+      getAuthInputPatch('maxNumberOfLoginAttempts', '3', BASE_FIELD_VALUES)
+    ).toEqual({ data: { maxNumberOfLoginAttempts: 3 } })
+  })
+
+  it('should not patch maxNumberOfLoginAttempts when value is invalid', () => {
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '0', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '6', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '3.5', BASE_FIELD_VALUES)
+    ).toBeNull()
   })
 
   it('should patch idleLogout input with minute conversion', () => {
@@ -109,7 +121,25 @@ describe('getAuthInputPatch', () => {
     ).toBeNull()
   })
 
+  it('should not patch passwordResetTime when value is below the minimum', () => {
+    expect(
+      getAuthInputPatch('passwordResetTime', '0', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', '-1', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', '0.5', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', 'abc', BASE_FIELD_VALUES)
+    ).toBeNull()
+  })
+
   it('should patch passwordResetTime with day conversion', () => {
+    expect(
+      getAuthInputPatch('passwordResetTime', '1', BASE_FIELD_VALUES)
+    ).toEqual({ data: { passwordResetTime: 1 * 24 * 60 * 60 } })
     expect(
       getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
     ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })

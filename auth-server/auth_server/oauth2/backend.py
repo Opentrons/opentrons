@@ -25,6 +25,7 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
+from auth_server.users.models import AccountType
 from auth_server.users.scopes import get_scope_set_of_user
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import must_reset_password, password_hash
@@ -107,6 +108,16 @@ class Backend:
     def revoke_all_tokens(self) -> None:
         """Invalidate every issued access and refresh token."""
         self._token_store.revoke_all()
+
+    def revoke_tokens_for_user(self, user_id: int) -> None:
+        """Invalidate every issued access and refresh token for one user."""
+        self._token_store.revoke_for_user(user_id)
+
+    def revoke_tokens_for_username(self, username: str) -> None:
+        """Invalidate every issued access and refresh token for the named user."""
+        user = self._user_store.get(username)
+        if user is not None:
+            self.revoke_tokens_for_user(user.id)
 
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
@@ -337,6 +348,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             failed_login_count=failed_login_count,
             max_attempts=max_login_attempts,
         )
+        if AccountType(user.account_type) == AccountType.SERVICE:
+            # Service accounts must remain usable for Opentrons maintenance.
+            # Failed attempts are still recorded and audited.
+            is_currently_locked = False
 
         if is_currently_locked or not password_is_correct:
             reason = (
@@ -622,6 +637,9 @@ class _TokenStore:
 
     def revoke_all(self) -> None:
         self._tokens.clear()
+
+    def revoke_for_user(self, user_id: int) -> None:
+        self._tokens = [token for token in self._tokens if token.user_id != user_id]
 
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:

@@ -19,6 +19,21 @@ function axiosError(errors: Array<{ id: string; meta?: object }>): unknown {
 }
 
 describe('mapAuthUserMutationError', () => {
+  it('maps usernameContainsInvalidCharacters to the username field', () => {
+    const result = mapAuthUserMutationError<{ username: string }>(
+      axiosError([{ id: 'usernameContainsInvalidCharacters' }]),
+      t
+    )
+
+    expect(result).toEqual({
+      field: 'username',
+      error: {
+        type: 'server',
+        message: 'desktop_username_invalid_characters',
+      },
+    })
+  })
+
   it('prefers passwordTooShort when special-character and length errors are both present', () => {
     const result = mapAuthUserMutationError<{ password: string }>(
       axiosError([
@@ -46,6 +61,15 @@ describe('mapSetNewPasswordError', () => {
         t
       )
     ).toBe('must_be_at_least_characters')
+  })
+
+  it('maps invalid password characters to the shared allowlist message', () => {
+    expect(
+      mapSetNewPasswordError(
+        axiosError([{ id: 'passwordContainsInvalidCharacters' }]),
+        t
+      )
+    ).toBe('password_invalid_characters')
   })
 
   it('maps a missing special character to the descriptive special-character message', () => {
