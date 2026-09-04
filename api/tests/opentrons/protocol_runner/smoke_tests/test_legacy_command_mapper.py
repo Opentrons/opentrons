@@ -43,7 +43,8 @@ async def simulate_and_get_commands(protocol_file: Path) -> list[commands.Comman
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     assert result.state_summary.errors == []
     assert result.state_summary.status == EngineStatus.SUCCEEDED
-    commands = [command for command in result.commands]
+    commands_list = await subject.get_all_commands()
+    commands = [command for command in commands_list]
     await subject.finish(
         drop_tips_after_run=False,
         set_run_status=False,
