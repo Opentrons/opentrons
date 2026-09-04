@@ -6,6 +6,7 @@ import {
   isAdminEquivalentAccountType,
   isForbiddenError,
   isProtocolWritePermissionError,
+  isRunSignoffRequiredError,
 } from '../utils'
 
 const GENERAL_ERROR = 'Protocol run could not be created on the robot.'
@@ -72,6 +73,40 @@ describe('getAuditLogDeleteErrorMessage', () => {
         generalMessage
       )
     ).toBe(generalMessage)
+  })
+})
+
+describe('isRunSignoffRequiredError', () => {
+  it('is true when the API error id is RunSignoffRequired', () => {
+    expect(
+      isRunSignoffRequiredError({
+        isAxiosError: true,
+        response: {
+          data: {
+            errors: [{ id: 'RunSignoffRequired' }],
+          },
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('is false for a different API error id', () => {
+    expect(
+      isRunSignoffRequiredError({
+        isAxiosError: true,
+        response: {
+          data: {
+            errors: [{ id: 'RunNotIdle' }],
+          },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for a generic Error', () => {
+    expect(
+      isRunSignoffRequiredError(new Error('One or more runs failed to delete'))
+    ).toBe(false)
   })
 })
 

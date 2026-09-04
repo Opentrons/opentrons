@@ -20,11 +20,10 @@ import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 
-// file-saver has circular dep, need to mock with factory to prevent error
-vi.mock('file-saver', async importOriginal => {
-  const actual = await importOriginal<any>()
-  return { ...actual, saveAs: vi.fn() }
-})
+vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
+  saveFileWithPicker: vi.fn().mockResolvedValue(undefined),
+  isFileSaveCanceledError: vi.fn(),
+}))
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/analytics')
 

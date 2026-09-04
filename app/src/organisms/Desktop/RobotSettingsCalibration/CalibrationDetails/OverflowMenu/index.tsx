@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { saveAs } from 'file-saver'
 import { css } from 'styled-components'
 
 import {
@@ -25,6 +24,10 @@ import {
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
+import {
+  isFileSaveCanceledError,
+  saveFileWithPicker,
+} from '/app/local-resources/files/saveFileWithPicker'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import {
@@ -129,15 +132,23 @@ export function OverflowMenu({
     })
 
     if (calType === 'pipetteOffset') {
-      saveAs(
-        new Blob([JSON.stringify(pipetteOffsetCalibrations)]),
-        `opentrons-${robotName}-pipette-offset-calibration.json`
-      )
+      void saveFileWithPicker(
+        `opentrons-${robotName}-pipette-offset-calibration.json`,
+        new Blob([JSON.stringify(pipetteOffsetCalibrations)])
+      ).catch((error: unknown) => {
+        if (!isFileSaveCanceledError(error)) {
+          throw error
+        }
+      })
     } else if (calType === 'tipLength') {
-      saveAs(
-        new Blob([JSON.stringify(tipLengthCalibrations)]),
-        `opentrons-${robotName}-tip-length-calibration.json`
-      )
+      void saveFileWithPicker(
+        `opentrons-${robotName}-tip-length-calibration.json`,
+        new Blob([JSON.stringify(tipLengthCalibrations)])
+      ).catch((error: unknown) => {
+        if (!isFileSaveCanceledError(error)) {
+          throw error
+        }
+      })
     }
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }

@@ -1,11 +1,11 @@
 import { useMutation } from 'react-query'
-import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import last from 'lodash/last'
 
 import { GET, request } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
+import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import { saveFileToUsb } from '/app/redux/shell/remote'
@@ -63,7 +63,7 @@ export function useDownloadRobotLogs(
     if (usbPath != null) {
       await saveFileToUsb(`${usbPath}/${filename}`, buffer)
     } else {
-      saveAs(new Blob([buffer]), filename)
+      await saveFileWithPicker(filename, buffer)
     }
   }
 

@@ -24,6 +24,10 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import {
+  isFileSaveCanceledError,
+  saveFileWithPicker,
+} from '/app/local-resources/files/saveFileWithPicker'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
@@ -83,26 +87,34 @@ export function DeviceResetSlideout({
         robotType: isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
       },
     })
-    saveAs(
+    void saveFileWithPicker(
+      `opentrons-${robotName}-calibration.json`,
       new Blob([
         JSON.stringify({
           deck: deckCalibrationData,
           pipetteOffset: pipetteOffsetCalibrations,
           tipLength: tipLengthCalibrations,
         }),
-      ]),
-      `opentrons-${robotName}-calibration.json`
-    )
+      ])
+    ).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   const downloadRunHistoryLogs: MouseEventHandler = e => {
     e.preventDefault()
     const runsHistory =
       runsQueryResponse != null ? runsQueryResponse.data?.data : []
-    saveAs(
-      new Blob([JSON.stringify(runsHistory)]),
-      `opentrons-${robotName}-runsHistory.json`
-    )
+    void saveFileWithPicker(
+      `opentrons-${robotName}-runsHistory.json`,
+      new Blob([JSON.stringify(runsHistory)])
+    ).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   const handleClearData = (): void => {

@@ -36,13 +36,7 @@ import type { ReactNode } from 'react'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
-import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
-
-const TOAST_STYLE: MakeToastOptions = {
-  closeButton: true,
-  width: '80%',
-}
 
 const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = [
   'download_log_period',
@@ -134,23 +128,18 @@ export function ComplianceReadySoftwareFiles({
         const toastId = makeToast(
           t('downloading_log_periods') as string,
           INFO_TOAST,
-          {
-            disableTimeout: true,
-            icon: toastIcon,
-            ...TOAST_STYLE,
-          }
+          { disableTimeout: true, icon: toastIcon }
         )
         await downloadLogPeriodsMutation
           .mutateAsync({ logPeriods })
           .then(() => {
             makeToast(
               t('files_successfully_downloaded') as string,
-              SUCCESS_TOAST,
-              TOAST_STYLE
+              SUCCESS_TOAST
             )
           })
           .catch((error: Error) => {
-            makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
+            makeToast(error.message, ERROR_TOAST, { closeButton: true })
           })
           .finally(() => {
             eatToast(toastId)
@@ -206,9 +195,19 @@ export function ComplianceReadySoftwareFiles({
               downloaded.deletionKey != null
           )
           if (deletableDownloads.length < logPeriods.length) {
-            makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
-              closeButton: true,
-            })
+            const allDownloaded = downloadedPeriods.length === logPeriods.length
+            makeToast(
+              (allDownloaded
+                ? t('in_progress_logs_cannot_be_deleted')
+                : t('some_logs_not_deleted')) as string,
+              WARNING_TOAST,
+              {
+                ...(allDownloaded
+                  ? { heading: t('unable_to_delete_audit_logs') }
+                  : {}),
+                closeButton: true,
+              }
+            )
           }
           if (deletableDownloads.length === 0) {
             return

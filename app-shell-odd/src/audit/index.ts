@@ -1,5 +1,5 @@
 import { constants } from 'fs'
-import { access, mkdir, rmdir } from 'fs/promises'
+import { access, mkdir, rm } from 'fs/promises'
 import path from 'path'
 
 import {
@@ -20,8 +20,6 @@ import type { Action, Dispatch } from '../types'
 export const MISSING_USB_DESTINATION_ERROR = 'No USB destination provided'
 export const UNWRITABLE_USB_DESTINATION_ERROR =
   'USB device not found or not writable'
-export const MISSING_DELETION_KEY_ERROR =
-  'Missing deletion key in download response'
 
 export function registerAudit(dispatch: Dispatch): Dispatch {
   return function handleActionForAudit(action: Action): void {
@@ -66,11 +64,6 @@ async function downloadAuditLog(
         deletionKey = response.headers.get('opentrons-log-period-deletion-key')
       },
     })
-
-    if (deletionKey == null) {
-      failDownload(dispatch, logPeriodId, MISSING_DELETION_KEY_ERROR)
-      return false
-    }
 
     dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
 
@@ -136,7 +129,7 @@ async function downloadAuditLogs(
   )
 
   if (results.every(succeeded => !succeeded)) {
-    await rmdir(outputDirectory)
+    await rm(outputDirectory, { recursive: true, force: true })
   }
 }
 

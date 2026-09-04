@@ -9,6 +9,8 @@ const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
 
+const RUN_SIGNOFF_REQUIRED = 'RunSignoffRequired'
+
 /** Admin and service accounts share the same privileged robot permissions. */
 export function isAdminEquivalentAccountType(
   accountType: AuthUserAccountType | undefined
@@ -45,6 +47,16 @@ export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
 
 export function isForbiddenError(error: unknown): error is AxiosError {
   return isAxiosError(error) && error.response?.status === 403
+}
+
+export function isRunSignoffRequiredError(error: unknown): boolean {
+  if (!isAxiosError(error)) {
+    return false
+  }
+  const errorId = (
+    error.response?.data as { errors?: Array<{ id?: unknown }> } | undefined
+  )?.errors?.[0]?.id
+  return errorId === RUN_SIGNOFF_REQUIRED
 }
 
 export function getAuditLogDeleteErrorMessage(

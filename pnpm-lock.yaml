@@ -420,9 +420,6 @@ importers:
       events:
         specifier: 3.0.0
         version: 3.0.0
-      file-saver:
-        specifier: 2.0.1
-        version: 2.0.1
       history:
         specifier: 4.7.2
         version: 4.7.2
@@ -517,9 +514,6 @@ importers:
       '@types/classnames':
         specifier: 2.2.5
         version: 2.2.5
-      '@types/file-saver':
-        specifier: 2.0.1
-        version: 2.0.1
       '@types/hls.js':
         specifier: 1.0.0
         version: 1.0.0
