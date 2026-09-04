@@ -41,6 +41,7 @@ def subject(mock_client: Client, request: pytest.FixtureRequest) -> AuditLogger:
         auto_log_response_head=True,
         auto_log_request_body=True,
         auto_log_response_body=True,
+        auto_log_request_full_headers=True,
     )
 
 
@@ -60,6 +61,7 @@ def parametrized_subject(
             auto_log_response_head=True,
             auto_log_request_body=True,
             auto_log_response_body=True,
+            auto_log_request_full_headers=True,
         )
         .set_action("a")
         .set_username("u")
