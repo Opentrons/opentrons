@@ -184,7 +184,6 @@ async def construct_run_result(
     Of note, in order to prevent copies of the data appearing in both the robot-server and
     the protocol process the commands are deleted to preserve memory.
     """
-
     command_length = await run_coordinator.get_length()
     commands: List[Command] = []
     while command_length > 0:

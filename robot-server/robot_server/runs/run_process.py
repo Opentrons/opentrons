@@ -413,9 +413,11 @@ class DirectedRunProcess(AbstractRunCoordinator):
         )
 
     async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
         return await self._guaranteed_run_orchestrator.get_length()
 
     async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
         await self._guaranteed_run_orchestrator.delete_command_slice_end(length)
 
     async def get_command_annotations_slice(

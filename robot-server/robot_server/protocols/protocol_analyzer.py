@@ -6,7 +6,6 @@ from typing import List, Optional, Union
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
 from opentrons.config import feature_flags
-from opentrons.protocol_engine import Command
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -16,7 +15,6 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
-from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot.types import RobotType

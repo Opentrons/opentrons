@@ -230,8 +230,8 @@ async def test_analyze(
             deck_configuration=[],
         )
     ).then_return(
-        protocol_runner.RunResult(
-            commands=[analysis_command],
+        protocol_runner.EngineRunResult(
+            # commands=[analysis_command],
             state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,
                 errors=[],
@@ -247,7 +247,7 @@ async def test_analyze(
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
-            command_annotations=[new_command_annotation],
+            # command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )

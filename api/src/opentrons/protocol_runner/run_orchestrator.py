@@ -314,6 +314,7 @@ class RunOrchestrator(AbstractRunCoordinator):
         )
 
     async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
         return self._protocol_engine.state_view.commands.get_length()
 
     async def get_commands_deleted(self) -> bool:
@@ -321,6 +322,7 @@ class RunOrchestrator(AbstractRunCoordinator):
         return self._commands_deleted
 
     async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
         self._commands_deleted = True
         self._protocol_engine.state_view.commands.delete_end_slice(length)
 
