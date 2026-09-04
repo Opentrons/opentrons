@@ -194,7 +194,7 @@ async def construct_run_result(
         )
         await run_coordinator.delete_command_slice_end(100)
         commands[:0] = latest_commands.commands
-        command_length = await run_coordinator.get_length()
+        command_length -= len(latest_commands.commands)
 
     return RunResult(
         state_summary=await run_coordinator.get_state_summary(),
