@@ -124,10 +124,14 @@ export function RecentProtocolRuns({
             {t('run_history')}
           </StyledText>
           <div className={styles.header_actions}>
-            <BasicButton onClick={handleDownloadSelected} iconName="download">
+            <BasicButton
+              onClick={handleDownloadSelected}
+              iconName="download"
+              underLine
+            >
               {t('download_all')}
             </BasicButton>
-            <BasicButton onClick={handleClickDeleteAll}>
+            <BasicButton onClick={handleClickDeleteAll} underLine>
               {t('delete_all')}
             </BasicButton>
           </div>
