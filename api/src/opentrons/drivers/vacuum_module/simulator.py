@@ -30,6 +30,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.target_rpm = 0
         self.current_rpm = 0
         self._pending_async_error: Optional[SerialException] = None
+        self._waste_detection_enabled = False
 
     def inject_async_error(self, error: SerialException) -> None:
         """Queue an async module error to raise on the next polled driver read."""
@@ -187,8 +188,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         max_window_time: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
-        pass
+        self._waste_detection_enabled = enable_waste_full_detection
 
     async def get_waste_configs(self) -> WasteConfigParameters:
         """Get the waste full detection configs"""
-        return WasteConfigParameters(False, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        return WasteConfigParameters(
+            self._waste_detection_enabled, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        )

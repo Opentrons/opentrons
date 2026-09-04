@@ -8,6 +8,8 @@ import StackerAnalysis from './StackerAnalysis.json'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 import './styles.css'
+import '@opentrons/components/styles/global'
+import '@opentrons/protocol-visualization/styles'
 
 import { useState } from 'react'
 
@@ -131,6 +133,7 @@ function VisualizationPage(): JSX.Element {
         <ProtocolVisualization
           analysis={showFlex ? analysis : ot2Analysis}
           groupedCommands={null}
+          appType="web"
         />
       </div>
     </main>
