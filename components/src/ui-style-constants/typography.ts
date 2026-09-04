@@ -3,12 +3,21 @@ import { css } from 'styled-components'
 import { COLORS } from '../helix-design-system'
 
 // Font Sizes
+// Note: since we are migrating to CSS Modules
+// basicall using the following isn't recommended
 export const fontSize80 = '5rem' // 80px
+export const fontSize39 = '2.4375rem' // 39px
 export const fontSize38 = '2.375rem' // 38px
 export const fontSize32 = '2rem' // 32px
 export const fontSize28 = '1.75rem' // 28px
+export const fontSize26 = '1.625rem' // 26px
+export const fontSize24 = '1.5rem' // 24px
+export const fontSize23 = '1.375rem' // 23px
 export const fontSize22 = '1.375rem' // 22px
 export const fontSize20 = '1.25rem' // 20px
+export const fontSize18 = '1.125rem' // 18px
+export const fontSize16 = '1rem' // 16px
+export const fontSize12 = '0.75rem' // 12px
 export const fontSizeH1 = '1.188rem' // 19px
 export const fontSizeH2 = '0.9375rem' // 15px
 export const fontSizeH3 = '0.875rem' // 14px

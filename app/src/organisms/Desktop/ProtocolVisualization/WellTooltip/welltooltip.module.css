@@ -10,7 +10,7 @@
     0 3px 6px rgb(0 0 0 / 23%);
   color: white;
   cursor: pointer;
-  font-size: var(--font-size-caption);
+  font-size: var(--font-size-10);
   font-weight: var(--font-weight-regular);
   pointer-events: none;
 }
