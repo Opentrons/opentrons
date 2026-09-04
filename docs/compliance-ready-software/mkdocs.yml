@@ -1,0 +1,62 @@
+site_name: compliance-ready-software
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  favicon: images/favicon.png
+  logo: images/logo.png
+
+extra_css:
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
+  - ../shared/print-pdf.css
+
+markdown_extensions:
+  - toc:
+      permalink: true 
+      title: Table of Contents 
+  - admonition 
+  - abbr 
+  - pymdownx.blocks.caption 
+  - md_in_html 
+  - attr_list 
+  - pymdownx.blocks.caption 
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
+      enumerate_headings: false
+
+nav:
+  
+  - Comliance Ready Software Instruction Manual: index.md
+  - Getting Started: 
+      - Activation: activation.md
+      - Roles: roles.md
+      - Settings: settings.md
+  - Using Compliance Ready Software:
+      - Using Compliance Ready Software: using/index.md 
+      - Logging in: using/login.md
+      - Document actions: using/documentation.md
+      - Running a protocol: using/running.md 
+      - Completing a protocol: using/complete.md
+      - Accessing files: using/files.md
+  - Additional Features: 
+      - Security: security.md 
+      - Devices: devices.md
+      - Administrator settings: admin.md
+  - Appendices: 
+      - Documented Actions: actions.md
+      - Glossary: glossary.md
