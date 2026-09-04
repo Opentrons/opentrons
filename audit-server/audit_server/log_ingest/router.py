@@ -203,7 +203,6 @@ async def store_robot_log(  # noqa: C901
     """Store a robot log with the current log period."""
     supporting_message_data: SubmitSupportingFileMessageData | None = None
     stored_file_hash: str | None = None
-    stored_file_name: str | None = None
 
     supporting_message_data = SubmitSupportingFileMessageData.model_validate_json(
         await supporting_info.read()
@@ -216,7 +215,7 @@ async def store_robot_log(  # noqa: C901
         )
 
     try:
-        stored_file_hash = await log_data_manager.store_robot_log(
+        stored_file_details = await log_data_manager.store_robot_log(
             robot_log=file, robot_log_path=robot_logs_directory
         )
     except KeyStorageUnavailableError as exc:
@@ -227,14 +226,15 @@ async def store_robot_log(  # noqa: C901
             ),
         ) from exc
 
-    if stored_file_hash:
+    if stored_file_details:
+        stored_file_hash, stored_file_path = stored_file_details
         ingest_time = datetime.datetime.now(datetime.timezone.utc)
         message = AuditLogMessage(
             action=ACTION_STORE_RUNLOG,
             accountName=supporting_message_data.accountName,
             legalName=supporting_message_data.legalName,
             message=json.dumps(
-                {"fileHash": stored_file_hash, "filePath": stored_file_name}
+                {"fileHash": stored_file_hash, "filePath": stored_file_path}
             ),
             reason=supporting_message_data.reason,
             loggedAt=ingest_time,
@@ -252,6 +252,8 @@ async def store_robot_log(  # noqa: C901
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(
-            data=StoreRobotLogResponseData(loggingEnabled=stored_file_hash is not None)
+            data=StoreRobotLogResponseData(
+                loggingEnabled=stored_file_details is not None
+            )
         ),
     )
