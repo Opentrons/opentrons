@@ -73,6 +73,8 @@ exclude = ["key_server/_version.py"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
 # macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
 dependency-metadata = [

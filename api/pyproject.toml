@@ -158,6 +158,8 @@ known-first-party = ["opentrons_shared_data", "opentrons_hardware"]
 known-local-folder = ["opentrons"]
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders

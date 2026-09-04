@@ -148,16 +148,16 @@ eval "$(pyenv init -)"
 
 [uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```shell
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```shell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.zprofile`:
@@ -195,16 +195,16 @@ On Windows, we rely on:
 
 [uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.12.1/install.ps1 | iex"
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```powershell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 #### 4. Install build tools via Visual Studio Installer
@@ -225,16 +225,16 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 
 [uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```shell
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```shell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.bashrc` or `~/.profile`:
