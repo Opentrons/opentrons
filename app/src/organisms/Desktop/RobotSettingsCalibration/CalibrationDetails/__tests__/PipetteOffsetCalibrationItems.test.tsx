@@ -8,21 +8,21 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
-import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/resources/instruments'
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '/app/resources/instruments/__fixtures__'
 
 import { OverflowMenu } from '../OverflowMenu'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { formatLastCalibrated } from '../utils'
 
 import type { ComponentProps } from 'react'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 const render = (
   props: ComponentProps<typeof PipetteOffsetCalibrationItems>

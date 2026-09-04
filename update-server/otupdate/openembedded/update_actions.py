@@ -161,7 +161,7 @@ class OT3UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -314,3 +314,11 @@ class OT3UpdateActions(UpdateActionsInterface):
                 os.remove(filepath)
             except Exception:
                 LOG.exception(f"Could not delete update file {filepath}.")
+
+    def restart(self) -> None:
+        """Restart the robot."""
+        subprocess.check_call(["reboot"])
+
+    def shutdown(self) -> None:
+        """Shut down the robot."""
+        subprocess.check_call(["shutdown", "-h", "now"])

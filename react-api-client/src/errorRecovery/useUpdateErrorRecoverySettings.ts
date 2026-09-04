@@ -1,8 +1,7 @@
-import { useMutation } from 'react-query'
-
 import { updateErrorRecoverySettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -14,6 +13,7 @@ import type {
   ErrorRecoverySettingsRequest,
   ErrorRecoverySettingsResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseUpdateErrorRecoverySettingsMutationResult = UseMutationResult<
   ErrorRecoverySettingsResponse,
@@ -27,18 +27,27 @@ export type UseUpdateErrorRecoverySettingsMutationResult = UseMutationResult<
   >
 }
 
+export type UseUpdateErrorRecoverySettingsMutationOptions = UseMutationOptions<
+  ErrorRecoverySettingsResponse,
+  AxiosError,
+  ErrorRecoverySettingsRequest
+>
+
 export function useUpdateErrorRecoverySettings(
-  options: UseMutationOptions<
+  documentationState: DocumentationState,
+  options: UseUpdateErrorRecoverySettingsMutationOptions = {}
+): UseUpdateErrorRecoverySettingsMutationResult {
+  const host = useHost()
+  const mutation = useDocumentedMutation<
     ErrorRecoverySettingsResponse,
     AxiosError,
     ErrorRecoverySettingsRequest
-  > = {}
-): UseUpdateErrorRecoverySettingsMutationResult {
-  const host = useHost()
-  const mutation = useMutation(
-    [host, 'errorRecovery', 'settings'],
-    (settings: ErrorRecoverySettingsRequest) =>
-      updateErrorRecoverySettings(host!, settings)
+  >(
+    documentationState,
+    ['update_error_recovery_settings'],
+    getQueryKey(host, 'errorRecovery', 'settings'),
+    ({ variables: settings, userNotes }) =>
+      updateErrorRecoverySettings(host!, settings, userNotes)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

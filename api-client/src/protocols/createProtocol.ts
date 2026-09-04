@@ -14,7 +14,8 @@ export function createProtocol(
   protocolKey?: string,
   protocolKind?: string,
   runTimeParameterValues?: RunTimeParameterValuesCreateData,
-  runTimeParameterFiles?: RunTimeParameterFilesCreateData
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData,
+  userNotes?: string
 ): ResponsePromise<Protocol> {
   const formData = new FormData()
   files.forEach(file => {
@@ -39,5 +40,8 @@ export function createProtocol(
     )
   }
 
-  return request<Protocol, FormData>(POST, '/protocols', formData, config)
+  return request<Protocol, FormData>(POST, '/protocols', config, {
+    body: formData,
+    userNotes,
+  })
 }

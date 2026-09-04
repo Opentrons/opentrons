@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateDeckConfiguration } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -12,6 +13,7 @@ import type {
 } from 'react-query'
 import type { ErrorResponse } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DocumentationState } from '../accessControl'
 
 export type UseUpdateDeckConfigurationMutationResult = UseMutationResult<
   DeckConfiguration,
@@ -32,25 +34,29 @@ export type UseUpdateDeckConfigurationMutationOptions = UseMutationOptions<
 >
 
 export function useUpdateDeckConfigurationMutation(
+  documentationState: DocumentationState,
   options: UseUpdateDeckConfigurationMutationOptions = {}
 ): UseUpdateDeckConfigurationMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     DeckConfiguration,
     AxiosError<ErrorResponse>,
     DeckConfiguration
   >(
-    [host, 'deck_configuration'],
-    (deckConfig: DeckConfiguration) =>
-      updateDeckConfiguration(host!, deckConfig).then(response => {
-        queryClient
-          .invalidateQueries([host, 'deck_configuration'])
-          .catch((e: Error) => {
-            throw e
-          })
-        return response.data?.data?.cutoutFixtures ?? []
+    documentationState,
+    ['update_deck_configuration'],
+    getQueryKey(host, 'deck_configuration'),
+    ({ variables: deckConfig, userNotes }) =>
+      updateDeckConfiguration(host!, deckConfig, userNotes).then(response => {
+        const updatedDeckConfiguration =
+          response.data?.data?.cutoutFixtures ?? []
+        queryClient.setQueryData(
+          getQueryKey(host, 'deck_configuration'),
+          updatedDeckConfiguration
+        )
+        return updatedDeckConfiguration
       }),
     options
   )

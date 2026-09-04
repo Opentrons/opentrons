@@ -13,8 +13,7 @@ export interface SearchLabwareOffsetsRequest {
     id?: string
     definitionUri?: string
     locationSequence?:
-      | LabwareOffsetLocationSequenceComponent[]
-      | typeof ANY_LOCATION
+      LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
     mostRecentOnly?: boolean
   }>
 }
@@ -36,5 +35,5 @@ export function searchLabwareOffsets(
   return request<
     SearchLabwareOffsetsResponse,
     { data: SearchLabwareOffsetsRequest }
-  >(POST, '/labwareOffsets/searches', { data }, config)
+  >(POST, '/labwareOffsets/searches', config, { body: { data } })
 }

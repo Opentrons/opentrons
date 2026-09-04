@@ -79,6 +79,8 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <ContentArea zIndex={zIndex} position={position} noPadding={noPadding}>
         <ModalArea
           aria-label="ModalShell_ModalArea"
+          role="dialog"
+          aria-modal="true"
           isFullPage={fullPage}
           onClick={(e: MouseEvent) => {
             e.stopPropagation()
@@ -155,4 +157,7 @@ const Header = styled.div`
   background-color: ${COLORS.white};
   position: ${POSITION_STICKY};
   top: 0;
+  overflow: hidden;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 `

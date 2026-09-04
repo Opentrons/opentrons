@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -38,9 +38,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -99,15 +101,23 @@ export function ProtocolSetupLabware({
         mostRecentAnalysis?.labware ?? [],
         mostRecentAnalysis?.modules ?? []
       ),
-    [mostRecentAnalysis]
+    [
+      mostRecentAnalysis?.commands,
+      mostRecentAnalysis?.labware,
+      mostRecentAnalysis?.modules,
+    ]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
+  const sortedStartingDeckEntries = useMemo(
+    () =>
+      Object.entries(getStacksWithLabware(startingDeck))
+        .filter(([location]) => location !== 'offDeck')
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
+    [startingDeck]
+  )
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -123,16 +133,39 @@ export function ProtocolSetupLabware({
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
+  )
+
+  const handleProceed = useHandleAndLog(
+    () => {
+      setIsConfirmed(true)
+      setSetupScreen('prepare to run')
+    },
+    'confirm_placements',
+    {
+      action: 'confirmed liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
+    }
   )
 
   return (
@@ -169,10 +202,7 @@ export function ProtocolSetupLabware({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
+                onClick={handleProceed}
                 buttonCategory="rounded"
               />
             )}
@@ -203,9 +233,9 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(([key, value], index) => (
+                {sortedStartingDeckEntries.map(([key, value]) => (
                   <RowLabware
-                    key={index}
+                    key={key}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={key}
@@ -214,12 +244,12 @@ export function ProtocolSetupLabware({
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.map((item, index) => (
+                {offDeckItems.map(item => (
                   <RowLabware
-                    key={index}
+                    key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
                     stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
@@ -229,11 +259,14 @@ export function ProtocolSetupLabware({
               </>
             )}
           </Flex>
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
               setShowMapView(mapView => !mapView)
             }}
+            aria-label={
+              showMapView ? t('display_list_view') : t('display_map_view')
+            }
           />
         </>
       )}
@@ -257,8 +290,9 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =
-    useCreateLiveCommandMutation()
+    useCreateLiveCommandMutation(documentationState)
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -273,8 +307,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
@@ -496,7 +529,7 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => {
             const quantityTag = offDeckQuantity ?? labware.quantity
             return (
-              <>
+              <Fragment key={labware.labwareId}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -552,7 +585,7 @@ function RowLabware({
                     />
                   ) : null}
                 </Flex>
-              </>
+              </Fragment>
             )
           })}
         </Flex>

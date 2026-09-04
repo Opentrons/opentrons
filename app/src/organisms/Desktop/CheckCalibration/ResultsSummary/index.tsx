@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { saveAs } from 'file-saver'
 import find from 'lodash/find'
 
 import {
@@ -14,16 +13,20 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 
-import { LEFT, RIGHT } from '/app/redux/pipettes'
+import {
+  isFileSaveCanceledError,
+  saveFileWithPicker,
+} from '/app/local-resources/files/saveFileWithPicker'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '/app/redux/sessions'
 
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { CalibrationResult } from './CalibrationResult'
 import { RenderMountInformation } from './RenderMountInformation'
 
+import type { Mount } from '@opentrons/api-client'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
-import type { Mount } from '/app/redux/pipettes/types'
 import type {
   CalibrationCheckComparisonsPerCalibration,
   CalibrationCheckInstrument,
@@ -53,7 +56,13 @@ export function ResultsSummary(
     const data = new Blob([JSON.stringify(report, null, 4)], {
       type: 'application/json',
     })
-    saveAs(data, 'Robot Calibration Check Report.json')
+    void saveFileWithPicker('Robot Calibration Check Report.json', data).catch(
+      (error: unknown) => {
+        if (!isFileSaveCanceledError(error)) {
+          throw error
+        }
+      }
+    )
   }
 
   const leftPipette = find(

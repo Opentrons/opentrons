@@ -2,15 +2,23 @@
   "name": "eslint-plugin-opentrons",
   "version": "0.0.0",
   "description": "Rules about importing different parts of the app code",
-  "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin"
+  ],
   "author": "Opentrons Engineering",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "lint": "npm-run-all \"lint:*\"",
     "lint:eslint-docs": "npm-run-all \"update:eslint-docs -- --check\"",
     "lint:js": "eslint .",
+    "generate:mutating-api-client-exports": "node ./generate-mutating-api-client-exports.js",
+    "check:mutating-api-client-exports": "node ./generate-mutating-api-client-exports.js --check",
     "test": "mocha tests --recursive",
     "update:eslint-docs": "eslint-doc-generator"
   },

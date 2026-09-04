@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -8,19 +8,26 @@ import {
   PrimaryButton,
   SUCCESS_TOAST,
 } from '@opentrons/components'
-import { useCreateProtocolMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useCreateProtocolMutation,
+} from '@opentrons/react-api-client'
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isProtocolWritePermissionError } from '/app/local-resources/access-control/utils'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotSlideout, SendingButtonLabel } from '../ChooseRobotSlideout'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
@@ -44,26 +51,49 @@ export function SendProtocolToFlexSlideout(
   const { isExpanded, onCloseClick, storedProtocolData } = props
   const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
     storedProtocolData
-  const { t } = useTranslation(['protocol_details', 'protocol_list'])
+  const { t } = useTranslation([
+    'protocol_details',
+    'protocol_list',
+    'access_control',
+  ])
 
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
+  const [runCreationError, setRunCreationError] = useState<string | null>(null)
+  const [isSending, setIsSending] = useState(false)
 
   const isSelectedRobotOnDifferentSoftwareVersion =
     useIsRobotOnWrongVersionOfSoftware(selectedRobot?.name ?? '')
 
   const { eatToast, makeToast } = useToaster()
 
-  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
-    {},
-    selectedRobot != null
+  const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
+
+  // TODO(jj, 2026-07-08): Remove all manual host configs
+  const hostConfig = useMemo(() => {
+    return selectedRobot != null
       ? {
           hostname: selectedRobot.ip,
+          robotName: selectedRobot.name,
+          token,
+          port: selectedRobot.port,
           requestor:
             selectedRobot?.ip === OPENTRONS_USB
               ? appShellUSBRequestor
               : undefined,
         }
       : null
+  }, [selectedRobot, token])
+
+  const documentationState = useDocumentationState(
+    undefined,
+    selectedRobot?.name,
+    hostConfig
+  )
+
+  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
+    documentationState,
+    {},
+    hostConfig
   )
 
   const isAnalyzing = useSelector((state: State) =>
@@ -92,6 +122,11 @@ export function SendProtocolToFlexSlideout(
   const icon: IconProps = { name: 'ot-spinner', spin: true }
 
   const handleSendClick = (): void => {
+    if (isSending) {
+      return
+    }
+    setIsSending(true)
+    setRunCreationError(null)
     const toastId = makeToast(selectedRobot?.name ?? '', INFO_TOAST, {
       heading: `${t('sending')} ${protocolDisplayName}`,
       icon,
@@ -110,61 +145,79 @@ export function SendProtocolToFlexSlideout(
         })
         onCloseClick()
       })
-      .catch(
-        (
-          error: AxiosError<{
-            errors: Array<{ id: string; detail: string; title: string }>
-          }>
-        ) => {
-          eatToast(toastId)
-          const [errorDetail] = error?.response?.data?.errors ?? []
-          const { id, detail, title } = errorDetail ?? {}
-          if (id != null && detail != null && title != null) {
-            makeToast(detail, ERROR_TOAST, {
-              closeButton: true,
-              disableTimeout: true,
-              heading: `${protocolDisplayName} ${title} - ${
-                selectedRobot?.name ?? ''
-              }`,
-            })
-          } else {
-            makeToast(selectedRobot?.name ?? '', ERROR_TOAST, {
-              closeButton: true,
-              disableTimeout: true,
-              heading: `${t('unsuccessfully_sent')} ${protocolDisplayName}`,
-            })
-          }
-          onCloseClick()
+      .catch((error: unknown) => {
+        eatToast(toastId)
+        if (isDocumentedMutationError(error)) {
+          return
         }
-      )
+        if (isProtocolWritePermissionError(error)) {
+          setRunCreationError(
+            t(
+              'access_control:send_protocol_admin_credentials_required'
+            ) as string
+          )
+          return
+        }
+        const axiosError = error as AxiosError<{
+          errors: Array<{ id: string; detail: string; title: string }>
+        }>
+        const [errorDetail] = axiosError.response?.data?.errors ?? []
+        const { id, detail, title } = errorDetail ?? {}
+        if (id != null && detail != null && title != null) {
+          makeToast(detail, ERROR_TOAST, {
+            closeButton: true,
+            disableTimeout: true,
+            heading: `${protocolDisplayName} ${title} - ${
+              selectedRobot?.name ?? ''
+            }`,
+          })
+        } else {
+          makeToast(selectedRobot?.name ?? '', ERROR_TOAST, {
+            closeButton: true,
+            disableTimeout: true,
+            heading: `${t('unsuccessfully_sent')} ${protocolDisplayName}`,
+          })
+        }
+        onCloseClick()
+      })
+      .finally(() => {
+        setIsSending(false)
+      })
   }
 
   return (
-    <ChooseRobotSlideout
-      isExpanded={isExpanded}
-      isSelectedRobotOnDifferentSoftwareVersion={
-        isSelectedRobotOnDifferentSoftwareVersion
-      }
-      onCloseClick={onCloseClick}
-      title={t('protocol_list:send_to_robot', {
-        robot_display_name: FLEX_DISPLAY_NAME,
-      })}
-      footer={
-        <PrimaryButton
-          disabled={
-            selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
-          }
-          onClick={handleSendClick}
-          width="100%"
-        >
-          {t('protocol_details:send')}
-        </PrimaryButton>
-      }
-      selectedRobot={selectedRobot}
-      setSelectedRobot={setSelectedRobot}
-      robotType={FLEX_ROBOT_TYPE}
-      isAnalysisError={analysisStatus === 'error'}
-      isAnalysisStale={analysisStatus === 'stale'}
-    />
+    <ApiHostProvider robotName={selectedRobot?.name ?? null}>
+      <ChooseRobotSlideout
+        isExpanded={isExpanded}
+        isSelectedRobotOnDifferentSoftwareVersion={
+          isSelectedRobotOnDifferentSoftwareVersion
+        }
+        onCloseClick={onCloseClick}
+        title={t('protocol_list:send_to_robot', {
+          robot_display_name: FLEX_DISPLAY_NAME,
+        })}
+        footer={
+          <PrimaryButton
+            disabled={
+              selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
+            }
+            onClick={handleSendClick}
+            width="100%"
+          >
+            {isSending ? <SendingButtonLabel /> : t('protocol_details:send')}
+          </PrimaryButton>
+        }
+        selectedRobot={selectedRobot}
+        setSelectedRobot={setSelectedRobot}
+        robotType={FLEX_ROBOT_TYPE}
+        runCreationError={runCreationError}
+        isCreatingRun={isSending}
+        reset={() => {
+          setRunCreationError(null)
+        }}
+        isAnalysisError={analysisStatus === 'error'}
+        isAnalysisStale={analysisStatus === 'stale'}
+      />
+    </ApiHostProvider>
   )
 }

@@ -107,6 +107,7 @@ export const SlotDetailModal = (
   const isHopper = Object.values(modules).some(
     ({ slot, model }) => slot === slotName && model === FLEX_STACKER_MODULE_V1
   )
+  const isVacuumDock = labwareOnDeck.stack.includes('vacuumDock')
 
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
@@ -114,7 +115,12 @@ export const SlotDetailModal = (
         {t('labware_in')}
       </StyledText>
       <RobotInfoLabel
-        deckLabel={getDeckLabel(slotName, isHopper, t as TFunction)}
+        deckLabel={getDeckLabel(
+          slotName,
+          isHopper,
+          isVacuumDock,
+          t as TFunction
+        )}
       />
     </Flex>
   )

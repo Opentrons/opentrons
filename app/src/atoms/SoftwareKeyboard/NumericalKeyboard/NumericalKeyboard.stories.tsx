@@ -11,11 +11,12 @@ import {
 import { NumericalKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const meta: Meta<typeof NumericalKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
   component: NumericalKeyboard,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     isDecimal: {
       control: {
@@ -40,7 +41,8 @@ const Keyboard = (args): JSX.Element => {
   const { isDecimal, hasHyphen } = args
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   return (
     <div
       style={{
@@ -50,6 +52,7 @@ const Keyboard = (args): JSX.Element => {
     >
       <form id="test_form">
         <TouchInputField
+          ref={inputElementRef}
           value={value}
           type="text"
           label="Numerical keyboard input"
@@ -72,9 +75,8 @@ const Keyboard = (args): JSX.Element => {
       >
         {showKeyboard && (
           <NumericalKeyboard
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-            onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal={isDecimal}
             hasHyphen={hasHyphen}
           />

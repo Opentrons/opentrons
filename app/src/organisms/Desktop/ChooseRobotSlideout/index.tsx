@@ -71,6 +71,8 @@ import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtoc
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
 
+export { SendingButtonLabel } from './SendingButtonLabel'
+
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
@@ -221,15 +223,10 @@ export function ChooseRobotSlideout(
         return robots
       } else {
         return robots.filter(robot => {
-          const displayName = robot.displayName.toLowerCase()
           const name = robot.name.toLowerCase()
           const model = robot.robotModel.toLowerCase()
 
-          return (
-            displayName.includes(query) ||
-            name.includes(query) ||
-            model.includes(query)
-          )
+          return name.includes(query) || model.includes(query)
         })
       }
     },

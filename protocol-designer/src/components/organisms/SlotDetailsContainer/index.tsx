@@ -4,13 +4,16 @@ import { useSelector } from 'react-redux'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
+  VACUUM_MODULE_A3_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
+import { VACUUM_MODULE_SLOT } from '/protocol-designer/constants'
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
@@ -44,9 +47,15 @@ export function SlotDetailsContainer(
     return null
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
-  const adjustedSlotToFindModule = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
+  const isVacuumModuleMainArea = slot === VACUUM_MODULE_A3_ADDRESSABLE_AREA
+  let adjustedSlotToFindModule = slot
+  if (isSlotAHopper) {
+    adjustedSlotToFindModule =
+      FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  } else if (isSlotAVacuumDock || isVacuumModuleMainArea) {
+    adjustedSlotToFindModule = VACUUM_MODULE_SLOT
+  }
 
   const {
     modules: deckSetupModules,
@@ -71,8 +80,11 @@ export function SlotDetailsContainer(
   )
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
-    slot,
-    isSlotAHopper
+    // need to special case this for now, since the main vacuum addressable area maps to slot A3 for stack logic
+    // this will not be necessary once addressable areas are the source of truth in an upcoming large-scale refactor
+    isVacuumModuleMainArea ? VACUUM_MODULE_SLOT : slot,
+    isSlotAHopper,
+    isSlotAVacuumDock
   )
   const topLocationLabwareId =
     fullStackFromLabwares?.length > 0
@@ -125,6 +137,13 @@ export function SlotDetailsContainer(
     )
     labwareIds.forEach(id => {
       labwares.push(deckSetupLabwares[id].def.metadata.displayName)
+    })
+  } else if (isSlotAVacuumDock && fullStackFromLabwares?.length > 0) {
+    // For vacuum dock, show all labware in the stack
+    fullStackFromLabwares.forEach(id => {
+      if (deckSetupLabwares[id] != null) {
+        labwares.push(nickNames[id])
+      }
     })
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {

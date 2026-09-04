@@ -3,19 +3,38 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import isEqual from 'lodash/isEqual'
 
+import { isAdminEquivalentAccountType } from '/app/local-resources/access-control/utils'
+
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
 
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type { Draft, PayloadAction } from '@reduxjs/toolkit'
+import type { AuthUserAccountType } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 export interface RobotAuthState {
-  [robotName: string]: PerRobotAuthState | undefined
+  perRobotAuthStates: {
+    [robotName: string]: PerRobotAuthState | undefined
+  }
+
+  /** The robotName of the robot that's most recently been logged into. */
+  mostRecentRobotName: string | null
 }
 
-interface PerRobotAuthState {
+export interface LoggedInUserProfile {
   /** The username that we're currently logged in as. */
   username: string
+
+  /** The user's legal name returned from GET /auth/users/self at login. */
+  fullName: string
+
+  /** The account type returned from GET /auth/users/self at login. */
+  accountType: AuthUserAccountType
+}
+
+export interface PerRobotAuthState {
+  /** Profile data returned from GET /auth/users/self at login. */
+  user: LoggedInUserProfile
 
   /** The OAuth 2 access token, for making robot API requests. */
   accessToken: string
@@ -33,15 +52,24 @@ interface PerRobotAuthState {
   expiresAt: number | null
 }
 
-export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {}
+export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {
+  perRobotAuthStates: {},
+  mostRecentRobotName: null,
+}
 
 /** Stores the result of logging in to a robot, of refreshing an existing login. */
 interface LogInOrRefreshPayload {
   robotName: string
-  username: string
+  user: LoggedInUserProfile
   accessToken: string
   refreshToken: string | null
   expiresAt: number | null
+}
+
+interface UpdateLoggedInUserProfilePayload {
+  robotName: string
+  username: string
+  fullName: string
 }
 
 /** Stores the result of logging out of a robot, or of a login naturally timing out. */
@@ -53,21 +81,68 @@ const robotAuthSlice = createSlice({
   name: 'robotAuth',
   initialState: INITIAL_ROBOT_AUTH_STATE,
   reducers: {
-    logInOrRefresh(state, action: PayloadAction<LogInOrRefreshPayload>) {
-      const { robotName, ...robotAuthState } = action.payload
-      state[robotName] = robotAuthState
+    logIn: (stateDraft, action: PayloadAction<LogInOrRefreshPayload>) => {
+      logInOrRefresh(stateDraft, action.payload)
     },
-    logOutOrTimeOut(state, action: PayloadAction<LogOutOrTimeOutPayload>) {
-      // dynamic-delete is normal and fine with Immer and Redux.
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete state[action.payload.robotName]
+    refreshLogin: (
+      stateDraft,
+      action: PayloadAction<LogInOrRefreshPayload>
+    ) => {
+      logInOrRefresh(stateDraft, action.payload)
+    },
+    logOut: (stateDraft, action: PayloadAction<LogOutOrTimeOutPayload>) => {
+      logOutOrTimeOut(stateDraft, action.payload)
+    },
+    timeOutLogin: (
+      stateDraft,
+      action: PayloadAction<LogOutOrTimeOutPayload>
+    ) => {
+      logOutOrTimeOut(stateDraft, action.payload)
+    },
+    updateLoggedInUserProfile: (
+      stateDraft,
+      action: PayloadAction<UpdateLoggedInUserProfilePayload>
+    ) => {
+      const { robotName, username, fullName } = action.payload
+      const authState = stateDraft.perRobotAuthStates[robotName]!
+      authState.user.username = username
+      authState.user.fullName = fullName
     },
   },
 })
 
+function logInOrRefresh(
+  stateDraft: Draft<RobotAuthState>,
+  payload: LogInOrRefreshPayload
+): void {
+  const { robotName, user, accessToken, refreshToken, expiresAt } = payload
+  stateDraft.perRobotAuthStates[robotName] = {
+    user,
+    accessToken,
+    refreshToken,
+    expiresAt,
+  }
+  stateDraft.mostRecentRobotName = robotName
+}
+
+function logOutOrTimeOut(
+  stateDraft: Draft<RobotAuthState>,
+  payload: LogOutOrTimeOutPayload
+): void {
+  // dynamic-delete is normal and fine with Immer and Redux.
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  delete stateDraft.perRobotAuthStates[payload.robotName]
+}
+
 export const robotAuthReducer = robotAuthSlice.reducer
 
-export const { logInOrRefresh, logOutOrTimeOut } = robotAuthSlice.actions
+export const {
+  logIn,
+  refreshLogin,
+  logOut,
+  timeOutLogin,
+  updateLoggedInUserProfile,
+} = robotAuthSlice.actions
 
 export type RobotAuthAction = ActionTypesFromSlice<
   typeof robotAuthSlice.actions
@@ -77,7 +152,31 @@ export function getAuthStateForRobot(
   state: State,
   robotName: string
 ): PerRobotAuthState | null {
-  return state.robotAuth?.[robotName] ?? null
+  return state.robotAuth?.perRobotAuthStates[robotName] ?? null
+}
+
+export function getUsernameForRobot(
+  state: State,
+  robotName: string | null
+): string | null {
+  if (robotName == null) {
+    return null
+  }
+  return getAuthStateForRobot(state, robotName)?.user.username ?? null
+}
+
+export function getLoggedInUserForRobot(
+  state: State,
+  robotName: string
+): LoggedInUserProfile | null {
+  return getAuthStateForRobot(state, robotName)?.user ?? null
+}
+
+/** True when the logged-in user has admin-equivalent privileges. */
+export function getIsAdminForRobot(state: State, robotName: string): boolean {
+  return isAdminEquivalentAccountType(
+    getAuthStateForRobot(state, robotName)?.user.accountType
+  )
 }
 
 /**
@@ -97,6 +196,11 @@ export const getLocalRobotAuthState = createSelector(
       return getAuthStateForRobot(state, localRobotName)
     }
   }
+)
+
+export const getMostRecentRobotName = createSelector(
+  (state: State) => state,
+  (state: State): string | null => state.robotAuth.mostRecentRobotName
 )
 
 export const getLocalRobotAccessToken = createSelector(
@@ -129,7 +233,7 @@ export const getCurrentUsernameForLocalRobot = createSelector(
   (state: State) => getLocalRobot(state)?.name ?? null,
   (state: State, localRobotName: string | null): string | null => {
     if (localRobotName == null) return null
-    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+    return getAuthStateForRobot(state, localRobotName)?.user.username ?? null
   }
 )
 
@@ -139,9 +243,11 @@ interface GetNextExpirationResult {
 }
 
 export const getNextExpiration = createSelector(
-  (state: State) => state.robotAuth,
-  (robotAuthState: RobotAuthState): GetNextExpirationResult | null =>
-    Object.entries(robotAuthState).reduce<GetNextExpirationResult | null>(
+  (state: State) => state.robotAuth.perRobotAuthStates,
+  (
+    perRobotAuthStates: RobotAuthState['perRobotAuthStates']
+  ): GetNextExpirationResult | null =>
+    Object.entries(perRobotAuthStates).reduce<GetNextExpirationResult | null>(
       (acc, [candidateName, candidateState]) => {
         if (
           candidateState?.expiresAt != null &&

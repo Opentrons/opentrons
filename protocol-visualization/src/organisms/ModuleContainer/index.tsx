@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { Chip, RobotInfoLabel, StyledText } from '@opentrons/components'
@@ -15,6 +16,7 @@ import {
 import { ModuleStatusContainer } from '../ModuleStatusContainer'
 import styles from './modulecontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 
 interface ModuleContainerProps {
@@ -22,6 +24,7 @@ interface ModuleContainerProps {
   moduleEntities: ModuleEntities
   moduleRobotState: RobotState['modules']
   slotId: string
+  headerPortalEl?: HTMLElement | null
 }
 
 export function ModuleContainer({
@@ -29,7 +32,8 @@ export function ModuleContainer({
   moduleEntities,
   moduleRobotState,
   slotId,
-}: ModuleContainerProps): JSX.Element {
+  headerPortalEl,
+}: ModuleContainerProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   const { model } = moduleEntities[moduleId]
   const { moduleState } = moduleRobotState[moduleId]
@@ -224,13 +228,19 @@ export function ModuleContainer({
       )
   }
 
+  const header = (
+    <>
+      <RobotInfoLabel deckLabel={slotId} />
+      <StyledText desktopStyle="bodyDefaultSemiBold">
+        {moduleDisplayName}
+      </StyledText>
+    </>
+  )
+
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>
-        <RobotInfoLabel deckLabel={slotId} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {moduleDisplayName}
-        </StyledText>
+        {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
         {moduleDetails}
       </div>
     </div>

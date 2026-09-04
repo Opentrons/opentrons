@@ -66,7 +66,11 @@ export const customViewports = {
 }
 
 export const parameters = {
-  viewport: { viewports: customViewports },
+  viewport: {
+    options: {
+      ...customViewports,
+    },
+  },
   options: {
     storySort: {
       method: 'alphabetical',

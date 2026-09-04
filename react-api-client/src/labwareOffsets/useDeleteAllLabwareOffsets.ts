@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { deleteAllLabwareOffsets } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
 
@@ -18,10 +18,12 @@ export function useDeleteAllLabwareOffsetsMutation(): UseDeleteAllLabwareOffsets
   const host = useHost()
   const queryClient = useQueryClient()
 
+  // Directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this hook.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<null, unknown>(() =>
     deleteAllLabwareOffsets(host!).then(response => {
       queryClient
-        .invalidateQueries([host, 'labwareOffsets'])
+        .invalidateQueries(getQueryKey(host, 'labwareOffsets'))
         .catch((e: Error) => {
           console.error(`error invalidating labwareOffsets query: ${e.message}`)
         })

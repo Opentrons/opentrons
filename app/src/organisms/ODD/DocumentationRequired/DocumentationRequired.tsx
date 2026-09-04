@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import NiceModal from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
@@ -7,21 +8,34 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
+
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 interface DocumentationRequiredProps {
   username: string
+  actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
   onBack: () => void
+  minReportLength: number
+  initialDocreport?: DocumentationReport
 }
 
 export function DocumentationRequired({
   username,
+  actionsToDocument,
   onConfirm,
   onBack,
+  minReportLength,
+  initialDocreport,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const [inputText, setInputText] = useState<string>('')
+  const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
+  const [error, setError] = useState<string | null>(null)
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -30,10 +44,32 @@ export function DocumentationRequired({
     setKeyboardExpanded(prev => !prev)
   }
 
+  const handleInputChange = (value: string): void => {
+    setInputText(value)
+    setError(null)
+  }
+
   const trimmedNote = inputText.trim()
   const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
+    if (trimmedNote.length < minReportLength) {
+      setError(
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
+      )
+      return
+    }
     onConfirm(trimmedNote)
+  }
+
+  const handleViewActions = async (): Promise<void> => {
+    await NiceModal.show(ActionsView, {
+      actionsToDocument,
+    })
   }
 
   return (
@@ -43,13 +79,12 @@ export function DocumentationRequired({
           header={t('documentation_required')}
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
-          buttonIsDisabled={trimmedNote === ''}
           secondaryButtonProps={{
             buttonText: 'View actions',
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
-            onClick: () => {},
+            onClick: handleViewActions,
           }}
           onClickBack={onBack}
         />
@@ -64,15 +99,14 @@ export function DocumentationRequired({
           >
             <div className={styles.text_area_field_fill}>
               <TouchTextAreaField
+                multiline
                 autoFocus
                 value={inputText}
                 ref={textAreaRef}
                 label={t('access_control_note', { user: username })}
+                error={error}
                 onChange={e => {
-                  setInputText(e.target.value)
-                }}
-                onBlur={e => {
-                  e.target.focus()
+                  handleInputChange(e.target.value)
                 }}
               />
             </div>
@@ -85,11 +119,8 @@ export function DocumentationRequired({
           onToggle={handleKeyboardToggle}
         >
           <FullKeyboard
-            onChange={(input: string) => {
-              setInputText(input)
-              textAreaRef.current?.focus()
-            }}
             keyboardRef={keyboardRef}
+            inputElementRef={textAreaRef}
           />
         </AccordionKeyboard>
       </div>

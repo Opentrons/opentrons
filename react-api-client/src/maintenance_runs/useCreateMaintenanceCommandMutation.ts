@@ -1,22 +1,26 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
+import type {
+  CommandData,
+  CreateMaintenanceCommandParams,
+} from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
-interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
+interface CreateMaintenanceCommandMutateParams extends CreateMaintenanceCommandParams {
   maintenanceRunId: string
   command: CreateCommand
-  waitUntilComplete?: boolean
-  timeout?: number
 }
 
 export type UseCreateMaintenanceCommandMutationResult = UseMutationResult<
@@ -37,33 +41,60 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
   CreateMaintenanceCommandMutateParams
 >
 
-export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceCommandMutationResult {
+export function useCreateMaintenanceCommandMutation(
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void
+): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CommandData,
     unknown,
     CreateMaintenanceCommandMutateParams
-  >(({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
-    createMaintenanceCommand(host!, maintenanceRunId, command, {
-      waitUntilComplete,
-      timeout,
-    })
-      .then(response => {
-        queryClient
-          .invalidateQueries([host, 'maintenance_runs'])
-          .catch((e: Error) => {
-            console.error(
-              `error invalidating maintenance runs query: ${e.message}`
-            )
-          })
-        return response.data
-      })
-      .catch((e: any) => {
-        queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
-        throw e
-      })
+  >(
+    documentationState,
+    actionsToDocument,
+    ({
+      variables: {
+        maintenanceRunId,
+        command,
+        waitUntilComplete,
+        timeout,
+        requiresClosedDoor = true,
+      },
+      userNotes,
+    }: DocumentedMutationParameters<CreateMaintenanceCommandMutateParams>) =>
+      createMaintenanceCommand(
+        host!,
+        maintenanceRunId,
+        command,
+        {
+          waitUntilComplete,
+          timeout,
+          requiresClosedDoor,
+        },
+        userNotes
+      )
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating maintenance runs query: ${e.message}`
+              )
+            })
+
+          addActionToDocument(response.data.data)
+          return response.data
+        })
+        .catch((e: any) => {
+          queryClient.invalidateQueries(
+            getQueryKey(host, 'robot/control/estopStatus')
+          )
+          throw e
+        })
   )
 
   return {

@@ -1,6 +1,5 @@
 import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -18,6 +17,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
@@ -53,7 +53,6 @@ export function SummaryAndSettings(
   const { exitButtonProps, state: wizardFlowState, analyticsStartTime } = props
   const navigate = useNavigate()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
-  const queryClient = useQueryClient()
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
@@ -72,14 +71,14 @@ export function SummaryAndSettings(
     initializeSummaryState
   )
 
-  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
+  const documentationState = useDocumentationState()
+  const { mutateAsync: createProtocolAsync } =
+    useCreateProtocolMutation(documentationState)
 
   const { createRun } = useCreateRunMutation(
+    documentationState,
     {
       onSuccess: data => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
         navigate(`/runs/${data.data.id}/setup`)
       },
     },

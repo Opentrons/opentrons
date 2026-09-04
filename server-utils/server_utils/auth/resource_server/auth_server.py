@@ -10,9 +10,16 @@ import typing
 from abc import ABC, abstractmethod
 
 import aiohttp
-import pydantic
+
+from .types import (
+    AuthSettingsResponse,
+    ClientIDType,
+    TokenIntrospectionRequestFormData,
+    TokenIntrospectionResponse,
+)
 
 SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
+ALL_AUTH_SETTINGS_ENDPOINT_PATH = "auth/settings"
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 
@@ -25,7 +32,6 @@ TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 # in our requests here. If it isn't, we should use a client_id separate from the
 # Opentrons App, like "opentrons_resource_server" or something.
 CLIENT_ID: ClientIDType = "opentrons_app"
-ClientIDType: typing.TypeAlias = typing.Literal["opentrons_app"]
 
 
 class Client(ABC):
@@ -117,41 +123,3 @@ class LocalHTTPClient(Client):
         response.raise_for_status()
         parsed_response = TokenIntrospectionResponse.model_validate_json(response_bytes)
         return parsed_response
-
-
-class _StrictBaseModel(pydantic.BaseModel):
-    model_config = {"strict": True}
-
-
-class TokenIntrospectionResponse(_StrictBaseModel):
-    """A response body from auth-server's token introspection endpoint.
-
-    This is specified by https://datatracker.ietf.org/doc/html/rfc7662#section-2.2.
-    """
-
-    active: bool
-    scope: str = ""
-    username: str | None = None
-
-
-class TokenIntrospectionRequestFormData(typing.TypedDict):
-    """Form data for a request to auth-server's token introspection endpoint.
-
-    This is specified by https://datatracker.ietf.org/doc/html/rfc7662#section-2.1.
-    """
-
-    token: str
-
-    client_id: ClientIDType
-
-
-class AuthSettingsResponse(_StrictBaseModel):
-    """A response body from auth-server's /settings endpoint."""
-
-    data: AuthSettingsResponseData
-
-
-class AuthSettingsResponseData(_StrictBaseModel):
-    """Response body data from auth-server's /settings endpoint."""
-
-    accessControlEnabled: bool

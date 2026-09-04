@@ -66,9 +66,7 @@ export const roundValue = (
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
 const GENERIC: 'GENERIC' = 'GENERIC'
 export type Error =
-  | typeof TOO_MANY_DECIMALS
-  | typeof OUT_OF_BOUNDS
-  | typeof GENERIC
+  typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS | typeof GENERIC
 
 export const getErrorText = (args: {
   errors: Error[]

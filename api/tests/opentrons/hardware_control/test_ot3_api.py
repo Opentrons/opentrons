@@ -82,6 +82,7 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
     TempDeck,
     Thermocycler,
+    VacuumModule,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.ot3api import OT3API
@@ -618,6 +619,32 @@ def mock_backend_get_tip_status(hardware_backend: OT3Simulator) -> Iterator[Asyn
         hardware_backend, "get_tip_status", AsyncMock()
     ) as mock_tip_status:
         yield mock_tip_status
+
+
+async def test_verify_tip_presence_simulates_probe_attachment_on_simulator(
+    ot3_hardware: ThreadManager[OT3API],
+    managed_obj: OT3API,
+    hardware_backend: OT3Simulator,
+) -> None:
+    """Simulator tip sensors are absent; verifying PRESENT should succeed."""
+    pipette_config = load_pipette_data.load_definition(
+        PipetteModelType("p1000"),
+        PipetteChannelType(8),
+        PipetteVersionType(3, 4),
+        PipetteOEMType.OT,
+    )
+    instr_data = AttachedPipette(config=pipette_config, id="fakepip")
+    await ot3_hardware.cache_pipette(OT3Mount.RIGHT, instr_data, None)
+
+    assert hardware_backend.current_tip_state(OT3Mount.RIGHT) is False
+
+    await managed_obj.verify_tip_presence(
+        OT3Mount.RIGHT,
+        TipStateType.PRESENT,
+        InstrumentProbeType.PRIMARY,
+    )
+
+    assert hardware_backend.current_tip_state(OT3Mount.RIGHT) is True
 
 
 @pytest.fixture
@@ -2566,11 +2593,12 @@ async def test_estop_event_deactivate_module(
     hs = decoy.mock(cls=HeaterShaker)
     md = decoy.mock(cls=MagDeck)
     td = decoy.mock(cls=TempDeck)
+    vm = decoy.mock(cls=VacuumModule)
 
     decoy.when(hs.speed_status).then_return(SpeedStatus.HOLDING)
 
     decoy.when(api._backend.module_controls.available_modules).then_return(
-        [tc, hs, md, td]
+        [tc, hs, md, td, vm]
     )
 
     estop_event = EstopStateNotification(old_state=old_state, new_state=new_state)
@@ -2589,6 +2617,7 @@ async def test_estop_event_deactivate_module(
             await hs.deactivate_shaker(must_be_running=False),
             await md.deactivate(must_be_running=False),
             await td.deactivate(must_be_running=False),
+            await vm.deactivate(must_be_running=False),
         )
     else:
         assert len(futures) == 0

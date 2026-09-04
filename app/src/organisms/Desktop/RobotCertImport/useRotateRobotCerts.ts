@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query'
 
 import { getPlaintextCACertificates } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { tryInstallPlaintextRobotCertificate } from '/app/redux/shell/remote'
 
@@ -41,7 +41,7 @@ export function useRotateRobotCerts(): UseQueryResult<boolean> {
         certificateData: maybeCert.cert_data,
       })
     },
-    queryKey: [host, 'rotate-robot-certs'],
+    queryKey: getQueryKey(host, 'rotate-robot-certs'),
     refetchInterval: 24 * 60 * 60 * 1000,
     staleTime: 24 * 60 * 60 * 1000,
     enabled: host != null,

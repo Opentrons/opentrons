@@ -1,24 +1,33 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
-import { customDisplayForIndividual } from '../constants'
+import {
+  customDisplayForIndividual,
+  softwareKeyboardButtonAttributes,
+} from '../constants'
+import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
 
 import '../index.css'
 import './index.css'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface IndividualKeyProps {
-  onChange: (input: string) => void
   keyboardRef: MutableRefObject<KeyboardReactInterface | null>
+  /**
+   * The underlying element that the software keyboard should type into.
+   * See `useSoftwareKeyboardControl()`.
+   */
+  inputElementRef: SoftwareKeyboardControlOptions['inputElementRef']
   keyText: string
   debug?: boolean
 }
 
 export function IndividualKey({
-  onChange,
   keyboardRef,
+  inputElementRef,
   keyText,
   debug = false,
 }: IndividualKeyProps): JSX.Element {
@@ -27,23 +36,28 @@ export function IndividualKey({
       default: [`${keyText}`],
     },
   }
+
+  const { beforeInputUpdate, onChange } = useSoftwareKeyboardControl({
+    keyboardRef,
+    inputElementRef,
+  })
+
   return (
-    /*
-     *  autoUseTouchEvents: for Flex on-device app
-     *  useButtonTag: this is for testing purpose that each key renders as a button
-     */
     <Keyboard
       keyboardRef={r => {
         keyboardRef.current = r
       }}
       theme="hg-theme-default oddTheme1 individual-key"
       onChange={onChange}
+      beforeInputUpdate={beforeInputUpdate}
       layoutName="default"
       display={customDisplayForIndividual}
-      useButtonTag={true}
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
       {...numericalKeyboard}
       width="100%"
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

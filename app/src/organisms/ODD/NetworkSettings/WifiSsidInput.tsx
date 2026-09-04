@@ -30,6 +30,7 @@ export function WifiSsidInput({
 }: WifiSsidInputProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   return (
@@ -48,27 +49,19 @@ export function WifiSsidInput({
           {t('enter_network_name')}
         </LegacyStyledText>
         <TouchInputField
+          ref={inputRef}
           autoFocus
           aria-label="wifi_ssid"
           value={inputSsid}
-          id="wifiSsid"
           onChange={e => {
             setInputSsid(e.target.value)
           }}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-        <FullKeyboard
-          onChange={e => {
-            e != null && setInputSsid(e)
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <FullKeyboard inputElementRef={inputRef} keyboardRef={keyboardRef} />
       </Flex>
     </>
   )

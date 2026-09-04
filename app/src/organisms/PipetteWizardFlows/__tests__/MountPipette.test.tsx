@@ -9,7 +9,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { CheckPipetteButton } from '../CheckPipetteButton'
@@ -40,6 +40,9 @@ describe('MountPipette', () => {
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
       setFetching: vi.fn(),
@@ -91,7 +94,7 @@ describe('MountPipette', () => {
       isFetching: true,
     }
     render(props)
-    screen.getAllByTestId('Skeleton')
+    screen.getAllByRole('status')
     const backBtn = screen.getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })

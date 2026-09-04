@@ -18,6 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     TemperatureStatus,
     ThermocyclerStep,
+    VacuumModuleStep,
 )
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
@@ -43,6 +44,16 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     @abstractmethod
     def get_display_name(self) -> str:
         """Get the module's display name."""
+
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            "inject_async_gcode_response is not supported by this module."
+        )
 
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
@@ -552,6 +563,14 @@ class AbstractVacuumModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+
+    @abstractmethod
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+
+    @abstractmethod
     def start_set_vacuum_pressure(
         self,
         gauge_pressure_mbar: float,
@@ -559,7 +578,8 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+        equalize_timeout_s: int | None = None,
+    ) -> AbstractTaskCore:
         """Set vacuum pressure."""
 
     @abstractmethod
@@ -570,7 +590,8 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+        equalize_timeout_s: int | None = None,
+    ) -> AbstractTaskCore:
         """Set vacuum power."""
 
     @abstractmethod
@@ -578,3 +599,26 @@ class AbstractVacuumModuleCore(
         self,
     ) -> None:
         """Stop the vacuum pump."""
+
+    @abstractmethod
+    def start_execute_profile(
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int,
+        vent_after: bool = False,
+        equalize_timeout_s: int | None = None,
+    ) -> AbstractTaskCore:
+        """Start a vacuum module profile."""
+
+    @abstractmethod
+    def open_vent(
+        self,
+        equalize_timeout_s: int | None = None,
+    ) -> None:
+        """Open the vent."""
+
+    @abstractmethod
+    def close_vent(
+        self,
+    ) -> None:
+        """Close the vent."""

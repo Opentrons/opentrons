@@ -7,8 +7,6 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyStacker } from './hooks'
-
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -22,7 +20,13 @@ interface CheckStackerInstallProps extends ModuleSetupWizardMaybePipetteStepProp
 export function CheckStackerInstall(
   props: CheckStackerInstallProps
 ): JSX.Element {
-  const { proceed, isOnDevice, doorOpenStatus, attachedModules } = props
+  const {
+    proceed,
+    isOnDevice,
+    doorOpenStatus,
+    attachedModules,
+    sendIdentifyModule,
+  } = props
   const { t, i18n } = useTranslation([
     'module_wizard_flows',
     'shared',
@@ -49,17 +53,16 @@ export function CheckStackerInstall(
     } else {
       if (attachedStacker != null) {
         // Transition back to standard identify for stacker
-        sendIdentifyStacker(attachedStacker, true, 'blue')
+        sendIdentifyModule(attachedStacker, true, 'blue')
       }
       proceed()
     }
   }
 
-  const sendIdentifyStacker = useSendIdentifyStacker()
   const handleTryAgain = (): void => {
     if (attachedStacker != null) {
       // Set the stacker to red
-      sendIdentifyStacker(attachedStacker, true, 'red')
+      sendIdentifyModule(attachedStacker, true, 'red')
     }
     setStackerNotInstalled(false)
   }

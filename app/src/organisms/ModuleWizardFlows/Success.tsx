@@ -14,11 +14,9 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-
-import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -46,16 +44,16 @@ export function Success(props: SuccessProps): JSX.Element {
     isOnDevice,
     restartSetup,
     setSelectedModule,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyStacker = useSendIdentifyStacker()
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 
   const handleOnClick = (restart: boolean): void => {
     if (restart) {
       setSelectedModule(null)
-      sendIdentifyStacker(attachedModule, false)
+      sendIdentifyModule(attachedModule, false)
       restartSetup()
       return
     }

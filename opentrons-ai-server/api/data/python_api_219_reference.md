@@ -795,7 +795,7 @@ Nozzle layouts numbering between 2\-7 nozzles, account for the distance from
 
 New in version 2\.16\.
 
-consolidate(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'List\[labware.Well]'_, _dest: 'labware.Well'_, _\\\*args: 'Any'_, _\\\*\\\*kwargs: 'Any'_) → 'InstrumentContext'
+consolidate(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'List\[labware.Well]'_, _dest: 'labware.Well'_, _\\\*args: 'Any'_, _\\\*\\\\*kwargs: 'Any'_) → 'InstrumentContext'
 Move liquid from multiple source wells to a single destination well.
 
 Parameters:
@@ -897,7 +897,7 @@ Changed in version 2\.17: Behavior of the `volume` parameter.
 
 New in version 2\.0\.
 
-distribute(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'labware.Well'_, _dest: 'List\[labware.Well]'_, _\\\*args: 'Any'_, _\\\*\\\*kwargs: 'Any'_) → 'InstrumentContext'
+distribute(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'labware.Well'_, _dest: 'List\[labware.Well]'_, _\\\*args: 'Any'_, _\\\*\\\\*kwargs: 'Any'_) → 'InstrumentContext'
 Move a volume of liquid from one source to multiple destinations.
 
 Parameters:
@@ -1385,7 +1385,7 @@ This instance.
 
 New in version 2\.0\.
 
-transfer(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'AdvancedLiquidHandling'_, _dest: 'AdvancedLiquidHandling'_, _trash: 'bool' \= True_, _\\\*\\\*kwargs: 'Any'_) → 'InstrumentContext'
+transfer(_self_, _volume: 'Union\[float_, _Sequence\[float]]'_, _source: 'AdvancedLiquidHandling'_, _dest: 'AdvancedLiquidHandling'_, _trash: 'bool' \= True_, _\\\*\\\\*kwargs: 'Any'_) → 'InstrumentContext'
 Move liquid from one well or group of wells to another.
 
 Transfer is a higher\-level command, incorporating other

@@ -1,7 +1,12 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { usePlayRunMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  usePlayRunMutation,
+} from '@opentrons/react-api-client'
+
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryActionMutation } from '../useRecoveryActionMutation'
@@ -10,6 +15,7 @@ import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client', () => ({
   usePlayRunMutation: vi.fn(),
+  isDocumentedMutationError: vi.fn(),
 }))
 
 describe('useRecoveryActionMutation', () => {
@@ -22,6 +28,7 @@ describe('useRecoveryActionMutation', () => {
     mockMutateAsync = vi.fn()
     mockIsLoading = false
     mockProceedToRouteAndStep = vi.fn().mockResolvedValue(undefined)
+    vi.mocked(isDocumentedMutationError).mockReturnValue(false)
 
     vi.mocked(usePlayRunMutation).mockReturnValue({
       mutateAsync: mockMutateAsync,
@@ -31,9 +38,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return resumeRecovery and isResumeRecoveryLoading', () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     expect(result.current).toHaveProperty('resumeRecovery')
@@ -43,9 +54,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return updated isResumeRecoveryLoading when it changes', () => {
     const { result, rerender } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     expect(result.current.isResumeRecoveryLoading).toBe(false)
@@ -63,9 +78,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should call mutateAsync with runId when resumeRecovery is called', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     mockMutateAsync.mockResolvedValue('MOCK_RESULT')
@@ -77,9 +96,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should handle error and proceed to error route when resumeRecovery fails', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     mockMutateAsync.mockRejectedValue(new Error('MOCK_ERROR'))
@@ -91,5 +114,24 @@ describe('useRecoveryActionMutation', () => {
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
     )
+  })
+
+  it('should not route to the error screen when documentation is cancelled', async () => {
+    const mockError = new Error('No documentation report provided')
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    mockMutateAsync.mockRejectedValue(mockError)
+
+    const { result } = renderHook(() =>
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
+    )
+
+    await expect(result.current.resumeRecovery()).rejects.toBe(mockError)
+    expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
   })
 })

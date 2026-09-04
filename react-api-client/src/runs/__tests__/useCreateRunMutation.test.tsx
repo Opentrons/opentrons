@@ -6,6 +6,7 @@ import { createRun } from '@opentrons/api-client'
 
 import { useCreateRunMutation } from '..'
 import { mockRunResponse, PROTOCOL_ID } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -41,9 +42,12 @@ describe('useCreateRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRun).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCreateRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useCreateRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.createRun({})
@@ -58,9 +62,12 @@ describe('useCreateRunMutation hook', () => {
       data: mockRunResponse,
     } as Response<Run>)
 
-    const { result } = renderHook(() => useCreateRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useCreateRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.createRun(createRunData))
 
     await waitFor(() => {
@@ -75,9 +82,12 @@ describe('useCreateRunMutation hook', () => {
       data: mockRunResponse,
     } as Response<Run>)
 
-    const { result } = renderHook(() => useCreateRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useCreateRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.createRun(createRunData))
 
     await waitFor(() => {

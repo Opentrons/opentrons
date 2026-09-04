@@ -4,7 +4,7 @@ import enum
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.errors import EnumeratedError, GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -42,7 +42,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import RunResult
+from opentrons.protocol_runner.protocol_runner import EngineRunResult
 from opentrons.types import NozzleMapInterface
 
 
@@ -75,7 +75,9 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
         ...
 
@@ -85,12 +87,12 @@ class AbstractRunCoordinator(ABC):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         ...
 
     @abstractmethod
-    def pause(self) -> None:
+    async def pause(self) -> None:
         """Pause the run."""
         ...
 
@@ -100,7 +102,7 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
         ...
 
@@ -116,22 +118,22 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         ...
 
     @abstractmethod
-    def get_preconditions(self) -> CommandPreconditions:
+    async def get_preconditions(self) -> CommandPreconditions:
         """Get the preconditions of a protocol run."""
         ...
 
     @abstractmethod
-    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+    async def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
         ...
 
     @abstractmethod
-    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the list of run time parameters defined in the protocol, if any.
 
         This returns a list of all run time parameters with their validated definitions
@@ -149,32 +151,32 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_all_command_annotations(self) -> List[CommandAnnotation]:
+    async def get_all_command_annotations(self) -> List[CommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
         ...
 
     @abstractmethod
-    def get_total_command_annotations_count(self) -> int:
+    async def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations defined in the protocol, if any."""
         ...
 
     @abstractmethod
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+    async def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the command annotation by ID."""
         ...
 
     @abstractmethod
-    def get_current_command(self) -> Optional[CommandPointer]:
+    async def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
         ...
 
     @abstractmethod
-    def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
+    async def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
         ...
 
     @abstractmethod
-    def get_command_slice(
+    async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
@@ -187,14 +189,29 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_command_annotations_slice(
+    async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        ...
+
+    @abstractmethod
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        ...
+
+    @abstractmethod
+    async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        ...
+
+    @abstractmethod
+    async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
         """Get a slice of command annotations in the run."""
         ...
 
     @abstractmethod
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self,
         cursor: int,
         length: int,
@@ -210,66 +227,66 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
         ...
 
     @abstractmethod
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
         ...
 
     @abstractmethod
-    def get_all_commands(self) -> List[Command]:
+    async def get_all_commands(self) -> List[Command]:
         """Get all run commands."""
         ...
 
     @abstractmethod
-    def get_command_errors(self) -> List[ErrorOccurrence]:
+    async def get_command_errors(self) -> List[ErrorOccurrence]:
         """Get all run command errors."""
         ...
 
     @abstractmethod
-    def get_run_status(self) -> EngineStatus:
+    async def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         ...
 
     @abstractmethod
-    def get_is_run_terminal(self) -> bool:
+    async def get_is_run_terminal(self) -> bool:
         """Get whether engine is in a terminal state."""
         ...
 
     @abstractmethod
-    def get_camera_capture_image_settings(
+    async def get_camera_capture_image_settings(
         self,
     ) -> Dict[str, Any]:
         """Get camera capture image settings."""
         ...
 
     @abstractmethod
-    def run_has_started(self) -> bool:
+    async def run_has_started(self) -> bool:
         """Get whether the run has started."""
         ...
 
     @abstractmethod
-    def run_has_stopped(self) -> bool:
+    async def run_has_stopped(self) -> bool:
         """Get whether the run has stopped."""
         ...
 
     @abstractmethod
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
         ...
 
     @abstractmethod
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         ...
 
     @abstractmethod
-    def add_camera_enablement_settings(
+    async def add_camera_enablement_settings(
         self,
         enablement_settings: CameraSettings,
     ) -> CameraSettings:
@@ -277,7 +294,7 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def add_camera_capture_image_settings(
+    async def add_camera_capture_image_settings(
         self,
         camera_id: Optional[str] = None,
         resolution: Optional[Tuple[int, int]] = None,
@@ -302,13 +319,16 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def estop(self) -> None:
+    async def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         ...
 
     @abstractmethod
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -348,7 +368,7 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_is_okay_to_clear(self) -> bool:
+    async def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly, so it could be removed."""
         ...
 
@@ -368,21 +388,21 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
+    async def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
         ...
 
     @abstractmethod
-    def get_tip_attached(self) -> Dict[str, bool]:
+    async def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
         ...
 
     @abstractmethod
-    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+    async def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         ...
 
     @abstractmethod
-    def clear_command_history(self) -> None:
+    async def clear_command_history(self) -> None:
         """Force cleanup of command history."""
         ...

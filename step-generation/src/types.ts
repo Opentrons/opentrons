@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   AddressableArea,
+  CommonArgs,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -16,6 +17,7 @@ import type {
   ModuleType,
   PipetteMount as Mount,
   NozzleConfigurationStyle,
+  OpentronsAIArgs,
   PipetteName,
   PipetteV2Specs,
   PositionReference,
@@ -112,9 +114,7 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    | ProfileBlockActivity
-    | TargetTempBlockActivity
-    | DeactivatedBlockActivity
+    ProfileBlockActivity | TargetTempBlockActivity | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -143,7 +143,7 @@ export interface ProfileBlockActivity {
 
 export interface VacuumPumpProfileActivity {
   type: 'profile'
-  profileElements: VacuumRunProfileParams['profile']
+  profileElements: VacuumRunProfileParams['steps']
   taskId: string
   ventAfter: boolean
 }
@@ -303,10 +303,7 @@ export interface Ingredients {
 }
 
 export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
+  'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
@@ -385,11 +382,7 @@ export interface PipetteEntities {
 
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
-  | 'always'
-  | 'once'
-  | 'never'
-  | 'perDest'
-  | 'perSource'
+  'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -400,19 +393,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-}
-
-interface CommonArgs {
-  /** NOTE: stepNumber probably shouldn't be optional but making it optional
-   * for the sake of not having to make too many changes for PD 8.5.2
-   * this should be refactored to not be optional for PD 8.6.0
-   * making it optional saves a lot of changes in unit tests
-   */
-  stepNumber?: number
-  /** Optional user-readable name for this step */
-  name?: string | null
-  /** Optional user-readable description/notes for this step */
-  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
@@ -903,14 +883,14 @@ export type VacuumPumpArgs =
 export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
 export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
@@ -950,6 +930,7 @@ export type CommandCreatorArgs =
   | CommentArgs
   | FlexStackerArgs
   | VacuumArgs
+  | OpentronsAIArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -1099,6 +1080,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
   | 'TOO_MANY_TIPS'
+  | 'VACUUM_UNDER_PRESSURE'
 
 export interface CommandCreatorError {
   message: string
@@ -1144,8 +1126,7 @@ export interface CommandsAndWarnings extends StepInfo {
   python?: string
 }
 export type CommandCreatorResult =
-  | CommandsAndWarnings
-  | CommandCreatorErrorResponse
+  CommandsAndWarnings | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
@@ -1194,5 +1175,4 @@ export type UnsafePipetteMovementReason =
     }
 
 export type PipetteMovementSafetyStatus =
-  | { isSafe: true }
-  | { isSafe: false; reason: UnsafePipetteMovementReason }
+  { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }

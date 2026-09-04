@@ -18,9 +18,9 @@ import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipet
 import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { OverflowMenu } from '..'
@@ -46,14 +46,10 @@ const PIPETTE_NAME = 'pipetteName'
 const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 
 const startCalibration = vi.fn()
-// file-saver has circular dep, need to mock with factory to prevent error
-vi.mock('file-saver', async importOriginal => {
-  const actual = await importOriginal<typeof saveAs>()
-  return {
-    ...actual,
-    saveAs: vi.fn(),
-  }
-})
+vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
+  saveFileWithPicker: vi.fn().mockResolvedValue(undefined),
+  isFileSaveCanceledError: vi.fn(),
+}))
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')

@@ -118,6 +118,7 @@ export function PipetteShadow(props: {
     wellName: hoveredWell,
     pipetteSpec,
     primaryNozzle,
+    nozzleConfiguration: nozzles,
   })
 
   const { channels, pipetteBoundingBoxOffsets } = pipetteSpec

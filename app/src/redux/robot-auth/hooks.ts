@@ -1,9 +1,22 @@
 import { useCallback } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useMatch } from 'react-router-dom'
 
-import { getAuthStateForRobot } from './slice'
+import { useHost } from '@opentrons/react-api-client'
+
+import { getIsOnDevice } from '../config'
+import { getLocalRobot } from '../discovery'
+import {
+  getAuthStateForRobot,
+  getCurrentUsernameForLocalRobot,
+  getIsAdminForRobot,
+  getLoggedInUserForRobot,
+  getUsernameForRobot,
+  logOut,
+} from './slice'
 
 import type { State } from '../types'
+import type { LoggedInUserProfile } from './slice'
 
 /** Return the OAuth 2 access token to make requests to the given robot, if we have one. */
 export function useAccessTokenForRobot(
@@ -20,4 +33,73 @@ export function useAccessTokenForRobot(
     [robotName]
   )
   return useSelector(selector)
+}
+
+/** Return the username for the given robot, if we are logged in to it. */
+export function useUsernameForRobot(robotName: string | null): string | null {
+  const selector = useCallback(
+    (state: State) => getUsernameForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return whether the logged-in user has admin-equivalent privileges. */
+export function useIsAdminForRobot(robotName: string): boolean {
+  const selector = useCallback(
+    (state: State) => getIsAdminForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return the logged-in user profile for the given robot, if we are logged in to it. */
+export function useLoggedInUserForRobot(
+  robotName: string
+): LoggedInUserProfile | null {
+  const selector = useCallback(
+    (state: State) => getLoggedInUserForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/**
+ * Return the username for the robot the user is currently acting on:
+ * the local robot on ODD, or the robot being viewed on desktop.
+ */
+export function useCurrentUsername(): string | null {
+  const isOnDevice = useSelector(getIsOnDevice)
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
+  const localRobotUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const desktopRobotUsername = useUsernameForRobot(desktopRobotName)
+
+  return isOnDevice ? localRobotUsername : desktopRobotUsername
+}
+
+export function useCurrentRobotName(): string | null {
+  const isOnDevice = useSelector(getIsOnDevice)
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const localRobotName = useSelector(getLocalRobot)?.name ?? null
+  const desktopRouteRobotName = deviceRouteMatch?.params?.robotName ?? null
+  const desktopHostRobotName = useHost()?.robotName ?? null
+
+  return isOnDevice
+    ? localRobotName
+    : (desktopRouteRobotName ?? desktopHostRobotName)
+}
+
+/** Log out of the robot the user is currently acting on. */
+export function useLogout(): () => void {
+  const dispatch = useDispatch()
+  const robotName = useCurrentRobotName()
+
+  return useCallback(() => {
+    if (robotName == null) {
+      console.warn("Couldn't identify the robot to log out of.")
+    } else {
+      dispatch(logOut({ robotName }))
+    }
+  }, [dispatch, robotName])
 }

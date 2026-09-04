@@ -1,5 +1,6 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
   DEFAULT_STATUS_REFETCH_INTERVAL,
@@ -11,12 +12,13 @@ import {
 
 import type { UseQueryOptions } from 'react-query'
 import type { Run, RunData, RunStatus } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface RunControls {
   play: () => void
   pause: () => void
   stop: () => void
-  reset: () => void
+  reset: (options?: { onError?: (error: unknown) => void }) => void
   resumeFromRecovery: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
@@ -28,8 +30,11 @@ export interface RunControls {
 
 export function useRunControls(
   runId: string | null,
-  onCloneRunSuccess?: (createRunResponse: Run) => unknown
+  onCloneRunSuccess?: (createRunResponse: Run) => unknown,
+  playDocumentationState?: DocumentationState
 ): RunControls {
+  const documentationState = useDocumentationState()
+
   const {
     playRun,
     pauseRun,
@@ -39,7 +44,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!)
+  } = useRunActionMutations(runId!, documentationState, playDocumentationState)
 
   const {
     cloneRun,

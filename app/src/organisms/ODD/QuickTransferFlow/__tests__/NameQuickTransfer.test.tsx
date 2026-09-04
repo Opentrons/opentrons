@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -7,17 +8,8 @@ import { i18n } from '/app/i18n'
 import { NameQuickTransfer } from '../NameQuickTransfer'
 
 import type { ComponentProps } from 'react'
-import type { TouchInputField } from '@opentrons/components'
 
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof NameQuickTransfer>) => {
   return renderWithProviders(<NameQuickTransfer {...props} />, {
@@ -46,22 +38,24 @@ describe('NameQuickTransfer', () => {
     screen.getByText('Enter up to 60 characters')
   })
 
-  it('renders the keyboard buttons and enables save if you press one', () => {
+  it('renders the keyboard buttons and enables save if you press one', async () => {
+    const user = userEvent.setup()
     render(props)
     const wKey = screen.getByText('w')
-    fireEvent.click(wKey)
+    await user.click(wKey)
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeEnabled()
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.onSave).toHaveBeenCalled()
     expect(saveBtn).toBeDisabled()
   })
 
-  it('disables save if you enter more than 60 characters', () => {
+  it('disables save if you enter more than 60 characters', async () => {
+    const user = userEvent.setup()
     render(props)
     const wKey = screen.getByText('w')
     for (let i = 0; i < 61; i++) {
-      fireEvent.click(wKey)
+      await user.click(wKey)
     }
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()

@@ -53,12 +53,12 @@ describe('CheckboxField', () => {
     // INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
     expect(checkBoxInput).toHaveStyle(`overflow: hidden`)
-    expect(checkBoxInput).toHaveStyle(`clip: rect(0 0 0 0)`)
+    expect(checkBoxInput).toHaveStyle(`clip-path: inset(50%)`)
     expect(checkBoxInput).toHaveStyle(`height: 1px`)
     expect(checkBoxInput).toHaveStyle(`width: 1px`)
     expect(checkBoxInput).toHaveStyle(`margin: -1px`)
     expect(checkBoxInput).toHaveStyle(`padding: 0`)
-    expect(checkBoxInput).toHaveStyle(`border: 0`)
+    expect(checkBoxInput).toHaveStyle(`border-width: 0`)
     expect(checkBoxInput).toHaveAttribute('tabindex', '0')
 
     // LABEL_TEXT_STYLE

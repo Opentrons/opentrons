@@ -1,0 +1,7 @@
+# Files that Cursor should attempt to completely exclude from agent features.
+# Cursor can only make a best effort, so do not rely on only this for security, like hiding API keys.
+# See also .cursorindexignore for something softer.
+
+# Chinese localization data. LLMs will "helpfully" try to keep this in sync with the
+# English data, but we want to do it ourselves.
+**/zh/**.json

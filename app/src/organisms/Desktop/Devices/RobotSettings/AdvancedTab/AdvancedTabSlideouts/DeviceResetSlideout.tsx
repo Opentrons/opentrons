@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep'
 
 import {
@@ -20,20 +19,21 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import {
+  isFileSaveCanceledError,
+  saveFileWithPicker,
+} from '/app/local-resources/files/saveFileWithPicker'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
 import { UNREACHABLE } from '/app/redux/discovery'
-import {
-  fetchResetConfigOptions,
-  getResetConfigOptions,
-} from '/app/redux/robot-admin'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import {
@@ -46,8 +46,7 @@ import type { MouseEventHandler } from 'react'
 import type {
   ResetConfigOption,
   ResetConfigRequest,
-} from '/app/redux/robot-admin/types'
-import type { Dispatch, State } from '/app/redux/types'
+} from '@opentrons/api-client'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean
@@ -65,7 +64,6 @@ export function DeviceResetSlideout({
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
-  const dispatch = useDispatch<Dispatch>()
   const [displayedOptions, setDisplayedOptions] =
     useState<DisplayedResetOptionState>(ALL_DESELECTED)
   const runsQueryResponse = useNotifyAllRunsQuery()
@@ -75,17 +73,11 @@ export function DeviceResetSlideout({
   const deckCalibrationData = useDeckCalibrationData(robotName)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
-  const serverOptions = useSelector((state: State) =>
-    getResetConfigOptions(state, robotName)
-  )
-  // Check length>0 to cope with the current behavior of getResetConfigOptions.
-  // Perhaps it should return null instead of [] if we don't have options loaded yet.
-  const areServerOptionsLoaded =
-    serverOptions != null && Object.keys(serverOptions).length > 0
-
-  useEffect(() => {
-    dispatch(fetchResetConfigOptions(robotName))
-  }, [dispatch, robotName])
+  const { data: resetOptionsData } = useResetConfigOptionsQuery({
+    enabled: isExpanded,
+  })
+  const serverOptions = resetOptionsData?.options ?? []
+  const areServerOptionsLoaded = serverOptions.length > 0
 
   const downloadCalibrationLogs: MouseEventHandler = e => {
     e.preventDefault()
@@ -95,26 +87,34 @@ export function DeviceResetSlideout({
         robotType: isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
       },
     })
-    saveAs(
+    void saveFileWithPicker(
+      `opentrons-${robotName}-calibration.json`,
       new Blob([
         JSON.stringify({
           deck: deckCalibrationData,
           pipetteOffset: pipetteOffsetCalibrations,
           tipLength: tipLengthCalibrations,
         }),
-      ]),
-      `opentrons-${robotName}-calibration.json`
-    )
+      ])
+    ).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   const downloadRunHistoryLogs: MouseEventHandler = e => {
     e.preventDefault()
     const runsHistory =
       runsQueryResponse != null ? runsQueryResponse.data?.data : []
-    saveAs(
-      new Blob([JSON.stringify(runsHistory)]),
-      `opentrons-${robotName}-runsHistory.json`
-    )
+    void saveFileWithPicker(
+      `opentrons-${robotName}-runsHistory.json`,
+      new Blob([JSON.stringify(runsHistory)])
+    ).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   const handleClearData = (): void => {

@@ -9,12 +9,13 @@ import type {
 
 export function updateErrorRecoverySettings(
   config: HostConfig,
-  settings: ErrorRecoverySettingsRequest
+  settings: ErrorRecoverySettingsRequest,
+  userNotes: string
 ): ResponsePromise<ErrorRecoverySettingsResponse> {
   return request<ErrorRecoverySettingsResponse, ErrorRecoverySettingsRequest>(
     PATCH,
     '/errorRecovery/settings',
-    settings,
-    config
+    config,
+    { body: settings, userNotes }
   )
 }

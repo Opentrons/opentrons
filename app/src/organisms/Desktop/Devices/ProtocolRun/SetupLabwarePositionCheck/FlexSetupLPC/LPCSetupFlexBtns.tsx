@@ -12,6 +12,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -85,7 +86,8 @@ export function LPCSetupFlexBtns({
     }
   }
 
-  const { applyOffsets } = useApplyOffsets(runId)
+  const documentationState = useDocumentationState()
+  const { applyOffsets } = useApplyOffsets(runId, documentationState)
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       setOffsetsConfirmed(true)
@@ -96,7 +98,6 @@ export function LPCSetupFlexBtns({
     <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>
       <SecondaryButton
         onClick={launchLPC}
-        id="LabwareSetup_checkLabwarePositionsButton"
         {...runLPCTargetProps}
         disabled={lpcDisabledReason !== null || offsetsConfirmed}
       >
@@ -109,7 +110,6 @@ export function LPCSetupFlexBtns({
       ) : null}
       <PrimaryButton
         onClick={onApplyOffsets}
-        id="LPC_setOffsetsConfirmed"
         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
         disabled={isApplyOffsetsBtnDisabled}
         {...confirmOffsetsTargetProps}

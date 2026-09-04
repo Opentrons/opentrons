@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -12,7 +13,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  ApiHostContext,
   useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
@@ -58,16 +59,25 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
+import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
+import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
+import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
+import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
-  useProtocolReceiptToast,
   useScrollRef,
-  useSoftwareUpdatePoll,
-} from './hooks'
+} from './hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from './hooks/useProtocolReceiptToast'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
@@ -107,7 +117,8 @@ export const ON_DEVICE_DISPLAY_PATHS = [
 ] as const
 
 function getPathComponent(
-  path: (typeof ON_DEVICE_DISPLAY_PATHS)[number]
+  path: (typeof ON_DEVICE_DISPLAY_PATHS)[number],
+  isCRSEnabled: boolean
 ): JSX.Element {
   switch (path) {
     case '/account':
@@ -133,7 +144,7 @@ function getPathComponent(
     case '/network-setup/wifi':
       return <ConnectViaWifi />
     case '/protocols':
-      return <ProtocolDashboard />
+      return <ProtocolDashboard isCRSEnabled={isCRSEnabled} />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
     case '/quick-transfer/new':
@@ -164,11 +175,13 @@ const TURN_OFF_BACKLIGHT = '7'
 const RETRY_DELAY_MS = 1000
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useSoftwareUpdatePoll()
+  useTrackRobotRestarts()
 
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
   // But here at the app root, that doesn't exist. So we need to make sure we pass this
@@ -179,8 +192,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     () => ({
       hostname: _ODD_IP_ ?? 'localhost',
       token: accessToken,
+      port: localRobot?.port ?? null,
     }),
-    [accessToken]
+    [accessToken, localRobot?.port]
   )
 
   const { brightness: userSetBrightness, sleepMs } = useSelector(
@@ -201,6 +215,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
+  useRefreshAccessTokenOnActivity()
+
   const isShellReady = useSelector(getIsShellReady)
 
   const robotSettingsQuery = useRobotSettingsQuery(
@@ -219,60 +235,80 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     hostConfig
   )
 
+  const isCRSEnabled =
+    accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
   const isReady =
     // ensure robot-server api, etc. is up and running
     isShellReady &&
     // ensure settings query data is available for localization provider
     robotSettingsQuery.isSuccess &&
     // ensure we know whether access control is enabled or not,
-    // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
+    // so on first render we can immediately show the LoggedOutOverlay
+    // and hide CRS-incompatible UI, if appropriate.
     accessControlEnabledQuery.isSuccess
-
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider {...hostConfig}>
+    // to make sure that the host config stays stable and in step with the initial queries,
+    // we use an ApiHostContext.Provider here instead of an ApiHostProvider.
+    <ApiHostContext.Provider value={hostConfig}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
-                <SleepScreen />
+                <SleepScreen aria-label={t('exit_sleep_mode')} />
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <MaintenanceRunTakeover>
-                    <EstopTakeover />
-                    <FirmwareUpdateTakeover />
-                    {showModuleSetupModal && localRobot?.name != null ? (
-                      <ModuleWizardFlows
-                        showSetupLauncher={true}
-                        closeFlow={() => {
-                          setShowModuleSetupModal(false)
-                        }}
-                        robotName={localRobot.name}
-                      />
-                    ) : null}
-                    <NiceModal.Provider>
-                      <RobotEncryptionKeyTakeover>
-                        <ToasterOven>
-                          <ProtocolReceiptToasts />
-                          {!showModuleSetupModal ? (
-                            <ModuleAttachedToasts
-                              openFlow={(open: boolean) => {
-                                setShowModuleSetupModal(open)
-                              }}
-                            />
-                          ) : null}
+                  <DocumentationRequiredModalContext.Provider
+                    value={{
+                      showDocumentationRequiredModal: requireDocumentation,
+                      // the ODD only ever logs in to its own robot, so robotName is unused
+                      showLoginModal,
+                      showSignRunModal,
+                      showDownloadLogsModal,
+                    }}
+                  >
+                    <RobotUpdateProvider>
+                      <MaintenanceRunTakeover>
+                        <EstopTakeover />
+                        <FirmwareUpdateTakeover />
+                        {showModuleSetupModal && localRobot?.name != null ? (
+                          <ModuleWizardFlows
+                            showSetupLauncher={true}
+                            closeFlow={() => {
+                              setShowModuleSetupModal(false)
+                            }}
+                            robotName={localRobot.name}
+                          />
+                        ) : null}
 
-                          <SharedScrollRefProvider>
-                            <OnDeviceDisplayAppRoutes />
-                          </SharedScrollRefProvider>
-                          <LoggedOutOverlayMount />
+                        <ToasterOven>
+                          <NiceModal.Provider>
+                            <RobotEncryptionKeyTakeover>
+                              <ProtocolReceiptToasts />
+                              {!showModuleSetupModal ? (
+                                <ModuleAttachedToasts
+                                  openFlow={(open: boolean) => {
+                                    setShowModuleSetupModal(open)
+                                  }}
+                                />
+                              ) : null}
+
+                              <SharedScrollRefProvider>
+                                <OnDeviceDisplayAppRoutes
+                                  isCRSEnabled={isCRSEnabled}
+                                />
+                              </SharedScrollRefProvider>
+                              <LoggedOutOverlayMount />
+                              <DragToLogOutOverlay />
+                            </RobotEncryptionKeyTakeover>
+                          </NiceModal.Provider>
                         </ToasterOven>
-                      </RobotEncryptionKeyTakeover>
-                    </NiceModal.Provider>
-                  </MaintenanceRunTakeover>
+                      </MaintenanceRunTakeover>
+                    </RobotUpdateProvider>
+                  </DocumentationRequiredModalContext.Provider>
                 </>
               )}
             </Box>
@@ -282,7 +318,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       ) : (
         <InitialLoadingScreen />
       )}
-    </ApiHostProvider>
+    </ApiHostContext.Provider>
   )
 }
 
@@ -294,9 +330,15 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
   return '/dashboard'
 }
 
+interface OnDeviceDisplayAppRoutesProps {
+  isCRSEnabled: boolean
+}
+
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
-export function OnDeviceDisplayAppRoutes(): JSX.Element {
+export function OnDeviceDisplayAppRoutes({
+  isCRSEnabled,
+}: OnDeviceDisplayAppRoutesProps): JSX.Element {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(
@@ -346,7 +388,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
           element={
             <Box css={TOUCH_SCREEN_STYLE} ref={refCallback}>
               <ModalPortalRoot />
-              {getPathComponent(path)}
+              {getPathComponent(path, isCRSEnabled)}
             </Box>
           }
         />

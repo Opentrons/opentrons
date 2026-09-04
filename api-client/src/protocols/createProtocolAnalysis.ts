@@ -33,6 +33,6 @@ export function createProtocolAnalysis(
   const response = request<
     ProtocolAnalysisSummaryResult,
     { data: CreateProtocolAnalysisData }
-  >(POST, `/protocols/${protocolKey}/analyses`, { data }, config)
+  >(POST, `/protocols/${protocolKey}/analyses`, config, { body: { data } })
   return response
 }

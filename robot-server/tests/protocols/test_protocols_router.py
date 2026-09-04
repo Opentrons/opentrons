@@ -29,6 +29,7 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.audit.audit_logger import AuditLogger
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -83,6 +84,12 @@ from robot_server.protocols.router import (
     get_protocol_ids,
     get_protocols,
 )
+
+
+@pytest.fixture
+def audit_logger(decoy: Decoy) -> AuditLogger:
+    """Audit logger for testing."""
+    return decoy.mock(cls=AuditLogger)
 
 
 @pytest.fixture
@@ -431,6 +438,7 @@ async def test_create_existing_protocol(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should return the existing protocol info from database."""
     protocol_directory = Path("/dev/null")
@@ -493,7 +501,7 @@ async def test_create_existing_protocol(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(
         await analysis_store.matching_rtp_values_in_analysis(
             last_analysis_summary=completed_analysis, new_parameters=[]
@@ -520,6 +528,8 @@ async def test_create_existing_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     assert result.content.data == Protocol(
@@ -548,6 +558,7 @@ async def test_create_protocol(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
@@ -615,7 +626,7 @@ async def test_create_protocol(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(
         await analyses_manager.start_analysis(
             analysis_id="analysis-id",
@@ -642,6 +653,8 @@ async def test_create_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     assert result.content.data == Protocol(
@@ -674,6 +687,7 @@ async def test_create_new_protocol_with_run_time_params(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should handle the run time parameter overrides correctly."""
     protocol_directory = Path("/dev/null")
@@ -791,6 +805,8 @@ async def test_create_new_protocol_with_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     decoy.verify(
@@ -811,6 +827,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -911,6 +928,8 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     assert result.content.data == Protocol(
@@ -938,6 +957,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -1029,7 +1049,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
             },
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1065,6 +1085,8 @@ async def test_create_existing_protocol_with_different_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     assert result.content.data == Protocol(
@@ -1093,6 +1115,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should re-trigger analysis of the existing protocol resource."""
     protocol_directory = Path("/dev/null")
@@ -1166,7 +1189,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1195,6 +1218,8 @@ async def test_create_existing_protocol_with_same_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     assert result.content.data == Protocol(
@@ -1209,6 +1234,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         key="dummy-key-222",
     )
     assert result.status_code == 200
+    decoy.verify(await analyzer.clean_up())
 
 
 async def test_create_existing_protocol_with_pending_analysis_raises(
@@ -1223,6 +1249,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should raise an error if protocol has existing pending analysis."""
     protocol_directory = Path("/dev/null")
@@ -1297,7 +1324,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1327,6 +1354,8 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=20,
+            access_control_status=False,
+            audit_logger=audit_logger,
         )
 
     assert exc_info.value.status_code == 503
@@ -1339,6 +1368,7 @@ async def test_create_protocol_not_readable(
     file_hasher: FileHasher,
     protocol_reader: ProtocolReader,
     protocol_store: ProtocolStore,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should 422 if the protocol is rejected by the pre-analyzer."""
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
@@ -1373,6 +1403,8 @@ async def test_create_protocol_not_readable(
             robot_type="OT-2 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
+            access_control_status=False,
+            audit_logger=audit_logger,
         )
 
     assert exc_info.value.status_code == 422
@@ -1386,6 +1418,7 @@ async def test_create_protocol_different_robot_type(
     protocol_store: ProtocolStore,
     file_reader_writer: FileReaderWriter,
     file_hasher: FileHasher,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should 422 if the protocol's robot type doesn't match the server's."""
     decoy.when(await file_reader_writer.read(files=matchers.Anything())).then_return([])
@@ -1435,6 +1468,8 @@ async def test_create_protocol_different_robot_type(
             robot_type="OT-3 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
+            access_control_status=False,
+            audit_logger=audit_logger,
         )
 
     assert exc_info.value.status_code == 422
@@ -1442,11 +1477,12 @@ async def test_create_protocol_different_robot_type(
 
 
 async def test_delete_protocol_by_id(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
+    decoy: Decoy, protocol_store: ProtocolStore, audit_logger: AuditLogger
 ) -> None:
     """It should remove a single protocol file."""
-    result = await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+    result = await delete_protocol_by_id(
+        "protocol-id", protocol_store=protocol_store, audit_logger=audit_logger
+    )
 
     decoy.verify(protocol_store.remove(protocol_id="protocol-id"))
 
@@ -1455,8 +1491,7 @@ async def test_delete_protocol_by_id(
 
 
 async def test_delete_protocol_not_found(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
+    decoy: Decoy, protocol_store: ProtocolStore, audit_logger: AuditLogger
 ) -> None:
     """It should 404 if the protocol to delete is not found."""
     not_found_error = ProtocolNotFoundError("protocol-id")
@@ -1466,14 +1501,17 @@ async def test_delete_protocol_not_found(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+        await delete_protocol_by_id(
+            "protocol-id",
+            protocol_store=protocol_store,
+            audit_logger=audit_logger,
+        )
 
     assert exc_info.value.status_code == 404
 
 
 async def test_delete_protocol_run_exists(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
+    decoy: Decoy, protocol_store: ProtocolStore, audit_logger: AuditLogger
 ) -> None:
     """It should 404 if the protocol to delete is not found."""
     run_exists_error = ProtocolUsedByRunError("protocol-id")
@@ -1483,7 +1521,9 @@ async def test_delete_protocol_run_exists(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+        await delete_protocol_by_id(
+            "protocol-id", protocol_store=protocol_store, audit_logger=audit_logger
+        )
 
     assert exc_info.value.status_code == 409
 
@@ -1761,7 +1801,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1781,9 +1821,11 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
+        access_control_status=False,
     )
     assert result.content.data == analysis_summaries
     assert result.status_code == 200
+    decoy.verify(await analyzer.clean_up())
 
 
 async def test_update_protocol_analyses_with_new_rtp_values(
@@ -1872,7 +1914,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             run_time_param_paths=rtp_files,
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter, csv_parameter]
     )
     decoy.when(
@@ -1907,6 +1949,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         data_files_store=data_files_store,
         data_files_directory=Path("/dev/null"),
         analysis_id="analysis-id-2",
+        access_control_status=False,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -1988,6 +2031,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
+        access_control_status=False,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -2008,6 +2052,7 @@ async def test_create_protocol_kind_quick_transfer(
     analyses_manager: AnalysesManager,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should store an uploaded protocol file marked as quick-transfer."""
     protocol_directory = Path("/dev/null")
@@ -2112,6 +2157,8 @@ async def test_create_protocol_kind_quick_transfer(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        access_control_status=False,
+        audit_logger=audit_logger,
     )
 
     decoy.verify(
@@ -2144,6 +2191,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
     file_hasher: FileHasher,
     protocol_auto_deleter: ProtocolAutoDeleter,
     quick_transfer_protocol_auto_deleter: ProtocolAutoDeleter,
+    audit_logger: AuditLogger,
 ) -> None:
     """It should throw a 409 error if the quick transfer protocols maximum is exceeded."""
     protocol_directory = Path("/dev/null")
@@ -2197,6 +2245,8 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_kind=ProtocolKind.QUICK_TRANSFER,
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=1,
+            access_control_status=False,
+            audit_logger=audit_logger,
         )
 
         assert exc_info.value.status_code == 409

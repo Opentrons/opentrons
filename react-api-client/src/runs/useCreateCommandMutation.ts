@@ -1,12 +1,14 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createCommand } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
 
 interface CreateCommandMutateParams extends CreateCommandParams {
   runId: string
@@ -27,24 +29,39 @@ export type UseCreateCommandMutationResult = UseMutationResult<
   >
 }
 
-export function useCreateCommandMutation(): UseCreateCommandMutationResult {
+export function useCreateCommandMutation(
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void
+): UseCreateCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<CommandData, unknown, CreateCommandMutateParams>(
-    params => {
-      const { runId, command, ...rest } = params
+  const mutation = useDocumentedMutation<
+    CommandData,
+    unknown,
+    CreateCommandMutateParams
+  >(documentationState, actionsToDocument, ({ variables, userNotes }) => {
+    const { runId, command, ...rest } = variables
 
-      return createCommand(host!, runId, command, {
+    return createCommand(
+      host!,
+      runId,
+      command,
+      {
         ...rest,
-      }).then(response => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+      },
+      userNotes
+    ).then(response => {
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)
         })
-        return response.data
-      })
-    }
-  )
+      addActionToDocument(response.data.data)
+      return response.data
+    })
+  })
 
   return {
     ...mutation,

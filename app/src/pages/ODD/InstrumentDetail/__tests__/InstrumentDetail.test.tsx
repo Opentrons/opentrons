@@ -36,6 +36,9 @@ vi.mock('react-router-dom', () => ({
 vi.mock('/app/local-resources/instruments')
 vi.mock('/app/resources/robot-settings/hooks')
 vi.mock('/app/organisms/DropTipWizardFlows')
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: vi.fn().mockReturnValue('otie'),
+}))
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {

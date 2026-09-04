@@ -5,6 +5,7 @@ from mock import MagicMock
 from starlette.testclient import TestClient
 
 from opentrons import types
+from opentrons.config import feature_flags
 from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount
 
@@ -31,8 +32,11 @@ def attached_pipettes():
     }
 
 
-def test_get_pipettes(api_client, hardware, attached_pipettes):
+def test_get_pipettes(
+    api_client, hardware, attached_pipettes, mock_feature_flags, decoy
+):
     hardware.attached_instruments = attached_pipettes
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     expected = {
         "left": {
             "model": attached_pipettes[types.Mount.LEFT]["model"],

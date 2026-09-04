@@ -3,6 +3,7 @@ test_name: Accessing protected resources within auth-server
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Enable access control enabled so protected resources require a valid token
@@ -21,7 +22,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: testuser
+          username: testuser
           password: testuserpassword
           fullName: Test User
           accountType: user
@@ -33,7 +34,7 @@ stages:
       method: POST
       json:
         data:
-          userName: testuser
+          username: testuser
           password: testuserpassword
           fullName: Test User
           accountType: user
@@ -71,7 +72,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: testuser
+          username: testuser
           password: testuserpassword
           fullName: Test User
           accountType: user
@@ -108,7 +109,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: testuser_new
+          username: testuser_new
           password: testuserpassword
           fullName: Test User
           accountType: user

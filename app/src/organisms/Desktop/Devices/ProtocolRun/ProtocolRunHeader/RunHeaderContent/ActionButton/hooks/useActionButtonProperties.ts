@@ -1,9 +1,11 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import {
   isModuleConfirmationStatus,
   isRunAgainStatus,
@@ -28,11 +30,15 @@ import {
   getCameraUsageState,
   getMissingSetupSteps,
 } from '/app/redux/protocol-runs'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
+import { useRunHeaderRunControls } from '../../../hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { IconName } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { BaseActionButtonProps } from '..'
@@ -50,6 +56,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   areCameraPreferencesConfirmed: boolean
   isClosingCurrentRun: boolean
   isCameraReadyToRun: boolean
+  setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
 }
 
 // Returns ActionButton properties.
@@ -67,7 +74,6 @@ export function useActionButtonProperties({
   runRecord,
   robotAnalyticsData,
   robotSerialNumber,
-  protocolRunControls,
   attachedModules,
   runHeaderModalContainerUtils,
   isResetRunLoadingRef,
@@ -76,13 +82,14 @@ export function useActionButtonProperties({
   isValidRunAgain,
   protocolRunHeaderRef,
   isCameraReadyToRun,
+  setShowRobotOutOfStorageModal,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
   buttonIconName: IconName | null
 } {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { play, pause, reset } = protocolRunControls
+
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
   const { reportCameraEnablementSettings } = useCameraAnalytics({
@@ -95,13 +102,35 @@ export function useActionButtonProperties({
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
     getMissingSetupSteps(state, runId)
   )
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+
+  const actionsToDocument: DocumentedAction[] = useMemo(
+    () =>
+      !areCameraPreferencesConfirmed
+        ? ['update_camera_settings_for_run', 'play_run']
+        : ['play_run'],
+    [areCameraPreferencesConfirmed]
+  )
+  const { documentationState: linkedDocumentationState } =
+    useLinkedDocumentationState(actionsToDocument, runId)
+
+  const protocolRunControls = useRunHeaderRunControls(
+    runId,
+    robotName,
+    linkedDocumentationState
+  )
+  const { play, pause, reset } = protocolRunControls
+
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation(
+    linkedDocumentationState
+  )
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
+
+  const isRobotOutOfMemory = useIsRobotOutOfStorage()
 
   const handlePlay = (): void => {
     play()
@@ -202,6 +231,8 @@ export function useActionButtonProperties({
           },
           { onSettled: handlePlay }
         )
+      } else if (isRobotOutOfMemory) {
+        setShowRobotOutOfStorageModal(true)
       } else {
         handlePlay()
       }
@@ -210,8 +241,18 @@ export function useActionButtonProperties({
     buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      if (isRobotOutOfMemory) {
+        setShowRobotOutOfStorageModal(true)
+        return
+      }
+
       isResetRunLoadingRef.current = true
-      reset()
+      reset({
+        onError: () => {
+          // e.g. user cancelled the documentation modal
+          isResetRunLoadingRef.current = false
+        },
+      })
       runHeaderModalContainerUtils.dropTipUtils.resetTipStatus()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

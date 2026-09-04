@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof DeckFixtureSetupInstructionsModalComponent> = {
   title: 'ODD/Organisms/DeckFixtureSetupInstructionsModal',
   component: DeckFixtureSetupInstructionsModalComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

@@ -17,7 +17,6 @@ export function getCurrentSubsystemUpdate(
   return request<SubsystemUpdateProgressData>(
     GET,
     `/subsystems/updates/current/${subsystem}`,
-    null,
     config
   )
 }

@@ -18,9 +18,7 @@ export type { DiscoveryClientRobot, DiscoveryClientRobotAddress, HealthStatus }
 export type RobotsMap = Record<string, DiscoveryClientRobot>
 
 export type ConnectivityStatus =
-  | typeof CONNECTABLE
-  | typeof REACHABLE
-  | typeof UNREACHABLE
+  typeof CONNECTABLE | typeof REACHABLE | typeof UNREACHABLE
 
 export type RobotModel = typeof ROBOT_MODEL_OT2 | typeof ROBOT_MODEL_OT3
 
@@ -30,7 +28,6 @@ export interface DiscoveryState {
 }
 
 export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
-  displayName: string // todo(mm, 2026-04-27): What is the difference between this and DiscoveryClientRobot.name?
   local: boolean | null
   seen: boolean
   robotModel: RobotModel

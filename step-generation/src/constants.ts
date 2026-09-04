@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -146,17 +147,6 @@ export const FAKE_HOPPER_LOCATION_MAP = {
 
 export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
 
-export const VACUUM_DOCK_LOCATION = 'vacuumDock'
-
-export const VACUUM_DOCK_FAKE_LOCATION = 'vacuumDockA4'
-
-export const FAKE_VACUUM_DOCK_LOCATION_MAP = {
-  vacuumDockA4: 'A4',
-}
-
-export type VacuumDockLocationMapKey =
-  keyof typeof FAKE_VACUUM_DOCK_LOCATION_MAP
-
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup
 > = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
@@ -174,7 +164,15 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   D4: 'hopperD4',
 }
 
-export const VACUUM_VENT_OPEN: 'open' = 'open'
+// Vacuum dock location marker (used in labware stack to indicate labware is on vacuum dock)
+// TODO (nd: 05/21/2026): refactor this; we should be able to rely simply on the actual dock addressable area name
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
+// The actual addressable area for the vacuum dock (re-exported for convenience)
+export const VACUUM_DOCK_ADDRESSABLE_AREA =
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
+
+export const VACUUM_VENT_OPEN: 'opened' = 'opened'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
 
 export const VACUUM_MODE_POWER: 'power' = 'power'
@@ -188,9 +186,10 @@ export const VACUUM_STATE_VENT: 'vent' = 'vent'
 export const VACUUM_VENT_SET_OPEN: 'open' = 'open'
 export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
 
-// TODO (nd:2026-03-09) These should match physical min/max when defined
-export const VACUUM_MIN_PRESSURE_MBAR = 0.1
-export const VACUUM_MAX_PRESSURE_MBAR = 1000
-
 export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
 export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'
+
+export const VACUUM_SPACER_LOAD_NAMES: string[] = [
+  'opentrons_vacuum_manifold_spacer_short',
+  'opentrons_vacuum_manifold_spacer_tall',
+]

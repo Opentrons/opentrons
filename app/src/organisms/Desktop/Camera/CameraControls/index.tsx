@@ -14,6 +14,7 @@ import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
@@ -36,8 +37,9 @@ export function CameraControls({
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues(runId)
   const dispatch = useDispatch()
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
-
+  const documentationState = useDocumentationState()
+  const { createCameraImageSettings } =
+    useCreateCameraImageSettings(documentationState)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = (): void => {
@@ -77,6 +79,7 @@ export function CameraControls({
         <div className={styles.content_container}>
           <CameraControlSettings settings={settings} />
           <PreviewSettings
+            documentationState={documentationState}
             settings={{
               zoom: settings.zoom,
               brightness: settings.brightness,

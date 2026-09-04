@@ -11,7 +11,6 @@ export function getRunLoadedLabwareDefintions(
   return request<RunLoadedLabwareDefinitions>(
     GET,
     `runs/${runId}/loaded_labware_definitions`,
-    null,
     config
   )
 }
