@@ -131,7 +131,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Usernames can include letters, numbers, and punctuation, but not spaces.'
+          'Usernames can include letters, numbers, and punctuation from the on-device keyboard.'
         )
       ).toBeInTheDocument()
     })
@@ -151,19 +151,19 @@ describe('PersonalAccountSettingsEditForm', () => {
     expect(props.onSave).not.toHaveBeenCalled()
   })
 
-  it('shows an invalid character error when the password contains a space', async () => {
+  it('shows an invalid character error when the password is off the software keyboard', async () => {
     const { container } = render(props)
     const [passwordInput, confirmPasswordInput] = getPasswordInputs(container)
-    fireEvent.change(passwordInput, { target: { value: 'new password' } })
+    fireEvent.change(passwordInput, { target: { value: 'new-passwordé' } })
     fireEvent.change(confirmPasswordInput, {
-      target: { value: 'new password' },
+      target: { value: 'new-passwordé' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Passwords can include letters, numbers, and punctuation, but not spaces.'
+          'Passwords can include letters, numbers, punctuation, and spaces from the on-device keyboard.'
         )
       ).toBeInTheDocument()
     })

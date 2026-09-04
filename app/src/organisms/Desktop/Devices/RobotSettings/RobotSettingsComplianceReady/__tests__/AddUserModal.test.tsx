@@ -96,7 +96,7 @@ describe('AddUserModal', () => {
 
     await waitFor(() => {
       screen.getByText(
-        'Usernames can include letters, numbers, and punctuation, but not spaces.'
+        'Usernames can include letters, numbers, and punctuation from the on-device keyboard.'
       )
     })
 

@@ -1,6 +1,6 @@
 import {
-  CREDENTIAL_ALLOWED_PATTERN,
-  CREDENTIAL_SPECIAL_CHARACTERS,
+  hasOnlyAllowedPasswordCharacters,
+  SOFTWARE_KEYBOARD_SYMBOLS,
 } from './credentialCharacters'
 
 /**
@@ -11,7 +11,7 @@ import {
 export const DEFAULT_MIN_PASSWORD_LENGTH = 8
 
 /** Characters that satisfy the "require special characters" password rule. */
-export const PASSWORD_SPECIAL_CHARACTERS = CREDENTIAL_SPECIAL_CHARACTERS
+export const PASSWORD_SPECIAL_CHARACTERS = SOFTWARE_KEYBOARD_SYMBOLS
 
 export interface PasswordComplexityRequirements {
   minLength: number
@@ -32,13 +32,13 @@ export function getPasswordComplexityError(
   if (Array.from(password).length < requirements.minLength) {
     return 'tooShort'
   }
-  if (!CREDENTIAL_ALLOWED_PATTERN.test(password)) {
+  if (!hasOnlyAllowedPasswordCharacters(password)) {
     return 'invalidCharacters'
   }
   if (
     requirements.requireSpecialCharacters &&
     !Array.from(password).some(character =>
-      CREDENTIAL_SPECIAL_CHARACTERS.includes(character)
+      SOFTWARE_KEYBOARD_SYMBOLS.includes(character)
     )
   ) {
     return 'missingSpecialCharacters'

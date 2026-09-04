@@ -307,11 +307,40 @@ def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
         )
 
 
-def test_create_user_password_with_spaces_raises(manager: UserDataManager) -> None:
+def test_create_user_password_with_spaces_succeeds(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(username="test_user", full_name="X")
+    decoy.when(mock_store.get("test_user")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="test_user",
+            hashed_password=matchers.IsA(str),
+            full_name="X",
+            account_type=AccountType.USER,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    manager.create_user(
+        username="test_user",
+        password="valid pass",
+        full_name="X",
+        account_type=AccountType.USER,
+        now=_NOW,
+    )
+
+
+def test_create_user_password_off_keyboard_raises(manager: UserDataManager) -> None:
     with pytest.raises(PasswordContainsInvalidCharactersError, match="password"):
         manager.create_user(
             username="test_user",
-            password="valid pass",
+            password="validpassé",
             full_name="X",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
