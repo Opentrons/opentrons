@@ -231,12 +231,15 @@ async def test_store_robot_log_stores_file(
                 "eeeeee"
             )
             assert not temp_path.is_file()
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "eeeeee"
             assert temp_path.is_file()
+            assert stored_name == temp_path.name
 
 
 async def test_store_robot_log_renames_file(
@@ -273,12 +276,15 @@ async def test_store_robot_log_renames_file(
                 "eeeeee"
             )
             assert not temp_path.is_file()
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "eeeeee"
             assert temp_path.is_file()
+            assert temp_path.name == stored_name
 
             # It should it handle it for the first copy
             copied_temp_path = temp_path.with_stem(f"{temp_path.stem}_copy")
@@ -286,12 +292,15 @@ async def test_store_robot_log_renames_file(
                 mock_store.store_robot_log(robot_log, copied_temp_path)
             ).then_return("iiiiii")
             temp_file.seek(0)
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "iiiiii"
             assert copied_temp_path.is_file()
+            assert copied_temp_path.name == stored_name
 
             # Trying the same file a third time should make _copy_copy
             copied_copied_temp_path = copied_temp_path.with_stem(
@@ -301,12 +310,15 @@ async def test_store_robot_log_renames_file(
                 mock_store.store_robot_log(robot_log, copied_copied_temp_path)
             ).then_return("oooooo")
             temp_file.seek(0)
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "oooooo"
             assert copied_copied_temp_path.is_file()
+            assert copied_copied_temp_path.name == stored_name
 
 
 async def test_store_robot_log_raises_keyserver_unavailable(
