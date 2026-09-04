@@ -1,11 +1,11 @@
 import { useMutation } from 'react-query'
 import { useSelector } from 'react-redux'
-import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
 import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
@@ -85,7 +85,7 @@ export function useDownloadSelectedRuns(
     if (callTimeUsbPath != null) {
       await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
     } else {
-      saveAs(new Blob([buffer]), filename)
+      await saveFileWithPicker(filename, buffer)
     }
 
     return successfulRuns

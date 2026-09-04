@@ -14,6 +14,7 @@ import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { isRunSignoffRequiredError } from '/app/local-resources/access-control/utils'
+import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import {
@@ -97,7 +98,9 @@ export function ProtocolRunRecords({
           makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
         .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)
@@ -138,7 +141,7 @@ export function ProtocolRunRecords({
         return deleteSelectedRuns(successfullyDownloadedRuns)
       })
       .catch((error: Error) => {
-        if (isDocumentedMutationError(error)) {
+        if (isDocumentedMutationError(error) || isFileSaveCanceledError(error)) {
           setShowDeleteRecordsModal(true)
         } else if (isRunSignoffRequiredError(error)) {
           makeToast(
@@ -150,7 +153,12 @@ export function ProtocolRunRecords({
             }
           )
         } else {
-          makeToast(error.message || 'Error processing records', ERROR_TOAST)
+          makeToast(
+            error.message.length > 0
+              ? error.message
+              : 'Error processing records',
+            ERROR_TOAST
+          )
         }
       })
   }
@@ -162,7 +170,9 @@ export function ProtocolRunRecords({
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={handleConfirmDeleteSelected}
+          onConfirm={() => {
+            void handleConfirmDeleteSelected()
+          }}
           type="selectedRuns"
         />
       )}
