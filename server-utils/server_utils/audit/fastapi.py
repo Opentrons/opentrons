@@ -184,7 +184,9 @@ async def _handle_autolog(
     audit_logger: AuditLogger, request: Request, response: Response | None
 ) -> None:
     if audit_logger.auto_log_request_head:
-        audit_logger.append_request_head_to_message(request)
+        audit_logger.append_request_head_to_message(
+            request, audit_logger.auto_log_request_full_headers
+        )
     if audit_logger.auto_log_request_body:
         await audit_logger.append_request_body_to_message(request)
     if audit_logger.auto_log_response_head:
@@ -281,6 +283,7 @@ def get_audit_logger(
     auto_log_request_body: bool = True,
     auto_log_response_head: bool = True,
     auto_log_response_body: bool = True,
+    auto_log_request_full_headers: bool = False,
 ) -> Callable[..., Awaitable[AuditLogger]]:
     """A FastAPI dependency to log actions to the audit log.
 
@@ -346,6 +349,7 @@ def get_audit_logger(
             auto_log_response_head=auto_log_response_head,
             auto_log_request_body=auto_log_request_body,
             auto_log_response_body=auto_log_response_body,
+            auto_log_request_full_headers=auto_log_request_full_headers,
             request=request,
         )
         if action is not None:
