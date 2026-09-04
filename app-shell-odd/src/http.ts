@@ -1,4 +1,5 @@
 // fetch wrapper to throw if response is not ok
+import { createHash } from 'crypto'
 import fs from 'fs'
 import { Transform } from 'stream'
 import FormData from 'form-data'
@@ -13,6 +14,8 @@ import type { Request, RequestInit, Response } from 'node-fetch'
 import type { Readable } from 'stream'
 
 const log = createLogger('http')
+
+const SHA256_HEADER = 'opentrons-download-sha256'
 
 type RequestInput = Request | string
 
@@ -76,6 +79,9 @@ export function fetchToFile(
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) ?? null
 
+    const correctHash = response.headers.get(SHA256_HEADER)
+    const hasher = createHash('sha256')
+
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
     const inputStream = response.body
@@ -86,6 +92,9 @@ export function fetchToFile(
     const progressReader = new Transform({
       transform(chunk: string | Buffer, encoding, next) {
         downloaded += chunk.length
+        if (correctHash != null) {
+          hasher.update(chunk)
+        }
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (onProgress) onProgress({ downloaded, size })
         next(null, chunk)
@@ -99,25 +108,27 @@ export function fetchToFile(
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
         const handleError = (problem: Error): void => {
-          // if we error out, delete the temp dir to clean up
           log.error(`Aborting fetchToFile: ${problem.name}: ${problem.message}`)
           remove(destination).then(() => {
-            reject(error)
+            reject(problem)
           })
         }
-        const listener = (): void => {
-          handleError(
-            new LocalAbortError(
-              (options?.signal?.reason as string | null) ?? 'aborted'
-            )
-          )
-        }
-        options?.signal?.addEventListener('abort', listener, { once: true })
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
           handleError(error)
+          return
         }
-        options?.signal?.removeEventListener('abort', listener, {})
+
+        if (
+          correctHash != null &&
+          hasher.digest('hex').toLowerCase() !== correctHash?.toLowerCase()
+        ) {
+          handleError(
+            new Error('Downloaded file hash does not match expected hash')
+          )
+          return
+        }
+
         resolve(destination)
       })
     })

@@ -1,8 +1,10 @@
 // fetch wrapper to throw if response is not ok
+import { createHash } from 'crypto'
 import fs from 'fs'
 import fsPromises from 'fs/promises'
 import { Transform } from 'stream'
 import FormData from 'form-data'
+import { remove } from 'fs-extra'
 import _fetch from 'node-fetch'
 import pump from 'pump'
 
@@ -10,6 +12,8 @@ import type { Request, RequestInit, Response } from 'node-fetch'
 import type { Readable } from 'stream'
 
 type RequestInput = Request | string
+
+const SHA256_HEADER = 'opentrons-download-sha256'
 
 export interface DownloadProgress {
   downloaded: number
@@ -57,6 +61,9 @@ export function fetchToFile(
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const size = Number(response.headers.get('Content-Length')) || null
 
+    const correctHash = response.headers.get(SHA256_HEADER)
+    const hasher = createHash('sha256')
+
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
     const inputStream = response.body
@@ -67,6 +74,9 @@ export function fetchToFile(
     const progressReader = new Transform({
       transform(chunk: string | Buffer, encoding, next) {
         downloaded += chunk.length
+        if (correctHash != null) {
+          hasher.update(chunk)
+        }
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (onProgress) onProgress({ downloaded, size })
         next(null, chunk)
@@ -81,9 +91,23 @@ export function fetchToFile(
       pump(inputStream, progressReader, outputStream, error => {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
-          reject(error)
+          remove(destination).then(() => {
+            reject(error)
+          })
           return
         }
+        if (
+          correctHash != null &&
+          hasher.digest('hex').toLowerCase() !== correctHash?.toLowerCase()
+        ) {
+          remove(destination).then(() => {
+            reject(
+              new Error('Downloaded file hash does not match expected hash')
+            )
+          })
+          return
+        }
+
         resolve(destination)
       })
     })

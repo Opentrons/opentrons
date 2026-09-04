@@ -1,6 +1,8 @@
-import { mkdtemp, writeFile } from 'fs/promises'
+import { createHash } from 'crypto'
+import { access, mkdtemp, readFile, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
+import { Readable } from 'stream'
 import isError from 'lodash/isError'
 import fetch from 'node-fetch'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,6 +15,25 @@ import type { Request, Response } from 'node-fetch'
 
 vi.mock('../config')
 vi.mock('node-fetch')
+
+const DOWNLOAD_SHA256_HEADER = 'opentrons-download-sha256'
+
+function sha256Hex(contents: string): string {
+  return createHash('sha256').update(contents).digest('hex')
+}
+
+function mockDownloadResponse(
+  body: string,
+  headers: Record<string, string | null> = {}
+): void {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    headers: {
+      get: (name: string) => headers[name] ?? null,
+    },
+    body: Readable.from(Buffer.from(body)),
+  } as unknown as Response)
+}
 
 describe('app-shell main http module', () => {
   beforeEach(() => {
@@ -126,6 +147,58 @@ describe('app-shell main http module', () => {
       return expect(method(request as unknown as Request)).rejects.toThrow(
         expected
       )
+    })
+  })
+
+  describe('fetchToFile', () => {
+    let destination: string
+
+    beforeEach(async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), 'fetch-to-file-'))
+      destination = path.join(dir, 'logperiod.zip')
+    })
+
+    it('writes the response body to the destination', async () => {
+      mockDownloadResponse('zip-bytes')
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
+    })
+
+    it('succeeds when the sha256 header matches the downloaded bytes', async () => {
+      const body = 'zip-bytes'
+      mockDownloadResponse(body, {
+        [DOWNLOAD_SHA256_HEADER]: sha256Hex(body),
+      })
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe(body)
+    })
+
+    it('skips hash verification when the server omits the sha256 header', async () => {
+      mockDownloadResponse('zip-bytes')
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
+    })
+
+    it('rejects and deletes the file when the sha256 header does not match', async () => {
+      mockDownloadResponse('zip-bytes', {
+        [DOWNLOAD_SHA256_HEADER]: sha256Hex('different-bytes'),
+      })
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).rejects.toThrow('Downloaded file hash does not match expected hash')
+      await expect(access(destination)).rejects.toMatchObject({
+        code: 'ENOENT',
+      })
     })
   })
 })
