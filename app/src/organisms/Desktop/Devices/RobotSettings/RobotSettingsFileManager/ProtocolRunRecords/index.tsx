@@ -12,8 +12,9 @@ import {
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import {
   useDeleteSelectedRuns,
   useDownloadSelectedRuns,
@@ -28,6 +29,9 @@ import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
 import type { IconProps } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
+
+const DELETE_RUNS_ACTIONS: DocumentedAction[] = ['delete_runs']
 
 interface ProtocolRunRecordsProps {
   robotName: string
@@ -43,7 +47,15 @@ export function ProtocolRunRecords({
     () => [...(runData?.data ?? [])].reverse(),
     [runData?.data]
   )
-  const documentationState = useDocumentationState()
+  const { documentationState } = useLinkedDocumentationState(
+    DELETE_RUNS_ACTIONS,
+    robotName,
+    robotName
+  )
+  const ensureAuthorized = useEnsureAuditLogAuthorization(
+    documentationState,
+    DELETE_RUNS_ACTIONS
+  )
   const { mutateAsync: downloadSelectedRuns, status: downloadRunsStatus } =
     useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns, deletingIds } =
@@ -100,8 +112,17 @@ export function ProtocolRunRecords({
     setShowDeleteRecordsModal(true)
   }
 
-  const handleConfirmDeleteSelected = (): void => {
+  const handleConfirmDeleteSelected = async (): Promise<void> => {
     setShowDeleteRecordsModal(false)
+    try {
+      await ensureAuthorized()
+    } catch (error) {
+      if (!isDocumentedMutationError(error)) {
+        makeToast((error as Error).message, ERROR_TOAST)
+      }
+      setShowDeleteRecordsModal(true)
+      return
+    }
     const selectedRuns = runs.filter(run => selectedIds.has(run.id))
     void downloadSelectedRuns({ runs: selectedRuns })
       .then(successfullyDownloadedRuns => {
@@ -117,7 +138,6 @@ export function ProtocolRunRecords({
       })
       .catch((error: Error) => {
         if (isDocumentedMutationError(error)) {
-          // Re-open delete modal if it was a documented mutation error
           setShowDeleteRecordsModal(true)
         } else {
           makeToast(error.message || 'Error processing records', ERROR_TOAST)
