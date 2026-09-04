@@ -456,6 +456,8 @@ class RunOrchestratorStore:
 
         try:
             assert self._run_result is not None
+            result = self._run_result
+            self._run_result = None
 
             if self._run_coordinator is not None:
                 await self._run_coordinator.clear_command_history()
@@ -466,7 +468,7 @@ class RunOrchestratorStore:
             if feature_flags.protocol_subprocess_enabled():
                 self._run_process_pyro_provider.set_active_process_as_used()
 
-        return self._run_result
+        return result
 
     async def create_pyro(
         self,

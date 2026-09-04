@@ -9,6 +9,7 @@ from opentrons.config import feature_flags
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
+    PostRunHardwareState,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
@@ -169,7 +170,11 @@ class ProtocolAnalyzer:
             try:
                 okay_to_clear = await self._coordinator.get_is_okay_to_clear()
                 if okay_to_clear:
-                    await self._coordinator.stop()
+                    await self._coordinator.finish(
+                        drop_tips_after_run=False,
+                        set_run_status=False,
+                        post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+                    )
                 else:
                     log.warning(
                         "Analyzer is no longer in use but orchestrator is busy. "

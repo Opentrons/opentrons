@@ -194,7 +194,7 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    async def get_commands_deleted(self) -> int:
+    async def get_commands_deleted(self) -> bool:
         """Get the status of command deletion."""
         ...
 
