@@ -158,6 +158,24 @@ async function downloadAuditLogs(
     directory = filePaths[0]
   }
 
+  // If there is only one log period to download, don't make a folder for it.
+  if (logPeriodSummaries.length === 1) {
+    const logPeriodSummary = logPeriodSummaries[0]
+    const fileName = `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`
+    const filePath = path.join(directory, fileName)
+    await downloadAuditLog(
+      {
+        logPeriodId: logPeriodSummary.id,
+        fileName,
+        hostname,
+        port,
+        destination: filePath,
+      },
+      mainWindow,
+      dispatch
+    )
+  }
+
   const folderName =
     `${robotName}-audit-logs-${new Date().toISOString()}`.replace(
       /[^a-zA-Z0-9._-]/g,
