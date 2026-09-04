@@ -37,8 +37,13 @@ from server_utils.audit.audit_server import (
 )
 from server_utils.audit.audit_server import (
     NoCurrentLogPeriodError,
+    SubmitSupportingFileMessageData,
 )
-from server_utils.audit.fastapi import get_audit_client, get_audit_logger
+from server_utils.audit.fastapi import (
+    get_audit_client,
+    get_audit_logger,
+    get_supplied_user_notes,
+)
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
 )
@@ -50,6 +55,7 @@ from server_utils.auth.resource_server.fastapi import (
     require_scopes,
 )
 from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
     AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
@@ -561,6 +567,7 @@ async def update_run(  # noqa: C901
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
     ],
+    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -575,6 +582,7 @@ async def update_run(  # noqa: C901
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
+        user_notes: The Opentrons-User-Notes data from the request, if any.
     """
     if request_body.data.signedBy is not None:
         _require_signoff_scope(authentication)
@@ -610,7 +618,24 @@ async def update_run(  # noqa: C901
                 if run_log_entry is not None:
                     file_path, _ = run_log_entry
                     with open(file_path, "r") as fh:
-                        await audit_client.store_robot_log(robot_log_file=fh)
+                        await audit_client.store_robot_log(
+                            robot_log_file=fh,
+                            message=SubmitSupportingFileMessageData(
+                                fileType="runrecord",
+                                serverId=runId,
+                                accountName=(
+                                    authentication.username
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                legalName=(
+                                    authentication.fullname
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                reason=user_notes,
+                            ),
+                        )
                 staging_dir.cleanup()
 
         if run_data is None:

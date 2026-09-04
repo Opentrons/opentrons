@@ -3,6 +3,9 @@ from io import BytesIO
 import httpx
 import pytest
 
+from server_utils.audit.audit_server import SubmitSupportingFileMessageData
+
+
 from ..dev_server import DevServer
 
 
@@ -30,6 +33,19 @@ async def ensure_inactive_period(run_server: DevServer, enable_logging: None) ->
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{run_server.base_url}/audit/internal/storeRobotLog",
-            files={"file": BytesIO(b"hello world")},
+            files={
+                "file": BytesIO(b"hello world"),
+                "supporting_info": BytesIO(
+                    SubmitSupportingFileMessageData(
+                        fileType="runrecord",
+                        serverId="123123123",
+                        accountName="steve",
+                        legalName="Steve",
+                        reason=None,
+                    )
+                    .model_dump_json()
+                    .encode("utf-8")
+                ),
+            },
         )
         response.raise_for_status()
