@@ -127,7 +127,7 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 ### Typography
 
-**Font size:** `--font-size-caption` (10px), `--font-size-label` (11px), `--font-size-p` (13px), `--font-size-h4` (13px), `--font-size-h3` (14px), `--font-size-h2` (15px), `--font-size-h1` (19px), `--font-size-20`, `--font-size-22`, `--font-size-28`, `--font-size-32`, `--font-size-38`, `--font-size-80`
+**Font size:** `--font-size-10` (10px), `--font-size-11` (11px), `--font-size-13` (13px), `--font-size-13` (13px), `--font-size-14` (14px), `--font-size-15` (15px), `--font-size-19` (19px), `--font-size-20`, `--font-size-22`, `--font-size-28`, `--font-size-32`, `--font-size-38`, `--font-size-80`
 
 **Font weight:** `--font-weight-light` (300), `--font-weight-regular` (400), `--font-weight-semi-bold` (600), `--font-weight-bold` (700)
 

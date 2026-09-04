@@ -46,7 +46,7 @@
   border: none;
   background: transparent;
   color: var(--black-90);
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
   outline: none;
@@ -58,7 +58,7 @@
 
 .signature_error_text {
   color: var(--red-60);
-  font-size: var(--font-size-caption);
+  font-size: var(--font-size-10);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
 }
