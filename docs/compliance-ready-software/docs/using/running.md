@@ -89,17 +89,21 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 * Tapping **Capture image** during the protocol.
 * Starting and completing error recovery during a protocol run.
 
-You won't be blocked from completing any of the actions listed above while your protocol runs, but you'll need to enter documentation *after* you complete them. 
+Your Flex won't complete actions like these until you enter documentation. For example, if you need to pause your protocol, the Flex will only pause after you click **Confirm** on the "Documentation required" screen. 
 
-For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll be prompted to add documentation when you:
+Remember that you can use the [Emergency Stop Pendant] to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
+
+In some cases, you'll be prompted to document multiple actions after they occur, like in error recovery or robot calibration. 
+
+First, the Opentrons App or Flex touchscreen will prompt you to add documentation when you choose from the available recovery actions:
 
 * Start or complete [error recovery](../../flex/touchscreen/protocol-run.md#error-recovery).
 * Retry or skip the step causing the error. 
 * Cancel the protocol run.
 
+As you complete multi-step actions like pipette calibration, Labware Position Check, or error recovery, the [list of actions](documentation.md#view-actions) can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.
+
 <figure class="screenshot" markdown>
   ![Add documentation after completing error recovery.](../images/recovery-action.png)
   <figcaption>You'll need to add documentation during error recovery.</figcaption>
 </figure>
-
-In processes like error recovery, shown above on the Flex touchscreen, the [list of actions](documentation.md#viewing-actions) requiring documentation can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.

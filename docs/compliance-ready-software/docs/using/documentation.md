@@ -14,7 +14,7 @@ This section covers how users will add documentation. For a full list of user ac
 
 ## Adding documentation
 
-Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. A "Documentation required" screen opens in the Opentrons App or on the Flex touchscreen after completing actions like pipette calibration or protocol setup, and blocks users from moving forward until they've added their text.
+Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. A "Documentation required" screen opens in the Opentrons App or on the Flex touchscreen when users click or tap to complete actions like pipette calibration or protocol setup, and blocks users from moving forward until they've added their text.
 
 On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
@@ -39,9 +39,7 @@ Users can also add text in the Opentrons App. Here, you'll also see a [list of a
 
 Click **Cancel action** if you didn't mean to complete the action.
 
-You'll see the same screen on the Flex touchscreen and in the Opentrons App every time you need to add documentation, no matter which step you're on.
-
-When you're finished, click **Confirm** to save your text and move on.
+You'll see the same screen on the Flex touchscreen and in the Opentrons App every time you need to add documentation, no matter which step you're on. For most actions, your Flex won't complete the action until you add documentation and click **Confirm** to save your text. 
 
 ## View actions
 
