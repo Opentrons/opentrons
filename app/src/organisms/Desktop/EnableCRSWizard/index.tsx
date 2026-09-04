@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Controller,
@@ -16,13 +16,16 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  setRefs,
   StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
 import { getPasswordComplexityError } from '/app/resources/auth/getPasswordComplexityError'
@@ -503,6 +506,21 @@ function AdminPasswordPage({
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, getValues, trigger } = useFormContext<FormValues>()
   const formId = useId()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(passwordInputRef, showPassword, true)
+  usePlaceCaretAtEndOnToggle(confirmPasswordInputRef, showConfirmPassword, true)
+
+  const handleTogglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+  }
+
+  const handleToggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(current => !current)
+  }
 
   return (
     <ModalShell
@@ -563,10 +581,18 @@ function AdminPasswordPage({
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('login_form_password_field')}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoFocus
                   error={fieldState.error?.message}
                   {...field}
+                  ref={setRefs(field.ref, passwordInputRef)}
+                  rightElement={
+                    <PasswordVisibilityToggle
+                      isVisible={showPassword}
+                      onToggle={handleTogglePasswordVisibility}
+                      iconOnly
+                    />
+                  }
                 />
               )}
             />
@@ -582,9 +608,17 @@ function AdminPasswordPage({
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('setup_wizard_confirm_password')}
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   error={fieldState.error?.message}
                   {...field}
+                  ref={setRefs(field.ref, confirmPasswordInputRef)}
+                  rightElement={
+                    <PasswordVisibilityToggle
+                      isVisible={showConfirmPassword}
+                      onToggle={handleToggleConfirmPasswordVisibility}
+                      iconOnly
+                    />
+                  }
                 />
               )}
             />
