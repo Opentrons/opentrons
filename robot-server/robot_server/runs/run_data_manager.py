@@ -529,7 +529,10 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if run_id == self._run_orchestrator_store.current_run_id:
+        if (
+            run_id == self._run_orchestrator_store.current_run_id
+            and not await self._run_orchestrator_store.get_commands_deleted()
+        ):
             return await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,

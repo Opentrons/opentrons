@@ -247,6 +247,7 @@ class RunOrchestratorStore:
         self._most_recent_finalized_command: Optional[CommandPointer] = None
         self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
         self._access_control_mode = access_control_status
+        self._run_result: Optional[RunResult] = None
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -366,6 +367,7 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        self._run_result = None
         if feature_flags.protocol_subprocess_enabled():
             return await self.create_pyro(
                 run_id=run_id,
@@ -454,20 +456,18 @@ class RunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         try:
-            run_result = await construct_run_result(
-                run_coordinator=self.run_coordinator
-            )
+            assert self._run_result is not None
+
+            if self._run_coordinator is not None:
+                await self._run_coordinator.clear_command_history()
+                self._run_coordinator = None
+                self._current_run_id = None
 
         finally:
             if feature_flags.protocol_subprocess_enabled():
                 self._run_process_pyro_provider.set_active_process_as_used()
 
-        if self._run_coordinator is not None:
-            await self._run_coordinator.clear_command_history()
-            self._run_coordinator = None
-            self._current_run_id = None
-
-        return run_result
+        return self._run_result
 
     async def create_pyro(
         self,
@@ -513,29 +513,10 @@ class RunOrchestratorStore:
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start the run."""
-        engine_result = await self.run_coordinator.run(
-            deck_configuration=deck_configuration
-        )
+        await self.run_coordinator.run(deck_configuration=deck_configuration)
+        self._run_result = await construct_run_result(self.run_coordinator)
 
-        # Collect the command list but don't delete it yet, to prevent conflicts with the cleanup steps
-        command_length = await self.run_coordinator.get_length()
-        commands: List[Command] = []
-        while command_length > 0:
-            latest_commands = await self.run_coordinator.get_command_slice(
-                cursor=len(commands),
-                length=100,
-                include_fixit_commands=True,
-            )
-            commands.extend(latest_commands.commands)
-            command_length = command_length - len(latest_commands.commands)
-
-        return RunResult(
-            commands=commands,
-            state_summary=engine_result.state_summary,
-            parameters=engine_result.parameters,
-            command_annotations=await self.run_coordinator.get_all_command_annotations(),
-            command_preconditions=engine_result.command_preconditions,
-        )
+        return self._run_result
 
     async def pause(self) -> None:
         """Pause the run."""
