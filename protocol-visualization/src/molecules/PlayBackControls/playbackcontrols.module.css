@@ -22,6 +22,7 @@
   display: flex;
   flex: 1;
   align-items: center;
+  padding-right: var(--spacing-12);
   gap: var(--spacing-16);
 }
 
@@ -38,19 +39,42 @@
 }
 
 .speed_button {
-  padding: 0 var(--spacing-8);
+  position: relative;
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border: none;
+  border-radius: 50%;
   background: none;
   color: var(--text-color-black, #1d1d1d);
   cursor: pointer;
+
+  /* this will be replaced by var when the size is defined */
   font-size: 16px;
   font-weight: 600;
   outline: none;
+  transition: background-color 0.15s ease;
   user-select: none;
 }
 
 .speed_button:hover {
-  opacity: 0.7;
+  background-color: var(--grey-30);
+}
+
+.speed_button:active {
+  background-color: var(--grey-35);
+}
+
+.speed_button:focus-visible::after {
+  position: absolute;
+  border: 2px solid var(--blue-50);
+  border-radius: 50%;
+  content: '';
+  inset: -8px;
+  pointer-events: none;
 }
 
 .divider {
@@ -62,15 +86,16 @@
 .controls_right {
   display: flex;
   align-items: center;
+  padding-left: var(--spacing-12);
 }
 
 .icon_button {
+  position: relative;
   display: flex;
   width: 2rem;
   height: 2rem;
   align-items: center;
   justify-content: center;
-  padding: 0;
   border: none;
   border-radius: 50%;
   background-color: transparent;
@@ -85,4 +110,13 @@
 
 .icon_button:active {
   background-color: var(--grey-35);
+}
+
+.icon_button:focus-visible::after {
+  position: absolute;
+  border: 2px solid var(--blue-50);
+  border-radius: 50%;
+  content: '';
+  inset: -8px;
+  pointer-events: none;
 }
