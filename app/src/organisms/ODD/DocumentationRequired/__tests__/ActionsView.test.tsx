@@ -91,7 +91,7 @@ describe('ActionsView', () => {
 
   it('renders audit log actions with translated text', () => {
     renderWithModal(['play_run', 'stop_run'])
-    screen.getByText('Playing protocol')
+    screen.getByText('Starting protocol run')
     screen.getByText('Stopping protocol run')
   })
 
