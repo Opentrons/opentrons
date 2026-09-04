@@ -4,17 +4,20 @@ import clsx from 'clsx'
 
 import { getIsLoggedInToLocalRobot, useLogout } from '/app/redux/robot-auth'
 
-import styles from './dragoverlay.module.css'
+import styles from './dragtologoutoverlay.module.css'
+
+import type { CSSProperties, ReactNode, TransitionEvent } from 'react'
 
 const LOG_OUT_THRESHOLD = 0.75
 const HOLD_DURATION_MS = 800
 const MOVE_THRESHOLD = 10
-const HOLD_ZONE = 150
+const HOLD_ZONE_PX = 150
 const HANDLE_HEIGHT = 8
 const REGRAB_ZONE = HANDLE_HEIGHT + 16
 const RESET_TIME_S = 1
+const RESET_TIME_BACKUP_S = RESET_TIME_S + 1
 
-export function DragToLogOutOverlay(): JSX.Element | null {
+export function DragToLogOutOverlay(): ReactNode {
   const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
 
   const [isLongPressed, setIsLongPressed] = useState(false)
@@ -72,10 +75,11 @@ export function DragToLogOutOverlay(): JSX.Element | null {
   // cleanup on unmount
   useEffect(() => clearHoldTimer, [clearHoldTimer])
   useEffect(() => clearResetBackupTimer, [clearResetBackupTimer])
+  useEffect(() => clearLogoutBackupTimer, [clearLogoutBackupTimer])
 
   useEffect(() => {
     const down = (e: PointerEvent): void => {
-      if (!e.isPrimary || e.clientY > HOLD_ZONE) {
+      if (!e.isPrimary || e.clientY > HOLD_ZONE_PX) {
         return
       }
       const { clientY, clientX, pointerId } = e
@@ -130,13 +134,10 @@ export function DragToLogOutOverlay(): JSX.Element | null {
         setIsAnimatingOverlay(true)
       }
       clearResetBackupTimer()
-      resetBackupTimer.current = setTimeout(
-        () => {
-          setIsResetting(false)
-          setIsAnimatingOverlay(false)
-        },
-        (RESET_TIME_S + 1) * 1000
-      )
+      resetBackupTimer.current = setTimeout(() => {
+        setIsResetting(false)
+        setIsAnimatingOverlay(false)
+      }, RESET_TIME_BACKUP_S * 1000)
     }
 
     const cancel = (): void => {
@@ -171,8 +172,12 @@ export function DragToLogOutOverlay(): JSX.Element | null {
         e.preventDefault() // vertical drag → suppress scroll → no pointercancel
       }
     }
-    window.addEventListener('touchmove', touchMove, { passive: false })
 
+    if (!isLoggedIn) {
+      return
+    }
+
+    window.addEventListener('touchmove', touchMove, { passive: false })
     window.addEventListener('pointerdown', down)
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
@@ -191,10 +196,11 @@ export function DragToLogOutOverlay(): JSX.Element | null {
     clearHoldTimer,
     clearResetBackupTimer,
     isResetting,
+    isLoggedIn,
   ])
 
   const handleOverlayTransitionEnd = (
-    e: React.TransitionEvent<HTMLDivElement>
+    e: TransitionEvent<HTMLDivElement>
   ): void => {
     if (e.propertyName !== 'transform') return // ignore the background-color transition
     if (isLoggingOut) {
@@ -208,13 +214,23 @@ export function DragToLogOutOverlay(): JSX.Element | null {
   }
 
   const handleHandleTransitionEnd = (
-    e: React.TransitionEvent<HTMLDivElement>
+    e: TransitionEvent<HTMLDivElement>
   ): void => {
     if (e.propertyName !== 'opacity') return
     setIsResetting(false)
     setIsAnimatingOverlay(false)
     clearResetBackupTimer()
   }
+
+  const overLayStyles: CSSProperties & Record<string, string> = useMemo(
+    () => ({
+      '--drag-overlay-y': `${y}px`,
+      '--handle-height': `${HANDLE_HEIGHT}px`,
+      '--hold-zone': `${HOLD_ZONE_PX}px`,
+      '--reset-time': `${RESET_TIME_S}s`,
+    }),
+    [y]
+  )
 
   if (!isLoggedIn) {
     return null
@@ -227,14 +243,7 @@ export function DragToLogOutOverlay(): JSX.Element | null {
         [styles.overlay_visible]: isLongPressed || isLoggingOut || isResetting,
         [styles.done_animating]: isResetting && !isAnimatingOverlay,
       })}
-      style={
-        {
-          '--drag-overlay-y': `${y}px`,
-          '--handle-height': `${HANDLE_HEIGHT}px`,
-          '--hold-zone': `${HOLD_ZONE}px`,
-          '--reset-time': `${RESET_TIME_S}s`,
-        } as any
-      }
+      style={overLayStyles}
       ref={overlayRef}
       onTransitionEnd={handleOverlayTransitionEnd}
     >
