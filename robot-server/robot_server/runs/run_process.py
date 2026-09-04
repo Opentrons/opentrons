@@ -61,7 +61,7 @@ from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.protocol_runner import RunResult
+from opentrons.protocol_runner.protocol_runner import EngineRunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -128,7 +128,7 @@ def register_process_types() -> None:
         NozzleMap,
         ProtocolSource,
         ProtocolResource,
-        RunResult,
+        EngineRunResult,
         StateSummary,
         FlexStackerSubState,
         NozzleMapNotification,
@@ -314,7 +314,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         return await self._guaranteed_run_orchestrator.run(
             deck_configuration, protocol_source, run_time_param_values
@@ -412,6 +412,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
             cursor, length, include_fixit_commands
         )
 
+    async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        return await self._guaranteed_run_orchestrator.get_length()
+
+    async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        await self._guaranteed_run_orchestrator.delete_command_slice_end(length)
+
     async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
@@ -440,6 +448,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
     async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
         return await self._guaranteed_run_orchestrator.get_command_recovery_target()
+
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        return await self._guaranteed_run_orchestrator.get_commands_deleted()
 
     async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""

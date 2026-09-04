@@ -766,10 +766,14 @@ async def get_current_state(  # noqa: C901
     """
     try:
         run = await run_data_manager.get(run_id=runId)
+        active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
+        pipette_tip_states = run_data_manager.get_tip_attached(run_id=runId)
+        flex_stacker_substates = run_data_manager.get_flex_stacker_substate(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
     nozzle_layouts = {
         pipetteId: ActiveNozzleLayout.model_construct(
             startingNozzle=nozzle_map.starting_nozzle,
@@ -781,9 +785,7 @@ async def get_current_state(  # noqa: C901
 
     tip_states = {
         pipette_id: TipState.model_construct(hasTip=has_tip)
-        for pipette_id, has_tip in run_data_manager.get_tip_attached(
-            run_id=runId
-        ).items()
+        for pipette_id, has_tip in pipette_tip_states.items()
     }
 
     current_command = run_data_manager.get_current_command(run_id=runId)
@@ -842,7 +844,6 @@ async def get_current_state(  # noqa: C901
                 if place_labware:
                     break
 
-    flex_stacker_substates = run_data_manager.get_flex_stacker_substate(run_id=runId)
     flex_stacker_states: Dict[str, FlexStackerState] | None
     if len(flex_stacker_substates) > 0:
         flex_stacker_states = {}

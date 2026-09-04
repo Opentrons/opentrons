@@ -134,6 +134,12 @@ class CommandHistory:
         commands = selected_command_ids[start:stop]
         return [self._commands_by_id[command].command for command in commands]
 
+    def del_end_slice(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        for command_id in self._all_command_ids[length * -1 :]:
+            del self._commands_by_id[command_id]
+        del self._all_command_ids[length * -1 :]
+
     def get_tail_command(self) -> Optional[CommandEntry]:
         """Get the command most recently added."""
         if self._commands_by_id:

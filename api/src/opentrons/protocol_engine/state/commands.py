@@ -873,6 +873,14 @@ class CommandView:
             total_length=total_length,
         )
 
+    def delete_end_slice(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        self._state.command_history.del_end_slice(length)
+
+    def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        return self._state.command_history.length()
+
     def get_errors_slice(
         self,
         cursor: int,
