@@ -103,7 +103,7 @@ export function RobotOverview({
               <ReachableBanner robot={robot} />
             </Box>
             <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
-            <SignAndDownloadRunBanner robotName={robotName} />
+            <SignAndDownloadRunBanner robotName={robotName} onRobotOverview />
             {showRecoveryBanner ? (
               <ErrorRecoveryBanner
                 recoveryIntent={recoveryIntent}
