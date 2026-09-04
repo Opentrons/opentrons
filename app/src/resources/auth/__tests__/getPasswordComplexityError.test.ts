@@ -60,13 +60,13 @@ describe('getPasswordComplexityError', () => {
     ).toBe('tooShort')
   })
 
-  it('returns invalidCharacters when the password contains a space', () => {
+  it('allows spaces in passwords', () => {
     expect(
       getPasswordComplexityError('pass word', {
         minLength: 8,
         requireSpecialCharacters: false,
       })
-    ).toBe('invalidCharacters')
+    ).toBeNull()
   })
 
   it('returns invalidCharacters for characters outside the shared allowlist', () => {
@@ -78,7 +78,7 @@ describe('getPasswordComplexityError', () => {
     ).toBe('invalidCharacters')
   })
 
-  it('accepts every punctuation character used by auth-server', () => {
+  it('accepts every software-keyboard symbol', () => {
     for (const character of PASSWORD_SPECIAL_CHARACTERS) {
       expect(
         getPasswordComplexityError(`password${character}`, {

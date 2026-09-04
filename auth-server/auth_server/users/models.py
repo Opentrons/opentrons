@@ -3,9 +3,11 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Annotated, Literal, Sequence, TypedDict
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import AfterValidator, BaseModel, Field, SecretStr
 
-from auth_server.users.credential_characters import CREDENTIAL_ALLOWED_PATTERN
+from auth_server.users.software_keyboard_characters import (
+    has_only_allowed_username_characters,
+)
 
 
 # leave this outside of the db. this will not change.
@@ -23,15 +25,31 @@ SERVICE_ACCOUNT_FULL_NAME = "Service Account"
 
 USERNAME_MAX_LENGTH = 20
 
+
+def _validate_username_characters(value: str) -> str:
+    if not has_only_allowed_username_characters(value):
+        raise ValueError(
+            "username contains characters not supported by the ODD software keyboard"
+        )
+    return value
+
+
+def _validate_optional_username_characters(value: str | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_username_characters(value)
+
+
 Username = Annotated[
     str,
     Field(
         max_length=USERNAME_MAX_LENGTH,
-        pattern=CREDENTIAL_ALLOWED_PATTERN,
         description=(
-            "The username of the user. Letters, digits, and punctuation are allowed."
+            "The username of the user. Characters must be typeable on the "
+            "ODD software keyboard. Spaces are not allowed."
         ),
     ),
+    AfterValidator(_validate_username_characters),
 ]
 
 OptionalUsername = Annotated[
@@ -39,11 +57,12 @@ OptionalUsername = Annotated[
     Field(
         default=None,
         max_length=USERNAME_MAX_LENGTH,
-        pattern=CREDENTIAL_ALLOWED_PATTERN,
         description=(
-            "The username of the user. Letters, digits, and punctuation are allowed."
+            "The username of the user. Characters must be typeable on the "
+            "ODD software keyboard. Spaces are not allowed."
         ),
     ),
+    AfterValidator(_validate_optional_username_characters),
 ]
 
 
@@ -201,12 +220,12 @@ class UserAlreadyExistsErrorDetails(BaseModel):
 
 
 class UsernameContainsInvalidCharactersErrorDetails(BaseModel):
-    """An error when a username contains whitespace or other disallowed characters."""
+    """An error when a username contains characters the ODD software keyboard cannot type."""
 
     id: Literal["usernameContainsInvalidCharacters"]
 
 
 class PasswordContainsInvalidCharactersErrorDetails(BaseModel):
-    """An error when a password contains whitespace or other disallowed characters."""
+    """An error when a password contains characters the ODD software keyboard cannot type."""
 
     id: Literal["passwordContainsInvalidCharacters"]
