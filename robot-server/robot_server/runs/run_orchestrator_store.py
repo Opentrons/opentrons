@@ -460,22 +460,23 @@ class RunOrchestratorStore:
                 self._run_result = None
             else:
                 # Account for situations in which run() has not finished but clear() has been called
-                run_data = await self.run_coordinator.get_state_summary()
-                commands = await self.run_coordinator.get_all_commands()
-                run_time_parameters = (
-                    await self.run_coordinator.get_run_time_parameters()
-                )
-                command_annotations = (
-                    await self.run_coordinator.get_all_command_annotations()
-                )
-                preconditions = await self.run_coordinator.get_preconditions()
+                command_length = await self.run_coordinator.get_length()
+                commands: List[Command] = []
+                while command_length > 0:
+                    latest_commands = await self.run_coordinator.get_command_slice(
+                        cursor=len(commands),
+                        length=100,
+                        include_fixit_commands=True,
+                    )
+                    commands.extend(latest_commands.commands)
+                    command_length = command_length - len(latest_commands.commands)
 
                 result = RunResult(
-                    state_summary=run_data,
+                    state_summary=await self.run_coordinator.get_state_summary(),
                     commands=commands,
-                    parameters=run_time_parameters,
-                    command_annotations=command_annotations,
-                    command_preconditions=preconditions,
+                    parameters=await self.run_coordinator.get_run_time_parameters(),
+                    command_annotations=await self.run_coordinator.get_all_command_annotations(),
+                    command_preconditions=await self.run_coordinator.get_preconditions(),
                 )
 
             if self._run_coordinator is not None:
