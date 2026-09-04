@@ -195,9 +195,19 @@ export function ComplianceReadySoftwareFiles({
               downloaded.deletionKey != null
           )
           if (deletableDownloads.length < logPeriods.length) {
-            makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
-              closeButton: true,
-            })
+            const allDownloaded = downloadedPeriods.length === logPeriods.length
+            makeToast(
+              (allDownloaded
+                ? t('in_progress_logs_cannot_be_deleted')
+                : t('some_logs_not_deleted')) as string,
+              WARNING_TOAST,
+              {
+                ...(allDownloaded
+                  ? { heading: t('unable_to_delete_audit_logs') }
+                  : {}),
+                closeButton: true,
+              }
+            )
           }
           if (deletableDownloads.length === 0) {
             return

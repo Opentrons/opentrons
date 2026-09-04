@@ -13,9 +13,6 @@ import type { Dispatch, State } from '/app/redux/types'
 
 export interface DownloadedLogPeriod {
   logPeriod: LogPeriodSummary
-  // the deletion key from a successful download, or null if the download
-  // failed; callers that chain a delete after download must check this
-  deletionKey: string | null
 }
 
 export interface DownloadLogPeriodsVariables {

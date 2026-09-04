@@ -188,7 +188,7 @@ describe('audit module dispatches', () => {
     )
   })
 
-  it('dispatches failure when the download response is missing a deletion key', async () => {
+  it('dispatches success without a deletion key for in-progress periods', async () => {
     vi.mocked(dialog.showOpenDialog).mockResolvedValue(
       mockShowOpenDialogSelected
     )
@@ -207,9 +207,9 @@ describe('audit module dispatches', () => {
     await flush()
 
     expect(dispatch).toHaveBeenCalledWith(
-      logPeriodDownloadFailed({
+      logPeriodDownloadSucceeded({
         logPeriodId: 'lp-1',
-        error: 'Missing deletion key in download response',
+        deletionKey: null,
       })
     )
   })

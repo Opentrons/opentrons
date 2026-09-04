@@ -54,6 +54,22 @@ describe('audit download status', () => {
     expect(getLogPeriodDownloadError(makeState(next), 'lp-1')).toEqual(null)
   })
 
+  it('marks a log period download as succeeded without a deletion key', () => {
+    const next = auditReducer(
+      INITIAL_AUDIT_STATE,
+      logPeriodDownloadSucceeded({
+        logPeriodId: 'lp-1',
+        deletionKey: null,
+      })
+    )
+
+    expect(getLogPeriodDownloadStatus(makeState(next), 'lp-1')).toEqual({
+      status: 'download-success',
+      deletionKey: null,
+    })
+    expect(getLogPeriodDeletionKey(makeState(next), 'lp-1')).toEqual(null)
+  })
+
   it('marks a log period download as failed with an error', () => {
     const next = auditReducer(
       INITIAL_AUDIT_STATE,
