@@ -92,7 +92,3 @@ export function hasOnlyAllowedUsernameCharacters(value: string): boolean {
 export function hasOnlyAllowedPasswordCharacters(value: string): boolean {
   return hasOnlySoftwareKeyboardCharacters(value)
 }
-
-export function hasOnlyAllowedLegalNameCharacters(value: string): boolean {
-  return hasOnlySoftwareKeyboardCharacters(value)
-}

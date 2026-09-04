@@ -43,8 +43,3 @@ def has_only_allowed_username_characters(value: str) -> bool:
 def has_only_allowed_password_characters(value: str) -> bool:
     """Passwords use the full keyboard allowlist."""
     return has_only_software_keyboard_characters(value)
-
-
-def has_only_allowed_legal_name_characters(value: str) -> bool:
-    """Legal names use the full keyboard allowlist."""
-    return has_only_software_keyboard_characters(value)

@@ -12,7 +12,6 @@ import { describe, expect, it } from 'vitest'
 import { fullKeyboardLayout, layoutCandidates } from '../constants'
 import {
   extractLayoutTokens,
-  hasOnlyAllowedLegalNameCharacters,
   hasOnlyAllowedPasswordCharacters,
   hasOnlyAllowedUsernameCharacters,
   isSoftwareKeyboardSupportedCharacter,
@@ -106,7 +105,7 @@ describe('softwareKeyboardCharacters', () => {
     expect(hasOnlyAllowedUsernameCharacters('Ada Lovelace')).toBe(false)
     expect(hasOnlyAllowedUsernameCharacters('张伟')).toBe(true)
     expect(hasOnlyAllowedPasswordCharacters('pass word')).toBe(true)
-    expect(hasOnlyAllowedLegalNameCharacters('张 Wei')).toBe(true)
+    expect(hasOnlyAllowedPasswordCharacters('张 Wei')).toBe(true)
     expect(hasOnlyAllowedPasswordCharacters('José')).toBe(false)
     expect(SOFTWARE_KEYBOARD_SYMBOLS.includes('`')).toBe(false)
   })

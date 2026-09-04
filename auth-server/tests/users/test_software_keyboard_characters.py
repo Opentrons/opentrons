@@ -1,6 +1,5 @@
 from auth_server.users.software_keyboard_characters import (
     SOFTWARE_KEYBOARD_SYMBOLS,
-    has_only_allowed_legal_name_characters,
     has_only_allowed_password_characters,
     has_only_allowed_username_characters,
     is_software_keyboard_supported_character,
@@ -21,10 +20,10 @@ def test_accepts_keyboard_symbol_and_candidate_hanzi() -> None:
     assert not is_software_keyboard_supported_character("\u3400")
 
 
-def test_username_rejects_space_password_and_legal_name_allow_space() -> None:
+def test_username_rejects_space_password_allows_space() -> None:
     assert has_only_allowed_username_characters("Ada_Lovelace-1")
     assert not has_only_allowed_username_characters("Ada Lovelace")
     assert has_only_allowed_username_characters("张伟")
     assert has_only_allowed_password_characters("pass word")
-    assert has_only_allowed_legal_name_characters("张 Wei")
+    assert has_only_allowed_password_characters("张 Wei")
     assert not has_only_allowed_password_characters("José")

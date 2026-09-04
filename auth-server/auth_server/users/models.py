@@ -46,7 +46,7 @@ Username = Annotated[
         max_length=USERNAME_MAX_LENGTH,
         description=(
             "The username of the user. Characters must be typeable on the "
-            "ODD software keyboard. Spaces are not allowed."
+            "ODD software keyboard."
         ),
     ),
     AfterValidator(_validate_username_characters),
@@ -59,7 +59,7 @@ OptionalUsername = Annotated[
         max_length=USERNAME_MAX_LENGTH,
         description=(
             "The username of the user. Characters must be typeable on the "
-            "ODD software keyboard. Spaces are not allowed."
+            "ODD software keyboard."
         ),
     ),
     AfterValidator(_validate_optional_username_characters),

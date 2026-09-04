@@ -19,7 +19,7 @@ _TEMP_PASSWORD_CHARACTERS = CREDENTIAL_ALLOWED_CHARACTERS
 
 
 def has_only_allowed_credential_characters(value: str) -> bool:
-    """Return whether every character is allowed in a password (spaces OK)."""
+    """Return whether every character is allowed in a password."""
     return has_only_allowed_password_characters(value)
 
 
