@@ -5,9 +5,9 @@ description: "An overview of the Flex's compliance-ready setings, and who has pe
 
 Administrators can customize compliance ready settings in the Opentrons App and on the Flex touchscreen.
 
-For a complete list of Flex robot settings, see the [Flex Instruction Manual].
+See the Flex Instruction Manual for a [complete list of Flex robot settings]().
 
-## Access settings
+## Accessing settings
 
 In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
 
@@ -25,25 +25,26 @@ On the Flex touchscreen, tap the **Settings** tab, then **Compliance Ready Softw
   <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
 </figure>
 
-Not all Compliance Ready Software settings are available from the Flex touchscreen. For example, administrators can only create accounts, and aren't able to delete accounts or reset passwords. 
+!!! note
+     Not all Compliance Ready Software settings are available from the Flex touchscreen. For example, administrators can only create accounts, and aren't able to delete accounts or reset passwords. 
 
-The sections below cover every Compliance Ready Software setting available in the Opentrons App. 
+The sections below cover every Compliance Ready Software setting available in the Opentrons App.
 
 ## Personal account settings 
 
 In personal account settings, every user can update their username, legal name, and password. Usernames are restricted to 20 characters on the Flex.
 
-Administrators can customize password settings, like character length, whether to include special characters, and how often users will need to update their passwords.
-
 Users can only make changes to their personal account settings, and can't view or customize settings in User Management or Compliance Ready Software settings. 
+
+Personal account settings are the only settings uesr accounts will see in Compliance Ready settings. All other settings listed on this page are available only to adminstrator accounts.
 
 ## User management
 
-Administrators can unlock or delete users accounts, reset passwords, or edit user permissions. 
+Administrators can unlock or delete user accounts, reset passwords, or edit user permissions. 
 
 <figure class="screenshot" markdown>
   ![Image showing admin controls for user management.](images/create-account.png)
-  <figcaption>Administrators can manage user accounts in compliance-ready settings.</figcaption>
+  <figcaption>Administrators can manage user accounts in compliance ready settings.</figcaption>
 </figure>
 
 All accounts are locked by default after 5 failed login attempts. An administrator must unlock a locked account and provide the user with their one-time password. Users can choose a new password after successfully logging in.
@@ -53,7 +54,7 @@ All accounts are locked by default after 5 failed login attempts. An administrat
   <figcaption>Administrators can unlock user accounts with a one-time password.</figcaption>
 </figure>
 
-If your lab [loses access](roles.md#account-recovery) to all administrator accounts, Opentrons offers a paid on-site recovery service.
+If your lab loses access to all administrator accounts, Opentrons offers a paid on-site [recovery service](roles.md#account-recovery).
 
 
 ## Compliance Ready Software settings
@@ -71,11 +72,11 @@ Administrators can make changes to security, documentation, and storage settings
 
 ## File source folder
 
-You can choose a location to automatically download and save [files](using/files.md) from the Opentrons App.
+You can choose a location to automatically download and save files from the Opentrons App.
 
 Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location from your computer's directory.
 
-If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
+If robot settings, like your Flex's name, ever change, you may need to repeat this process.
 
 <figure class="screenshot" markdown>
   ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/source-folder.png)

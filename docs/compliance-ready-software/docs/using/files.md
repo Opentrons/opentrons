@@ -47,7 +47,7 @@ On the Flex touchscreen, tap **Settings**, then choose **File Manager** from the
 
 You'll use the file manager in the Opentrons App or on the Flex touchscreen to download and delete files from your Flex.
 
-By default, the Flex doesn't store audit logs locally—you'll need to download them from the Opentrons App after each run to save space. Administrators can change this [setting](../settings.md#download-files-after-a-run).
+By default, the Flex doesn't store audit logs locally—you'll need to download them from the Opentrons App after each run to save space. Administrators can [change this setting](../settings.md#download-files-after-a-run).
 
 You can also choose to download protocol run records and diagnostic files after every run, or wait for the Flex to remind you. 
 
@@ -71,17 +71,17 @@ All users can download files, including audit logs, from your compliance ready F
 
 Your files download as: 
 
-* **Audit logs**: A folder for each download, containing a `.zip` file with .JSON files for each log period.
-* **Diagnostic files**: An individual .JSON file for calibration logs or a `.zip` file for troubleshooting logs.
+* **Audit logs**: A folder for each download, containing a `.zip` file with `.json` files for each log period.
+* **Diagnostic files**: An individual `.json` file for calibration logs or a `.zip` file for troubleshooting logs.
 * **Protocol run records**: A `.zip` file for each run record.
 
-By default, protocol run records are automatically deleted when the Flex's storage reaches its maximum of 20 run records. Administrators can change this [setting](../admin.md).
+By default, protocol run records are automatically deleted when the Flex's storage reaches its maximum of 20 run records. Administrators can [change this setting](../admin.md).
 
 This section takes a look at downloading and deleting files in the Opentrons App and on the Flex touchscreen.
 
 ### Opentrons App
 
-In the file manager in the Opentrons App, click the check boxes for individual files in each section. Then, click at the top of each section to **Download selected** or **Delete selected**. Deleting files is irreversible, so the Opentrons App includes a reminder before you start.
+In the file manager in the Opentrons App, click the check boxes for individual files in each section. Then, click at the top of each section to **Download selected** or **Delete selected**. Deleting files is irreversible, so you'll need to confirm and document the deletion action.
 
 <figure class="screenshot" markdown>
   ![Download and delete selected audit logs.](../images/download-and-delete.png)
@@ -90,17 +90,12 @@ In the file manager in the Opentrons App, click the check boxes for individual f
 
 In the app's file manager, you can also click the arrow on the right to expand each protocol run record and see the files that are included: 
 
-* the Python protocol file. 
+* The Python protocol file. 
 * A protocol run log. 
 * Labware offset data.
 * Any images or CSV files generated during the protocol run.
 
-You can use compliance ready [settings](../admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
-
-<figure class="screenshot" markdown>
-  ![Choose a download location from the Opentrons App.](../images/download-location.png)
-  <figcaption>Choose a location for your files to download to.</figcaption>
-</figure>
+You can use compliance ready settings to [choose a default location](../admin.md) for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
 
 ### Flex touchscreen

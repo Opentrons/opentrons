@@ -42,7 +42,7 @@ plugins:
 nav:
   
   - Comliance Ready Software Instruction Manual: index.md
-  - Activation: 
+  - Getting Started: 
       - Activation: activation.md
       - Roles: roles.md
       - Settings: settings.md
@@ -54,7 +54,7 @@ nav:
       - Completing a protocol: using/complete.md
       - Accessing files: using/files.md
   - Additional Features: 
-      - Additional Features: features.md 
+      - Security: security.md 
       - Devices: devices.md
       - Administrator settings: admin.md
   - Appendices: 

@@ -5,7 +5,7 @@ description: "Beginning a day-to-day look at using compliance-ready software on 
 
 You'll start by logging in. Compliance Ready Software restricts access to your Flex through both the touchscreen and the Opentrons App.
 
-If your lab uses more than one Opentrons robot, you can still use the same Opentrons App to control them. You'll be blocked from completing actions like running protocols, changing module status, or updating robot settings on any compliance ready Flex robots. 
+If your lab uses more than one Opentrons robot, you can still use the same Opentrons App to control them. Before you log in, you'll be blocked from completing actions like running protocols, changing module status, or updating robot settings on any compliance ready Flex robots. 
 
 <figure class="screenshot" markdown>
   ![Devices page before login.](../images/devices-before-login.png)
@@ -25,7 +25,7 @@ You can log in by clicking **Log in** in the upper right. The Opentrons App will
   <figcaption>The Opentrons App prompts users to log in.</figcaption>
 </figure>
 
-Your Flex touchscreen will appear locked until you log in.
+Your Flex touchscreen will appear locked until you log in, with a lock icon in the lower right.
 
 <figure class="screenshot" markdown>
   ![Image showing a locked Flex touchscreen.](../images/locked-odd.png)

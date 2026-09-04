@@ -3,7 +3,7 @@ title: "Running protocols"
 description: "Setting up, running, and documenting protocols in Compliance Ready Software."
 ---
 
-Opentrons Flex Compliance Ready Software requires users to document their reason for completing actions like calibrating pipettes and modules, running a protocol, or recovering from an error.
+Opentrons Flex Compliance Ready Software requires users to document their reason for setting up and running protocols, including completing steps like error recovery during a protocol run.
 
 This section includes examples that users might see while using a compliance ready Flex. For a full list of user actions that require documentation, see the [Documented Actions](../actions.md) appendix.
 
@@ -28,7 +28,7 @@ For either method, the Opentrons App will prompt administrators to document thei
   <figcaption>Click to send a protocol to your compliance ready Flex.</figcaption>
 </figure>
 
-Since users can't send (and therefore run) protocols to the Flex by default, their accounts will be blocked from sending a protocol using either method.
+Since users can't send protocols to the Flex by default, their accounts will be blocked from sending a protocol using either method.
 
 <figure class="screenshot" markdown>
   ![Click to send a protocol to your compliance ready Flex.](../images/user-blocked.png)
@@ -42,15 +42,18 @@ Administrators can change this setting to allow users to send protocols to your 
 1. Log in to Compliance Ready Software in the Opentrons App. 
 2. Use the three-dot menu at the right to access robot settings for your Flex. 
 3. Select the **Compliance Ready** tab. 
-4. Under **Actions requiring admin credentials**, toggle on or off the **Require admin credentials to send protocols to this robot** setting.
+4. Under **Actions requiring admin credentials**, toggle the **Require admin credentials to send protocols to this robot** setting.
+
+!!! note
+    Because Compliance Ready Software limits protocol runs to those chosen by verified users, [Quick Transfer protocols] are disabled on your compliance ready Flex.
 
 ## Setting up a protocol
 
 After logging in on the Flex touchscreen or in the Opentrons App, you'll be able to start setting up a protocol.
 
-Click or tap the protocols tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols [sent to the Flex](#sending-protocols) by an administrator.
+Click or tap the **Protocols** tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols [sent to the Flex](#sending-protocols) by an administrator.
 
-After choosing any [runtime parameters](../../python-api/runtime-parameters/index.md) and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
+After choosing any runtime parameters and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
 <figure class="screenshot" markdown>
   ![Users should add documentation before beginning protocol setup.](../images/setup-documentation.png)
@@ -62,7 +65,7 @@ You'll need to continue adding documentation at several points during protocol s
 * Attaching, detaching, or calibrating pipettes or hardware, like modules.
 * Updating or confirming deck placements, including labware and liquids.
 * Changing a module's state, like opening a labware latch or setting temperature.
-* Applying [labware offsets](../../flex/touchscreen/protocol-setup.md#labware-offsets) or starting a labware position check.
+* Applying [labware offsets](../../flex/touchscreen/protocol-setup.md#labware-offsets) or starting a Labware Position Check.
 * Updating protocol run settings, like camera and image preferences.
 
 Although you can begin a protocol run on the Flex before some setup steps are complete, you'll need to document your reason for doing so. 
@@ -74,7 +77,7 @@ Although you can begin a protocol run on the Flex before some setup steps are co
 
 In this example, you can still begin the protocol run. You'll see a warning on the Flex touchscreen and, if you tap **Start run**, you'll need to document a separate action—starting the run without applying labware offsets. 
 
-If you need to make changes to the Flex or an attached instrument or module before you begin setup, you'll also need to add documentation for those [actions](../actions.md). 
+If you need to make changes to the Flex or an attached instrument or module before you begin setup, you'll also need to add documentation for those actions. 
 
 ## Running a protocol
 
@@ -88,7 +91,7 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 
 You won't be blocked from completing any of the actions listed above while your protocol runs, but you'll need to enter documentation *after* you complete them. 
 
-For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll prompted to add documentation when you:
+For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll be prompted to add documentation when you:
 
 * Start or complete [error recovery](../../flex/touchscreen/protocol-run.md#error-recovery).
 * Retry or skip the step causing the error. 

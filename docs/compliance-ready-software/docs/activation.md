@@ -3,7 +3,7 @@ title: "Activation"
 description: "What users need to know about activating Flex Compliance-Ready Software."
 ---
 
-Activating Opentrons Flex Compliance Ready Software permanently adds technical controls, like required documentation and user access, for FDA regulation 21 CFR part 11–ready operation.
+Activating Opentrons Flex Compliance Ready Software adds technical controls, like required documentation and user access, for FDA regulation 21 CFR part 11–ready operation. Software activation is permanent and secures the Flex in your lab for daily use. 
 
 An Opentrons-trained representative will install and activate Compliance Ready Software during an on-site visit. The price of the software includes installation, activation, and training.
 
@@ -11,7 +11,7 @@ During activation, your representative will first install the software using a *
 
 ## Encryption key
 
-Next, they'll use an *encryption key* to establish a connection between your unique Flex and the Opentrons App. This ensures that only approved users can control the Flex and access its records through your app. 
+After installation, your representative will use an *encryption key* to establish a connection between your unique Flex and the Opentrons App. This ensures that only approved users can control the Flex and access its records through your app. 
 
 The encryption key is a three-word string, and your Flex generates a new one every 30 seconds. 
 
@@ -22,7 +22,7 @@ When you update settings or software, you may need to use the encryption key to 
   <figcaption>The Opentrons App will prompt you if you need to enter the robot encryption key again.</figcaption>
 </figure>
 
-To access and add the key again: 
+They key should appear on the Flex touchscreen whenever it's required in the app. To access the key any time: 
 
 <div class="instruction-list" markdown>
 
@@ -36,10 +36,12 @@ To access and add the key again:
 
 3. In your Opentrons App, click the three-dot menu to the right of your robot's name to access its settings. Select the **Advanced** tab, then click to **Enter encryption key**.
 
+You'll only be able to access the encryption key from the Flex touchscreen, and only add it in the Opentrons App.
+
 
 ## Completing activation
 
-Finally, your representative will create accounts for your lab to use, assigned either an administrator or user [role](roles.md). You'll also be able to customize Compliance Ready Software [settings](settings.md).
+Finally, your representative will create accounts for your lab to use, assigned either an administrator or [user role](roles.md). You'll also be able to customize Compliance Ready Software [settings](settings.md).
 
 After setup, a "Compliance Ready" badge appears next to your Flex in the Opentrons App.
 
@@ -51,4 +53,4 @@ After setup, a "Compliance Ready" badge appears next to your Flex in the Opentro
 !!! note
     Remember that you can control multiple robots through the same Opentrons App, including those that don't have Compliance Ready Software. The way you use the app to interact with a compliance ready Flex will be different, including logins, protocol runs, and required documentation.
 
-After activation, you'll need to add your own protocols and data management practices to use your Flex into a fully audit-ready workflow.
+After activation, you'll need to add your own protocols and data management practices to use your Flex in a fully audit-ready workflow.

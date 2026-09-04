@@ -9,7 +9,7 @@ Opentrons Flex Compliance Ready Software adds required documentation checkpoints
 
 Users will need to document their reason for updating robot settings: 
 
-* Changing the Flex's network connection (Ethernet or WiFi).
+* Changing the Flex's network connection (Ethernet or Wi-Fi).
 * Changing the Flex's name.
 * Updating the robot software through the Opentrons App or with a file.
 * Matching Opentrons App and robot software.
@@ -44,16 +44,15 @@ From the **Devices** page in the Opentrons App, users can complete robot actions
 * Downloading calibration logs.
 * Dropping attached tips from a pipette.
 * Changing module states:
-   * Homing the Stacker Shuttle.
-   * Changing the Thermocycler Module's lid position.
-   * Testing the Heater-Shaker's shake speed.
-   * Setting a target temperature for the Heater-Shaker, Thermocycler, or Temperature Module.
-   * Opening or closing the Heater-Shaker's labware latch.
-   * Deactivating a module.
-   * Setting up a new module.
+      * Homing the Stacker shuttle.
+      * Changing the Thermocycler Module's lid position.
+      * Testing the Heater-Shaker's shake speed.
+      * Setting a target temperature for the Heater-Shaker, Thermocycler, or Temperature Module.
+      * Opening or closing the Heater-Shaker's labware latch.
+      * Deactivating a module.
+      * Setting up a new module.
 * Updating module and hardware deck slot locations.
-* Adding or removing items from the deck.
-* Homing Stacker shuttle.
+* Adding or removing modules or fixtures, like the trash bin, from the deck.
 
 ## Protocol setup
 
@@ -64,7 +63,7 @@ When setting up a protocol, users will need to document their reason for:
 * Calibrating pipettes or modules.
 * Changing the deck slot locations of modules or labware, including resolving deck location conflicts. 
 * Changing a module's state, like opening a labware latch or setting temperature.
-* Starting or completing labware position check.
+* Starting or completing Labware Position Check.
 * Applying labware offsets.
 * Confirming labware and liquid placements on the Flex deck.
 * Updating camera settings for the protocol run: 

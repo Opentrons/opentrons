@@ -7,9 +7,9 @@ This glossary defines terms related to Opentrons Flex Compliance Ready Software.
 
 ##### 21 CFR part 11
 
-Part of the code of federal regulations under Chapter I (Food and Drug Administration), Subchapter A, and part 11, pertaining to electronic records and electronic signatures.
+Part of the Code of Federal Regulations under Chapter I (Food and Drug Administration), Subchapter A, and part 11, pertaining to electronic records and electronic signatures.
 
-##### Administrator
+##### Admin
 
 Each lab needs at least one compliance ready account assigned an administrator role. These accounts have full system access and can update administrator and Flex system settings. By default, only these accounts can manage protocols on the Flex. 
 
@@ -19,7 +19,7 @@ Files containing protocol and Compliance Ready Software data, like user actions 
 
 ##### Documentation
 
-Text added by users in an open prompt in the Opentrons App or on the Flex touchscreen to document their reason for completing an action, like running a protocol or updating a setting on their compliance ready Flex. 
+Text added by users in an open prompt in the Opentrons App or on the Flex touchscreen to explain their reason for completing an action, like running a protocol or updating a setting on their compliance ready Flex. 
 
 ##### Encryption key 
 

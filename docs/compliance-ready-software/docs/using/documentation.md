@@ -5,7 +5,7 @@ description: "Covers the concept of documenting user actions in Compliance Ready
 
 Required *documentation* is an important part of Opentrons Flex Compliance Ready Software.  Whenever administrators and users make changes to modules, set up a protocol, detach a pipette, or run a protocol, they'll need to document their reason for doing so. 
 
-Their documentation, along with their name and user ID, become a part of the [files](files.md) your compliance ready Flex generates.
+Their documentation, along with their name and user ID, become a part of the files your compliance ready Flex generates.
 
 This section covers how users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](../actions.md) appendix.
 
@@ -18,22 +18,19 @@ Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to
 
 On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
-<figure class="screenshot" markdown>
-  ![Add documentation on the Flex touchscreen.](../images/documentation-required.png)
-  <figcaption>Add documentation on the Flex touchscreen.</figcaption>
-</figure>
-
-!!! note
-    The Flex touchscreen's on-screen keyboard includes features to make it easier for your lab to add documentation:
-
-       * Tap the gray arrow on the right side to collapse the keyboard.
-       * Double tap text to cut, copy, or paste.
-   
+!!! tip
     Flex also supports an [external keyboard](../devices.md), attached via USB, to type documentation.
 
-Since this action requires documentation, you can't bypass this screen. If you didn't mean to complete this action, you can always tap the back arrow in the upper left.
+<figure class="screenshot" markdown>
+  ![Add documentation on the Flex touchscreen.](../images/documentation-required.png)
+  <figcaption>Add documentation on the Flex touchscreen. Tap the gray arrow on the right to collapse the keyboard.</figcaption>
+</figure>
 
-Users can also add text in the Opentrons App. Here, you'll also see a [list of actions](#viewing-actions) requiring documentation on the right. Read more in the section below.
+Whenever an action requires documentation, you won't be able to bypass this screen. Once documentation is added, your Flex will proceed with the action. 
+
+If you didn't mean to complete the action, you can always tap the back arrow in the upper left.
+
+Users can also add text in the Opentrons App. Here, you'll also see a [list of actions](#viewing-actions) requiring documentation on the right.
 
 <figure class="screenshot" markdown>
   ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
@@ -46,7 +43,7 @@ You'll see the same screen on the Flex touchscreen and in the Opentrons App ever
 
 When you're finished, click **Confirm** to save your text and move on.
 
-## Viewing actions
+## View actions
 
 While working on the bench, you'll see several prompts to add documentation in the same workflow. In the Opentrons App, you'll always see a list of actions requiring documentation in the same place you enter documentation.
 
@@ -57,7 +54,7 @@ On your Flex itself, the "Documentation required" screen fills the entire touchs
   <figcaption>Tap in the top right to see the Thermocycler Module action requiring documentation.</figcaption>
 </figure>
 
-## Documentation Settings
+## Documentation settings
 
 Administrators can customize documentation settings in the Opentrons App. Click the three-dot menu to the right of your robot's name to access **Robot Settings**. Then, choose the **Compliance Ready** tab. Under **Audit log requirements**, administrators can update settings:  
 
@@ -66,4 +63,4 @@ Administrators can customize documentation settings in the Opentrons App. Click 
 
 If you choose to no longer require documentation for robot actions, the user ID for the currently logged in user will still be attached to every user action in the protocol and included in the audit log. However, the Opentrons App and Flex touchscreen will never prompt users to enter documentation. Users without appropriate credentials will still be blocked from completing certain actions and updating settings.
 
-See the complete list of administrator-customizable [settings](../admin.md) for more.
+See the complete list of [administrator settings](../admin.md) for more.
