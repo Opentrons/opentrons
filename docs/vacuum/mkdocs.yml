@@ -1,0 +1,66 @@
+site_name: vacuum
+
+nav:
+  - Opentrons Vacuum Module GEN1 Instruction Manual: index.md
+  - Safety and Compliance: compliance.md
+  - Product Specifications:
+      - Product Specifications: specifications/index.md
+      - Deck Components: specifications/deck-components.md
+      - Waste Collection Carboy: specifications/carboy.md
+      - Chemical Compatibility: specifications/compatibility.md
+  - Use Cases and Stack Configurations: use-cases.md
+  - Installing the Vacuum Module: installation.md
+  - Maintenance and Cleaning: maintenance.md
+  - Vacuum Module G-Codes:
+      - Vacuum Module G-Code Concepts: g-code-concepts.md
+      - Vacuum Module G-Codes: g-codes.md
+      - Vacuum Module Error Codes: error-codes.md
+  - Additional Product Information: additional-info.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+  favicon: images/favicon.png
+  logo: assets/logo.png
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
+      enumerate_headings: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+      title: Table of Contents
+      toc_depth: 3
+
+
+extra_css:
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
+  - ../shared/print-pdf.css

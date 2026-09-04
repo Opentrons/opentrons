@@ -17,6 +17,7 @@ nav:
       - Thermocycler Module: '!include thermocycler/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
+      - Vacuum Module: '!include vacuum/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
 
