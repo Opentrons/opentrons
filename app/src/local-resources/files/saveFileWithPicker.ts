@@ -29,9 +29,9 @@ interface SaveFilePickerWindow {
 /**
  * Prompt the user to choose a save location, then write `data` to that file.
  *
- * Unlike file-saver's `saveAs`, this waits until the user confirms Save before
- * resolving. Canceling the dialog rejects with `FileSaveCanceledError` so
- * callers can do things like skip toasts and follow-up work such as delete.
+ * Resolves only after the user confirms Save. Canceling the dialog rejects
+ * with `FileSaveCanceledError` so callers can skip toasts and follow-up work
+ * such as delete.
  *
  * File type filters are inferred from the filename extension (`.zip`, `.json`).
  */
