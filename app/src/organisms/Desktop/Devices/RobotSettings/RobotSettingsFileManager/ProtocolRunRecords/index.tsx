@@ -13,6 +13,7 @@ import {
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
+import { isRunSignoffRequiredError } from '/app/local-resources/access-control/utils'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import {
@@ -139,6 +140,15 @@ export function ProtocolRunRecords({
       .catch((error: Error) => {
         if (isDocumentedMutationError(error)) {
           setShowDeleteRecordsModal(true)
+        } else if (isRunSignoffRequiredError(error)) {
+          makeToast(
+            t('cancel_or_start_run_before_deleting') as string,
+            ERROR_TOAST,
+            {
+              heading: t('unable_to_delete_run_record'),
+              closeButton: true,
+            }
+          )
         } else {
           makeToast(error.message || 'Error processing records', ERROR_TOAST)
         }
