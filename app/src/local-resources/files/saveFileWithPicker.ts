@@ -26,32 +26,65 @@ interface SaveFilePickerWindow {
   }>
 }
 
+/**
+ * Prompt the user to choose a save location, then write `data` to that file.
+ *
+ * Unlike file-saver's `saveAs`, this waits until the user confirms Save before
+ * resolving. Canceling the dialog rejects with `FileSaveCanceledError` so
+ * callers can do things like skip toasts and follow-up work such as delete.
+ *
+ * File type filters are inferred from the filename extension (`.zip`, `.json`).
+ */
 export function saveFileWithPicker(
   filename: string,
-  buffer: ArrayBuffer
+  data: ArrayBuffer | Blob
 ): Promise<void> {
   const picker = (window as SaveFilePickerWindow).showSaveFilePicker
   if (picker == null) {
     return Promise.reject(new Error('Save file picker is not available'))
   }
 
+  const types = getSaveFilePickerTypes(filename)
+
   return picker({
     suggestedName: filename,
-    types: [
-      {
-        description: 'ZIP archive',
-        accept: { 'application/zip': ['.zip'] },
-      },
-    ],
+    ...(types.length > 0 ? { types } : {}),
   })
     .then(handle => handle.createWritable())
-    .then(writable =>
-      writable.write(buffer).then(() => writable.close())
-    )
+    .then(writable => writable.write(data).then(() => writable.close()))
     .catch(error => {
       if (error instanceof DOMException && error.name === 'AbortError') {
         throw new FileSaveCanceledError()
       }
       throw error
     })
+}
+
+function getSaveFilePickerTypes(filename: string): Array<{
+  description: string
+  accept: Record<string, string[]>
+}> {
+  const extension = filename.includes('.')
+    ? filename.slice(filename.lastIndexOf('.'))
+    : ''
+
+  if (extension === '.json') {
+    return [
+      {
+        description: 'JSON',
+        accept: { 'application/json': ['.json'] },
+      },
+    ]
+  }
+
+  if (extension === '.zip') {
+    return [
+      {
+        description: 'ZIP archive',
+        accept: { 'application/zip': ['.zip'] },
+      },
+    ]
+  }
+
+  return []
 }

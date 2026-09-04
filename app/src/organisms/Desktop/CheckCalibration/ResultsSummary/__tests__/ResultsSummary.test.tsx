@@ -1,5 +1,4 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { saveAs } from 'file-saver'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -14,14 +13,14 @@ import { RenderMountInformation } from '../RenderMountInformation'
 
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 
-// file-saver has circular dep, need to mock with factory to prevent error
-vi.mock('file-saver', async importOriginal => {
-  const actual = await importOriginal<typeof saveAs>()
-  return {
-    ...actual,
-    saveAs: vi.fn(),
-  }
-})
+const mockSaveFileWithPicker = vi.hoisted(() =>
+  vi.fn().mockResolvedValue(undefined)
+)
+
+vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
+  saveFileWithPicker: mockSaveFileWithPicker,
+  isFileSaveCanceledError: vi.fn(),
+}))
 vi.mock('/app/redux/sessions')
 vi.mock('../CalibrationHealthCheckResults')
 vi.mock('../RenderMountInformation')
@@ -80,7 +79,10 @@ describe('ResultsSummary', () => {
     render(props)
     const button = screen.getByTestId('ResultsSummary_Download_Button')
     fireEvent.click(button)
-    expect(vi.mocked(saveAs)).toHaveBeenCalled()
+    expect(mockSaveFileWithPicker).toHaveBeenCalledWith(
+      'Robot Calibration Check Report.json',
+      expect.any(Blob)
+    )
   })
 
   it('calls mock function when clicking finish', () => {

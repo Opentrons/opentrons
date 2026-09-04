@@ -36,12 +36,38 @@ describe('saveFileWithPicker', () => {
     })
   })
 
+  it('filters the picker by JSON when the filename ends in .json', () => {
+    const showSaveFilePicker = vi.fn().mockResolvedValue({
+      createWritable: vi.fn().mockResolvedValue({
+        write: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
+      }),
+    })
+    vi.stubGlobal('showSaveFilePicker', showSaveFilePicker)
+
+    return saveFileWithPicker('otie-calibration.json', new Blob(['{}'])).then(
+      () => {
+        expect(showSaveFilePicker).toHaveBeenCalledWith({
+          suggestedName: 'otie-calibration.json',
+          types: [
+            {
+              description: 'JSON',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        })
+      }
+    )
+  })
+
   it('throws FileSaveCanceledError when the user cancels', () => {
     vi.stubGlobal(
       'showSaveFilePicker',
-      vi.fn().mockRejectedValue(
-        new DOMException('The user aborted a request.', 'AbortError')
-      )
+      vi
+        .fn()
+        .mockRejectedValue(
+          new DOMException('The user aborted a request.', 'AbortError')
+        )
     )
 
     return expect(
