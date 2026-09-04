@@ -56,7 +56,7 @@ export function useDeleteSelectedRuns(
         }
 
         if (signoffRequiredError != null) {
-          throw signoffRequiredError
+          await Promise.reject(signoffRequiredError)
         }
         if (hasDeleteError) {
           throw new Error('One or more runs failed to delete')

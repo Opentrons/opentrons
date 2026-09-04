@@ -13,6 +13,8 @@ import type { Dispatch, State } from '/app/redux/types'
 
 export interface DownloadedLogPeriod {
   logPeriod: LogPeriodSummary
+  // present for completed periods; in-progress periods download without one
+  deletionKey: string | null
 }
 
 export interface DownloadLogPeriodsVariables {

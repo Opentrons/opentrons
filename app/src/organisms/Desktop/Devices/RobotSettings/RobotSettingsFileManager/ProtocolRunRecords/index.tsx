@@ -141,7 +141,10 @@ export function ProtocolRunRecords({
         return deleteSelectedRuns(successfullyDownloadedRuns)
       })
       .catch((error: Error) => {
-        if (isDocumentedMutationError(error) || isFileSaveCanceledError(error)) {
+        if (
+          isDocumentedMutationError(error) ||
+          isFileSaveCanceledError(error)
+        ) {
           setShowDeleteRecordsModal(true)
         } else if (isRunSignoffRequiredError(error)) {
           makeToast(

@@ -151,9 +151,8 @@ describe('useDownloadSelectedRuns', () => {
   })
 
   it('should reject when the user cancels the save dialog', async () => {
-    const { FileSaveCanceledError } = await import(
-      '/app/local-resources/files/saveFileWithPicker'
-    )
+    const { FileSaveCanceledError } =
+      await import('/app/local-resources/files/saveFileWithPicker')
     vi.mocked(saveFileWithPicker).mockRejectedValue(new FileSaveCanceledError())
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
       wrapper,
