@@ -1,8 +1,10 @@
 """Route handlers for ingesting log messages."""
 
 import datetime
+import json
 from logging import getLogger
 from pathlib import Path
+from textwrap import dedent
 from typing import Annotated
 
 import fastapi
@@ -11,6 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
     KeyStorageUnavailableError,
 )
 
+from server_utils.audit.constants import ACTION_STORE_RUNLOG
 from server_utils.audit.fastapi import get_supplied_user_notes, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
@@ -31,6 +34,7 @@ from .models import (
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
     SubmitExternalAuditLogMessageData,
+    SubmitSupportingFileMessageData,
 )
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
@@ -169,8 +173,12 @@ async def post_external_log_message(
 @PydanticResponse.wrap_route(
     router.post,
     path="/audit/internal/storeRobotLog",
-    summary="Store a robot's run record and associate it with the"
-    " current log period, if logging is enabled.",
+    summary=dedent(
+        """Store a robot's run record and associate it with the current log period, if logging is enabled.
+
+    Callers must provide both the runlog, under the multipart/form-data key file, and a file of supporting information
+    matching {fileType: 'runrecord', serverId: str, accountName: str, legalName: str, reason: str | None}"""
+    ),
     responses={
         fastapi.status.HTTP_201_CREATED: {
             "model": SimpleBody[StoreRobotLogResponseData]
@@ -181,18 +189,34 @@ async def post_external_log_message(
                 " could not be signed."
             ),
         },
+        fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "description": "One of the two required files was not provided, or the supporting info did not meet requirements."
+        },
     },
 )
-async def store_robot_log(
+async def store_robot_log(  # noqa: C901
     log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
     robot_logs_directory: Annotated[Path, fastapi.Depends(get_robot_logs_directory)],
-    file: Annotated[
-        fastapi.UploadFile, fastapi.File(description="Data file to upload")
-    ],
+    file: fastapi.UploadFile,
+    supporting_info: fastapi.UploadFile,
 ) -> PydanticResponse[SimpleBody[StoreRobotLogResponseData]]:
     """Store a robot log with the current log period."""
+    supporting_message_data: SubmitSupportingFileMessageData | None = None
+    stored_file_hash: str | None = None
+    stored_file_name: str | None = None
+
+    supporting_message_data = SubmitSupportingFileMessageData.model_validate_json(
+        await supporting_info.read()
+    )
+
+    if supporting_message_data.fileType != "runrecord":
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Only run records are accepted by this endpoint",
+        )
+
     try:
-        stored_robot_log = await log_data_manager.store_robot_log(
+        stored_file_hash = await log_data_manager.store_robot_log(
             robot_log=file, robot_log_path=robot_logs_directory
         )
     except KeyStorageUnavailableError as exc:
@@ -202,10 +226,32 @@ async def store_robot_log(
                 "Audit log message could not be signed: key-server is unavailable."
             ),
         ) from exc
+
+    if stored_file_hash:
+        ingest_time = datetime.datetime.now(datetime.timezone.utc)
+        message = AuditLogMessage(
+            action=ACTION_STORE_RUNLOG,
+            accountName=supporting_message_data.accountName,
+            legalName=supporting_message_data.legalName,
+            message=json.dumps(
+                {"fileHash": stored_file_hash, "filePath": stored_file_name}
+            ),
+            reason=supporting_message_data.reason,
+            loggedAt=ingest_time,
+        )
+        try:
+            await log_data_manager.store_log(message.model_dump_json(indent=None))
+        except KeyStorageUnavailableError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    "Audit log message could not be signed: key-server is unavailable."
+                ),
+            ) from exc
     await log_data_manager.rotate_periods()
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(
-            data=StoreRobotLogResponseData(loggingEnabled=stored_robot_log is not None)
+            data=StoreRobotLogResponseData(loggingEnabled=stored_file_hash is not None)
         ),
     )

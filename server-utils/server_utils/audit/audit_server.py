@@ -7,6 +7,7 @@ audit log messages.
 from __future__ import annotations
 
 import contextlib
+import io
 import logging
 import typing
 from abc import ABC, abstractmethod
@@ -47,7 +48,7 @@ class Client(ABC):
 
     @abstractmethod
     async def store_robot_log(
-        self, robot_log_file: typing.TextIO
+        self, robot_log_file: typing.TextIO, message: SubmitSupportingFileMessageData
     ) -> StoreRobotLogSuccessData:
         """Store a robot log file and rotate the log period.
 
@@ -157,10 +158,14 @@ class LocalHTTPClient(Client):
 
     @typing.override
     async def store_robot_log(
-        self, robot_log_file: typing.TextIO
+        self, robot_log_file: typing.TextIO, message: SubmitSupportingFileMessageData
     ) -> StoreRobotLogSuccessData:
         async with self._session.post(
-            STORE_ROBOT_LOG_ENDPOINT_PATH, data={"file": robot_log_file}
+            STORE_ROBOT_LOG_ENDPOINT_PATH,
+            data={
+                "file": robot_log_file,
+                "supporting_info": io.StringIO(message.model_dump_json()),
+            },
         ) as response:
             response_bytes = await response.read()
         response.raise_for_status()
@@ -245,10 +250,10 @@ class NoOpClient(Client):
 
     @typing.override
     async def store_robot_log(
-        self, robot_log_file: typing.TextIO
+        self, robot_log_file: typing.TextIO, message: SubmitSupportingFileMessageData
     ) -> StoreRobotLogSuccessData:
         _log.info(
-            f"Store robot log (audit-server not configured): {robot_log_file.name}"
+            f"Store robot log (audit-server not configured): {robot_log_file.name}: {message.model_dump_json()}"
         )
         return StoreRobotLogSuccessData(loggingEnabled=False)
 
@@ -286,6 +291,16 @@ class NoOpClient(Client):
 
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
+
+
+class SubmitSupportingFileMessageData(_StrictBaseModel):
+    """Details for a supporting-file submission."""
+
+    fileType: str
+    serverId: str
+    accountName: str
+    legalName: str
+    reason: str | None
 
 
 class SubmitAuditLogMessageData(_StrictBaseModel):
