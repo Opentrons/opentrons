@@ -141,7 +141,7 @@ export function RenameRobotSlideout({
       if (data.name != null) {
         dispatch(renameRobot(previousRobotName, data.name))
         dispatch(startDiscovery())
-        navigate(`/devices/${data.name}/robot-settings`)
+        navigate(`/devices`)
       }
     },
     onError: (error: Error) => {
