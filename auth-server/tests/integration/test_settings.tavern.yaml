@@ -49,6 +49,18 @@ stages:
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: PATCH passwordResetTime below one day is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          passwordResetTime: 1.0
+    response:
+      status_code: 422
+
   - name: PATCH more settings
     request:
       method: PATCH
@@ -58,7 +70,7 @@ stages:
       json:
         data:
           idleLogout: 60.0
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -67,7 +79,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -84,7 +96,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -101,7 +113,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -128,7 +140,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -138,7 +150,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -226,12 +238,12 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
     response:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null

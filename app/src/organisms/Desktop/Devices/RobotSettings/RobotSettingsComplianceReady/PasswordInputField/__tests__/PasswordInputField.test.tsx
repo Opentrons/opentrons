@@ -11,6 +11,7 @@ import { PasswordInputField } from '..'
 
 import type { ComponentProps } from 'react'
 
+const TOGGLE_PASSWORD_VISIBILITY = 'Toggle password visibility'
 const PASSWORD_PLACEHOLDER = i18n.t('desktop_password_placeholder', {
   ns: 'device_settings',
 })
@@ -40,28 +41,38 @@ describe('PasswordInputField', () => {
     )
   })
 
-  it('renders a Show button by default', () => {
+  it('renders an icon-only visibility toggle by default', () => {
     render(props)
-    screen.getByRole('button', { name: 'Show' })
+    expect(
+      screen.getByRole('button', { name: TOGGLE_PASSWORD_VISIBILITY })
+    ).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.queryByRole('button', { name: 'Show' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Hide' })).toBeNull()
   })
 
-  it('reveals the password when the Show button is clicked', () => {
+  it('reveals the password when the visibility toggle is clicked', () => {
     render({ ...props, value: 'secret' })
-    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: TOGGLE_PASSWORD_VISIBILITY })
+    )
     const input = screen.getByDisplayValue('secret')
     expect(input).toHaveAttribute('type', 'text')
     expect(input).toHaveValue('secret')
-    screen.getByRole('button', { name: 'Hide' })
+    expect(
+      screen.getByRole('button', { name: TOGGLE_PASSWORD_VISIBILITY })
+    ).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('keeps focus on the password input when the Show button is clicked', async () => {
+  it('keeps focus on the password input when the visibility toggle is clicked', async () => {
     const user = userEvent.setup()
     render({ ...props, value: 'secret' })
     const input = screen.getByDisplayValue('secret')
     input.focus()
     expect(input).toHaveFocus()
 
-    await user.click(screen.getByRole('button', { name: 'Show' }))
+    await user.click(
+      screen.getByRole('button', { name: TOGGLE_PASSWORD_VISIBILITY })
+    )
 
     expect(input).toHaveFocus()
     expect(input).toHaveAttribute('type', 'text')
@@ -76,7 +87,9 @@ describe('PasswordInputField', () => {
     expect(input.selectionStart).toBe(3)
     expect(input.selectionEnd).toBe(3)
 
-    await user.click(screen.getByRole('button', { name: 'Show' }))
+    await user.click(
+      screen.getByRole('button', { name: TOGGLE_PASSWORD_VISIBILITY })
+    )
 
     expect(input).toHaveFocus()
     expect(input.selectionStart).toBe(input.value.length)

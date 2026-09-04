@@ -10,6 +10,7 @@ export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
   autoFocusFirstField?: boolean
   stacked?: boolean
   usernameMaxLength?: number
+  readOnly?: boolean
 }
 
 export function UserAccountIdentityFormFields<T extends FieldValues>({
@@ -17,6 +18,7 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
   autoFocusFirstField,
   stacked = false,
   usernameMaxLength,
+  readOnly = false,
 }: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
   if (stacked) {
     return (
@@ -25,8 +27,9 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
           autoFocus={autoFocusFirstField}
           control={control}
           usernameMaxLength={usernameMaxLength}
+          readOnly={readOnly}
         />
-        <UserAccountFullNameField control={control} />
+        <UserAccountFullNameField control={control} readOnly={readOnly} />
       </>
     )
   }
@@ -37,8 +40,9 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
         autoFocus={autoFocusFirstField}
         control={control}
         usernameMaxLength={usernameMaxLength}
+        readOnly={readOnly}
       />
-      <UserAccountFullNameField control={control} />
+      <UserAccountFullNameField control={control} readOnly={readOnly} />
     </div>
   )
 }

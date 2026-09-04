@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -18,20 +19,25 @@ import type { ReactNode } from 'react'
 export interface DownloadAuditLogsModalProps {
   onDownload: () => void
   isLoading: boolean
+  closeOnOutsideClick?: boolean
+  onClose?: () => void
 }
 
 export function DownloadAuditLogsModal({
   onDownload,
   isLoading,
-}: DownloadAuditLogsModalProps): ReactNode {
+  closeOnOutsideClick = false,
+  onClose,
+}: DownloadAuditLogsModalProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
   return createPortal(
     <Modal
       type="warning"
       title={t('download_audit_logs')}
-      closeOnOutsideClick={false}
+      closeOnOutsideClick={closeOnOutsideClick}
       childrenPadding="var(--spacing-24)"
+      onClose={onClose}
     >
       <div className={styles.content}>
         <StyledText desktopStyle="bodyDefaultRegular">
@@ -94,11 +100,13 @@ function DownloadAuditLogsModalContent({
     downloadAndDeleteAuditLog()
       .then(() => {
         modal.resolve(true)
+        modal.remove()
       })
-      .catch(error => {
+      .catch((error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          return
+        }
         modal.reject(error)
-      })
-      .finally(() => {
         modal.remove()
       })
   }

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import {
+  DocumentedMutationError,
   useAuditSettingsMutation,
   useAuditSettingsQuery,
   useAuthSettingsMutation,
@@ -166,6 +167,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       mutate: mockPatchAuthSettings,
+      mutateAsync: mockPatchAuthSettings,
     } as any)
     vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
       {
@@ -174,6 +176,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
     vi.mocked(useAuditSettingsMutation).mockReturnValue({
       mutate: mockPatchAuditSettings,
+      mutateAsync: mockPatchAuditSettings,
     } as any)
     vi.mocked(useUsersQuery).mockReturnValue(
       mockSuccessQueryResults({
@@ -401,6 +404,31 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     })
   })
+
+  it('should revert auth input values when documentation is cancelled', async () => {
+    mockPatchAuthSettings.mockRejectedValue(
+      new DocumentedMutationError('no_documentation_report')
+    )
+
+    render()
+    expandAccordion()
+
+    const loginAttemptsField = screen.getByLabelText(
+      'Maximum login attempts before account deactivation'
+    )
+    fireEvent.change(loginAttemptsField, { target: { value: '1' } })
+    expect(loginAttemptsField).toHaveValue(1)
+
+    fireEvent.blur(loginAttemptsField)
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(
+          'Maximum login attempts before account deactivation'
+        )
+      ).toHaveValue(5)
+    })
+  })
   it('should update audit input values without patching until blur', async () => {
     render()
     expandAccordion()
@@ -447,6 +475,33 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
     expect(idleLogoutField).toHaveValue(0)
+  })
+
+  it('should not patch passwordResetTime when blurred value is below the minimum', async () => {
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          ...MOCK_AUTH_SETTINGS.data,
+          passwordResetTime: 90 * 24 * 60 * 60,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+
+    render()
+    expandAccordion()
+
+    const passwordResetTimeField = screen.getByLabelText('Edit length of time')
+    expect(passwordResetTimeField).toHaveValue(90)
+
+    fireEvent.change(passwordResetTimeField, { target: { value: '0' } })
+    fireEvent.blur(passwordResetTimeField)
+
+    await waitFor(() => {
+      screen.getByText('Must be at least 1 day')
+    })
+
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(passwordResetTimeField).toHaveValue(0)
   })
 })
 
