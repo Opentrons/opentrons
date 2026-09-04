@@ -1,19 +1,19 @@
 .container {
   position: absolute;
   z-index: 10;
-  right: var(--spacing-40);
+  right: 0;
   bottom: var(--spacing-32);
-  left: var(--spacing-40);
+  left: 0;
   display: flex;
   overflow: visible;
-  width: auto;
+  width: min(50rem, calc(100% - 2 * var(--spacing-40))); /* 800px max */
   min-width: 21.25rem; /* 340px */
-  max-width: 50rem; /* 800px */
   height: 4.5rem;
   box-sizing: border-box;
   align-items: center;
   padding: 0 var(--spacing-20);
   border-radius: var(--border-radius-full);
+  margin: 0 auto;
   background-color: var(--white);
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
 }
