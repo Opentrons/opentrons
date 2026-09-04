@@ -455,9 +455,28 @@ class RunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         try:
-            assert self._run_result is not None
-            result = self._run_result
-            self._run_result = None
+            if self._run_result is not None:
+                result = self._run_result
+                self._run_result = None
+            else:
+                # Account for situations in which run() has not finished but clear() has been called
+                run_data = await self.run_coordinator.get_state_summary()
+                commands = await self.run_coordinator.get_all_commands()
+                run_time_parameters = (
+                    await self.run_coordinator.get_run_time_parameters()
+                )
+                command_annotations = (
+                    await self.run_coordinator.get_all_command_annotations()
+                )
+                preconditions = await self.run_coordinator.get_preconditions()
+
+                result = RunResult(
+                    state_summary=run_data,
+                    commands=commands,
+                    parameters=run_time_parameters,
+                    command_annotations=command_annotations,
+                    command_preconditions=preconditions,
+                )
 
             if self._run_coordinator is not None:
                 await self._run_coordinator.clear_command_history()
