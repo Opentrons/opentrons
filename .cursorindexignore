@@ -103,3 +103,7 @@ Dockerfile
 DOCKER.md
 docker-compose.yml
 .dockerignore
+
+# Chinese localization data. LLMs will "helpfully" try to keep this in sync with the
+# English data, but we want to do it ourselves.
+**/zh/**.json

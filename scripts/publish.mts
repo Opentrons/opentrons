@@ -283,6 +283,26 @@ async function smokeTestEsm(
   }
 }
 
+async function smokeTestComponentsLocalization(): Promise<void> {
+  console.log(
+    '\n=== Smoke-testing Node-safe @opentrons/components/localization ==='
+  )
+  const localizationPath = path.join(COMPONENTS_ROOT, 'lib', 'localization.mjs')
+  try {
+    const mod = await import(localizationPath)
+    if (mod.shared_en_resources == null || mod.resources == null) {
+      throw new Error('missing shared_en_resources or resources export')
+    }
+    console.log('  localization ESM smoke test PASSED')
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(
+      `\n  FATAL: localization import failed in bare Node.\n  Error: ${message}`
+    )
+    process.exit(1)
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Temporarily patch source package.json files, pnpm pack, then restore
 // ---------------------------------------------------------------------------
@@ -419,6 +439,7 @@ async function main(): Promise<void> {
     '@opentrons/step-generation'
   )
   await smokeTestEsm(path.join(COMPONENTS_ROOT, 'lib'), '@opentrons/components')
+  await smokeTestComponentsLocalization()
   await smokeTestEsm(
     path.join(PROTOCOL_VISUALIZATION_ROOT, 'lib'),
     '@opentrons/protocol-visualization'
