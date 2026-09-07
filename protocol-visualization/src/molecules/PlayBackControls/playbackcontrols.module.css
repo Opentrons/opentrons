@@ -16,7 +16,12 @@
   margin: 0 auto;
   background-color: var(--white);
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
+  transform: translate(var(--drag-x, 0px), var(--drag-y, 0px));
+  cursor: grab;
+  touch-action: none;
 }
+
+.dragging { cursor: grabbing; user-select: none; }
 
 .controls_left {
   display: flex;
