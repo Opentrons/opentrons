@@ -51,7 +51,9 @@ export function ProtocolVisualization(
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
-  const [showStepDetails, setShowStepDetails] = useState<boolean>(true)
+  const [showStepDetails, setShowStepDetails] = useState<boolean>(
+    appType !== 'web'
+  )
 
   const [showStepDetail, setShowStepDetail] = useState<boolean>(true)
 
