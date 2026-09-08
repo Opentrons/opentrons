@@ -15,7 +15,16 @@ import type { Readable } from 'stream'
 
 const log = createLogger('http')
 
-const SHA256_HEADER = 'opentrons-download-sha256'
+function parseSha256ContentDigest(header: string | null): Buffer | null {
+  if (header == null) {
+    return null
+  }
+  const match = /(?:^|,)\s*sha-256=:([A-Za-z0-9+/]+=*):/i.exec(header)
+  if (match == null) {
+    return null
+  }
+  return Buffer.from(match[1], 'base64')
+}
 
 type RequestInput = Request | string
 
@@ -79,7 +88,8 @@ export function fetchToFile(
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) ?? null
 
-    const correctHash = response.headers.get(SHA256_HEADER)
+    const contentDigest = response.headers.get('content-digest')
+    const expectedDigest = parseSha256ContentDigest(contentDigest)
     const hasher = createHash('sha256')
 
     // with node-fetch, response.body will be a Node.js readable stream
@@ -92,7 +102,7 @@ export function fetchToFile(
     const progressReader = new Transform({
       transform(chunk: string | Buffer, encoding, next) {
         downloaded += chunk.length
-        if (correctHash != null) {
+        if (contentDigest != null) {
           hasher.update(chunk)
         }
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -120,8 +130,8 @@ export function fetchToFile(
         }
 
         if (
-          correctHash != null &&
-          hasher.digest('hex').toLowerCase() !== correctHash?.toLowerCase()
+          contentDigest != null &&
+          (expectedDigest == null || !expectedDigest.equals(hasher.digest()))
         ) {
           handleError(
             new Error('Downloaded file hash does not match expected hash')

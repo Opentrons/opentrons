@@ -16,10 +16,11 @@ vi.mock('../config')
 vi.mock('node-fetch')
 vi.mock('../log')
 
-const DOWNLOAD_SHA256_HEADER = 'opentrons-download-sha256'
+const CONTENT_DIGEST_HEADER = 'content-digest'
 
-function sha256Hex(contents: string): string {
-  return createHash('sha256').update(contents).digest('hex')
+function sha256ContentDigest(contents: string): string {
+  const digest = createHash('sha256').update(contents).digest('base64')
+  return `sha-256=:${digest}:`
 }
 
 function mockDownloadResponse(
@@ -150,10 +151,10 @@ describe('app-shell main http module', () => {
       expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
     })
 
-    it('succeeds when the sha256 header matches the downloaded bytes', async () => {
+    it('succeeds when the Content-Digest header matches the downloaded bytes', async () => {
       const body = 'zip-bytes'
       mockDownloadResponse(body, {
-        [DOWNLOAD_SHA256_HEADER]: sha256Hex(body),
+        [CONTENT_DIGEST_HEADER]: sha256ContentDigest(body),
       })
 
       await expect(
@@ -162,7 +163,7 @@ describe('app-shell main http module', () => {
       expect(await readFile(destination, 'utf8')).toBe(body)
     })
 
-    it('skips hash verification when the server omits the sha256 header', async () => {
+    it('skips hash verification when the server omits the Content-Digest header', async () => {
       mockDownloadResponse('zip-bytes')
 
       await expect(
@@ -171,9 +172,9 @@ describe('app-shell main http module', () => {
       expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
     })
 
-    it('rejects and deletes the file when the sha256 header does not match', async () => {
+    it('rejects and deletes the file when the Content-Digest header does not match', async () => {
       mockDownloadResponse('zip-bytes', {
-        [DOWNLOAD_SHA256_HEADER]: sha256Hex('different-bytes'),
+        [CONTENT_DIGEST_HEADER]: sha256ContentDigest('different-bytes'),
       })
 
       await expect(

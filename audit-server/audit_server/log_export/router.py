@@ -1,5 +1,6 @@
 """Route handlers for audit log export endpoints."""
 
+import base64
 import hashlib
 import json
 import tempfile
@@ -54,9 +55,6 @@ _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 # Response header carrying the one-time deletion key for a downloaded log period.
 # Must match ``LOG_PERIOD_DELETION_KEY_HEADER`` in api-client/src/audit/constants.ts.
 _DELETION_KEY_HEADER: Final = "opentrons-log-period-deletion-key"
-
-# Response header carrying the SHA-256 hash of the downloaded log period.
-_SHA256_HEADER: Final = "opentrons-download-sha256"
 
 
 @router.get(
@@ -184,8 +182,8 @@ async def download_log_period(
     with zip_file_path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             hasher.update(chunk)
-    sha256_hash = hasher.hexdigest()
-    headers[_SHA256_HEADER] = sha256_hash
+    digest_b64 = base64.b64encode(hasher.digest()).decode("ascii")
+    headers["Content-Digest"] = f"sha-256=:{digest_b64}:"
 
     def cleanup_files() -> None:
         zip_file_path.unlink()
