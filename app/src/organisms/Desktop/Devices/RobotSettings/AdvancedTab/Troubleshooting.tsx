@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
+import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
@@ -52,7 +53,9 @@ export function Troubleshooting({
           )
         })
         .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)

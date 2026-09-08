@@ -231,12 +231,15 @@ async def test_store_robot_log_stores_file(
                 "eeeeee"
             )
             assert not temp_path.is_file()
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "eeeeee"
             assert temp_path.is_file()
+            assert stored_name == temp_path.name
 
 
 async def test_store_robot_log_renames_file(
@@ -273,12 +276,15 @@ async def test_store_robot_log_renames_file(
                 "eeeeee"
             )
             assert not temp_path.is_file()
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "eeeeee"
             assert temp_path.is_file()
+            assert temp_path.name == stored_name
 
             # It should it handle it for the first copy
             copied_temp_path = temp_path.with_stem(f"{temp_path.stem}_copy")
@@ -286,12 +292,15 @@ async def test_store_robot_log_renames_file(
                 mock_store.store_robot_log(robot_log, copied_temp_path)
             ).then_return("iiiiii")
             temp_file.seek(0)
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "iiiiii"
             assert copied_temp_path.is_file()
+            assert copied_temp_path.name == stored_name
 
             # Trying the same file a third time should make _copy_copy
             copied_copied_temp_path = copied_temp_path.with_stem(
@@ -301,12 +310,15 @@ async def test_store_robot_log_renames_file(
                 mock_store.store_robot_log(robot_log, copied_copied_temp_path)
             ).then_return("oooooo")
             temp_file.seek(0)
-            stored_hash = await subject.store_robot_log(
+            stored_details = await subject.store_robot_log(
                 UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
                 Path(temp_dir),
             )
+            assert stored_details is not None
+            stored_hash, stored_name = stored_details
             assert stored_hash == "oooooo"
             assert copied_copied_temp_path.is_file()
+            assert copied_copied_temp_path.name == stored_name
 
 
 async def test_store_robot_log_raises_keyserver_unavailable(
@@ -358,10 +370,26 @@ async def test_store_log_rotates_if_cannot_get_tail_hash(
             signatureVersion=3,
         )
     )
+
     decoy.when(
         await mock_key_client.sign_message(
             SignMessageData.model_construct(
-                message=matchers.StringMatching(".*log-error.*"), previousHash="he"
+                message=matchers.StringMatching(".*robot-version.*"),
+                previousHash="he",
+            ),
+        )
+    ).then_return(
+        SignedMessageData(
+            message="1.2.3a4",
+            messageHash="hf",
+            messageSignature="od",
+            signatureVersion=8,
+        )
+    )
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(".*log-error.*"), previousHash="hf"
             )
         )
     ).then_return(
@@ -372,26 +400,32 @@ async def test_store_log_rotates_if_cannot_get_tail_hash(
             signatureVersion=4,
         )
     )
+
     decoy.when(
-        mock_store.store_log(
-            StoredLog(
-                message="log period begun",
-                message_hash="he",
-                message_sig="lo",
-                sig_version="3",
-            )
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message="log period begun",
+                    message_hash="he",
+                    message_sig="lo",
+                    sig_version="3",
+                ),
+                StoredLog(
+                    message="1.2.3a4",
+                    message_hash="hf",
+                    message_sig="od",
+                    sig_version="8",
+                ),
+                StoredLog(
+                    message="log error",
+                    message_hash="go",
+                    message_sig="od",
+                    sig_version="4",
+                ),
+            ]
         )
-    ).then_return("he")
-    decoy.when(
-        mock_store.store_log(
-            StoredLog(
-                message="log error",
-                message_hash="go",
-                message_sig="od",
-                sig_version="4",
-            )
-        )
-    ).then_return("od")
+    ).then_return("go")
+
     decoy.when(
         await mock_key_client.sign_message(
             SignMessageData.model_construct(
@@ -417,24 +451,6 @@ async def test_store_log_rotates_if_cannot_get_tail_hash(
             )
         )
     ).then_return("ee")
-    decoy.when(
-        mock_store.start_period(
-            [
-                StoredLog(
-                    message="log period begun",
-                    message_hash="he",
-                    message_sig="lo",
-                    sig_version="3",
-                ),
-                StoredLog(
-                    message="log error",
-                    message_hash="go",
-                    message_sig="od",
-                    sig_version="4",
-                ),
-            ]
-        )
-    ).then_return("go")
     result = await subject.store_log("mymessage")
     assert result == "ee"
 
@@ -495,9 +511,31 @@ async def test_rotate_happypath(
         )
     )
     decoy.when(
-        mock_store.start_period([StoredLog("start-log-period", "ee", "s2", "2")])
-    ).then_return("ee")
-    assert await subject.rotate_periods() == "ee"
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash="ee",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="robot-version",
+            messageHash="gg",
+            messageSignature="s3",
+            signatureVersion=3,
+        )
+    )
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog("start-log-period", "ee", "s2", "2"),
+                StoredLog("robot-version", "gg", "s3", "3"),
+            ]
+        )
+    ).then_return("gg")
+    assert await subject.rotate_periods() == "gg"
 
 
 async def test_rotate_no_previous_period(
@@ -521,9 +559,26 @@ async def test_rotate_no_previous_period(
     ).then_return(
         SignedMessageData(
             message="start-log-period",
-            messageHash="ff",
+            messageHash="ee",
             messageSignature="s1",
             signatureVersion=1,
+        )
+    )
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash="ee",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="robot-version",
+            messageHash="ff",
+            messageSignature="s2",
+            signatureVersion=2,
         )
     )
     decoy.when(
@@ -538,9 +593,9 @@ async def test_rotate_no_previous_period(
     ).then_return(
         SignedMessageData(
             message="error-no-period",
-            messageHash="ee",
-            messageSignature="s2",
-            signatureVersion=2,
+            messageHash="gg",
+            messageSignature="s3",
+            signatureVersion=3,
         )
     )
     decoy.when(
@@ -548,20 +603,26 @@ async def test_rotate_no_previous_period(
             [
                 StoredLog(
                     message="start-log-period",
-                    message_hash="ff",
+                    message_hash="ee",
                     message_sig="s1",
                     sig_version="1",
                 ),
                 StoredLog(
-                    message="error-no-period",
-                    message_hash="ee",
+                    message="robot-version",
+                    message_hash="ff",
                     message_sig="s2",
                     sig_version="2",
                 ),
+                StoredLog(
+                    message="error-no-period",
+                    message_hash="gg",
+                    message_sig="s3",
+                    sig_version="3",
+                ),
             ]
         )
-    ).then_return("ee")
-    assert await subject.rotate_periods() == "ee"
+    ).then_return("gg")
+    assert await subject.rotate_periods() == "gg"
 
 
 async def test_rotate_no_previous_log(
@@ -633,6 +694,23 @@ async def test_rotate_no_previous_log(
         )
     )
     decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash="dd",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="robot-version",
+            messageHash="cc",
+            messageSignature="s4",
+            signatureVersion=4,
+        )
+    )
+    decoy.when(
         mock_store.start_period(
             [
                 StoredLog(
@@ -640,11 +718,17 @@ async def test_rotate_no_previous_log(
                     message_hash="dd",
                     message_sig="s3",
                     sig_version="3",
-                )
+                ),
+                StoredLog(
+                    message="robot-version",
+                    message_hash="cc",
+                    message_sig="s4",
+                    sig_version="4",
+                ),
             ]
         )
-    ).then_return("dd")
-    assert await subject.rotate_periods() == "dd"
+    ).then_return("cc")
+    assert await subject.rotate_periods() == "cc"
 
 
 async def test_rotate_log_happypath_handles_no_keyserver(
@@ -697,6 +781,16 @@ async def test_rotate_log_happypath_handles_no_keyserver(
         )
     ).then_raise(KeyStorageUnavailableError())
     decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
         mock_store.start_period(
             [
                 StoredLog(
@@ -715,10 +809,26 @@ async def test_rotate_log_happypath_handles_no_keyserver(
                     message_sig="",
                     sig_version="-1",
                 ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.ACTION_ROBOT_VERSION}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
             ]
         )
-    ).then_return("dd")
-    assert await subject.rotate_periods() == "dd"
+    ).then_return("zz")
+    assert await subject.rotate_periods() == "zz"
 
 
 async def test_rotate_no_previous_period_handles_no_keyserver(
@@ -744,6 +854,16 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
         await mock_key_client.sign_message(
             SignMessageData.model_construct(
                 message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
                 ),
                 previousHash=None,
@@ -756,6 +876,22 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
                 StoredLog(
                     message=matchers.StringMatching(
                         f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.ACTION_ROBOT_VERSION}.*"
                     ),
                     message_hash="",
                     message_sig="",
@@ -865,11 +1001,37 @@ async def test_rotate_no_previous_log_handles_no_key_server(
         )
     ).then_raise(KeyStorageUnavailableError())
     decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_ROBOT_VERSION}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
         mock_store.start_period(
             [
                 StoredLog(
                     message=matchers.StringMatching(
                         f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    "",
+                    "",
+                    "-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.ACTION_ROBOT_VERSION}.*"
                     ),
                     message_hash="",
                     message_sig="",

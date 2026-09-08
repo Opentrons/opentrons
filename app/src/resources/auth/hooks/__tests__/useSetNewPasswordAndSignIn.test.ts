@@ -1,18 +1,15 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DocumentedMutationError } from '@opentrons/react-api-client'
+
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { useSetNewPasswordAndSignIn } from '../useSetNewPasswordAndSignIn'
 
 const mockUpdateSelf = vi.fn()
 const mockUseHost = vi.fn()
-
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    updateSelf: (...args: unknown[]) => mockUpdateSelf(...args),
-  }
-})
+const mockUseUpdateSelfMutation = vi.fn()
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -25,6 +22,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: () => mockUseHost(),
+    useUpdateSelfMutation: (...args: unknown[]) =>
+      mockUseUpdateSelfMutation(...args),
   }
 })
 
@@ -35,9 +34,14 @@ describe('useSetNewPasswordAndSignIn', () => {
 
   beforeEach(() => {
     mockUpdateSelf.mockReset()
+    mockUseUpdateSelfMutation.mockReset()
     onSuccess.mockReset()
     onError.mockReset()
     mockUseHost.mockReturnValue(host)
+    mockUseUpdateSelfMutation.mockReturnValue({
+      updateSelf: mockUpdateSelf,
+      isLoading: false,
+    })
     mockUpdateSelf.mockResolvedValue({
       data: {
         username: 'alice',
@@ -49,23 +53,35 @@ describe('useSetNewPasswordAndSignIn', () => {
     })
   })
 
-  it('patches self with the new password', async () => {
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
+  const renderSubject = (): {
+    result: { current: ReturnType<typeof useSetNewPasswordAndSignIn> }
+  } =>
+    renderHook(() =>
+      useSetNewPasswordAndSignIn(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE, {
+        onSuccess,
+        onError,
+      })
     )
+
+  it('passes documentation state to useUpdateSelfMutation', () => {
+    renderSubject()
+
+    expect(mockUseUpdateSelfMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+  })
+
+  it('patches self with the new password', async () => {
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'new-secret')
     })
 
     await waitFor(() => {
-      expect(mockUpdateSelf).toHaveBeenCalledWith(
-        host,
-        {
-          data: { password: 'new-secret' },
-        },
-        ''
-      )
+      expect(mockUpdateSelf).toHaveBeenCalledWith({
+        data: { password: 'new-secret' },
+      })
     })
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith('alice', 'new-secret')
@@ -76,9 +92,7 @@ describe('useSetNewPasswordAndSignIn', () => {
   it('reports not signed in when host or token is missing', () => {
     mockUseHost.mockReturnValue({ hostname: 'localhost' })
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'new-secret')
@@ -105,9 +119,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       },
     })
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'short')
@@ -129,9 +141,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       },
     })
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'same-as-current')
@@ -159,9 +169,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       },
     })
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'short')
@@ -183,9 +191,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       },
     })
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'password123')
@@ -202,9 +208,7 @@ describe('useSetNewPasswordAndSignIn', () => {
   it('reports failure when patch self request fails', async () => {
     mockUpdateSelf.mockRejectedValue(new Error('network'))
 
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
+    const { result } = renderSubject()
 
     act(() => {
       result.current.submitNewPassword('alice', 'new-secret')
@@ -215,6 +219,24 @@ describe('useSetNewPasswordAndSignIn', () => {
         'set_new_password_error_update_failed'
       )
     })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
+  it('does not report an error when the documentation modal is cancelled', async () => {
+    mockUpdateSelf.mockRejectedValue(
+      new DocumentedMutationError('no_documentation_report')
+    )
+
+    const { result } = renderSubject()
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'new-secret')
+    })
+
+    await waitFor(() => {
+      expect(mockUpdateSelf).toHaveBeenCalled()
+    })
+    expect(onError).not.toHaveBeenCalled()
     expect(onSuccess).not.toHaveBeenCalled()
   })
 })

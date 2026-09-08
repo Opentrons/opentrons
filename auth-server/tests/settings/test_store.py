@@ -38,8 +38,8 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
     "updates, expected_changes",
     [
         pytest.param(
-            PatchSettingsRequestData(maxNumberOfLoginAttempts=10),
-            SettingsResponseData(maxNumberOfLoginAttempts=10),
+            PatchSettingsRequestData(maxNumberOfLoginAttempts=3),
+            SettingsResponseData(maxNumberOfLoginAttempts=3),
             id="single-field",
         ),
         pytest.param(

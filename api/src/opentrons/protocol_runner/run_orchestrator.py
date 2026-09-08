@@ -48,7 +48,7 @@ from ..protocol_engine.types import (
 )
 from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
-from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from . import EngineRunResult, JsonRunner, PythonAndLegacyRunner, protocol_runner
 from .run_coordinator import (
     AbstractRunCoordinator,
     ParseMode,
@@ -113,6 +113,7 @@ class RunOrchestrator(AbstractRunCoordinator):
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
         # used by SimulatingRunOrchestrator to clean up the simulating hardware controller
         self._hardware_api = hardware_api
+        self._commands_deleted = False
 
     @property
     def run_id(self) -> str:
@@ -182,7 +183,7 @@ class RunOrchestrator(AbstractRunCoordinator):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         if self._protocol_runner:
             return await self._protocol_runner.run(
@@ -311,6 +312,19 @@ class RunOrchestrator(AbstractRunCoordinator):
         return self._protocol_engine.state_view.commands.get_slice(
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
+
+    async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        return self._protocol_engine.state_view.commands.get_length()
+
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        return self._commands_deleted
+
+    async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        self._commands_deleted = True
+        self._protocol_engine.state_view.commands.delete_end_slice(length)
 
     async def get_command_annotations_slice(
         self, cursor: int, length: int

@@ -1,4 +1,4 @@
-import { mkdir, rmdir } from 'fs/promises'
+import { mkdir, rm } from 'fs/promises'
 import path from 'path'
 import { dialog } from 'electron'
 
@@ -117,16 +117,6 @@ async function downloadAuditLog(
       requestInit,
     })
 
-    if (deletionKey == null) {
-      dispatch(
-        logPeriodDownloadFailed({
-          logPeriodId,
-          error: 'Missing deletion key in download response',
-        }) as Action
-      )
-      return false
-    }
-
     dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
     return true
   } catch (error) {
@@ -202,6 +192,6 @@ async function downloadAuditLogs(
   )
 
   if (!!outputDirectory && results.every(succeeded => !succeeded)) {
-    await rmdir(outputDirectory)
+    await rm(outputDirectory, { recursive: true, force: true })
   }
 }

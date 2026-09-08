@@ -128,12 +128,13 @@ export const DesktopApp = (): JSX.Element => {
         }}
       >
         <RobotUpdateProvider>
-          <NiceModal.Provider>
-            <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-              <ReactQueryDevtools />
-              <SystemLanguagePreferenceModal />
-              <Navbar routes={desktopRoutes} />
-              <ToasterOven>
+          <ToasterOven>
+            <NiceModal.Provider>
+              <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+                <ReactQueryDevtools />
+                <SystemLanguagePreferenceModal />
+                <Navbar routes={desktopRoutes} />
+
                 <EmergencyStopContext.Provider
                   value={{
                     isEmergencyStopModalDismissed,
@@ -188,9 +189,9 @@ export const DesktopApp = (): JSX.Element => {
                     </Alerts>
                   </Box>
                 </EmergencyStopContext.Provider>
-              </ToasterOven>
-            </ErrorBoundary>
-          </NiceModal.Provider>
+              </ErrorBoundary>
+            </NiceModal.Provider>
+          </ToasterOven>
         </RobotUpdateProvider>
       </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>

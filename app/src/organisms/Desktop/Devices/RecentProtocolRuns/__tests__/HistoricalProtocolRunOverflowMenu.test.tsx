@@ -4,10 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  useDeleteRunImages,
-  useDeleteRunMutation,
-} from '@opentrons/react-api-client'
+import { useDeleteRunImages } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -86,9 +83,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       downloadRunRecord: mockDownloadRunRecord,
       isDownloading: false,
     })
-    vi.mocked(useDeleteRunMutation).mockReturnValue({
-      deleteRun: vi.fn(),
-    } as any)
 
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -126,6 +120,8 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       robotName: ROBOT_NAME,
       robotIsBusy: false,
       runHasImages: true,
+      deleteRun: vi.fn(),
+      isDeletingRun: false,
     }
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
@@ -163,7 +159,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     expect(useRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)
-    expect(useDeleteRunMutation).toHaveBeenCalled()
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {

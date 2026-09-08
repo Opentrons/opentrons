@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { InputField, StyledText } from '@opentrons/components'
 
+import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
+
 import styles from './userAccountForm.module.css'
 
 import type { JSX } from 'react'
@@ -12,12 +14,14 @@ export interface UserAccountUsernameFieldProps<T extends FieldValues> {
   control: Control<T>
   autoFocus?: boolean
   usernameMaxLength?: number
+  readOnly?: boolean
 }
 
 export function UserAccountUsernameField<T extends FieldValues>({
   control,
   autoFocus,
   usernameMaxLength,
+  readOnly = false,
 }: UserAccountUsernameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const requiredError = t(
@@ -29,6 +33,9 @@ export function UserAccountUsernameField<T extends FieldValues>({
           maxLength: usernameMaxLength,
         }) as string)
       : null
+  const invalidCharactersError = t(
+    'desktop_username_invalid_characters'
+  ) as string
 
   return (
     <div className={styles.field_group}>
@@ -42,29 +49,41 @@ export function UserAccountUsernameField<T extends FieldValues>({
           rules={{
             validate: value => {
               const username = value as string
-              if (username.trim() === '') {
+              const trimmedUsername = username.trim()
+              if (trimmedUsername === '') {
                 return requiredError
               }
-              if (
-                usernameMaxLength != null &&
-                username.length > usernameMaxLength
-              ) {
+              const validationError = getUsernameValidationError(
+                trimmedUsername,
+                usernameMaxLength
+              )
+              if (validationError === 'tooLong') {
                 return tooLongError ?? false
+              }
+              if (validationError === 'invalidCharacters') {
+                return invalidCharactersError
               }
               return true
             },
           }}
           render={({ field, fieldState }) => {
-            const isUsernameTooLong =
-              usernameMaxLength != null &&
-              (field.value as string).length > usernameMaxLength
-            const error =
-              fieldState.error?.message ??
-              (isUsernameTooLong ? tooLongError : null)
+            const trimmedUsername = (field.value as string).trim()
+            const liveValidationError =
+              trimmedUsername === ''
+                ? null
+                : getUsernameValidationError(trimmedUsername, usernameMaxLength)
+            let liveError: string | null = null
+            if (liveValidationError === 'tooLong') {
+              liveError = tooLongError
+            } else if (liveValidationError === 'invalidCharacters') {
+              liveError = invalidCharactersError
+            }
+            const error = fieldState.error?.message ?? liveError
 
             return (
               <InputField
                 autoFocus={autoFocus}
+                readOnly={readOnly}
                 value={field.value}
                 error={error}
                 caption={

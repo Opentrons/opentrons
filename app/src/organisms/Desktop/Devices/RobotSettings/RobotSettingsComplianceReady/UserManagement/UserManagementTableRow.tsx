@@ -46,6 +46,12 @@ export function UserManagementTableRow({
       action(user)
     }
 
+  const isServiceAccount = user.accountType === 'service'
+  const canEdit = !isServiceAccount
+  const canDelete = !isServiceAccount
+  const canLockOrUnlock = !isServiceAccount
+  const canResetPassword = !user.locked
+
   return (
     <ListItem type="default">
       <div className={styles.row}>
@@ -78,23 +84,27 @@ export function UserManagementTableRow({
           {showOverflowMenu ? (
             <>
               <div className={styles.overflow_menu}>
-                <MenuItem onClick={handleMenuAction(onEdit)}>
-                  {t('desktop_edit_user')}
-                </MenuItem>
-                <MenuItem onClick={handleMenuAction(onDelete)}>
-                  {t('desktop_delete_user')}
-                </MenuItem>
-                {user.locked ? (
+                {canEdit ? (
+                  <MenuItem onClick={handleMenuAction(onEdit)}>
+                    {t('desktop_edit_user')}
+                  </MenuItem>
+                ) : null}
+                {canDelete ? (
+                  <MenuItem onClick={handleMenuAction(onDelete)}>
+                    {t('desktop_delete_user')}
+                  </MenuItem>
+                ) : null}
+                {canLockOrUnlock && user.locked ? (
                   <MenuItem onClick={handleMenuAction(onActivate)}>
                     {t('desktop_unlock_user')}
                   </MenuItem>
                 ) : null}
-                {!user.locked ? (
+                {canResetPassword ? (
                   <MenuItem onClick={handleMenuAction(onResetPassword)}>
                     {t('desktop_reset_password')}
                   </MenuItem>
                 ) : null}
-                {!user.locked ? (
+                {canLockOrUnlock && !user.locked ? (
                   <MenuItem onClick={handleMenuAction(onDeactivate)}>
                     {t('desktop_lock_user')}
                   </MenuItem>

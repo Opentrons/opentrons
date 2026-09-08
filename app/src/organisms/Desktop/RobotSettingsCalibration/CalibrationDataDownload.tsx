@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
+import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
@@ -38,7 +39,11 @@ export function CalibrationDataDownload({
 
   const onClickSaveAs: MouseEventHandler = e => {
     e.preventDefault()
-    void downloadCalibration()
+    void downloadCalibration().catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   return (

@@ -9,6 +9,7 @@ import {
   SUCCESS_TOAST,
 } from '@opentrons/components'
 
+import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   useDownloadCalibrationData,
@@ -75,7 +76,9 @@ export function DiagnosticsFiles({
         makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
       })
       .catch((e: Error) => {
-        makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        if (!isFileSaveCanceledError(e)) {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        }
       })
       .finally(() => {
         eatToast(toastId)

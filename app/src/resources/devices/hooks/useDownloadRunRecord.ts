@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { saveAs } from 'file-saver'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import {
+  isFileSaveCanceledError,
+  saveFileWithPicker,
+} from '/app/local-resources/files/saveFileWithPicker'
 import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
@@ -54,12 +57,15 @@ export function useDownloadRunRecord(
           const buffer = await (res.data as Blob).arrayBuffer()
           await saveFileToUsb(`${usbPath}/${filename}`, buffer)
         } else {
-          saveAs(res.data as Blob, filename)
+          await saveFileWithPicker(filename, res.data as Blob)
         }
         setIsDownloading(false)
       })
       .catch((e: Error) => {
         setIsDownloading(false)
+        if (isFileSaveCanceledError(e)) {
+          return
+        }
         onError?.(e)
         throw e
       })

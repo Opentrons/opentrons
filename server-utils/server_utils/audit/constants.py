@@ -16,6 +16,8 @@ ACTION_LOG_PERIOD_START: Final = "log-period-begin"
 ACTION_LOG_PERIOD_END: Final = "log-period-end"
 ACTION_LOG_LOGGING_ERROR: Final = "log-error"
 ACTION_UNSIGNED_RUNS_WARNING: Final = "unsigned-runs-warning"
+ACTION_ROBOT_VERSION: Final = "robot-version"
+ACTION_STORE_RUNLOG: Final = "store-runlog"
 
 ACCOUNT_NAME_SYSTEM: Final = "system"
 LEGAL_NAME_SYSTEM: Final = ""

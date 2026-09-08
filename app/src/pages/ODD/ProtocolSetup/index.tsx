@@ -34,7 +34,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
@@ -122,6 +122,8 @@ import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
+import type { AuditLogAction } from '@opentrons/react-api-client/src/accessControl/types'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,
@@ -777,10 +779,7 @@ export function ProtocolSetup(): JSX.Element {
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
-  const { play } = useRunControls(runId)
-  const documentationState = useDocumentationState()
-  const { addCameraSettingsToRun } =
-    useAddCameraSettingsToRunMutation(documentationState)
+
   const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
     useState<boolean>(true)
   const robotType = useRobotType(robotName)
@@ -855,10 +854,6 @@ export function ProtocolSetup(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
-    runId,
-    documentationState
-  )
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: initialRobotCameraSettings } = useNotifyCamera({
@@ -897,6 +892,29 @@ export function ProtocolSetup(): JSX.Element {
   if (cameraSettingsApplied && !cameraSettingsConfirmed) {
     setCameraSettingsConfirmed(true)
   }
+
+  const actionsToDocument = useMemo(() => {
+    const actions: DocumentedAction[] = [
+      !cameraSettingsApplied ? 'update_camera_settings_for_run' : null,
+      !offsetsConfirmed ? 'apply_offsets' : null,
+      'play_run',
+    ].filter((action): action is AuditLogAction => action != null)
+    console.log('actionsToDocument', actions)
+    return actions
+  }, [cameraSettingsApplied, offsetsConfirmed])
+
+  const { documentationState: playDocumentationState } =
+    useLinkedDocumentationState(actionsToDocument, runId)
+  const { play } = useRunControls(runId, undefined, playDocumentationState)
+
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation(
+    playDocumentationState
+  )
+
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    playDocumentationState
+  )
 
   const proceedToRun = (): void => {
     // Camera settings do not require explicit confirmation by *any* user,

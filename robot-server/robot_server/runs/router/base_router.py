@@ -37,8 +37,13 @@ from server_utils.audit.audit_server import (
 )
 from server_utils.audit.audit_server import (
     NoCurrentLogPeriodError,
+    SubmitSupportingFileMessageData,
 )
-from server_utils.audit.fastapi import get_audit_client, get_audit_logger
+from server_utils.audit.fastapi import (
+    get_audit_client,
+    get_audit_logger,
+    get_supplied_user_notes,
+)
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
 )
@@ -50,6 +55,7 @@ from server_utils.auth.resource_server.fastapi import (
     require_scopes,
 )
 from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
     AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
@@ -561,6 +567,7 @@ async def update_run(  # noqa: C901
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
     ],
+    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -575,6 +582,7 @@ async def update_run(  # noqa: C901
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
+        user_notes: The Opentrons-User-Notes data from the request, if any.
     """
     if request_body.data.signedBy is not None:
         _require_signoff_scope(authentication)
@@ -610,7 +618,24 @@ async def update_run(  # noqa: C901
                 if run_log_entry is not None:
                     file_path, _ = run_log_entry
                     with open(file_path, "r") as fh:
-                        await audit_client.store_robot_log(robot_log_file=fh)
+                        await audit_client.store_robot_log(
+                            robot_log_file=fh,
+                            message=SubmitSupportingFileMessageData(
+                                fileType="runrecord",
+                                serverId=runId,
+                                accountName=(
+                                    authentication.username
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                legalName=(
+                                    authentication.fullname
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                reason=user_notes,
+                            ),
+                        )
                 staging_dir.cleanup()
 
         if run_data is None:
@@ -741,10 +766,14 @@ async def get_current_state(  # noqa: C901
     """
     try:
         run = await run_data_manager.get(run_id=runId)
+        active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
+        pipette_tip_states = run_data_manager.get_tip_attached(run_id=runId)
+        flex_stacker_substates = run_data_manager.get_flex_stacker_substate(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
     nozzle_layouts = {
         pipetteId: ActiveNozzleLayout.model_construct(
             startingNozzle=nozzle_map.starting_nozzle,
@@ -756,9 +785,7 @@ async def get_current_state(  # noqa: C901
 
     tip_states = {
         pipette_id: TipState.model_construct(hasTip=has_tip)
-        for pipette_id, has_tip in run_data_manager.get_tip_attached(
-            run_id=runId
-        ).items()
+        for pipette_id, has_tip in pipette_tip_states.items()
     }
 
     current_command = run_data_manager.get_current_command(run_id=runId)
@@ -817,7 +844,6 @@ async def get_current_state(  # noqa: C901
                 if place_labware:
                     break
 
-    flex_stacker_substates = run_data_manager.get_flex_stacker_substate(run_id=runId)
     flex_stacker_states: Dict[str, FlexStackerState] | None
     if len(flex_stacker_substates) > 0:
         flex_stacker_states = {}

@@ -27,7 +27,9 @@ const mockJSZip = vi.hoisted(() => ({
   generateAsync: vi.fn(),
 }))
 
-const mockSaveAs = vi.hoisted(() => vi.fn())
+const mockSaveFileWithPicker = vi.hoisted(() =>
+  vi.fn().mockResolvedValue(undefined)
+)
 const MockJSZip = vi.hoisted(
   () =>
     function MockJSZip(): typeof mockJSZip {
@@ -39,8 +41,9 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('file-saver', () => ({
-  saveAs: mockSaveAs,
+vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
+  saveFileWithPicker: mockSaveFileWithPicker,
+  isFileSaveCanceledError: vi.fn(),
 }))
 vi.mock('jszip', () => {
   return {
@@ -67,8 +70,8 @@ describe('RobotSettings Troubleshooting', () => {
   beforeEach(() => {
     mockJSZip.file.mockClear()
     mockJSZip.generateAsync.mockClear()
-    mockJSZip.generateAsync.mockResolvedValue(new Blob())
-    mockSaveAs.mockClear()
+    mockJSZip.generateAsync.mockResolvedValue(new ArrayBuffer(8))
+    mockSaveFileWithPicker.mockClear()
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
@@ -129,9 +132,9 @@ describe('RobotSettings Troubleshooting', () => {
 
     await waitFor(
       () => {
-        expect(mockSaveAs).toHaveBeenCalledWith(
-          expect.any(Blob),
-          'otie_logs.zip'
+        expect(mockSaveFileWithPicker).toHaveBeenCalledWith(
+          'otie_logs.zip',
+          expect.any(ArrayBuffer)
         )
       },
       { timeout: 3000 }

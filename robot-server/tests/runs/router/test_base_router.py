@@ -972,6 +972,7 @@ async def test_update_run_to_not_current(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1018,6 +1019,7 @@ async def test_update_current_none_noop(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1078,6 +1080,7 @@ async def test_update_run_signed_by_and_uncurrent(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=uncurrent_response)
@@ -1110,6 +1113,7 @@ async def test_update_run_not_complete(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1142,6 +1146,7 @@ async def test_update_run_signoff_required(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1174,6 +1179,7 @@ async def test_update_to_current_not_current(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1206,6 +1212,7 @@ async def test_update_to_current_conflict(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1238,6 +1245,7 @@ async def test_update_to_current_missing(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 404
@@ -1267,6 +1275,7 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
                 username="testuser",
                 fullname="Test User",
             ),
+            user_notes=None,
         )
 
     assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
@@ -1317,6 +1326,7 @@ async def test_update_run_signed_by(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)

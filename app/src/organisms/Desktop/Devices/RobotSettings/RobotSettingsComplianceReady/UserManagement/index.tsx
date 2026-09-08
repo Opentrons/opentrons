@@ -14,6 +14,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
@@ -40,6 +41,8 @@ interface UserManagementTableProps {
   onResetPassword: (user: AuthUser) => void
   onDeactivate: (user: AuthUser) => void
 }
+
+const USER_REFETCH_TIME = 10000
 
 function UserManagementTable({
   users,
@@ -90,14 +93,12 @@ export function UserManagement({
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const username = useUsernameForRobot(robotName)
-  const usersQuery = useUsersQuery({ enabled: username != null })
+  const usersQuery = useUsersQuery({
+    enabled: username != null,
+    refetchInterval: USER_REFETCH_TIME,
+  })
   const users = usersQuery?.data?.data ?? []
-  const documentationState = useDocumentationState(undefined, robotName)
-  const { deleteUser } = useDeleteUserMutation(documentationState)
-  const { resetUserPassword, isLoading: isResettingPassword } =
-    useResetUserPasswordMutation(documentationState)
-  const { updateUser, isLoading: isUpdatingUser } =
-    useUpdateUserMutation(documentationState)
+
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
@@ -109,6 +110,27 @@ export function UserManagement({
   )
   const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
     useState<string | null>(null)
+
+  const documentationState = useDocumentationState(undefined, robotName)
+  const { documentationState: linkedDocumentationState } =
+    useLinkedDocumentationState(
+      ['unlock_user', 'reset_user_password'],
+      userToActivate?.username ?? null
+    )
+
+  const { deleteUser } = useDeleteUserMutation(documentationState)
+  const { resetUserPassword, isLoading: isResettingPassword } =
+    useResetUserPasswordMutation(documentationState)
+  const { updateUser, isLoading: isUpdatingUser } =
+    useUpdateUserMutation(documentationState)
+
+  const {
+    resetUserPassword: resetPasswordAfterUnlock,
+    isLoading: isResettingPasswordAfterUnlock,
+  } = useResetUserPasswordMutation(linkedDocumentationState)
+  const { updateUser: unlockUser, isLoading: isUnlockingUser } =
+    useUpdateUserMutation(linkedDocumentationState)
+
   const { makeToast } = useToaster()
 
   const handleDeleteConfirm = (): void => {
@@ -137,11 +159,11 @@ export function UserManagement({
 
     const { username } = userToActivate
 
-    void updateUser({
+    void unlockUser({
       username,
       request: { data: { locked: false } },
     })
-      .then(() => resetUserPassword(username))
+      .then(() => resetPasswordAfterUnlock(username))
       .then(response => {
         setUserToActivate(null)
         makeToast(
@@ -281,7 +303,7 @@ export function UserManagement({
           heading={t('desktop_activate_user_modal_heading') as string}
           description={t('desktop_activate_user_modal_description') as string}
           confirmLabel={t('desktop_unlock_user') as string}
-          isConfirmDisabled={isUpdatingUser || isResettingPassword}
+          isConfirmDisabled={isUnlockingUser || isResettingPasswordAfterUnlock}
           onConfirm={handleActivateConfirm}
           onCancel={() => {
             setUserToActivate(null)

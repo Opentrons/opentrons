@@ -33,6 +33,7 @@ class AuditLogger:
         auto_log_response_head: bool,
         auto_log_request_body: bool,
         auto_log_response_body: bool,
+        auto_log_request_full_headers: bool,
     ) -> None:
         """Build an audit logger object.
 
@@ -51,6 +52,7 @@ class AuditLogger:
         self.auto_log_response_head = auto_log_response_head
         self.auto_log_request_body = auto_log_request_body
         self.auto_log_response_body = auto_log_response_body
+        self.auto_log_request_full_headers = auto_log_request_full_headers
         self.did_log = False
         self.should_log = True
         self.request = request
@@ -98,11 +100,14 @@ class AuditLogger:
             self._message_chunks.append("Query parameters: none")
         return self
 
-    def append_request_head_to_message(self: Self, request: Request) -> Self:
+    def append_request_head_to_message(
+        self: Self, request: Request, full_headers: bool
+    ) -> Self:
         """Append material from the query head (aka not the body) to the message."""
         self.append_request_method_path_to_message(request)
         self.append_request_query_params_to_message(request)
-        self.append_request_headers_to_message(request)
+        if full_headers:
+            self.append_request_headers_to_message(request)
         return self
 
     async def append_request_body_to_message(self: Self, request: Request) -> Self:

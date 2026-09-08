@@ -1,11 +1,10 @@
-import { saveAs } from 'file-saver'
-
 import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
@@ -39,10 +38,8 @@ export function useDownloadCalibrationData(
     if (usbPath != null) {
       const buffer = new TextEncoder().encode(jsonString).buffer
       return saveFileToUsb(`${usbPath}/${filename}`, buffer)
-    } else {
-      saveAs(new Blob([jsonString]), filename)
-      return Promise.resolve()
     }
+    return saveFileWithPicker(filename, new Blob([jsonString]))
   }
 
   return {

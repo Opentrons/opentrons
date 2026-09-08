@@ -6,8 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -21,6 +23,9 @@ import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('/app/resources/client_data/encryptionKeys')
 vi.mock('/app/redux/shell/remote', () => ({
   appShellListener: vi.fn(),
@@ -116,13 +121,15 @@ function mockLoginSSLError(): void {
 function mockSetNewPasswordSuccess(
   onSubmit?: (username: string, password: string) => void
 ): void {
-  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
-    submitNewPassword: (username: string, password: string) => {
-      onSubmit?.(username, password)
-      onSuccess(username, password)
-    },
-    isLoading: false,
-  }))
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+    (_documentationState, { onSuccess }) => ({
+      submitNewPassword: (username: string, password: string) => {
+        onSubmit?.(username, password)
+        onSuccess(username, password)
+      },
+      isLoading: false,
+    })
+  )
 }
 
 const renderAndOpenLoginModal = (): void => {
@@ -334,8 +341,86 @@ describe('LoginModal', () => {
     screen.getByText('Your password has expired')
     screen.getByText('Create a new password to use')
     expect(screen.getByLabelText('New password')).toHaveFocus()
-    screen.getByLabelText('Confirm password')
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(
+      screen.getAllByRole('button', { name: 'Toggle password visibility' })
+    ).toHaveLength(2)
     screen.getByRole('button', { name: 'Confirm' })
+  })
+
+  it('toggles new and confirm password visibility independently', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'new-password' },
+    })
+
+    const [newPasswordToggle, confirmPasswordToggle] = screen.getAllByRole(
+      'button',
+      { name: 'Toggle password visibility' }
+    )
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(newPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'false')
+
+    fireEvent.click(confirmPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+  })
+
+  it('logs out when closing the set new password view', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.click(
+      screen.getByTestId(
+        'ModalHeader_icon_close_Compliance Ready Software login'
+      )
+    )
+
+    expect(vi.mocked(logOut)).toHaveBeenCalledWith({ robotName: ROBOT_NAME })
+    expect(screen.queryByText('Your password has expired')).toBeNull()
   })
 
   it('returns to login after setting a new password', () => {

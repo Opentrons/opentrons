@@ -1,0 +1,56 @@
+.overlay {
+  position: fixed;
+  z-index: 1000000;
+  top: calc(var(--handle-height) + var(--spacing-16));
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgb(from var(--black-90) r g b / 20%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(-100% + var(--drag-overlay-y)));
+  transition: transform 0s;
+}
+
+.overlay_visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.done_animating {
+  background-color: transparent;
+}
+
+.animate_transform {
+  transition: transform 0.2s ease-in-out;
+}
+
+.handle_container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: calc(var(--handle-height) + var(--spacing-16));
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.handle {
+  width: 240px;
+  height: var(--handle-height);
+  border-radius: var(--border-radius-full);
+  background-color: var(--grey-55);
+  opacity: 0;
+}
+
+.visible {
+  opacity: calc(1 - (var(--drag-overlay-y) / 50vh));
+  transition: none;
+}
+
+.handle_fading {
+  opacity: 0;
+  transition: opacity var(--reset-time) ease-in-out;
+}

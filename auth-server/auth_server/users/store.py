@@ -32,6 +32,14 @@ class UserStore:
                 session.expunge(user)
             return user
 
+    def get_by_id(self, user_id: int) -> User | None:
+        """Look up a user by primary key. Returns the User or None."""
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.id == user_id))
+            if user is not None:
+                session.expunge(user)
+            return user
+
     def get_all(self) -> list[User]:
         """Return all users, ordered by username."""
         with self._session() as session:

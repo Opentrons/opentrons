@@ -11,12 +11,11 @@ import opentrons.protocol_runner.create_simulating_orchestrator as simulating_ru
 import opentrons.util.helpers as datetime_helper
 from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
+    CommandSlice,
     EngineStatus,
     StateSummary,
 )
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-)
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
@@ -230,8 +229,7 @@ async def test_analyze(
             deck_configuration=[],
         )
     ).then_return(
-        protocol_runner.RunResult(
-            commands=[analysis_command],
+        protocol_runner.EngineRunResult(
             state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,
                 errors=[],
@@ -247,15 +245,52 @@ async def test_analyze(
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
-            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
+    )
+    decoy.when(await orchestrator.get_length()).then_return(len([analysis_command]))
+    decoy.when(
+        await orchestrator.get_command_slice(
+            cursor=max(0, len([analysis_command]) - 100),
+            length=100,
+            include_fixit_commands=True,
+        )
+    ).then_return(
+        CommandSlice(
+            commands=[analysis_command], cursor=0, total_length=len([analysis_command])
+        )
+    )
+    decoy.when(await orchestrator.get_state_summary()).then_return(
+        StateSummary(
+            status=EngineStatus.SUCCEEDED,
+            errors=[],
+            labware=[analysis_labware],
+            pipettes=[analysis_pipette],
+            modules=[],
+            peripherals=[],
+            labwareOffsets=[offset],
+            liquids=[],
+            liquidClasses=[],
+            wells=[],
+            files=[],
+            hasEverEnteredErrorRecovery=False,
+        ),
+    )
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return(
+        [bool_parameter]
+    )
+    decoy.when(await orchestrator.get_all_command_annotations()).then_return(
+        [new_command_annotation]
+    )
+    decoy.when(await orchestrator.get_preconditions()).then_return(
+        command_preconditions
     )
     decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
 
     await subject.analyze(
         analysis_id="analysis-id",
     )
+    decoy.when(await orchestrator.get_length()).then_return(0)
     decoy.verify(
         await analysis_store.update(
             analysis_id="analysis-id",
