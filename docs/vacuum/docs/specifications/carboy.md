@@ -34,7 +34,7 @@ The cap assembly features a waste diverter and mechanical float. The diverter di
     <tr>
       <td><strong>Carboy</strong></td>
       <td> <ul>
-          <li>Composition: Borosilicate 3.3, clear glass</li>
+          <li>Composition: borosilicate 3.3, clear glass</li>
           <li>Capacity: 2 L</li>
           <li>Graduations: 400–2,000 mL (200 mL increments)
           <li>Opening: wide-mouth, screw top</li>
@@ -56,7 +56,7 @@ The cap assembly features a waste diverter and mechanical float. The diverter di
 
 ## Chemical compatibility
 
-The waste carboy is made of Borosilicate 3.3 glass. This material is resistant to water, steam, acids, salt solutions, halogens, and organic solvents. Its low coefficient of thermal expansion provides high resistance to thermal shock. Although Borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions.
+The waste carboy is made of borosilicate 3.3 glass. This material is resistant to water, steam, acids, salt solutions, halogens, and organic solvents. Its low coefficient of thermal expansion provides high resistance to thermal shock. Although borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions.
 
 !!! warning
     Exposure to hot, concentrated phosphoric acid or hydrofluoric acid will cause surface etching or complete dissolution.

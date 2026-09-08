@@ -108,7 +108,7 @@ Caution: This equipment is not intended for use in residential environments and 
 
 Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
 
-Opentrons products that fall under the WEEE directive are labeled with the ![WEEE symbol](images/WEEE.svg){: style="vertical-align: middle; height: 1.25em;"} symbol symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+Opentrons products that fall under the WEEE directive are labeled with the ![WEEE symbol](images/WEEE.svg){: style="vertical-align: middle; height: 1.25em;"} symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
 
 ### Environmental warning
 

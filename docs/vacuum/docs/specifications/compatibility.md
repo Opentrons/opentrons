@@ -92,7 +92,7 @@ Deck pieces include the vacuum base, the short and tall collars, and the short a
 
 ## External hoses
 
-The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, non-DEHP flexible tubing. This material is resistant to aqueous solutions, acids, bases, ketones, salts, and alcohols. It is less resistant to aromatic and chlorinated hydrocarbons (e.g., Toluene, Hexane, Methylene Chloride/DCM, Tetrahydrofuran/THF, Ethyl Acetate).
+The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, non-DEHP flexible tubing. This material is resistant to aqueous solutions, acids, bases, ketones, salts, and alcohols. It is less resistant to aromatic and chlorinated hydrocarbons (e.g., toluene, hexane, methylene chloride/DCM, tetrahydrofuran/THF, ethyl acetate).
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -116,7 +116,7 @@ The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, n
 
 ## Gaskets
 
-Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqueous solutions, dilute acids, bases, and alcohols. It is less resistant to concentrated acids, non-polar organic solvents (e.g., Hexane, Toluene), ketones (e.g., Acetone), and strong hydrocarbons.
+Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqueous solutions, dilute acids, bases, and alcohols. It is less resistant to concentrated acids, non-polar organic solvents (e.g., hexane, toluene), ketones (e.g., acetone), and strong hydrocarbons.
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -140,7 +140,7 @@ Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqu
 
 ## O-rings
 
-The O-rings on the CPC quick connect/disconnect fittings, the carboy cap, and carboy float are made of ethylene propylene diene monomer (EPDM). This material is resistant to aqueous solutions, dilute acids, bases, alcohols, and polar organic solvents (e.g., Acetone). It is less resistant to petroleum-based oils, mineral oils, gasoline, halogenated solvents, and non-polar hydrocarbons (e.g., Hexane, Toluene).
+The O-rings on the CPC quick connect/disconnect fittings, the carboy cap, and carboy float are made of ethylene propylene diene monomer (EPDM). This material is resistant to aqueous solutions, dilute acids, bases, alcohols, and polar organic solvents (e.g., acetone). It is less resistant to petroleum-based oils, mineral oils, gasoline, halogenated solvents, and non-polar hydrocarbons (e.g., hexane, toluene).
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -164,7 +164,7 @@ The O-rings on the CPC quick connect/disconnect fittings, the carboy cap, and ca
 
 ## Quick connect fittings and carboy float
 
-The CPC quick connect/disconnect fittings (excluding O-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g. Ethanol, Isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., Hexane, Toluene), chlorinated solvents (e.g., Methylene Chloride), and concentrated fuming acids (e.g., concentrated Nitric Acid, Aqua Regia).
+The CPC quick connect/disconnect fittings (excluding O-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g., ethanol, isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., hexane, toluene), chlorinated solvents (e.g., methylene chloride), and concentrated fuming acids (e.g., nitric acid, aqua regia).
 
 | Reagent | Compatibility |
 | :--- | :--- |

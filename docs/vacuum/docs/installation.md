@@ -3,7 +3,7 @@ title: "Vacuum Module: Installation"
 description: "Installation instructions for attaching the module to a Flex robot."
 ---
 
-The Vacuum Module ships in three separate boxes containing all the components required for assembly and operation.
+The Vacuum Module ships in multiple boxes containing all the components required for assembly and operation.
 
 !!! warning "Before you begin"
     Turn off the power and unplug Flex before installing the Vacuum Module. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
@@ -23,7 +23,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 ## Part 2: Deck hardware assembly
 
-4. Remove any modules and labware from the deck to give yourself room to work. With the robot powered off, you can also gently move the gantry aside if it's in the way.
+4. Remove any labware from the deck to give yourself room to work. With the robot powered off, you can also gently move the gantry aside if it's in the way.
 
 5. Remove the trash bin (if installed) or any modules, labware, and plates from slots A3–A4.
 
@@ -46,7 +46,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
     !!! note
         - **Pass-through openings:** The four holes in the deck adapter are unthreaded. The fasteners pass through these holes from the bottom of the adapter and screw into threaded holes in the vacuum base.
-        - **Imperial fasteners:** Unlike other Flex deck modules that use Metric hardware, the vacuum base uses Imperial screws requiring the provided 7/64″ L-key.
+        - **Imperial fasteners:** Unlike other Flex deck modules that use metric hardware, the vacuum base uses imperial screws requiring the provided 7/64″ L-key.
 
 10. Press the L-shaped 6 mm (&frac14;") quick connect fitting (and its attached hose) into the exhaust manifold. The quick connect fittings lock into place with an audible click.
 
@@ -64,7 +64,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
     <figcaption>Vacuum hose exiting Flex from a lower side panel.</figcaption>
     </figure>
 
-13. Place the assembled piece (deck adapter and attached vacuum base) into slots A3–A4. Align the assembly so vacuum base occupies slot A3 and the raised part of the adapter (the "dock") occupies slot A4. The vacuum base exhaust coupling and vacuum hose should be facing towards the back of the robot.
+13. Place the assembled piece (deck adapter and attached vacuum base) into slots A3–A4. Align the assembly so the vacuum base occupies slot A3 and the raised part of the adapter (the "dock") occupies slot A4. The vacuum base exhaust coupling and vacuum hose should be facing towards the back of the robot.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)

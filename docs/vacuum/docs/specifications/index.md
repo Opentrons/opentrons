@@ -11,7 +11,7 @@ The Vacuum Module ships in separate boxes that contain all the components and ha
 
 ### Deck components
 
-Deck components install directly onto the Flex deck to support labware and different vacuum protocol profiles. These include the vacuum manifold base, collars, internal spacers, and plate support grids.
+Deck components install directly onto the Flex deck to support labware and different vacuum protocol applications. These include the vacuum manifold base, collars, internal spacers, and plate support grids.
 
 <div class="parts-list" markdown>
 
@@ -123,7 +123,7 @@ Waste collection components connect directly to the manifold base and provide an
 * Extra fittings and hose clamps are provided to assemble custom vacuum line lengths if needed.
 
 <figure markdown>
-![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="70%" }
+![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="55%" }
 <figcaption>(1) Carboy, 2L</figcaption>
 </figure>
 
@@ -161,6 +161,9 @@ Waste collection components connect directly to the manifold base and provide an
 
 The Control Box houses the vacuum pump, air/water separator, electronics, and power supply.
 
+!!! note
+    Values reflect the pump manufacturer's hardware ratings. Actual flow rates and vacuum ranges may be limited by Opentrons software.
+
 <table>
   <thead>
     <tr>
@@ -178,22 +181,20 @@ The Control Box houses the vacuum pump, air/water separator, electronics, and po
       <td>10 kg (22 lbs)</td>
     </tr>
     <tr>
- <tr>
       <td><strong>Pump type</strong></td>
       <td>Piston-driven</td>
-   </tr>
-   <tr>
-      <td><strong>Flow rate</strong></td>
-      <td>50.1 L/min (gas)<br>
-      <p><strong>Note:</strong> Pump values reflect published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
-      </td>
     </tr>
-   <tr>
-      <td><strong>Vacuum range<strong></td>
+    <tr>
+      <td><strong>Flow rate</strong></td>
+      <td>50.1 L/min (gas)</td>
+    </tr>
+    <tr>
+      <td><strong>Vacuum range</strong></td>
       <td>
         <ul>
           <li>Gauge pressure: 0 mbar (ambient atmospheric) to -881.31 mbar (maximum pump rating).</li>
           <li>Absolute pressure: 1,013 mbar (sea level ambient) to ~132 mbar.</li>
+        </ul>
       </td>
     </tr>
   </tbody>
@@ -226,7 +227,7 @@ The Vacuum Module ships with two vacuum hoses, factory installed quick connect/d
     </tr>
     <tr>
       <td><strong>Fittings</strong></td>
-      <td>The Vacuum Manifold uses CPC quick connect/disconnect fittings. These fittings come attached to the hoses from the factory. You also get extra fittings (and hose clamps) to make your own,custom hose connections. Dimensions are given below:
+      <td>The Vacuum Manifold uses CPC quick connect/disconnect fittings. These fittings come attached to the hoses from the factory. You also get extra fittings (and hose clamps) to make your own, custom hose connections. Dimensions are given below:
         <ul>
           <li>L-shaped fitting: 3.2 mm (⅛")</li>
           <li>All other fittings: 6.4 mm (&frac14;")</li>
@@ -254,7 +255,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
         </td>
     </tr>
     <tr>
-      <td><strong>Input Power</strong></td>
+      <td><strong>Input power</strong></td>
       <td>
         <ul>
           <li>100&ndash;240 VAC</li>
@@ -263,7 +264,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       </td>
     </tr>
     <tr>
-      <td><strong>Output Power</strong></td>
+      <td><strong>Output power</strong></td>
       <td>
         <ul>
           <li>24 VDC</li>
@@ -304,7 +305,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       </td>
     </tr>
     <tr>
-      <td><strong>Mains Fluctuation</strong></td>
+      <td><strong>Mains fluctuation</strong></td>
       <td>
         <ul>
           <li>Line Regulation: ±0.5%</li>
@@ -313,7 +314,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       </td>
     </tr>
     <tr>
-      <td><strong>Typical and Peak Consumption</strong></td>
+      <td><strong>Typical and peak consumption</strong></td>
       <td>
         <ul>
           <li>No-load Power Consumption: < 0.5 W </li>

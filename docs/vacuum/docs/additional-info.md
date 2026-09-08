@@ -10,11 +10,11 @@ All hardware purchased from Opentrons is covered under a 1-year standard warrant
 
 Opentrons Support can help you with questions about our products and services. If you discover a defect, or believe your product is not functioning to published specifications, contact us at <support@opentrons.com>.
 
-Please have the module’s serial number available when contacting support. To find the module serial number in the app, go to the Instruments and Modules section of your robot’s device details page, click the three-dot menu (⋮) and then click **About**. You can also find the serial number on <span style="color: red; font-weight: bold;"><strong>STICKER LOCATION PLACEHOLDER</strong></span>.
+Please have the module’s serial number available when contacting support. To find the module serial number in the app, go to the Instruments and Modules section of your robot’s device details page, click the three-dot menu (⋮) and then click **About**. You can also find the serial number on the Control Box.
 
 ## App Download
 
-Control your liquid handling robot and module using the Opentrons App. Download the app for Windows, macOS, or Ubuntu at <https://opentrons.com/ot-app>.
+Control your Flex liquid handling robot and Flex Vacuum Module using the Opentrons App. Download the app for Windows, macOS, or Ubuntu at <https://opentrons.com/ot-app>.
 
 ## Manufacturer Description
 
