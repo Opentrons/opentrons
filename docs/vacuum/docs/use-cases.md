@@ -43,19 +43,17 @@ This stack omits both the the spacers and the collection well plate. Instead, th
 
 ## Stacking advice and guidelines
 
-Some combinations of collars, spacers, and labware are not compatible with Vaccum Module operations. A successful run depends on stack height (too tall or too short) and maintaining a vacuum seal.
+Some combinations of collars, spacers, and labware are not compatible with the Vacuum Module. A successful vacuum operation depends on the stack height and maintaining a good vacuum seal.
 
-- **Stack height:** The internal stack (spacer,collection plate, and filter plate) must fit within the your chosen collar. If the stack is too tall, the collar cannot seat flat against the manifold base. If the stack is too short, the filter plate may not form a tight seal against the upper lip the collar.
+- **Stack height:** The internal stack (spacer,collection plate, and filter plate) must fit within the chosen collar. If the stack is too tall, the bottom of the collar may not seat flat against the manifold base. If the stack is too short, the plate may not form a tight seal against the gasket inside the collar.
 
 - **Seal integrity:** The short or tall collar must sit and press evenly against the gasket on the vacuum base. The filter plate must also seat flush against the collar. Good contact among all the components in your vacuum stack helps the module pull and maintain vacuum.
 
-A few simple rules can help you avoid problems with labware heigh and vacuum seal issues.
+A few recommendations can help you avoid problems with labware height and vacuum seal issues.
 
-<font color="red">TRY A TABLE</font>
-
-- **Test first:** Always test your specific well plate and vacuum collar combinations first, before running a production protocol. A dry-run test using your specific well plate and vacuum collar combinations can help make sure these pieces fit together without gaps and that the Gripper can reliably grasp the assembled stack.
-
-- spacers are optional
-- don't stack spacers
-- no spacers and short collars
-- well plate placement
+| Guidance | Description |
+|:----|:----|
+| **Test first** | Try to test your specific well plate and vacuum collar combinations first, before running a production protocol. A dry-run test using the required well plate and vacuum collar combination can help make sure these pieces fit together snugly and that the Gripper can reliably grasp the assembled stack. |
+| **Spacers are optional** | These pieces help position a collection plate closer to the filter plate. If droplet deflection is not a problem during vacuum extraction, you may not need a spacer. |
+| **Short collar-spacer incompatibility** | Due to height issues, you cannot combine spacers with the short (42 mm) collar. |
+| **Collection plate below filter plate** | When collecting filtrate, the collection plate must always sit below the filter plate on the vacuum base or on a spacer (also placed on the vacuum base). |
