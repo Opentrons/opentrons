@@ -43,17 +43,31 @@ This stack omits both the the spacers and the collection well plate. Instead, th
 
 ## Stacking advice and guidelines
 
-Some combinations of collars, spacers, and labware are not compatible with the Vacuum Module. A successful vacuum operation depends on the stack height and maintaining a good vacuum seal.
+Sometimes you may find that different combinations of collars, spacers, and labware don't make a good labware stack. A successful operation often depends on two physical characteristics that allow the module to create and maintain a vacuum seal:
 
-- **Stack height:** The internal stack (spacer,collection plate, and filter plate) must fit within the chosen collar. If the stack is too tall, the bottom of the collar may not seat flat against the manifold base. If the stack is too short, the plate may not form a tight seal against the gasket inside the collar.
+- **Stack height:** The internal stack (spacer and collection plate) must fit inside the collar. If the internal stack is too tall, the bottom of the collar will not sit flush against the vacuum base. If the internal stack is too short, the collection plate cannot seal tightly against the collar's internal gasket.
 
-- **Seal integrity:** The short or tall collar must sit and press evenly against the gasket on the vacuum base. The filter plate must also seat flush against the collar. Good contact among all the components in your vacuum stack helps the module pull and maintain vacuum.
+- **Seal integrity:** All mating or connecting surfaces must sit flush against each other and compress evenly to hold pressure. The filter plate must sit flush against the upper part of the collar's gasket to prevent air leaks. The whole stack should not rock back and forth when placed on the vacuum base.
 
-A few recommendations can help you avoid problems with labware height and vacuum seal issues.
+## Testing a vacuum stack
 
-| Guidance | Description |
-|:----|:----|
-| **Test first** | Try to test your specific well plate and vacuum collar combinations first, before running a production protocol. A dry-run test using the required well plate and vacuum collar combination can help make sure these pieces fit together snugly and that the Gripper can reliably grasp the assembled stack. |
-| **Spacers are optional** | These pieces help position a collection plate closer to the filter plate. If droplet deflection is not a problem during vacuum extraction, you may not need a spacer. |
-| **Short collar-spacer incompatibility** | Due to height issues, you cannot combine spacers with the short (42 mm) collar. |
-| **Collection plate below filter plate** | When collecting filtrate, the collection plate must always sit below the filter plate on the vacuum base or on a spacer (also placed on the vacuum base). |
+You can test a vacuum stack with a simple visual examination or via the Python API.
+
+### In the Opentrons App
+
+If stacked components appear to fit flush together, then the stack will probably hold vacuum. Test and verify your specific well plate and vacuum collar combinations by running the vacuum pump using the Opentrons app. A test run can help verify these pieces fit together if the stacked components can reach and hold a targeted vacuum pressure without audible leaks. <font color="red">App directions</font>
+
+### In the Python API
+
+Use the `start_set_vacuum_pressure()` method with a specific pressure, duration, and timeout settings to test stacked components. For example, this snippet can help you create an automated pressure test that will raise an error if the module does not reach -200 mbar in 10 seconds:
+
+```python
+test_task = vacuum.start_set_vacuum_pressure(
+    gauge_pressure_mbar=-200,
+    duration_s=5,
+    timeout_s=10,
+    vent_after=True,
+    equalize_timeout_s=5
+)
+```
+<font color="red"><strong>LINK TO API DOCS FROM HERE OR MOVE AND LINK?</strong></font>
