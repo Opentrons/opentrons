@@ -39,7 +39,10 @@ export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
       <div className={styles.container}>
         <Icon name="ot-spinner" spin className={styles.spinner} />
         {header != null ? (
-          <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
+          <StyledText
+            oddStyle="level3HeaderBold"
+            desktopStyle="headingSmallBold"
+          >
             {header}
           </StyledText>
         ) : null}
