@@ -25,6 +25,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { logOut, useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isAdminEquivalentAccountType } from './utils'
@@ -36,22 +37,43 @@ import type { Dispatch } from '/app/redux/types'
 // Above typical login overlays so the toast remains visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
-export interface RequireAdminForUpdatesResult {
+export interface GatedStartRobotUpdateResult {
   isLoading: boolean
-  ensureCanUpdate: () => boolean
+  startUpdate: (systemFile?: string) => boolean
 }
 
 /**
- * One-shot gate for robot software and firmware updates that require admin
- * credentials.
+ * Wraps orchestrator startUpdate with the admin-credentials gate.
+ * Call from UI already under ToasterOven — not from the orchestrator.
  *
  * When the user cannot complete the update, logs out of the target robot,
  * shows a toast, and prompts login if on desktop.
  * Does not auto-continue the update.
  */
-export function useRequireAdminForUpdates(
-  robotName: string | null
-): RequireAdminForUpdatesResult {
+export function useGatedStartRobotUpdate(
+  robotName: string
+): GatedStartRobotUpdateResult {
+  const { startUpdate } = useRobotUpdateContext()
+  const { ensureCanUpdate, isLoading } = useRequireAdminForUpdates(robotName)
+
+  const gatedStartUpdate = useCallback(
+    (systemFile?: string): boolean => {
+      if (!ensureCanUpdate()) {
+        return false
+      }
+      startUpdate(robotName, systemFile)
+      return true
+    },
+    [ensureCanUpdate, robotName, startUpdate]
+  )
+
+  return { isLoading, startUpdate: gatedStartUpdate }
+}
+
+function useRequireAdminForUpdates(robotName: string): {
+  isLoading: boolean
+  ensureCanUpdate: () => boolean
+} {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const queryClient = useQueryClient()
@@ -68,11 +90,10 @@ export function useRequireAdminForUpdates(
   const { data: self, isLoading: isSelfLoading } = useSelfQuery(undefined, host)
 
   const isLoading =
-    robotName != null &&
-    (host == null ||
-      isAccessControlLoading === true ||
-      isAuthSettingsLoading === true ||
-      isSelfLoading === true)
+    host == null ||
+    isAccessControlLoading === true ||
+    isAuthSettingsLoading === true ||
+    isSelfLoading === true
 
   const accessControlEnabled = accessControl?.data.accessControlEnabled === true
   const requireAdmin =
@@ -108,9 +129,6 @@ export function useRequireAdminForUpdates(
   }, [eatToast, i18n, makeToast, t])
 
   const handleLogBackIn = useCallback((): void => {
-    if (robotName == null) {
-      return
-    }
     setLoginInFlight(true)
     void showLoginModal({
       robotName,
@@ -154,7 +172,7 @@ export function useRequireAdminForUpdates(
   }, [eatToast, host, queryClient, refetchSelf])
 
   const ensureCanUpdate = useCallback((): boolean => {
-    if (robotName == null || isLoading || loginInFlight) {
+    if (isLoading || loginInFlight) {
       return false
     }
     if (canUpdate) {
@@ -191,15 +209,12 @@ export function useRequireAdminForUpdates(
   return { isLoading, ensureCanUpdate }
 }
 
-function useHostConfigForRobot(robotName: string | null): HostConfig | null {
+function useHostConfigForRobot(robotName: string): HostConfig | null {
   const contextHost = useHost()
   const robot = useRobot(robotName)
   const token = useAccessTokenForRobot(robotName)
 
   return useMemo(() => {
-    if (robotName == null) {
-      return null
-    }
     if (robot?.ip != null) {
       return {
         hostname: robot.ip,

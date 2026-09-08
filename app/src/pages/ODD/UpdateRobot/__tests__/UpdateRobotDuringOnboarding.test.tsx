@@ -12,12 +12,15 @@ import { UpdateRobotDuringOnboarding } from '../UpdateRobotDuringOnboarding'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 
-const mockStartUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
-  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: mockStartUpdate,
+    isLoading: false,
+  }),
 }))
 
 const MOCK_STATE: State = {

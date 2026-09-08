@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
@@ -33,7 +34,6 @@ import {
   UPGRADE,
 } from '/app/redux/robot-update'
 import { useIsOEMMode } from '/app/resources/robot-settings'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { RobotSystemType } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
@@ -81,7 +81,7 @@ export function UpdateRobotModal({
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
-  const { startUpdate } = useRobotUpdateContext()
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const robotUpdateVersion = useSelector((state: State) => {
     return getRobotUpdateVersion(state, robotName) ?? ''
   })
@@ -140,7 +140,7 @@ export function UpdateRobotModal({
         <PrimaryButton
           onClick={() => {
             dispatch(downloadRobotUpdate())
-            startUpdate(robotName)
+            startUpdate()
           }}
           css={FOOTER_BUTTON_STYLE}
           disabled={updateDisabled}
