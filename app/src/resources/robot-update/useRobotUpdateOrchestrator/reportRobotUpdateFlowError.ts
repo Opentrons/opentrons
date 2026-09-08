@@ -24,8 +24,8 @@ export function reportRobotUpdateFlowError(
     dispatch(clearRobotUpdateSession())
     return
   }
-  if (isDocumentedMutationError(error) === true) {
-    // access_control_loading is retried in createUpdateSession; if it still
+  if (isDocumentedMutationError(error)) {
+    // access_control_loading is retried in createUpdateSession. If it still
     // surfaces here, keep the session so the UI does not silently disappear.
     if (error.type === 'access_control_loading') {
       dispatch(
