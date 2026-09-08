@@ -29,7 +29,7 @@ minimumReleaseAge: 10080 # 1 week
 
 minimumReleaseAgeExclude:
   # https://github.com/electron-userland/electron-builder/releases/tag/electron-builder%4026.16.1
-  # for https://github.com/electron-userland/electron-builder/issues/10167 
+  # for https://github.com/electron-userland/electron-builder/issues/10167
   - electron-builder
   - builder-util
   - dmg-builder
