@@ -7,6 +7,7 @@ import {
   isForbiddenError,
   isProtocolWritePermissionError,
   isRunSignoffRequiredError,
+  isUpdatesWritePermissionError,
 } from '../utils'
 
 const GENERAL_ERROR = 'Protocol run could not be created on the robot.'
@@ -129,6 +130,44 @@ describe('isProtocolWritePermissionError', () => {
 
   it('is false for non-axios errors', () => {
     expect(isProtocolWritePermissionError(new Error('nope'))).toBe(false)
+  })
+})
+
+const updatesWriteDeniedError = {
+  isAxiosError: true,
+  response: {
+    status: 403,
+    data: {
+      debugMessage: 'missing scopes',
+      requiredScopes: ['updates.write'],
+      providedScopes: ['users.read.self', 'users.write.self'],
+    },
+  },
+}
+
+describe('isUpdatesWritePermissionError', () => {
+  it('is true for a 403 missing updates.write', () => {
+    expect(isUpdatesWritePermissionError(updatesWriteDeniedError)).toBe(true)
+  })
+
+  it('is false for a protocols.write 403', () => {
+    expect(isUpdatesWritePermissionError(permissionDeniedError)).toBe(false)
+  })
+
+  it('is false for other 403s', () => {
+    expect(
+      isUpdatesWritePermissionError({
+        isAxiosError: true,
+        response: {
+          status: 403,
+          data: { requiredScopes: ['robot.settings.write'] },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for non-axios errors', () => {
+    expect(isUpdatesWritePermissionError(new Error('nope'))).toBe(false)
   })
 })
 
