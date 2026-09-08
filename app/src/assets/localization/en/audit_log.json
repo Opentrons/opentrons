@@ -49,6 +49,7 @@
   "home_gantry": "Homing gantry",
   "home_pipettes": "Homing pipettes",
   "home_robot": "Homing gantry",
+  "jog_pipette": "Jogging pipette",
   "launching_error_recovery": "Launching error recovery",
   "left_mount": "left mount",
   "lpc_flow": "Launching labware position check",
