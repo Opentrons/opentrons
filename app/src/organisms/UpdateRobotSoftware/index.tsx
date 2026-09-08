@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
 import {
   downloadRobotUpdate,
   getRobotUpdateSession,
 } from '/app/redux/robot-update'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import { CheckUpdates } from './CheckUpdates'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
@@ -40,9 +40,10 @@ export function UpdateRobotSoftware(
     beforeCommittingSuccessfulUpdate,
     afterCancel,
   } = props
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotName =
+    typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
-  const { startUpdate } = useRobotUpdateContext()
+  const { startUpdate, isLoading } = useGatedStartRobotUpdate(robotName)
 
   const session = useSelector(getRobotUpdateSession)
   const {
@@ -64,13 +65,14 @@ export function UpdateRobotSoftware(
   }
 
   useEffect(() => {
-    // check isDownloading to avoid dispatching again
-    if (!isDownloading) {
-      setIsDownloading(true)
-      dispatch(downloadRobotUpdate())
-      startUpdate(robotName)
+    // Wait for auth queries so a loading false does not skip an allowed update.
+    if (isLoading || isDownloading) {
+      return
     }
-  }, [dispatch, startUpdate, robotName, isDownloading])
+    setIsDownloading(true)
+    dispatch(downloadRobotUpdate())
+    startUpdate()
+  }, [dispatch, startUpdate, isDownloading, isLoading])
 
   useEffect(() => {
     if (session == null && hadSessionRef.current && !didCancelRef.current) {

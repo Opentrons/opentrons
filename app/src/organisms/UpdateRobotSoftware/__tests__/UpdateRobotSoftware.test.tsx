@@ -15,12 +15,15 @@ import * as UpdateRobotSoftware from '../'
 
 import type { State } from '/app/redux/types'
 
-const mockStartUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
-  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: mockStartUpdate,
+    isLoading: false,
+  }),
 }))
 vi.mock('/app/organisms/UpdateRobotSoftware/CheckUpdates')
 vi.mock('/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
@@ -110,7 +113,7 @@ describe('UpdateRobotSoftware', () => {
   it('should start the robot update through the orchestrator on mount', () => {
     vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
     render()
-    expect(mockStartUpdate).toHaveBeenCalledWith('oddtie')
+    expect(mockStartUpdate).toHaveBeenCalled()
     expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
   })
 

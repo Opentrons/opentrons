@@ -21,10 +21,10 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { remote } from '/app/redux/shell/remote'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { ChangeEventHandler, MouseEventHandler } from 'react'
 import type { Run } from '@opentrons/api-client'
@@ -54,7 +54,7 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { startUpdate } = useRobotUpdateContext()
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const isRunActive =
     currentRun != null && !isTerminalRunStatus(currentRun.data.status)
 
@@ -64,8 +64,10 @@ export function UpdateRobotSoftware({
     if (files != null) {
       void remote.getFilePathFrom(files[0]).then(filePath => {
         if (files.length === 1 && !updateDisabled) {
-          startUpdate(robotName, filePath)
-          onUpdateStart()
+          const started = startUpdate(filePath)
+          if (started) {
+            onUpdateStart()
+          }
         }
         // this is to reset the state of the file picker so users can reselect the same
         // system image if the upload fails
