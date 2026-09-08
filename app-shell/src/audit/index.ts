@@ -162,18 +162,28 @@ async function downloadAuditLogs(
   if (logPeriodSummaries.length === 1) {
     const logPeriodSummary = logPeriodSummaries[0]
     const fileName = `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`
-    const filePath = path.join(directory, fileName)
+
+    if (!directory) {
+      dispatch(
+        logPeriodDownloadCanceled({
+          logPeriodId: logPeriodSummary.id,
+        })
+      )
+      return
+    }
+
     await downloadAuditLog(
       {
         logPeriodId: logPeriodSummary.id,
         fileName,
         hostname,
         port,
-        destination: filePath,
+        destination: directory,
       },
       mainWindow,
       dispatch
     )
+    return
   }
 
   const folderName =
