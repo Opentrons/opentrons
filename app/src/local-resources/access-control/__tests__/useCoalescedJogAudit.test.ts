@@ -37,32 +37,58 @@ describe('useCoalescedJogAudit', () => {
       useCoalescedJogAudit(commandDocState, mockAddActionToDocument)
     )
 
-  it('posts one coalesced jog_pipette record on flush after successful jogs', () => {
+  it('posts one jog_pipette record per successful jog on flush', () => {
     const { result } = renderAuditHook()
 
     act(() => {
       result.current.recordJog('x', 1, 1)
       result.current.recordJog('x', 1, 0.1)
-      result.current.recordJog('x', 1, 0.1)
-      result.current.recordJog('y', 1, 0.1)
       result.current.recordJog('y', 1, 0.1)
       result.current.flush()
     })
 
-    expect(mockPostLogMessage).toHaveBeenCalledTimes(1)
-    expect(mockPostLogMessage).toHaveBeenCalledWith({
+    expect(mockPostLogMessage).toHaveBeenCalledTimes(3)
+    expect(mockPostLogMessage).toHaveBeenNthCalledWith(1, {
       action: 'jog_pipette',
-      message: 'Jogged X: 1.2mm, Y: 0.2mm, Z: 0mm',
+      message: 'Jogged X: 1.0mm',
     })
+    expect(mockPostLogMessage).toHaveBeenNthCalledWith(2, {
+      action: 'jog_pipette',
+      message: 'Jogged X: 0.1mm',
+    })
+    expect(mockPostLogMessage).toHaveBeenNthCalledWith(3, {
+      action: 'jog_pipette',
+      message: 'Jogged Y: 0.1mm',
+    })
+    expect(mockAddActionToDocument).toHaveBeenCalledTimes(1)
     expect(mockAddActionToDocument).toHaveBeenCalledWith('jog_pipette')
   })
 
-  it('does not post when net displacement is zero', () => {
+  it('still posts when jogs cancel out to net zero', () => {
     const { result } = renderAuditHook()
 
     act(() => {
       result.current.recordJog('x', 1, 1)
       result.current.recordJog('x', -1, 1)
+      result.current.flush()
+    })
+
+    expect(mockPostLogMessage).toHaveBeenCalledTimes(2)
+    expect(mockPostLogMessage).toHaveBeenNthCalledWith(1, {
+      action: 'jog_pipette',
+      message: 'Jogged X: 1.0mm',
+    })
+    expect(mockPostLogMessage).toHaveBeenNthCalledWith(2, {
+      action: 'jog_pipette',
+      message: 'Jogged X: -1.0mm',
+    })
+  })
+
+  it('does not record a zero-distance jog', () => {
+    const { result } = renderAuditHook()
+
+    act(() => {
+      result.current.recordJog('x', 1, 0)
       result.current.flush()
     })
 
