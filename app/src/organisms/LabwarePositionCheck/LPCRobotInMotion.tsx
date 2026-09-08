@@ -41,7 +41,7 @@ export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
         {header != null ? (
           <StyledText
             oddStyle="level3HeaderBold"
-            desktopStyle="headingSmallBold"
+            desktopStyle="headingSmallSemiBold"
           >
             {header}
           </StyledText>
