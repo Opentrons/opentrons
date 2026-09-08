@@ -51,6 +51,8 @@ After setup, a "Compliance Ready" badge appears next to your Flex in the Opentro
 </figure>
 
 !!! note
-    Remember that you can control multiple robots through the same Opentrons App, including those that don't have Compliance Ready Software. The way you use the app to interact with a compliance ready Flex will be different, including logins, protocol runs, and required documentation.
+    Remember that you can control multiple robots through the same Opentrons App, including those that don't have Compliance Ready Software. 
+    
+    When you use the app to control a compliance ready Flex, you'll notice some differences, including required logins and documentation.
 
 After activation, you'll need to add your own protocols and data management practices to use your Flex in a fully audit-ready workflow.

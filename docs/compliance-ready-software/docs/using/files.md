@@ -67,7 +67,9 @@ While storage is full, you won't be able to send or start new protocols on your 
 
 ## Download and delete files
 
-All users can download files, including audit logs, from your compliance ready Flex, even before logging in to Compliance Ready Software. However, you'll need to log in to delete files. Only administrators can delete files.
+All users can download files, including audit logs, from your compliance ready Flex, even before logging in to Compliance Ready Software. However, you'll need to log in to delete files. 
+
+To be safe, deleting files requires you to download them, even if they've already been downloaded. Only administrators can delete files.
 
 Your files download as: 
 
@@ -107,7 +109,7 @@ If you'd like to download files using the Flex touchscreen, you'll need to attac
   <figcaption>View attached external devices on the Flex touchscreen.</figcaption>
 </figure> 
 
-Your compliance ready Flex supports USB storage devices via the [front USB port](../../flex/system-description/connections.md#usb-and-auxiliary-connections).
+Your compliance ready Flex supports USB storage devices via [USB port](../../flex/system-description/connections.md#usb-and-auxiliary-connections).
 
 On the Flex touchscreen, choose the file type you'd like to manage. Then, choose which files to download: 
 

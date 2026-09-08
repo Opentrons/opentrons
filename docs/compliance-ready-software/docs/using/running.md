@@ -91,7 +91,8 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 
 Your Flex won't complete actions like these until you enter documentation. For example, if you need to pause your protocol, the Flex will only pause after you click **Confirm** on the "Documentation required" screen. 
 
-Remember that you can use the [Emergency Stop Pendant] to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
+!!! note
+     Remember that you can use the [Emergency Stop Pendant] to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
 
 In some cases, you'll be prompted to document multiple actions after they occur, like in error recovery or robot calibration. 
 
@@ -102,8 +103,3 @@ First, the Opentrons App or Flex touchscreen will prompt you to add documentatio
 * Cancel the protocol run.
 
 As you complete multi-step actions like pipette calibration, Labware Position Check, or error recovery, the [list of actions](documentation.md#view-actions) can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.
-
-<figure class="screenshot" markdown>
-  ![Add documentation after completing error recovery.](../images/recovery-action.png)
-  <figcaption>You'll need to add documentation during error recovery.</figcaption>
-</figure>

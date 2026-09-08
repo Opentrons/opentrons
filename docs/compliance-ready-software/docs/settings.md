@@ -33,8 +33,8 @@ When you require users to download audit logs from the Opentrons App, you can al
 
 <figure class="screenshot" markdown>
 ![Image showing how to choose a storage location.](images/storage-location.png)
+<figcaption>Click to choose or change the folder your audit logs will download to.</figcaption>
 </figure>
-<figcaption>Choose a storage location for your files.</figcaption>
 
 Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location on your computer.
 
