@@ -394,6 +394,7 @@ export function ProtocolSteps({
             formData == null ? `0 ${SPACING.spacing12} 0 0` : SPACING.spacing12
           }
         >
+          {/* @ts-expect-error: StepForm cannot be used as a JSX component. */}
           <StepForm />
         </Flex>
 

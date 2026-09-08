@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { HashRouter } from 'react-router-dom'
@@ -14,20 +15,23 @@ import { ProtocolRoutes } from './ProtocolRoutes'
 
 export function ProtocolEditor(): JSX.Element {
   return (
-    <DndProvider backend={HTML5Backend}>
-      <Box
-        width="100%"
-        height="100vh"
-        overflow={OVERFLOW_AUTO}
-        id="protocol-editor"
-      >
-        <PortalRoot />
-        <Flex flexDirection={DIRECTION_COLUMN} height="100%">
-          <HashRouter>
-            <ProtocolRoutes />
-          </HashRouter>
-        </Flex>
-      </Box>
-    </DndProvider>
+    <Fragment>
+      {/* @ts-expect-error: DndProvider cannot be used as a JSX component. */}
+      <DndProvider backend={HTML5Backend}>
+        <Box
+          width="100%"
+          height="100vh"
+          overflow={OVERFLOW_AUTO}
+          id="protocol-editor"
+        >
+          <PortalRoot />
+          <Flex flexDirection={DIRECTION_COLUMN} height="100%">
+            <HashRouter>
+              <ProtocolRoutes />
+            </HashRouter>
+          </Flex>
+        </Box>
+      </DndProvider>
+    </Fragment>
   )
 }
