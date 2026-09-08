@@ -20,7 +20,9 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { OddModal } from '/app/molecules/OddModal'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
@@ -51,6 +53,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   )
 
   const documentationState = useDocumentationState()
+  const robotName = useLocalRobotName()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName ?? 'no name')
   const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
@@ -97,6 +101,9 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
         </LegacyStyledText>
         <SmallButton
           onClick={() => {
+            if (!ensureCanUpdate()) {
+              return
+            }
             setInitiatedSubsystemUpdate(subsystem)
             updateSubsystem(subsystem)
           }}
