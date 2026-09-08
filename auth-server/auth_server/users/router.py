@@ -37,6 +37,7 @@ from auth_server.users.models import (
     UpdateUser,
     UserAlreadyExistsErrorDetails,
     UserCreate,
+    UserLoginStatus,
     UsernameContainsInvalidCharactersErrorDetails,
     UserResponse,
 )
@@ -188,6 +189,31 @@ async def get_user(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users/byUsername/{username}/loginStatus",
+    summary="Get user login status",
+    description=(
+        "Return whether a user must reset their password before full robot access."
+        " This endpoint is unauthenticated so clients can adjust the login UI."
+    ),
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserLoginStatus]},
+        fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
+    },
+)
+async def get_user_login_status(
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
+) -> PydanticResponse[SimpleBody[UserLoginStatus]]:
+    """Get login status for a user by username."""
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(
+            data=UserLoginStatus(resetPassword=user.resetPassword),
+        ),
     )
 
 

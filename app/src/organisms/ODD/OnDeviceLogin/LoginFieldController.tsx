@@ -12,6 +12,7 @@ export interface LoginFieldControllerProps {
   step: LoginStep
   t: TFunction
   isPasswordResetRequired: boolean
+  loginResetPassword: boolean
   loginError: string | null
   confirmPasswordError: string | null
   usernameError: string | null
@@ -27,6 +28,7 @@ export const LoginFieldController = forwardRef<
     step,
     t,
     isPasswordResetRequired,
+    loginResetPassword,
     loginError,
     confirmPasswordError,
     usernameError,
@@ -58,6 +60,11 @@ export const LoginFieldController = forwardRef<
   if (step === 'password') {
     const passwordError =
       loginError != null && loginError !== '' ? loginError : null
+    const passwordLabel = isPasswordResetRequired
+      ? t('access_control:on_device_login_new_password')
+      : loginResetPassword
+        ? t('access_control:on_device_login_one_time_password')
+        : t('access_control:login_form_password_field')
 
     return (
       <Controller
@@ -68,11 +75,7 @@ export const LoginFieldController = forwardRef<
           <LoginFieldInput
             ref={ref}
             field={field}
-            label={
-              isPasswordResetRequired
-                ? t('access_control:on_device_login_new_password')
-                : t('access_control:login_form_password_field')
-            }
+            label={passwordLabel}
             error={passwordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}

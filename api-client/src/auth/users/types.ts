@@ -30,6 +30,14 @@ export interface AuthUsersResponse {
   }
 }
 
+export interface UserLoginStatus {
+  resetPassword: boolean
+}
+
+export interface UserLoginStatusResponse {
+  data: UserLoginStatus
+}
+
 export interface CreateUserRequest {
   data: {
     username: string
