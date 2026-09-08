@@ -20,11 +20,11 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import successIcon from '/app/assets/images/icon_success.png'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import {
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
-  startRobotUpdate,
 } from '/app/redux/robot-update'
 import {
   INIT_STATUS,
@@ -67,8 +67,8 @@ export function RobotUpdateProgressModal({
   session,
   closeRobotUpdate,
 }: RobotUpdateProgressModalProps): JSX.Element {
-  const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
   const installFromFileRef = useRef<HTMLInputElement>(null)
 
@@ -86,7 +86,7 @@ export function RobotUpdateProgressModal({
   const handleFileSelect: ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
     if (files?.length === 1) {
-      dispatch(startRobotUpdate(robotName, files[0].path))
+      startUpdate(files[0].path)
     }
     setShowFileSelect(false)
   }
