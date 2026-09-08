@@ -3,7 +3,15 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import {
+  ERROR_TOAST,
+  Icon,
+  INFO_TOAST,
+  Modal,
+  PrimaryButton,
+  StyledText,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -12,7 +20,10 @@ import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useDownloadAndDeleteAuditLog } from '/app/resources/audit/useDownloadAndDeleteAuditLog'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
+import { useToaster } from '../../ToasterOven'
 import styles from './downloadauditlogsmodal.module.css'
+
+import type { IconProps } from '@opentrons/components'
 
 export interface DownloadAuditLogsModalProps {
   onDownload: () => void
@@ -89,14 +100,23 @@ function DownloadAuditLogsModalContent({
 }: {
   logPeriodId: string
 }): JSX.Element {
+  const { t } = useTranslation('device_details')
   const modal = useModal()
+  const { makeToast, eatToast } = useToaster()
 
   const { downloadAndDeleteAuditLog, isLoading } =
     useDownloadAndDeleteAuditLog(logPeriodId)
 
   const handleDownload = (): void => {
+    const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+    const inProgressToastId = makeToast(
+      t('downloading_log_periods') as string,
+      INFO_TOAST,
+      { disableTimeout: true, icon: toastIcon }
+    )
     downloadAndDeleteAuditLog()
       .then(() => {
+        makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         modal.resolve(true)
         modal.remove()
       })
@@ -104,8 +124,16 @@ function DownloadAuditLogsModalContent({
         if (isDocumentedMutationError(error)) {
           return
         }
+        const message =
+          error instanceof Error && error.message.length > 0
+            ? error.message
+            : String(error)
+        makeToast(message, ERROR_TOAST, { closeButton: true })
         modal.reject(error)
         modal.remove()
+      })
+      .finally(() => {
+        eatToast(inProgressToastId)
       })
   }
 
