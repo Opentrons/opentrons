@@ -93,7 +93,10 @@ export function useLPCCommands(
     setErrorMessage,
     chainLPCCommands,
   })
-  const handleConditionalCleanupUtils = useHandleClose(props)
+  const handleConditionalCleanupUtils = useHandleClose({
+    ...props,
+    flushJogAudit: handleJogUtils.flushJogAudit,
+  })
   const handleProbeCommands = useHandleProbeCommands({
     ...props,
     chainLPCCommands,
