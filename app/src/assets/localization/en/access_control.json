@@ -2,6 +2,8 @@
   "access_control_note": "Note for robot audit log by {{user}}",
   "action_list": "Action list",
   "actions_requiring_documentation": "Actions requiring documentation",
+  "admin_credentials_required": "Admin credentials required",
+  "admin_credentials_required_description": "Log in with an authorized account.",
   "audit_log_download_required": "Audit log download required",
   "audit_log_download_required_description": "Download the robot's audit logs before continuing.",
   "cancel_action": "Cancel action",
