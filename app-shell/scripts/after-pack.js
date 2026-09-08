@@ -50,7 +50,7 @@ module.exports = async function afterPack(context) {
       console.log(
         `After-pack: Packing python for darwin/universal as darwin/x64 to ${appBase}`
       )
-      const result = installPython(platformName, ['x64'], appBase)
+      const result = await installPython(platformName, ['x64'], appBase)
       console.log(
         `After pack: done after packing python for universal: ${result}`
       )
@@ -60,7 +60,7 @@ module.exports = async function afterPack(context) {
     console.log(
       `After-pack: Packing python for ${platformName}/${archStr} to ${appOutDir}`
     )
-    const result = installPython(platformName, [archStr], appOutDir)
+    const result = await installPython(platformName, [archStr], appOutDir)
     console.log(`After-pack: done after packing python for one arch: ${result}`)
     return result
   }
