@@ -62,7 +62,7 @@ const LoadingText = styled.h1`
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level4HeaderSemiBold}
+    ${TYPOGRAPHY.level3HeaderBold}
   }
 `
 
