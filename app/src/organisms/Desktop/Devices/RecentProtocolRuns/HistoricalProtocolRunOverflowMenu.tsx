@@ -8,6 +8,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -272,7 +273,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     <Flex
       whiteSpace={NO_WRAP}
       zIndex={10}
-      borderRadius="4px 4px 0px 0px"
+      borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
