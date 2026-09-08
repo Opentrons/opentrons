@@ -128,7 +128,8 @@ function DownloadAuditLogsModalContent({
           error instanceof Error && error.message.length > 0
             ? error.message
             : String(error)
-        makeToast(message, ERROR_TOAST, { closeButton: true })
+        const casedMessage = message.charAt(0).toUpperCase() + message.slice(1)
+        makeToast(casedMessage, ERROR_TOAST, { closeButton: true })
         modal.reject(error)
         modal.remove()
       })

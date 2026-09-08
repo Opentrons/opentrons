@@ -182,9 +182,18 @@ export function ComplianceReadySoftwareFiles({
       } finally {
         setIsAuthorizing(false)
       }
+      const toastId = makeToast(
+        t('downloading_log_periods') as string,
+        INFO_TOAST,
+        {
+          disableTimeout: true,
+          icon: { name: 'ot-spinner', spin: true },
+        }
+      )
       void downloadLogPeriodsMutation
         .mutateAsync({ logPeriods })
         .then(downloadedPeriods => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
           // only chain a delete for periods that actually came back with a
           // deletion key; a period downloaded without one can't be deleted yet
           const deletableDownloads = downloadedPeriods.filter(
@@ -246,10 +255,14 @@ export function ComplianceReadySoftwareFiles({
             restoreDeleteModal()
           }
         })
+        .finally(() => {
+          eatToast(toastId)
+        })
     },
     [
       deleteSelectedLogPeriods,
       downloadLogPeriodsMutation,
+      eatToast,
       ensureAuthorized,
       makeToast,
       t,
