@@ -16,7 +16,6 @@ import { ProtocolRoutes } from './ProtocolRoutes'
 export function ProtocolEditor(): JSX.Element {
   return (
     <Fragment>
-      {/* @ts-expect-error: DndProvider cannot be used as a JSX component. */}
       <DndProvider backend={HTML5Backend}>
         <Box
           width="100%"
