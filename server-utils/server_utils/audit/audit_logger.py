@@ -57,6 +57,19 @@ class AuditLogger:
         self.should_log = True
         self.request = request
 
+    def skip_persist(self: Self) -> Self:
+        """Do not sign or store an audit record for this request.
+
+        Use this when the route is audited in general but this particular
+        request should not wait on audit-server persist. 
+        Middleware will return the HTTP response as soon as the handler finishes.
+
+        This is not a substitute for ``skip_audit_logger()``, which marks an
+        entire route as never audited.
+        """
+        self.should_log = False
+        return self
+
     def set_action_from_request(self: Self, request: Request) -> Self:
         """Set the action to log based on the request.
 
@@ -276,10 +289,10 @@ class AuditLogger:
         if isinstance(auth_details, AuthenticatedResult):
             self._fullname = auth_details.fullname
             self._username = auth_details.username
+            return self
         else:
             _LOG.warning(f"Will not send audit log because auth was {auth_details}")
-            self.should_log = False
-        return self
+            return self.skip_persist()
 
     def set_user_note(self: Self, user_note: str | None) -> Self:
         """Set the user note to be included in the log."""

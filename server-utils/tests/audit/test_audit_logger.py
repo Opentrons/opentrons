@@ -267,6 +267,18 @@ async def test_audit_logger_does_not_log_if_not_authenticated(
     decoy.verify(await mock_client.submit_log_message(matchers.Anything()), times=0)
 
 
+async def test_audit_logger_skip_persist_does_not_submit(
+    parametrized_subject: AuditLogger,
+    mock_client: Client,
+    decoy: Decoy,
+) -> None:
+    """skip_persist should prevent audit-server persist for this request."""
+    parametrized_subject.append_message_chunk("m")
+    parametrized_subject.skip_persist()
+    await parametrized_subject.log()
+    decoy.verify(await mock_client.submit_log_message(matchers.Anything()), times=0)
+
+
 async def test_audit_logger_uses_auth_result(
     parametrized_subject: AuditLogger,
     mock_client: Client,
