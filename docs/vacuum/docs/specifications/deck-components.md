@@ -18,7 +18,7 @@ When connected to the waste carboy, negative pressure from the vacuum pump draws
 
 ## Collars
 
-Collars sit directly on the vacuum base. They support filter plates used during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the vacuum base seals it to the collar. The short and tall collars can be paired interchangeably with the spacers. Both collar variations are fully compatible with the Flex Gripper.
+Collars sit directly on the vacuum base. They support filter plates used during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the vacuum base seals it to the collar. The short and tall collars are fully compatible with the Flex Gripper.
 
 The Vacuum Module includes two collars to match different labware profiles:
 
