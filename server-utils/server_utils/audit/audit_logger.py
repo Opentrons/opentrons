@@ -61,7 +61,7 @@ class AuditLogger:
         """Do not sign or store an audit record for this request.
 
         Use this when the route is audited in general but this particular
-        request should not wait on audit-server persist. 
+        request should not wait on audit-server persist.
         Middleware will return the HTTP response as soon as the handler finishes.
 
         This is not a substitute for ``skip_audit_logger()``, which marks an
