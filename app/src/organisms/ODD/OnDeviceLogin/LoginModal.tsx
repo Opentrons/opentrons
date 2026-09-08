@@ -39,16 +39,16 @@ const LoginModalImpl = NiceModal.create(
     const { t } = useTranslation(['access_control'])
     const passwordUpdatedToastId = useId()
     const host = useHost()
-  const shouldShowPasswordUpdatedToastRef = useRef(false)
-  const [phase, setPhase] = useState<LoginModalPhase>('login')
+    const shouldShowPasswordUpdatedToastRef = useRef(false)
+    const [phase, setPhase] = useState<LoginModalPhase>('login')
     const [step, setStep] = useState<LoginStep>('username')
     const [loginError, setLoginError] = useState<string | null>(null)
     const [loginUsername, setLoginUsername] = useState<string | undefined>(
       undefined
     )
     const [loginResetPassword, setLoginResetPassword] = useState(false)
-  const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
-  const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
+    const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
+    const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
       string | null
     >(null)
     const storeLoginState = useStoreLoginState()
@@ -92,7 +92,7 @@ const LoginModalImpl = NiceModal.create(
           finishModal(username, {
             showPasswordUpdatedToast: shouldShowPasswordUpdatedToastRef.current,
           })
-        shouldShowPasswordUpdatedToastRef.current = false
+          shouldShowPasswordUpdatedToastRef.current = false
         }
       },
       [finishModal, storeLoginState, localRobotName]
@@ -103,20 +103,20 @@ const LoginModalImpl = NiceModal.create(
       modal.remove()
     }, [modal])
 
-  const handleUsernameSubmit = async (username: string): Promise<void> => {
-    setLoginUsername(username)
-    if (host == null) return
+    const handleUsernameSubmit = async (username: string): Promise<void> => {
+      setLoginUsername(username)
+      if (host == null) return
 
-    setIsFetchingLoginStatus(true)
-    try {
-      const response = await getUserLoginStatus(host, username)
-      setLoginResetPassword(response.data.data.resetPassword)
-    } catch {
-      setLoginResetPassword(false)
-    } finally {
-      setIsFetchingLoginStatus(false)
+      setIsFetchingLoginStatus(true)
+      try {
+        const response = await getUserLoginStatus(host, username)
+        setLoginResetPassword(response.data.data.resetPassword as boolean)
+      } catch {
+        setLoginResetPassword(false)
+      } finally {
+        setIsFetchingLoginStatus(false)
+      }
     }
-  }
 
     const { submitPassword, isAuthLoading: isLoginAuthLoading } =
       useOAuth2PasswordLogin({
@@ -129,11 +129,11 @@ const LoginModalImpl = NiceModal.create(
     const handleNewPasswordSuccess = useCallback(
       (username: string, newPassword: string) => {
         setLoginError(null)
-      shouldShowPasswordUpdatedToastRef.current = true
-      setLoginResetPassword(false)
-      setLoginUsername(username)
-      setPhase('login')
-      setStep('password')
+        shouldShowPasswordUpdatedToastRef.current = true
+        setLoginResetPassword(false)
+        setLoginUsername(username)
+        setPhase('login')
+        setStep('password')
         submitPassword(username, newPassword)
       },
       [submitPassword]
@@ -184,8 +184,10 @@ const LoginModalImpl = NiceModal.create(
           key={phase}
           step={step}
           onStepChange={setStep}
-          onUsernameSubmit={phase === 'login' ? handleUsernameSubmit : undefined}
-        submitPassword={
+          onUsernameSubmit={
+            phase === 'login' ? handleUsernameSubmit : undefined
+          }
+          submitPassword={
             isChoosingNewPassword ? submitNewPassword : submitPassword
           }
           isAuthLoading={
@@ -195,7 +197,7 @@ const LoginModalImpl = NiceModal.create(
           }
           isPasswordResetRequired={isChoosingNewPassword}
           loginResetPassword={loginResetPassword}
-        initialUsername={initialUsername}
+          initialUsername={initialUsername}
           loginError={loginError}
           onClearLoginError={() => {
             setLoginError(null)
