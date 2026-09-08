@@ -60,19 +60,25 @@ export function UpdateRobotSoftware(
   const hadSessionRef = useRef(session != null)
   const didCancelRef = useRef(false)
 
+  const didAttemptStartRef = useRef(false)
+
   if (session != null) {
     hadSessionRef.current = true
   }
 
   useEffect(() => {
     // Wait for auth queries so a loading false does not skip an allowed update.
-    if (isLoading || isDownloading) {
+    if (isLoading || didAttemptStartRef.current) {
+      return
+    }
+    didAttemptStartRef.current = true
+    if (!startUpdate()) {
+      afterCancelRef.current()
       return
     }
     setIsDownloading(true)
     dispatch(downloadRobotUpdate())
-    startUpdate()
-  }, [dispatch, startUpdate, isDownloading, isLoading])
+  }, [dispatch, startUpdate, isLoading])
 
   useEffect(() => {
     if (session == null && hadSessionRef.current && !didCancelRef.current) {
