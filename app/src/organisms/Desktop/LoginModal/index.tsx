@@ -20,6 +20,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
@@ -178,8 +179,9 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
     onError: handleError,
   })
 
+  const documentationState = useDocumentationState(undefined, robotName)
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
-    useSetNewPasswordAndSignIn({
+    useSetNewPasswordAndSignIn(documentationState, {
       onSuccess: (successfulUsername, _newPassword) => {
         dispatch(logOut({ robotName }))
         setScreen({
@@ -308,8 +310,9 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
       <Modal
         title={t('access_control:desktop_login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
-        // Above SignRun and other run-header modals (zIndexOverlay: 1000).
-        zIndexOverlay={10001}
+        // Login is 10001 so it sits above SignRun (1000) and documentation (10000).
+        // Drop to 9999 on set-new-password so the documentation modal is visible.
+        zIndexOverlay={screen.kind === 'setNewPassword' ? 9999 : 10001}
         footer={<div className={styles.modal_footer_container}>{footer}</div>}
       >
         <div className={styles.content_container}>
@@ -501,6 +504,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
     onPasswordFieldBlur,
   } = props
   const { t } = useTranslation()
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const newPasswordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(newPasswordInputRef, showNewPassword, true)
+  usePlaceCaretAtEndOnToggle(confirmPasswordInputRef, showConfirmPassword, true)
+
+  const handleToggleNewPasswordVisibility = (): void => {
+    setShowNewPassword(current => !current)
+  }
+
+  const handleToggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(current => !current)
+  }
 
   return (
     <>
@@ -515,12 +533,13 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
 
       <div className={styles.fields_container}>
         <InputField
+          ref={newPasswordInputRef}
           autoFocus
           name="newPassword"
           title={t(
             'access_control:desktop_password_expired_new_password_field'
           )}
-          type="password"
+          type={showNewPassword ? 'text' : 'password'}
           value={formData.newPassword}
           error={formData.error ?? undefined}
           onChange={event => {
@@ -529,13 +548,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showNewPassword}
+              onToggle={handleToggleNewPasswordVisibility}
+              iconOnly
+            />
+          }
         />
         <InputField
+          ref={confirmPasswordInputRef}
           name="confirmPassword"
           title={t(
             'access_control:desktop_password_expired_confirm_password_field'
           )}
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={formData.confirmPassword}
           error={formData.confirmPasswordError ?? undefined}
           onChange={event => {
@@ -544,6 +571,13 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showConfirmPassword}
+              onToggle={handleToggleConfirmPasswordVisibility}
+              iconOnly
+            />
+          }
         />
       </div>
     </>

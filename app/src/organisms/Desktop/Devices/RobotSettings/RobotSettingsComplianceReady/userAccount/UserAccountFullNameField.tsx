@@ -10,10 +10,12 @@ import type { Control, FieldValues, Path } from 'react-hook-form'
 
 export interface UserAccountFullNameFieldProps<T extends FieldValues> {
   control: Control<T>
+  readOnly?: boolean
 }
 
 export function UserAccountFullNameField<T extends FieldValues>({
   control,
+  readOnly = false,
 }: UserAccountFullNameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -34,6 +36,7 @@ export function UserAccountFullNameField<T extends FieldValues>({
           render={({ field, fieldState }) => (
             <InputField
               value={field.value}
+              readOnly={readOnly}
               error={fieldState.error?.message}
               onChange={field.onChange}
               onBlur={field.onBlur}

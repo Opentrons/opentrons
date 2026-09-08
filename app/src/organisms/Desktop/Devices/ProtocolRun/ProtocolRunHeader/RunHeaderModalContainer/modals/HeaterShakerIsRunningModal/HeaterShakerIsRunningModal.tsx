@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -18,16 +18,19 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 
+import { useRunHeaderRunControls } from '../../../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
 
-import type { ReactNode } from 'react'
 import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
+import type {
+  HeaterShakerDeactivateShakerCreateCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export type UseHeaterShakerIsRunningModalResult =
   | { showModal: true; module: HeaterShakerModule; toggleModal: () => void }
@@ -60,16 +63,16 @@ export function useHeaterShakerIsRunningModal(
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
   module: HeaterShakerModule
-  startRun: () => void
+  runId: string
+  robotName: string
 }
 
 export const HeaterShakerIsRunningModal = (
   props: HeaterShakerIsRunningModalProps
-): ReactNode => {
-  const { closeModal, module, startRun } = props
+): JSX.Element => {
+  const { closeModal, module, runId, robotName } = props
   const { t } = useTranslation('heater_shaker')
-  const documentationState = useDocumentationState()
-  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
+
   const attachedModules = useAttachedModules()
   const moduleIds = attachedModules
     .filter(
@@ -79,6 +82,35 @@ export const HeaterShakerIsRunningModal = (
         module.data.speedStatus !== 'idle'
     )
     .map(module => module.id)
+
+  const moduleCommands = useMemo(() => {
+    return moduleIds.map(moduleId => {
+      const stopShakeCommand: RunTimeCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: { moduleId },
+        id: '',
+        createdAt: '',
+        startedAt: '',
+        status: 'queued',
+        completedAt: '',
+      }
+      return stopShakeCommand
+    })
+  }, [moduleIds])
+
+  const { documentationState: linkedDocumentationState } =
+    useLinkedDocumentationState([...moduleCommands, 'play_run'], runId)
+
+  const { play } = useRunHeaderRunControls(runId, robotName)
+
+  const { play: playWithModuleCommands } = useRunHeaderRunControls(
+    runId,
+    robotName,
+    linkedDocumentationState
+  )
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    linkedDocumentationState
+  )
 
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -94,7 +126,7 @@ export const HeaterShakerIsRunningModal = (
   )
 
   const handleContinueShaking = (): void => {
-    startRun()
+    play()
     closeModal()
   }
 
@@ -115,7 +147,8 @@ export const HeaterShakerIsRunningModal = (
         )
       })
     })
-    handleContinueShaking()
+    playWithModuleCommands()
+    closeModal()
   }
 
   return (

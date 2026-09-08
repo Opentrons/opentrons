@@ -9,6 +9,7 @@ import {
   getOAuth2Token,
   OAUTH2_CLIENT_ID,
   patchAccessControlEnabled,
+  postResetConfig,
   restart,
 } from '@opentrons/api-client'
 import {
@@ -44,7 +45,7 @@ const USER_NOTE =
 
 /**
  * Create initial accounts, flip the switch to enable Compliance Ready Software,
- * and restart the robot.
+ * clear run history, and restart the robot.
  *
  * We do this all in one batch at the end of the wizard to reduce the chances of it
  * getting interrupted and leaving the robot in a half-set-up state. Though it's still
@@ -118,13 +119,18 @@ export function useEnableCRSMutation(): UseMutationResult<
       token: tokenResponse.data.access_token,
     }
 
-    // Send the restart request, start tracking the restart progress through Redux,
-    // and wait for the robot to come back online.
+    // Clear the run history, send the restart request, start tracking the restart
+    // progress through Redux, and wait for the robot to come back online.
     //
-    // Note: We can't use the useRestartRobotMutation hook because it captures its
-    // HostConfig at the time the hook is called (when the component is rendered),
-    // whereas we modify our HostConfig midway through this whole procedure when we
-    // log in as the new admin account.
+    // Note: We can't use useResetRobotConfigMutation / useRestartRobotMutation
+    // because those hooks capture HostConfig at render time, whereas we modify
+    // our HostConfig midway through this procedure when we log in as the new
+    // admin account.
+    await postResetConfig(
+      hostConfigWithAccessToken,
+      { runsHistory: true },
+      USER_NOTE
+    )
     await restart(hostConfigWithAccessToken, USER_NOTE)
     for (const action of beginRobotRestartTracking(
       robotName,

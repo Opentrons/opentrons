@@ -58,12 +58,24 @@ describe('getPasswordComplexityError', () => {
         requireSpecialCharacters: false,
       })
     ).toBe('tooShort')
+  })
+
+  it('returns invalidCharacters when the password contains a space', () => {
+    expect(
+      getPasswordComplexityError('pass word', {
+        minLength: 8,
+        requireSpecialCharacters: false,
+      })
+    ).toBe('invalidCharacters')
+  })
+
+  it('returns invalidCharacters for characters outside the shared allowlist', () => {
     expect(
       getPasswordComplexityError('☃'.repeat(8), {
         minLength: 8,
         requireSpecialCharacters: false,
       })
-    ).toBeNull()
+    ).toBe('invalidCharacters')
   })
 
   it('accepts every punctuation character used by auth-server', () => {
