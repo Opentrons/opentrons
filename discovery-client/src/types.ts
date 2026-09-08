@@ -203,6 +203,7 @@ export interface DiscoveryClientOptions {
 export interface DiscoveryClient {
   getRobots: () => DiscoveryClientRobot[]
   removeRobot: (robotName: string) => void
+  renameRobot: (prevName: string, newName: string) => void
   start: (config: DiscoveryClientConfig) => void
   stop: () => void
 }

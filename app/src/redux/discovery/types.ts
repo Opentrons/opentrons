@@ -87,6 +87,12 @@ export interface RemoveRobotAction {
   meta: { shell: true }
 }
 
+export interface RenameRobotAction {
+  type: 'discovery:RENAME'
+  payload: { prevName: string; newName: string }
+  meta: { shell: true }
+}
+
 export interface ClearDiscoveryCacheAction {
   type: 'discovery:CLEAR_CACHE'
   meta: { shell: true }
@@ -98,3 +104,4 @@ export type DiscoveryAction =
   | UpdateListAction
   | RemoveRobotAction
   | ClearDiscoveryCacheAction
+  | RenameRobotAction

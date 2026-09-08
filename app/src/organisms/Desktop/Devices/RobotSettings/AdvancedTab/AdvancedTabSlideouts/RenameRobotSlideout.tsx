@@ -26,6 +26,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
   startDiscovery,
 } from '/app/redux/discovery'
 
@@ -137,14 +138,11 @@ export function RenameRobotSlideout({
   const documentationState = useDocumentationState()
   const { updateRobotName } = useUpdateRobotNameMutation(documentationState, {
     onSuccess: (data: UpdatedRobotName) => {
-      // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
-      // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
-      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
-      // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && navigate('/devices')
-      dispatch(removeRobot(previousRobotName))
-      // TODO(jj  07/15/2026): preserve ip address in hostsByIp during removal, to prevent having to search for the robot again
-      dispatch(startDiscovery())
+      if (data.name != null) {
+        dispatch(renameRobot(previousRobotName, data.name))
+        dispatch(startDiscovery())
+        navigate(`/devices`)
+      }
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,

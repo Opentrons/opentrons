@@ -330,4 +330,44 @@ describe('robotsByName reducer', () => {
 
     expect(nextState).toBe(initialState)
   })
+
+  it('should handle "client:RENAME_ROBOT" by moving health to the new name', () => {
+    const action = Actions.renameRobot('opentrons-dev', 'new-name')
+    const initialState = {
+      'opentrons-dev': {
+        name: 'opentrons-dev',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+      },
+      'opentrons-other': {
+        name: 'opentrons-other',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+      },
+    }
+    const nextState = robotsByNameReducer(initialState, action)
+
+    expect(nextState).toEqual({
+      'new-name': {
+        name: 'new-name',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+      },
+      'opentrons-other': initialState['opentrons-other'],
+    })
+  })
+
+  it('should noop "client:RENAME_ROBOT" if robot not in state', () => {
+    const action = Actions.renameRobot('opentrons-dev', 'new-name')
+    const initialState = {
+      'opentrons-other': {
+        name: 'opentrons-other',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+      },
+    }
+    const nextState = robotsByNameReducer(initialState, action)
+
+    expect(nextState).toBe(initialState)
+  })
 })

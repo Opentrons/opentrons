@@ -41,6 +41,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
 } from '/app/redux/discovery'
 
 import type { FieldError, Resolver } from 'react-hook-form'
@@ -158,7 +159,7 @@ export function RobotNameEditor(): JSX.Element {
             setRobotNameConfirmation(data.name)
           }
           if (previousName != null) {
-            dispatch(removeRobot(previousName))
+            dispatch(renameRobot(previousName, data.name))
           }
         }
       },
