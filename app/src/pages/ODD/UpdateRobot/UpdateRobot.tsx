@@ -17,6 +17,7 @@ import {
   clearRobotUpdateSession,
   downloadRobotUpdate,
   getRobotUpdateAvailable,
+  getRobotUpdateSession,
 } from '/app/redux/robot-update'
 import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
@@ -32,6 +33,7 @@ export function UpdateRobot(): JSX.Element {
       : null
   })
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const session = useSelector(getRobotUpdateSession)
   const { startUpdate } = useRobotUpdateContext()
   const dispatch = useDispatch<Dispatch>()
 
@@ -64,7 +66,7 @@ export function UpdateRobot(): JSX.Element {
         </ErrorUpdateSoftware>
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
+        (robotUpdateType !== 'upgrade' && session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate(-1)

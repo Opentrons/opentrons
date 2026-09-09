@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react'
-import { useQueryClient } from 'react-query'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 
 import {
@@ -11,10 +10,7 @@ import {
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
-import {
-  clearRobotUpdateSession,
-  startRobotUpdate,
-} from '/app/redux/robot-update'
+import { startRobotUpdate } from '/app/redux/robot-update'
 import {
   getRobotUpdateSession,
   getRobotUpdateSessionRobotName,
@@ -35,15 +31,23 @@ export function useRobotUpdateOrchestrator(): {
 } {
   const dispatch = useDispatch<Dispatch>()
   const store = useStore<State>()
-  const queryClient = useQueryClient()
   const sessionRobotName = useSelector(getRobotUpdateSessionRobotName)
   const baseHostConfig = useRobotUpdateHostConfig()
   const accessToken = useAccessTokenForRobot(sessionRobotName)
 
   const abortRef = useRef<AbortController | null>(null)
-  // After AC cache reset, ignore settled docs until host is ready and queries
-  // have loaded again, otherwise create can use a stale CRS-enabled snapshot.
+  const inFlightRef = useRef(false)
+  // Ignore settled docs until the session host is ready and its AC queries
+  // have loaded. Otherwise create can see a stale "AC off" snapshot while
+  // hostConfig is still null.
   const acGateRef = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+      inFlightRef.current = false
+    }
+  }, [])
 
   // Values that may change mid-flow. Read via getters.
   const accessTokenRef = useRef(accessToken)
@@ -113,6 +117,10 @@ export function useRobotUpdateOrchestrator(): {
 
   const startUpdate = useCallback(
     (robotName: string, systemFile?: string) => {
+      if (inFlightRef.current) {
+        return
+      }
+
       const previousPathPrefix = getRobotUpdateSession(
         store.getState()
       )?.pathPrefix
@@ -120,6 +128,7 @@ export function useRobotUpdateOrchestrator(): {
       abortRef.current?.abort()
       const abortController = new AbortController()
       abortRef.current = abortController
+      inFlightRef.current = true
 
       // Cancel before clearing so host + documentation still match
       // the in-flight robot. Upload ignores AbortSignal, so this must be eager.
@@ -130,49 +139,37 @@ export function useRobotUpdateOrchestrator(): {
       }
 
       clearDocreport()
-      dispatch(clearRobotUpdateSession())
       dispatch(startRobotUpdate(robotName, systemFile ?? null))
 
       acGateRef.current = true
 
-      void queryClient
-        .resetQueries({
-          predicate: query => {
-            const key = query.queryKey
-            return (
-              Array.isArray(key) &&
-              (key.includes('accessControlEnabled') || key.includes('audit'))
-            )
-          },
-        })
-        .then(() => {
-          if (abortController.signal.aborted) {
-            return
+      void runRobotUpdateFlow({
+        store,
+        dispatch,
+        robotName,
+        systemFile: systemFile ?? null,
+        getAccessToken: () => {
+          if (!shouldUseAccessToken(readDocumentationState())) {
+            return null
           }
-          return runRobotUpdateFlow({
-            store,
-            dispatch,
-            robotName,
-            systemFile: systemFile ?? null,
-            getAccessToken: () => {
-              if (!shouldUseAccessToken(readDocumentationState())) {
-                return null
-              }
-              return accessTokenRef.current
-            },
-            getDocumentationState: readDocumentationState,
-            isHostConfigReady: () => hostConfigReadyRef.current,
-            getMutations: () => mutationsRef.current,
-            signal: abortController.signal,
-          })
-        })
+          return accessTokenRef.current
+        },
+        getDocumentationState: readDocumentationState,
+        isHostConfigReady: () => hostConfigReadyRef.current,
+        getMutations: () => mutationsRef.current,
+        signal: abortController.signal,
+      }).finally(() => {
+        if (abortRef.current === abortController) {
+          inFlightRef.current = false
+        }
+      })
 
       function readDocumentationState(): DocumentationState {
         const state = docsStateRef.current
         if (!acGateRef.current) {
           return state
         }
-        // Hold the gate until the post-reset host/queries have settled.
+        // Hold the gate until the session host and its AC queries have settled.
         if (!hostConfigReadyRef.current || state.isLoading) {
           return { isLoading: true }
         }
@@ -180,7 +177,7 @@ export function useRobotUpdateOrchestrator(): {
         return state
       }
     },
-    [clearDocreport, dispatch, queryClient, store]
+    [clearDocreport, dispatch, store]
   )
 
   return { startUpdate }
