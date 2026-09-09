@@ -1,5 +1,5 @@
 ---
-title: "Documentation"
+title: "Compliance Ready Software: Documentation"
 description: "Covers the concept of documenting user actions in Compliance Ready Software."
 ---
 
@@ -19,7 +19,7 @@ Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to
 On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
 !!! tip
-    Flex also supports an [external keyboard](../devices.md), attached via USB, to type documentation.
+    Flex also supports an [external keyboard](../features/devices.md), attached via USB, to type documentation.
 
 <figure class="screenshot" markdown>
   ![Add documentation on the Flex touchscreen.](../images/documentation-required.png)
@@ -61,4 +61,4 @@ Administrators can customize documentation settings in the Opentrons App. Click 
 
 If you choose to no longer require documentation for robot actions, the user ID for the currently logged in user will still be attached to every user action in the protocol and included in the audit log. However, the Opentrons App and Flex touchscreen will never prompt users to enter documentation. Users without appropriate credentials will still be blocked from completing certain actions and updating settings.
 
-See the complete list of [administrator settings](../admin.md) for more.
+See the complete list of [administrator settings](../features/admin.md) for more.

@@ -54,9 +54,10 @@ nav:
       - Completing a protocol: using/complete.md
       - Accessing files: using/files.md
   - Additional Features: 
-      - Security: security.md 
-      - Devices: devices.md
-      - Administrator settings: admin.md
+      - Additional Features: features/index.md
+      - Security: features/security.md 
+      - Devices: features/devices.md
+      - Administrator settings: features/admin.md
   - Appendices: 
       - Documented Actions: actions.md
       - Glossary: glossary.md

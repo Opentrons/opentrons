@@ -1,5 +1,5 @@
 ---
-title: "Glossary"
+title: "Compliance Ready Software: Glossary"
 description: "A glossary of new and relevant Compliance Ready Software Terms."
 ---
 
@@ -9,7 +9,7 @@ This glossary defines terms related to Opentrons Flex Compliance Ready Software.
 
 Part of the Code of Federal Regulations under Chapter I (Food and Drug Administration), Subchapter A, and part 11, pertaining to electronic records and electronic signatures.
 
-##### Admin
+##### Admin account
 
 Each lab needs at least one compliance ready account assigned an administrator role. These accounts have full system access and can update administrator and Flex system settings. By default, only these accounts can manage protocols on the Flex. 
 
@@ -33,13 +33,9 @@ Audit logs are grouped together by period for download from the Opentrons App or
 
 A list of protocols run by any Flex, including run date, protocol title, status (canceled, failed, or completed), associated files, and run duration. 
 
-First, choose your robot from the **Devices** tab in the Opentrons App. Then, select the **Run History** tab.
-
 ##### Protocol run record
 
 Additional details about each protocol run listed in your Flex's run history, including selected parameters, timestamps, run time, images taken during the run, and more.
-
-For any line in the **Run History** tab, click the three-dot menu on the right and choose **View protocol run record**. 
 
 ##### Recovery account
 
@@ -49,7 +45,7 @@ A single recovery account is created during software activation. Your lab should
 
 If your lab loses access to all administrator accounts and your recovery account, contact Opentrons for a paid, on-site recovery service. This service restores access and preserves existing files from your Flex.
 
-##### Service
+##### Service account
 
 An account created on your compliance ready Flex during software activation. Opentrons-trained representatives can log into this account for maintenance, service, or to restore locked accounts.
 
@@ -58,7 +54,7 @@ An account created on your compliance ready Flex during software activation. Ope
 
 A PIN provided by an Opentrons-trained representative and used to activate Opentrons Flex Compliance Ready Software. Your lab will never need to access this PIN again.
 
-##### User
+##### User account
 
 Day-to-day users of the Flex are assigned this role in Compliance Ready Software. They can't configure administrator settings and, by default, can't manage protocols on the Flex. 
 

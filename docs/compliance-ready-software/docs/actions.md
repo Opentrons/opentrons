@@ -1,5 +1,5 @@
 ---
-title: "Documented Actions"
+title: "Compliance Ready Software: Documented Actions"
 description: "An appendix containing a full list of actions requiring user documentation."
 ---
 
@@ -23,7 +23,7 @@ Users will need to document their reason for updating robot settings:
 * Setting the Flex to home the gantry upon reset.
 * Placing the Flex in OEM mode for third-party use.
 * Resetting the Flex.
-* Updating Compliance Ready Software [settings](admin.md): 
+* Updating Compliance Ready Software [settings](features/admin.md): 
     * Updating the number of allowed login attempts.
     * Customzing required password complexity.
     * Customizing the length of time before screen timeout.
@@ -31,7 +31,7 @@ Users will need to document their reason for updating robot settings:
     * Choosing whether to require user documentation for robot actions. 
     * Choosing whether to require audit logs to be downloaded from the Opentrons App. 
 
-By default, administrator credentials are required to update robot software and to perform some compliance ready actions, like sending protocols to the Flex. Adminstrators can customize some of these permissions in [settings](admin.md).
+By default, administrator credentials are required to update robot software and to perform some compliance ready actions, like sending protocols to the Flex. Adminstrators can customize some of these permissions in [settings](features/admin.md).
 
 
 ## Robot actions
@@ -52,7 +52,8 @@ From the **Devices** page in the Opentrons App, users can complete robot actions
       * Deactivating a module.
       * Setting up a new module.
 * Updating module and hardware deck slot locations.
-* Adding or removing modules or fixtures, like the trash bin, from the deck.
+* Adding or removing modules.
+* Adding or removing a trash bin or waste chute from the deck.
 
 ## Protocol setup
 
@@ -61,7 +62,8 @@ When setting up a protocol, users will need to document their reason for:
 * Setting up the protocol.
 * Attaching or detaching pipettes or the Flex Gripper. 
 * Calibrating pipettes or modules.
-* Changing the deck slot locations of modules or labware, including resolving deck location conflicts. 
+* Changing the deck slot locations of modules.
+* Resolving deck location conflicts. 
 * Changing a module's state, like opening a labware latch or setting temperature.
 * Starting or completing Labware Position Check.
 * Applying labware offsets.

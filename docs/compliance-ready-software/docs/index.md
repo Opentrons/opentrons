@@ -1,5 +1,5 @@
 ---
-title: "Compliance Ready Software Instruction Manual"
+title: "Compliance Ready Software: Compliance Ready Software Instruction Manual"
 description: "Permanent, compliance-ready software to enable 21 CFR part 11-ready operation of the Opentrons Flex."
 ---
 

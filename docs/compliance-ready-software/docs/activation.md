@@ -1,5 +1,5 @@
 ---
-title: "Activation"
+title: "Compliance Ready Software: Activation"
 description: "What users need to know about activating Flex Compliance-Ready Software."
 ---
 

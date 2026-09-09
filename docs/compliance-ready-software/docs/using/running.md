@@ -1,5 +1,5 @@
 ---
-title: "Running protocols"
+title: "Compliance Ready Software: Running protocols"
 description: "Setting up, running, and documenting protocols in Compliance Ready Software."
 ---
 
@@ -92,7 +92,7 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 Your Flex won't complete actions like these until you enter documentation. For example, if you need to pause your protocol, the Flex will only pause after you click **Confirm** on the "Documentation required" screen. 
 
 !!! note
-     Remember that you can use the [Emergency Stop Pendant] to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
+     Remember that you can use the [Emergency Stop Pendant](../../flex/system-description/e-stop.md) to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
 
 In some cases, you'll be prompted to document multiple actions after they occur, like in error recovery or robot calibration. 
 

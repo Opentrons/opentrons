@@ -1,11 +1,11 @@
 ---
-title: "Settings"
+title: "Compliance Ready Software: Settings"
 description: "Settings that can be used to customize a compliance ready Flex during setup."
 ---
 
 During Opentrons Flex Compliance Ready Software activation, an Opentrons-trained representative can help you change settings to customize your day-to-day experience.
 
-Adminstrator accounts have the option to change these settings again later. For more, see the full list of [administrator settings](admin.md).
+Adminstrator accounts have the option to change these settings again later. For more, see the full list of [administrator settings](features/admin.md).
 
 ## Download files after a run
 
@@ -41,4 +41,4 @@ Click the :material-cog: in the lower left to access **App settings**. Select th
 If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 
 !!! note
-    There's more than one way to save your files. You can attach a [USB](devices.md) and copy files to it from the Flex touchscreen. Then, attach the drive to your computer and save them in your preferred location.
+    There's more than one way to save your files. You can attach a [USB](features/devices.md) and copy files to it from the Flex touchscreen. Then, attach the drive to your computer and save them in your preferred location.

@@ -1,5 +1,5 @@
 ---
-title: "Roles"
+title: "Compliance Ready Software: Roles"
 description: "Types of roles (service, administrator, and service) in Compliance Ready Software."
 ---
 
@@ -11,7 +11,7 @@ Three kinds of users can operate a compliance ready Flex. During software instal
 | **Admin** | <ul><li>Full system access</li><li>Can change Flex system settings</li><li>Can send protocols to the Flex</li><li>Can view, download, and manage files</li><li>Day-to-day operation of the Flex</li></ul> |
 | **User** | <ul><li>Can't change Flex system settings</li><li>By default, can't send protocols to the Flex</li><li>Can view and download files</li><li>Day-to-day operation of the Flex</li></ul> |
  
-Your lab can set up multiple administrator accounts that will have full access to the Flex. These accounts can configure [administrator settings](admin.md) and the day-to-day user's experience. By default, they can also [send protocols](using/running.md#sending-protocols) to the Flex, and view, download, and [manage files](using/files.md). 
+Your lab can set up multiple administrator accounts that will have full access to the Flex. These accounts can configure [administrator settings](features/admin.md) and the day-to-day user's experience. By default, they can also [send protocols](using/running.md#sending-protocols) to the Flex, and view, download, and [manage files](using/files.md). 
 
 User accounts can run protocols on the Flex and view files. By default, they won't be able to send protocols to the Flex, and they can't customize settings or delete files. In general, users are blocked from completing actions that require administrator credentials. 
 
@@ -20,14 +20,14 @@ User accounts can run protocols on the Flex and view files. By default, they won
   <figcaption>Administrator credentials are required for the action the user is logging in to complete.</figcaption>
 </figure>
 
-Administrators can [customize settings](admin.md) to change some user permissions.
+Administrators can [customize settings](features/admin.md) to change some user permissions.
 
 
 ## Account recovery
 
 Your Opentrons-trained representative will help you set up a *recovery account* with an automatically generated username and password. Be sure to save these account details in a safe place in case you're ever locked out of the system. 
 
-All Compliance Ready Software accounts will be locked after a number of failed login attempts. An administrator can [customize](admin.md#personal-account-settings) this number. If your lab loses access to *all* administrator accounts, try the following:
+All Compliance Ready Software accounts will be locked after a number of failed login attempts. An administrator can [customize](features/admin.md#personal-account-settings) this number. If your lab loses access to *all* administrator accounts, try the following:
 
 * Log in using your lab's *recovery account*. This account should only be used for emergency login, never regular use.
 * Contact Opentrons for a paid, on-site *recovery service*. An Opentrons-trained representative will use a service account to restore access and preserve existing audit logs via a physical serial port.

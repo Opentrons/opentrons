@@ -1,5 +1,5 @@
 ---
-title: "Using Compliance Ready Software"
+title: "Compliance Ready Software: Using Compliance Ready Software"
 description: "Documents the user flow from log in to documenting actions, running protocols, and accessing files."
 ---
 

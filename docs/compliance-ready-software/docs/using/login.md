@@ -1,5 +1,5 @@
 ---
-title: "Logging in"
+title: "Compliance Ready Software:Logging in"
 description: "Beginning a day-to-day look at using compliance-ready software on the Flex with login."
 ---
 
