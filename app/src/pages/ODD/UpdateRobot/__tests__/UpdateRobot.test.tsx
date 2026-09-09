@@ -119,6 +119,15 @@ describe('UpdateRobot', () => {
     screen.getByText('Your software is already up to date!')
   })
 
+  it('should keep showing the update when a session exists even if type is not upgrade', () => {
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(mockSession)
+    render()
+    screen.getByText('Downloading software...')
+  })
+
   it('should render mock ErrorUpdateSoftware when an error occurs', () => {
     const mockErrorSession = {
       ...mockSession,

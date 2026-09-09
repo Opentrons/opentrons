@@ -10,10 +10,7 @@ import {
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
-import {
-  clearRobotUpdateSession,
-  startRobotUpdate,
-} from '/app/redux/robot-update'
+import { startRobotUpdate } from '/app/redux/robot-update'
 import {
   getRobotUpdateSession,
   getRobotUpdateSessionRobotName,
@@ -144,7 +141,9 @@ export function useRobotUpdateOrchestrator(): {
       }
 
       clearDocreport()
-      dispatch(clearRobotUpdateSession())
+      // Do not clearRobotUpdateSession() here: a null session looks like a
+      // user cancel to UpdateRobotSoftware (afterCancel → leave the page) and
+      // remounts the apply UI. START_UPDATE already resets step/error.
       dispatch(startRobotUpdate(robotName, systemFile ?? null))
 
       acGateRef.current = true

@@ -235,15 +235,15 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   const queriesSucceeded =
     robotSettingsQuery.isSuccess && accessControlEnabledQuery.isSuccess
-  // Keep the tree mounted after the first successful load. Resetting AC/audit
-  // queries (for example at the start of a software update) would otherwise
-  // flip isSuccess false, unmount the ODD, and restart the update in a loop.
+  // After the first successful load, never return to the spinner. Query resets,
+  // shell-ready blips, and refetches during a software update would otherwise
+  // unmount the update UI (and abort the apply flow) until "Sending software...".
   const hasCompletedInitialReadyRef = useRef(false)
   if (isShellReady && queriesSucceeded) {
     hasCompletedInitialReadyRef.current = true
   }
   const isReady =
-    isShellReady && (queriesSucceeded || hasCompletedInitialReadyRef.current)
+    hasCompletedInitialReadyRef.current || (isShellReady && queriesSucceeded)
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     // to make sure that the host config stays stable and in step with the initial queries,
