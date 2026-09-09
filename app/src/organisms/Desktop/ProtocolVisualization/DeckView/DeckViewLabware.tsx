@@ -9,6 +9,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getActiveLayer } from '../utils/getActiveLayer'
+import { isLabwareInDisposalLocation } from '../utils/isLabwareInDisposalLocation'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
@@ -64,6 +65,11 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
           return []
         }
         const slot = getSlotInLocationStack(lw.stack)
+        // gripperWasteChute / trash AAs still have deck coordinates, but disposed
+        // labware must not stay visible on the chute or trash after a move.
+        if (isLabwareInDisposalLocation(slot)) {
+          return []
+        }
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
