@@ -18,6 +18,7 @@ import {
   registerDiscoverySecondaryWindow,
   unregisterDiscovery,
 } from './discovery'
+import { registerDownloadHandlers } from './downloads/ipc'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -231,6 +232,7 @@ async function startUp(): Promise<void> {
     }
   })
   await registerCertIPC()
+  registerDownloadHandlers(mainWindow)
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }
