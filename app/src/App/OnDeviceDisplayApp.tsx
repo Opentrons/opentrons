@@ -274,17 +274,18 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       <MaintenanceRunTakeover>
                         <EstopTakeover />
                         <ToasterOven>
-                          <FirmwareUpdateTakeover />
-                          {showModuleSetupModal && localRobot?.name != null ? (
-                            <ModuleWizardFlows
-                              showSetupLauncher={true}
-                              closeFlow={() => {
-                                setShowModuleSetupModal(false)
-                              }}
-                              robotName={localRobot.name}
-                            />
-                          ) : null}
                           <NiceModal.Provider>
+                            <FirmwareUpdateTakeover />
+                            {showModuleSetupModal &&
+                            localRobot?.name != null ? (
+                              <ModuleWizardFlows
+                                showSetupLauncher={true}
+                                closeFlow={() => {
+                                  setShowModuleSetupModal(false)
+                                }}
+                                robotName={localRobot.name}
+                              />
+                            ) : null}
                             <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
                               {!showModuleSetupModal ? (
