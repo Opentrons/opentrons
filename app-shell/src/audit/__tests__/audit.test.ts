@@ -183,14 +183,14 @@ describe('audit module dispatches', () => {
 
   it('does not overwrite an existing audit log file with the same name', async () => {
     await writeFile(path.join(tempDir, 'logperiod.zip'), 'original')
-    vi.mocked(Http.fetchToFile).mockImplementation(async (_url, destination) => {
-      await writeFile(destination, 'new-bytes')
-      return destination
-    })
-
-    handleAction(
-      downloadAuditLog({ ...downloadPayload, destination: tempDir })
+    vi.mocked(Http.fetchToFile).mockImplementation(
+      async (_url, destination) => {
+        await writeFile(destination, 'new-bytes')
+        return destination
+      }
     )
+
+    handleAction(downloadAuditLog({ ...downloadPayload, destination: tempDir }))
     await vi.waitFor(async () => {
       await expect(
         readFile(path.join(tempDir, 'logperiod (1).zip'), 'utf8')
@@ -276,10 +276,12 @@ describe('audit module dispatches', () => {
   })
 
   it('zips multiple audit logs into one archive and removes the folder', async () => {
-    vi.mocked(Http.fetchToFile).mockImplementation(async (_url, destination) => {
-      await writeFile(destination, 'zip-bytes')
-      return destination
-    })
+    vi.mocked(Http.fetchToFile).mockImplementation(
+      async (_url, destination) => {
+        await writeFile(destination, 'zip-bytes')
+        return destination
+      }
+    )
 
     handleAction(
       downloadAuditLogs({
@@ -330,10 +332,12 @@ describe('audit module dispatches', () => {
       '2024-01-01T00:00:00.000Z'
     )
 
-    vi.mocked(Http.fetchToFile).mockImplementation(async (_url, destination) => {
-      await writeFile(destination, 'zip-bytes')
-      return destination
-    })
+    vi.mocked(Http.fetchToFile).mockImplementation(
+      async (_url, destination) => {
+        await writeFile(destination, 'zip-bytes')
+        return destination
+      }
+    )
 
     handleAction(
       downloadAuditLogs({
@@ -358,7 +362,9 @@ describe('audit module dispatches', () => {
 
     await vi.waitFor(async () => {
       const entries = await readdir(tempDir)
-      expect(entries).toContain('otie-audit-logs-2024-01-01T00_00_00.000Z (1).zip')
+      expect(entries).toContain(
+        'otie-audit-logs-2024-01-01T00_00_00.000Z (1).zip'
+      )
     })
 
     await expect(

@@ -12,8 +12,8 @@ import {
 
 import {
   MISSING_USB_DESTINATION_ERROR,
-  UNWRITABLE_USB_DESTINATION_ERROR,
   registerAudit,
+  UNWRITABLE_USB_DESTINATION_ERROR,
 } from '..'
 import * as Http from '../../http'
 
@@ -41,10 +41,12 @@ describe('app-shell-odd audit module', () => {
     tempDir = tempy.directory()
     dispatch = vi.fn()
     handleAction = registerAudit(dispatch)
-    vi.mocked(Http.fetchToFile).mockImplementation(async (_url, destination) => {
-      await writeFile(destination, 'zip-bytes')
-      return destination
-    })
+    vi.mocked(Http.fetchToFile).mockImplementation(
+      async (_url, destination) => {
+        await writeFile(destination, 'zip-bytes')
+        return destination
+      }
+    )
   })
 
   afterEach(() => {
