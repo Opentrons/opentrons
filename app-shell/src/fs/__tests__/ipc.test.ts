@@ -84,7 +84,7 @@ describe('app-shell fs/ipc', () => {
     if (handler == null) {
       throw new Error(`No handler registered for ${channel}`)
     }
-    return handler({}, payload)
+    return await handler({}, payload)
   }
 
   describe('downloads:saveFileFromBuffer', () => {
