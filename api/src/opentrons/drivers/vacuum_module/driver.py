@@ -39,6 +39,12 @@ MAX_GAUGE_PRESSURE_MBAR = -800
 THEORETICAL_MAX_GAUGE_PRESSURE_MBAR = -1013.25
 MAX_VAC_DURATION_S = 60 * 60 * 24  # 24hrs
 
+# Waste M127 range — match firmware waste_detector.hpp configure().
+WASTE_H_MAX = 500.0
+WASTE_G_MAX = float(MAX_PUMP_RPM)
+WASTE_HOLD_MS_MAX = 1_000_000.0
+WASTE_N_MAX = 1000.0
+
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
     """Driver for Opentrons Vacuum Module."""
@@ -429,16 +435,20 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Sets the Waste Full detection algorithm parameters"""
 
         command = GCODE.SET_WASTE_CONFIG.build_command()
-        for letter, value in (
-            ("A", p_filter_alpha),
-            ("G", g_sealed_max),
-            ("H", flowing_dp_mbar),
-            ("T", stable_hold_ms),
-            ("U", stable_hold_deep_ms),
-            ("N", min_waste_depth_mbar),
+        for letter, value, lo, hi in (
+            ("A", p_filter_alpha, 0, 1.0),
+            ("G", g_sealed_max, 0, WASTE_G_MAX),
+            ("H", flowing_dp_mbar, 0, WASTE_H_MAX),
+            ("T", stable_hold_ms, 0, WASTE_HOLD_MS_MAX),
+            ("U", stable_hold_deep_ms, 0, WASTE_HOLD_MS_MAX),
+            ("N", min_waste_depth_mbar, 0, WASTE_N_MAX),
         ):
             if value is not None:
-                command.add_float(letter, value, GCODE_ROUNDING_PRECISION)
+                command.add_float(
+                    letter,
+                    max(lo, min(value, hi)),
+                    3,
+                )
         command.add_int("E", int(enable_waste_full_detection))
 
         resp = await self._connection.send_command(command)

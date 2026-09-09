@@ -153,7 +153,19 @@ class PressureControlTunings:
 
 @dataclass
 class WasteConfigParameters:
-    """Get the waste config parameters"""
+    """Waste-full Detection config parameters.
+
+    waste_detection_enabled: Master switch.
+    p_filter_alpha: EMA on sensor B; closer to 0 = heavier filter, 1 = raw B.
+    g_sealed_max: Sealed if RPM_cmd / vacuum < G. The discriminator.
+        Lower G → harder to look sealed (fewer empty trips, more full
+        misses). Raise G to trip full more easily.
+    flowing_dp_mbar: |A−B| above this vetoes a wide-open path.
+        Hold |A−B| is mostly sensor offset;
+    stable_hold_ms: Sealed time required below −800 mbar, milliseconds.
+    stable_hold_deep_ms: Sealed time at commanded depth ≥ 800 mbar.
+    min_waste_depth_mbar: Skip detection shallower than this.
+    """
 
     waste_detection_enabled: bool
     p_filter_alpha: float
