@@ -10,6 +10,7 @@ import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fix
 
 import { VerifyVacuumInstall } from '../VerifyVacuumInstall'
 
+import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
@@ -38,7 +39,7 @@ const mockVacuumModuleWithLivePressure = {
 
 describe('VerifyVacuumInstall', () => {
   let props: ComponentProps<typeof VerifyVacuumInstall>
-  let chainRunCommands: ReturnType<typeof vi.fn>
+  let chainRunCommands: Mock
 
   beforeEach(() => {
     chainRunCommands = vi
@@ -48,7 +49,9 @@ describe('VerifyVacuumInstall', () => {
       proceed: vi.fn(),
       goBack: vi.fn(),
       restartSetup: vi.fn(),
-      chainRunCommands,
+      chainRunCommands: chainRunCommands as ComponentProps<
+        typeof VerifyVacuumInstall
+      >['chainRunCommands'],
       isRobotMoving: false,
       isModuleUpdating: false,
       setIsModuleUpdating: vi.fn(),

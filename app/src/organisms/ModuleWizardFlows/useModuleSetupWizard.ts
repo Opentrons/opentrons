@@ -201,10 +201,7 @@ export function useModuleSetupWizard(
       )
       chainRunCommands(
         maintenanceRunId,
-        [
-          ...exitCleanupCommands,
-          { commandType: 'home' as const, params: {} },
-        ],
+        [...exitCleanupCommands, { commandType: 'home' as const, params: {} }],
         true
       )
         .then(() => {
