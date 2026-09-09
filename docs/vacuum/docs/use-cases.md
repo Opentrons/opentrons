@@ -41,7 +41,7 @@ This stack omits both the spacers and the collection well plate. Instead, the fi
   <figcaption>Waste disposal stack</figcaption>
 </figure>
 
-## Stacking advice and guidelines
+## Stacking advice
 
 Sometimes different combinations of collars, spacers, and labware don't stack up well or hold vacuum. A successful operation often depends on two physical characteristics that allow stacked pieces to create and maintain a good vacuum seal:
 
