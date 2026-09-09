@@ -13,13 +13,15 @@ import { RenderMountInformation } from '../RenderMountInformation'
 
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 
-const mockSaveFileWithPicker = vi.hoisted(() =>
-  vi.fn().mockResolvedValue(undefined)
+const mockSaveFileFromBuffer = vi.hoisted(() =>
+  vi.fn().mockResolvedValue('/tmp')
 )
 
-vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
-  saveFileWithPicker: mockSaveFileWithPicker,
+vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
   isFileSaveCanceledError: vi.fn(),
+}))
+vi.mock('/app/redux/shell/remote', () => ({
+  saveFileFromBuffer: mockSaveFileFromBuffer,
 }))
 vi.mock('/app/redux/sessions')
 vi.mock('../CalibrationHealthCheckResults')
@@ -79,10 +81,10 @@ describe('ResultsSummary', () => {
     render(props)
     const button = screen.getByTestId('ResultsSummary_Download_Button')
     fireEvent.click(button)
-    expect(mockSaveFileWithPicker).toHaveBeenCalledWith(
-      'Robot Calibration Check Report.json',
-      expect.any(Blob)
-    )
+    expect(mockSaveFileFromBuffer).toHaveBeenCalledWith({
+      name: 'Robot Calibration Check Report.json',
+      buffer: expect.any(ArrayBuffer),
+    })
   })
 
   it('calls mock function when clicking finish', () => {

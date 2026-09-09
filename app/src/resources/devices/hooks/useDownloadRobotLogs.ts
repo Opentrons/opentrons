@@ -9,11 +9,11 @@ import { remote } from '/app/redux/shell/remote'
 import type { UseMutationResult } from 'react-query'
 
 export interface DownloadRobotLogsVariables {
-  usbPath?: string
+  destination?: string
 }
 
 type UseDownloadRobotLogsResult = UseMutationResult<
-  void,
+  string,
   unknown,
   DownloadRobotLogsVariables
 > & {
@@ -30,8 +30,8 @@ export function useDownloadRobotLogs(
     robot?.status === CONNECTABLE && robot?.health?.logs != null
 
   const downloadLogs = async ({
-    usbPath,
-  }: DownloadRobotLogsVariables): Promise<void> => {
+    destination,
+  }: DownloadRobotLogsVariables): Promise<string> => {
     const logs = robot?.health?.logs
     if (!canDownload || host == null || logs == null) {
       throw new Error('Unable to download robot logs: robot is not connectable')
@@ -39,20 +39,13 @@ export function useDownloadRobotLogs(
 
     const name = `${robotName}_logs.zip`
 
-    const result: boolean = await remote.ipcRenderer.invoke(
-      'downloads:saveLogs',
-      {
-        name,
-        paths: logs,
-        hostname: host.hostname,
-        port: host.port,
-        destination: usbPath,
-      }
-    )
-
-    if (!result) {
-      throw new Error('Failed to download robot logs')
-    }
+    return await remote.ipcRenderer.invoke('downloads:saveLogs', {
+      name,
+      paths: logs,
+      hostname: host.hostname,
+      port: host.port,
+      destination,
+    })
   }
 
   // Downloading logs doesn't mutate robot state, so it doesn't need

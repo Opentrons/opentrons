@@ -14,7 +14,7 @@ import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { isRunSignoffRequiredError } from '/app/local-resources/access-control/utils'
-import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import {

@@ -24,16 +24,14 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
-import {
-  isFileSaveCanceledError,
-  saveFileWithPicker,
-} from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
 import { UNREACHABLE } from '/app/redux/discovery'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import {
@@ -87,16 +85,16 @@ export function DeviceResetSlideout({
         robotType: isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
       },
     })
-    void saveFileWithPicker(
-      `opentrons-${robotName}-calibration.json`,
-      new Blob([
+    void saveFileFromBuffer({
+      name: `opentrons-${robotName}-calibration.json`,
+      buffer: new TextEncoder().encode(
         JSON.stringify({
           deck: deckCalibrationData,
           pipetteOffset: pipetteOffsetCalibrations,
           tipLength: tipLengthCalibrations,
-        }),
-      ])
-    ).catch((error: unknown) => {
+        })
+      ).buffer,
+    }).catch((error: unknown) => {
       if (!isFileSaveCanceledError(error)) {
         throw error
       }
@@ -107,10 +105,10 @@ export function DeviceResetSlideout({
     e.preventDefault()
     const runsHistory =
       runsQueryResponse != null ? runsQueryResponse.data?.data : []
-    void saveFileWithPicker(
-      `opentrons-${robotName}-runsHistory.json`,
-      new Blob([JSON.stringify(runsHistory)])
-    ).catch((error: unknown) => {
+    void saveFileFromBuffer({
+      name: `opentrons-${robotName}-runsHistory.json`,
+      buffer: new TextEncoder().encode(JSON.stringify(runsHistory)).buffer,
+    }).catch((error: unknown) => {
       if (!isFileSaveCanceledError(error)) {
         throw error
       }

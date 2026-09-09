@@ -22,34 +22,22 @@ import type { ComponentProps } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
-const mockJSZip = vi.hoisted(() => ({
-  file: vi.fn(),
-  generateAsync: vi.fn(),
-}))
-
-const mockSaveFileWithPicker = vi.hoisted(() =>
-  vi.fn().mockResolvedValue(undefined)
-)
-const MockJSZip = vi.hoisted(
-  () =>
-    function MockJSZip(): typeof mockJSZip {
-      return mockJSZip
-    }
-)
+const mockInvoke = vi.hoisted(() => vi.fn().mockResolvedValue('/tmp'))
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
-  saveFileWithPicker: mockSaveFileWithPicker,
+vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
   isFileSaveCanceledError: vi.fn(),
 }))
-vi.mock('jszip', () => {
-  return {
-    default: MockJSZip,
-  }
-})
+vi.mock('/app/redux/shell/remote', () => ({
+  remote: {
+    ipcRenderer: {
+      invoke: mockInvoke,
+    },
+  },
+}))
 
 const ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
@@ -68,10 +56,8 @@ const render = (props: ComponentProps<typeof Troubleshooting>) => {
 describe('RobotSettings Troubleshooting', () => {
   let props: ComponentProps<typeof Troubleshooting>
   beforeEach(() => {
-    mockJSZip.file.mockClear()
-    mockJSZip.generateAsync.mockClear()
-    mockJSZip.generateAsync.mockResolvedValue(new ArrayBuffer(8))
-    mockSaveFileWithPicker.mockClear()
+    mockInvoke.mockClear()
+    mockInvoke.mockResolvedValue('/tmp')
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
@@ -79,7 +65,15 @@ describe('RobotSettings Troubleshooting', () => {
     props = {
       robotName: ROBOT_NAME,
     }
-    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
+    when(useRobot)
+      .calledWith(ROBOT_NAME)
+      .thenReturn({
+        ...mockConnectableRobot,
+        health: {
+          ...mockConnectableRobot.health!,
+          logs: ['/logs/api.log'],
+        },
+      } as typeof mockConnectableRobot)
     when(useHost).calledWith().thenReturn(HOST_CONFIG)
     when(useToaster)
       .calledWith()
@@ -132,10 +126,13 @@ describe('RobotSettings Troubleshooting', () => {
 
     await waitFor(
       () => {
-        expect(mockSaveFileWithPicker).toHaveBeenCalledWith(
-          'otie_logs.zip',
-          expect.any(ArrayBuffer)
-        )
+        expect(mockInvoke).toHaveBeenCalledWith('downloads:saveLogs', {
+          name: 'otie_logs.zip',
+          paths: ['/logs/api.log'],
+          hostname: 'localhost',
+          port: undefined,
+          destination: undefined,
+        })
       },
       { timeout: 3000 }
     )

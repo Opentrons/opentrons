@@ -46,9 +46,11 @@ const PIPETTE_NAME = 'pipetteName'
 const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 
 const startCalibration = vi.fn()
-vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
-  saveFileWithPicker: vi.fn().mockResolvedValue(undefined),
+vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
   isFileSaveCanceledError: vi.fn(),
+}))
+vi.mock('/app/redux/shell/remote', () => ({
+  saveFileFromBuffer: vi.fn().mockResolvedValue('/tmp'),
 }))
 
 vi.mock('@opentrons/shared-data', async () => {

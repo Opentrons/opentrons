@@ -6,8 +6,7 @@ import { when } from 'vitest-when'
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
-import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 
 import { useDownloadSelectedRuns } from '../useDownloadSelectedRuns'
 
@@ -29,17 +28,7 @@ vi.mock('jszip', () => ({ default: MockJSZip }))
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({
-  saveFileToUsb: vi.fn(),
-}))
-vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
-  saveFileWithPicker: vi.fn(),
-  FileSaveCanceledError: class FileSaveCanceledError extends Error {
-    readonly isFileSaveCanceled = true
-    constructor() {
-      super('File save canceled')
-      this.name = 'FileSaveCanceledError'
-    }
-  },
+  saveFileFromBuffer: vi.fn(),
 }))
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal()
@@ -79,10 +68,8 @@ describe('useDownloadSelectedRuns', () => {
     mockJSZip.file.mockClear()
     mockJSZip.generateAsync.mockClear()
     mockJSZip.generateAsync.mockResolvedValue(new ArrayBuffer(0))
-    vi.mocked(saveFileWithPicker).mockClear()
-    vi.mocked(saveFileWithPicker).mockResolvedValue(undefined)
-    vi.mocked(saveFileToUsb).mockClear()
-    vi.mocked(saveFileToUsb).mockResolvedValue(undefined)
+    vi.mocked(saveFileFromBuffer).mockClear()
+    vi.mocked(saveFileFromBuffer).mockResolvedValue('/tmp')
   })
 
   afterEach(() => {
@@ -99,7 +86,7 @@ describe('useDownloadSelectedRuns', () => {
     expect(getRunRaw).not.toHaveBeenCalled()
   })
 
-  it('should fetch every run, zip them, and save via the browser when no usbPath is given', async () => {
+  it('should fetch every run, zip them, and save when no destination is given', async () => {
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
       wrapper,
     })
@@ -126,34 +113,34 @@ describe('useDownloadSelectedRuns', () => {
       'run-2_2024-01-02T10_00_00.000Z.zip',
       expect.any(ArrayBuffer)
     )
-    expect(saveFileWithPicker).toHaveBeenCalledWith(
-      `${ROBOT_NAME}-run-records.zip`,
-      expect.any(ArrayBuffer)
-    )
-    expect(saveFileToUsb).not.toHaveBeenCalled()
+    expect(saveFileFromBuffer).toHaveBeenCalledWith({
+      name: `${ROBOT_NAME}-run-records.zip`,
+      buffer: expect.any(ArrayBuffer),
+      destination: undefined,
+    })
   })
 
-  it('should save to the usbPath instead of the browser when provided', async () => {
+  it('should save to the destination when provided', async () => {
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
       wrapper,
     })
 
     await result.current.mutateAsync({
       runs: [mockRunOne],
-      callTimeUsbPath: '/mnt/usb',
+      destination: '/mnt/usb',
     })
 
-    expect(saveFileToUsb).toHaveBeenCalledWith(
-      `/mnt/usb/${ROBOT_NAME}-run-records.zip`,
-      expect.any(ArrayBuffer)
-    )
-    expect(saveFileWithPicker).not.toHaveBeenCalled()
+    expect(saveFileFromBuffer).toHaveBeenCalledWith({
+      name: `${ROBOT_NAME}-run-records.zip`,
+      buffer: expect.any(ArrayBuffer),
+      destination: '/mnt/usb',
+    })
   })
 
   it('should reject when the user cancels the save dialog', async () => {
-    const { FileSaveCanceledError } =
-      await import('/app/local-resources/files/saveFileWithPicker')
-    vi.mocked(saveFileWithPicker).mockRejectedValue(new FileSaveCanceledError())
+    const cancelError = new Error('File save canceled')
+    cancelError.name = 'FileSaveCanceledError'
+    vi.mocked(saveFileFromBuffer).mockRejectedValue(cancelError)
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
       wrapper,
     })

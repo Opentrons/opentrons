@@ -4,15 +4,14 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 
 interface UseDownloadCalibrationDataResult {
-  downloadCalibration: (usbPath?: string) => Promise<void>
+  downloadCalibration: (destination?: string) => Promise<string>
   isLoading: boolean
 }
 
@@ -25,7 +24,7 @@ export function useDownloadCalibrationData(
   const { data: attachedModules, isLoading: isLoadingModules } =
     useModulesQuery()
 
-  const downloadCalibration = (usbPath?: string): Promise<void> => {
+  const downloadCalibration = async (destination?: string): Promise<string> => {
     doTrackEvent({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: { robotType: FLEX_ROBOT_TYPE },
@@ -35,11 +34,13 @@ export function useDownloadCalibrationData(
       instrumentData: attachedInstruments,
       moduleData: attachedModules,
     })
-    if (usbPath != null) {
-      const buffer = new TextEncoder().encode(jsonString).buffer
-      return saveFileToUsb(`${usbPath}/${filename}`, buffer)
-    }
-    return saveFileWithPicker(filename, new Blob([jsonString]))
+    const buffer = new TextEncoder().encode(jsonString).buffer
+
+    return await saveFileFromBuffer({
+      name: filename,
+      buffer,
+      destination,
+    })
   }
 
   return {

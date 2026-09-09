@@ -5,9 +5,8 @@ import JSZip from 'jszip'
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
-import { saveFileWithPicker } from '/app/local-resources/files/saveFileWithPicker'
 import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 
 import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
 
@@ -16,7 +15,7 @@ import type { RunData } from '@opentrons/api-client'
 
 export interface DownloadRunsVariables {
   runs: readonly RunData[]
-  callTimeUsbPath?: string
+  destination?: string
 }
 
 export function useDownloadSelectedRuns(
@@ -30,7 +29,7 @@ export function useDownloadSelectedRuns(
 
   const downloadRuns = async ({
     runs,
-    callTimeUsbPath,
+    destination,
   }: DownloadRunsVariables): Promise<readonly RunData[]> => {
     const currentHost = host
     if (currentHost == null || runs.length === 0) {
@@ -82,11 +81,11 @@ export function useDownloadSelectedRuns(
     const buffer = await zip.generateAsync({ type: 'arraybuffer' })
     const filename = `${robotName}-run-records.zip`
 
-    if (callTimeUsbPath != null) {
-      await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
-    } else {
-      await saveFileWithPicker(filename, buffer)
-    }
+    await saveFileFromBuffer({
+      name: filename,
+      buffer,
+      destination,
+    })
 
     return successfulRuns
   }

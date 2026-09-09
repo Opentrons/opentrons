@@ -9,7 +9,7 @@ import {
   SUCCESS_TOAST,
 } from '@opentrons/components'
 
-import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   useDownloadCalibrationData,
@@ -46,13 +46,15 @@ export function DiagnosticsFiles({
   const { selectedIds, isAllSelected, isSomeSelected, toggleAll, toggleOne } =
     useRecordSelection(DIAGNOSTIC_ROWS)
 
-  const handleDownloadSelected = (): void => {
-    const shouldDownloadLogs =
-      selectedIds.has('troubleshooting') && downloadLogsStatus !== 'loading'
-    const shouldDownloadCalibration =
-      selectedIds.has('calibration') && !isLoadingCalibration
+  const handleDownloadSelected = async (): Promise<void> => {
+    const shouldDownloadLogs = selectedIds.has('troubleshooting')
+    const shouldDownloadCalibration = selectedIds.has('calibration')
 
-    if (!shouldDownloadLogs && !shouldDownloadCalibration) {
+    if (
+      (!shouldDownloadLogs && !shouldDownloadCalibration) ||
+      downloadLogsStatus === 'loading' ||
+      isLoadingCalibration
+    ) {
       return
     }
 
@@ -63,26 +65,25 @@ export function DiagnosticsFiles({
       { disableTimeout: true, icon: toastIcon }
     )
 
-    const downloads: Array<Promise<unknown>> = []
-    if (shouldDownloadLogs) {
-      downloads.push(downloadLogs({}))
-    }
-    if (shouldDownloadCalibration) {
-      downloads.push(downloadCalibration())
-    }
+    try {
+      let destination: string | undefined
 
-    void Promise.all(downloads)
-      .then(() => {
-        makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
-      })
-      .catch((e: Error) => {
-        if (!isFileSaveCanceledError(e)) {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        }
-      })
-      .finally(() => {
-        eatToast(toastId)
-      })
+      if (shouldDownloadLogs) {
+        destination = await downloadLogs({})
+      }
+      // reuse destination from log download
+      if (shouldDownloadCalibration) {
+        await downloadCalibration(destination)
+      }
+
+      makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+    } catch (e) {
+      if (e instanceof Error && !isFileSaveCanceledError(e)) {
+        makeToast(e.message, ERROR_TOAST, { closeButton: true })
+      }
+    } finally {
+      eatToast(toastId)
+    }
   }
 
   return (

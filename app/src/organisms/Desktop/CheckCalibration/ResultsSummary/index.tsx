@@ -15,11 +15,9 @@ import {
 } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
-import {
-  isFileSaveCanceledError,
-  saveFileWithPicker,
-} from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '/app/redux/sessions'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { CalibrationResult } from './CalibrationResult'
@@ -53,16 +51,14 @@ export function ResultsSummary(
       instruments,
       savedAt: now.toISOString(),
     }
-    const data = new Blob([JSON.stringify(report, null, 4)], {
-      type: 'application/json',
-    })
-    void saveFileWithPicker('Robot Calibration Check Report.json', data).catch(
-      (error: unknown) => {
-        if (!isFileSaveCanceledError(error)) {
-          throw error
-        }
+    void saveFileFromBuffer({
+      name: 'Robot Calibration Check Report.json',
+      buffer: new TextEncoder().encode(JSON.stringify(report, null, 4)).buffer,
+    }).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
       }
-    )
+    })
   }
 
   const leftPipette = find(

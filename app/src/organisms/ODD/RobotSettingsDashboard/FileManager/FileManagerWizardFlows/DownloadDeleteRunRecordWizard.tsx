@@ -43,7 +43,9 @@ export function DownloadDeleteRunRecordWizard({
       copy={copyProps}
       showChoiceScreen={!initialDeleteAfterDownload}
       initialDeleteAfterDownload={initialDeleteAfterDownload}
-      onDownload={downloadRunRecord}
+      onDownload={async (destination?: string) => {
+        await downloadRunRecord(destination)
+      }}
       onDelete={() =>
         deleteRun({ runId: run.id }).then(() => 'deleted' as const)
       }

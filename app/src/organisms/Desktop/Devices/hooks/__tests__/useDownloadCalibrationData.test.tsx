@@ -20,9 +20,8 @@ import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 
-vi.mock('/app/local-resources/files/saveFileWithPicker', () => ({
-  saveFileWithPicker: vi.fn().mockResolvedValue(undefined),
-  isFileSaveCanceledError: vi.fn(),
+vi.mock('/app/redux/shell/remote', () => ({
+  saveFileFromBuffer: vi.fn().mockResolvedValue('/tmp'),
 }))
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/analytics')
@@ -62,7 +61,7 @@ describe('useDownloadCalibrationData', () => {
       () => useDownloadCalibrationData(ROBOT_NAME),
       { wrapper }
     )
-    result.current.downloadCalibration()
+    void result.current.downloadCalibration()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: { robotType: FLEX_ROBOT_TYPE },

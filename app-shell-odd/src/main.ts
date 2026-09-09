@@ -18,6 +18,7 @@ import {
   resetStore,
 } from './config'
 import { registerDiscovery } from './discovery'
+import { registerDownloadHandlers } from './downloads/ipc'
 import { setUserDataPath } from './early'
 import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
@@ -161,6 +162,7 @@ function startUp(): void {
   ]
 
   registerUsbDeviceHandlers()
+  registerDownloadHandlers()
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
