@@ -62,8 +62,6 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
           return []
         }
         const slot = getSlotInLocationStack(lw.stack)
-        // gripperWasteChute / trash AAs still have deck coordinates, but disposed
-        // labware must not stay visible on the chute or trash after a move.
         if (isLabwareInDisposalLocation(slot)) {
           return []
         }
