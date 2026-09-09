@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-08-26T17:49:22.19407Z"
+exclude-newer = "2026-08-27T21:05:05.652568Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -924,6 +924,7 @@ dependencies = [
     { name = "pyserial" },
     { name = "pyusb" },
     { name = "typing-extensions" },
+    { name = "zipstream-ng" },
 ]
 
 [package.metadata]
@@ -943,6 +944,7 @@ requires-dist = [
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -983,6 +985,7 @@ dev = [
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "wheel", specifier = "==0.37.0" },
     { name = "zipp", specifier = "==3.21.0" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 robot = [
     { name = "anyio", specifier = "==4.9.0" },
@@ -995,6 +998,7 @@ robot = [
     { name = "pyro5", specifier = "==5.16" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "zipp", specifier = "==3.21.0" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [[package]]

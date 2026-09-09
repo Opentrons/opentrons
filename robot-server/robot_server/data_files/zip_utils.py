@@ -115,13 +115,12 @@ def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
 
 async def run_zip_generator(
     entries: List[Tuple[Path, str]],
-    staging_dir: Path,
 ) -> AsyncIterator[bytes]:
     """Create and yield zip archiveb in chunks."""
     run_zip_stream: ZipStream = ZipStream(compress_type=ZIP_DEFLATED)
     for source_path, archive_name in entries:
         run_zip_stream.add_path(source_path, archive_name)
-    async for chunk in run_zip_stream:
+    for chunk in run_zip_stream:
         yield chunk
 
 

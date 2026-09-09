@@ -172,7 +172,7 @@ async def download_run_files(
     headers = {"Content-Disposition": f'attachment; filename="{zip_filename}"'}
 
     return StreamingResponse(
-        content=run_zip_generator(entries=zip_entries, staging_dir=staging_path),
+        content=run_zip_generator(entries=zip_entries),
         media_type="application/zip",
         headers=headers,
         background=BackgroundTask(staging_dir.cleanup),
