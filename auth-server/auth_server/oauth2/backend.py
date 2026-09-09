@@ -525,13 +525,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         return self.__user_store.get_by_id(token.user_id)
 
     def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
-        """Return granted token scopes, updated for current settings and user state."""
-        live_scopes = self.__get_live_scopes_for_token(token)
-        if not token.requested_scopes:
-            return live_scopes
-        return set(token.requested_scopes) & live_scopes
+        """Return granted token scopes from current settings and user state.
 
-    def __get_live_scopes_for_token(self, token: _TokenIssuance) -> set[Scope]:
+        Always follows live settings, including on tokens issued before a
+        settings change.
+        """
         user = self.__get_user_for_token(token)
         if user is None:
             return set()
