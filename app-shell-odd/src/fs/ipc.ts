@@ -7,7 +7,7 @@ import last from 'lodash/last'
 import { fetch, fetchToFile } from '../http'
 import { createLogger } from '../log'
 import { buildRobotHttpUrl } from '../system-update/httpUrl'
-import { resolveUniqueFilePath } from './utils'
+import { resolveUniqueFilePath, syncFileToDevice } from './utils'
 
 const log = createLogger('fs/ipc')
 
@@ -159,6 +159,7 @@ export function registerDownloadHandlers(): void {
           content,
         }))
       )
+      await syncFileToDevice(filePath)
       log.info('saveLogs: done', { filePath })
       return {
         directory,
@@ -185,6 +186,7 @@ export function registerDownloadHandlers(): void {
           }
         },
       })
+      await syncFileToDevice(filePath)
 
       log.info('saveFileFromUrl: done', { filePath })
       return directory
@@ -201,6 +203,7 @@ export function registerDownloadHandlers(): void {
       const filePath = await resolveUniqueFilePath(directory, name)
       log.debug('saveFileFromBuffer: writing file', { filePath })
       await writeFile(filePath, Buffer.from(buffer))
+      await syncFileToDevice(filePath)
       log.info('saveFileFromBuffer: done', { filePath })
       return directory
     }

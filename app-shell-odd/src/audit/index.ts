@@ -8,7 +8,11 @@ import {
 } from '@opentrons/app/src/redux/audit/slice'
 
 import { DOWNLOAD_AUDIT_LOG, DOWNLOAD_AUDIT_LOGS } from '../constants'
-import { resolveUniqueFilePath, zipDirectory } from '../fs/utils'
+import {
+  resolveUniqueFilePath,
+  syncFileToDevice,
+  zipDirectory,
+} from '../fs/utils'
 import { fetchToFile } from '../http'
 import { createLogger } from '../log'
 import { buildRobotHttpUrl } from '../system-update/httpUrl'
@@ -38,7 +42,9 @@ export function registerAudit(dispatch: Dispatch): Dispatch {
 
 async function downloadAuditLog(
   payload: DownloadAuditLogPayload,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  // false when the file is staging for a zip that gets synced instead
+  syncAfterWrite: boolean = true
 ): Promise<boolean> {
   const { logPeriodId, fileName, hostname, port, destination } = payload
 
@@ -68,6 +74,10 @@ async function downloadAuditLog(
         deletionKey = response.headers.get('opentrons-log-period-deletion-key')
       },
     })
+
+    if (syncAfterWrite) {
+      await syncFileToDevice(filePath)
+    }
 
     dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
 
@@ -127,7 +137,8 @@ async function downloadAuditLogs(
           port,
           destination: outputDirectory,
         },
-        dispatch
+        dispatch,
+        false
       )
     )
   )
@@ -142,6 +153,7 @@ async function downloadAuditLogs(
   const zipPath = await resolveUniqueFilePath(destination, zipName)
   try {
     await zipDirectory(outputDirectory, zipPath)
+    await syncFileToDevice(zipPath)
     await rm(outputDirectory, { recursive: true, force: true })
   } catch (error) {
     // Downloads already succeeded; leave the folder if zipping fails.

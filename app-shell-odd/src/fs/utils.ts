@@ -1,7 +1,11 @@
 import { constants, createWriteStream } from 'fs'
-import { access } from 'fs/promises'
+import { access, open } from 'fs/promises'
 import path from 'path'
 import { ZipArchive } from 'archiver'
+
+import { createLogger } from '../log'
+
+const log = createLogger('fs/utils')
 
 async function pathExists(filePath: string): Promise<boolean> {
   try {
@@ -46,4 +50,32 @@ export async function zipDirectory(
   archive.directory(sourceDir, false)
   await archive.finalize()
   await archiveClosed
+}
+
+async function fsync(target: string): Promise<void> {
+  const handle = await open(target, 'r')
+  try {
+    await handle.sync()
+  } finally {
+    await handle.close()
+  }
+}
+
+/**
+ * Commit a just-written file to the physical device.
+ *
+ * Closing a write stream only guarantees the bytes reached the page cache, and
+ * the ODD never unmounts USB drives, so a drive pulled after a download would
+ * otherwise contain a 0-byte file. Syncing the directory as well commits the
+ * FAT entry that holds the file's size.
+ */
+export async function syncFileToDevice(filePath: string): Promise<void> {
+  await fsync(filePath)
+  try {
+    await fsync(path.dirname(filePath))
+  } catch (error) {
+    // not every filesystem supports fsync on a directory; the file itself is
+    // already durable at this point
+    log.warn('Could not sync directory entry', { filePath, error })
+  }
 }
