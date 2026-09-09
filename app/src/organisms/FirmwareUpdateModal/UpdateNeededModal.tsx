@@ -86,7 +86,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     iconColor: COLORS.yellow50,
   }
 
-  let modalContent = (
+  const modalContent = (
     <OddModal
       header={updateNeededHeader}
       modalZIndex={UPDATE_NEEDED_MODAL_Z_INDEX}
