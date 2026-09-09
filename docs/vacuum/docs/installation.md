@@ -18,9 +18,6 @@ The Vacuum Module ships in multiple boxes containing all the components required
 
 3. Remove the inner boxes from the shipping boxes.
 
-    !!! info "Vacuum hose location"
-        Vacuum hoses are wrapped around the specially shaped foam padding on the bottom of the large shipping box that holds the smaller box with the carboy and its accessories.
-
 ## Part 2: Deck hardware assembly
 
 4. Remove any labware from the deck to give yourself room to work. With the robot powered off, you can also gently move the gantry aside if it's in the way.

@@ -34,7 +34,7 @@ This stack omits spacers altogether to seat a sample filter plate directly on to
 
 ### Direct to waste
 
-This stack omits both the the spacers and the collection well plate. Instead, the filter plate rests directly on a short or tall collar, which sits on the vacuum base. When under vacuum, this configuration draws liquid through the filter plate and into the carboy.
+This stack omits both the spacers and the collection well plate. Instead, the filter plate rests directly on a short or tall collar, which sits on the vacuum base. When under vacuum, this configuration draws liquid through the filter plate and into the carboy.
 
 <figure markdown>
   ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.svg){ width="80%" }
@@ -43,23 +43,26 @@ This stack omits both the the spacers and the collection well plate. Instead, th
 
 ## Stacking advice and guidelines
 
-Sometimes you may find that different combinations of collars, spacers, and labware don't make a good labware stack. A successful operation often depends on two physical characteristics that allow the module to create and maintain a vacuum seal:
+Sometimes different combinations of collars, spacers, and labware don't stack up well or hold vacuum. A successful operation often depends on two physical characteristics that allow stacked pieces to create and maintain a good vacuum seal:
 
-- **Stack height:** The internal stack (spacer and collection plate) must fit inside the collar. If the internal stack is too tall, the bottom of the collar will not sit flush against the vacuum base. If the internal stack is too short, the collection plate cannot seal tightly against the collar's internal gasket.
+- **Stack height:** The spacer and collection plate must fit inside the collar so the collection plate seals against collar's internal gasket. If the internal stack is too tall, the bottom of the collar cannot sit flush against the vacuum base gasket. If the internal stack is too short, the collection plate cannot seal tightly against the collar's inner gasket.
 
-- **Seal integrity:** All mating or connecting surfaces must sit flush against each other and compress evenly to hold pressure. The filter plate must sit flush against the upper part of the collar's gasket to prevent air leaks. The whole stack should not rock back and forth when placed on the vacuum base.
+- **Seal integrity:** All mating surfaces must sit flush against each other and compress evenly to hold pressure.
 
 ## Testing a vacuum stack
 
-You can test a vacuum stack with a simple visual examination or via the Python API.
+A visual inspection and an active vacuum test help determine if a combination of collars, spacers, and well plates can hold vacuum.
 
-### In the Opentrons App
+| Test | Description |
+|:----|:----|
+| **Visual inspection** | Check if stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious titling or easily rocking back and forth. |
+| **In App** | In the Opentrons App, go to <font color="red">App directions here</font> to run the pump and verify the system reaches the target pressure without audible hissing or air leaks. |
+| **API** | Run an automated test by calling `start_set_vacuum_pressure()` <font color="red">merge and link to reference</font> with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. |
 
-If stacked components appear to fit flush together, then the stack will probably hold vacuum. Test and verify your specific well plate and vacuum collar combinations by running the vacuum pump using the Opentrons app. A test run can help verify these pieces fit together if the stacked components can reach and hold a targeted vacuum pressure without audible leaks. <font color="red">App directions</font>
 
-### In the Python API
+<font color="red">commented code in source</font>
 
-Use the `start_set_vacuum_pressure()` method with a specific pressure, duration, and timeout settings to test stacked components. For example, this snippet can help you create an automated pressure test that will raise an error if the module does not reach -200 mbar in 10 seconds:
+<!--- include here or refer to API docs?
 
 ```python
 test_task = vacuum.start_set_vacuum_pressure(
@@ -70,4 +73,4 @@ test_task = vacuum.start_set_vacuum_pressure(
     equalize_timeout_s=5
 )
 ```
-<font color="red"><strong>LINK TO API DOCS FROM HERE OR MOVE AND LINK?</strong></font>
+--->
