@@ -17,7 +17,7 @@ Any user can import any valid Python protocol into the Opentrons App, and they'l
 * Click the protocol, then choose **Start setup** and your compliance ready Flex. 
 
 <figure class="screenshot" markdown>
-  ![Click to send a protocol to your compliance ready Flex.](../images/send-protocol.png)
+  ![Click to send a protocol to your compliance ready Flex.](../images/send-protocol-flex.png)
   <figcaption>Click to send a protocol to your compliance ready Flex.</figcaption>
 </figure>
 
@@ -45,7 +45,7 @@ Administrators can change this setting to allow users to send protocols to your 
 4. Under **Actions requiring admin credentials**, toggle the **Require admin credentials to send protocols to this robot** setting.
 
 !!! note
-    Because Compliance Ready Software limits protocol runs to those chosen by verified users, [Quick Transfer protocols] are disabled on your compliance ready Flex.
+    Because Compliance Ready Software limits protocol runs to those chosen by verified users, [Quick Transfer protocols](../../flex/touchscreen/quick-transfer.md) are disabled on your compliance ready Flex.
 
 ## Setting up a protocol
 
@@ -53,10 +53,10 @@ After logging in on the Flex touchscreen or in the Opentrons App, you'll be able
 
 Click or tap the **Protocols** tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols [sent to the Flex](#sending-protocols) by an administrator.
 
-After choosing any runtime parameters and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
+After choosing any [runtime parameters](../../flex/protocols/python-api.md#runtime-parameters) and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
 <figure class="screenshot" markdown>
-  ![Users should add documentation before beginning protocol setup.](../images/setup-documentation.png)
+  ![Users should add documentation before beginning protocol setup.](../images/document-sending-protocol.png)
   <figcaption>Add documentation before beginning protocol setup.</figcaption>
 </figure>
 
@@ -91,12 +91,19 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 
 Your Flex won't complete actions like these until you enter documentation. For example, if you need to pause your protocol, the Flex will only pause after you click **Confirm** on the "Documentation required" screen. 
 
+<figure class="screenshot" markdown>
+  ![Tap the Flex touchscreen to cancel or pause the protocol.](../images/tap-pause.png)
+  <figcaption>Tapping to cancel or pause the protocol requires documentation before the Flex completes the action.</figcaption>
+</figure>
+
+If you tap the blue :material-pause: on the Flex touchscreen, shown above, your Flex will continue to aspirate liquid in the current step, and may even move on to the next step before you submit documentation.
+
 !!! note
      Remember that you can use the [Emergency Stop Pendant](../../flex/system-description/e-stop.md) to quickly stop all robot motion, but that this action will cancel your current protocol run. You'll be required to document your reason for using the E-stop, and you won't be able to resume the protocol.  
 
 In some cases, you'll be prompted to document multiple actions after they occur, like in error recovery or robot calibration. 
 
-First, the Opentrons App or Flex touchscreen will prompt you to add documentation when you choose from the available recovery actions:
+Let's consider an error recovery example. The Opentrons App or Flex touchscreen will first prompt you to add documentation when you choose from the available recovery actions:
 
 * Start or complete [error recovery](../../flex/touchscreen/protocol-run.md#error-recovery).
 * Retry or skip the step causing the error. 

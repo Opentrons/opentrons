@@ -30,7 +30,7 @@ Whenever an action requires documentation, you won't be able to bypass this scre
 
 If you didn't mean to complete the action, you can always tap the back arrow in the upper left.
 
-Users can also add text in the Opentrons App. Here, you'll also see a [list of actions](#viewing-actions) requiring documentation on the right.
+Users can also add text in the Opentrons App. Here, you'll also see a [list of actions](#view-actions) requiring documentation on the right.
 
 <figure class="screenshot" markdown>
   ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
@@ -39,7 +39,7 @@ Users can also add text in the Opentrons App. Here, you'll also see a [list of a
 
 Click **Cancel action** if you didn't mean to complete the action.
 
-You'll see the same screen on the Flex touchscreen and in the Opentrons App every time you need to add documentation, no matter which step you're on. For most actions, your Flex won't complete the action until you add documentation and click **Confirm** to save your text. 
+You'll see the same screen on the Flex touchscreen and in the Opentrons App every time you need to add documentation, no matter which step you're on. In most cases, your Flex won't complete the action until you add documentation and click **Confirm** to save your text. 
 
 ## View actions
 

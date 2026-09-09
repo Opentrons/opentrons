@@ -16,6 +16,13 @@ When a protocol is complete, you'll need to sign for the run in the Opentrons Ap
   <figcaption>Sign for a protocol run in the Opentrons App.</figcaption>
 </figure>
 
+Until you sign, the protocol run isn't complete in the Opentrons App or on the Flex touchscreen. You'll be blocked from completing other actions until signing when this default setting is on. 
+
+<figure class="screenshot" markdown>
+  ![Sign for a protocol run before completing other actions.](../images/block-until-signed.png)
+  <figcaption>You'll need to sign for the run before proceeding to other protocols or actions on your Flex.</figcaption> 
+</figure>
+
 After signing, your Flex will prompt you to download audit logs. [Audit logs](files.md) are files the Flex generates containing data like responsible users, timestamps, and documentation for every robot action. 
 
 To conserve space, these files are not saved to the Flex by default. Instead, they're saved in the Opentrons App, where you'll need to downloaded them after signing for your protocol run. 

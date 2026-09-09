@@ -17,7 +17,7 @@ Before activation, a Flex can run any valid Python file developed using the Open
 
 Any action on your compliance ready Flex's touchscreen or connected Opentrons App requires a user login. Once Compliance Ready Software is activated, your Flex is blocked from running any actions, like protocol commands, unless a user is logged in.
 
-Administrators can [customize settings](features/admin.md), including screen timeouts and other security policies, to further protect your data in the lab.
+Administrators can [customize settings](admin.md), including screen timeouts and other security policies, to further protect your data in the lab.
 
 ### Files
 
