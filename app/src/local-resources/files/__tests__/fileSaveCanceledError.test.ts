@@ -16,6 +16,14 @@ describe('isFileSaveCanceledError', () => {
     expect(isFileSaveCanceledError(error)).toBe(true)
   })
 
+  it('is true when the IPC message contains File save canceled', () => {
+    expect(
+      isFileSaveCanceledError(
+        new Error('Error invoking remote method: Error: File save canceled')
+      )
+    ).toBe(true)
+  })
+
   it('is false for other errors', () => {
     expect(isFileSaveCanceledError(new Error('nope'))).toBe(false)
   })

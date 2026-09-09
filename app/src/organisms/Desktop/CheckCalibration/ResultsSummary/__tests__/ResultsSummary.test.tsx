@@ -81,10 +81,13 @@ describe('ResultsSummary', () => {
     render(props)
     const button = screen.getByTestId('ResultsSummary_Download_Button')
     fireEvent.click(button)
-    expect(mockSaveFileFromBuffer).toHaveBeenCalledWith({
-      name: 'Robot Calibration Check Report.json',
-      buffer: expect.any(ArrayBuffer),
-    })
+    expect(mockSaveFileFromBuffer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Robot Calibration Check Report.json',
+      })
+    )
+    const saved = mockSaveFileFromBuffer.mock.calls[0][0]
+    expect(saved.buffer.byteLength).toBeGreaterThan(0)
   })
 
   it('calls mock function when clicking finish', () => {
