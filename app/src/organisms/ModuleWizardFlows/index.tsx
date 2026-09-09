@@ -455,6 +455,7 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             deckConfig={deckConfig}
             attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>

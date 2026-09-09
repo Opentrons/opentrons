@@ -16,7 +16,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_SINGLE_SLOT_BY_CUTOUT_ID } from '@opentrons/shared-data'
+import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
 import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
@@ -27,18 +30,22 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import { VERIFY_VACUUM_GAUGE_PRESSURE_MBAR } from './constants'
 import {
   getVacuumCleanupCommands,
   getVerifyVacuumCommands,
 } from './getVerifyVacuumCommands'
 
+import type { AttachedModule, VacuumModuleData } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
-type VacuumVerifyScreen = 'checkTubes' | 'checkCollar' | 'inProgress' | 'failed'
+type VacuumVerifyScreen =
+  'checkTubes' | 'checkCollar' | 'inProgress' | 'failed' | 'success'
 
 interface VerifyVacuumInstallProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
+  attachedModules: AttachedModule[]
 }
 
 export function VerifyVacuumInstall(
@@ -51,13 +58,21 @@ export function VerifyVacuumInstall(
     chainRunCommands,
     setErrorMessage,
     isOnDevice,
+    isRobotMoving,
     deckConfig,
+    attachedModules,
     setExitCleanupCommands,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   const [screen, setScreen] = useState<VacuumVerifyScreen>('checkTubes')
+  const [failurePressures, setFailurePressures] = useState<{
+    current: number | null
+    target: number
+  } | null>(null)
   const verificationAttempt = useRef(0)
   const startedVerification = useRef(false)
+  const attachedModulesRef = useRef(attachedModules)
+  attachedModulesRef.current = attachedModules
 
   const cutoutId = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
@@ -116,9 +131,12 @@ export function VerifyVacuumInstall(
       })
       .then(() => {
         startedVerification.current = false
-        proceed()
+        setScreen('success')
       })
       .catch(() => {
+        setFailurePressures(
+          getVacuumLivePressures(attachedModulesRef.current, attachedModule)
+        )
         return stopVacuum().then(() => {
           setScreen('failed')
         })
@@ -144,11 +162,25 @@ export function VerifyVacuumInstall(
     return (
       <VacuumVerificationFailed
         isOnDevice={isOnDevice}
+        currentPressure={failurePressures?.current ?? null}
+        targetPressure={
+          failurePressures?.target ?? VERIFY_VACUUM_GAUGE_PRESSURE_MBAR
+        }
         onRetry={handleRetry}
         onContinueAnyway={() => {
           startedVerification.current = false
           proceed()
         }}
+      />
+    )
+  }
+
+  if (screen === 'success') {
+    return (
+      <VacuumVerificationSuccess
+        isOnDevice={isOnDevice}
+        isRobotMoving={isRobotMoving}
+        onContinue={proceed}
       />
     )
   }
@@ -172,6 +204,35 @@ export function VerifyVacuumInstall(
       }}
     />
   )
+}
+
+function getVacuumLivePressures(
+  modules: AttachedModule[],
+  attachedModule: AttachedModule
+): { current: number | null; target: number } {
+  const liveModule = modules.find(
+    module =>
+      module.moduleType === VACUUM_MODULE_TYPE &&
+      module.serialNumber === attachedModule.serialNumber
+  )
+  let data: VacuumModuleData | null = null
+  if (liveModule != null && liveModule.moduleType === VACUUM_MODULE_TYPE) {
+    data = liveModule.data
+  } else if (attachedModule.moduleType === VACUUM_MODULE_TYPE) {
+    data = attachedModule.data
+  }
+
+  return {
+    current: data?.currentPressure ?? null,
+    target: data?.targetPressure ?? VERIFY_VACUUM_GAUGE_PRESSURE_MBAR,
+  }
+}
+
+function formatGaugePressureMbar(pressureMbar: number | null): string {
+  if (pressureMbar == null) {
+    return 'N/A'
+  }
+  return String(Math.round(pressureMbar * 10) / 10)
 }
 
 function verificationCommandsSucceeded(results: unknown): boolean {
@@ -236,7 +297,7 @@ function VacuumCheckCollarScreen({
 
   return (
     <GenericWizardTile
-      header={t('install_collar_and_block')}
+      header={t('prepare_to_test_vacuum_pressure')}
       rightHandBody={
         <AnimationVideo width="100%">
           <source src={CheckCollar} />
@@ -254,14 +315,56 @@ function VacuumCheckCollarScreen({
   )
 }
 
+interface VacuumVerificationSuccessProps {
+  isOnDevice: boolean
+  isRobotMoving: boolean
+  onContinue: () => void
+}
+
+function VacuumVerificationSuccess({
+  isOnDevice,
+  isRobotMoving,
+  onContinue,
+}: VacuumVerificationSuccessProps): JSX.Element {
+  const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
+  const continueText = i18n.format(t('shared:continue'), 'capitalize')
+
+  return (
+    <SimpleWizardBody
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
+      isSuccess={true}
+      iconColor={COLORS.red50}
+      header={t('target_vacuum_pressure_reached')}
+    >
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={onContinue}
+            buttonText={continueText}
+          />
+        ) : (
+          <PrimaryButton disabled={isRobotMoving} onClick={onContinue}>
+            {continueText}
+          </PrimaryButton>
+        )}
+      </Flex>
+    </SimpleWizardBody>
+  )
+}
+
 interface VacuumVerificationFailedProps {
   isOnDevice: boolean
+  currentPressure: number | null
+  targetPressure: number
   onRetry: () => void
   onContinueAnyway: () => void
 }
 
 function VacuumVerificationFailed({
   isOnDevice,
+  currentPressure,
+  targetPressure,
   onRetry,
   onContinueAnyway,
 }: VacuumVerificationFailedProps): JSX.Element {
@@ -272,7 +375,10 @@ function VacuumVerificationFailed({
       justifyContentForOddButton={JUSTIFY_FLEX_END}
       isSuccess={false}
       iconColor={COLORS.red50}
-      header={t('vacuum_verification_failed')}
+      header={t('target_vacuum_pressure_unmet', {
+        current: formatGaugePressureMbar(currentPressure),
+        target: formatGaugePressureMbar(targetPressure),
+      })}
       subHeader={t('vacuum_verification_failed_description')}
     >
       <Flex

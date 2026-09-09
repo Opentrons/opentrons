@@ -27,6 +27,15 @@ const mockDeckConfig: DeckConfiguration = [
   } as CutoutConfig,
 ]
 
+const mockVacuumModuleWithLivePressure = {
+  ...mockVacuumModule,
+  data: {
+    ...mockVacuumModule.data,
+    currentPressure: -120,
+    targetPressure: -500,
+  },
+}
+
 describe('VerifyVacuumInstall', () => {
   let props: ComponentProps<typeof VerifyVacuumInstall>
   let chainRunCommands: ReturnType<typeof vi.fn>
@@ -44,6 +53,7 @@ describe('VerifyVacuumInstall', () => {
       isModuleUpdating: false,
       setIsModuleUpdating: vi.fn(),
       attachedModule: mockVacuumModule,
+      attachedModules: [mockVacuumModuleWithLivePressure],
       attachedPipette: mockAttachedPipetteInformation,
       errorMessage: null,
       setErrorMessage: vi.fn(),
@@ -84,11 +94,11 @@ describe('VerifyVacuumInstall', () => {
   it('renders tube connection instructions first', () => {
     render(props)
 
-    screen.getByText('Check all tube connections')
+    screen.getByText('Check all tube connections are secure')
     screen.getByText(
       'All tubes must be securely connected to maintain an airtight seal.'
     )
-    screen.getByText('Push the tube in until it clicks into place.')
+    screen.getByText('Push each tube in until it clicks into place.')
   })
 
   it('shows collar instructions after continuing from tube connections', () => {
@@ -96,9 +106,7 @@ describe('VerifyVacuumInstall', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    screen.getByText(
-      'Install the vacuum collar and block it with a non-filter plate'
-    )
+    screen.getByText('Prepare to test vacuum pressure')
     screen.getByText(
       'The collar must be fully seated on the vacuum module. Cover it with a solid, non-filter plate so the system can hold vacuum during this check.'
     )
@@ -118,16 +126,16 @@ describe('VerifyVacuumInstall', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'back' }))
 
-    screen.getByText('Check all tube connections')
+    screen.getByText('Check all tube connections are secure')
   })
 
-  it('runs the vacuum pressure command and proceeds on success', async () => {
+  it('runs the vacuum pressure command and shows success until continue', async () => {
     render(props)
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    screen.getByText('Stand back, verifying vacuum seal')
+    screen.getByText('Stand back, reaching target vacuum pressure')
 
     await waitFor(() => {
       expect(chainRunCommands).toHaveBeenCalledWith(
@@ -152,9 +160,15 @@ describe('VerifyVacuumInstall', () => {
         true
       )
     })
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    await screen.findByText('Target vacuum pressure reached')
+    expect(screen.queryByText('successfully set up')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Finish' })
+    ).not.toBeInTheDocument()
+    expect(props.proceed).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(props.proceed).toHaveBeenCalled()
   })
 
   it('shows retry and continue anyway after a failed verification', async () => {
@@ -166,9 +180,9 @@ describe('VerifyVacuumInstall', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    await screen.findByText('Vacuum verification failed')
+    await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     screen.getByText(
-      'The vacuum module did not reach the target pressure. Check tube connections, confirm the collar is installed, and that a non-filter plate is seated on the collar.'
+      'Ensure tube connections are secure and the collar and non-filter plate are fully seated. Try again or continue setup.'
     )
     screen.getByRole('button', { name: /try again/i })
     screen.getByRole('button', { name: 'Continue anyway' })
@@ -186,10 +200,10 @@ describe('VerifyVacuumInstall', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    await screen.findByText('Vacuum verification failed')
+    await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     fireEvent.click(screen.getByRole('button', { name: /try again/i }))
 
-    screen.getByText('Check all tube connections')
+    screen.getByText('Check all tube connections are secure')
   })
 
   it('continues setup when the user chooses continue anyway', async () => {
@@ -201,10 +215,23 @@ describe('VerifyVacuumInstall', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    await screen.findByText('Vacuum verification failed')
+    await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     fireEvent.click(screen.getByRole('button', { name: 'Continue anyway' }))
 
     expect(props.proceed).toHaveBeenCalled()
+  })
+
+  it('falls back to N/A and the commanded target when live pressure is missing', async () => {
+    chainRunCommands.mockRejectedValueOnce(new Error('pressure not reached'))
+    chainRunCommands.mockResolvedValueOnce([])
+    props.attachedModules = [mockVacuumModule]
+
+    render(props)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    await screen.findByText('Target vacuum pressure unmet: N/A / -500 mbar')
   })
 
   it('does not proceed if verification commands are still running', async () => {
@@ -216,7 +243,7 @@ describe('VerifyVacuumInstall', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    await screen.findByText('Vacuum verification failed')
+    await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     expect(props.proceed).not.toHaveBeenCalled()
   })
 })
