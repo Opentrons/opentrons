@@ -121,7 +121,7 @@ async def run_zip_generator(
     run_zip_stream: ZipStream = ZipStream(compress_type=ZIP_DEFLATED)
     for source_path, archive_name in entries:
         run_zip_stream.add_path(source_path, archive_name)
-    async for chunk in run_zip_stream:
+    for chunk in run_zip_stream:
         yield chunk
 
 
