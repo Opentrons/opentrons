@@ -75,6 +75,7 @@ describe('UpdateFirmware', () => {
       maintenanceRunId: '123',
       patchModuleAfterUpdate: vi.fn(),
       sendIdentifyModule,
+      setExitCleanupCommands: vi.fn(),
     }
     mockMutation()
     vi.mocked(useModulesQuery).mockReturnValue({ data: undefined } as any)
