@@ -161,7 +161,7 @@ const ModalArea = styled.div<
 `
 
 const ModalBody = styled.div.withConfig({
-  shouldForwardProp: prop => prop !== 'allowOverflow',
+  shouldForwardProp: prop => (prop as string) !== 'allowOverflow',
 })<{ allowOverflow: boolean }>`
   flex: ${FLEX_AUTO};
   min-height: 0;
