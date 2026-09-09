@@ -1001,4 +1001,23 @@ describe('update driver', () => {
         })
       })
   })
+  it('waits for download instead of erroring when the system file is not ready', () => {
+    const thisSubject = subject!
+    return thisSubject
+      .handleAction({
+        type: 'robotUpdate:READ_SYSTEM_FILE',
+        payload: { target: 'flex' },
+        meta: { shell: true },
+      })
+      .then(() => {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: 'robotUpdate:CHECKING_FOR_UPDATE',
+          payload: 'flex',
+        })
+        expect(dispatch).not.toHaveBeenCalledWith({
+          type: 'robotUpdate:UNEXPECTED_ERROR',
+          payload: { message: 'System update file not downloaded' },
+        })
+      })
+  })
 })

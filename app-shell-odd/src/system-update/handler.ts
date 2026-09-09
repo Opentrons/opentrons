@@ -313,18 +313,14 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           }
           return new Promise(resolve => {
             const details = getDetails()
-            if (details === 'ongoing') {
+            if (details === 'ongoing' || details == null) {
+              // Match desktop: wait for the in-flight (or just-requested)
+              // download instead of failing the apply flow. The UI already
+              // dispatched DOWNLOAD_UPDATE; middleware continues once it
+              // finishes.
               dispatch({
                 type: 'robotUpdate:CHECKING_FOR_UPDATE',
                 payload: 'flex',
-              })
-              resolve()
-              return
-            }
-            if (details == null) {
-              dispatch({
-                type: 'robotUpdate:UNEXPECTED_ERROR',
-                payload: { message: 'System update file not downloaded' },
               })
               resolve()
               return
