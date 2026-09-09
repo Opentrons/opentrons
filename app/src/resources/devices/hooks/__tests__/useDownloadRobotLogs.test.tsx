@@ -10,22 +10,17 @@ import {
   mockConnectableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
+import { saveLogs } from '/app/redux/shell/remote'
 
 import { useDownloadRobotLogs } from '../useDownloadRobotLogs'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 
-const mockInvoke = vi.hoisted(() => vi.fn())
-
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/shell/remote', () => ({
-  remote: {
-    ipcRenderer: {
-      invoke: mockInvoke,
-    },
-  },
+  saveLogs: vi.fn(),
 }))
 
 const ROBOT_NAME = 'otie'
@@ -42,8 +37,11 @@ describe('useDownloadRobotLogs', () => {
     wrapper = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
-    mockInvoke.mockReset()
-    mockInvoke.mockResolvedValue('/tmp/downloads')
+    vi.mocked(saveLogs).mockReset()
+    vi.mocked(saveLogs).mockResolvedValue({
+      directory: '/tmp/downloads',
+      succeededPaths: ['/logs/api.log', '/logs/serial.log'],
+    })
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
@@ -78,7 +76,7 @@ describe('useDownloadRobotLogs', () => {
     expect(result.current.canDownload).toBe(false)
   })
 
-  it('invokes downloads:saveLogs and returns the destination', async () => {
+  it('invokes saveLogs and returns the destination directory', async () => {
     const { result } = renderHook(() => useDownloadRobotLogs(ROBOT_NAME), {
       wrapper,
     })
@@ -87,7 +85,7 @@ describe('useDownloadRobotLogs', () => {
       result.current.mutateAsync({ destination: '/tmp/usb' })
     ).resolves.toBe('/tmp/downloads')
 
-    expect(mockInvoke).toHaveBeenCalledWith('downloads:saveLogs', {
+    expect(saveLogs).toHaveBeenCalledWith({
       name: 'otie_logs.zip',
       paths: ['/logs/api.log', '/logs/serial.log'],
       hostname: '10.0.0.5',
@@ -108,15 +106,18 @@ describe('useDownloadRobotLogs', () => {
     await expect(result.current.mutateAsync({})).rejects.toThrow(
       'Unable to download robot logs: robot is not connectable'
     )
-    expect(mockInvoke).not.toHaveBeenCalled()
+    expect(saveLogs).not.toHaveBeenCalled()
   })
 
   it('reports loading while the IPC call is in flight', async () => {
-    let resolveInvoke: (value: string) => void = () => {}
-    mockInvoke.mockImplementation(
+    let resolveSave: (value: {
+      directory: string
+      succeededPaths: string[]
+    }) => void = () => {}
+    vi.mocked(saveLogs).mockImplementation(
       () =>
-        new Promise<string>(resolve => {
-          resolveInvoke = resolve
+        new Promise(resolve => {
+          resolveSave = resolve
         })
     )
 
@@ -129,7 +130,7 @@ describe('useDownloadRobotLogs', () => {
       expect(result.current.status).toBe('loading')
     })
 
-    resolveInvoke('/tmp')
+    resolveSave({ directory: '/tmp', succeededPaths: ['/logs/api.log'] })
     await pending
 
     await waitFor(() => {

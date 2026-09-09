@@ -22,7 +22,12 @@ import type { ComponentProps } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
-const mockInvoke = vi.hoisted(() => vi.fn().mockResolvedValue('/tmp'))
+const mockSaveLogs = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    directory: '/tmp',
+    succeededPaths: ['/logs/api.log'],
+  })
+)
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
@@ -32,11 +37,7 @@ vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
   isFileSaveCanceledError: vi.fn(),
 }))
 vi.mock('/app/redux/shell/remote', () => ({
-  remote: {
-    ipcRenderer: {
-      invoke: mockInvoke,
-    },
-  },
+  saveLogs: mockSaveLogs,
 }))
 
 const ROBOT_NAME = 'otie'
@@ -56,8 +57,11 @@ const render = (props: ComponentProps<typeof Troubleshooting>) => {
 describe('RobotSettings Troubleshooting', () => {
   let props: ComponentProps<typeof Troubleshooting>
   beforeEach(() => {
-    mockInvoke.mockClear()
-    mockInvoke.mockResolvedValue('/tmp')
+    mockSaveLogs.mockClear()
+    mockSaveLogs.mockResolvedValue({
+      directory: '/tmp',
+      succeededPaths: ['/logs/api.log'],
+    })
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
@@ -126,11 +130,11 @@ describe('RobotSettings Troubleshooting', () => {
 
     await waitFor(
       () => {
-        expect(mockInvoke).toHaveBeenCalledWith('downloads:saveLogs', {
+        expect(mockSaveLogs).toHaveBeenCalledWith({
           name: 'otie_logs.zip',
           paths: ['/logs/api.log'],
           hostname: 'localhost',
-          port: undefined,
+          port: null,
           destination: undefined,
         })
       },

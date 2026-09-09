@@ -6,7 +6,7 @@ import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
-import { remote } from '/app/redux/shell/remote'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 
 import { isEmptyDownloadError } from './utils/isEmptyDownloadResponse'
 
@@ -27,7 +27,7 @@ export function useDownloadRunRecord(
   run: RunData,
   onError?: (error: Error) => void
 ): {
-  downloadRunRecord: (destination?: string) => Promise<string | void>
+  downloadRunRecord: (destination?: string) => Promise<string | undefined>
   isDownloading: boolean
 } {
   const host = useHost()
@@ -60,14 +60,12 @@ export function useDownloadRunRecord(
     }
 
     try {
-      return await remote.ipcRenderer.invoke('downloads:saveFileFromUrl', {
+      return await saveFileFromUrl({
         name: filename,
         source: buildRunDownloadSource(id, params),
         hostname: host.hostname,
         port: host.port ?? null,
         destination,
-        token: host.token,
-        secure: host.secure,
       })
     } catch (error) {
       // Match previous getRunRaw behavior: cancel and empty (204) are silent.

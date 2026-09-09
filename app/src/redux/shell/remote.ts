@@ -161,6 +161,33 @@ export async function saveFileFromBuffer(props: {
   })
 }
 
+export async function saveFileFromUrl(props: {
+  name: string
+  source: string
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<string> {
+  return await remote.ipcRenderer.invoke('downloads:saveFileFromUrl', props)
+}
+
+export type SaveLogsPath = string | { path: string; name?: string }
+
+export interface SaveLogsResult {
+  directory: string
+  succeededPaths: string[]
+}
+
+export async function saveLogs(props: {
+  name: string
+  paths: SaveLogsPath[]
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<SaveLogsResult> {
+  return await remote.ipcRenderer.invoke('downloads:saveLogs', props)
+}
+
 export async function tryInstallEncryptedRobotCertificate(props: {
   certificateData: string
   password: string

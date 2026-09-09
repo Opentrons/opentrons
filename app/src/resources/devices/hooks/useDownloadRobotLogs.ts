@@ -4,7 +4,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
-import { remote } from '/app/redux/shell/remote'
+import { saveLogs } from '/app/redux/shell/remote'
 
 import type { UseMutationResult } from 'react-query'
 
@@ -39,13 +39,14 @@ export function useDownloadRobotLogs(
 
     const name = `${robotName}_logs.zip`
 
-    return await remote.ipcRenderer.invoke('downloads:saveLogs', {
+    const result = await saveLogs({
       name,
       paths: logs,
       hostname: host.hostname,
-      port: host.port,
+      port: host.port ?? null,
       destination,
     })
+    return result.directory
   }
 
   // Downloading logs doesn't mutate robot state, so it doesn't need

@@ -18,8 +18,8 @@ import {
   resetStore,
 } from './config'
 import { registerDiscovery } from './discovery'
-import { registerDownloadHandlers } from './downloads/ipc'
 import { setUserDataPath } from './early'
+import { registerDownloadHandlers } from './fs/ipc'
 import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'

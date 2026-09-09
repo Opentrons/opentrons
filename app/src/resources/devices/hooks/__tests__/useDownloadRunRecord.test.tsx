@@ -8,21 +8,18 @@ import { when } from 'vitest-when'
 import { DEFAULT_RUN_DOWNLOAD_PARAMS } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import { saveFileFromUrl } from '/app/redux/shell/remote'
+
 import { useDownloadRunRecord } from '../useDownloadRunRecord'
 
 import type { Store } from 'redux'
+import type { Mock } from 'vitest'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { HostConfig, RunData } from '@opentrons/api-client'
 
-const mockInvoke = vi.hoisted(() => vi.fn())
-
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({
-  remote: {
-    ipcRenderer: {
-      invoke: mockInvoke,
-    },
-  },
+  saveFileFromUrl: vi.fn(),
 }))
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal()
@@ -45,7 +42,7 @@ const mockRun = {
 
 describe('useDownloadRunRecord', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
-  let onError: ReturnType<typeof vi.fn>
+  let onError: Mock<(error: Error) => void>
 
   beforeEach(() => {
     const store: Store<any> = legacy_createStore(vi.fn(), {})
@@ -58,8 +55,8 @@ describe('useDownloadRunRecord', () => {
       </Provider>
     )
     onError = vi.fn()
-    mockInvoke.mockReset()
-    mockInvoke.mockResolvedValue('/tmp/downloads')
+    vi.mocked(saveFileFromUrl).mockReset()
+    vi.mocked(saveFileFromUrl).mockResolvedValue('/tmp/downloads')
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     vi.mocked(useAllProtocolsQuery).mockReturnValue({
       data: {
@@ -90,14 +87,12 @@ describe('useDownloadRunRecord', () => {
       Object.entries(expectedParams).map(([key, value]) => [key, String(value)])
     )
 
-    expect(mockInvoke).toHaveBeenCalledWith('downloads:saveFileFromUrl', {
+    expect(saveFileFromUrl).toHaveBeenCalledWith({
       name: 'My Protocol_2024-01-01T10_00_00.000Z.zip',
       source: `/runs/run-1/download?${search.toString()}`,
       hostname: '10.0.0.5',
       port: 31950,
       destination: '/tmp/usb',
-      token: 'access-token',
-      secure: undefined,
     })
     expect(onError).not.toHaveBeenCalled()
   })
@@ -105,7 +100,7 @@ describe('useDownloadRunRecord', () => {
   it('silently returns when the save is canceled', async () => {
     const cancelError = new Error('File save canceled')
     cancelError.name = 'FileSaveCanceledError'
-    mockInvoke.mockRejectedValue(cancelError)
+    vi.mocked(saveFileFromUrl).mockRejectedValue(cancelError)
 
     const { result } = renderHook(
       () => useDownloadRunRecord(mockRun, onError),
@@ -119,7 +114,7 @@ describe('useDownloadRunRecord', () => {
   it('silently returns on empty download errors', async () => {
     const emptyError = new Error('Empty download')
     emptyError.name = 'EmptyDownloadError'
-    mockInvoke.mockRejectedValue(emptyError)
+    vi.mocked(saveFileFromUrl).mockRejectedValue(emptyError)
 
     const { result } = renderHook(
       () => useDownloadRunRecord(mockRun, onError),
@@ -131,7 +126,7 @@ describe('useDownloadRunRecord', () => {
   })
 
   it('calls onError and rethrows other failures', async () => {
-    mockInvoke.mockRejectedValue(new Error('network down'))
+    vi.mocked(saveFileFromUrl).mockRejectedValue(new Error('network down'))
 
     const { result } = renderHook(
       () => useDownloadRunRecord(mockRun, onError),
@@ -145,11 +140,11 @@ describe('useDownloadRunRecord', () => {
   })
 
   it('tracks isDownloading while the IPC call is in flight', async () => {
-    let resolveInvoke: (value: string) => void = () => {}
-    mockInvoke.mockImplementation(
+    let resolveSave: (value: string) => void = () => {}
+    vi.mocked(saveFileFromUrl).mockImplementation(
       () =>
         new Promise<string>(resolve => {
-          resolveInvoke = resolve
+          resolveSave = resolve
         })
     )
 
@@ -163,7 +158,7 @@ describe('useDownloadRunRecord', () => {
       expect(result.current.isDownloading).toBe(true)
     })
 
-    resolveInvoke('/tmp')
+    resolveSave('/tmp')
     await pending
 
     await waitFor(() => {

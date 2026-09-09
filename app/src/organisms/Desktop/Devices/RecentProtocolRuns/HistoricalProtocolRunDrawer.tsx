@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import isEqual from 'lodash/isEqual'
@@ -25,10 +26,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useAllRunImagesRaw,
-  useDataFileQuery,
-} from '@opentrons/react-api-client'
+import { useDataFileQuery, useHost } from '@opentrons/react-api-client'
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -39,12 +37,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,
 } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
@@ -370,12 +369,13 @@ function ImagesFileDataRow({
   robotName: string
 }): JSX.Element {
   const { t } = useTranslation('run_details')
+  const host = useHost()
   const robotType = useRobotType(robotName)
   const { reportPhotoAccessUsage } = useCameraAnalytics({
     source: SOURCE_RUN_RECORD,
     robotType: robotType,
   })
-  const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
+  const [isDownloading, setIsDownloading] = useState(false)
   const formattedRunTs = format(new Date(run.createdAt), 'yyyyMMdd-HHmmss')
   const buildImagesZipName = (): string =>
     `${robotName}_${protocolName}_${formattedRunTs}.zip`
@@ -415,24 +415,39 @@ function ImagesFileDataRow({
         <Link
           role="button"
           css={
-            imagesZipFile == null
+            host == null
               ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
               : TYPOGRAPHY.linkPSemiBold
           }
           onClick={() => {
-            if (imagesZipFile != null) {
-              downloadFile(imagesZipFile, buildImagesZipName())
-              reportPhotoAccessUsage({
-                action: 'downloadZip',
-              })
+            if (host == null) {
+              return
             }
+            setIsDownloading(true)
+            void saveFileFromUrl({
+              name: buildImagesZipName(),
+              source: `/dataFiles/${run.id}/images/download`,
+              hostname: host.hostname,
+              port: host.port ?? null,
+            })
+              .catch((error: unknown) => {
+                if (!isFileSaveCanceledError(error)) {
+                  throw error
+                }
+              })
+              .finally(() => {
+                setIsDownloading(false)
+              })
+            reportPhotoAccessUsage({
+              action: 'downloadZip',
+            })
           }}
         >
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <LegacyStyledText forwardedAs="p">
-              {isLoading ? t('loading') : t('download')}
+              {isDownloading ? t('loading') : t('download')}
             </LegacyStyledText>
-            {!isLoading && <Icon name="download" size="1rem" />}
+            {!isDownloading && <Icon name="download" size="1rem" />}
           </Flex>
         </Link>
       </Box>
