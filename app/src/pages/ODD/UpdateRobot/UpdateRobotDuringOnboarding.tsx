@@ -23,6 +23,7 @@ import {
   clearRobotUpdateSession,
   downloadRobotUpdate,
   getRobotUpdateAvailable,
+  getRobotUpdateSession,
 } from '/app/redux/robot-update'
 
 import type { Dispatch, State } from '/app/redux/types'
@@ -43,6 +44,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
   })
   const robotName =
     typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
+  const session = useSelector(getRobotUpdateSession)
   const { startUpdate } = useGatedStartRobotUpdate(robotName)
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
@@ -103,11 +105,13 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             />
           </Flex>
         </ErrorUpdateSoftware>
-      ) : isShowCheckingUpdates && robotUpdateType !== 'upgrade' ? (
+      ) : isShowCheckingUpdates &&
+        robotUpdateType !== 'upgrade' &&
+        session == null ? (
         <CheckUpdates />
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
+        (robotUpdateType !== 'upgrade' && session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate('/emergency-stop')

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
@@ -54,13 +54,11 @@ export function UpdateRobotSoftware(
     step: null,
     error: null,
   }
-  const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const didKickOffRef = useRef(false)
   const afterCancelRef = useRef(afterCancel)
   afterCancelRef.current = afterCancel
   const hadSessionRef = useRef(session != null)
   const didCancelRef = useRef(false)
-
-  const didAttemptStartRef = useRef(false)
 
   if (session != null) {
     hadSessionRef.current = true
@@ -68,17 +66,21 @@ export function UpdateRobotSoftware(
 
   useEffect(() => {
     // Wait for auth queries so a loading false does not skip an allowed update.
-    if (isLoading || didAttemptStartRef.current) {
+    if (isLoading || didKickOffRef.current) {
       return
     }
-    didAttemptStartRef.current = true
+
+    didKickOffRef.current = true
+
     if (!startUpdate()) {
       afterCancelRef.current()
       return
     }
-    setIsDownloading(true)
-    dispatch(downloadRobotUpdate())
-  }, [dispatch, startUpdate, isLoading])
+
+    if (session?.robotName == null) {
+      dispatch(downloadRobotUpdate())
+    }
+  }, [dispatch, startUpdate, isLoading, session?.robotName])
 
   useEffect(() => {
     if (session == null && hadSessionRef.current && !didCancelRef.current) {
@@ -87,12 +89,14 @@ export function UpdateRobotSoftware(
     }
   }, [session])
 
-  // Display Error screen
-  if (sessionError != null) {
-    afterError(sessionError)
-  }
-  let updateType:
-    'downloading' | 'validating' | 'sendingFile' | 'installing' | null = null
+  useEffect(() => {
+    if (sessionError != null) {
+      afterError(sessionError)
+    }
+  }, [afterError, sessionError])
+
+  let updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' =
+    'downloading'
   if (step === 'finished') {
     return <CompleteUpdateSoftware robotName={robotName} />
   } else {
@@ -105,8 +109,6 @@ export function UpdateRobotSoftware(
         updateType = 'installing'
         beforeCommittingSuccessfulUpdate && beforeCommittingSuccessfulUpdate()
       }
-    } else if (isDownloading) {
-      updateType = 'downloading'
     }
     return <UpdateSoftware updateType={updateType} />
   }

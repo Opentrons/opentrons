@@ -1,5 +1,7 @@
 """Route handlers for audit log export endpoints."""
 
+import base64
+import hashlib
 import json
 import tempfile
 import zipfile
@@ -175,6 +177,13 @@ async def download_log_period(
             zh.write(robot_log_path, arcname=robot_log_path.name)
         if serialized_log is not None:
             zh.writestr(serialized_log.filename, serialized_log.serialized_json)
+
+    hasher = hashlib.sha256()
+    with zip_file_path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            hasher.update(chunk)
+    digest_b64 = base64.b64encode(hasher.digest()).decode("ascii")
+    headers["Content-Digest"] = f"sha-256=:{digest_b64}:"
 
     def cleanup_files() -> None:
         zip_file_path.unlink()

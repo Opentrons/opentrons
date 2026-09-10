@@ -17,12 +17,13 @@ import Pyro5.api
 from opentrons.config import feature_flags, robot_configs
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
+from ..persistence.protocol_user_permissions import PROTOCOL_USER_NAME
 from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
 
 _log = logging.getLogger(__name__)
 
-_RESTRICTED_USER_NAME = "ot-protocol"
+_RESTRICTED_USER_NAME = PROTOCOL_USER_NAME
 _ROOT_USER_NAME = "root"
 
 _RUN_PROXY_NAME = (

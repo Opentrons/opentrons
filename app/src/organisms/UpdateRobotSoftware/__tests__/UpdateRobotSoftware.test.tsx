@@ -104,6 +104,7 @@ describe('UpdateRobotSoftware', () => {
     mockAfterError.mockClear()
     mockBeforeCommitting.mockClear()
     mockAfterCancel.mockClear()
+    vi.mocked(RobotUpdate.downloadRobotUpdate).mockClear()
     vi.mocked(CompleteUpdateSoftware).mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
     )
@@ -111,10 +112,17 @@ describe('UpdateRobotSoftware', () => {
   })
 
   it('should start the robot update through the orchestrator on mount', () => {
-    vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
     render()
     expect(mockStartUpdate).toHaveBeenCalled()
     expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
+  })
+
+  it('does not re-download if a session already exists', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
+    render()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(RobotUpdate.downloadRobotUpdate).not.toHaveBeenCalled()
   })
 
   it('should render complete screen when finished', () => {

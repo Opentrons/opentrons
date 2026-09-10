@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -237,15 +237,15 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   const isCRSEnabled =
     accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
+  const queriesSucceeded =
+    robotSettingsQuery.isSuccess && accessControlEnabledQuery.isSuccess
+  // After the first successful load, never return to the initial init spinner.
+  const hasCompletedInitialReadyRef = useRef(false)
+  if (isShellReady && queriesSucceeded) {
+    hasCompletedInitialReadyRef.current = true
+  }
   const isReady =
-    // ensure robot-server api, etc. is up and running
-    isShellReady &&
-    // ensure settings query data is available for localization provider
-    robotSettingsQuery.isSuccess &&
-    // ensure we know whether access control is enabled or not,
-    // so on first render we can immediately show the LoggedOutOverlay
-    // and hide CRS-incompatible UI, if appropriate.
-    accessControlEnabledQuery.isSuccess
+    hasCompletedInitialReadyRef.current || (isShellReady && queriesSucceeded)
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     // to make sure that the host config stays stable and in step with the initial queries,

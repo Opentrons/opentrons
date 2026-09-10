@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   EmptySelectorButton,
@@ -16,7 +17,7 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
@@ -92,6 +93,7 @@ export function UserManagement({
   robotName,
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const dispatch = useDispatch()
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({
     enabled: username != null,
@@ -138,7 +140,9 @@ export function UserManagement({
       return
     }
 
-    void deleteUser(userToDelete.username)
+    const deletedUsername = userToDelete.username
+
+    void deleteUser(deletedUsername)
       .then(() => {
         makeToast(
           t('desktop_delete_user_success_banner') as string,
@@ -146,6 +150,9 @@ export function UserManagement({
           { closeButton: true }
         )
         setUserToDelete(null)
+        if (username === deletedUsername) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(() => {
         setUserToDelete(null)
@@ -186,7 +193,9 @@ export function UserManagement({
       return
     }
 
-    void resetUserPassword(userToResetPassword.username)
+    const resetUsername = userToResetPassword.username
+
+    void resetUserPassword(resetUsername)
       .then(response => {
         makeToast(
           t('desktop_reset_password_success_banner') as string,
@@ -198,6 +207,9 @@ export function UserManagement({
           setResetPasswordTemporaryPassword(temporaryPassword)
         } else {
           setUserToResetPassword(null)
+        }
+        if (username === resetUsername) {
+          dispatch(logOut({ robotName }))
         }
       })
       .catch(() => {
@@ -215,8 +227,10 @@ export function UserManagement({
       return
     }
 
+    const lockedUsername = userToDeactivate.username
+
     void updateUser({
-      username: userToDeactivate.username,
+      username: lockedUsername,
       request: { data: { locked: true } },
     })
       .then(() => {
@@ -226,6 +240,9 @@ export function UserManagement({
           { closeButton: true }
         )
         setUserToDeactivate(null)
+        if (username === lockedUsername) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(() => {
         setUserToDeactivate(null)
