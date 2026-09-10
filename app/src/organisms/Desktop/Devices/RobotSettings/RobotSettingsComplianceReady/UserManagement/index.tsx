@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   EmptySelectorButton,
@@ -16,7 +17,7 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
@@ -92,6 +93,7 @@ export function UserManagement({
   robotName,
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const dispatch = useDispatch()
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({
     enabled: username != null,
@@ -186,7 +188,9 @@ export function UserManagement({
       return
     }
 
-    void resetUserPassword(userToResetPassword.username)
+    const resetUsername = userToResetPassword.username
+
+    void resetUserPassword(resetUsername)
       .then(response => {
         makeToast(
           t('desktop_reset_password_success_banner') as string,
@@ -198,6 +202,9 @@ export function UserManagement({
           setResetPasswordTemporaryPassword(temporaryPassword)
         } else {
           setUserToResetPassword(null)
+        }
+        if (username === resetUsername) {
+          dispatch(logOut({ robotName }))
         }
       })
       .catch(() => {

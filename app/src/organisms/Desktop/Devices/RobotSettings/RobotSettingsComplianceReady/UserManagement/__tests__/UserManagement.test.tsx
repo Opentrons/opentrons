@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useDeleteUserMutation,
@@ -14,11 +14,13 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { logOut } from '/app/redux/robot-auth'
 
 import { UserManagement } from '..'
 
 import type { RenderResult } from '@testing-library/react'
-import type { AuthUsersResponse } from '@opentrons/api-client'
+import type { Store } from 'redux'
+import type { AuthUser, AuthUsersResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 vi.mock('../AddUserModal', () => ({
@@ -59,23 +61,32 @@ const MOCK_AUTH_STATE = {
   expiresAt: null,
 }
 
+const ALICE_USER: AuthUser = {
+  username: 'alice',
+  fullName: 'Alice Example',
+  accountType: 'admin',
+  locked: false,
+  resetPassword: false,
+}
+
+const BOB_USER: AuthUser = {
+  username: 'bob',
+  fullName: 'Bob Example',
+  accountType: 'user',
+  locked: true,
+  resetPassword: false,
+}
+
+const CAROL_USER: AuthUser = {
+  username: 'carol',
+  fullName: 'Carol Example',
+  accountType: 'user',
+  locked: false,
+  resetPassword: false,
+}
+
 const MOCK_USERS_RESPONSE: AuthUsersResponse = {
-  data: [
-    {
-      username: 'alice',
-      fullName: 'Alice Example',
-      accountType: 'admin',
-      locked: false,
-      resetPassword: false,
-    },
-    {
-      username: 'bob',
-      fullName: 'Bob Example',
-      accountType: 'user',
-      locked: true,
-      resetPassword: false,
-    },
-  ],
+  data: [ALICE_USER, BOB_USER],
   meta: {
     cursor: 0,
     totalLength: 2,
@@ -84,7 +95,9 @@ const MOCK_USERS_RESPONSE: AuthUsersResponse = {
 
 vi.mock('@opentrons/react-api-client')
 
-const render = (initialState: Partial<State> = {}): RenderResult => {
+const render = (
+  initialState: Partial<State> = {}
+): [RenderResult, Store<State>] => {
   return renderWithProviders(<UserManagement robotName={ROBOT_NAME} />, {
     i18nInstance: i18n,
     initialState: {
@@ -96,7 +109,7 @@ const render = (initialState: Partial<State> = {}): RenderResult => {
       },
       ...initialState,
     } as State,
-  })[0]
+  })
 }
 
 function expandAccordion(): void {
@@ -137,6 +150,10 @@ describe('UserManagement', () => {
           data: options?.enabled === false ? undefined : MOCK_USERS_RESPONSE,
         }) as ReturnType<typeof useUsersQuery>
     )
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('renders the user management accordion', () => {
@@ -212,6 +229,60 @@ describe('UserManagement', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
     screen.getByText("Reset this user's password?")
+  })
+
+  it('logs out and shows the one-time password when the logged-in user resets their own password', async () => {
+    mockResetUserPassword.mockResolvedValue({
+      data: { temporaryPassword: 'temp-password-123' },
+    })
+    const [, store] = render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+
+    await vi.waitFor(() => {
+      expect(mockResetUserPassword).toHaveBeenCalledWith('alice')
+      expect(store.dispatch).toHaveBeenCalledWith(
+        logOut({ robotName: ROBOT_NAME })
+      )
+      screen.getByText('temp-password-123')
+    })
+  })
+
+  it('does not log out when resetting another user password', async () => {
+    mockResetUserPassword.mockResolvedValue({
+      data: { temporaryPassword: 'temp-password-456' },
+    })
+    vi.mocked(useUsersQuery).mockImplementation(
+      options =>
+        ({
+          data:
+            options?.enabled === false
+              ? undefined
+              : {
+                  data: [ALICE_USER, CAROL_USER],
+                  meta: { cursor: 0, totalLength: 2 },
+                },
+        }) as ReturnType<typeof useUsersQuery>
+    )
+    const [, store] = render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_carol' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+
+    await vi.waitFor(() => {
+      expect(mockResetUserPassword).toHaveBeenCalledWith('carol')
+      screen.getByText('temp-password-456')
+    })
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      logOut({ robotName: ROBOT_NAME })
+    )
   })
 
   it('shows Unlock in the overflow menu only for locked users', () => {
