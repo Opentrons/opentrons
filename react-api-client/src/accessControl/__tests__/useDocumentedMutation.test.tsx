@@ -19,10 +19,29 @@ const MOCK_REPORT = 'test note' as DocumentationReport
 
 const testMutationKey = ['acm', 'useDocumentedMutation', 'test'] as const
 
-function createAxios401Error(): AxiosError {
+function createAuth401Error(): AxiosError {
   return {
     isAxiosError: true,
-    response: { status: 401 },
+    response: {
+      status: 401,
+      headers: { 'www-authenticate': 'Bearer error="invalid_token"' },
+      data: {
+        debugMessage:
+          'The access token provided by the request is bogus or expired.',
+        requiredScopes: ['robot.control.write'],
+        providedScopes: [],
+      },
+    },
+  } as AxiosError
+}
+
+function createWifi401Error(): AxiosError {
+  return {
+    isAxiosError: true,
+    response: {
+      status: 401,
+      data: { message: 'no', errorCode: '4000' },
+    },
   } as AxiosError
 }
 
@@ -176,7 +195,7 @@ describe('useDocumentedMutation', () => {
     const askForDocumentation = vi.fn()
     const mutationFn = vi
       .fn()
-      .mockImplementationOnce(() => Promise.reject(createAxios401Error()))
+      .mockImplementationOnce(() => Promise.reject(createAuth401Error()))
       .mockImplementationOnce(({ variables }: { variables: number }) =>
         Promise.resolve(variables + 1)
       )
@@ -278,7 +297,7 @@ describe('useDocumentedMutation', () => {
   })
 
   it('does not prompt for login after a 401 when access control is disabled', async () => {
-    const mutationFn = vi.fn().mockRejectedValue(createAxios401Error())
+    const mutationFn = vi.fn().mockRejectedValue(createAuth401Error())
 
     const { result } = renderHook(
       () =>
@@ -302,12 +321,51 @@ describe('useDocumentedMutation', () => {
     expect(mutationFn).toHaveBeenCalledTimes(1)
   })
 
+  it('propagates a Wi-Fi-shaped 401 without prompting for login', async () => {
+    const askForLogin = vi.fn()
+    const askForDocumentation = vi.fn()
+    const wifi401Error = createWifi401Error()
+    const mutationFn = vi.fn().mockRejectedValue(wifi401Error)
+
+    const { result } = renderHook(
+      () =>
+        useDocumentedMutation<number, AxiosError, number>(
+          {
+            isLoading: false,
+            accessControlEnabled: true,
+            loginExpired: false,
+            askForLogin,
+            reasonForInteractionRequired: true,
+            docreport: MOCK_REPORT,
+            askForDocumentation,
+          },
+          ['play_run'],
+          testMutationKey,
+          ({ variables: n }) => mutationFn(n),
+          {}
+        ),
+      { wrapper }
+    )
+
+    act(() => {
+      result.current.mutate(5)
+    })
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
+    expect(result.current.error).toBe(wifi401Error)
+    expect(askForLogin).not.toHaveBeenCalled()
+    expect(askForDocumentation).not.toHaveBeenCalled()
+    expect(mutationFn).toHaveBeenCalledTimes(1)
+  })
+
   it('prompts for login and re-documents after a 401, then reruns the mutation', async () => {
     const askForLogin = vi.fn().mockResolvedValue({ username: 'alice' })
     const askForDocumentation = vi.fn().mockResolvedValue(MOCK_REPORT)
     const mutationFn = vi
       .fn()
-      .mockImplementationOnce(() => Promise.reject(createAxios401Error()))
+      .mockImplementationOnce(() => Promise.reject(createAuth401Error()))
       .mockImplementationOnce(({ variables }: { variables: string }) =>
         Promise.resolve(`${variables}-ok`)
       )
@@ -354,7 +412,7 @@ describe('useDocumentedMutation', () => {
     const askForDocumentation = vi
       .fn()
       .mockResolvedValue('' as DocumentationReport)
-    const mutationFn = vi.fn().mockRejectedValue(createAxios401Error())
+    const mutationFn = vi.fn().mockRejectedValue(createAuth401Error())
 
     const { result } = renderHook(
       () =>

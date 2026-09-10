@@ -169,7 +169,7 @@ async function runMutation<TData, TVariables>(
       console.log('hit error', e)
       console.log(documentationState)
       if (
-        isAxiosUnauthorizedError(e) &&
+        isHttpAuthenticationUnauthorizedError(e) &&
         documentationState.accessControlEnabled
       ) {
         console.log('hit 401')
@@ -184,13 +184,37 @@ async function runMutation<TData, TVariables>(
     })
 }
 
-function isAxiosUnauthorizedError(error: unknown): boolean {
+// 401 is used both for HTTP auth challenges and for some domain failures
+// (for example a failed Wi-Fi join). Only treat auth-challenge 401s as
+// expired login so those domain errors can settle as mutation failures.
+function isHttpAuthenticationUnauthorizedError(error: unknown): boolean {
   if (error == null || typeof error !== 'object') {
     return false
   }
   const axiosError = error as {
     isAxiosError?: unknown
-    response?: { status?: unknown }
+    response?: {
+      status?: unknown
+      headers?: Record<string, unknown>
+      data?: unknown
+    }
   }
-  return axiosError.isAxiosError === true && axiosError.response?.status === 401
+  if (axiosError.isAxiosError !== true || axiosError.response?.status !== 401) {
+    return false
+  }
+
+  const headers = axiosError.response.headers ?? {}
+  const wwwAuthenticate =
+    headers['www-authenticate'] ?? headers['WWW-Authenticate']
+  if (typeof wwwAuthenticate === 'string' && wwwAuthenticate.length > 0) {
+    return true
+  }
+
+  const data = axiosError.response.data
+  return (
+    data != null &&
+    typeof data === 'object' &&
+    'debugMessage' in data &&
+    'requiredScopes' in data
+  )
 }
