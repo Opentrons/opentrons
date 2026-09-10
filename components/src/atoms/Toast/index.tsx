@@ -14,7 +14,6 @@ import {
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { truncateString } from '../../utils'
 import { StyledText } from '../StyledText'
-import styles from './toast.module.css'
 
 import type {
   DefaultTheme,
@@ -339,10 +338,27 @@ export function Toast(props: ToastProps): JSX.Element {
           gap={showODDStyle ? SPACING.spacing4 : undefined}
         >
           {headingText.length > 0 ? (
-            <p className={styles.heading}>{headingText}</p>
+            <StyledText
+              oddStyle="bodyTextSemiBold"
+              desktopStyle="bodyDefaultSemiBold"
+              maxWidth={showODDStyle ? '30.375rem' : 'auto'}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace={NO_WRAP}
+            >
+              {headingText}
+            </StyledText>
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
-            <p className={styles.message}>{message}</p>
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace={NO_WRAP}
+            >
+              {message}
+            </StyledText>
           </Flex>
         </Flex>
       </Flex>
