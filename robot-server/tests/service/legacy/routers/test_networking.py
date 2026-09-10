@@ -180,7 +180,7 @@ def test_wifi_configure_nmcli_error(api_client, monkeypatch):
     monkeypatch.setattr(nmcli, "configure", mock_configure)
 
     resp = api_client.post("/wifi/configure", json={"ssid": "asasd", "foo": "bar"})
-    assert resp.status_code == 401
+    assert resp.status_code == 400
     body = resp.json()
     assert {"errorCode": "4000", "message": "no"} == body
 
