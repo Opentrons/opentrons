@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from anyio import to_thread
 from typing_extensions import Final
 
 from server_utils.persistence.folder_migrator import MigrationOrchestrator
@@ -32,6 +33,7 @@ from ._migrations import (
     v18_to_v19,
 )
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
+from .protocol_user_permissions import grant_protocol_user_access
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 
@@ -80,9 +82,18 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
 
 
 async def prepare_active_subdirectory(prepared_root: Path) -> Path:
-    """Return the active persistence subdirectory after preparing it, if necessary."""
+    """Return the active persistence subdirectory after preparing it, if necessary.
+
+    After migrations, grant the `ot-protocol` user access to protocol files.
+    Directories are setgid so later uploads inherit that group. oe-core's systemd-tmpfiles
+    only chowns paths that already exist at boot, so this must run here, since the first CRS
+    reset recreates the tree after tmpfiles has already finished.
+    """
     orchestrator = make_migration_orchestrator(prepared_root)
-    return await server_utils_prepare_active_subdirectory(orchestrator)
+    subdirectory = await server_utils_prepare_active_subdirectory(orchestrator)
+    await to_thread.run_sync(grant_protocol_user_access, subdirectory)
+
+    return subdirectory
 
 
 async def prepare_root(persistence_directory_root: Path | None) -> Path:
