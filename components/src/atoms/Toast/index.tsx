@@ -339,7 +339,7 @@ export function Toast(props: ToastProps): JSX.Element {
         >
           {headingText.length > 0 ? (
             <StyledText
-              oddStyle="bodyTextBold"
+              oddStyle="bodyTextSemiBold"
               desktopStyle="bodyDefaultSemiBold"
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
@@ -351,11 +351,11 @@ export function Toast(props: ToastProps): JSX.Element {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
-              oddStyle="bodyTextSemiBold"
+              oddStyle="bodyTextRegular"
               desktopStyle="bodyDefaultRegular"
               overflow="hidden"
-              text-overflow="ellipsis"
-              white-space="nowrap"
+              textOverflow="ellipsis"
+              whiteSpace={NO_WRAP}
             >
               {message}
             </StyledText>
