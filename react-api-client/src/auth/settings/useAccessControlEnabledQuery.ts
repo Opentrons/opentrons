@@ -33,7 +33,6 @@ export function useAccessControlEnabledQuery(
     {
       enabled: host !== null,
       staleTime: Infinity,
-      cacheTime: Infinity,
       ...options,
     }
   )
