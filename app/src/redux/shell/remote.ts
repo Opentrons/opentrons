@@ -149,14 +149,43 @@ remote.ipcRenderer.on(
   }
 )
 
-export async function saveFileToUsb(
-  filePath: string,
+export async function saveFileFromBuffer(props: {
+  name: string
   buffer: ArrayBuffer
-): Promise<void> {
-  await remote.ipcRenderer.invoke('usb:saveFile', {
-    filePath,
-    buffer: Array.from(new Uint8Array(buffer)),
+  destination?: string
+}): Promise<string> {
+  return await remote.ipcRenderer.invoke('downloads:saveFileFromBuffer', {
+    name: props.name,
+    buffer: Array.from(new Uint8Array(props.buffer)),
+    destination: props.destination,
   })
+}
+
+export async function saveFileFromUrl(props: {
+  name: string
+  source: string
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<string> {
+  return await remote.ipcRenderer.invoke('downloads:saveFileFromUrl', props)
+}
+
+export type SaveLogsPath = string | { path: string; name?: string }
+
+export interface SaveLogsResult {
+  directory: string
+  succeededPaths: string[]
+}
+
+export async function saveLogs(props: {
+  name: string
+  paths: SaveLogsPath[]
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<SaveLogsResult> {
+  return await remote.ipcRenderer.invoke('downloads:saveLogs', props)
 }
 
 export async function tryInstallEncryptedRobotCertificate(props: {

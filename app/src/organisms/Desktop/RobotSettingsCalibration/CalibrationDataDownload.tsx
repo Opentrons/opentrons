@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 

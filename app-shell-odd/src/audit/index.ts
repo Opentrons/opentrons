@@ -8,7 +8,13 @@ import {
 } from '@opentrons/app/src/redux/audit/slice'
 
 import { DOWNLOAD_AUDIT_LOG, DOWNLOAD_AUDIT_LOGS } from '../constants'
+import {
+  resolveUniqueFilePath,
+  syncFileToDevice,
+  zipDirectory,
+} from '../fs/utils'
 import { fetchToFile } from '../http'
+import { createLogger } from '../log'
 import { buildRobotHttpUrl } from '../system-update/httpUrl'
 
 import type {
@@ -16,6 +22,8 @@ import type {
   DownloadAuditLogsPayload,
 } from '@opentrons/app/src/redux/audit/types'
 import type { Action, Dispatch } from '../types'
+
+const log = createLogger('audit')
 
 export const MISSING_USB_DESTINATION_ERROR = 'No USB destination provided'
 export const UNWRITABLE_USB_DESTINATION_ERROR =
@@ -34,7 +42,9 @@ export function registerAudit(dispatch: Dispatch): Dispatch {
 
 async function downloadAuditLog(
   payload: DownloadAuditLogPayload,
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  // false when the file is staging for a zip that gets synced instead
+  syncAfterWrite: boolean = true
 ): Promise<boolean> {
   const { logPeriodId, fileName, hostname, port, destination } = payload
 
@@ -56,7 +66,7 @@ async function downloadAuditLog(
   )
 
   try {
-    const filePath = path.join(destination, fileName)
+    const filePath = await resolveUniqueFilePath(destination, fileName)
     let deletionKey: string | null = null
 
     await fetchToFile(url, filePath, {
@@ -64,6 +74,10 @@ async function downloadAuditLog(
         deletionKey = response.headers.get('opentrons-log-period-deletion-key')
       },
     })
+
+    if (syncAfterWrite) {
+      await syncFileToDevice(filePath)
+    }
 
     dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
 
@@ -110,7 +124,7 @@ async function downloadAuditLogs(
       /[^a-zA-Z0-9._-]/g,
       '_'
     )
-  const outputDirectory = path.join(destination, folderName)
+  const outputDirectory = await resolveUniqueFilePath(destination, folderName)
   await mkdir(outputDirectory, { recursive: true })
 
   const results = await Promise.all(
@@ -123,13 +137,27 @@ async function downloadAuditLogs(
           port,
           destination: outputDirectory,
         },
-        dispatch
+        dispatch,
+        false
       )
     )
   )
 
-  if (results.every(succeeded => !succeeded)) {
+  const anySucceeded = results.some(succeeded => succeeded)
+  if (!anySucceeded) {
     await rm(outputDirectory, { recursive: true, force: true })
+    return
+  }
+
+  const zipName = `${path.basename(outputDirectory)}.zip`
+  const zipPath = await resolveUniqueFilePath(destination, zipName)
+  try {
+    await zipDirectory(outputDirectory, zipPath)
+    await syncFileToDevice(zipPath)
+    await rm(outputDirectory, { recursive: true, force: true })
+  } catch (error) {
+    // Downloads already succeeded; leave the folder if zipping fails.
+    log.error('Failed to zip audit log folder', { error, outputDirectory })
   }
 }
 

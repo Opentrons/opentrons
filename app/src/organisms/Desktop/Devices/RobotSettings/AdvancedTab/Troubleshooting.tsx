@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { isFileSaveCanceledError } from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 

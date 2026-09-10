@@ -37,7 +37,8 @@ export function DownloadDiagnosticFilesWizard({
 
   const handleContinueFromUsb = (usbPath: string): void => {
     setStep(STEP_TYPES.DOWNLOADING)
-    Promise.all([downloadLogs({ usbPath }), downloadCalibration(usbPath)])
+    void downloadLogs({ destination: usbPath })
+      .then(destination => downloadCalibration(destination))
       .then(() => {
         setStep(STEP_TYPES.SUCCESS)
       })

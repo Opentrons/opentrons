@@ -24,16 +24,14 @@ import {
 import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
-import {
-  isFileSaveCanceledError,
-  saveFileWithPicker,
-} from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
@@ -132,19 +130,22 @@ export function OverflowMenu({
     })
 
     if (calType === 'pipetteOffset') {
-      void saveFileWithPicker(
-        `opentrons-${robotName}-pipette-offset-calibration.json`,
-        new Blob([JSON.stringify(pipetteOffsetCalibrations)])
-      ).catch((error: unknown) => {
+      void saveFileFromBuffer({
+        name: `opentrons-${robotName}-pipette-offset-calibration.json`,
+        buffer: new TextEncoder().encode(
+          JSON.stringify(pipetteOffsetCalibrations)
+        ).buffer,
+      }).catch((error: unknown) => {
         if (!isFileSaveCanceledError(error)) {
           throw error
         }
       })
     } else if (calType === 'tipLength') {
-      void saveFileWithPicker(
-        `opentrons-${robotName}-tip-length-calibration.json`,
-        new Blob([JSON.stringify(tipLengthCalibrations)])
-      ).catch((error: unknown) => {
+      void saveFileFromBuffer({
+        name: `opentrons-${robotName}-tip-length-calibration.json`,
+        buffer: new TextEncoder().encode(JSON.stringify(tipLengthCalibrations))
+          .buffer,
+      }).catch((error: unknown) => {
         if (!isFileSaveCanceledError(error)) {
           throw error
         }

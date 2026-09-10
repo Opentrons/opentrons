@@ -17,7 +17,9 @@ import {
   OPENTRONS_USB,
 } from '../constants'
 import { showOpenDirectoryDialog } from '../dialogs'
+import { resolveUniqueFilePath, zipDirectory } from '../fs/utils'
 import { fetchToFile } from '../http'
+import { createLogger } from '../log'
 import { buildRobotHttpUrl } from '../robot-update/httpUrl'
 import { getSerialPortHttpAgent } from '../usb'
 
@@ -31,6 +33,8 @@ import type {
   DownloadAuditLogsPayload,
 } from '@opentrons/app/src/redux/audit/types'
 import type { Action, Dispatch } from '../types'
+
+const log = createLogger('audit')
 
 export const AUDIT_LOG_DIRECTORY_CONFIG_PATH = 'audit.logDirectory'
 
@@ -107,7 +111,7 @@ async function downloadAuditLog(
   }
 
   try {
-    const filePath = path.join(directory, fileName)
+    const filePath = await resolveUniqueFilePath(directory, fileName)
     let deletionKey: string | null = null
 
     await fetchToFile(url, filePath, {
@@ -186,26 +190,24 @@ async function downloadAuditLogs(
     return
   }
 
+  if (!directory) {
+    for (const logPeriodSummary of logPeriodSummaries) {
+      dispatch(logPeriodDownloadCanceled({ logPeriodId: logPeriodSummary.id }))
+    }
+    return
+  }
+
   const folderName =
     `${robotName}-audit-logs-${new Date().toISOString()}`.replace(
       /[^a-zA-Z0-9._-]/g,
       '_'
     )
-  const outputDirectory = !directory ? null : path.join(directory, folderName)
-  if (outputDirectory != null) {
-    await mkdir(outputDirectory, { recursive: true })
-  }
+  const outputDirectory = await resolveUniqueFilePath(directory, folderName)
+  await mkdir(outputDirectory, { recursive: true })
 
   const results = await Promise.all(
-    logPeriodSummaries.map(logPeriodSummary => {
-      if (!outputDirectory) {
-        dispatch(
-          logPeriodDownloadCanceled({ logPeriodId: logPeriodSummary.id })
-        )
-        return Promise.resolve()
-      }
-
-      return downloadAuditLog(
+    logPeriodSummaries.map(logPeriodSummary =>
+      downloadAuditLog(
         {
           logPeriodId: logPeriodSummary.id,
           fileName: `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`,
@@ -216,10 +218,22 @@ async function downloadAuditLogs(
         mainWindow,
         dispatch
       )
-    })
+    )
   )
 
-  if (!!outputDirectory && results.every(succeeded => !succeeded)) {
+  const anySucceeded = results.some(succeeded => succeeded)
+  if (!anySucceeded) {
     await rm(outputDirectory, { recursive: true, force: true })
+    return
+  }
+
+  const zipName = `${path.basename(outputDirectory)}.zip`
+  const zipPath = await resolveUniqueFilePath(directory, zipName)
+  try {
+    await zipDirectory(outputDirectory, zipPath)
+    await rm(outputDirectory, { recursive: true, force: true })
+  } catch (error) {
+    // Downloads already succeeded; leave the folder if zipping fails.
+    log.error('Failed to zip audit log folder', { error, outputDirectory })
   }
 }

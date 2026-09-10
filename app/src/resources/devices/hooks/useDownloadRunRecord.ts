@@ -1,25 +1,33 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
+import { DEFAULT_RUN_DOWNLOAD_PARAMS } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
-import {
-  isFileSaveCanceledError,
-  saveFileWithPicker,
-} from '/app/local-resources/files/saveFileWithPicker'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 
-import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
+import { isEmptyDownloadError } from './utils/isEmptyDownloadResponse'
 
-import type { RunData } from '@opentrons/api-client'
+import type { GetRunDownloadParams, RunData } from '@opentrons/api-client'
+
+function buildRunDownloadSource(
+  runId: string,
+  params: Required<GetRunDownloadParams>
+): string {
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    search.set(key, String(value))
+  }
+  return `/runs/${runId}/download?${search.toString()}`
+}
 
 export function useDownloadRunRecord(
   run: RunData,
   onError?: (error: Error) => void
 ): {
-  downloadRunRecord: (usbPath?: string) => Promise<void>
+  downloadRunRecord: (destination?: string) => Promise<string | undefined>
   isDownloading: boolean
 } {
   const host = useHost()
@@ -36,10 +44,14 @@ export function useDownloadRunRecord(
   const matchingProtocolName = matchingProtocol?.metadata.protocolName
   const runDateTransformed = run.createdAt.replaceAll(':', '_')
 
-  const downloadRunRecord = (usbPath?: string): Promise<void> => {
-    if (host == null) {
-      return Promise.resolve()
+  const downloadRunRecord = async (
+    destination?: string
+  ): Promise<string | undefined> => {
+    const id: string = run.id
+    if (host == null || id == null) {
+      return
     }
+
     setIsDownloading(true)
     const filename = `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`
     const params = {
@@ -47,28 +59,25 @@ export function useDownloadRunRecord(
       protocol: includeProtocolSource,
     }
 
-    return getRunRaw(host, run.id, params, 'blob')
-      .then(async res => {
-        if (isEmptyDownloadResponse(res.data, res.status)) {
-          setIsDownloading(false)
-          return
-        }
-        if (usbPath != null) {
-          const buffer = await (res.data as Blob).arrayBuffer()
-          await saveFileToUsb(`${usbPath}/${filename}`, buffer)
-        } else {
-          await saveFileWithPicker(filename, res.data as Blob)
-        }
-        setIsDownloading(false)
+    try {
+      return await saveFileFromUrl({
+        name: filename,
+        source: buildRunDownloadSource(id, params),
+        hostname: host.hostname,
+        port: host.port ?? null,
+        destination,
       })
-      .catch((e: Error) => {
-        setIsDownloading(false)
-        if (isFileSaveCanceledError(e)) {
-          return
-        }
-        onError?.(e)
-        throw e
-      })
+    } catch (error) {
+      // Match previous getRunRaw behavior: cancel and empty (204) are silent.
+      if (isFileSaveCanceledError(error) || isEmptyDownloadError(error)) {
+        return
+      }
+      const err = error instanceof Error ? error : new Error(String(error))
+      onError?.(err)
+      throw err
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   return { downloadRunRecord, isDownloading }

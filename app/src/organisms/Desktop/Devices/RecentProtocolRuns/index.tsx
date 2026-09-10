@@ -13,6 +13,7 @@ import {
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
@@ -79,7 +80,9 @@ export function RecentProtocolRuns({
           makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
         .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)
