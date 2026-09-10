@@ -222,8 +222,10 @@ export function UserManagement({
       return
     }
 
+    const lockedUsername = userToDeactivate.username
+
     void updateUser({
-      username: userToDeactivate.username,
+      username: lockedUsername,
       request: { data: { locked: true } },
     })
       .then(() => {
@@ -233,6 +235,9 @@ export function UserManagement({
           { closeButton: true }
         )
         setUserToDeactivate(null)
+        if (username === lockedUsername) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(() => {
         setUserToDeactivate(null)

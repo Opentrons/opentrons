@@ -351,8 +351,8 @@ describe('UserManagement', () => {
     screen.getByText('Lock this account?')
   })
 
-  it('locks the user when confirmed in the lock modal', async () => {
-    render()
+  it('locks the user and logs out when the logged-in user locks their own account', async () => {
+    const [, store] = render()
     expandAccordion()
     fireEvent.click(
       screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
@@ -365,8 +365,43 @@ describe('UserManagement', () => {
         username: 'alice',
         request: { data: { locked: true } },
       })
+      expect(store.dispatch).toHaveBeenCalledWith(
+        logOut({ robotName: ROBOT_NAME })
+      )
     })
     expect(mockUpdateUser).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not log out when locking another user account', async () => {
+    vi.mocked(useUsersQuery).mockImplementation(
+      options =>
+        ({
+          data:
+            options?.enabled === false
+              ? undefined
+              : {
+                  data: [ALICE_USER, CAROL_USER],
+                  meta: { cursor: 0, totalLength: 2 },
+                },
+        }) as ReturnType<typeof useUsersQuery>
+    )
+    const [, store] = render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_carol' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+
+    await vi.waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        username: 'carol',
+        request: { data: { locked: true } },
+      })
+    })
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      logOut({ robotName: ROBOT_NAME })
+    )
   })
 
   it('unlocks and resets password when confirmed in the activate modal', async () => {
