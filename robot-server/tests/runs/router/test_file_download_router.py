@@ -68,9 +68,11 @@ async def _read_and_cleanup_zip(
     result: Union[FileResponse, StreamingResponse],
 ) -> zipfile.ZipFile:
     """Copy zip bytes, run background cleanup, then open an in-memory ZipFile."""
+    # breakpoint()
     if isinstance(result, StreamingResponse):
         zip_bytes = bytes()
         async for chunk in result.body_iterator:
+            # breakpoint()
             assert isinstance(chunk, bytes)
             zip_bytes += chunk
     elif isinstance(result, FileResponse):
