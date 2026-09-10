@@ -54,8 +54,9 @@ nav:
       - Jupyter Notebook: advanced-control/jupyter.md
       - Command Line: advanced-control/command-line.md
       - Robot Motor Control: advanced-control/robot-motors.md
-  - Example Protocols: examples.md
-  - Vacuum Module Miniprep Use Case: vacuum-module-example.md
+  - Examples:
+      - Protocol Examples: examples/index.md
+      - Module Examples: examples/modules.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
   - API Reference:
       - Protocols: reference/protocols.md

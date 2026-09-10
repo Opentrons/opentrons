@@ -3,7 +3,7 @@ title: "Python API: Protocol Examples"
 description: "Example protocols for transfers, mixes, and common workflows."
 ---
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the [tutorial](tutorial.md). Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the [tutorial](../tutorial.md). Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
 
 ## Using these protocols
 
@@ -110,7 +110,7 @@ These protocols demonstrate how to move 100 µL of liquid from one well to anoth
 
 ### Basic method
 
-This protocol uses some [building block commands](building-block-commands/index.md) to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods.
+This protocol uses some [building block commands](../building-block-commands/index.md) to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods.
 
 === "Flex"
     ```python
@@ -422,7 +422,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
         pipette.return_tip()
     ```
 
-Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
+Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](../tutorial.md#commands) section of the Tutorial.
 
 ## Dilution
 
@@ -545,7 +545,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             )
     ```
 
-Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also the [Commands](tutorial.md#commands) section of the Tutorial.
+Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also the [Commands](../tutorial.md#commands) section of the Tutorial.
 
 ## Plate mapping
 
