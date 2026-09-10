@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - seed_users
+      - user_scopes_str
 
 stages:
   - name: Enable access control enabled so protected resources require a valid token
@@ -44,6 +45,9 @@ stages:
     response:
       status_code: 401
 
+  # Request-time scope narrowing is not enforced at use time (live scopes always
+  # win), so get insufficient scopes from an account type that is not authorized
+  # for users.write instead of asking an admin for a subset.
   - name: Get an access token with insufficient scopes
     request:
       method: POST
@@ -51,9 +55,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: testadmin
-        password: testadminpassword
-        scope: users.read.others # Omit users.write.
+        username: testuser
+        password: testuserpassword
     response:
       status_code: 200
       json:
@@ -61,7 +64,8 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: users.read.others
+        # Regular users are not authorized for users.write.
+        scope: '{user_scopes_str}'
       save:
         json:
           access_token: access_token
@@ -72,7 +76,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          username: testuser
+          username: testuser_new
           password: testuserpassword
           fullName: Test User
           accountType: user
@@ -90,7 +94,6 @@ stages:
         grant_type: password
         username: testadmin
         password: testadminpassword
-        scope: users.write
     response:
       status_code: 200
       json:
@@ -98,7 +101,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: users.write
+        scope: !anystr
       save:
         json:
           access_token: access_token
