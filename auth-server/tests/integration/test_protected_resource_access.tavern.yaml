@@ -57,6 +57,7 @@ stages:
         grant_type: password
         username: testuser
         password: testuserpassword
+        scope: users.read.others # Omit users.write.
     response:
       status_code: 200
       json:
@@ -64,7 +65,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        # Regular users are not authorized for users.write.
+        # scopes based on user account type and settings
         scope: '{user_scopes_str}'
       save:
         json:
