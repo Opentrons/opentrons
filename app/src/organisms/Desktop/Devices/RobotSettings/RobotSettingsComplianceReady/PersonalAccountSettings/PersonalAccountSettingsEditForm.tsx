@@ -17,6 +17,7 @@ export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
   isSaving: boolean
+  identityReadOnly?: boolean
   onSave: (data: UpdateSelfRequest) => Promise<void>
   onCancel: () => void
 }
@@ -32,6 +33,7 @@ export function PersonalAccountSettingsEditForm({
   username,
   fullName,
   isSaving,
+  identityReadOnly = false,
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
@@ -39,7 +41,7 @@ export function PersonalAccountSettingsEditForm({
     t: TFunction
   }
 
-  const { control, handleSubmit, watch, setError } = useForm<FormValues>({
+  const { control, handleSubmit, setError } = useForm<FormValues>({
     defaultValues: {
       username,
       fullName,
@@ -50,29 +52,27 @@ export function PersonalAccountSettingsEditForm({
     reValidateMode: 'onChange',
   })
 
-  const {
-    username: usernameInput,
-    fullName: fullNameInput,
-    password,
-    confirmPassword,
-  } = watch()
-  const trimmedUsername = usernameInput.trim()
-  const trimmedFullName = fullNameInput.trim()
-  const hasProfileChanges =
-    trimmedUsername !== username || trimmedFullName !== fullName
-  const hasPasswordChange = password !== ''
+  const onSubmit = (data: FormValues): void => {
+    const trimmedUsername = data.username.trim()
+    const trimmedFullName = data.fullName.trim()
+    const hasProfileChanges =
+      !identityReadOnly &&
+      (trimmedUsername !== username || trimmedFullName !== fullName)
+    const hasPasswordChange = data.password !== ''
 
-  const isSaveDisabled =
-    isSaving ||
-    (!hasProfileChanges && !hasPasswordChange) ||
-    (hasPasswordChange && (password === '' || confirmPassword === ''))
+    if (!hasProfileChanges && !hasPasswordChange) {
+      return
+    }
 
-  const onSubmit = (): void => {
     void onSave({
       data: {
-        ...(trimmedUsername !== username ? { username: trimmedUsername } : {}),
-        ...(trimmedFullName !== fullName ? { fullName: trimmedFullName } : {}),
-        ...(hasPasswordChange ? { password } : {}),
+        ...(!identityReadOnly && trimmedUsername !== username
+          ? { username: trimmedUsername }
+          : {}),
+        ...(!identityReadOnly && trimmedFullName !== fullName
+          ? { fullName: trimmedFullName }
+          : {}),
+        ...(hasPasswordChange ? { password: data.password } : {}),
       },
     }).catch(error => {
       const formError = mapAuthUserMutationError<FormValues>(error, t)
@@ -85,13 +85,16 @@ export function PersonalAccountSettingsEditForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.form_fields}>
-        <UserAccountIdentityFormFields control={control} />
+        <UserAccountIdentityFormFields
+          control={control}
+          readOnly={identityReadOnly}
+        />
         <UserAccountPasswordFormFields control={control} />
         <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>
             {t('shared:cancel') as string}
           </SecondaryButton>
-          <PrimaryButton type="submit" disabled={isSaveDisabled}>
+          <PrimaryButton type="submit" disabled={isSaving}>
             {t('shared:save') as string}
           </PrimaryButton>
         </div>

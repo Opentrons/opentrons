@@ -39,6 +39,7 @@
   "reference_wavelength": "Reference wavelength",
   "remaining_tips": "{{remaining}} tips",
   "right_mount": "RIGHT MOUNT",
+  "search_commands_placeholder": "Search commands...",
   "seconds_per_step": "{{seconds}} s per step",
   "slot": "Slot",
   "slot_empty": "Slot empty",
@@ -67,8 +68,7 @@
   "waste_chute": "WASTE CHUTE",
   "wavelengths": "Wavelengths",
   "well_dimension": "{{number}} mm",
-  "search_commands_placeholder": "Search commands...",
-  "well_name": "Well {{wellName}}",
+  "well_name": "WELL {{wellName}}",
   "well_view": "Well view",
   "well_volume": "{{volume}} µL"
 }

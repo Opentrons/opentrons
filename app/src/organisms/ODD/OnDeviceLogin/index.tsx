@@ -118,6 +118,14 @@ export function OnDeviceLogin({
             )
             return
           }
+          if (complexityError === 'invalidCharacters') {
+            setPasswordPolicyError(
+              t('password_invalid_characters', {
+                ns: 'access_control',
+              }) as string
+            )
+            return
+          }
           if (complexityError === 'missingSpecialCharacters') {
             setPasswordPolicyError(
               t('must_include_at_least_one_special_character', {

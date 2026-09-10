@@ -12,6 +12,7 @@ import {
 
 import type { UseQueryOptions } from 'react-query'
 import type { Run, RunData, RunStatus } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface RunControls {
   play: () => void
@@ -29,7 +30,8 @@ export interface RunControls {
 
 export function useRunControls(
   runId: string | null,
-  onCloneRunSuccess?: (createRunResponse: Run) => unknown
+  onCloneRunSuccess?: (createRunResponse: Run) => unknown,
+  playDocumentationState?: DocumentationState
 ): RunControls {
   const documentationState = useDocumentationState()
 
@@ -42,7 +44,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!, documentationState)
+  } = useRunActionMutations(runId!, documentationState, playDocumentationState)
 
   const {
     cloneRun,

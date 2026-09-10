@@ -120,7 +120,7 @@ export interface AttachingModuleAction {
  * DocumentedActions for one-off mutations without more needed context.
  * These should match keys in audit_log.json
  */
-type AuditLogAction =
+export type AuditLogAction =
   | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
@@ -199,6 +199,7 @@ type AuditLogAction =
   | 'change_language'
   | 'toggle_analytics'
   | 'download_log_period'
+  | 'unlock_user'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

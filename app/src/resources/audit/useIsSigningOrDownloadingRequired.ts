@@ -26,7 +26,7 @@ export function useIsSigningOrDownloadingRequired(robotName: string): {
     accessControlSettings?.data.requireSignoffForProtocolLog
   const downloadingSetting =
     accessControlEnabled?.data.accessControlEnabled &&
-    accessControlSettings?.data.requireLogsToBeSavedInApp
+    (accessControlSettings?.data.requireLogsToBeSavedInApp ?? false)
 
   const currentRunId = useCurrentRunId()
   const { data: runRecord } = useNotifyRunQuery(currentRunId)

@@ -38,13 +38,18 @@ import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
 import { ProtocolCard } from './ProtocolCard'
 import { sortProtocols } from './utils'
 
-import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function ProtocolDashboard(): ReactNode {
+export interface ProtocolDashboardProps {
+  isCRSEnabled: boolean
+}
+
+export function ProtocolDashboard({
+  isCRSEnabled,
+}: ProtocolDashboardProps): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
@@ -312,12 +317,14 @@ export function ProtocolDashboard(): ReactNode {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <TouchFloatingActionButton
-            buttonText={t('quick_transfer')}
-            iconName="plus"
-            onClick={handleCreateNewQuickTransfer}
-            aria-label={t('create_quick_transfer')}
-          />
+          {isCRSEnabled ? null : (
+            <TouchFloatingActionButton
+              buttonText={t('quick_transfer')}
+              iconName="plus"
+              onClick={handleCreateNewQuickTransfer}
+              aria-label={t('create_quick_transfer')}
+            />
+          )}
         </Box>
       </Flex>
     </>

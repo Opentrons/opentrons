@@ -66,6 +66,7 @@ import { DocumentationRequiredModalContext } from '../local-resources/access-con
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
+import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -117,7 +118,8 @@ export const ON_DEVICE_DISPLAY_PATHS = [
 ] as const
 
 function getPathComponent(
-  path: (typeof ON_DEVICE_DISPLAY_PATHS)[number]
+  path: (typeof ON_DEVICE_DISPLAY_PATHS)[number],
+  isCRSEnabled: boolean
 ): JSX.Element {
   switch (path) {
     case '/account':
@@ -143,7 +145,7 @@ function getPathComponent(
     case '/network-setup/wifi':
       return <ConnectViaWifi />
     case '/protocols':
-      return <ProtocolDashboard />
+      return <ProtocolDashboard isCRSEnabled={isCRSEnabled} />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
     case '/quick-transfer/new':
@@ -234,13 +236,16 @@ export const OnDeviceDisplayApp = (): ReactNode => {
     hostConfig
   )
 
+  const isCRSEnabled =
+    accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
   const isReady =
     // ensure robot-server api, etc. is up and running
     isShellReady &&
     // ensure settings query data is available for localization provider
     robotSettingsQuery.isSuccess &&
     // ensure we know whether access control is enabled or not,
-    // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
+    // so on first render we can immediately show the LoggedOutOverlay
+    // and hide CRS-incompatible UI, if appropriate.
     accessControlEnabledQuery.isSuccess
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
@@ -260,6 +265,7 @@ export const OnDeviceDisplayApp = (): ReactNode => {
                   <DocumentationRequiredModalContext.Provider
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
+                      // the ODD only ever logs in to its own robot, so robotName is unused
                       showLoginModal,
                       showSignRunModal,
                       showDownloadLogsModal,
@@ -279,9 +285,9 @@ export const OnDeviceDisplayApp = (): ReactNode => {
                           />
                         ) : null}
 
-                        <NiceModal.Provider>
-                          <RobotEncryptionKeyTakeover>
-                            <ToasterOven>
+                        <ToasterOven>
+                          <NiceModal.Provider>
+                            <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
                               {!showModuleSetupModal ? (
                                 <ModuleAttachedToasts
@@ -292,12 +298,15 @@ export const OnDeviceDisplayApp = (): ReactNode => {
                               ) : null}
 
                               <SharedScrollRefProvider>
-                                <OnDeviceDisplayAppRoutes />
+                                <OnDeviceDisplayAppRoutes
+                                  isCRSEnabled={isCRSEnabled}
+                                />
                               </SharedScrollRefProvider>
                               <LoggedOutOverlayMount />
-                            </ToasterOven>
-                          </RobotEncryptionKeyTakeover>
-                        </NiceModal.Provider>
+                              <DragToLogOutOverlay />
+                            </RobotEncryptionKeyTakeover>
+                          </NiceModal.Provider>
+                        </ToasterOven>
                       </MaintenanceRunTakeover>
                     </RobotUpdateProvider>
                   </DocumentationRequiredModalContext.Provider>
@@ -322,9 +331,15 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
   return '/dashboard'
 }
 
+interface OnDeviceDisplayAppRoutesProps {
+  isCRSEnabled: boolean
+}
+
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
-export function OnDeviceDisplayAppRoutes(): ReactNode {
+export function OnDeviceDisplayAppRoutes({
+  isCRSEnabled,
+}: OnDeviceDisplayAppRoutesProps): JSX.Element {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(
@@ -374,7 +389,7 @@ export function OnDeviceDisplayAppRoutes(): ReactNode {
           element={
             <Box css={TOUCH_SCREEN_STYLE} ref={refCallback}>
               <ModalPortalRoot />
-              {getPathComponent(path)}
+              {getPathComponent(path, isCRSEnabled)}
             </Box>
           }
         />

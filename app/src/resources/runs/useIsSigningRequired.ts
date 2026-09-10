@@ -36,7 +36,7 @@ export function useIsSigningRequired(): {
     isSigningRequired: isSigningRequired && !hasSignedBy,
     isDownloadingRequired:
       !!accessControlEnabled?.data.accessControlEnabled &&
-      !!accessControlSettings?.data.requireLogsToBeSavedInApp,
+      (accessControlSettings?.data.requireLogsToBeSavedInApp ?? false),
     logPeriodId: runRecord?.data.logPeriodId ?? null,
   }
 }

@@ -10,6 +10,7 @@ import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resource
 import { useAttachedModules } from '/app/resources/modules'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
+import { useRunHeaderRunControls } from '../../../../hooks'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
@@ -28,6 +29,7 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 }))
 vi.mock('/app/resources/modules')
 vi.mock('/app/resources/runs')
+vi.mock('../../../../hooks')
 vi.mock('../HeaterShakerModuleCard')
 
 const mockMovingHeaterShakerOne = {
@@ -83,11 +85,13 @@ const render = (props: ComponentProps<typeof HeaterShakerIsRunningModal>) => {
 describe('HeaterShakerIsRunningModal', () => {
   let props: ComponentProps<typeof HeaterShakerIsRunningModal>
   let mockCreateLiveCommand = vi.fn()
+  let mockPlay = vi.fn()
   beforeEach(() => {
     props = {
       closeModal: vi.fn(),
       module: mockHeaterShaker,
-      startRun: vi.fn(),
+      runId: '123',
+      robotName: 'otie',
     }
     vi.mocked(HeaterShakerModuleCard).mockReturnValue(
       <div>mock HeaterShakerModuleCard</div>
@@ -95,6 +99,10 @@ describe('HeaterShakerIsRunningModal', () => {
     vi.mocked(useAttachedModules).mockReturnValue([mockMovingHeaterShakerOne])
     mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockPlay = vi.fn()
+    vi.mocked(useRunHeaderRunControls).mockReturnValue({
+      play: mockPlay,
+    } as any)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -163,7 +171,7 @@ describe('HeaterShakerIsRunningModal', () => {
         },
       },
     })
-    expect(props.startRun).toHaveBeenCalled()
+    expect(mockPlay).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
   })
 
@@ -178,6 +186,8 @@ describe('HeaterShakerIsRunningModal', () => {
     })
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledTimes(2)
+    expect(mockPlay).toHaveBeenCalled()
+    expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('renders the keep shaking and start run button and calls startRun and closeModal', () => {
@@ -186,7 +196,7 @@ describe('HeaterShakerIsRunningModal', () => {
       name: /Keep shaking and start run/i,
     })
     fireEvent.click(button)
-    expect(props.startRun).toHaveBeenCalled()
+    expect(mockPlay).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
   })
 })

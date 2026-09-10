@@ -43,6 +43,7 @@ def get_scope_set_of_account_type(
                 Scope.USERS_READ_SELF,
                 Scope.USERS_WRITE_SELF,
                 Scope.AUDIT_LOG_WRITE,
+                Scope.AUDIT_LOG_DELETE,
             }
             if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
                 result.add(Scope.UPDATES_WRITE)

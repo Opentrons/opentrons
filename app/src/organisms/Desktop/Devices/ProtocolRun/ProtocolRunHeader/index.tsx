@@ -27,7 +27,7 @@ import { useIsDownloadAuditLogsRequired } from '/app/resources/runs/useIsDownloa
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
-import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
+import { useRunAnalytics, useRunErrors } from './hooks'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
 import {
@@ -104,12 +104,11 @@ export function ProtocolRunHeader(
   ])
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
-  const protocolRunControls = useRunHeaderRunControls(runId, robotName)
+
   const runHeaderModalContainerUtils = useRunHeaderModalContainer({
     ...props,
     attachedModules,
     runStatus,
-    protocolRunControls,
     runRecord: runRecord ?? null,
     runErrors,
     closeCurrentRun,
@@ -138,7 +137,6 @@ export function ProtocolRunHeader(
         runStatus={runStatus}
         runHeaderModalContainerUtils={runHeaderModalContainerUtils}
         runErrors={runErrors}
-        protocolRunControls={protocolRunControls}
         {...props}
       />
       <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
@@ -160,7 +158,6 @@ export function ProtocolRunHeader(
           runStatus={runStatus}
           isResetRunLoadingRef={isResetRunLoadingRef}
           attachedModules={attachedModules}
-          protocolRunControls={protocolRunControls}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           isClosingCurrentRun={isClosingCurrentRun}
           numberOfAtomicCommands={

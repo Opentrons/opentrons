@@ -1,10 +1,11 @@
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
@@ -30,6 +31,7 @@ import {
   useQuickProtocolDetailsForRun,
 } from '/app/resources/runs'
 
+import { useRunHeaderRunControls } from '../hooks'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   useHeaterShakerConfirmationModal,
@@ -44,8 +46,11 @@ import {
 } from './modals'
 
 import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
+import type {
+  AuditLogAction,
+  DocumentedAction,
+} from '@opentrons/react-api-client/src/accessControl/types'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
-import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { State } from '/app/redux/types'
 import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
@@ -67,7 +72,6 @@ interface OffsetCOnflictModalUtils {
 
 interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {
   attachedModules: AttachedModule[]
-  protocolRunControls: RunControls
   runStatus: RunStatus | null
   runRecord: Run | null
   runErrors: UseRunErrorsResult
@@ -93,7 +97,6 @@ export function useRunHeaderModalContainer({
   runStatus,
   runRecord,
   attachedModules,
-  protocolRunControls,
   runErrors,
   closeCurrentRun,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
@@ -115,13 +118,28 @@ export function useRunHeaderModalContainer({
   const isThisRunCurrent = runId === useCurrentRunId()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
-  const documentationState = useDocumentationState()
+
+  const actionsToDocument: DocumentedAction[] = useMemo(() => {
+    return [
+      !areCameraPreferencesConfirmed ? 'update_camera_settings_for_run' : null,
+      !flexOffsetsApplied ? 'apply_offsets' : null,
+      'play_run',
+    ].filter((action): action is AuditLogAction => action != null)
+  }, [areCameraPreferencesConfirmed, flexOffsetsApplied])
+  const { documentationState: linkedDocumentationState } =
+    useLinkedDocumentationState(actionsToDocument, runId)
+
+  const protocolRunControls = useRunHeaderRunControls(
+    runId,
+    robotName,
+    linkedDocumentationState
+  )
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
     runId,
-    documentationState
+    linkedDocumentationState
   )
   const { mutateAsync: addCameraSettingsToRun } =
-    useAddCameraSettingsToRunMutation(documentationState)
+    useAddCameraSettingsToRunMutation(linkedDocumentationState)
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )

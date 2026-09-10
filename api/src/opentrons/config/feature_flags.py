@@ -99,3 +99,9 @@ def run_protocol_as_restricted_user() -> bool:
 
 def internal_96ch_attach() -> bool:
     return advs.get_setting_with_env_overload("internal96chAttach", RobotTypeEnum.FLEX)
+
+
+def vacuum_module_waste_detection_disabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "disableVacuumModuleWasteDetection", RobotTypeEnum.FLEX
+    )
