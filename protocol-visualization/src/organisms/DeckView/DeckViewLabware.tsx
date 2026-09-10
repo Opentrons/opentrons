@@ -9,6 +9,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getActiveLayer } from '../utils/getActiveLayer'
+import { isLabwareInDisposalLocation } from '../utils/isLabwareInDisposalLocation'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
@@ -61,6 +62,10 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
           return []
         }
         const slot = getSlotInLocationStack(lw.stack)
+        // skip disposal location slots
+        if (isLabwareInDisposalLocation(slot)) {
+          return []
+        }
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
