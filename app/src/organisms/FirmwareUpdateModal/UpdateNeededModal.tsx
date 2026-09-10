@@ -20,13 +20,18 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { OddModal } from '/app/molecules/OddModal'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 
 import type { Subsystem } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+
+// Below the login overlay (z-index 10001) and admin-credentials toast (10002).
+const UPDATE_NEEDED_MODAL_Z_INDEX = 1000
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -51,6 +56,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   )
 
   const documentationState = useDocumentationState()
+  const robotName = useLocalRobotName()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName ?? 'no name')
   const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
@@ -79,8 +86,11 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     iconColor: COLORS.yellow50,
   }
 
-  let modalContent = (
-    <OddModal header={updateNeededHeader}>
+  const modalContent = (
+    <OddModal
+      header={updateNeededHeader}
+      modalZIndex={UPDATE_NEEDED_MODAL_Z_INDEX}
+    >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans
@@ -97,6 +107,9 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
         </LegacyStyledText>
         <SmallButton
           onClick={() => {
+            if (!ensureCanUpdate()) {
+              return
+            }
             setInitiatedSubsystemUpdate(subsystem)
             updateSubsystem(subsystem)
           }}
@@ -110,9 +123,13 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     (status === 'updating' || status === 'queued') &&
     ongoingUpdateId != null
   ) {
-    modalContent = <UpdateInProgressModal subsystem={subsystem} />
-  } else if (status === 'done' && ongoingUpdateId != null) {
-    modalContent = (
+    return createPortal(
+      <UpdateInProgressModal subsystem={subsystem} />,
+      getTopPortalEl()
+    )
+  }
+  if (status === 'done' && ongoingUpdateId != null) {
+    return createPortal(
       <UpdateResultsModal
         instrument={instrument}
         isSuccess={updateError === undefined}
@@ -123,9 +140,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           onClose()
         }}
         shouldExit={shouldExit}
-      />
+      />,
+      getTopPortalEl()
     )
   }
 
-  return createPortal(modalContent, getTopPortalEl())
+  // Stay in the ODD tree so the admin-credentials toast and
+  // login overlay can stack above this modal.
+  return modalContent
 }

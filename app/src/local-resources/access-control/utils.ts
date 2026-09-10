@@ -6,6 +6,7 @@ import type {
 } from '@opentrons/react-api-client'
 
 const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
+const UPDATES_WRITE_SCOPE = 'updates.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
 
@@ -71,16 +72,11 @@ export function getAuditLogDeleteErrorMessage(
 }
 
 export function isProtocolWritePermissionError(error: unknown): boolean {
-  if (!isForbiddenError(error)) {
-    return false
-  }
-  const requiredScopes = (
-    error.response?.data as { requiredScopes?: unknown } | undefined
-  )?.requiredScopes
-  return (
-    Array.isArray(requiredScopes) &&
-    requiredScopes.includes(PROTOCOLS_WRITE_SCOPE)
-  )
+  return isForbiddenMissingScope(error, PROTOCOLS_WRITE_SCOPE)
+}
+
+export function isUpdatesWritePermissionError(error: unknown): boolean {
+  return isForbiddenMissingScope(error, UPDATES_WRITE_SCOPE)
 }
 
 export function getProtocolOrRunCreationErrorMessage(
@@ -103,6 +99,16 @@ export function getProtocolOrRunCreationErrorMessage(
     }
   }
   return generalErrorMessage
+}
+
+function isForbiddenMissingScope(error: unknown, scope: string): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes) && requiredScopes.includes(scope)
 }
 
 function isAxiosError(error: unknown): error is AxiosError {

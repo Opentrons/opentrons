@@ -40,6 +40,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
@@ -141,6 +143,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { parseModuleUSBPort } = useModuleUSBPort()
   const { makeToast } = useToaster()
   const documentationState = useDocumentationState()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName)
   const {
     mutateAsync: updateModuleAsync,
     isLoading: isPending,
@@ -155,9 +158,21 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     !Boolean(updatePipetteFWRequired)
 
   const handleFirmwareUpdateClick = (): void => {
-    void updateModuleAsync(module.serialNumber).then(() => {
-      makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
-    })
+    if (!ensureCanUpdate()) {
+      return
+    }
+    void updateModuleAsync(module.serialNumber)
+      .then(() => {
+        makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
+      })
+      .catch((updateError: unknown) => {
+        if (
+          isDocumentedMutationError(updateError) ||
+          isUpdatesWritePermissionError(updateError)
+        ) {
+          resetUpdateModule()
+        }
+      })
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -176,7 +191,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   )
 
   const showFirmwareUpdateFailed =
-    isError && error != null && !isDocumentedMutationError(error)
+    isError &&
+    error != null &&
+    !isDocumentedMutationError(error) &&
+    !isUpdatesWritePermissionError(error)
 
   const hideBanners =
     isPending || isRunRunning || ongoingSubsystemUpdate != null
