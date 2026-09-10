@@ -1,22 +1,9 @@
-import { css } from 'styled-components'
+import clsx from 'clsx'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  Btn,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_END,
-  NO_WRAP,
-  SPACING,
-  StyledText,
-  truncateString,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Icon, StyledText, truncateString } from '@opentrons/components'
 
 import { useToaster } from '../../../ToasterOven'
+import styles from './protocolsetupstep.module.css'
 
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
 
@@ -48,6 +35,13 @@ export interface ProtocolSetupStepProps {
   fontSize?: string
 }
 
+const ROW_STATUS_CLASS: Record<ProtocolSetupStepStatus, string> = {
+  ready: styles.row_ready,
+  'not ready': styles.row_not_ready,
+  general: styles.row_general,
+  inform: styles.row_inform,
+}
+
 export function ProtocolSetupStep({
   onClickSetupStep,
   status,
@@ -61,15 +55,8 @@ export function ProtocolSetupStep({
   description,
   hasRightIcon = true,
   hasLeftIcon = true,
-  fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const isInteractionDisabled = interactionDisabled || disabled
-  const backgroundColorByStepStatus = {
-    ready: COLORS.green35,
-    'not ready': COLORS.yellow35,
-    general: COLORS.grey35,
-    inform: COLORS.grey35,
-  }
   const { makeSnackbar } = useToaster()
 
   const makeDisabledReasonSnackbar = (): void => {
@@ -78,99 +65,73 @@ export function ProtocolSetupStep({
     }
   }
 
-  let backgroundColor: string
-  if (!disabled) {
-    switch (status) {
-      case 'general':
-        backgroundColor = COLORS.blue35
-        break
-      case 'ready':
-        backgroundColor = COLORS.green40
-        break
-      case 'inform':
-        backgroundColor = COLORS.grey50
-        break
-      default:
-        backgroundColor = COLORS.yellow40
-    }
-  } else backgroundColor = ''
-
-  const PUSHED_STATE_STYLE = css`
-    &:active {
-      background-color: ${backgroundColor};
-    }
-  `
-
   const isToggle = detail === 'On' || detail === 'Off'
+  const showStatusIcon =
+    status !== 'general' && !disabled && status !== 'inform' && hasLeftIcon
 
   return (
-    <Btn
+    <button
+      type="button"
+      className={styles.button}
       onClick={() => {
         !isInteractionDisabled
           ? onClickSetupStep()
           : makeDisabledReasonSnackbar()
       }}
-      width="100%"
       data-testid={`SetupButton_${title}`}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={
-          disabled ? COLORS.grey35 : backgroundColorByStepStatus[status]
-        }
-        borderRadius={BORDERS.borderRadius16}
-        gridGap={SPACING.spacing16}
-        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-        css={PUSHED_STATE_STYLE}
+      <div
+        className={clsx(
+          styles.row,
+          disabled ? styles.row_disabled : ROW_STATUS_CLASS[status]
+        )}
       >
-        {status !== 'general' &&
-        !disabled &&
-        status !== 'inform' &&
-        hasLeftIcon ? (
+        {showStatusIcon ? (
           <Icon
-            color={status === 'ready' ? COLORS.green60 : COLORS.yellow60}
-            size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
+            className={clsx(
+              styles.status_icon,
+              status === 'ready'
+                ? styles.status_icon_ready
+                : styles.status_icon_not_ready
+            )}
           />
         ) : null}
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          textAlign={TYPOGRAPHY.textAlignLeft}
-        >
+        <div className={styles.title_column}>
           <StyledText
             oddStyle="level4HeaderSemiBold"
-            color={disabled ? COLORS.grey50 : COLORS.black90}
+            className={disabled ? styles.title_disabled : styles.title_enabled}
           >
             {title}
           </StyledText>
           {description != null ? (
             <StyledText
               oddStyle="bodyTextRegular"
-              color={disabled ? COLORS.grey50 : COLORS.grey60}
-              maxWidth="35rem"
-              style={{
-                overflowWrap: 'anywhere',
-                whiteSpace: 'normal',
-                wordBreak: 'normal',
-              }}
+              className={clsx(
+                styles.description,
+                disabled
+                  ? styles.description_disabled
+                  : styles.description_enabled
+              )}
             >
               {description}
             </StyledText>
           ) : null}
-        </Flex>
-        <Flex
-          flex="1"
-          justifyContent={JUSTIFY_END}
-          padding={
-            isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
-          }
+        </div>
+        <div
+          className={clsx(styles.detail_column, {
+            [styles.detail_column_toggle]: isToggle,
+          })}
         >
           <StyledText
             oddStyle="bodyTextRegular"
-            textAlign={TYPOGRAPHY.textAlignRight}
-            color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
-            maxWidth="20rem"
-            css={clipDetail ? CLIPPED_TEXT_STYLE : undefined}
+            className={clsx(
+              styles.detail,
+              interactionDisabled
+                ? styles.detail_disabled
+                : styles.detail_enabled,
+              { [styles.detail_clipped]: clipDetail }
+            )}
           >
             {title === 'CSV File' && detail != null
               ? truncateString(detail, CSV_FILE_MAX_LENGTH)
@@ -178,23 +139,11 @@ export function ProtocolSetupStep({
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
-        </Flex>
+        </div>
         {interactionDisabled || !hasRightIcon ? null : (
-          <Icon
-            marginLeft={SPACING.spacing8}
-            name="more"
-            size="3rem"
-            // Required to prevent inconsistent component height.
-            style={{ backgroundColor: 'initial' }}
-          />
+          <Icon name="more" className={styles.more_icon} />
         )}
-      </Flex>
-    </Btn>
+      </div>
+    </button>
   )
 }
-
-const CLIPPED_TEXT_STYLE = css`
-  white-space: ${NO_WRAP};
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
