@@ -386,14 +386,6 @@ export function RunSummary(): JSX.Element {
     </Flex>
   )
 
-  // if (shouldPromptSignRun && !showSplash) {
-  //   return <SignRun runId={runId} documentationState={documentationState} />
-  // }
-
-  // if (shouldPromptDownloadLog && !showSplash) {
-  //   return <DownloadAuditLogsModal />
-  // }
-
   return (
     <Btn
       display={DISPLAY_FLEX}
