@@ -140,7 +140,9 @@ export function UserManagement({
       return
     }
 
-    void deleteUser(userToDelete.username)
+    const deletedUsername = userToDelete.username
+
+    void deleteUser(deletedUsername)
       .then(() => {
         makeToast(
           t('desktop_delete_user_success_banner') as string,
@@ -148,6 +150,9 @@ export function UserManagement({
           { closeButton: true }
         )
         setUserToDelete(null)
+        if (username === deletedUsername) {
+          dispatch(logOut({ robotName }))
+        }
       })
       .catch(() => {
         setUserToDelete(null)

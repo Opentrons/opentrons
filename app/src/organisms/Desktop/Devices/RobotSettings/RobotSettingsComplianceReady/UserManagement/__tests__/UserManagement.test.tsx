@@ -221,6 +221,52 @@ describe('UserManagement', () => {
     screen.getByText('Delete this account?')
   })
 
+  it('logs out when the logged-in user deletes their own account', async () => {
+    const [, store] = render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await vi.waitFor(() => {
+      expect(mockDeleteUser).toHaveBeenCalledWith('alice')
+      expect(store.dispatch).toHaveBeenCalledWith(
+        logOut({ robotName: ROBOT_NAME })
+      )
+    })
+  })
+
+  it('does not log out when deleting another user account', async () => {
+    vi.mocked(useUsersQuery).mockImplementation(
+      options =>
+        ({
+          data:
+            options?.enabled === false
+              ? undefined
+              : {
+                  data: [ALICE_USER, CAROL_USER],
+                  meta: { cursor: 0, totalLength: 2 },
+                },
+        }) as ReturnType<typeof useUsersQuery>
+    )
+    const [, store] = render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_carol' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await vi.waitFor(() => {
+      expect(mockDeleteUser).toHaveBeenCalledWith('carol')
+    })
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      logOut({ robotName: ROBOT_NAME })
+    )
+  })
+
   it('opens the reset password confirm modal when Reset password is selected from the overflow menu', () => {
     render()
     expandAccordion()
