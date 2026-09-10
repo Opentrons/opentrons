@@ -1,0 +1,30 @@
+.text {
+  overflow: hidden;
+  color: var(--black-90);
+  font-size: var(--font-size-p);
+  line-height: var(--line-height-20);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heading {
+  composes: text;
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.message {
+  composes: text;
+  font-weight: var(--font-weight-regular);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .heading,
+  .message {
+    font-size: var(--font-size-22);
+    line-height: var(--line-height-28);
+  }
+
+  .heading {
+    max-width: 30.375rem;
+  }
+}
