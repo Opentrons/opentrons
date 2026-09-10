@@ -1,5 +1,5 @@
 ---
-title: "Vacuum Module: Miniprep Use Case"
+title: "Python API: Module Examples"
 description: A Vacuum Module protocol demonstrating how to its API methods in a plasmid miniprep.
 ---
 
