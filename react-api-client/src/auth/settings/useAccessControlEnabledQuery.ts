@@ -30,7 +30,12 @@ export function useAccessControlEnabledQuery(
   const query = useQuery<AccessControlEnabledSettingsResponse, AxiosError>(
     accessControlEnabledQueryKey(host),
     () => getAccessControlEnabled(host!).then(response => response.data),
-    { enabled: host !== null, ...options }
+    {
+      enabled: host !== null,
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      ...options,
+    }
   )
 
   return query
