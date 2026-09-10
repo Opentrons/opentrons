@@ -136,8 +136,6 @@ describe('GalleryItemCard', () => {
         source: '/dataFiles/imageid123/download',
         hostname: '10.0.0.5',
         port: 31950,
-        token: undefined,
-        secure: undefined,
       })
     })
   })

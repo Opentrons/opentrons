@@ -39,10 +39,12 @@ describe('useDownloadRunLog', () => {
     )
     makeToast = vi.fn()
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    when(vi.mocked(useToaster)).calledWith().thenReturn({
-      makeToast,
-      eatToast: vi.fn(),
-    } as any)
+    when(vi.mocked(useToaster))
+      .calledWith()
+      .thenReturn({
+        makeToast,
+        eatToast: vi.fn(),
+      } as any)
     vi.mocked(getCommands)
       .mockResolvedValueOnce({
         data: { meta: { totalLength: 1 }, data: [] },
@@ -66,10 +68,9 @@ describe('useDownloadRunLog', () => {
   })
 
   it('saves the run log JSON via saveFileFromBuffer', async () => {
-    const { result } = renderHook(
-      () => useDownloadRunLog(ROBOT_NAME, RUN_ID),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useDownloadRunLog(ROBOT_NAME, RUN_ID), {
+      wrapper,
+    })
 
     result.current.downloadRunLog()
 
@@ -105,10 +106,9 @@ describe('useDownloadRunLog', () => {
       },
     } as any)
 
-    const { result } = renderHook(
-      () => useDownloadRunLog(ROBOT_NAME, RUN_ID),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useDownloadRunLog(ROBOT_NAME, RUN_ID), {
+      wrapper,
+    })
 
     result.current.downloadRunLog()
 
