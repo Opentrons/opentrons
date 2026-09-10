@@ -145,7 +145,7 @@ export function ProtocolSetupStep({
           </StyledText>
           {description != null ? (
             <StyledText
-              oddStyle="level4HeaderRegular"
+              oddStyle="bodyTextRegular"
               color={disabled ? COLORS.grey50 : COLORS.grey60}
               maxWidth="35rem"
               style={{
@@ -166,7 +166,7 @@ export function ProtocolSetupStep({
           }
         >
           <StyledText
-            oddStyle="level4HeaderSemiBold"
+            oddStyle="bodyTextRegular"
             textAlign={TYPOGRAPHY.textAlignRight}
             color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
