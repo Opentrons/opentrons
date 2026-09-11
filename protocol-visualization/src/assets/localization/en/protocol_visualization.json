@@ -32,6 +32,7 @@
   "percent_complete": "{{percent}}% complete",
   "pipette": "Pipette",
   "play": "Play",
+  "playback_speed": "Playback speed",
   "protocol_analysis_failure": "Protocol analysis failure",
   "protocol_steps": "Protocol Steps",
   "quantity": "Quantity: {{quantity}}",
