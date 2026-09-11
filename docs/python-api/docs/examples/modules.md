@@ -31,7 +31,7 @@ Created automatically by the Opentrons App, AI, or Protocol Designer.
 
 "Step" or "Stage"
 
-### Step 1: Load modules and labware
+### Part 1: load modules and labware
 
 Some description or summary here.
 
@@ -64,7 +64,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
 
-### Step 2: clarify and filter
+### Part 2: clarify and filter
 
 Some description or summary here. Mention concurrent or simultaneous actions. Split code into 2 blocks here:
 
@@ -87,7 +87,7 @@ block 1
     )
 ```
 
-block 2, the concurrent stuff
+block 2, the concurrent stuff, do some hand waving
 
 ```python
     # The Flex can pipette liquids or manipulate labware in other deck slots while 
@@ -105,17 +105,65 @@ block 2, the concurrent stuff
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
-### Step 3: waste collection, wash, and dry
+### Part 3: waste binding, wash, and dry
 
-3 parts here. Summary. Organize like this:
+More description here, focus is on vacuum module
 
-- code blocks
-- text summaries (before or after code blocks)
-- 3 sections of descriptive txt and code, no H4 just sentences or paragraphs and then the code blocks
+```python
+# Move collection plate off the module to open the base for direct draining
+    protocol.move_labware(collection_plate, "D2", use_gripper=True)
 
-### Step 4: Elution recovery
+    # Seat the collar on the base and load the silica plate directly onto it
+    protocol.move_labware(collar, vacuum, use_gripper=True)
+    protocol.move_labware(silica_plate, collar, use_gripper=True)
+
+    # Sample Binding: evacuate waste liquid directly to the 2 L carboy
+    bind_task = vacuum.start_set_vacuum_pressure(
+        gauge_pressure_mbar=-500,
+        duration_s=60,
+        vent_after=True,
+        equalize_timeout_s=10,
+    )
+    protocol.wait_for_tasks([bind_task])
+
+    # Membrane Drying: deep vacuum profile to clear residual wash ethanol
+    dry_task = vacuum.start_set_vacuum_pressure(
+        gauge_pressure_mbar=-800,
+        duration_s=60,
+        vent_after=True,
+        equalize_timeout_s=30,
+    )
+    protocol.wait_for_tasks([dry_task])
+```
+
+### Step 4: recover elution
 
 Collect the liquid.
+
+```python
+# Return collar to dock to access the empty base cavity
+    vacuum.move_to_dock(collar, use_gripper=True)
+
+    # Place a clean PCR plate inside the base, then stack the silica plate and collar
+    elution_plate = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "C2", label="Elution Plate"
+    )
+    protocol.move_labware(elution_plate, vacuum, use_gripper=True)
+    protocol.move_labware(silica_plate, elution_plate, use_gripper=True)
+    protocol.move_labware(collar, vacuum, use_gripper=True)
+
+    # Pull purified eluate into the recovery plate
+    elute_task = vacuum.start_set_vacuum_pressure(
+        gauge_pressure_mbar=-500,
+        duration_s=60,
+        vent_after=True,
+        equalize_timeout_s=20,
+    )
+    protocol.wait_for_tasks([elute_task])
+
+    # Return collar to the dock to expose the purified samples for downstream use
+    vacuum.move_to_dock(collar, use_gripper=True)
+```
 
 ## Procedure conclusion
 
