@@ -137,9 +137,12 @@ describe('useRefreshAccessTokenOnActivity', () => {
       },
     })
 
-    renderHook(() => {
-      useRefreshAccessTokenOnActivity()
-    }, { wrapper })
+    renderHook(
+      () => {
+        useRefreshAccessTokenOnActivity()
+      },
+      { wrapper }
+    )
 
     expect(capturedOnActivity).not.toBeNull()
     await act(async () => {
@@ -175,9 +178,12 @@ describe('useRefreshAccessTokenOnActivity', () => {
       createAxiosError(400, { error: 'invalid_grant' })
     )
 
-    renderHook(() => {
-      useRefreshAccessTokenOnActivity()
-    }, { wrapper })
+    renderHook(
+      () => {
+        useRefreshAccessTokenOnActivity()
+      },
+      { wrapper }
+    )
 
     await act(async () => {
       capturedOnActivity?.()
@@ -193,9 +199,12 @@ describe('useRefreshAccessTokenOnActivity', () => {
   it('does not time out the login on a transient network error', async () => {
     mockGetOAuth2Token.mockRejectedValue(createAxiosError(undefined))
 
-    renderHook(() => {
-      useRefreshAccessTokenOnActivity()
-    }, { wrapper })
+    renderHook(
+      () => {
+        useRefreshAccessTokenOnActivity()
+      },
+      { wrapper }
+    )
 
     await act(async () => {
       capturedOnActivity?.()

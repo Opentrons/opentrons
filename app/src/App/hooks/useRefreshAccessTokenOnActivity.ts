@@ -29,12 +29,7 @@ export function isRefreshGrantRejected(error: unknown): boolean {
   const status = error.response.status
   const oauthError = (error.response.data as { error?: string } | undefined)
     ?.error
-  return (
-    status === 400 ||
-    status === 401 ||
-    status === 403 ||
-    oauthError === 'invalid_grant'
-  )
+  return status === 400 || status === 401 || oauthError === 'invalid_grant'
 }
 
 /**
