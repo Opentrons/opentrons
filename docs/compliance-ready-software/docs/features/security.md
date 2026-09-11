@@ -3,11 +3,11 @@ title: "Compliance Ready Software: Security"
 description: "An overview of security for compliance ready Flex robots."
 ---
 
-Opentrons Flex Compliance Ready Software permanently locks your Flex's robot server in your lab. This section covers changes you'll see on your  compliance ready Flex for additional security.
+Opentrons Flex Compliance Ready Software permanently locks certain features of your Flex's robot software. This section covers changes you'll see on your compliance ready Flex for additional security.
 
 ## Disabled features
 
-The Opentrons Flex is an open-source liquid handling robot, and includes features that let users control the robot outside of Opentrons software. Once Compliance Ready Software is active on your Flex, open-source features that allow access outside of the touchscreen or Opentrons App, like [Jupyter notebook](../../flex/advanced-operation/jupyter-notebook.md) and [SSH command line operation](../../flex/advanced-operation/command-line.md#) are permanently disabled. This ensures that only your lab users can use your Flex.  
+The Opentrons Flex is an open-source liquid handling robot, and includes features that let users control the robot outside of Opentrons software. Once Compliance Ready Software is active on your Flex, open-source features that allow access outside of the touchscreen or Opentrons App, like [Jupyter notebook](../../flex/advanced-operation/jupyter-notebook.md) and [SSH command line operation](../../flex/advanced-operation/command-line.md#) are permanently disabled. This ensures that only your lab users can use your Flex.
 
 Because activating Compliance Ready Software is permanent and irreversible, a factory reset of your Flex will delete calibration data, run history, and protocols, but cannot remove Compliance Ready Software from the system. 
 

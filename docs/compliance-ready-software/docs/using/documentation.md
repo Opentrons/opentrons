@@ -45,7 +45,7 @@ You'll see the same screen on the Flex touchscreen and in the Opentrons App ever
 
 While working on the bench, you'll see several prompts to add documentation in the same workflow. In the Opentrons App, you'll always see a list of actions requiring documentation in the same place you enter documentation.
 
-On your Flex itself, the "Documentation required" screen fills the entire touchscreen. In case you've stepped away or simply forgot which action you started, you can tap **View Actions** in the upper right.
+On your Flex itself, the "Documentation required" screen fills the entire touchscreen. In case you've stepped away or simply forgot which action you started, you can tap **View actions** in the upper right.
 
 <figure class="screenshot" markdown>
   ![Add documentation on the Flex touchscreen.](../images/view-actions-odd.png)

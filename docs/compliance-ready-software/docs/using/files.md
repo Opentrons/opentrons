@@ -97,12 +97,12 @@ In the app's file manager, you can also click the arrow on the right to expand e
 * Labware offset data.
 * Any images or CSV files generated during the protocol run.
 
-You can use compliance ready settings to [choose a default location](../features/admin.md) for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
+You can use compliance ready settings to [choose a default location](../features/admin.md#audit-log-folder) for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
 
 ### Flex touchscreen
 
-If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device. Your compliance ready Flex supports USB storage devices via [USB port](../../flex/system-description/connections.md#usb-and-auxiliary-connections).
+If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device. Your compliance ready Flex supports USB storage devices via a [USB port](../../flex/system-description/connections.md#usb-and-auxiliary-connections).
 
 On the Flex touchscreen, choose the file type you'd like to manage. Then, choose which files to download: 
 

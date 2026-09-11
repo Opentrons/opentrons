@@ -27,7 +27,7 @@ Administrators can [customize settings](features/admin.md) to change some user p
 
 Your Opentrons-trained representative will help you set up a *recovery account* with an automatically generated username and password. Be sure to save these account details in a safe place in case you're ever locked out of the system. 
 
-All Compliance Ready Software accounts will be locked after a number of failed login attempts. An administrator can [customize](features/admin.md#personal-account-settings) this number. If your lab loses access to *all* administrator accounts, try the following:
+All Compliance Ready Software accounts will be locked after a number of failed login attempts. An administrator can [customize](features/admin.md#compliance-ready-software-settings) this number. If your lab loses access to *all* administrator accounts, try the following:
 
 * Log in using your lab's *recovery account*. This account should only be used for emergency login, never regular use.
 * Contact Opentrons for a paid, on-site *recovery service*. An Opentrons-trained representative will use a service account to restore access and preserve existing audit logs via a physical serial port.

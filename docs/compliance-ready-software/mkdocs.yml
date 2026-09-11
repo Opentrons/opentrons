@@ -41,7 +41,7 @@ plugins:
 
 nav:
   
-  - Comliance Ready Software Instruction Manual: index.md
+  - Compliance Ready Software Instruction Manual: index.md
   - Getting Started: 
       - Activation: activation.md
       - Roles: roles.md

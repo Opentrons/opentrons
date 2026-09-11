@@ -1,5 +1,5 @@
 ---
-title: "Compliance Ready Software: Compliance-Ready Settings"
+title: "Compliance Ready Software: Administrator settings"
 description: "An overview of the Flex's compliance-ready setings, and who has permission to update them."
 ---
 
@@ -28,7 +28,7 @@ In personal account settings, every user can update their username, legal name, 
 
 Users can only make changes to their personal account settings, and can't view or customize settings in User Management or Compliance Ready Software settings. 
 
-Personal account settings are the only settings uesr accounts will see in Compliance Ready settings. All other settings listed on this page are available only to adminstrator accounts.
+Personal account settings are the only settings user accounts will see in Compliance Ready settings. All other settings listed on this page are available only to adminstrator accounts.
 
 ### User management
 
@@ -66,7 +66,7 @@ Administrators can make changes to security, documentation, and storage settings
 
 You can choose a location to automatically download and save files from the Opentrons App.
 
-Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location from your computer's directory.
+Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location on your computer.
 
 If robot settings, like your Flex's name, ever change, you may need to repeat this process.
 

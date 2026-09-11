@@ -25,7 +25,7 @@ Until you sign, the protocol run isn't complete in the Opentrons App or on the F
 
 After signing, your Flex will prompt you to download audit logs. [Audit logs](files.md) are files the Flex generates containing data like responsible users, timestamps, and documentation for every robot action. 
 
-To conserve space, these files are not saved to the Flex by default. Instead, they're saved in the Opentrons App, where you'll need to downloaded them after signing for your protocol run. 
+To conserve space, these files are not saved to the Flex by default. Instead, you'll need to download them from the Opentrons App after signing for your protocol run.
 
 <figure class="screenshot" markdown>
   ![Download audit logs.](../images/download-logs-odd.png)
