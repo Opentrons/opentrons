@@ -8,6 +8,7 @@ import { i18n } from '/app/i18n'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
@@ -17,13 +18,14 @@ import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 import type { ComponentProps } from 'react'
 
 const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
+const mockGatedStart = vi.hoisted(() => ({
+  startUpdate: mockStartUpdate,
+  isLoading: false,
+}))
 
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
-  useGatedStartRobotUpdate: () => ({
-    startUpdate: mockStartUpdate,
-    isLoading: false,
-  }),
+  useGatedStartRobotUpdate: () => mockGatedStart,
 }))
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
@@ -38,6 +40,13 @@ describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
   beforeEach(() => {
     mockStartUpdate.mockClear()
+    mockStartUpdate.mockReturnValue(true)
+    mockGatedStart.isLoading = false
+    vi.mocked(downloadRobotUpdate).mockClear()
+    vi.mocked(downloadRobotUpdate).mockReturnValue({
+      type: 'robotUpdate:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    } as ReturnType<typeof downloadRobotUpdate>)
     props = {
       robotName: 'test robot',
       releaseNotes: 'test notes',
@@ -121,5 +130,31 @@ describe('UpdateRobotModal', () => {
     screen.getByText('Robot Operating System Update Available')
     screen.getByText('Not now')
     screen.getByText('Update robot now')
+  })
+
+  it('downloads then starts the update when update is allowed', () => {
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+
+    expect(downloadRobotUpdate).toHaveBeenCalled()
+    expect(mockStartUpdate).toHaveBeenCalled()
+  })
+
+  it('disables update while admin permission queries are loading', () => {
+    mockGatedStart.isLoading = true
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    render(props)
+    expect(screen.getByText('Update robot now')).toBeDisabled()
   })
 })

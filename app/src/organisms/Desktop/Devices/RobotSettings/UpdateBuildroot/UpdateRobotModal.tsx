@@ -81,13 +81,14 @@ export function UpdateRobotModal({
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
-  const { startUpdate } = useGatedStartRobotUpdate(robotName)
+  const { startUpdate, isLoading } = useGatedStartRobotUpdate(robotName)
   const robotUpdateVersion = useSelector((state: State) => {
     return getRobotUpdateVersion(state, robotName) ?? ''
   })
 
   const isRobotBusy = useIsRobotBusy()
-  const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
+  const updateDisabled =
+    updateFromFileDisabledReason !== null || isRobotBusy || isLoading
 
   let disabledReason: string = ''
   if (updateFromFileDisabledReason) {
