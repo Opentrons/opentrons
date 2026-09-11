@@ -3,7 +3,6 @@
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
-  padding: var(--spacing-16);
   background-color: var(--grey-10);
 }
 
