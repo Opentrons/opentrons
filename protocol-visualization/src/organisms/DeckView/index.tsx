@@ -25,6 +25,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { getActiveLayer } from '../utils/getActiveLayer'
 import { getIsCutoutA1Active } from '../utils/getIsCutoutA1Active'
 import { getIsPipetteOverTrash } from '../utils/getIsPipetteOverTrash'
+import { partitionWasteChuteDeckFixtures } from '../utils/partitionWasteChuteDeckFixtures'
 import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
 
@@ -130,9 +131,11 @@ export function DeckView(props: DeckViewProps): ReactNode {
     slot: trash.location.split('cutout')[1],
     id: trash.id,
   }))
-  const wasteChuteStagingAreaFixtures = Object.values(
-    stagingAreaEntities
-  ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
+  const {
+    stagingAreaFixtures,
+    wasteChuteOnlyFixtures,
+    wasteChuteStagingAreaFixtures,
+  } = partitionWasteChuteDeckFixtures(stagingAreaEntities, wasteChuteEntities)
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
@@ -202,7 +205,7 @@ export function DeckView(props: DeckViewProps): ReactNode {
                         />
                       ) : null
                     })}
-                    {Object.values(stagingAreaEntities).map(entity => (
+                    {stagingAreaFixtures.map(entity => (
                       <StagingAreaFixture
                         key={entity.id}
                         cutoutId={entity.location as StagingAreaLocation}
@@ -244,25 +247,23 @@ export function DeckView(props: DeckViewProps): ReactNode {
                           )
                         })
                       : null}
-                    {Object.values(wasteChuteEntities).map(
-                      ({ id, location }) => {
-                        const isPipetteOverTrash = getIsPipetteOverTrash(
-                          pipettes,
-                          id,
-                          selectedRunTimeCommand
-                        )
-                        return (
-                          <WasteChuteFixture
-                            key={id}
-                            cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
-                            deckDefinition={deckDef}
-                            fixtureBaseColor={
-                              isPipetteOverTrash ? COLORS.purple30 : lightFill
-                            }
-                          />
-                        )
-                      }
-                    )}
+                    {wasteChuteOnlyFixtures.map(({ id, location }) => {
+                      const isPipetteOverTrash = getIsPipetteOverTrash(
+                        pipettes,
+                        id,
+                        selectedRunTimeCommand
+                      )
+                      return (
+                        <WasteChuteFixture
+                          key={id}
+                          cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
+                          deckDefinition={deckDef}
+                          fixtureBaseColor={
+                            isPipetteOverTrash ? COLORS.purple30 : lightFill
+                          }
+                        />
+                      )
+                    })}
                     {wasteChuteStagingAreaFixtures.map(fixture => (
                       <WasteChuteStagingAreaFixture
                         key={fixture.id}
