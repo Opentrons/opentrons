@@ -333,7 +333,7 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def _stop_from_asynchronous_error(self) -> None:
+    def _stop_from_asynchronous_error(self, msg: str = "") -> None:
         try:
             action = self._state_store.commands.validate_action_allowed(
                 StopAction(from_asynchronous_error=True)
@@ -354,7 +354,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self._get_queue_worker.cancel()
+        self._get_queue_worker.cancel(msg)
 
     def estop(self) -> None:
         """Signal to the engine that an E-stop event occurred.
@@ -374,7 +374,7 @@ class ProtocolEngine:
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error("E-stop Pressed")
 
     async def async_module_error(
         self,
@@ -424,7 +424,7 @@ class ProtocolEngine:
         ):
             return False
 
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error(f"asynchronous module error from {module_model}")
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -457,7 +457,7 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error(f"Module {module_model} {serial} has disconnected")
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
