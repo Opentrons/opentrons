@@ -41,13 +41,13 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 - **Rerun protocol now:** The same as choosing **Start setup** on the corresponding protocol.
 
-- **Download protocol files:** Save to your computer a .`zip` files containing protocol data in JSON files, including all performed steps, and all still images taken during a protocol run, if the camera was enabled.
+- **Download protocol files:** Download a .`zip` file containing protocol data in JSON files, including all performed steps, and all still images taken during a protocol run, if the camera was enabled.
 
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
-    [Opentrons Flex Compliance Ready Software](../../../compliance-ready-software/docs/index.md) users have more options to generate and save protocol data. 
+    Opentrons Flex [Compliance Ready Software](../../compliance-ready-software/index.md) users have more options to generate and save protocol data. 
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
