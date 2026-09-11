@@ -15,6 +15,14 @@ Opentrons hardware modules add features and capabilities to your robot.
 
 <div class="grid cards" markdown>
 
+-   :opentrons-vacuum:{ .xl .middle } __Vacuum Module__
+
+    ---
+
+    An on-deck vacuum filtration and purification module for Flex.
+
+    [:octicons-arrow-right-24: Instruction Manual](../vacuum/index.md)
+
 -   :opentrons-stacker:{ .xl .middle } __Flex Stacker__
 
     ---
