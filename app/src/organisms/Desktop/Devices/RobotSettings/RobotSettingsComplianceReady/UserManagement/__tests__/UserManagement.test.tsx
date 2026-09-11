@@ -170,7 +170,9 @@ describe('UserManagement', () => {
       },
     })
 
-    expect(useUsersQuery).toHaveBeenCalledWith({ enabled: false })
+    expect(useUsersQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ enabled: false })
+    )
     expandAccordion()
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
@@ -325,5 +327,53 @@ describe('UserManagement', () => {
     expect(mockUpdateUser.mock.invocationCallOrder[0]).toBeLessThan(
       mockResetUserPassword.mock.invocationCallOrder[0]!
     )
+  })
+
+  it('only allows reset password for a service account', () => {
+    vi.mocked(useUsersQuery).mockImplementation(
+      options =>
+        ({
+          data:
+            options?.enabled === false
+              ? undefined
+              : {
+                  ...MOCK_USERS_RESPONSE,
+                  data: [
+                    ...MOCK_USERS_RESPONSE.data,
+                    {
+                      username: 'service',
+                      fullName: 'Service Account',
+                      accountType: 'service' as const,
+                      locked: false,
+                      resetPassword: false,
+                    },
+                  ],
+                  meta: { cursor: 0, totalLength: 3 },
+                },
+        }) as ReturnType<typeof useUsersQuery>
+    )
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'UserManagement_overflowMenu_service',
+      })
+    )
+
+    screen.getByRole('button', { name: 'Reset password' })
+    expect(
+      screen.queryByRole('button', { name: 'Edit user' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Delete user' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Lock account' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unlock account and reset password',
+      })
+    ).not.toBeInTheDocument()
   })
 })

@@ -1,3 +1,5 @@
 export * from './hooks'
 export * from './mapAuthUserMutationError'
+export * from './credentialCharacters'
 export * from './getPasswordComplexityError'
+export * from './getUsernameValidationError'

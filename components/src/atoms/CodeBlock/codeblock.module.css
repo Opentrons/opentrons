@@ -4,7 +4,7 @@
   border-radius: var(--border-radius-4);
   background-color: var(--grey-20);
   font-family: 'Reddit Mono Variable', 'Reddit Mono', monospace;
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
   overflow-wrap: break-word;

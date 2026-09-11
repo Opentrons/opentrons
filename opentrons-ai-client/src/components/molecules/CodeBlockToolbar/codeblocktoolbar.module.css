@@ -16,7 +16,7 @@
 
 .language_badge {
   color: #666;
-  font-size: var(--font-size-caption, 0.75rem);
+  font-size: var(--font-size-10, 0.75rem);
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -31,7 +31,7 @@
   background: #fff;
   color: #333;
   cursor: pointer;
-  font-size: var(--font-size-caption, 0.75rem);
+  font-size: var(--font-size-10, 0.75rem);
   gap: 0.25rem;
   transition: all 0.2s ease;
 }

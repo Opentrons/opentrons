@@ -1,3 +1,8 @@
+import {
+  CREDENTIAL_ALLOWED_PATTERN,
+  CREDENTIAL_SPECIAL_CHARACTERS,
+} from './credentialCharacters'
+
 /**
  * Default minimum password length used when auth settings do not specify one.
  * Keep in sync with `_DEFAULT_MIN_PASSWORD_LENGTH` in
@@ -5,11 +10,8 @@
  */
 export const DEFAULT_MIN_PASSWORD_LENGTH = 8
 
-/**
- * Characters that satisfy the "require special characters" password rule.
- * Keep in sync with Python `string.punctuation` used by auth-server.
- */
-export const PASSWORD_SPECIAL_CHARACTERS = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+/** Characters that satisfy the "require special characters" password rule. */
+export const PASSWORD_SPECIAL_CHARACTERS = CREDENTIAL_SPECIAL_CHARACTERS
 
 export interface PasswordComplexityRequirements {
   minLength: number
@@ -17,11 +19,11 @@ export interface PasswordComplexityRequirements {
 }
 
 export type PasswordComplexityErrorKind =
-  'tooShort' | 'missingSpecialCharacters'
+  'tooShort' | 'invalidCharacters' | 'missingSpecialCharacters'
 
 /**
  * Returns the first password-complexity failure for `password`.
- * Length is preferred when both length and special-character rules fail.
+ * Length is preferred, then disallowed characters, then the special-character rule.
  */
 export function getPasswordComplexityError(
   password: string,
@@ -30,10 +32,13 @@ export function getPasswordComplexityError(
   if (Array.from(password).length < requirements.minLength) {
     return 'tooShort'
   }
+  if (!CREDENTIAL_ALLOWED_PATTERN.test(password)) {
+    return 'invalidCharacters'
+  }
   if (
     requirements.requireSpecialCharacters &&
     !Array.from(password).some(character =>
-      PASSWORD_SPECIAL_CHARACTERS.includes(character)
+      CREDENTIAL_SPECIAL_CHARACTERS.includes(character)
     )
   ) {
     return 'missingSpecialCharacters'

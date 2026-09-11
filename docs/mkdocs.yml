@@ -19,6 +19,7 @@ nav:
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
+  - Compliance-Ready Software: '!include compliance-ready-software/mkdocs.yml'
 
 exclude_docs: |
   python-api/liquid-class-tables/*.md

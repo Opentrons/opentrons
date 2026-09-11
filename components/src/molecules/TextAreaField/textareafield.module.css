@@ -65,7 +65,7 @@
   border: 1px solid var(--grey-50);
   border-radius: var(--border-radius-4);
   background-color: var(--white);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   resize: none;
 }
@@ -97,7 +97,7 @@
 .label_text {
   padding-bottom: var(--spacing-4);
   color: var(--grey-60);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
 }

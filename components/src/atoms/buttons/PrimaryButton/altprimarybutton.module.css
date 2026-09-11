@@ -6,7 +6,7 @@
   box-shadow: none;
   color: var(--black-90);
   cursor: pointer;
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
 }

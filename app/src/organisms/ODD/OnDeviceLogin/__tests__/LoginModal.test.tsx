@@ -9,6 +9,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { robotAuthReducer } from '/app/redux/robot-auth/slice'
 import {
@@ -29,6 +30,9 @@ vi.mock('/app/redux/discovery', async importOriginal => {
 })
 
 vi.mock('/app/resources/auth')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -56,12 +60,14 @@ function mockSuccessfulLogin(): void {
     isAuthLoading: false,
   }))
 
-  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
-    submitNewPassword: (username: string, password: string) => {
-      onSuccess(username, password)
-    },
-    isLoading: false,
-  }))
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+    (_documentationState, { onSuccess }) => ({
+      submitNewPassword: (username: string, password: string) => {
+        onSuccess(username, password)
+      },
+      isLoading: false,
+    })
+  )
 }
 
 function setupLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
@@ -225,7 +231,7 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
     vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
-      ({ onSuccess }) => ({
+      (_documentationState, { onSuccess }) => ({
         submitNewPassword: (username: string, password: string) => {
           onSuccess(username, password)
         },
@@ -264,12 +270,14 @@ describe('LoginModal', () => {
       },
       isAuthLoading: false,
     }))
-    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onError }) => ({
-      submitNewPassword: () => {
-        onError('Must include at least one special character')
-      },
-      isLoading: false,
-    }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      (_documentationState, { onError }) => ({
+        submitNewPassword: () => {
+          onError('Must include at least one special character')
+        },
+        isLoading: false,
+      })
+    )
 
     const clickOpenLoginModal = setupLoginModalTrigger()
     void clickOpenLoginModal()

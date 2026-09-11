@@ -17,11 +17,7 @@ import {
 
 import { ProtocolRunHeader } from '..'
 import { RunProgressMeter } from '../../../../RunProgressMeter'
-import {
-  useRunAnalytics,
-  useRunErrors,
-  useRunHeaderRunControls,
-} from '../hooks'
+import { useRunAnalytics, useRunErrors } from '../hooks'
 import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
 import { RunHeaderContent } from '../RunHeaderContent'
 import {
@@ -100,7 +96,6 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useRunGeneratedDataFiles).mockReturnValue({ jpeg: [], csv: [] })
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
-    vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)
     vi.mocked(useRunHeaderModalContainer).mockReturnValue(
       MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS as any
     )
@@ -183,7 +178,6 @@ describe('ProtocolRunHeader', () => {
       expect.objectContaining({
         runStatus: RUN_STATUS_RUNNING,
         runErrors: [],
-        protocolRunControls: expect.any(Object),
       }),
       expect.anything()
     )
@@ -213,7 +207,6 @@ describe('ProtocolRunHeader', () => {
         runStatus: RUN_STATUS_RUNNING,
         isResetRunLoadingRef: expect.any(Object),
         attachedModules: [],
-        protocolRunControls: expect.any(Object),
       }),
       expect.anything()
     )

@@ -38,6 +38,7 @@
   "error_encountered": "遇到错误",
   "exit": "退出",
   "extension_mount": "抓手安装支架",
+  "finish": "完成",
   "flow_complete": "{{flowName}}完成！",
   "get_started": "开始",
   "github": "GitHub",
@@ -88,7 +89,7 @@
   "unknown": "未知",
   "unknown_error": "发生未知错误",
   "update": "更新",
-  "view_latest_release_notes": "查看最新发布说明：",
+  "view_latest_release_notes": "查看最新发布说明",
   "yes": "是",
   "you_will_need": "您将需要："
 }

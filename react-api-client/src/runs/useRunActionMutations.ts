@@ -27,7 +27,8 @@ interface UseRunActionMutations {
 
 export function useRunActionMutations(
   runId: string,
-  documentationState: DocumentationState
+  documentationState: DocumentationState,
+  playDocumentationState?: DocumentationState
 ): UseRunActionMutations {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -41,7 +42,7 @@ export function useRunActionMutations(
   }
 
   const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(
-    documentationState,
+    playDocumentationState ?? documentationState,
     [],
     {
       onSuccess,

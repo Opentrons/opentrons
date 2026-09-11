@@ -31,11 +31,17 @@ export const useDrag = (position: ElementPosition): UseDragResult => {
     useState<ElementPosition>(position)
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
-  let { x, y, width, height } = elementPosition
 
-  const enable = (): void => {
-    if (interactiveRef?.current != null) {
-      interact(interactiveRef.current as unknown as HTMLElement)
+  useEffect(
+    () => {
+      const element = interactiveRef.current
+      if (element == null || !isEnabled) {
+        return
+      }
+
+      let { x, y, width, height } = elementPosition
+
+      const interactable = interact(element as unknown as HTMLElement)
         .draggable({
           modifiers: [],
           inertia: false,
@@ -51,22 +57,10 @@ export const useDrag = (position: ElementPosition): UseDragResult => {
             y,
           })
         })
-    }
-  }
-  const disable = (): void => {
-    if (interactiveRef?.current != null) {
-      interact(interactiveRef.current as unknown as HTMLElement).unset()
-    }
-  }
 
-  useEffect(
-    () => {
-      if (isEnabled) {
-        enable()
-      } else {
-        disable()
+      return () => {
+        interactable.unset()
       }
-      return disable
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps

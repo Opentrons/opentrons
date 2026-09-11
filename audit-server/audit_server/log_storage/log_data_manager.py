@@ -26,6 +26,7 @@ from .store import (
     PeriodIsActiveError,
 )
 from .types import LogPeriodEntries, StoredLog
+from audit_server._version import version
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
     SettingsStore,
@@ -291,49 +292,53 @@ class LogDataManager:
         ending_messages.append(signed_end_log)
         return self._store.end_period(ending_messages)
 
+    async def _do_create_system_messages_with_signing_error_handling(
+        self, action: str, message: str, tail_hash: str | None
+    ) -> tuple[list[StoredLog], str]:
+        """Handle signed message creation with error handling (swallow) for boot."""
+        message = self._build_system_message(action=action, message=message)
+        signed_message, sign_error = await self._sign_log(message, tail_hash)
+        messages = [signed_message]
+        tail_hash = signed_message.message_hash
+        if sign_error:
+            sign_error_message = self._build_sign_error_message(sign_error, tail_hash)
+            messages.append(sign_error_message)
+            tail_hash = sign_error_message.message_hash
+        return messages, tail_hash
+
     async def _do_rotate_periods(self) -> str:
         """Execute a log period rotation while handling possible error cases."""
         stop_result = await self._stop_period()
-        start_messages: list[StoredLog] = []
-        start_message = self._build_system_message(
+        tracking_tail_hash = stop_result if isinstance(stop_result, str) else None
+        (
+            start_messages,
+            tracking_tail_hash,
+        ) = await self._do_create_system_messages_with_signing_error_handling(
             action=constants.ACTION_LOG_PERIOD_START,
             message=constants.MESSAGE_LOG_PERIOD_START,
+            tail_hash=tracking_tail_hash,
         )
-        tracking_tail_hash = stop_result if isinstance(stop_result, str) else None
-        signed_start, sign_error = await self._sign_log(
-            start_message, tracking_tail_hash
+        (
+            version_messages,
+            tracking_tail_hash,
+        ) = await self._do_create_system_messages_with_signing_error_handling(
+            action=constants.ACTION_ROBOT_VERSION,
+            message=version,
+            tail_hash=tracking_tail_hash,
         )
-        # our start message has to be the first thing in the log, even if there are
-        # errors from the previous log
-        start_messages.append(signed_start)
-        tracking_tail_hash = signed_start.message_hash
-        # signing errors are swallowed here because log rotation is an automated process
-        # during boot that we can't handle.
-        if sign_error:
-            sign_error_message = self._build_sign_error_message(
-                sign_error, tracking_tail_hash
-            )
-            start_messages.append(sign_error_message)
-            tracking_tail_hash = sign_error_message.message_hash
+        start_messages.extend(version_messages)
 
-        # now we can note if this is a start after an unstoppe dperiod
+        # now we can note if this is a start after an unstopped period
         if isinstance(stop_result, NoActivePeriodError):
-            was_no_period_error = self._build_system_message(
-                constants.ACTION_LOG_LOGGING_ERROR, constants.MESSAGE_NO_PREVIOUS_PERIOD
+            (
+                was_no_period_messages,
+                tracking_tail_hash,
+            ) = await self._do_create_system_messages_with_signing_error_handling(
+                action=constants.ACTION_LOG_LOGGING_ERROR,
+                message=constants.MESSAGE_NO_PREVIOUS_PERIOD,
+                tail_hash=tracking_tail_hash,
             )
-            was_no_period_signed, sign_error = await self._sign_log(
-                was_no_period_error, tracking_tail_hash
-            )
-            start_messages.append(was_no_period_signed)
-            tracking_tail_hash = was_no_period_signed.message_hash
-            # signing errors are swallowed here because log rotation is an automated
-            # process during boot that we can't handle.
-            if sign_error:
-                sign_error_message = self._build_sign_error_message(
-                    sign_error, tracking_tail_hash
-                )
-                start_messages.append(sign_error_message)
-                tracking_tail_hash = sign_error_message.message_hash
+            start_messages.extend(was_no_period_messages)
         return self._store.start_period(start_messages)
 
     async def _sign_log(

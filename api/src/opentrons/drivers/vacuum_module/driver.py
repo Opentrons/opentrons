@@ -120,7 +120,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not match:
             raise ValueError(f"Incorrect Response for get waste confis: {response}")
         return WasteConfigParameters(
-            bool(match.group("E")),
+            bool(int(match.group("E"))),
             float(match.group("S")),
             float(match.group("P")),
             float(match.group("F")),

@@ -10,6 +10,7 @@ import {
   useSignRunMutation,
 } from '@opentrons/react-api-client'
 
+import { isAdminEquivalentAccountType } from '/app/local-resources/access-control/utils'
 import { useLogout } from '/app/redux/robot-auth'
 
 import { useNotifyRunQuery } from '../runs'
@@ -24,11 +25,12 @@ import type { DocumentationState } from '@opentrons/react-api-client'
 type LoginGate = 'idle' | 'prompting' | 'needsadmin' | 'done'
 
 export interface SignRunFlowResult {
-  signRun: (name: string) => void
+  signRun: () => void
   isLoading: boolean
   isSigned: boolean
   loginGate: LoginGate
-  correctName: string | undefined
+  name: string
+  logout: () => void
 }
 
 export function useSignRunFlow(
@@ -37,10 +39,12 @@ export function useSignRunFlow(
   showLoginModal: (props: {
     robotName: string
     uncloseable: boolean
+    key?: string
   }) => Promise<{ username: string } | null>,
   popToast: () => void,
   eatToast: () => void,
   documentationState: DocumentationState,
+  isOnDevice: boolean,
   onSigned?: () => void
 ): SignRunFlowResult {
   const queryClient = useQueryClient()
@@ -67,7 +71,7 @@ export function useSignRunFlow(
 
   const requireAdmin =
     authSettings?.data.requireAdminCredsForSignoffProtocol === true
-  const isAdmin = self?.data.accountType === 'admin'
+  const isAdmin = isAdminEquivalentAccountType(self?.data.accountType)
   const canSignProtocol = !requireAdmin || isAdmin
 
   const [loginInFlight, setLoginInFlight] = useState(false)
@@ -108,32 +112,48 @@ export function useSignRunFlow(
     }
   }, [refetchSelf, eatToast, queryClient, host])
 
+  const handleLogBackIn = useCallback(() => {
+    setLoginInFlight(true)
+    void showLoginModal({
+      robotName,
+      uncloseable: true,
+      // forces rerender
+      key: crypto.randomUUID(),
+    })
+      .then(result => {
+        if (result == null) {
+          eatToast()
+          setLoginInFlight(false)
+          return
+        }
+        setRefetchSelf(true)
+      })
+      .catch(() => {
+        eatToast()
+        setLoginInFlight(false)
+      })
+  }, [eatToast, robotName, showLoginModal, setLoginInFlight, setRefetchSelf])
+
+  const handleLogout = useCallback(() => {
+    logout()
+    queryClient.removeQueries(getSelfQueryKey(host))
+    handleLogBackIn()
+  }, [logout, queryClient, host, handleLogBackIn])
+
   useEffect(() => {
     if (isAuthLoading || isSelfFetching) {
       return
     }
     switch (loginGate) {
       case 'needsadmin':
-        logout()
+        handleLogout()
         popToast()
-        queryClient.removeQueries(getSelfQueryKey(host))
-      // prompt for login
-      // eslint-disable-next-line no-fallthrough -- just being cute :)
+        break
       case 'idle':
-        setLoginInFlight(true)
-        void showLoginModal({ robotName, uncloseable: true })
-          .then(result => {
-            if (result == null) {
-              eatToast()
-              setLoginInFlight(false)
-              return
-            }
-            setRefetchSelf(true)
-          })
-          .catch(() => {
-            eatToast()
-            setLoginInFlight(false)
-          })
+        if (isOnDevice) {
+          break
+        }
+        handleLogBackIn()
         break
       // waiting for login to finish / self to settle
       case 'prompting':
@@ -143,41 +163,36 @@ export function useSignRunFlow(
         break
     }
   }, [
-    eatToast,
-    host,
+    handleLogout,
+    handleLogBackIn,
+    popToast,
     isAuthLoading,
     isSelfFetching,
     loginGate,
-    logout,
-    popToast,
-    queryClient,
-    robotName,
-    showLoginModal,
+    isOnDevice,
   ])
 
-  const signRun = useCallback(
-    (name: string) => {
-      const trimmedName = name.trim()
-      if (!trimmedName || trimmedName !== self?.data?.fullName) {
-        return
+  const signRun = useCallback(() => {
+    const name = self?.data?.fullName ?? null
+    if (!name) {
+      return
+    }
+    signRunMutation(
+      { runId, name },
+      {
+        onSuccess: () => {
+          onSigned?.()
+        },
       }
-      signRunMutation(
-        { runId, name },
-        {
-          onSuccess: () => {
-            onSigned?.()
-          },
-        }
-      )
-    },
-    [self?.data?.fullName, signRunMutation, runId, onSigned]
-  )
+    )
+  }, [self?.data?.fullName, signRunMutation, runId, onSigned])
 
   return {
     signRun,
     isLoading,
     loginGate,
     isSigned,
-    correctName: self?.data?.fullName,
+    name: self?.data?.fullName ?? '',
+    logout: handleLogout,
   }
 }

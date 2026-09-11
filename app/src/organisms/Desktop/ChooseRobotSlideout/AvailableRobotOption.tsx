@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
+import clsx from 'clsx'
 import { css } from 'styled-components'
 
 import {
   Box,
   COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   Icon,
   LegacyStyledText,
   SIZE_1,
@@ -26,6 +25,8 @@ import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+
+import styles from './availablerobotoption.module.css'
 
 import type { Dispatch as ReactDispatch, ReactNode } from 'react'
 import type { Runs } from '@opentrons/api-client'
@@ -128,17 +129,13 @@ export function AvailableRobotOptionComponent(
       >
         <img
           src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
-          css={css`
-            width: 4rem;
-            height: 3.5625rem;
-          `}
+          className={styles.robot_image}
           alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
         />
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          marginLeft={SPACING.spacing16}
-          marginTop={SPACING.spacing8}
-          marginBottom={SPACING.spacing16}
+        <div
+          className={clsx(styles.details, {
+            [styles.details_with_chip]: isComplianceReady,
+          })}
         >
           <LegacyStyledText
             forwardedAs="h6"
@@ -165,15 +162,17 @@ export function AvailableRobotOptionComponent(
             </LegacyStyledText>
           </Box>
           {isComplianceReady ? (
-            <StatusLabel
-              status={t('protocol_list:compliance_ready')}
-              backgroundColor={COLORS.blue30}
-              showIcon={false}
-              // override capitalization since both words should be capitalized in this instance
-              capitalizeStatus={false}
-            />
+            <div className={styles.compliance_chip}>
+              <StatusLabel
+                status={t('protocol_list:compliance_ready')}
+                backgroundColor={COLORS.blue30}
+                showIcon={false}
+                // override capitalization since both words should be capitalized in this instance
+                capitalizeStatus={false}
+              />
+            </div>
           ) : null}
-        </Flex>
+        </div>
         {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
         isSelected ? (
           <>
