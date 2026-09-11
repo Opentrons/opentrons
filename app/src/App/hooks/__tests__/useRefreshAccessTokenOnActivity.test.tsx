@@ -86,7 +86,7 @@ function createState(): State {
         },
       },
     },
-  } as State
+  } as any as State
 }
 
 describe('isRefreshGrantRejected', () => {
