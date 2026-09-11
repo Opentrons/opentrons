@@ -9,7 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
+import { logOut, useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { startRobotUpdate } from '/app/redux/robot-update'
 import {
   getRobotUpdateSession,
@@ -25,6 +25,7 @@ import type { Dispatch, State } from '/app/redux/types'
 
 /**
  * Owns robot software update apply-flow wiring.
+ * Logs out when the update finishes (tokens won't survive reboot).
  */
 export function useRobotUpdateOrchestrator(): {
   startUpdate: (robotName: string, systemFile?: string) => void
@@ -158,11 +159,17 @@ export function useRobotUpdateOrchestrator(): {
         isHostConfigReady: () => hostConfigReadyRef.current,
         getMutations: () => mutationsRef.current,
         signal: abortController.signal,
-      }).finally(() => {
-        if (abortRef.current === abortController) {
-          inFlightRef.current = false
-        }
       })
+        // token will not survive reboot, so we need to log out
+        .then(() => {
+          dispatch(logOut({ robotName }))
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (abortRef.current === abortController) {
+            inFlightRef.current = false
+          }
+        })
 
       function readDocumentationState(): DocumentationState {
         const state = docsStateRef.current
