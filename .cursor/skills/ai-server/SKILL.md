@@ -26,10 +26,11 @@ All endpoints require a Bearer token in `Authorization`. Setting `"fake": true` 
 
 ## Package Manager — uv
 
-This project uses **uv** for Python dependency management (not pipenv, pip-tools, or poetry).
+This project uses **uv** for Python dependency management (not pipenv, pip-tools, or poetry). The uv **tool** version is pinned by `required-version` in this project's own `[tool.uv]`, matching the monorepo root [`uv.toml`](../uv.toml); CI installs that version via `astral-sh/setup-uv` `version-file`. uv does not inherit config across directories, so the two must be bumped together.
 
 | File               | Role                                                        | Committed?      |
 | ------------------ | ----------------------------------------------------------- | --------------- |
+| `../uv.toml`       | Pinned uv tool version for projects without `[tool.uv]`     | Yes             |
 | `pyproject.toml`   | Single source of truth for dependencies AND all tool config | Yes             |
 | `uv.lock`          | Locked dependency graph                                     | Yes             |
 | `requirements.txt` | Generated pip-format file for Docker builds                 | No (gitignored) |
