@@ -153,4 +153,70 @@ describe('LabwareSlot', () => {
     render(props)
     expect(screen.getByText('mock LabwareRender')).toBeInTheDocument()
   })
+
+  it('should keep the stacked badge inside the viewBox for short labware', () => {
+    const shortLidId = 'shortLidId'
+    const shortLidDef = {
+      ...fixture96Plate,
+      metadata: {
+        ...fixture96Plate.metadata,
+        displayName: 'Opentrons Flex Tip Rack Lid',
+      },
+      dimensions: {
+        xDimension: 121,
+        yDimension: 78.75,
+        zDimension: 17,
+      },
+      wells: {},
+      ordering: [],
+    } as LabwareDefinition2
+
+    props.topLabwareOnSlotId = shortLidId
+    props.labwareEntities = {
+      [shortLidId]: {
+        id: shortLidId,
+        labwareDefURI: 'opentrons/opentrons_flex_tiprack_lid/1',
+        def: shortLidDef,
+        pythonName: 'mock_lid',
+      },
+      lidUnderId: {
+        id: 'lidUnderId',
+        labwareDefURI: 'opentrons/opentrons_flex_tiprack_lid/1',
+        def: shortLidDef,
+        pythonName: 'mock_lid_under',
+      },
+    }
+    props.commands = []
+    props.robotState = {
+      ...createMockRobotState(),
+      labware: {
+        [shortLidId]: {
+          stack: [shortLidId, 'lidUnderId', MOCK_SLOT],
+        },
+        lidUnderId: {
+          stack: ['lidUnderId', MOCK_SLOT],
+        },
+      },
+    }
+
+    const { container } = render(props)
+    expect(screen.getByLabelText('stacked')).toBeInTheDocument()
+    expect(screen.getByText('Top labware in stack')).toBeInTheDocument()
+
+    const svg = container.querySelector('svg')
+    expect(svg).not.toBeNull()
+    const viewBox = svg?.getAttribute('viewBox')?.split(' ').map(Number)
+    expect(viewBox).toEqual([0, 0, 133, 90.75])
+
+    const foreignObject = container.querySelector('foreignObject')
+    expect(foreignObject).not.toBeNull()
+    const badgeScale = 0.5
+    const badgeX = Number(foreignObject?.getAttribute('x')) * badgeScale
+    const badgeY = Number(foreignObject?.getAttribute('y')) * badgeScale
+    // Same relative corner inset as the legacy 235/155 placement on ANSI plates.
+    expect(badgeX).toBeCloseTo(111)
+    expect(badgeY).toBeCloseTo(70.75)
+    expect(badgeX).toBeLessThan(viewBox?.[2] ?? 0)
+    expect(badgeY).toBeLessThan(viewBox?.[3] ?? 0)
+  })
 })

@@ -21,6 +21,7 @@ const render = (props: ComponentProps<typeof SlotSpotlightViewer>) => {
 
 const mockRobotState = {} as RobotState
 const mockInvariantContext = {} as InvariantContext
+const mockAnalysis = {} as ProtocolAnalysisOutput
 
 describe('SlotSpotlightViewer', () => {
   let props: ComponentProps<typeof SlotSpotlightViewer>
@@ -31,7 +32,7 @@ describe('SlotSpotlightViewer', () => {
       slotId: 'A1',
       robotState: mockRobotState,
       invariantContext: mockInvariantContext,
-      analysis: { commands: [] } as ProtocolAnalysisOutput,
+      analysis: mockAnalysis,
       liquids: [],
       onClose: vi.fn(),
     }

@@ -150,6 +150,25 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
     quantity = stackQuantity
   }
 
+  const showStackedBadge = quantity > 1
+  // Match the pre-change visual size and the ANSI-plate corner inset from
+  // x=235/y=155 (scale 0.5 → ~10mm from right, ~8mm from back). Anchor to
+  // each labware's viewBox so shorter lids keep that same relative corner.
+  const stackedBadgeScale = 0.5
+  const stackedBadgeInsetXMm = 10
+  const stackedBadgeInsetYMm = 8
+  const stackedBadgeViewBoxPadMm = 12
+  const stackedBadgeX =
+    (labwareViewBox.maxX - stackedBadgeInsetXMm) / stackedBadgeScale
+  const stackedBadgeY =
+    (labwareViewBox.maxY - stackedBadgeInsetYMm) / stackedBadgeScale
+  const viewBoxWidth =
+    labwareViewBox.xDimension +
+    (showStackedBadge ? stackedBadgeViewBoxPadMm : 0)
+  const viewBoxHeight =
+    labwareViewBox.yDimension +
+    (showStackedBadge ? stackedBadgeViewBoxPadMm : 0)
+
   return (
     <div className={styles.container}>
       <div className={styles.labware_summary}>
@@ -171,7 +190,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
             <div className={styles.labware_render_container}>
               <RobotWorkSpace
                 key={topLabwareOnSlotId}
-                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension + (quantity > 1 ? 10 : 0)} ${labwareViewBox.yDimension + (quantity > 1 ? 5 : 0)}`}
+                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${viewBoxWidth} ${viewBoxHeight}`}
               >
                 {() => (
                   <>
@@ -198,29 +217,27 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
                         }}
                       />
                     </g>
-                    {quantity > 1 ? (
-                      <>
-                        <g transform="scale(0.5)">
-                          <RobotCoordsForeignObject
-                            width="1.5rem"
-                            height="1.25rem"
-                            x={235}
-                            y={155}
-                          >
-                            <RobotInfoLabel
-                              height="1rem"
-                              svgSize="0.875rem"
-                              highlight
-                              iconName="stacked"
-                            />
-                          </RobotCoordsForeignObject>
-                        </g>
-                      </>
+                    {showStackedBadge ? (
+                      <g transform={`scale(${stackedBadgeScale})`}>
+                        <RobotCoordsForeignObject
+                          width="1.5rem"
+                          height="1.25rem"
+                          x={stackedBadgeX}
+                          y={stackedBadgeY}
+                        >
+                          <RobotInfoLabel
+                            height="1rem"
+                            svgSize="0.875rem"
+                            highlight
+                            iconName="stacked"
+                          />
+                        </RobotCoordsForeignObject>
+                      </g>
                     ) : null}
                   </>
                 )}
               </RobotWorkSpace>
-              {quantity > 1 ? (
+              {showStackedBadge ? (
                 <div className={styles.labware_text_align}>
                   <StyledText
                     desktopStyle="captionRegular"
