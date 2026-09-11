@@ -9,9 +9,75 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Robot-stack release tags publish opentrons and opentrons-shared-data to PyPI from
+  # separate workflows. Those are independent runs, so without this wait a release could be
+  # cut while a PyPI publish had failed or been skipped. Other tags (labware-library@,
+  # components@, ai-client@, ...) do not trigger those workflows, so they skip this job.
+  await-pypi-deploys:
+    runs-on: 'ubuntu-24.04'
+    name: 'Wait for PyPI deploys'
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      actions: read
+    steps:
+      - name: 'wait for api and shared-data deploys'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Deliberately excludes "App test, build, and deploy": it uploads installers into
+          # this release, so gating release creation on it would deadlock.
+          REQUIRED_WORKFLOWS: 'API test/lint/deploy,shared-data test/lint/deploy'
+          HEAD_SHA: ${{ github.sha }}
+          TIMEOUT_MINUTES: '90'
+        run: |
+          set -euo pipefail
+          deadline=$(( SECONDS + TIMEOUT_MINUTES * 60 ))
+          failed=0
+          IFS=',' read -ra workflows <<< "$REQUIRED_WORKFLOWS"
+          for workflow in "${workflows[@]}"; do
+            echo "::group::${workflow}"
+            conclusion=''
+            while :; do
+              # The tag push fans out to sibling runs on the same commit; find this one.
+              read -r status conclusion < <(
+                gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${HEAD_SHA}&per_page=100" \
+                  --jq "[.workflow_runs[]
+                         | select(.name == \"${workflow}\" and .event == \"push\")]
+                        | sort_by(.run_started_at)
+                        | last
+                        | \"\(.status) \(.conclusion // \"\")\"" 2>/dev/null || echo "missing "
+              )
+              if [ "$status" = "missing" ] || [ -z "$status" ] || [ "$status" = "null" ]; then
+                echo "waiting: run not registered yet"
+              elif [ "$status" != "completed" ]; then
+                echo "waiting: $status"
+              else
+                echo "completed: $conclusion"
+                break
+              fi
+              if [ "$SECONDS" -ge "$deadline" ]; then
+                echo "::error::Timed out after ${TIMEOUT_MINUTES}m waiting for '${workflow}'."
+                failed=1
+                break
+              fi
+              sleep 30
+            done
+            if [ "$status" = "completed" ] && [ "$conclusion" != "success" ]; then
+              echo "::error::'${workflow}' concluded '${conclusion}' for ${GITHUB_REF_NAME}; not creating a release."
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "All required PyPI deploys succeeded for ${GITHUB_REF_NAME}."
+
   create-release:
     runs-on: 'ubuntu-24.04'
     name: 'Create changelogs and release'
+    needs: [await-pypi-deploys]
+    # await-pypi-deploys is skipped for non-v tags, which would otherwise skip this job too.
+    if: always() && needs.await-pypi-deploys.result != 'failure' && needs.await-pypi-deploys.result != 'cancelled'
     steps:
       # this could be improved by replacing this checkout with something like
       # mkdir opentrons ; git init . ;

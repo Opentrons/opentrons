@@ -177,11 +177,38 @@ jobs:
           repository_url: 'https://test.pypi.org/legacy/'
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
       - if: startsWith(env.OT_TAG, 'v')
+        id: pypi-upload
         name: 'upload to pypi'
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
         with:
           packages-dir: shared-data/dist/
           repository-url: https://upload.pypi.org/legacy/
+      - if: startsWith(github.ref, 'refs/tags/v')
+        name: 'confirm the pypi upload actually ran'
+        run: |
+          if [ "${{ steps.pypi-upload.outcome }}" != "success" ]; then
+            echo "::error::Release tag ${{ github.ref_name }} did not publish opentrons-shared-data to PyPI" \
+                 "(upload outcome: ${{ steps.pypi-upload.outcome || 'skipped' }}, OT_TAG: '${OT_TAG:-}')."
+            exit 1
+          fi
+
+  # A release tag that does not reach PyPI must be a hard failure rather than a
+  # silently skipped job, because "Create github release for tag" gates on this.
+  publish-required:
+    name: 'require pypi publish on release tags'
+    needs: [python-deploy]
+    runs-on: 'ubuntu-24.04'
+    if: always() && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: 'check deploy result'
+        run: |
+          result='${{ needs.python-deploy.result }}'
+          if [ "$result" != "success" ]; then
+            echo "::error::Release tag ${{ github.ref_name }} did not publish the opentrons-shared-data" \
+                 "package to PyPI (python-deploy job result: $result)."
+            exit 1
+          fi
+          echo "opentrons-shared-data package published for ${{ github.ref_name }}."
 
   publish-switch:
     runs-on: 'ubuntu-latest'

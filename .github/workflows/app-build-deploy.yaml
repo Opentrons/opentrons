@@ -208,6 +208,9 @@ jobs:
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
+          # Only applies when this step creates the release, which happens if it wins the
+          # race with "Create github release for tag". Never publish that one live.
+          draft: true
           omitBodyDuringUpdate: true
           omitDraftDuringUpdate: true
           omitNameDuringUpdate: true
@@ -219,6 +222,7 @@ jobs:
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
+          draft: true
           omitBodyDuringUpdate: true
           omitDraftDuringUpdate: true
           omitNameDuringUpdate: true
@@ -230,6 +234,7 @@ jobs:
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
+          draft: true
           omitBodyDuringUpdate: true
           omitDraftDuringUpdate: true
           omitNameDuringUpdate: true
