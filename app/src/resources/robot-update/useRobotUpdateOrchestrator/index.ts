@@ -160,6 +160,7 @@ export function useRobotUpdateOrchestrator(): {
         getMutations: () => mutationsRef.current,
         signal: abortController.signal,
       })
+        // token will not survive reboot, so we need to log out
         .then(() => {
           dispatch(logOut({ robotName }))
         })
