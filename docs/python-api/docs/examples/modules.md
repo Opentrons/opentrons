@@ -167,14 +167,18 @@ Collect the liquid.
 
 ## Procedure conclusion
 
-The "what did we learn" section, learn about the code and the module. Less about the "miniprep" as a thing.
+The "what did we learn" section. More about module API code and module functionality than the procedure itself, that's the idea or focus here.
 
-Key concepts here or at beginning?
+- **Adaptable stacking:** The protocol transitions between catching filtrate in an internal plate, clearing large volumes straight into the manifold base waste line, and recovering purified product into a PCR plate. This demonstrates the module's capacity to automatically configure deck pieces to match variations in protocol demands.
 
-## Full protocol?
+- **Asynchronous operations:** Non-blocking methods like [start_set_vacuum_pressure()][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] return a [Task][opentrons.protocol_api.Task] object, allowing the robot to execute pipetting tasks and operate other modules in parallel/simultaneously with vacuum procedures. Working in parallel faster than serial operation.
 
-Use drop-down? Exclude?
+- **Pressure controls:** Notice how the different instances of `start_set_vacuum_pressure()` increase the vacuum pressure to match the potential resistance of filter plate and requirements of each stage in the process. The protocol starts with a gentle vacuum at -330 mbar to avoid clogging clarification filters. Next, there's a deeper vacuum at -500 mbar for wash clearance. The final vacuum procedure brings the system down to its full capacity at -800 mbar for membrane drying. This demonstrates the module's ability to reach and hold vacuum at different pressure levels and time intervals.
+
+- **Gripper synchronization:** Every vacuum task specifies `vent_after=True` and an `equalize_timeout_s` before calling [ProtocolContext.wait_for_tasks()][opentrons.protocol_api.ProtocolContext.wait_for_tasks], ensuring the chamber reaches atmospheric pressure (0 mbar) before the Flex Gripper attempts to unstack or transport labware. This demonstrates something - advanced design, smart design, safe design - robot will not attempt to grab and move labware while its under vacuum pressure.
+
+## Full protocol
 
 If you're interested in the complete Python protocol, you can review and copy this file here.
 
-<font color="red">Expand section with complete .py file? 900 lines. </font>
+<font color="red">¿Expand section with complete .py file? 600 lines. </font>
