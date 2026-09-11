@@ -82,11 +82,13 @@ const UpdateBuildroot = NiceModal.create(
       return null
     } else if (robot != null && robot.status !== UNREACHABLE) {
       return (
-        <ViewUpdateModal
-          robotName={robotName.current}
-          robot={robot}
-          closeModal={ignoreUpdate}
-        />
+        <ApiHostProvider robotName={robotName.current}>
+          <ViewUpdateModal
+            robotName={robotName.current}
+            robot={robot}
+            closeModal={ignoreUpdate}
+          />
+        </ApiHostProvider>
       )
     } else {
       return null
