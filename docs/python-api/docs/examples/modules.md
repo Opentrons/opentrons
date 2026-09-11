@@ -167,15 +167,39 @@ Collect the liquid.
 
 ## Procedure conclusion
 
-The "what did we learn" section. More about module API code and module functionality than the procedure itself, that's the idea or focus here.
-
-- **Adaptable stacking:** The protocol transitions between catching filtrate in an internal plate, clearing large volumes straight into the manifold base waste line, and recovering purified product into a PCR plate. This demonstrates the module's capacity to automatically configure deck pieces to match variations in protocol demands.
-
-- **Asynchronous operations:** Non-blocking methods like [start_set_vacuum_pressure()][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] return a [Task][opentrons.protocol_api.Task] object, allowing the robot to execute pipetting tasks and operate other modules in parallel/simultaneously with vacuum procedures. Working in parallel faster than serial operation.
-
-- **Pressure controls:** Notice how the different instances of `start_set_vacuum_pressure()` increase the vacuum pressure to match the potential resistance of filter plate and requirements of each stage in the process. The protocol starts with a gentle vacuum at -330 mbar to avoid clogging clarification filters. Next, there's a deeper vacuum at -500 mbar for wash clearance. The final vacuum procedure brings the system down to its full capacity at -800 mbar for membrane drying. This demonstrates the module's ability to reach and hold vacuum at different pressure levels and time intervals.
-
-- **Gripper synchronization:** Every vacuum task specifies `vent_after=True` and an `equalize_timeout_s` before calling [ProtocolContext.wait_for_tasks()][opentrons.protocol_api.ProtocolContext.wait_for_tasks], ensuring the chamber reaches atmospheric pressure (0 mbar) before the Flex Gripper attempts to unstack or transport labware. This demonstrates something - advanced design, smart design, safe design - robot will not attempt to grab and move labware while its under vacuum pressure.
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left;">Feature</th>
+      <th style="text-align: left;">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dynamic stacking</strong></td>
+      <td>The module adapts to changing filtration requirements across protocol stages. In this workflow, the manifold transitions between collecting clarified lysate into an internal well plate, clearing high-volume binding and wash buffers directly into the base waste line, and recovering purified plasmid into an internal elution plate. Staging collars on the dock (slot A4) allows the Flex Gripper to assemble, seal, and swap these internal stacks autonomously.</td>
+    </tr>
+    <tr>
+      <td><strong>Concurrent operations</strong></td>
+      <td>Operational commands such as <code>start_set_vacuum_pressure()</code> run asynchronously and return a <code>Task</code> object. Because these calls do not halt protocol execution, the robot can perform liquid handling—such as preparing and dispensing binding buffers—or run adjacent modules while the vacuum pump operates in the background.</td>
+    </tr>
+    <tr>
+      <td><strong>Vacuum range</strong></td>
+      <td>Closed-loop pressure control adapts to membrane porosity and liquid volume across each step:<br>
+        <p>
+            <ul>
+                <li>A gentle vacuum at -330 mbar prevents filter fouling during lysate clarification.</li>
+                <li>An intermediate vacuum at -500 mbar clears wash buffers to the waste carboy.
+                <li>A final operation works module at an aggressive -800 mbar (maximum capacity) to dry the silica membrane prior to elution.</li>
+            </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Pressurization lockout</strong></td>
+      <td>Moving labware while the manifold remains under vacuum triggers an API error. Setting <code>vent_after=True</code> with an <code>equalize_timeout_s</code> delay ensures the module vents to atmospheric pressure (<code>0</code> mbar) at the end of a cycle. Calling <code>ProtocolContext.wait_for_tasks()</code> synchronizes execution so the chamber fully depressurizes before the Flex Gripper attempts to unstack or transport labware.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Full protocol
 
