@@ -188,9 +188,9 @@ Collect the liquid.
       <td>Closed-loop pressure control adapts to membrane porosity and liquid volume across each step:<br>
         <p>
             <ul>
-                <li>A gentle vacuum at -330 mbar prevents filter fouling during lysate clarification.</li>
-                <li>An intermediate vacuum at -500 mbar clears wash buffers to the waste carboy.
-                <li>A final operation works module at an aggressive -800 mbar (maximum capacity) to dry the silica membrane prior to elution.</li>
+                <li>-330 mbar prevents filter fouling during lysate clarification.</li>
+                <li>-500 mbar clears wash buffers to the waste carboy.
+                <li>-800 mbar (maximum capacity) dries the silica membrane prior to elution.</li>
             </ul>
       </td>
     </tr>
