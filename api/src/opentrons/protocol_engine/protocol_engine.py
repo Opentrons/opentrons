@@ -424,7 +424,9 @@ class ProtocolEngine:
         ):
             return False
 
-        self._stop_from_asynchronous_error(f"asynchronous module error from {module_model}")
+        self._stop_from_asynchronous_error(
+            f"asynchronous module error from {module_model}"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -457,7 +459,9 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
-        self._stop_from_asynchronous_error(f"Module {module_model} {serial} has disconnected")
+        self._stop_from_asynchronous_error(
+            f"Module {module_model} {serial} has disconnected"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
