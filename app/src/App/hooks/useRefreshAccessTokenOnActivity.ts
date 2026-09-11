@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import axios from 'axios'
 
 import { getOAuth2Token, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 
@@ -12,7 +11,6 @@ import {
   getAuthStateForRobot,
   getMostRecentRobotName,
   refreshLogin,
-  timeOutLogin,
   useAccessTokenForRobot,
 } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
@@ -22,23 +20,10 @@ import type { State } from '/app/redux/types'
 
 const THROTTLE_SEC = 10
 
-export function isRefreshGrantRejected(error: unknown): boolean {
-  if (!axios.isAxiosError(error) || error.response == null) {
-    return false
-  }
-  const status = error.response.status
-  const oauthError = (error.response.data as { error?: string } | undefined)
-    ?.error
-  return status === 400 || status === 401 || oauthError === 'invalid_grant'
-}
-
 /**
  * This keeps the user logged in to their robot while they're actively using the UI.
  * It sends periodic auth refresh requests while there is activity like typing and
  * clicking.
- *
- * If the server rejects the refresh grant, it clears the client session so the UI
- * no longer shows the user as logged in.
  *
  * This should be called once per app. It depends on having access to Redux state,
  * but does not depend on being inside an <ApiHostProvider>.
@@ -92,10 +77,6 @@ export function useRefreshAccessTokenOnActivity(): void {
           expiresAt,
         })
       )
-    } catch (error) {
-      if (isRefreshGrantRejected(error)) {
-        dispatch(timeOutLogin({ robotName }))
-      }
     } finally {
       isRequestInFlight.current = false
     }
