@@ -102,8 +102,7 @@ lock:
 
 .PHONY: test
 test:
-# No tests in this project.
-# This target exists to support `make test-py` in the top-level Makefile.
+	uv run python -m unittest discover -s scripts -p 'test_*.py'
 
 .PHONY: lint
 lint:

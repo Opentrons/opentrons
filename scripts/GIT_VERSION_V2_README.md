@@ -8,6 +8,7 @@
 
 1. **Protocol Designer** – configured via `createGitVersionToolkit({ project: 'protocol-designer' })` inside `protocol-designer/vite.config.mts`
 2. **Labware Library** – configured via `createGitVersionToolkit({ project: 'labware-library' })` inside `labware-library/vite.config.mts`
+3. **Docs (MkDocs)** – a Python port of `generateBuildInfoHtml` in `docs/scripts/generate_build_info.py`, invoked from `docs/hooks.py` on `on_post_build`. Docs CI is Python-only, so it does not import this module. Tag prefixes are `mkdocs-` (production) and `staging-mkdocs-` (staging), matching `mkdocs-v*` / `staging-mkdocs-v*` tags rather than `docs@`.
 
 ### Key Features
 
@@ -19,7 +20,7 @@
 
 ### Tag Priority and Semver Rules
 
-For any supported project (Protocol Designer and Labware Library today):
+For any supported project (Protocol Designer, Labware Library, and Docs):
 
 - **Version comparison**: Tags are compared using semantic versioning (semver) rules
   - Stable releases take precedence over prerelease versions of the same version (e.g., `8.6.0` > `8.6.0-beta.1`)
@@ -82,8 +83,10 @@ The script automatically generates a comprehensive build information page at `di
 
 - Protocol Designer (local): `http://localhost:5178/info/` — available during `make serve`
 - Labware Library (local): `http://localhost:5173/info/` — served by `make serve`
+- Docs (local): `http://127.0.0.1:8000/info/` — written on every MkDocs `build` / `serve` rebuild
 - Protocol Designer (production): `https://designer.opentrons.com/info/`
 - Labware Library (production): `https://labware.opentrons.com/info/`
+- Docs (production): `https://docs.opentrons.com/info/`
 
 ## Testing Results
 
@@ -125,3 +128,4 @@ Equivalent scenarios apply to Labware Library, substituting `labware-library@` a
 
 - **Protocol Designer**: `protocol-designer/vite.config.mts` registers a Vite plugin that invokes `generateBuildInfoHtml` after bundling, ensuring `/info/index.html` ships with every build.
 - **Labware Library**: `labware-library/vite.config.mts` wires the same helper into its build so both the creator and main surfaces expose `/info/index.html`.
+- **Docs**: `docs/hooks.py` writes `site/info/index.html` after MkDocs build. `/info/` is not in the MkDocs nav.

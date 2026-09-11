@@ -244,6 +244,7 @@ dependencies = [
     { name = "mkdocstrings", extra = ["python"] },
     { name = "opentrons" },
     { name = "opentrons-shared-data" },
+    { name = "packaging" },
     { name = "playwright" },
 ]
 
@@ -260,6 +261,7 @@ requires-dist = [
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.29.1" },
     { name = "opentrons", editable = "../api" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
+    { name = "packaging", specifier = ">=24.0" },
     { name = "playwright", specifier = ">=1.55" },
 ]
 
