@@ -4,7 +4,17 @@ import asyncio
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Callable, Final, List, Optional, Tuple, Union
+from typing import (
+    AsyncIterator,
+    Callable,
+    Final,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+
+from zipstream import ZIP_DEFLATED, ZipStream  # type: ignore[import-untyped]
 
 from opentrons import config
 from opentrons_shared_data.data_files import MimeType
@@ -109,6 +119,47 @@ def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
     ) as zip_file:
         for source_path, archive_name in entries:
             zip_file.write(source_path, arcname=archive_name)
+
+
+class RunFileByteStream(AsyncIterator[bytes]):
+    """Utility class that yields files in chunks of configurable size."""
+
+    def __init__(self, file_path: Path, chunk_size_bytes: int = 1024) -> None:
+        self.path = file_path
+        self.file_stream = open(file_path, "rb")
+        self.chunk_size = chunk_size_bytes
+        self.current_bytes = b""
+
+    def __aiter__(self) -> AsyncIterator[bytes]:
+        """Provides the AsyncIterator object."""
+        return self
+
+    async def __anext__(self) -> bytes:
+        """Asynchronously reads file and provides each chunk."""
+        self.current_bytes = await asyncio.to_thread(
+            self.file_stream.read,
+            self.chunk_size,
+        )
+
+        if self.current_bytes == b"":
+            self.file_stream.close()
+            raise StopAsyncIteration
+        else:
+            return self.current_bytes
+
+
+async def run_zip_generator(
+    entries: List[Tuple[Path, str]],
+    staging_dir: Path,
+) -> AsyncIterator[bytes]:
+    """Create and yield zip archive in chunks."""
+    run_zip_stream: ZipStream = ZipStream(compress_type=ZIP_DEFLATED)
+    for source_path, archive_name in entries:
+        async for file_chunk in RunFileByteStream(file_path=source_path):
+            run_zip_stream.add(file_chunk, archive_name)
+
+    for encoded_bytes in run_zip_stream:
+        yield encoded_bytes
 
 
 async def write_zip_for_download(
