@@ -5,19 +5,83 @@ description: "Power requirements, environmental conditions, and regulatory compl
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
-## Safe Use Specifications 
+## Power Supply Unit
 
-### Input and Output Connections
+The Temperature Module has the following power requirements, which are met by its external power supply unit (PSU). The following table describes some specifications for this device.
 
-The Temperature Module has the following power requirements, which are met by the unit’s power supply.
-
-!!!warning
+!!! warning
     Do not replace the power supply cable unless at the direction of Opentrons Support.
 
-- **Input:** 100–240 VAC, 50/60 Hz, 4.0 A at 115 VAC, 2.0 A at 230 VAC
-- **Output:** 36 VDC, 6.1 A, 219.6 W maximum
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>PSU Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Manufacturer and model</strong></td>
+      <td>The module is powered by a <a href="https://www.meanwell.com/index.aspx">Mean Well</a> GST220A36-R7B external PSU.</td>
+    </tr>
+    <tr>
+      <td><strong>Compliance</strong></td>
+      <td>
+        <ul>
+          <li>Energy efficiency Level VI</li>
+          <li>Standards: USA EISA 2007/DoE, Canada NRCan, Australia and New Zealand MEPS, Korea K-MEPS, EU ErP, and Code of Conduct (CoC) Version 5</li>
+          <li>Certifications: UL62368-1, TUV EN62368-1, BSMI CNS15598-1, CCC GB4943.1, PSE J62368-1, and AS/NZS 62368.1</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Input Power</strong></td>
+      <td>
+        <ul>
+          <li>85–264 VAC</li>
+          <li>85–264 VAC</li>
+          <li>47–63 Hz</li>
+          <li>2 A at 230 VAC or 4 A at 115 VAC</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Output Power</strong></td>
+      <td>
+        <ul>
+          <li>36 VDC</li>
+          <li>Up to 6.1 A</li>
+          <li>219.6 W maximum rated power</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Over-voltage</strong></td>
+      <td>
+        <ul>
+          <li>105–135% rated output voltage</li>
+          <li>Protection Type: Hiccup mode; recovers automatically after fault condition is removed</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Mains Fluctuation</strong></td>
+      <td>
+        <ul>
+          <li>Line Regulation: ±1.0%</li>
+          <li>Voltage Tolerance: ±2.0%</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>No-load</strong></td>
+      <td>&lt; 0.15 W</td>
+    </tr>
+  </tbody>
+</table>
 
-### Environmental Conditions
+
+## Environmental Conditions
 
 The Temperature Module should only be used indoors on a sturdy, dry, flat horizontal surface. It must be installed in a low-vibration environment with stable ambient conditions. Keep the Temperature Module away from direct sunlight or HVAC systems that may cause significant temperature or humidity changes.
 
@@ -32,7 +96,7 @@ Opentrons has validated the Temperature Module’s performance in the conditions
 !!!note "Note: Low Temperature Condensation"
     You may see condensation on the module’s cold surfaces upon reaching temperatures lower than ambient. The exact temperature at which condensation occurs depends on the atmospheric temperature and relative humidity in your lab. You can calculate this temperature by consulting any standard dew point index or condensation table.
 
-### Instrument Safety Warnings
+## Instrument Safety Warnings
 
 Warning symbols posted on the Opentrons Temperature Module refer directly to the safe use of the instrument.
 
