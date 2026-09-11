@@ -10,11 +10,7 @@ import { i18n } from '../../../../i18n'
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
-import type {
-  LabwareEntities,
-  ModuleEntities,
-  RobotState,
-} from '@opentrons/step-generation'
+import type { LabwareEntities, RobotState } from '@opentrons/step-generation'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
@@ -113,7 +109,6 @@ describe('LabwareSlot', () => {
       commands: [createMockLoadLabwareCommand()],
       liquids: [],
       robotState: createMockRobotState(),
-      moduleEntities: {} as ModuleEntities,
     }
   })
 
@@ -125,6 +120,13 @@ describe('LabwareSlot', () => {
   it('should render labware nickname when provided', () => {
     render(props)
     expect(screen.getByText('Test Plate')).toBeInTheDocument()
+  })
+
+  it('should render display name without nickname when displayName is absent', () => {
+    props.commands = []
+    render(props)
+    expect(screen.getByText('Mock 96 Well Plate')).toBeInTheDocument()
+    expect(screen.queryByText('Test Plate')).not.toBeInTheDocument()
   })
 
   it('should render LabwareRender component', () => {
