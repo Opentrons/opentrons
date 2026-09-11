@@ -13,7 +13,7 @@ port ?= 34000
 tests ?= tests
 test_opts ?=
 
-files_to_check := otupdate tests
+files_to_check := otupdate tests oe_upload.py
 
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file
@@ -37,10 +37,6 @@ setup-py: setup
 .PHONY: lock
 lock:
 	$(UV) lock
-
-.PHONY: dev
-dev:
-	$(python) -m otupdate.buildroot --log-level debug --port $(port)
 
 .PHONY: dev-flex
 dev-flex:
@@ -95,13 +91,6 @@ bootstrap: wheel
 .PHONY: restart
 restart:
 	curl -X POST http://$(host):31950/server/restart
-
-.PHONY: push
-push: wheel
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/usr/lib/python3.10/site-packages/)
-	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-update-server.service)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-update-server)
-
 
 .PHONY: push-ot3
 push-ot3: wheel

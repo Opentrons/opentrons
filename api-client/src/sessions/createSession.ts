@@ -17,5 +17,5 @@ export function createSession(
   return request<
     Session,
     { data: { sessionType: SessionType; createParams?: unknown } | undefined }
-  >(POST, '/sessions', { data }, config)
+  >(POST, '/sessions', config, { body: { data } })
 }

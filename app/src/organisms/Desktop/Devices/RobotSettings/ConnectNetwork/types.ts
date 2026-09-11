@@ -1,10 +1,6 @@
 import type { ChangeEventHandler, FocusEventHandler } from 'react'
 import type { FieldError } from 'react-hook-form'
-import type {
-  EapOption,
-  WifiKey,
-  WifiNetwork,
-} from '/app/redux/networking/types'
+import type { EapOption, WifiKey, WifiNetwork } from '@opentrons/api-client'
 import type {
   CONNECT,
   DISCONNECT,
@@ -15,19 +11,16 @@ import type {
 } from './constants'
 
 export type {
+  EapOption,
+  WifiAuthField,
+  WifiConfigureRequest,
+  WifiEapConfig,
   WifiNetwork,
   WifiSecurityType,
-  WifiAuthField,
-  WifiEapConfig,
-  WifiConfigureRequest,
-  WifiKey,
-  EapOption,
-} from '/app/redux/networking/types'
+} from '@opentrons/api-client'
 
 export type NetworkChangeType =
-  | typeof CONNECT
-  | typeof DISCONNECT
-  | typeof JOIN_OTHER
+  typeof CONNECT | typeof DISCONNECT | typeof JOIN_OTHER
 
 export type NetworkChangeState =
   | { type: typeof CONNECT; ssid: string; network: WifiNetwork }
@@ -73,9 +66,7 @@ export interface ConnectFormSecurityField extends ConnectFormFieldCommon {
 }
 
 export type ConnectFormField =
-  | ConnectFormTextField
-  | ConnectFormKeyField
-  | ConnectFormSecurityField
+  ConnectFormTextField | ConnectFormKeyField | ConnectFormSecurityField
 
 export type ConnectFormFieldProps = Readonly<{
   value: string | null

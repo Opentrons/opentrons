@@ -8,5 +8,5 @@ export function deleteSession(
   config: HostConfig,
   sessionId: string
 ): ResponsePromise<Session> {
-  return request<Session>(DELETE, `/sessions/${sessionId}`, null, config)
+  return request<Session>(DELETE, `/sessions/${sessionId}`, config)
 }

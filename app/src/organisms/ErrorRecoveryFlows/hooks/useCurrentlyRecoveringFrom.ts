@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
 
-import { useCommandQuery, useHost } from '@opentrons/react-api-client'
+import {
+  getQueryKey,
+  useCommandQuery,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import { isRecoveryStatus } from '/app/local-resources/runs/utils'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
@@ -29,7 +33,7 @@ export function useCurrentlyRecoveringFrom(
   useEffect(
     () => {
       if (isRunInRecoveryMode) {
-        void queryClient.invalidateQueries([host, 'runs', runId])
+        void queryClient.invalidateQueries(getQueryKey(host, 'runs', runId))
       } else {
         setIsReadyToShow(false)
       }

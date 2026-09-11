@@ -12,7 +12,6 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
@@ -83,8 +82,6 @@ export const ProtocolRunModuleControls = ({
     calibratePipetteRequired,
     updatePipetteFWRequired,
   } = usePipetteIsReady()
-  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
-
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId,
     true
@@ -129,10 +126,6 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
-              latestRequestId={getLatestRequestId(
-                module.attachedModuleMatch.serialNumber
-              )}
-              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}
@@ -157,10 +150,6 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
-              latestRequestId={getLatestRequestId(
-                module.attachedModuleMatch.serialNumber
-              )}
-              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}

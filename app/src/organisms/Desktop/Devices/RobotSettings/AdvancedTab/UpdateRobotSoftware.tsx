@@ -21,9 +21,9 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
 
 import type { ChangeEventHandler, MouseEventHandler } from 'react'
@@ -54,7 +54,7 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const isRunActive =
     currentRun != null && !isTerminalRunStatus(currentRun.data.status)
 
@@ -64,8 +64,10 @@ export function UpdateRobotSoftware({
     if (files != null) {
       void remote.getFilePathFrom(files[0]).then(filePath => {
         if (files.length === 1 && !updateDisabled) {
-          dispatchStartRobotUpdate(robotName, filePath)
-          onUpdateStart()
+          const started = startUpdate(filePath)
+          if (started) {
+            onUpdateStart()
+          }
         }
         // this is to reset the state of the file picker so users can reselect the same
         // system image if the upload fails
@@ -87,7 +89,6 @@ export function UpdateRobotSoftware({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing8}
-            id="AdvancedSettings_updateRobotSoftware"
           >
             {t('update_robot_software')}
           </LegacyStyledText>
@@ -100,7 +101,6 @@ export function UpdateRobotSoftware({
         </Box>
         <TertiaryButton
           marginLeft={SPACING_AUTO}
-          id="AdvancedSettings_softwareUpdateButton"
           {...updateButtonProps}
           disabled={updateDisabled || isRunActive}
           onClick={handleClick}

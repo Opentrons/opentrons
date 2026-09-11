@@ -1,0 +1,132 @@
+/* Root label */
+.root {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.root_disabled {
+  cursor: default;
+}
+
+/* Visually hidden native input */
+.input {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border-width: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Visual box */
+.box {
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-4);
+}
+
+/* Focus ring */
+.root:has(.input:focus-visible) .box {
+  outline: 2px solid var(--blue-50);
+  outline-offset: 2px;
+}
+
+/* ─── Default type — Unselected ─── */
+
+.box_unselected {
+  border: 1px solid var(--black-90);
+}
+
+.root:not(.root_disabled):hover .box_unselected {
+  border-width: 1.111px;
+}
+
+.box_unselected_disabled {
+  border: 1px solid var(--grey-40);
+}
+
+/* ─── Default type — Selected ───
+   No background needed: ot-checkbox SVG fill IS the box color.
+   The class exists solely as a hook for the hover fill override. */
+
+.root:not(.root_disabled):hover .box_selected svg {
+  fill: var(--blue-55);
+}
+
+/* .box_selected_disabled: icon color (grey-30) is passed via prop — no CSS needed */
+
+/* ─── Default type — Indeterminate ───
+   Box needs an explicit background; the dash sits on top. */
+
+.box_indeterminate {
+  background-color: var(--blue-50);
+}
+
+.root:not(.root_disabled):hover .box_indeterminate {
+  background-color: var(--blue-55);
+}
+
+.box_indeterminate_disabled {
+  background-color: var(--grey-30);
+}
+
+/* ─── On Color type — Unselected ─── */
+
+.box_on_color_unselected {
+  border: 1px solid var(--white);
+}
+
+.root:not(.root_disabled):hover .box_on_color_unselected {
+  border-width: 1.111px;
+}
+
+.box_on_color_unselected_disabled {
+  border: 1px solid rgb(255 255 255 / 80%);
+}
+
+/* ─── On Color type — Selected ───
+   Icon = white; background shows through the transparent checkmark hole = blue mark on white box. */
+
+.box_on_color_selected {
+  background-color: var(--blue-50);
+}
+
+.box_on_color_selected_disabled {
+  background-color: var(--blue-50);
+  opacity: 0.5;
+}
+
+/* ─── On Color type — Indeterminate ─── */
+
+.box_on_color_indeterminate {
+  background-color: var(--white);
+}
+
+.box_on_color_indeterminate_disabled {
+  background-color: var(--white);
+  opacity: 0.5;
+}
+
+/* ─── Indeterminate dash ─── */
+
+.dash {
+  width: 7.5px;
+  height: 1.5px;
+  border-radius: 1px;
+  background-color: var(--white);
+}
+
+.dash_on_color {
+  background-color: var(--blue-50);
+}
+
+.dash_disabled {
+  background-color: var(--grey-50);
+}

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import { CameraControls } from '..'
@@ -16,6 +17,10 @@ vi.mock('/app/local-resources/images/hooks/useCameraSettingsValues')
 vi.mock('../CameraControlsHome')
 vi.mock('../CameraTileSetting')
 vi.mock('../ZoomSettingsView')
+
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (props: CameraControlsProps) => {
   return renderWithProviders(<CameraControls {...props} />, {

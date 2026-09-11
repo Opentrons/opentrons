@@ -6,7 +6,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/resources/instruments/__fixtures__'
 
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 

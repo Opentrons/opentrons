@@ -1,13 +1,11 @@
 import asyncio
-from pathlib import Path
 
 import pytest
-from mock import MagicMock, PropertyMock, patch
+from mock import PropertyMock
 
 from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
-    BundledFirmware,
     HeaterShaker,
     MagDeck,
     ModuleType,
@@ -15,6 +13,10 @@ from opentrons.hardware_control.modules import (
     Thermocycler,
     UpdateError,
     utils,
+)
+from opentrons_shared_data.errors.exceptions import (
+    MissingConfigurationData,
+    ModuleNotPresent,
 )
 
 
@@ -151,175 +153,86 @@ async def heater_shaker():
     await heatershaker.cleanup()
 
 
-def test_execute_module_command(api_client, hardware, magdeck):
-    hardware.attached_modules = [magdeck]
-
-    resp = api_client.post(
-        "/modules/dummySerialMD",
-        json={"command_type": "deactivate"},
-        headers={"Opentrons-Version": "2"},
-    )
-    body = resp.json()
-    assert resp.status_code == 200
-    assert "message" in body
-    assert body["message"] == "Success"
-
-
-def test_execute_module_command_no_modules(api_client, hardware):
-    hardware.attached_modules = []
-
-    resp = api_client.post(
-        "/modules/dummySerialMD",
-        json={"command_type": "deactivate"},
-        headers={"Opentrons-Version": "2"},
-    )
-    body = resp.json()
-    assert resp.status_code == 404
-    assert "message" in body
-    assert body["message"] == "No connected modules"
-
-
-def test_execute_module_command_bad_serial(api_client, hardware, magdeck):
-    hardware.attached_modules = [magdeck]
-
-    resp = api_client.post(
-        "/modules/tooDummySerialMD",
-        json={"command_type": "deactivate"},
-        headers={"Opentrons-Version": "2"},
-    )
-    body = resp.json()
-    assert resp.status_code == 404
-    assert "message" in body
-    assert body["message"] == "Specified module not found"
-
-
-def test_execute_module_command_bad_command(api_client, hardware, magdeck):
-    hardware.attached_modules = [magdeck]
-
-    command_type = "something that doesn't exist"
-
-    resp = api_client.post(
-        "/modules/dummySerialMD",
-        json={"command_type": command_type},
-        headers={"Opentrons-Version": "2"},
-    )
-    body = resp.json()
-    assert resp.status_code == 400
-    assert "message" in body
-    assert body["message"] == f"Module does not have command: {command_type}"
-
-
-def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
-    hardware.attached_modules = [thermocycler]
-
-    thermocycler.set_temperature = MagicMock(side_effect=TypeError("found a 'str'"))
-
-    resp = api_client.post(
-        "modules/dummySerialTC",
-        json={"command_type": "set_temperature", "args": ["30"]},
-        headers={"Opentrons-Version": "2"},
-    )
-    body = resp.json()
-    assert resp.status_code == 400
-    assert "message" in body
-    assert "TypeError" in body["message"]
-
-
-def test_execute_module_command_valid_args(api_client, hardware, thermocycler):
-    hardware.attached_modules = [thermocycler]
-
-    thermocycler.set_temperature = MagicMock(return_value=None)
-
+def test_execute_module_command_410s(api_client):
     resp = api_client.post(
         "modules/dummySerialTC",
         json={"command_type": "set_temperature", "args": [30]},
         headers={"Opentrons-Version": "2"},
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 410
 
 
 def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):
     magdeck._bundled_fw = None
+    hardware.update_module.side_effect = MissingConfigurationData(
+        message="No stored firmware for magdeck dummySerialMD"
+    )
 
-    hardware.attached_modules = [magdeck]
     resp = api_client.post("/modules/dummySerialMD/update")
 
     body = resp.json()
     assert resp.status_code == 500
     assert body == {
-        "message": "Bundled fw file not found for module of type: magdeck",
-        "errorCode": "1005",
+        "message": "Update error: Error 4009 MISSING_CONFIGURATION_DATA (MissingConfigurationData): No stored firmware for magdeck dummySerialMD",
+        "errorCode": "4009",
     }
 
 
 def test_post_serial_update_no_modules(api_client, hardware):
+    hardware.update_module.side_effect = ModuleNotPresent(
+        "dummySerialMD", message="Module with serial dummySerialMD not found"
+    )
     resp = api_client.post("/modules/dummySerialMD/update")
-
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {"message": "Module dummySerialMD not found", "errorCode": "3015"}
+    assert body == {
+        "message": "Module with serial dummySerialMD not found",
+        "errorCode": "3015",
+    }
 
 
 def test_post_serial_update_no_match(api_client, hardware, tempdeck):
-    hardware.attached_modules = [tempdeck]
+    hardware.update_module.side_effect = ModuleNotPresent(
+        "dummySerialMD", message="Module with serial dummySerialMD not found"
+    )
 
     resp = api_client.post("/modules/superDummySerialMD/update")
 
     body = resp.json()
     assert resp.status_code == 404
     assert body == {
-        "message": "Module superDummySerialMD not found",
+        "message": "Module with serial superDummySerialMD not found",
         "errorCode": "3015",
     }
 
 
 def test_post_serial_update_error(api_client, hardware, magdeck):
-    async def thrower(*args, **kwargs):
-        raise UpdateError("not possible")
-
-    magdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
-
-    hardware.attached_modules = [magdeck]
-
-    with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        p.side_effect = thrower
-        resp = api_client.post("/modules/dummySerialMD/update")
-
-        body = resp.json()
-        assert resp.status_code == 500
-        assert body == {"message": "Update error: not possible", "errorCode": "1005"}
+    hardware.update_module.side_effect = UpdateError("not possible")
+    resp = api_client.post("/modules/dummySerialMD/update")
+    body = resp.json()
+    assert resp.status_code == 500
+    assert body == {
+        "message": "Update error: Error 1005 FIRMWARE_UPDATE_FAILED (UpdateError): not possible",
+        "errorCode": "1005",
+    }
 
 
-def test_post_serial_timeout_error(api_client, hardware, magdeck):
-    async def thrower(*args, **kwargs):
-        raise asyncio.TimeoutError()
+def test_post_serial_timeout_error(api_client, hardware):
+    hardware.update_module.side_effect = asyncio.TimeoutError()
 
-    magdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
-
-    hardware.attached_modules = [magdeck]
-
-    with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        p.side_effect = thrower
-        resp = api_client.post("/modules/dummySerialMD/update")
-
-        body = resp.json()
-        assert resp.status_code == 500
-        assert body == {"message": "Module not responding", "errorCode": "1005"}
+    resp = api_client.post("/modules/dummySerialMD/update")
+    body = resp.json()
+    assert resp.status_code == 500
+    assert body == {"message": "Module not responding", "errorCode": "1005"}
 
 
 def test_post_serial_update(api_client, hardware, tempdeck):
-    hardware.attached_modules = [tempdeck]
+    async def _runner(*args, **kwargs):
+        return
 
-    tempdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
-
-    with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        resp = api_client.post("/modules/dummySerialTD/update")
-
-        p.assert_called_once_with(
-            tempdeck,
-            tempdeck._bundled_fw.path,
-        )
-
-        body = resp.json()
-        assert resp.status_code == 200
-        assert body == {"message": "Successfully updated module dummySerialTD"}
+    hardware.update_module.side_effect = _runner
+    resp = api_client.post("/modules/dummySerialTD/update")
+    hardware.update_module.assert_called_once_with("dummySerialTD")
+    body = resp.json()
+    assert resp.status_code == 200
+    assert body == {"message": "Successfully updated module dummySerialTD"}

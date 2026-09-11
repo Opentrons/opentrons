@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { addLabwareOffsetToRun } from '@opentrons/api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 import { useAddLabwareOffsetToRunMutation } from '../useAddLabwareOffsetToRunMutation'
 
@@ -47,9 +48,15 @@ describe('useCreateLegacyLabwareOffsetMutation hook', () => {
       data: 'created offsets!',
     } as any)
 
-    const { result } = renderHook(useAddLabwareOffsetToRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useAddLabwareOffsetToRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {

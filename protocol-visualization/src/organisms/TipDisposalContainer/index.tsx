@@ -5,6 +5,7 @@ import { EMPTY } from '@opentrons/step-generation'
 
 import styles from './tipdisposalcontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { RobotState } from '@opentrons/step-generation'
 
 interface TipDisposalContainerProps {
@@ -13,7 +14,7 @@ interface TipDisposalContainerProps {
 
 export function TipDisposalContainer({
   robotState,
-}: TipDisposalContainerProps): JSX.Element {
+}: TipDisposalContainerProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   const { tipState } = robotState
   const totalEmptyTips = Object.values(tipState.tipracks).reduce(

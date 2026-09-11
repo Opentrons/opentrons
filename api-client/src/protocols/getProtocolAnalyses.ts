@@ -11,7 +11,6 @@ export function getProtocolAnalyses(
   return request<ProtocolAnalyses>(
     GET,
     `/protocols/${protocolId}/analyses`,
-    null,
     config
   )
 }

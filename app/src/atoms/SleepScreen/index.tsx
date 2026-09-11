@@ -1,12 +1,17 @@
-import { COLORS, Flex } from '@opentrons/components'
+import styles from './sleepscreen.module.css'
 
-export function SleepScreen(): JSX.Element {
+interface SleepScreenProps {
+  'aria-label': string
+}
+
+export function SleepScreen({
+  'aria-label': ariaLabel,
+}: SleepScreenProps): JSX.Element {
   return (
-    <Flex
-      width="100vw"
-      height="100vh"
-      backgroundColor={COLORS.black90}
-      data-testid="Touchscreen_SleepScreen"
-    ></Flex>
+    <div
+      className={styles.container}
+      role="button"
+      aria-label={ariaLabel}
+    ></div>
   )
 }

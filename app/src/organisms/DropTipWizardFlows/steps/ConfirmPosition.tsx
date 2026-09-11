@@ -34,7 +34,8 @@ export interface UseConfirmPositionResult {
 // an "in-motion" the same way other commands do, we synthetically create an "in motion", disabling
 // it once the step has completed or failed.
 export function useConfirmPosition(
-  currentStep: DropTipWizardContainerProps['currentStep']
+  currentStep: DropTipWizardContainerProps['currentStep'],
+  errorDetails: DropTipWizardContainerProps['errorDetails']
 ): UseConfirmPositionResult {
   const [isRobotPipetteMoving, setIsRobotPipetteMoving] = useState(false)
 
@@ -46,15 +47,16 @@ export function useConfirmPosition(
     () => {
       if (
         isRobotPipetteMoving &&
-        currentStep !== CONFIRM_POSITION &&
-        currentStep !== CHOOSE_LOCATION_OPTION
+        ((currentStep !== CONFIRM_POSITION &&
+          currentStep !== CHOOSE_LOCATION_OPTION) ||
+          errorDetails != null)
       ) {
         toggleIsRobotPipetteMoving()
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentStep, isRobotPipetteMoving]
+    [currentStep, isRobotPipetteMoving, errorDetails]
   )
 
   return {

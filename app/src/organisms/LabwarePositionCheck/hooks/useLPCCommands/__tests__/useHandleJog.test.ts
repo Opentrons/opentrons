@@ -1,9 +1,10 @@
 import { useSelector } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
+import { useCoalescedJogAudit } from '/app/local-resources/access-control/useCoalescedJogAudit'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
 import { moveRelativeCommand, moveToWellCommands } from '../commands'
@@ -12,6 +13,7 @@ import { useHandleJog } from '../useHandleJog'
 vi.mock('react-redux')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useCoalescedJogAudit')
 vi.mock('../commands')
 
 describe('useHandleJog', () => {
@@ -23,6 +25,9 @@ describe('useHandleJog', () => {
   const mockSetErrorMessage = vi.fn()
   const mockChainLPCCommands = vi.fn(() => Promise.resolve())
   const mockCreateSilentCommand = vi.fn()
+  const mockRecordJog = vi.fn()
+  const mockResetJogAudit = vi.fn()
+  const mockFlushJogAudit = vi.fn()
 
   const mockCommandResult = {
     data: {
@@ -65,7 +70,16 @@ describe('useHandleJog', () => {
     vi.mocked(useCreateMaintenanceCommandMutation).mockReturnValue({
       createMaintenanceCommand: mockCreateSilentCommand,
     } as any)
+    vi.mocked(useCoalescedJogAudit).mockReturnValue({
+      recordJog: mockRecordJog,
+      reset: mockResetJogAudit,
+      flush: mockFlushJogAudit,
+    })
     mockCreateSilentCommand.mockResolvedValue(mockCommandResult)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should initialize with empty queue', () => {
@@ -73,6 +87,7 @@ describe('useHandleJog', () => {
 
     expect(result.current).toHaveProperty('handleJog')
     expect(result.current).toHaveProperty('resetJog')
+    expect(result.current).toHaveProperty('flushJogAudit')
   })
 
   it('should issue a jog command when handleJog is called', async () => {
@@ -98,6 +113,7 @@ describe('useHandleJog', () => {
     await vi.runAllTimersAsync()
 
     expect(mockOnSuccess).toHaveBeenCalledWith({ x: 10, y: 20, z: 30 })
+    expect(mockRecordJog).toHaveBeenCalledWith('x', 1, 1)
   })
 
   it('should queue multiple jog commands and process them sequentially', async () => {
@@ -187,6 +203,7 @@ describe('useHandleJog', () => {
     expect(mockSetErrorMessage).toHaveBeenCalledWith(
       'Error issuing jog command: Command failed'
     )
+    expect(mockRecordJog).not.toHaveBeenCalled()
   })
 
   it('should set error message when pipette is not found', async () => {
@@ -238,6 +255,7 @@ describe('useHandleJog', () => {
       ],
       false
     )
+    expect(mockResetJogAudit).toHaveBeenCalled()
 
     act(() => {
       result.current.handleJog('z', 1, 0.1)

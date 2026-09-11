@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import {
-  getStacksWithLabware,
+  getStackedItemsOnStartingDeck,
   multiple_tipacks_with_tc,
 } from '@opentrons/shared-data'
 
@@ -18,10 +18,10 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 vi.mock('../LabwareListItem')
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getStacksWithLabware>()
+  const actual = await importOriginal<typeof getStackedItemsOnStartingDeck>()
   return {
     ...actual,
-    getStacksWithLabware: vi.fn(),
+    getStackedItemsOnStartingDeck: vi.fn(),
   }
 })
 const protocolWithTC =
@@ -43,13 +43,15 @@ describe('SetupLabwareList', () => {
     vi.mocked(LabwareListItem).mockReturnValue(
       <div>mock labware list item</div>
     )
-    vi.mocked(getStacksWithLabware).mockReturnValue({
+    vi.mocked(getStackedItemsOnStartingDeck).mockReturnValue({
       '9': [
-        {
-          labwareId: '7',
-          displayName: 'mockNickName',
-          definitionUri: 'mockDefUri',
-        },
+        [
+          {
+            labwareId: '7',
+            displayName: 'mockNickName',
+            definitionUri: 'mockDefUri',
+          },
+        ],
       ],
     })
   })

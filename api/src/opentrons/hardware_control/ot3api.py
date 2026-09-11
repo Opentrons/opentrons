@@ -10,6 +10,7 @@ from typing import (
     AsyncIterator,
     Awaitable,
     Callable,
+    Coroutine,
     Dict,
     List,
     Mapping,
@@ -28,6 +29,8 @@ from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateFailedError,
     GripperNotPresentError,
     InvalidActuator,
+    MissingConfigurationData,
+    ModuleNotPresent,
     PipetteLiquidNotFoundError,
     PipetteOverpressureError,
     PositionUnknownError,
@@ -109,9 +112,11 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareFeatureFlags,
+    HardwareSystemInfo,
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     MotionChecks,
     OT3AxisKind,
@@ -123,6 +128,7 @@ from .types import (
     StatusBarUpdateListener,
     StatusBarUpdateUnsubscriber,
     SubSystem,
+    SubsystemConnectionNotification,
     SubSystemState,
     TipScrapeType,
     TipStateType,
@@ -143,6 +149,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_dict_of_proxies,
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_result_to_wrapped_typed_dict,
@@ -380,17 +387,29 @@ class OT3API(
             (
                 AsynchronousModuleErrorNotification,
                 ModuleDisconnectedNotification,
+                ModuleConnectedNotification,
             ),
         ):
             return
         mod_log.info(
-            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+            f"Forwarding module event {event.event} for {event.name if isinstance(event, ModuleConnectedNotification) else event.module_model} {event.module_serial} at {event.port}"
         )
         for cb in self._callbacks:
             try:
                 cb(event)
             except Exception:
                 mod_log.exception("Errored during module asynchronous callback")
+
+    def _send_subsystem_notification(self) -> None:
+        subsystem_event = SubsystemConnectionNotification(
+            tracked_subsystems=self.attached_subsystems
+        )
+        mod_log.info("Forwarding subsystem event.")
+        for cb in self._callbacks:
+            try:
+                cb(subsystem_event)
+            except Exception:
+                mod_log.exception("Errored during subsystem asynchronous callback")
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
@@ -416,7 +435,6 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
-        use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
@@ -434,7 +452,6 @@ class OT3API(
 
         backend = await OT3Controller.build(
             checked_config,
-            use_usb_bus,
             check_updates=update_firmware,
             feature_flags=feature_flags,
         )
@@ -445,6 +462,8 @@ class OT3API(
             config=checked_config,
             feature_flags=feature_flags,
         )
+
+        backend.set_subsystem_event_callback(api_instance._send_subsystem_notification)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
@@ -547,6 +566,26 @@ class OT3API(
 
         return unregister
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
+        self._callbacks.add(cb)
+
+        async def unregister() -> None:
+            self._callbacks.remove(cb)
+
+        return unregister
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        serial = await self.get_serial_number()
+        return HardwareSystemInfo(
+            fw_version=self.fw_version,
+            board_revision=self.board_revision,
+            serial_number=serial,
+        )
+
     def get_fw_version(self) -> str:
         """
         Return the firmware version of the connected hardware.
@@ -594,6 +633,24 @@ class OT3API(
                 ) from e
             finally:
                 self._configured_since_update = False
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def update_firmware_with_fetching(
+        self, subsystems: Optional[Set[SubSystem]] = None, force: bool = False
+    ) -> Callable[[], Coroutine[Any, Any, UpdateStatus | None]]:
+        """Start the firmware update for one or more subsystems and return a callback for fetching progress.
+
+        This approach is more friendly to synchronous-dependent implementations for firmware updating, such as subprocess mode.
+        """
+        update_iterator = self.update_firmware(subsystems, force)
+
+        async def _get_latest_update_status() -> UpdateStatus | None:
+            try:
+                return await anext(update_iterator)
+            except StopAsyncIteration:
+                return None
+
+        return _get_latest_update_status
 
     # Incidentals (i.e. not motion) API
 
@@ -650,6 +707,21 @@ class OT3API(
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_modules(self) -> list[modules.AbstractModule]:
+        return self.attached_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_module_by_serial(
+        self, serial: str
+    ) -> modules.AbstractModule:
+        for module in self.attached_modules:
+            if module.device_info.get("serial") == serial:
+                return module
+        raise ModuleNotPresent(
+            serial, message=f"Could not find module with serial {serial}"
+        )
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -1893,9 +1965,10 @@ class OT3API(
         else:
             self._log.error("Tried to specify an OT2 config object")
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> OT3Config:
         """Update values of the robot's configuration."""
         self._config = self._config.model_copy(update=kwargs)
+        return self._config
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -2377,6 +2450,11 @@ class OT3API(
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
+        if isinstance(self._backend, OT3Simulator) and expected == TipStateType.PRESENT:
+            # The simulator has no physical tip/probe sensors. LPC and other
+            # calibration flows call verify_tip_presence after the user attaches
+            # a probe; simulate that attachment here.
+            self._backend._update_tip_state(real_mount, True)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
             raise FailedTipStateCheck(
@@ -2553,6 +2631,7 @@ class OT3API(
             )
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
         # TODO (lc 12-5-2022) We should have ONE entry point into knowing
         # what pipettes are attached from the hardware controller.
@@ -2569,6 +2648,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
@@ -3300,7 +3380,10 @@ class OT3API(
     def estop_status(self) -> EstopOverallStatus:
         return self._backend.estop_status
 
-    def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
+    async def get_estop_status(self) -> EstopOverallStatus:
+        return self._backend.estop_status
+
+    async def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
         """Attempt to acknowledge an Estop event and clear the status.
 
         Returns the estop status after clearing the status."""
@@ -3393,3 +3476,12 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    async def update_module(self, module_serial: str) -> None:
+        module = await self.get_attached_module_by_serial(module_serial)
+        bundled_fw = module.bundled_fw
+        if bundled_fw is None:
+            raise MissingConfigurationData(
+                message=f"No stored firmware for {module.name} {module.serial_number}"
+            )
+        return await modules.update_firmware(module, bundled_fw.path)

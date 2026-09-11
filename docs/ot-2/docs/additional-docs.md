@@ -45,6 +45,6 @@ The API reference is defined by and generated from an [OpenAPI](https://www.open
 
 Documentation for working directly with Opentrons source code is available alongside the corresponding code on GitHub. Notable documentation pages include:
 
-- [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md): Opinionated instructions for setting up your computer to work on the software in the Opentrons/opentrons repository. These setup steps are required for running the Opentrons App or a simulated robot server from source.
+- [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md): Opinionated instructions for setting up your computer to work on the software in the Opentrons/opentrons repository. These setup steps are required for running the Opentrons OT-2 App or a simulated robot server from source.
 
 - [Opentrons Emulation Wiki](https://github.com/Opentrons/opentrons-emulation/wiki): Explanation and instructions for using our software that emulates Opentrons robots at the firmware or hardware level.

@@ -10,8 +10,7 @@ import type {
 import type { HandlesCommands } from '../types'
 
 type LiquidProbeRunTimeCommands =
-  | LiquidProbeRunTimeCommand
-  | TryLiquidProbeRunTimeCommand
+  LiquidProbeRunTimeCommand | TryLiquidProbeRunTimeCommand
 
 export function getLiquidProbeCommandText({
   command,

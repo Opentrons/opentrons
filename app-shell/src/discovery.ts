@@ -8,6 +8,7 @@ import {
   CLEAR_CACHE,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
+  DISCOVERY_RENAME,
   DISCOVERY_START,
 } from '@opentrons/app/src/redux/discovery/actions'
 import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
@@ -290,6 +291,14 @@ function createPrimaryActionHandler(
         state.client.removeRobot(
           (action.payload as { robotName: string }).robotName
         )
+        return
+      }
+      case DISCOVERY_RENAME: {
+        const { prevName, newName } = action.payload as {
+          prevName: string
+          newName: string
+        }
+        state.client.renameRobot(prevName, newName)
         return
       }
       case CLEAR_CACHE: {

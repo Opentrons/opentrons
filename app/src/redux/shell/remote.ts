@@ -149,6 +149,45 @@ remote.ipcRenderer.on(
   }
 )
 
+export async function saveFileFromBuffer(props: {
+  name: string
+  buffer: ArrayBuffer
+  destination?: string
+}): Promise<string> {
+  return await remote.ipcRenderer.invoke('downloads:saveFileFromBuffer', {
+    name: props.name,
+    buffer: Array.from(new Uint8Array(props.buffer)),
+    destination: props.destination,
+  })
+}
+
+export async function saveFileFromUrl(props: {
+  name: string
+  source: string
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<string> {
+  return await remote.ipcRenderer.invoke('downloads:saveFileFromUrl', props)
+}
+
+export type SaveLogsPath = string | { path: string; name?: string }
+
+export interface SaveLogsResult {
+  directory: string
+  succeededPaths: string[]
+}
+
+export async function saveLogs(props: {
+  name: string
+  paths: SaveLogsPath[]
+  hostname: string
+  port: number | null
+  destination?: string
+}): Promise<SaveLogsResult> {
+  return await remote.ipcRenderer.invoke('downloads:saveLogs', props)
+}
+
 export async function tryInstallEncryptedRobotCertificate(props: {
   certificateData: string
   password: string
@@ -162,4 +201,22 @@ export async function tryInstallPlaintextRobotCertificate(props: {
   certificateData: string
 }): Promise<boolean> {
   return await remote.ipcRenderer.invoke('robot-cert:install-plaintext', props)
+}
+
+interface RobotUpdateUploadPayload {
+  ip: string
+  port: number | null
+  name: string
+  robotModel?: string | null
+  path: string
+  systemFile: string
+  userNotes?: string
+  token?: string | null
+  secure?: boolean
+}
+
+export function uploadRobotUpdateFileViaShell(
+  payload: RobotUpdateUploadPayload
+): Promise<{ ok: true }> {
+  return remote.ipcRenderer.invoke('robot-update:upload', payload)
 }

@@ -18,6 +18,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.system import camera
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -64,7 +65,10 @@ camera_router = LightRouter()
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change run camera settings")),
+    ],
 )
 async def add_camera_settings(
     request_body: RequestModel[CameraEnable],
@@ -95,18 +99,24 @@ async def add_camera_settings(
         )
 
     camera_settings = CameraSettings(
-        cameraEnabled=request_body.data.cameraEnabled
-        if request_body.data.cameraEnabled is not None
-        else False,
-        liveStreamEnabled=request_body.data.liveStreamEnabled
-        if request_body.data.liveStreamEnabled is not None
-        else False,
-        errorRecoveryCameraEnabled=request_body.data.errorRecoveryCameraEnabled
-        if request_body.data.errorRecoveryCameraEnabled is not None
-        else False,
+        cameraEnabled=(
+            request_body.data.cameraEnabled
+            if request_body.data.cameraEnabled is not None
+            else False
+        ),
+        liveStreamEnabled=(
+            request_body.data.liveStreamEnabled
+            if request_body.data.liveStreamEnabled is not None
+            else False
+        ),
+        errorRecoveryCameraEnabled=(
+            request_body.data.errorRecoveryCameraEnabled
+            if request_body.data.errorRecoveryCameraEnabled is not None
+            else False
+        ),
     )
 
-    response_data = run_orchestrator_store.add_camera_enablement_settings(
+    response_data = await run_orchestrator_store.add_camera_enablement_settings(
         camera_settings
     )
     log.info(f'Added unique camera settings "{request_body.data}" to run "{run.id}".')
@@ -114,10 +124,12 @@ async def add_camera_settings(
     # Restart the stream with any the newest live stream settings
     await camera.update_live_stream_status(
         robot_type=robot_type,
-        stream_status=response_data.liveStreamEnabled
-        if response_data.cameraEnabled is True
-        else False,
-        camera_provider=camera_provider,
+        stream_status=(
+            response_data.liveStreamEnabled
+            if response_data.cameraEnabled is True
+            else False
+        ),
+        camera_settings=await camera_provider.get_camera_settings(),
         override_settings=camera_settings,
     )
 
@@ -149,7 +161,10 @@ async def add_camera_settings(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change run camera capture settings")),
+    ],
 )
 async def add_camera_capture_image_settings(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -178,7 +193,7 @@ async def add_camera_capture_image_settings(
             status.HTTP_409_CONFLICT
         )
 
-    run_orchestrator_store.add_camera_capture_image_settings(
+    await run_orchestrator_store.add_camera_capture_image_settings(
         capture_image_settings=request_body.data
     )
     log.info(
@@ -218,7 +233,7 @@ async def get_camera_capture_image_settings(
         robot_type: Used to validate robot type for live stream service.
         camera_provider: Access to the camera settings and related services.
     """
-    result = run_orchestrator_store.get_camera_capture_image_settings(
+    result = await run_orchestrator_store.get_camera_capture_image_settings(
         camera_id=cameraId
     )
 
@@ -246,7 +261,10 @@ async def get_camera_capture_image_settings(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("capture run preview image")),
+    ],
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],

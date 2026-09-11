@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockFlexStacker, mockHeaterShaker } from '@opentrons/api-client'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
@@ -18,14 +19,11 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  mockFlexStacker,
-  mockHeaterShaker,
-} from '/app/redux/modules/__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
-import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
+import { useSendIdentifyModule } from '../../ModuleWizardFlows/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ComponentProps } from 'react'
@@ -38,6 +36,12 @@ vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/ModuleCard/utils')
 vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
+
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi
+    .fn()
+    .mockReturnValue(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+}))
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -57,7 +61,7 @@ const render = (props: ComponentProps<typeof LocationConflictModal>) => {
 
 describe('LocationConflictModal', () => {
   let props: ComponentProps<typeof LocationConflictModal>
-  let sendIdentifyStacker: (
+  let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
@@ -71,7 +75,7 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
-    sendIdentifyStacker = vi.fn()
+    sendIdentifyModule = vi.fn()
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       closeCurrentRun: vi.fn(),
     } as any)
@@ -82,7 +86,7 @@ describe('LocationConflictModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
-    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
   afterEach(() => {
     vi.resetAllMocks()

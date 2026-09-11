@@ -29,6 +29,8 @@ import {
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import { VACUUM_MODULE_TYPE_WITH_LABWARE } from '../../../constants'
+
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { ModuleLabwareCompatibilityKey } from '../../../types'
 
@@ -53,10 +55,7 @@ export const OT2_MODULE_MODELS: ModuleModel[] = [
 ]
 
 export type Fixture =
-  | 'stagingArea'
-  | 'trashBin'
-  | 'wasteChute'
-  | 'wasteChuteAndStagingArea'
+  'stagingArea' | 'trashBin' | 'wasteChute' | 'wasteChuteAndStagingArea'
 
 export const FIXTURES: Fixture[] = [
   'stagingArea',
@@ -120,9 +119,11 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
     'opentrons_flex_96_filtertiprack_1000ul',
     'opentrons_flex_96_filtertiprack_200ul',
     'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_filtertiprack_20ul',
     'opentrons_flex_96_tiprack_1000ul',
     'opentrons_flex_96_tiprack_200ul',
     'opentrons_flex_96_tiprack_50ul',
+    'opentrons_flex_96_tiprack_20ul',
     // tested and verified well plates
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
     'biorad_96_wellplate_200ul_pcr',
@@ -136,18 +137,20 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
     'opentrons_tough_1_reservoir_300ml',
     'opentrons_tough_4_reservoir_72ml',
   ],
-
-  // TODO (nd: 2026-05-14): correctly reflect vacuum module compatible labware once they are added to shared-data
+  // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE]: [
-    'opentrons_vacuum_module_spacer_thingamajig',
+    'opentrons_vacuum_manifold_collar_tall',
+    'opentrons_vacuum_manifold_collar_short',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
-    'opentrons_vacuum_module_gen1_collar_tall',
-    'opentrons_vacuum_module_gen1_collar_short',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_vacuum_manifold_spacer_tall',
+    'opentrons_vacuum_manifold_spacer_short',
   ],
-  VACUUM_MODULE_TYPE_WITH_LABWARE: [
+  // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
+  [VACUUM_MODULE_TYPE_WITH_LABWARE]: [
+    'opentrons_vacuum_manifold_collar_tall',
+    'opentrons_vacuum_manifold_collar_short',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
-    'opentrons_vacuum_module_gen1_collar_tall',
-    'opentrons_vacuum_module_gen1_collar_short',
   ],
 }
 

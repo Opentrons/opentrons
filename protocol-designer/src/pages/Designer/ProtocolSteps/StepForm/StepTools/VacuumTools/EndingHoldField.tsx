@@ -36,7 +36,7 @@ export function EndingHoldField(
       <ToggleStepFormField
         title={t('vacuum.controls.ending_hold_vent.label')}
         isSelected={formData.endingHoldVentCheckbox === true}
-        onLabel={t('vacuum.previous_state.vent.open')}
+        onLabel={t('vacuum.previous_state.vent.opened')}
         offLabel={t('vacuum.previous_state.vent.closed')}
         toggleUpdateValue={propsForFields.endingHoldVentCheckbox.updateValue}
         toggleValue={formData.endingHoldVentCheckbox}

@@ -10,7 +10,6 @@ import {
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
-import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getDeckConfiguration,
@@ -64,7 +63,6 @@ describe('FlexHardware', () => {
     vi.mocked(DeckConfigurator).mockReturnValue(
       <div>mock DeckConfigurator</div>
     )
-    vi.mocked(getEnableVacuumModule).mockReturnValue(true)
   })
 
   it('should render the deck configurator', () => {

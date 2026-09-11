@@ -5,6 +5,7 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import styles from './pipettecontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { PipetteName } from '@opentrons/shared-data'
 
 interface PipetteContainerProps {
@@ -17,7 +18,7 @@ export function PipetteContainer({
   mount,
   pipetteName,
   selected,
-}: PipetteContainerProps): JSX.Element {
+}: PipetteContainerProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   const pipetteDisplayName = getPipetteNameSpecs(pipetteName)?.displayName ?? ''
 

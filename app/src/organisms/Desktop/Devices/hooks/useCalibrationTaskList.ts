@@ -14,13 +14,13 @@ import { formatTimestamp } from '/app/transformations/runs'
 
 import { getDefaultTiprackDefForPipetteName } from '../constants'
 
+import type { AttachedPipette } from '@opentrons/api-client'
 import type { PipetteName } from '@opentrons/shared-data'
 import type {
   SubTaskProps,
   TaskListProps,
   TaskProps,
 } from '/app/molecules/TaskList'
-import type { AttachedPipette } from '/app/redux/pipettes/types'
 import type {
   PipetteOffsetCalibrationSessionParams,
   TipLengthCalibrationSessionParams,

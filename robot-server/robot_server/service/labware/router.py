@@ -10,6 +10,7 @@ from fastapi import Depends, status
 from typing_extensions import Literal, NoReturn
 
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -101,7 +102,10 @@ async def get_specific_labware_calibration(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody},
         status.HTTP_410_GONE: {"model": ErrorBody[LabwareCalibrationEndpointsRemoved]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("remove legacy labware calibration")),
+    ],
 )
 async def delete_specific_labware_calibration(
     calibrationId: str,

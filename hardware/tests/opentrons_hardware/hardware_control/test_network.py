@@ -120,13 +120,15 @@ class MockUSBStatusResponder:
                 )
 
 
-async def test_timeout_fires(mock_can_messenger: AsyncMock) -> None:
+async def test_timeout_fires(
+    mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock
+) -> None:
     """Test that the timeout functionality works."""
     then = datetime.datetime.utcnow()
     # we expect a timeout, but a handled timeout, and we don't want to hang the tests
     # if it didn't work, so wrap it in a wait_for of our own with a bigger timeout
     # that will raise if it fails
-    network_info = NetworkInfo(mock_can_messenger)
+    network_info = NetworkInfo(mock_can_messenger, mock_usb_messenger)
     nodes = set(
         await asyncio.wait_for(
             network_info.probe({NodeId.gantry_x, NodeId.gantry_y}, 0.5), 1.0
@@ -152,34 +154,40 @@ async def test_timeout_fires(mock_can_messenger: AsyncMock) -> None:
     )
 
 
-async def test_completes_exact_equality(mock_can_messenger: AsyncMock) -> None:
+async def test_completes_exact_equality(
+    mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock
+) -> None:
     """Test that if the exact specified nodes exist the probe works."""
     _ = MockCanStatusResponder(mock_can_messenger, [NodeId.gantry_x.value])
     # we should not get to the timeout, but if we did we wouldn't know because it
     # doesn't raise, so wrap it in a smaller timeout so it will raise (it should
     # complete basically instantly)
-    network_info = NetworkInfo(mock_can_messenger)
+    network_info = NetworkInfo(mock_can_messenger, mock_usb_messenger)
     probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     assert probed == {NodeId.gantry_x}
 
 
-async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> None:
+async def test_completes_more_than_expected(
+    mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock
+) -> None:
     """Test that if more than specified node exists, the probe works."""
     _ = MockCanStatusResponder(
         mock_can_messenger, [NodeId.gantry_y.value, NodeId.gantry_x.value]
     )
     # same deal with the timeout
-    network_info = NetworkInfo(mock_can_messenger)
+    network_info = NetworkInfo(mock_can_messenger, mock_usb_messenger)
     probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     # we should get everything we prepped the network with
     assert probed == {NodeId.gantry_x, NodeId.gantry_y}
 
 
-async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
+async def test_handles_bad_node_ids(
+    mock_can_messenger: AsyncMock, mock_usb_messenger: AsyncMock
+) -> None:
     """Test that invalid node ids are swalloed silently."""
     _ = MockCanStatusResponder(mock_can_messenger, [0x01, NodeId.gantry_x.value])
     # same deal with the timeout
-    network_info = NetworkInfo(mock_can_messenger)
+    network_info = NetworkInfo(mock_can_messenger, mock_usb_messenger)
     probed = set(await asyncio.wait_for(network_info.probe({NodeId.gantry_x}), 2.0))
     # we should get everything we prepped the network with and ignore the bad values
     assert probed == {NodeId.gantry_x}

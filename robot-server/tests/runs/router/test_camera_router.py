@@ -36,6 +36,7 @@ def run() -> Run:
         modules=[],
         labwareOffsets=[],
         protocolId=None,
+        logPeriodId=None,
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
@@ -76,14 +77,16 @@ async def test_camera_settings(
     )
 
     decoy.verify(
-        mock_run_orchestrator_store.add_camera_capture_image_settings(image_settings)
+        await mock_run_orchestrator_store.add_camera_capture_image_settings(
+            image_settings
+        )
     )
 
     assert result.content.data == image_settings
     assert result.status_code == 201
 
     decoy.when(
-        mock_run_orchestrator_store.get_camera_capture_image_settings(
+        await mock_run_orchestrator_store.get_camera_capture_image_settings(
             "ot_system_camera"
         )
     ).then_return(image_settings)

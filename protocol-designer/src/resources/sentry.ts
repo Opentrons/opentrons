@@ -21,9 +21,7 @@ const sentryDsn = _OT_PD_SENTRY_DSN_ ?? _OT_PD_SENTRY_DEV_DSN_
 const sentryRelease = _OT_PD_SENTRY_RELEASE_ ?? _OT_PD_VERSION_
 
 const resolveSentryEnvironment = ():
-  | 'production'
-  | 'staging'
-  | 'development' => {
+  'production' | 'staging' | 'development' => {
   if (getIsProduction()) {
     return 'production'
   }

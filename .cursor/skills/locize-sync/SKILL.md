@@ -22,7 +22,7 @@ The Locize synchronization system manages internationalization (i18n) for the Op
 2. **Localization Files**
    - **Primary**: `app/src/assets/localization/` — main application translations
    - **Secondary**: `components/src/assets/localization/` — shared component translations
-   - English (`en`) is the source of truth; Chinese (`zh`) is downloaded from Locize
+   - English (`en`) is the source of truth; Chinese (`zh`) is downloaded from Locize. Chinese (`zh`) files may be invisible to agents because of the repo's ignore rules.
    - The script consolidates files from `components/` into `app/` before syncing, then unconsolidates back
 
 3. **Authentication** — `LOCIZE_API_KEY` and `LOCIZE_PROJECT_ID` env vars (local `.env` or GitHub Actions secrets)

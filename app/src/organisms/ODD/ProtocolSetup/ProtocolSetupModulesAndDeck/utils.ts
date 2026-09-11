@@ -10,7 +10,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 
 interface UnmatchedModuleResults {

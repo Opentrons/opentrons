@@ -38,22 +38,17 @@ export function PlayButton({
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={isEnabled ? COLORS.blue50 : COLORS.grey35}
+      backgroundColor={COLORS.blue50}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
       justifyContent={JUSTIFY_CENTER}
       width="6.25rem"
-      disabled={disabled}
       onClick={onPlay}
       aria-label="play"
       css={playButtonStyle}
     >
-      <Icon
-        color={isEnabled ? COLORS.white : COLORS.grey50}
-        name="play"
-        size="2.5rem"
-      />
+      <Icon color={COLORS.white} name="play" size="2.5rem" />
     </Btn>
   )
 }

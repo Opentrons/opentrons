@@ -75,11 +75,7 @@ export function StepDetailContainer({
   )
 
   type ComponentType =
-    | 'left_pipette'
-    | 'right_pipette'
-    | 'tiprack'
-    | 'labware'
-    | 'disposal'
+    'left_pipette' | 'right_pipette' | 'tiprack' | 'labware' | 'disposal'
 
   const getComponentsToRender = (): ComponentType[] => {
     const components: ComponentType[] = []

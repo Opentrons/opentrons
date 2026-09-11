@@ -11,7 +11,7 @@ import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '@opentrons/api-client'
-import type { PipetteCalibrationsByMount } from '/app/redux/pipettes/types'
+import type { PipetteCalibrationsByMount } from '/app/resources/instruments/types'
 
 export function useAttachedPipetteCalibrations(): PipetteCalibrationsByMount {
   const attachedPipettes = useAttachedPipettes()

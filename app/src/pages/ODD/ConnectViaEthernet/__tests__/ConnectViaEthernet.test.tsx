@@ -2,15 +2,17 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
+import { INTERFACE_ETHERNET } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as Networking from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { ConnectViaEthernet } from '../'
 import { DisplayConnectionStatus } from '../DisplayConnectionStatus'
 import { TitleHeader } from '../TitleHeader'
 
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/discovery')
 vi.mock('../TitleHeader')
 vi.mock('../DisplayConnectionStatus')
@@ -19,7 +21,7 @@ const initialMockEthernet = {
   ipAddress: '127.0.0.101',
   subnetMask: '255.255.255.231',
   macAddress: 'ET:NT:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
 
 const render = () => {
@@ -35,7 +37,7 @@ const render = () => {
 
 describe('ConnectViaEthernet', () => {
   beforeEach(() => {
-    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: initialMockEthernet,
     })

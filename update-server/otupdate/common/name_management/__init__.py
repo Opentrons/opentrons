@@ -44,12 +44,16 @@ The robot has several names associated with it, some of which we tie together.
 from __future__ import annotations
 
 import json
+from typing import Annotated
 
-from aiohttp import web
+import fastapi
+from pydantic import BaseModel
 
+from server_utils.audit.fastapi import get_audit_logger
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
-from .. import auth
+from ..api_error import APIError, MessageBody
 from .name_synchronizer import (
     NameSynchronizer,
     get_name_synchronizer,
@@ -57,9 +61,33 @@ from .name_synchronizer import (
 )
 from .static_hostname import set_up_static_hostname
 
+router = fastapi.APIRouter()
 
-@auth.require_scopes(Scope.ROBOT_SETTINGS_WRITE)
-async def set_name_endpoint(request: web.Request) -> web.Response:
+
+class NameResponse(BaseModel):
+    """The robot's current human-readable name."""
+
+    name: str
+
+
+def _bad_request(message: str) -> APIError:
+    return APIError(400, MessageBody(message=message))
+
+
+@router.post(
+    "/server/name",
+    summary="Set the robot's name.",
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("change robot name")),
+    ],
+)
+async def set_name_endpoint(
+    request: fastapi.Request,
+    name_synchronizer: Annotated[
+        NameSynchronizer, fastapi.Depends(get_name_synchronizer)
+    ],
+) -> NameResponse:
     """Set the robot's name.
 
     This comprises a few things:
@@ -77,32 +105,32 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     In general, the name that is set will be the same name that was requested.
     It may be different if it had to be truncated, sanitized, etc.
     """
-
-    def build_400(msg: str) -> web.Response:
-        return web.json_response(data={"message": msg}, status=400)
-
     try:
         body = await request.json()
     except json.JSONDecodeError as exception:
         # stringifying a JSONDecodeError will include an error summary and location,
         # e.g. "Expecting value: line 1 column 1 (char 0)"
-        return build_400(str(exception))
+        raise _bad_request(str(exception)) from exception
 
     try:
         name_to_set = body["name"]
-    except KeyError:
-        return build_400('Body has no "name" key')
+    except KeyError as exception:
+        raise _bad_request('Body has no "name" key') from exception
 
     if not isinstance(name_to_set, str):
-        return build_400('"name" key is not a string"')
+        raise _bad_request('"name" key is not a string"')
 
-    name_synchronizer = get_name_synchronizer(request)
     new_name = await name_synchronizer.set_name(new_name=name_to_set)
 
-    return web.json_response(data={"name": new_name}, status=200)
+    return NameResponse(name=new_name)
 
 
-async def get_name_endpoint(request: web.Request) -> web.Response:
+@router.get("/server/name", summary="Get the robot's name.")
+async def get_name_endpoint(
+    name_synchronizer: Annotated[
+        NameSynchronizer, fastapi.Depends(get_name_synchronizer)
+    ],
+) -> NameResponse:
     """Get the robot's name, as previously set with `set_name_endpoint()`.
 
     This information is also accessible in /server/update/health, but this
@@ -110,10 +138,7 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
     GET /server/name -> 200 OK, {'name': robot name}
     """
-    name_synchronizer = get_name_synchronizer(request)
-    return web.json_response(
-        data={"name": await name_synchronizer.get_name()}, status=200
-    )
+    return NameResponse(name=await name_synchronizer.get_name())
 
 
 __all__ = [
@@ -123,4 +148,5 @@ __all__ = [
     "set_up_static_hostname",
     "get_name_endpoint",
     "set_name_endpoint",
+    "router",
 ]

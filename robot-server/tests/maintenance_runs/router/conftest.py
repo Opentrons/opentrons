@@ -3,6 +3,7 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -27,6 +28,12 @@ def mock_maintenance_run_orchestrator_store(
 def mock_protocol_engine(decoy: Decoy) -> ProtocolEngine:
     """Get a mock MaintenanceRunOrchestratorStore interface."""
     return decoy.mock(cls=ProtocolEngine)
+
+
+@pytest.fixture
+def mock_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock HardwareControlAPI."""
+    return decoy.mock(cls=OT3HardwareControlAPI)
 
 
 @pytest.fixture

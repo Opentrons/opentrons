@@ -115,7 +115,6 @@ export function SelectPipetteModal(
       />
     ) : (
       <Modal
-        marginLeft="0"
         width="37.125rem"
         type="info"
         title={t('add_pipette')}

@@ -79,6 +79,10 @@ export function toggleDevInternalFlag(
   return toggleConfigValue(`devInternal.${flag}`)
 }
 
+export function clearDevInternalFlags(): Types.UpdateConfigValueAction {
+  return updateConfigValue('devInternal', {})
+}
+
 // TODO(mc, 2020-02-05): move to `discovery` module
 export function addManualIp(ip: string): Types.AddUniqueConfigValueAction {
   return addUniqueConfigValue('discovery.candidates', ip)

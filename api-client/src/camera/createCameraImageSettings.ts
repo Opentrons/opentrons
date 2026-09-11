@@ -9,12 +9,13 @@ import type { HostConfig } from '../types'
 
 export function createCameraImageSettings(
   config: HostConfig,
-  data: CameraImageSettings
+  data: CameraImageSettings,
+  userNotes: string
 ): ResponsePromise<CameraImageSettingsResponse> {
   return request<CameraImageSettingsResponse, { data: CameraImageSettings }>(
     POST,
     `/camera/cameraSettings`,
-    { data },
-    config
+    config,
+    { body: { data }, userNotes }
   )
 }

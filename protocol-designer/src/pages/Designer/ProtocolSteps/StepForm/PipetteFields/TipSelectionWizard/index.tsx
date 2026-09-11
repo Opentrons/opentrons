@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { DIRTY } from '@opentrons/step-generation'
+import { DIRTY, EMPTY } from '@opentrons/step-generation'
 
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -13,10 +13,7 @@ import {
   getRobotStateAtActiveItem,
 } from '/protocol-designer/top-selectors/labware-locations'
 
-import {
-  INACCESSIBLE_INCOMPLETE,
-  INACCESSIBLE_TOO_MANY_PICKUPS,
-} from './constants'
+import { INACCESSIBLE_TOO_MANY_PICKUPS } from './constants'
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
@@ -78,7 +75,7 @@ export function TipSelectionWizard(
     tiprackSelected
   )
   const [showErrorBanner, setShowErrorBanner] = useState<boolean>(
-    selectedTips.flat().length > 0
+    selectedTips.length > 0
   )
   const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState =
@@ -86,6 +83,7 @@ export function TipSelectionWizard(
       ? robotState?.tipState.tipracks[selectedTiprackId]
       : null
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const { labware: activeDeckSetupLabware } = activeDeckSetup
   const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
   const robotType = useSelector(getRobotType)
@@ -93,8 +91,18 @@ export function TipSelectionWizard(
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
+  const selectedTiprackStatus =
+    selectedTiprackId != null ? tipAccessibilityStatus[selectedTiprackId] : {}
+
   const isAnySelectedWellUsed =
-    tipState != null && selectedTips.flat().some(tip => tipState[tip] === DIRTY)
+    tipState != null &&
+    selectedTips.some(group => {
+      const primary = group[0]
+      const affectedWells = selectedTiprackStatus[primary]?.affectedWells
+      return affectedWells != null
+        ? affectedWells.some(tip => tipState[tip] === DIRTY)
+        : group.some(tip => tipState[tip] === DIRTY)
+    })
   const handleSave = (): void => {
     updateFormTiprackSelected(selectedTiprackId)
     updateFormTipsSelected(selectedTips)
@@ -102,41 +110,46 @@ export function TipSelectionWizard(
   }
 
   const areAnyMatchingTipracksSelectable = getAreAnyMatchingTipracksSelectable({
-    allLabware: Object.values(activeDeckSetup.labware),
+    allLabware: Object.values(activeDeckSetupLabware),
     formTiprackUri,
     pipetteSpecs,
     nozzles,
     labwareEntities,
     validTiprackIds,
+    labwareRobotState: activeDeckSetupLabware,
   })
 
   const isSelectedTiprackValid =
     selectedTiprackId != null &&
     getIsTiprackSelectableAndValid({
-      labware: activeDeckSetup.labware[selectedTiprackId],
+      labware: activeDeckSetupLabware[selectedTiprackId],
       formTiprackUri,
       pipetteSpecs,
       nozzles,
       labwareEntities,
       validTiprackIds,
+      labwareRobotState: activeDeckSetupLabware,
     })
-
-  const selectedTiprackStatus =
-    selectedTiprackId != null ? tipAccessibilityStatus[selectedTiprackId] : {}
-  const isAnySelectedWellTooManyPickups = selectedTips
-    .flat()
-    .some(
-      tip =>
-        selectedTiprackStatus[tip].inaccessibleReason ===
-        INACCESSIBLE_TOO_MANY_PICKUPS
+  const isAnySelectedWellTooManyPickups = selectedTips.some(group => {
+    const primaryWell = group[0]
+    const selectedStatus = selectedTiprackStatus[primaryWell]
+    return (
+      selectedStatus != null &&
+      !selectedStatus.isAccessible &&
+      selectedStatus.inaccessibleReason === INACCESSIBLE_TOO_MANY_PICKUPS
     )
-  const isAnySelectedWellIncomplete = selectedTips
-    .flat()
-    .some(
-      tip =>
-        selectedTiprackStatus[tip].inaccessibleReason ===
-        INACCESSIBLE_INCOMPLETE
-    )
+  })
+  // Check physical tip state rather than the accessibility map for incompleteness. The map uses
+  // tipsToIgnore as all selected wells, so every selected group's own wells appear as isComplete=false.
+  // A group is actually incomplete only when a well is physically absent in the robot state.
+  const isAnySelectedWellIncomplete =
+    tipState != null &&
+    selectedTips.some(group => {
+      const primary = group[0]
+      const affectedWells =
+        selectedTiprackStatus[primary]?.affectedWells ?? group
+      return affectedWells.some(w => tipState[w] === EMPTY)
+    })
 
   const errorReason = ((): TipSelectionBannerReason | null => {
     if (isAnySelectedWellTooManyPickups) {

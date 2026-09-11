@@ -1,0 +1,9 @@
+.banner_wrapper {
+  display: flex;
+  width: 100%;
+  padding-right: var(--spacing-24);
+}
+
+.displayed_on_robot_overview {
+  margin-bottom: var(--spacing-10);
+}

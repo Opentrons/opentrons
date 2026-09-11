@@ -1,0 +1,137 @@
+test_name: The idleLogout setting controls token lifetimes
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: PATCH idleLogout to 30
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          idleLogout: 30.0
+    response:
+      status_code: 200
+
+  - name: New tokens should be issued with a 30s lifetime
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data: &password_grant
+        client_id: opentrons_app
+        grant_type: password
+        username: testadmin
+        password: testadminpassword
+    response:
+      status_code: 200
+      json:
+        expires_in: 30
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+      save:
+        json:
+          access_token: access_token
+          refresh_token: refresh_token
+      strict:
+        - json:off
+
+  - name: Introspection should show the access token as active inside the 30s lifetime
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{access_token}'
+    response:
+      status_code: 200
+      json:
+        active: true
+        username: testadmin
+      strict:
+        - json:off
+
+  - name: The refresh token should work inside the 30s lifetime
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{refresh_token}'
+    response:
+      status_code: 200
+      json:
+        expires_in: 30
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+      strict:
+        - json:off
+
+  - name: PATCH idleLogout to 1
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          idleLogout: 1.0
+    response:
+      status_code: 200
+
+  - name: New tokens should be issued with a 1s lifetime
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data: *password_grant
+    response:
+      status_code: 200
+      json:
+        expires_in: 1
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+      save:
+        json:
+          short_access_token: access_token
+          short_refresh_token: refresh_token
+      strict:
+        - json:off
+
+  - name: Introspection should show the access token as inactive outside the 1s lifetime
+    delay_before: 2
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{short_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: false
+      strict:
+        - json:off
+
+  - name: The refresh token should be rejected outside the 1s lifetime
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{short_refresh_token}'
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+      strict:
+        - json:off

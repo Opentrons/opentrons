@@ -4,6 +4,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
 from starlette import status as http_status_codes
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import ResourceLink
@@ -60,7 +61,10 @@ def get_session(manager: SessionManager, session_id: IdentifierType) -> BaseSess
     deprecated=True,
     response_model=SessionResponse,
     status_code=http_status_codes.HTTP_201_CREATED,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("make ot-2 calibration session")),
+    ],
 )
 async def create_session_handler(
     create_request: SessionCreateRequest,
@@ -89,7 +93,10 @@ async def create_session_handler(
     ),
     deprecated=True,
     response_model=SessionResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("delete ot2- calibration session")),
+    ],
 )
 async def delete_session_handler(
     sessionId: IdentifierType,
@@ -159,7 +166,10 @@ async def get_sessions_handler(
     ),
     deprecated=True,
     response_model=CommandResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("execute OT-2 calibration command")),
+    ],
 )
 async def session_command_execute_handler(
     sessionId: IdentifierType,

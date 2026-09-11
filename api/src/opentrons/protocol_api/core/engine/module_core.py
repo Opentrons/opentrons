@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, overload
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, cast, overload
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -26,6 +26,10 @@ from .tasks import EngineTaskCore
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
+)
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
 )
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control import modules as hw_modules
@@ -50,7 +54,13 @@ from opentrons.protocol_engine.types import (
     StackerLabwareMovementStrategy,
     StackerStoredLabwareGroup,
 )
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.types import (
+    APIVersion,
+    ThermocyclerStep,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
+    VacuumModuleStep,
+)
 from opentrons.types import DeckSlotName
 
 if TYPE_CHECKING:
@@ -116,6 +126,29 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         return self._engine_client.state.modules.get_definition(
             self.module_id
         ).displayName
+
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+        return MAX_GAUGE_PRESSURE_MBAR
+
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+        return MIN_GAUGE_PRESSURE_MBAR
+
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        inject = getattr(
+            self._sync_module_hardware, "inject_async_gcode_response", None
+        )
+        if inject is None:
+            raise NotImplementedError(
+                f"inject_async_gcode_response is not supported by {self.get_model()}"
+            )
+        inject(gcode_response=gcode_response, command=command)
 
 
 class NonConnectedModuleCore(AbstractModuleCore[LabwareCore]):
@@ -1165,19 +1198,26 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+        equalize_timeout_s: Optional[int] = None,
+    ) -> EngineTaskCore:
         """Set vacuum pressure."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPressureParams(
                 moduleId=self.module_id,
                 gaugePressure=gauge_pressure_mbar,
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
+
+        start_pressure_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_pressure_task
 
     def start_set_vacuum_power(
         self,
@@ -1186,24 +1226,110 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+        equalize_timeout_s: Optional[int] = None,
+    ) -> EngineTaskCore:
         """Set vacuum power."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPowerParams(
                 moduleId=self.module_id,
                 percentPower=percent_power,
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
+
+        start_power_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_power_task
 
     def stop_vacuum(
         self,
     ) -> None:
         self._engine_client.execute_command(
             cmd.vacuum_module.StopVacuumParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def _convert_vm_profile_steps(
+        self, steps: List[VacuumModuleStep], repetitions: int
+    ) -> cmd.vacuum_module.ProfileType:
+        protocol_engine_steps: cmd.vacuum_module.ProfileType = []
+
+        for step in steps:
+            enable_pump = step.get("enable_pump")
+            hold_time_seconds = step.get("hold_time_seconds")
+            ramp_rate = step.get("ramp_rate")
+            timeout_s = step.get("timeout_seconds")
+            vent_after = step.get("vent_after")
+            if step.get("percent_power") is not None:
+                this_power_step = cast(VacuumModulePowerStep, step)
+                percent_power = this_power_step.get("percent_power")
+                pe_power_step = cmd.vacuum_module.VacuumModuleProfilePowerStep(
+                    enablePump=enable_pump if enable_pump is not None else False,
+                    holdTimeSeconds=hold_time_seconds,
+                    rampRate=ramp_rate,
+                    timeoutSeconds=timeout_s,
+                    ventAfter=vent_after,
+                    percentPower=percent_power,
+                )
+                protocol_engine_steps.append(pe_power_step)
+            else:
+                this_pressure_step = cast(VacuumModulePressureStep, step)
+                gauge_pressure_mbar = this_pressure_step.get("gauge_pressure_mbar")
+                pe_pressure_step = cmd.vacuum_module.VacuumModuleProfilePressureStep(
+                    enablePump=enable_pump if enable_pump is not None else False,
+                    holdTimeSeconds=hold_time_seconds,
+                    rampRate=ramp_rate,
+                    timeoutSeconds=timeout_s,
+                    ventAfter=vent_after,
+                    gaugePressureMbar=gauge_pressure_mbar,
+                )
+                protocol_engine_steps.append(pe_pressure_step)
+        return protocol_engine_steps * repetitions
+
+    def start_execute_profile(
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int,
+        vent_after: bool = False,
+        equalize_timeout_s: Optional[int] = None,
+    ) -> EngineTaskCore:
+        """Start the execution of a vacuum module profile and return a task."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        engine_steps = self._convert_vm_profile_steps(
+            steps=steps, repetitions=repetitions
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.vacuum_module.StartRunProfileParams(
+                moduleId=self.module_id,
+                profile=engine_steps,
+                ventAfter=vent_after,
+                equalizeTimeout=equalize_timeout_s,
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+        start_execute_profile_result = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_execute_profile_result
+
+    def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(
+                moduleId=self.module_id,
+                equalizeTimeout=equalize_timeout_s,
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def close_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
             command_annotations=self._protocol_core.annotation_ids,
         )

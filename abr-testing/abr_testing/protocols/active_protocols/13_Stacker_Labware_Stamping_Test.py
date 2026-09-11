@@ -19,7 +19,7 @@ metadata = {
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
 DECK_SLOTS = ["A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]

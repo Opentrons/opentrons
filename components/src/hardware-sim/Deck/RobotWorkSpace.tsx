@@ -22,7 +22,7 @@ type BaseProps = {
   id?: string
 } & (
   | // Require at least one of deckDef or viewBox,
-  {
+    {
       deckDef: DeckDefinition
     }
   | {

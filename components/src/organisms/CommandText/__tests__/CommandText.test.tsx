@@ -491,7 +491,7 @@ describe('CommandText', () => {
         />,
         { i18nInstance: i18n }
       )
-      screen.getByText('Load P300 Single-Channel GEN1 in Left Mount')
+      screen.getByText('Load P300 Single-Channel GEN1 on left mount')
     }
   })
   it('renders correct text for loadModule', () => {

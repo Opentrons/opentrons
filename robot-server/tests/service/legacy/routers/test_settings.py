@@ -33,12 +33,17 @@ from robot_server.persistence.images_directory import ImagesResetter
 
 def test_get_robot_settings(api_client, hardware):
     Conf = make_dataclass("Conf", ["a", "b", "c"])
-    hardware.config = Conf(a="test", b="this", c=5)
+
+    async def _dummy_return_config(*args, **kwargs):
+        return Conf(a="test", b="this", c=5)
+
+    hardware.update_config.side_effect = _dummy_return_config
 
     res = api_client.get("/settings/robot")
 
     assert res.status_code == 200
     assert res.json() == {"a": "test", "b": "this", "c": 5}
+    hardware.update_config.assert_called_once_with()
 
 
 @pytest.fixture

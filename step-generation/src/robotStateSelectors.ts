@@ -8,7 +8,7 @@ import {
   ALL,
   COLUMN,
   FLEX_STACKER_MODULE_TYPE,
-  getIsLid,
+  getIsTiprack,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
@@ -23,7 +23,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
-import { getSlotInLocationStack } from './utils'
+import {
+  getIsInPipettableLocation,
+  getIsSafePickupWithinTiprack,
+  getLabwareHasLid,
+  getPipetteMovementSafetyStatus,
+  getSlotInLocationStack,
+} from './utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -211,26 +217,43 @@ export function getNextTiprack(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
   }
-  // filter out unmounted or non-compatible tiprack models
+  // filter out unmounted or non-compatible or lidded tiprack models
+  const excludedByLid: string[] = []
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
       console.assert(
         invariantContext.labwareEntities[labwareId]?.labwareDefURI != null,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
-      const isOnDeck =
-        getSlotInLocationStack(robotState.labware[labwareId].stack) !==
-        'offDeck'
+      const slotInLocationStack = getSlotInLocationStack(
+        robotState.labware[labwareId].stack
+      )
+      const isInPipettableLocation =
+        getIsInPipettableLocation(slotInLocationStack)
+
+      const hasLid = getLabwareHasLid({
+        labwareId,
+        labwareRobotState: robotState.labware,
+        labwareEntities: invariantContext.labwareEntities,
+      })
+      if (
+        isInPipettableLocation &&
+        hasLid &&
+        getIsTiprack(invariantContext.labwareEntities[labwareId].def)
+      ) {
+        excludedByLid.push(labwareId)
+        return false
+      }
+
       const labwareIdDefUri =
         invariantContext.labwareEntities[labwareId].labwareDefURI
-      return isOnDeck && labwareIdDefUri === tipRackUri
+      return isInPipettableLocation && labwareIdDefUri === tipRackUri
     }
   )
   let filteredSortedTiprackIds = sortedTipracksIds
   const is96Channel = pipetteEntity.spec.channels === 96
 
   const excludedBy96Channel: string[] = []
-  const excludedByLid: string[] = []
 
   if (is96Channel) {
     filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
@@ -250,17 +273,6 @@ export function getNextTiprack(
     })
   }
 
-  filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
-    const locationHasLid = Object.entries(robotState.labware).find(
-      ([id, temporalProperties]) =>
-        temporalProperties.stack.includes(tiprackId) &&
-        getIsLid(invariantContext.labwareEntities[id].def)
-    )
-    if (locationHasLid != null) {
-      excludedByLid.push(tiprackId)
-    }
-    return locationHasLid == null
-  })
   let firstAvailableTiprack: string | null = null
   let nextTip: string | null = null
 
@@ -273,8 +285,39 @@ export function getNextTiprack(
       robotState,
       primaryNozzle,
     })
+    const { isSafe: isCandidateSafeMovement } =
+      candidateTip != null
+        ? getPipetteMovementSafetyStatus({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId: tiprackId,
+            wellTargetName: candidateTip,
+            primaryNozzle,
+            nozzleConfiguration: nozzles,
+          })
+        : { isSafe: false }
+    const {
+      isSafe: isSafeWithinTiprack,
+      isComplete: isCompletePickup = false,
+    } =
+      candidateTip != null
+        ? getIsSafePickupWithinTiprack({
+            tipState: robotState.tipState.tipracks[tiprackId],
+            primaryNozzle,
+            channels: pipetteEntity.spec.channels,
+            nozzleConfiguration: nozzles,
+            wellName: candidateTip,
+            tiprackDef: invariantContext.labwareEntities[tiprackId].def,
+          })
+        : { isSafe: false }
 
-    if (candidateTip) {
+    if (
+      candidateTip &&
+      isCandidateSafeMovement &&
+      isSafeWithinTiprack &&
+      isCompletePickup
+    ) {
       firstAvailableTiprack = tiprackId
       nextTip = candidateTip
       break

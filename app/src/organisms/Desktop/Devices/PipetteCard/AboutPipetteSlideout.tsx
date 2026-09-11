@@ -12,8 +12,8 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 
+import type { AttachedPipette } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette } from '/app/redux/pipettes/types'
 
 interface AboutPipetteSlideoutProps {
   pipetteId: AttachedPipette['id']

@@ -98,7 +98,6 @@ export const HintsModal = (): JSX.Element | null => {
 
   return createPortal(
     <Modal
-      marginLeft="0"
       type="warning"
       zIndexOverlay={15}
       title={t(`hint.${hint.hintKey}.title`, i18nValues)}

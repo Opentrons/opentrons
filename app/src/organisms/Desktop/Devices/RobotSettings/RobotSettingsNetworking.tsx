@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
@@ -15,7 +15,6 @@ import {
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
@@ -27,14 +26,17 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 
 interface NetworkingProps {
   robotName: string
@@ -52,16 +54,13 @@ export function RobotSettingsNetworking({
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
-  const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robotName)
 
   const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(false)
 
   const canDisconnect = useCanDisconnect(robotName)
 
-  const { wifi, ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi, ethernet } = useNetworkInterfaces(robotName, STATUS_REFRESH_MS)
   const activeNetwork = wifiList?.find(network => network.active)
 
   const ssid = activeNetwork?.ssid ?? null
@@ -84,8 +83,6 @@ export function RobotSettingsNetworking({
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isFlexConnectedViaUSB =
     usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
-
-  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
     <>
@@ -130,68 +127,61 @@ export function RobotSettingsNetworking({
           </LegacyStyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
-          {wifi?.ipAddress != null ? (
-            <>
-              <Flex marginBottom={SPACING.spacing24}>
-                <Flex marginRight={SPACING.spacing8}>
-                  <SelectNetwork
-                    robotName={robotName}
-                    isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-                  />
-                </Flex>
-                {canDisconnect && !isRobotBusy ? (
-                  <SecondaryButton
-                    onClick={() => {
-                      setShowDisconnectModal(true)
-                    }}
-                    disabled={isEstopNotDisengaged}
-                  >
-                    {t('disconnect_from_wifi')}
-                  </SecondaryButton>
-                ) : null}
-              </Flex>
-              <Flex gridGap={SPACING.spacing16}>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_ip')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.ipAddress}
-                  </LegacyStyledText>
-                </Flex>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_subnet_mask')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.subnetMask}
-                  </LegacyStyledText>
-                </Flex>
-
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_mac_address')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.macAddress}
-                  </LegacyStyledText>
-                </Flex>
-              </Flex>
-            </>
-          ) : (
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <SelectNetwork robotName={robotName} isRobotBusy={isRobotBusy} />
+          <Flex
+            marginBottom={
+              wifi?.ipAddress != null ? SPACING.spacing24 : undefined
+            }
+          >
+            <Flex
+              marginRight={
+                wifi?.ipAddress != null ? SPACING.spacing8 : undefined
+              }
+              flexDirection={DIRECTION_COLUMN}
+            >
+              <SelectNetwork
+                robotName={robotName}
+                isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+              />
             </Flex>
-          )}
+            {wifi?.ipAddress != null && canDisconnect && !isRobotBusy ? (
+              <SecondaryButton
+                onClick={() => {
+                  setShowDisconnectModal(true)
+                }}
+                disabled={isEstopNotDisengaged}
+              >
+                {t('disconnect_from_wifi')}
+              </SecondaryButton>
+            ) : null}
+          </Flex>
+          {wifi?.ipAddress != null ? (
+            <Flex gridGap={SPACING.spacing16}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_ip')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.ipAddress}
+                </LegacyStyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_subnet_mask')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.subnetMask}
+                </LegacyStyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_mac_address')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.macAddress}
+                </LegacyStyledText>
+              </Flex>
+            </Flex>
+          ) : null}
         </Box>
         <Divider />
         <Flex alignItems={ALIGN_CENTER}>
@@ -270,7 +260,7 @@ export function RobotSettingsNetworking({
               flexDirection={DIRECTION_COLUMN}
               marginTop={SPACING.spacing16}
             >
-              <ExternalLink href={HELP_CENTER_URL} id="WiredUSB_description">
+              <ExternalLink href={HELP_CENTER_URL}>
                 {t('wired_usb_description')}
               </ExternalLink>
               <LegacyStyledText

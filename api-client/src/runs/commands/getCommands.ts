@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../../request'
+import { GET, request } from '../../request'
 
 import type { CommandsData } from '..'
 import type { ResponsePromise } from '../../request'
@@ -10,11 +10,7 @@ export function getCommands(
   runId: string,
   params: GetRunCommandsParamsRequest
 ): ResponsePromise<CommandsData> {
-  return request<CommandsData>(
-    GET,
-    `/runs/${runId}/commands`,
-    null,
-    config,
-    params && createAxiosConfig({ params })
-  )
+  return request<CommandsData>(GET, `/runs/${runId}/commands`, config, {
+    queryParams: { ...params },
+  })
 }

@@ -211,70 +211,74 @@ def test_mount(
             report(section, tag, [target_z, z_enc])
         return z_aligned
 
-    # LOOP THROUGH CURRENTS + SPEEDS
-    currents = list(CURRENTS_SPEEDS.keys())
-    for current in sorted(currents, reverse=True):
-        speeds = CURRENTS_SPEEDS[current]
-        for speed in sorted(speeds, reverse=False):
-            include_pass_fail = current >= MIN_PASS_CURRENT
-            # HOME
-            api.home([z_ax])
-            home_pos = api.gantry_position(OT3Mount.GRIPPER)
-            # LOWER CURRENT
-            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
-                api, z_ax, run_current=current
-            )
-            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
-                api, z_ax, default_max_speed=speed
-            )
-            api._set_active_current({z_ax: current})
-            # MOVE DOWN
-            _save_result(
-                _get_mount_test_tag(current, speed, "down", "start"),
-                target_z=home_pos.z,
-                include_pass_fail=include_pass_fail,
-            )
-            api.move_rel(
-                mount,
-                Point(z=-Z_AXIS_TRAVEL_DISTANCE),
-                speed=speed,
-                expect_stalls=True,
-            )
-            down_end_passed = _save_result(
-                _get_mount_test_tag(current, speed, "down", "end"),
-                target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
-                include_pass_fail=include_pass_fail,
-            )
-            if down_end_passed:
-                # MOVE UP
+    try:
+        helpers_ot3.enable_stall_detection(api, False)
+        # LOOP THROUGH CURRENTS + SPEEDS
+        currents = list(CURRENTS_SPEEDS.keys())
+        for current in sorted(currents, reverse=True):
+            speeds = CURRENTS_SPEEDS[current]
+            for speed in sorted(speeds, reverse=False):
+                include_pass_fail = current >= MIN_PASS_CURRENT
+                # HOME
+                api.home([z_ax])
+                home_pos = api.gantry_position(OT3Mount.GRIPPER)
+                # LOWER CURRENT
+                helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                    api, z_ax, run_current=current
+                )
+                helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                    api, z_ax, default_max_speed=speed
+                )
+                api._set_active_current({z_ax: current})
+                # MOVE DOWN
                 _save_result(
-                    _get_mount_test_tag(current, speed, "up", "start"),
-                    target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                    _get_mount_test_tag(current, speed, "down", "start"),
+                    target_z=home_pos.z,
                     include_pass_fail=include_pass_fail,
                 )
                 api.move_rel(
                     mount,
-                    Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                    Point(z=-Z_AXIS_TRAVEL_DISTANCE),
                     speed=speed,
                     expect_stalls=True,
                 )
-                up_end_passed = _save_result(
-                    _get_mount_test_tag(current, speed, "up", "end"),
-                    target_z=home_pos.z,
+                down_end_passed = _save_result(
+                    _get_mount_test_tag(current, speed, "down", "end"),
+                    target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
                     include_pass_fail=include_pass_fail,
                 )
-            else:
-                up_end_passed = False
-            # RESET CURRENTS AND HOME
-            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
-                api, z_ax, run_current=default_z_current
-            )
-            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
-                api, z_ax, default_max_speed=default_z_speed
-            )
-            api.home([z_ax])
-            if not down_end_passed or not up_end_passed and not api.is_simulator:
-                break
+                if down_end_passed:
+                    # MOVE UP
+                    _save_result(
+                        _get_mount_test_tag(current, speed, "up", "start"),
+                        target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                        include_pass_fail=include_pass_fail,
+                    )
+                    api.move_rel(
+                        mount,
+                        Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                        speed=speed,
+                        expect_stalls=True,
+                    )
+                    up_end_passed = _save_result(
+                        _get_mount_test_tag(current, speed, "up", "end"),
+                        target_z=home_pos.z,
+                        include_pass_fail=include_pass_fail,
+                    )
+                else:
+                    up_end_passed = False
+                # RESET CURRENTS AND HOME
+                helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                    api, z_ax, run_current=default_z_current
+                )
+                helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                    api, z_ax, default_max_speed=default_z_speed
+                )
+                api.home([z_ax])
+                if not down_end_passed or not up_end_passed and not api.is_simulator:
+                    break
+    finally:
+        helpers_ot3.enable_stall_detection(api, False)
 
 
 # -----------------   TEST Probe   ----------------

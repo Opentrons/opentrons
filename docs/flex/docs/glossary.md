@@ -193,7 +193,7 @@ See [*ambient lighting*](#ambient-lighting) or [*status light*](#status-light).
 
 ##### Liquid class
 
-A set of pipetting parameters—such as flow rate, submerge depth, air gap, blowout, and touch tip—optimized for a particular type of liquid. Opentrons provides verified liquid classes for aqueous, viscous, and volatile liquids. You can also modify or define custom liquid classes. See the [Liquid classes section](../python-api/liquid-classes.md) in the Python Protocol API documentation.
+A set of pipetting parameters—such as flow rate, submerge depth, air gap, blowout, and touch tip—optimized for a particular type of liquid. Opentrons provides verified liquid classes for aqueous, viscous, and volatile liquids. You can also modify or define custom liquid classes. See the [Liquid classes section](../python-api/liquid-classes/index.md) in the Python Protocol API documentation.
 
 ##### Liquid level detection
 

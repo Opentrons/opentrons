@@ -624,4 +624,66 @@ describe('hostsByIp reducer', () => {
       },
     })
   })
+
+  it('should rename all hosts with the previous robot name', () => {
+    const host = {
+      port: 31950,
+      seen: true,
+      healthStatus: Constants.HEALTH_STATUS_OK,
+      serverHealthStatus: Constants.HEALTH_STATUS_OK,
+      healthError: null,
+      serverHealthError: null,
+      robotName: 'shared-name',
+      advertisedModel: null,
+    }
+    const initialState = {
+      '127.0.0.1': { ...host, ip: '127.0.0.1' },
+      '127.0.0.2': { ...host, ip: '127.0.0.2' },
+      '127.0.0.3': {
+        ...host,
+        ip: '127.0.0.3',
+        robotName: 'opentrons-other',
+      },
+    }
+
+    const nextState = hostsByIpReducer(
+      initialState,
+      Actions.renameRobot('shared-name', 'new-name')
+    )
+
+    expect(nextState).toEqual({
+      '127.0.0.1': {
+        ...initialState['127.0.0.1'],
+        robotName: 'new-name',
+      },
+      '127.0.0.2': {
+        ...initialState['127.0.0.2'],
+        robotName: 'new-name',
+      },
+      '127.0.0.3': initialState['127.0.0.3'],
+    })
+  })
+
+  it('should noop "client:RENAME_ROBOT" if no host has that name', () => {
+    const initialState = {
+      '127.0.0.1': {
+        ip: '127.0.0.1',
+        port: 31950,
+        seen: true,
+        healthStatus: Constants.HEALTH_STATUS_OK,
+        serverHealthStatus: Constants.HEALTH_STATUS_OK,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-other',
+        advertisedModel: null,
+      },
+    }
+
+    const nextState = hostsByIpReducer(
+      initialState,
+      Actions.renameRobot('opentrons-dev', 'new-name')
+    )
+
+    expect(nextState).toBe(initialState)
+  })
 })

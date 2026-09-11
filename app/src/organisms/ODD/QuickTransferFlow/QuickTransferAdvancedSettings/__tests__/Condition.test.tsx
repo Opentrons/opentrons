@@ -18,6 +18,8 @@ let mockTrackEventWithRobotSerial: any
 const modifiedQuickTransferState = {
   ...QuickTransferState,
   path: 'multiAspirate',
+  // leaves 8 µL of the 10 µL tip free for conditioning
+  volume: 1,
 }
 
 const render = (props: ComponentProps<typeof Condition>) => {
@@ -70,6 +72,20 @@ describe('Condition', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
+  it('should disable the save button until a valid volume is entered', async () => {
+    const user = userEvent.setup()
+    render(props)
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: '9' }))
+    screen.getByText('Value must be between 0 to 8')
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'del' }))
+    await user.click(screen.getByRole('button', { name: '8' }))
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeEnabled()
+  })
+
   it('should call dispatch when clicking save button', async () => {
     const user = userEvent.setup()
     render(props)
@@ -77,12 +93,11 @@ describe('Condition', () => {
     screen.getByText('Continue')
     await user.click(screen.getByText('Enabled'))
     await user.click(screen.getByText('Continue'))
-    await user.click(screen.getByRole('button', { name: '1' }))
-    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '8' }))
     await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_CONDITION_ASPIRATE',
-      conditionAspirate: 11,
+      conditionAspirate: 8,
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: 'quickTransferSettingSaved',

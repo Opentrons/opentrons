@@ -88,11 +88,6 @@
   border: 1px solid var(--red-50);
 }
 
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .textarea_keyboard_focus:focus {
   border: 1px solid var(--blue-50);
   outline: 2px solid var(--blue-50);
@@ -123,4 +118,33 @@
 .error_text {
   padding-top: var(--spacing-4);
   color: var(--red-50);
+}
+
+/* Stretch label + textarea to fill a flex column parent. */
+.wrapper_multiline {
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.column_container_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.clickable_column_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.textarea_row_multiline {
+  min-height: 0;
+  flex: 1;
+  align-items: stretch;
+}
+
+.textarea_multiline {
+  min-height: 0;
+  flex: 1;
 }

@@ -6,6 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { usePlayRunMutation } from '..'
 import { mockPlayRunAction, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -36,9 +37,10 @@ describe('usePlayRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
-    const { result } = renderHook(usePlayRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePlayRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      { wrapper }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.playRun(RUN_ID_1))
@@ -53,9 +55,12 @@ describe('usePlayRunMutation hook', () => {
       data: mockPlayRunAction,
     } as Response<RunAction>)
 
-    const { result } = renderHook(usePlayRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePlayRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.playRun(RUN_ID_1))
 
     await waitFor(() => {

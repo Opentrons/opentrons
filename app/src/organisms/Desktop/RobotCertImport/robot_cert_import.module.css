@@ -12,3 +12,9 @@
   flex-direction: column;
   row-gap: var(--spacing-24);
 }
+
+.text_block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}

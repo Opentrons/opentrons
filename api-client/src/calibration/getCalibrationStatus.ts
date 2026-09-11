@@ -7,5 +7,5 @@ import type { CalibrationStatus } from './types'
 export function getCalibrationStatus(
   config: HostConfig
 ): ResponsePromise<CalibrationStatus> {
-  return request<CalibrationStatus>(GET, '/calibration/status', null, config)
+  return request<CalibrationStatus>(GET, '/calibration/status', config)
 }

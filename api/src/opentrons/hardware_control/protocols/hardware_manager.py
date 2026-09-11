@@ -2,11 +2,18 @@ from typing import Dict, Optional
 
 from typing_extensions import Protocol
 
-from ..types import Axis, SubSystem, SubSystemState
+from ..types import Axis, HardwareSystemInfo, SubSystem, SubSystemState
 
 
 class HardwareManager(Protocol):
     """Protocol specifying access to configuration plane elements of hardware."""
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        """Get the hardware information of the system.
+
+        Present system-level version and revision information.
+        """
+        ...
 
     def get_fw_version(self) -> str:
         """
@@ -21,6 +28,8 @@ class HardwareManager(Protocol):
 
         The version is a string retrieved directly from the attached hardware
         (or possibly simulator).
+
+        Do not use this in a remote call; prefer get_hw_details.
         """
         ...
 
@@ -28,6 +37,8 @@ class HardwareManager(Protocol):
     def board_revision(self) -> str:
         """
         Return the revision of the central hardware.
+
+        Do not use this in a remote call; prefer get_hw_details.
         """
         ...
 
@@ -44,7 +55,10 @@ class HardwareManager(Protocol):
         ...
 
     async def get_serial_number(self) -> Optional[str]:
-        """Get the robot serial number, if provisioned. If not provisioned, will be None."""
+        """Get the robot serial number, if provisioned. If not provisioned, will be None.
+
+        Do not use this in a remote call; prefer get_hw_details.
+        """
         ...
 
     def axis_is_present(self, axis: Axis) -> bool:

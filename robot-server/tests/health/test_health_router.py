@@ -7,9 +7,12 @@ import pytest
 from decoy import Decoy
 from mock import MagicMock, patch
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import HardwareSystemInfo
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.disk_monitor.models import DiskDetails
 from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.health.router import (
     ComponentVersions,
@@ -31,20 +34,30 @@ def images_directory(tmp_path: Path) -> Path:
 def disk_monitor(decoy: Decoy) -> DiskMonitor:
     """Get a mocked out DiskMonitor interface."""
     mock = decoy.mock(cls=DiskMonitor)
-    decoy.when(mock.get_available_disk_space_mb()).then_return(1000.0)
-    decoy.when(mock.get_images_directory_size_mb()).then_return(500.0)
+    decoy.when(mock.get_details()).then_return(
+        DiskDetails(
+            systemAvailableMb=1000.0,
+            systemTotalMb=5000.0,
+            imagesDirectorySizeMb=500.0,
+            runStartLimitFreeSpaceMb=100.0,
+            isDiskSpaceBelowRunStartLimit=True,
+        )
+    )
     return mock
 
 
 async def test_get_health(
-    hardware: MagicMock,
+    hardware_api: HardwareControlAPI,
     disk_monitor: DiskMonitor,
     images_directory: Path,
+    decoy: Decoy,
 ) -> None:
     """Test get_health function."""
-    hardware.fw_version = "FW111"
-    hardware.board_revision = "BR2.1"
-    hardware.get_serial_number.return_value = "mytestserial"
+    decoy.when(await hardware_api.get_hw_details()).then_return(
+        HardwareSystemInfo(
+            fw_version="FW111", board_revision="BR2.1", serial_number="mytestserial"
+        )
+    )
 
     versions = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
@@ -53,7 +66,7 @@ async def test_get_health(
     robot_type: RobotType = "OT-2 Standard"
 
     result = await get_health(
-        hardware=hardware,
+        hardware=hardware_api,
         sql_engine=MagicMock(),
         versions=versions,
         robot_type=robot_type,
@@ -85,7 +98,10 @@ async def test_get_health(
         "robot_serial": "mytestserial",
         "disk_details": {
             "systemAvailableMb": 1000.0,
+            "systemTotalMb": 5000.0,
             "imagesDirectorySizeMb": 500.0,
+            "runStartLimitFreeSpaceMb": 100.0,
+            "isDiskSpaceBelowRunStartLimit": True,
         },
     }
 
@@ -93,14 +109,17 @@ async def test_get_health(
 
 
 async def test_get_health_with_none_version(
-    hardware: MagicMock,
+    hardware_api: HardwareControlAPI,
     disk_monitor: DiskMonitor,
     images_directory: Path,
+    decoy: Decoy,
 ) -> None:
     """Test get_health function with no serial number."""
-    hardware.fw_version = "FW111"
-    hardware.board_revision = "BR2.1"
-    hardware.get_serial_number.return_value = None
+    decoy.when(await hardware_api.get_hw_details()).then_return(
+        HardwareSystemInfo(
+            fw_version="FW111", board_revision="BR2.1", serial_number=None
+        )
+    )
 
     versions = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
@@ -109,7 +128,7 @@ async def test_get_health_with_none_version(
     robot_type: RobotType = "OT-2 Standard"
 
     result = await get_health(
-        hardware=hardware,
+        hardware=hardware_api,
         sql_engine=MagicMock(),
         versions=versions,
         robot_type=robot_type,
@@ -140,7 +159,10 @@ async def test_get_health_with_none_version(
         },
         "disk_details": {
             "systemAvailableMb": 1000.0,
+            "systemTotalMb": 5000.0,
             "imagesDirectorySizeMb": 500.0,
+            "runStartLimitFreeSpaceMb": 100.0,
+            "isDiskSpaceBelowRunStartLimit": True,
         },
     }
 

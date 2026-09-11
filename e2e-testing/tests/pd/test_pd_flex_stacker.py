@@ -196,7 +196,6 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     plate_reader_page.button_selection("Save")
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("D4 Opentrons Flex Tip Rack Lid", "D3 Waste Chute in D3")
-    plate_reader_page.button_selection("Confirm")
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("D4 Opentrons Flex 96 Tip Rack", "A2")
     print("✓ Move lid from tip rack on shuttle to waste chute, and move tip rack to deck")

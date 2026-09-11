@@ -23,7 +23,7 @@ async def test_put(decoy: Decoy, mock_run_data_manager: RunDataManager) -> None:
         run_data_manager=mock_run_data_manager,
     )
     decoy.verify(
-        mock_run_data_manager.set_error_recovery_rules(
+        await mock_run_data_manager.set_error_recovery_rules(
             run_id="run-id", rules=policies.policyRules
         )
     )
@@ -35,7 +35,7 @@ async def test_put_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=er_models.ErrorRecoveryPolicy)
     decoy.when(
-        mock_run_data_manager.set_error_recovery_rules(  # type: ignore[func-returns-value]
+        await mock_run_data_manager.set_error_recovery_rules(  # type: ignore[func-returns-value]
             run_id="run-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())

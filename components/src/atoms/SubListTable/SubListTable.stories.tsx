@@ -2,6 +2,7 @@ import { css } from 'styled-components'
 
 import { Flex, VIEWPORT } from '@opentrons/components'
 
+import { customViewports } from '../../../../.storybook/preview'
 import { SubListTable as SubListTableComponent } from './index'
 
 import type { Meta, Story } from '@storybook/react'
@@ -25,7 +26,9 @@ export default {
         'Use SubListTable only when there should a table-esque component in a real table (ListTable), otherwise use ListTable.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface SubListTableStoryProps extends ComponentProps<

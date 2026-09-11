@@ -28,6 +28,7 @@ import {
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
 } from '@opentrons/step-generation'
 
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
@@ -42,7 +43,10 @@ import {
   SelectLabwareModal,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
-import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import {
+  DECK_SETUP_TOOLS_WIDTH_REM,
+  VACUUM_DOCK_DISPLAY_LOCATION,
+} from '../../../constants'
 import {
   createContainer,
   deleteContainer,
@@ -54,7 +58,11 @@ import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
-import { getIsLabwareOnSlotInUse, getIsVacuumModuleFull } from './utils'
+import {
+  getIsLabwareOnSlotInUse,
+  getIsVacuumDockFull,
+  getIsVacuumModuleFull,
+} from './utils'
 
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
@@ -107,6 +115,8 @@ export function DeckSetupToolbox(
     return null
   }
   const isHopperSlot = getIsSlotAHopper(slot)
+  const isVacuumDockSlot = getIsSlotAVacuumDock(slot)
+  const realSlot = slot
   const offDeckLabware = deckSetup.labware[slot]
   const isVacuumModule =
     selectedModuleModel != null &&
@@ -142,6 +152,14 @@ export function DeckSetupToolbox(
   const isVacuumModuleFull =
     hasVacuumModuleCreated &&
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
+
+  const isVacuumDockFull =
+    isVacuumDockSlot &&
+    getIsVacuumDockFull(
+      createdAdapterForSlot?.id ?? null,
+      createdStackForSlot,
+      deckSetup.labware
+    )
 
   const slotFull =
     ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -198,10 +216,28 @@ export function DeckSetupToolbox(
       (createdAdapterForSlot != null || createdStackForSlot.length > 0)
 
     //  handle clear for if you are changing the adapter/labware combo
-    // For vacuum modules, use additive behavior (never clear)
-    if (!isOffDeck && !isVacuumModule) {
+    // For vacuum modules and the vacuum dock, use additive behavior (never clear)
+    if (!isOffDeck && !isVacuumModule && !isVacuumDockSlot) {
       handleClear()
     }
+
+    // For the vacuum dock, when collar is present and user is adding a well plate,
+    // stack it on top of the collar rather than at the raw dock slot
+    if (
+      isVacuumDockSlot &&
+      createdAdapterForSlot != null &&
+      selectedTopLabware.labwareDefURI != null
+    ) {
+      dispatch(
+        createContainer({
+          slot: createdAdapterForSlot.id,
+          labwareDefURIStack: [selectedTopLabware.labwareDefURI],
+        })
+      )
+      setShowSelectLabwareModal(false)
+      return
+    }
+
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule && !vacuumModuleHasLabware) {
       let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
@@ -248,7 +284,7 @@ export function DeckSetupToolbox(
     } else {
       dispatch(
         createContainer({
-          slot,
+          slot: realSlot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
@@ -299,9 +335,16 @@ export function DeckSetupToolbox(
       handleClear()
     }
   }
-  const displaySlot = getIsSlotAHopper(slot)
-    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
-    : slot
+
+  let displaySlot = slot
+  if (getIsSlotAHopper(slot)) {
+    displaySlot = t('shared:stacker', { slot: getColumnFromWellName(slot) })
+  } else if (getIsSlotAVacuumDock(slot)) {
+    displaySlot = VACUUM_DOCK_DISPLAY_LOCATION
+  }
+
+  const isMultiStack = createdStackForSlot.length > 1
+  const shouldShowTopBottomOfSlotLabels = slotFull || isMultiStack
 
   return (
     <>
@@ -368,13 +411,16 @@ export function DeckSetupToolbox(
               <EmptySelectorButton
                 textAlignment="left"
                 text={
-                  hasNoLabware || hasVacuumModuleCreated
+                  hasNoLabware || hasVacuumModuleCreated || isVacuumDockSlot
                     ? t('add_labware')
                     : t('replace_labware')
                 }
                 iconName="plus"
                 onClick={() => {
-                  if (hasVacuumModuleCreated && isVacuumModuleFull) {
+                  if (
+                    (hasVacuumModuleCreated && isVacuumModuleFull) ||
+                    isVacuumDockFull
+                  ) {
                     makeSnackbar(t('labware_limit_reached') as string)
                   } else {
                     setShowSelectLabwareModal(true)
@@ -396,7 +442,7 @@ export function DeckSetupToolbox(
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -432,7 +478,7 @@ export function DeckSetupToolbox(
                   location={slot}
                 />
               ) : null}
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}

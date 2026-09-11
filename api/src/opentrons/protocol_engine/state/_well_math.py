@@ -193,8 +193,7 @@ def wells_covered_sparse(  # noqa: C901
                     ]
             elif starting_nozzle == "H1":
                 if (
-                    target_column_index + nozzle_column
-                    < len(target_wells_by_column[target_column_index])
+                    target_column_index + nozzle_column < len(target_wells_by_column)
                 ) and (target_row_index - nozzle_row >= 0):
                     yield target_wells_by_column[target_column_index + nozzle_column][
                         target_row_index - nozzle_row

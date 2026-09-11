@@ -90,6 +90,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
     isOnDevice,
     errorDetails,
     handleMustHome: dropTipCommands.handleMustHome,
+    handleClearError: props.clearErrorDetails,
   })
 
   const goBackRunValid = (): Promise<void> => {
@@ -191,7 +192,7 @@ export const DropTipWizardContent = (
   } = props
 
   const { t } = useTranslation('drop_tip_wizard')
-  const confirmPositionUtils = useConfirmPosition(currentStep)
+  const confirmPositionUtils = useConfirmPosition(currentStep, errorDetails)
 
   function buildGettingReady(): JSX.Element {
     return <InProgressModal description={t('getting_ready')} />

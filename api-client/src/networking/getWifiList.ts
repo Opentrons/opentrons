@@ -7,5 +7,5 @@ import type { WifiListResponse } from './types'
 export function getWifiList(
   config: HostConfig
 ): ResponsePromise<WifiListResponse> {
-  return request<WifiListResponse>(GET, '/wifi/list', null, config)
+  return request<WifiListResponse>(GET, '/wifi/list', config)
 }

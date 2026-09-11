@@ -144,7 +144,6 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
 
   return createPortal(
     <Modal
-      marginLeft="0"
       type="info"
       width="37.125rem"
       closeOnOutsideClick

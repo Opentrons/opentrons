@@ -7,5 +7,5 @@ import type { ActiveConnections } from './types'
 export function getConnections(
   config: HostConfig
 ): ResponsePromise<ActiveConnections> {
-  return request<ActiveConnections>(GET, `/system/connected`, null, config)
+  return request<ActiveConnections>(GET, `/system/connected`, config)
 }

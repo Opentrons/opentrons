@@ -24,7 +24,10 @@ from .deck_configuration import (
     DeckType,
     PotentialCutoutFixture,
 )
-from .execution import EngineStatus, PostRunHardwareState
+from .execution import (
+    EngineStatus,
+    PostRunHardwareState,
+)
 from .hardware_passthrough import MotorAxis, MovementAxis
 from .instrument import (
     CurrentAddressableArea,

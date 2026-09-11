@@ -22,7 +22,7 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 
 import { Slideout } from '../../atoms/Slideout'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule

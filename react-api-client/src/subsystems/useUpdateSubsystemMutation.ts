@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateSubsystem } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -14,6 +15,7 @@ import type {
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseUpdateSubsystemMutationResult = UseMutationResult<
   SubsystemUpdateProgressData,
@@ -33,24 +35,44 @@ export type UseUpdateSubsystemMutationOptions = UseMutationOptions<
 >
 
 export function useUpdateSubsystemMutation(
+  documentationState: DocumentationState,
   options: UseUpdateSubsystemMutationOptions = {}
 ): UseUpdateSubsystemMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     SubsystemUpdateProgressData,
     AxiosError,
     Subsystem
   >(
-    (subsystem: Subsystem) =>
-      updateSubsystem(host!, subsystem).then(response => {
-        queryClient.removeQueries([host, 'subsystems/updates'])
+    documentationState,
+    ['update_subsystem'],
+    ({ variables: subsystem, userNotes }) =>
+      updateSubsystem(host!, subsystem, userNotes).then(response => {
+        queryClient.setQueryData(
+          getQueryKey(
+            host,
+            'subsystems',
+            'updates',
+            'all',
+            response.data.data.id
+          ),
+          response.data
+        )
+        queryClient.setQueryData(
+          getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
+          response.data
+        )
         queryClient
-          .invalidateQueries([host, 'subsystems/updates'])
+          .invalidateQueries(
+            getQueryKey(host, 'subsystems', 'updates', 'current'),
+            { exact: true }
+          )
           .catch((e: Error) => {
             console.error(`error invalidating subsystems query: ${e.message}`)
           })
+
         return response.data
       }),
     options

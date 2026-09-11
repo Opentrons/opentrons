@@ -94,6 +94,9 @@ vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows/ChoosePipette')
 vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: vi.fn().mockReturnValue('otie'),
+}))
 
 const render = (path = '/') => {
   return renderWithProviders(

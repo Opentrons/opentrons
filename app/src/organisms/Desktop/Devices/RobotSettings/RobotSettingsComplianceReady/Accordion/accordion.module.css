@@ -1,0 +1,33 @@
+.accordion {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  min-height: 4.5rem;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-24) var(--spacing-16);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  gap: var(--spacing-24);
+  text-align: left;
+}
+
+.title {
+  flex: 1;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.content {
+  padding: 0 var(--spacing-16) var(--spacing-24);
+}

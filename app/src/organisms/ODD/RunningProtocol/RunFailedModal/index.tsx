@@ -7,6 +7,7 @@ import { LegacyStyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
@@ -37,7 +38,8 @@ export function RunFailedModal({
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
-  const { stopRun } = useStopRunMutation()
+  const documentationState = useDocumentationState()
+  const { stopRun } = useStopRunMutation(documentationState)
   const [isCanceling, setIsCanceling] = useState(false)
 
   if (

@@ -25,6 +25,7 @@ from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
+    ModuleModel,
 )
 from opentrons.types import DeckSlotName
 
@@ -142,6 +143,7 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
     ).then_return("module-serial")
 
     thermocycler = decoy.mock(cls=HardwareThermocycler)
+    decoy.when(thermocycler.model()).then_return(ModuleModel.THERMOCYCLER_MODULE_V2)
     decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
     decoy.when(thermocycler.lid_status).then_return(lid_status)
     decoy.when(hardware_api.attached_modules).then_return([thermocycler])

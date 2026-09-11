@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getProtocolAnalyses } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
@@ -27,7 +27,7 @@ export function useProtocolAnalysesQuery(
         : false,
   }
   const query = useQuery<ProtocolAnalyses>(
-    [host, 'protocols', protocolId, 'analyses'],
+    getQueryKey(host, 'protocols', protocolId, 'analyses'),
     () =>
       getProtocolAnalyses(host!, protocolId!).then(response => response.data),
     allOptions

@@ -1,6 +1,6 @@
 """Create or reset a server's persistence directory.
 
-Shared utilities used by both robot-server and auth-server.
+Shared utilities used by robot-server, auth-server, and audit-server.
 Each server has its own thin wrapper module that supplies server-specific
 configuration (migration list, temp-dir prefix, etc.) and delegates here.
 """
@@ -24,7 +24,43 @@ It tells the server to clear this directory on the next boot,
 after which it will delete this file.
 """
 
+# Scratch space for request-scoped work (e.g. zip download staging).
+PERSISTENCE_TEMP_SUBDIRECTORY: Final = "temp"
+
 _log = getLogger(__name__)
+
+
+def get_persistence_temp_directory(persistence_root: Path) -> Path:
+    """Return the path to ``persistence_root/temp``."""
+    return persistence_root / PERSISTENCE_TEMP_SUBDIRECTORY
+
+
+def ensure_persistence_temp_directory(persistence_root: Path) -> Path:
+    """Create and return ``persistence_root/temp`` for request-scoped scratch."""
+    temp_directory = get_persistence_temp_directory(persistence_root)
+    temp_directory.mkdir(parents=True, exist_ok=True)
+    return temp_directory
+
+
+def cleanup_persistence_temp_directory(persistence_root: Path) -> None:
+    """Delete ``persistence_root/temp`` if it exists."""
+    temp_directory = get_persistence_temp_directory(persistence_root)
+    if not temp_directory.exists():
+        return
+
+    try:
+        rmtree(temp_directory)
+    except Exception:
+        _log.warning(f"Error deleting {temp_directory.resolve()}.", exc_info=True)
+
+
+def clear_directory_contents(directory: Path) -> None:
+    """Delete everything inside directory without removing directory itself."""
+    for child in directory.iterdir():
+        if child.is_symlink() or not child.is_dir():
+            child.unlink()
+        else:
+            rmtree(child)
 
 
 class PersistenceResetter:
@@ -85,13 +121,16 @@ async def prepare_root(
             directory_to_reset=persistence_directory_root,
         ):
             _log.info(
-                f"{persistence_directory_root} was marked for reset. Deleting it."
+                f"{persistence_directory_root} was marked for reset."
+                " Clearing its contents."
             )
             # FIXME(mm, 2024-01-23): This can leave the persistence directory
-            # in a half-deleted state if it deletes the marker file, and then some
+            # in a half-cleared state if it deletes the marker file, and then some
             # of the other files, and then the device is power-cycled before it can
             # finish.
-            await to_thread.run_sync(rmtree, persistence_directory_root)
+            await to_thread.run_sync(
+                clear_directory_contents, persistence_directory_root
+            )
 
         await AsyncPath(persistence_directory_root).mkdir(parents=True, exist_ok=True)
         _log.info(f"Using directory {persistence_directory_root} for persistence.")

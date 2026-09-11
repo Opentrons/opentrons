@@ -1,3 +1,8 @@
+import { createHash } from 'crypto'
+import { access, mkdtemp, readFile, writeFile } from 'fs/promises'
+import { tmpdir } from 'os'
+import path from 'path'
+import { Readable } from 'stream'
 import isError from 'lodash/isError'
 import fetch from 'node-fetch'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,9 +16,46 @@ import type { Request, Response } from 'node-fetch'
 vi.mock('../config')
 vi.mock('node-fetch')
 
+const CONTENT_DIGEST_HEADER = 'content-digest'
+
+function sha256ContentDigest(contents: string): string {
+  const digest = createHash('sha256').update(contents).digest('base64')
+  return `sha-256=:${digest}:`
+}
+
+function mockDownloadResponse(
+  body: string,
+  headers: Record<string, string | null> = {}
+): void {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    headers: {
+      get: (name: string) => headers[name] ?? null,
+    },
+    body: Readable.from(Buffer.from(body)),
+  } as unknown as Response)
+}
+
 describe('app-shell main http module', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('postFile rejects when fetch fails so IPC invoke can reply', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'postfile-'))
+    const filePath = path.join(dir, 'update.zip')
+    await writeFile(filePath, 'zip-bytes')
+    vi.mocked(fetch).mockRejectedValueOnce(
+      new Error('certificate verify failed')
+    )
+
+    await expect(
+      Http.postFile(
+        'https://robot.local:32313/server/update/file',
+        'file',
+        filePath
+      )
+    ).rejects.toThrow(/certificate verify failed/)
   })
 
   const SUCCESS_SPECS = [
@@ -106,6 +148,58 @@ describe('app-shell main http module', () => {
       return expect(method(request as unknown as Request)).rejects.toThrow(
         expected
       )
+    })
+  })
+
+  describe('fetchToFile', () => {
+    let destination: string
+
+    beforeEach(async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), 'fetch-to-file-'))
+      destination = path.join(dir, 'logperiod.zip')
+    })
+
+    it('writes the response body to the destination', async () => {
+      mockDownloadResponse('zip-bytes')
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
+    })
+
+    it('succeeds when the Content-Digest header matches the downloaded bytes', async () => {
+      const body = 'zip-bytes'
+      mockDownloadResponse(body, {
+        [CONTENT_DIGEST_HEADER]: sha256ContentDigest(body),
+      })
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe(body)
+    })
+
+    it('skips hash verification when the server omits the Content-Digest header', async () => {
+      mockDownloadResponse('zip-bytes')
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).resolves.toBe(destination)
+      expect(await readFile(destination, 'utf8')).toBe('zip-bytes')
+    })
+
+    it('rejects and deletes the file when the Content-Digest header does not match', async () => {
+      mockDownloadResponse('zip-bytes', {
+        [CONTENT_DIGEST_HEADER]: sha256ContentDigest('different-bytes'),
+      })
+
+      await expect(
+        Http.fetchToFile('http://example.com/file', destination)
+      ).rejects.toThrow('Downloaded file hash does not match expected hash')
+      await expect(access(destination)).rejects.toMatchObject({
+        code: 'ENOENT',
+      })
     })
   })
 })

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Chip,
-  COLORS,
   NewIconButton,
   NO_WRAP,
   StyledText,
@@ -137,10 +136,8 @@ export function Controls(props: ControlsProps): JSX.Element {
             <NewIconButton
               variant="primary"
               iconName={isPlaying ? 'pause' : 'play'}
-              iconSize="1.5rem"
-              iconColor={COLORS.white}
-              size="3rem"
               onClick={handlePlayPause}
+              aria-label={isPlaying ? t('pause') : t('play')}
             />
           </div>
         </div>

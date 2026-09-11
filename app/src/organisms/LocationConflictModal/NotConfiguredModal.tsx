@@ -17,6 +17,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
@@ -41,7 +42,9 @@ export const NotConfiguredModal = (
     'shared',
     'deck_configuration',
   ])
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const documentationState = useDocumentationState()
+  const { updateDeckConfiguration } =
+    useUpdateDeckConfigurationMutation(documentationState)
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const handleUpdateDeck = (): void => {

@@ -7,6 +7,7 @@ import {
   useDeleteLabwareOffsetMutation,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { selectPendingOffsetOperations } from '/app/redux/protocol-runs'
 
 import { useSaveWorkingOffsets } from '../useSaveWorkingOffsets'
@@ -18,10 +19,13 @@ vi.mock('/app/redux/protocol-runs')
 describe('useSaveWorkingOffsets', () => {
   const mockRunId = 'mock_run_id'
   const mockReportSaveOffset = vi.fn()
+  const mockAddActionToDocument = vi.fn()
 
   const mockProps = {
     runId: mockRunId,
     analytics: { reportSaveOffset: mockReportSaveOffset },
+    commandDocState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+    addActionToDocument: mockAddActionToDocument,
   } as any
 
   const mockCreateLabwareOffsets = vi.fn()
@@ -104,10 +108,18 @@ describe('useSaveWorkingOffsets', () => {
       returnValue = await result.current.saveWorkingOffsets()
     })
 
+    expect(useCreateLabwareOffsetsMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+    expect(useDeleteLabwareOffsetMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     expect(mockCreateLabwareOffsets).toHaveBeenCalledWith(mockToUpdate)
     expect(mockDeleteLabwareOffset).toHaveBeenCalledWith('offset-3')
     expect(mockDeleteLabwareOffset).toHaveBeenCalledWith('offset-4')
     expect(mockDeleteLabwareOffset).toHaveBeenCalledTimes(2)
+    expect(mockAddActionToDocument).toHaveBeenCalledWith('create_offsets')
+    expect(mockAddActionToDocument).toHaveBeenCalledWith('delete_offsets')
     expect(returnValue).toEqual([mockStoredOffsets, mockDeletedOffsets])
   })
 
@@ -167,6 +179,7 @@ describe('useSaveWorkingOffsets', () => {
     })
 
     expect(result.current.isSavingWorkingOffsetsLoading).toBe(false)
+    expect(mockAddActionToDocument).not.toHaveBeenCalled()
     expect(returnValue).toEqual([[], []])
   })
 
@@ -187,6 +200,7 @@ describe('useSaveWorkingOffsets', () => {
 
     expect(mockCreateLabwareOffsets).not.toHaveBeenCalled()
     expect(mockDeleteLabwareOffset).not.toHaveBeenCalled()
+    expect(mockAddActionToDocument).not.toHaveBeenCalled()
     expect(returnValue).toEqual([[], []])
   })
 })

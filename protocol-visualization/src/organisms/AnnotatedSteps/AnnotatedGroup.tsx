@@ -35,7 +35,7 @@ interface AnnotatedGroupProps {
   // rendered after sub-commands when analysis failed inside this annotation group
   trailingErrorsFooter?: ReactNode | null
 }
-export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
+export function AnnotatedGroup(props: AnnotatedGroupProps): ReactNode {
   const {
     subCommands,
     annotationType,
@@ -116,7 +116,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
                 scrollTargetId={scrollTargetId}
                 listElement={listElement}
                 fromGroup={true}
-                key={`${subCommand.command.id}_${index}`}
+                key={subCommand.command.id}
                 command={subCommand.command}
                 commandNumber={commandStartNumber + index}
                 analysis={analysis}

@@ -291,7 +291,7 @@ def run(
     except FileNotFoundError:
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
-    calibration_data = []
+    calibration_data: List[Dict[str, Any]] = []
     ip_address_list = list(robot_dict.keys())
     for ip in ip_address_list:
         saved_file_path, calibration = read_robot_logs.get_calibration_offsets(

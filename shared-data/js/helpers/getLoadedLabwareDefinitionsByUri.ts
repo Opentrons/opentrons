@@ -18,11 +18,13 @@ export function getLoadedLabwareDefinitionsByUri(
       const labwareDef: LabwareDefinition | undefined =
         command.result?.definition
       if (labwareDef == null) {
-        console.warn(
-          `could not find a labware definition in the results of load labware command: ${JSON.stringify(
-            command
-          )}`
-        )
+        if (command.commandType !== 'loadLidStack') {
+          console.warn(
+            `could not find a labware definition in the results of load labware command: ${JSON.stringify(
+              command
+            )}`
+          )
+        }
         return acc
       } else {
         const definitionUri = getLabwareDefURI(labwareDef)

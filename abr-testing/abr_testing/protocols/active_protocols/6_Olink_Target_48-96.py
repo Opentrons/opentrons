@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 open_location: Any = "A4"
 
@@ -113,7 +113,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
     # Load Pipette and Tips
-    pip = protocol.load_instrument("flex_96channel_200")
+    pip = protocol.load_instrument("flex_96channel_1000")
 
     col_tips_1 = protocol.load_labware(
         "opentrons_flex_96_filtertiprack_50ul", "A1", "Tips per Column #1"

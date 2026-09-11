@@ -32,7 +32,6 @@ export function IncompatibleTipsModal(
   return (
     <HandleEnter onEnter={handleShowAllTips}>
       <Modal
-        marginLeft="0"
         title={t('incompatible_tips')}
         type="warning"
         closeOnOutsideClick

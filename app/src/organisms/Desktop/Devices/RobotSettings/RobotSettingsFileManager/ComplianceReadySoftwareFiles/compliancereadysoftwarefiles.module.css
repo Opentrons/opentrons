@@ -1,0 +1,46 @@
+/* Left padding matches the log period row's own padding so the select-all
+   checkbox lines up with each row's checkbox. */
+.compliance_table_header_row {
+  display: flex;
+  height: 1.25rem;
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-12);
+  color: var(--grey-60);
+  gap: var(--spacing-12);
+}
+
+.log_period_row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: var(--spacing-12);
+  gap: var(--spacing-12);
+}
+
+/* Shared by the header row and each log period row so the columns align. */
+.log_period_columns {
+  display: grid;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-24);
+  grid-template-columns: 33% 33% 33%;
+}
+
+.log_date_col {
+  min-width: 0;
+  flex: 3;
+}
+
+.log_status_col {
+  display: flex;
+  min-width: 0;
+  flex: 2;
+  align-items: center;
+}
+
+.skeleton_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}

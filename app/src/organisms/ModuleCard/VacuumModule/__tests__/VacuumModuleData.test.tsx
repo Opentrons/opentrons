@@ -46,7 +46,7 @@ describe('VacuumModuleData', () => {
   })
 
   it('renders vent section with open status', () => {
-    props.moduleData.ventStatus = 'open'
+    props.moduleData.ventStatus = 'opened'
     render(props)
 
     expect(screen.getByText('Vent')).toBeInTheDocument()
@@ -67,6 +67,24 @@ describe('VacuumModuleData', () => {
 
     expect(screen.getByText('Current: -500 mbar')).toBeInTheDocument()
     expect(screen.getByText('Target: -600 mbar')).toBeInTheDocument()
+  })
+
+  it('displays N/A when pressure is within atmospheric tolerance', () => {
+    props.moduleData.currentPressure = -5.2
+    props.moduleData.targetPressure = 0
+    render(props)
+
+    expect(screen.getByText('Current: N/A')).toBeInTheDocument()
+    expect(screen.getByText('Target: N/A')).toBeInTheDocument()
+  })
+
+  it('rounds current pressure to one decimal outside atmospheric tolerance', () => {
+    props.moduleData.currentPressure = -12.34
+    props.moduleData.targetPressure = -300
+    render(props)
+
+    expect(screen.getByText('Current: -12.3 mbar')).toBeInTheDocument()
+    expect(screen.getByText('Target: -300 mbar')).toBeInTheDocument()
   })
 
   it('renders N/A for current and target power when values are null in power mode', () => {

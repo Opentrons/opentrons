@@ -98,10 +98,10 @@ describe('robot update action creators', () => {
     {
       name: 'robotUpdate:SET_SESSION_STEP',
       creator: actions.setRobotUpdateSessionStep,
-      args: ['restarting'],
+      args: ['restart'],
       expected: {
         type: 'robotUpdate:SET_SESSION_STEP',
-        payload: 'restarting',
+        payload: 'restart',
       },
     },
     {
@@ -140,34 +140,6 @@ describe('robot update action creators', () => {
       expected: {
         type: 'robotUpdate:READ_SYSTEM_FILE',
         payload: { target: 'flex' },
-        meta: { shell: true },
-      },
-    },
-    {
-      name: 'robotUpdate:UPLOAD_FILE',
-      creator: actions.uploadRobotUpdateFile,
-      args: [mockRobot, '/server/update/token/file', '/path/to/some/file'],
-      expected: {
-        type: 'robotUpdate:UPLOAD_FILE',
-        payload: {
-          host: mockRobot,
-          path: '/server/update/token/file',
-          systemFile: '/path/to/some/file',
-        },
-        meta: { shell: true },
-      },
-    },
-    {
-      name: 'robotUpdate:UPLOAD_FILE with file specified',
-      creator: actions.uploadRobotUpdateFile,
-      args: [mockRobot, '/server/update/token/file', '/path/to/system.zip'],
-      expected: {
-        type: 'robotUpdate:UPLOAD_FILE',
-        payload: {
-          host: mockRobot,
-          path: '/server/update/token/file',
-          systemFile: '/path/to/system.zip',
-        },
         meta: { shell: true },
       },
     },

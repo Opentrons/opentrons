@@ -108,3 +108,22 @@ class ABSMeasurementConfig:
             "sampleWavelengths": self.sample_wavelengths,
             "referenceWavelength": self.reference_wavelength,
         }
+
+    @staticmethod
+    def to_pyro_dict(obj: "ABSMeasurementConfig") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "measure_mode": obj.measure_mode.value,
+            "sample_wavelengths": obj.sample_wavelengths,
+            "reference_wavelength": obj.reference_wavelength,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "ABSMeasurementConfig":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ABSMeasurementConfig(
+            measure_mode=ABSMeasurementMode(data["measure_mode"]),
+            sample_wavelengths=data["sample_wavelengths"],
+            reference_wavelength=data["reference_wavelength"],
+        )

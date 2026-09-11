@@ -17,6 +17,7 @@ import { FillWellAndRetryNewTips } from '../FillWellAndRetryNewTips'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { ComponentProps } from 'react'
+import type { UseRouteUpdateActionsResult } from '../../hooks'
 
 vi.mock('../CancelRun')
 vi.mock('../SelectRecoveryOption')
@@ -30,7 +31,10 @@ const render = (props: ComponentProps<typeof FillWellAndRetryNewTips>) => {
 
 describe('FillWellAndRetryNewTips', () => {
   let props: ComponentProps<typeof FillWellAndRetryNewTips>
-  let mockProceedToRouteAndStep: ReturnType<typeof vi.fn>
+  let mockProceedToRouteAndStep: Omit<
+    UseRouteUpdateActionsResult,
+    'stashedMapRef'
+  >['proceedToRouteAndStep']
 
   beforeEach(() => {
     mockProceedToRouteAndStep = vi.fn()

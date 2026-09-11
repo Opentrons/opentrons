@@ -2,11 +2,6 @@
 Opentrons OT-2 HTTP API
 =======================
 
-.. image:: https://badgen.net/codecov/c/github/Opentrons/opentrons
-   :target: https://codecov.io/gh/Opentrons/opentrons
-   :alt: Coverage Status
-
-
 Introduction
 ------------
 

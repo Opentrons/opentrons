@@ -19,7 +19,7 @@ export const getPipetteCriticalPoint = (
     nozzleConfiguration === COLUMN ||
     (nozzleConfiguration === ALL && spec.channels === 8)
   const labwareHasOneRow = labwareDefinition.ordering[0].length === 1
-  if ((isColumn || isRow) && labwareHasOneRow) {
+  if (isRow && labwareHasOneRow) {
     // return the XY CENTER
     const frontPoint = isColumn
       ? `H${primaryNozzle.slice(1)}`

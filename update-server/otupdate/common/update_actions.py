@@ -8,15 +8,21 @@ from __future__ import annotations
 import abc
 import contextlib
 import logging
-from typing import Callable, Generator, NamedTuple, Optional, cast
+from typing import Annotated, Callable, Generator, NamedTuple, Optional
 
-from aiohttp import web
+import fastapi
 
-from .constants import APP_VARIABLE_PREFIX
-
-FILE_ACTIONS_VARNAME = APP_VARIABLE_PREFIX + "fileactions"
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 
 LOG = logging.getLogger(__name__)
+
+_update_actions_accessor = AppStateAccessor["UpdateActionsInterface"](
+    "otupdate_update_actions"
+)
 
 
 class Partition(NamedTuple):
@@ -27,17 +33,14 @@ class Partition(NamedTuple):
 
 class UpdateActionsInterface:
     @staticmethod
-    def from_request(request: web.Request) -> Optional[UpdateActionsInterface]:
-        """Get the update object from the aiohttp app store"""
-        try:
-            return cast(UpdateActionsInterface, request.app[FILE_ACTIONS_VARNAME])
-        except KeyError:
-            return None
+    def from_app_state(app_state: AppState) -> Optional[UpdateActionsInterface]:
+        """Get the update object from global app state"""
+        return _update_actions_accessor.get_from(app_state)
 
     @classmethod
-    def build_and_insert(cls, app: web.Application) -> None:
-        """Build the object and put it in the app store"""
-        app[FILE_ACTIONS_VARNAME] = cls()
+    def build_and_insert(cls, app_state: AppState) -> None:
+        """Build the object and put it in global app state"""
+        _update_actions_accessor.set_on(app_state, cls())
 
     @abc.abstractmethod
     def validate_update(
@@ -45,7 +48,7 @@ class UpdateActionsInterface:
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -99,3 +102,28 @@ class UpdateActionsInterface:
     def clean_up(self, download_dir: str) -> None:
         """Deletes the update files from the download dir."""
         ...
+
+    @abc.abstractmethod
+    def restart(self) -> None:
+        """Restart the robot."""
+
+    @abc.abstractmethod
+    def shutdown(self) -> None:
+        """Shut down the robot."""
+
+
+def install_update_actions(
+    app_state: AppState, update_actions: UpdateActionsInterface
+) -> None:
+    """Store the hardware-specific update actions on global app state.
+
+    This should be done as part of server startup.
+    """
+    _update_actions_accessor.set_on(app_state, update_actions)
+
+
+def get_update_actions(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> Optional[UpdateActionsInterface]:
+    """A FastAPI dependency to retrieve the hardware-specific update actions."""
+    return UpdateActionsInterface.from_app_state(app_state)

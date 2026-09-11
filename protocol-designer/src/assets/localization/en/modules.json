@@ -1,68 +1,68 @@
 {
+  "actions": {
+    "action": "action",
+    "await_temperature": "pause until",
+    "closed_and_locked": "Closed and Locked",
+    "cycling": "cycling",
+    "deactivate_after": "Deactivate after",
+    "disengage": "disengage",
+    "engage": "engage",
+    "go_to": "go to",
+    "hold": "hold",
+    "open": "Open",
+    "profile": "profile"
+  },
   "adapter_compatible_labware": "Adapter Compatible Labware",
-  "custom_labware": "Custom Labware",
   "additional_equipment_display_names": {
     "gripper": "Flex Gripper",
     "stagingAreas": "Staging Area Slots",
     "trashBin": "Trash Bin",
     "wasteChute": "Waste Chute"
   },
-  "module_display_names": {
-    "multipleheaterShakerModuleTypes": "Multiple Heater-Shakers",
-    "multipletemperatureModuleTypes": "Multiple Temperatures",
-    "multiplemagneticBlockTypes": "Multiple Magnetic Blocks",
-    "temperatureModuleType": "Temperature",
-    "magneticModuleType": "Magnetic",
-    "thermocyclerModuleType": "Thermocycler",
-    "heaterShakerModuleType": "Heater-Shaker",
-    "magneticBlockType": "Magnetic Block",
-    "absorbanceReaderType": "Absorbance Plate Reader"
-  },
-  "module_long_names": {
-    "temperatureModuleType": "Temperature module",
-    "magneticModuleType": "Magnetic module",
-    "thermocyclerModuleType": "Thermocycler module",
-    "heaterShakerModuleType": "Heater-Shaker module",
-    "magneticBlockType": "Magnetic block",
-    "absorbanceReaderType": "Absorbance Plate Reader"
-  },
-  "model_display_name": {
-    "temperatureModuleV1": "GEN1",
-    "temperatureModuleV2": "GEN2",
-    "magneticModuleV1": "GEN1",
-    "magneticModuleV2": "GEN2",
-    "thermocyclerModuleV1": "GEN1",
-    "thermocyclerModuleV2": "GEN2",
-    "heaterShakerModuleV1": "GEN1",
-    "magneticBlockV1": "GEN1",
-    "gripperV1": "GEN1",
-    "absorbanceReaderV1": "GEN1"
-  },
-  "status": {
-    "engaged": "engaged",
-    "disengaged": "disengaged",
-    "deactivated": "deactivated"
-  },
-  "actions": {
-    "action": "action",
-    "await_temperature": "pause until",
-    "cycling": "cycling",
-    "disengage": "disengage",
-    "engage": "engage",
-    "go_to": "go to",
-    "hold": "hold",
-    "profile": "profile",
-    "closed_and_locked": "Closed and Locked",
-    "open": "Open",
-    "deactivate_after": "Deactivate after"
-  },
   "block_label": "Block",
-  "lid_label": "Lid ({{lidStatus}})",
+  "custom_labware": "Custom Labware",
+  "heater_label": "Heater",
+  "labware_latch": "Labware Latch",
+  "latch_label": "Latch",
   "lid_closed": "closed",
+  "lid_label": "Lid ({{lidStatus}})",
   "lid_open": "open",
   "lid_undefined": "undefined",
-  "latch_label": "Latch",
-  "heater_label": "Heater",
+  "model_display_name": {
+    "absorbanceReaderV1": "GEN1",
+    "gripperV1": "GEN1",
+    "heaterShakerModuleV1": "GEN1",
+    "magneticBlockV1": "GEN1",
+    "magneticModuleV1": "GEN1",
+    "magneticModuleV2": "GEN2",
+    "temperatureModuleV1": "GEN1",
+    "temperatureModuleV2": "GEN2",
+    "thermocyclerModuleV1": "GEN1",
+    "thermocyclerModuleV2": "GEN2"
+  },
+  "module_display_names": {
+    "absorbanceReaderType": "Absorbance Plate Reader",
+    "heaterShakerModuleType": "Heater-Shaker",
+    "magneticBlockType": "Magnetic Block",
+    "magneticModuleType": "Magnetic",
+    "multipleheaterShakerModuleTypes": "Multiple Heater-Shakers",
+    "multiplemagneticBlockTypes": "Multiple Magnetic Blocks",
+    "multipletemperatureModuleTypes": "Multiple Temperatures",
+    "temperatureModuleType": "Temperature",
+    "thermocyclerModuleType": "Thermocycler"
+  },
+  "module_long_names": {
+    "absorbanceReaderType": "Absorbance Plate Reader",
+    "heaterShakerModuleType": "Heater-Shaker module",
+    "magneticBlockType": "Magnetic block",
+    "magneticModuleType": "Magnetic module",
+    "temperatureModuleType": "Temperature module",
+    "thermocyclerModuleType": "Thermocycler module"
+  },
   "shaker_label": "Shaker",
-  "labware_latch": "Labware Latch"
+  "status": {
+    "deactivated": "deactivated",
+    "disengaged": "disengaged",
+    "engaged": "engaged"
+  }
 }

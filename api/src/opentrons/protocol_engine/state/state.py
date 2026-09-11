@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar, Union
 
 from typing_extensions import ParamSpec
 
@@ -20,17 +20,34 @@ from .addressable_areas import (
     AddressableAreaView,
 )
 from .camera import CameraState, CameraStore, CameraView
-from .commands import CommandState, CommandStore, CommandView
+from .commands import (
+    CommandState,
+    CommandStore,
+    CommandView,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from .config import Config
 from .files import FileState, FileStore, FileView
 from .geometry import GeometryView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
 from .liquids import LiquidState, LiquidStore, LiquidView
-from .modules import ModuleState, ModuleStore, ModuleView
+from .modules import (
+    FlexStackerSubstateNotification,
+    ModuleState,
+    ModuleStore,
+    ModuleView,
+)
 from .motion import MotionView
 from .peripherals import PeripheralState, PeripheralStore, PeripheralView
-from .pipettes import PipetteState, PipetteStore, PipetteView
+from .pipettes import (
+    NozzleMapNotification,
+    PipetteState,
+    PipetteStore,
+    PipetteView,
+    TipAttachedNotification,
+)
 from .preconditions import (
     CommandPreconditionState,
     CommandPreconditionStore,
@@ -46,6 +63,14 @@ from opentrons.util.change_notifier import ChangeNotifier
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")
+
+EngineEventNotification = Union[
+    NozzleMapNotification,
+    TipAttachedNotification,
+    FlexStackerSubstateNotification,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+]
 
 
 @dataclass(frozen=True)
@@ -175,6 +200,32 @@ class StateView(HasState[State]):
         """Get state view selectors for task state."""
         return self._tasks
 
+    def failed_task_failures_absorbed_by_active_recovery(
+        self, task_ids: list[str]
+    ) -> bool:
+        """Return whether every failed waited-on task is covered by active recovery.
+
+        A failed task is covered when the engine is awaiting recovery and the task's
+        originating command is the current recovery target. This lets ``waitForTasks``
+        succeed after associated-command recovery without masking unrelated failures.
+        """
+        failed_task_ids = self._tasks.get_failed_tasks(task_ids)
+        if not failed_task_ids:
+            return True
+
+        if not self._commands.get_is_awaiting_recovery():
+            return False
+
+        recovery_target = self._commands.get_recovery_target()
+        if recovery_target is None:
+            return False
+
+        recovery_command_id = recovery_target.command_id
+        return all(
+            self._tasks.get_originating_command_id(task_id) == recovery_command_id
+            for task_id in failed_task_ids
+        )
+
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()
@@ -225,6 +276,9 @@ class StateStore(StateView, ActionHandler):
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
         notify_publishers: Optional[Callable[[], None]] = None,
+        updates_callback: Optional[
+            Callable[[list[EngineEventNotification]], None]
+        ] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -241,13 +295,17 @@ class StateStore(StateView, ActionHandler):
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
             robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
+            updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
+        self._updates_callback = updates_callback
+        self._update_events: list[EngineEventNotification] = []
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
+            updates_callback=self._append_update_events,
         )
-        self._pipette_store = PipetteStore()
+        self._pipette_store = PipetteStore(updates_callback=self._append_update_events)
         if deck_configuration is None:
             deck_configuration = []
         self._addressable_area_store = AddressableAreaStore(
@@ -264,6 +322,7 @@ class StateStore(StateView, ActionHandler):
             config=config,
             deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
+            updates_callback=self._append_update_events,
         )
         self._peripheral_store = PeripheralStore(
             config=config,
@@ -402,6 +461,14 @@ class StateStore(StateView, ActionHandler):
 
         return current_value
 
+    def _append_update_events(self, event: EngineEventNotification) -> None:
+        latest_events = []
+        for old_event in self._update_events:
+            if not isinstance(old_event, event.__class__):
+                latest_events.append(old_event)
+        latest_events.append(event)
+        self._update_events = latest_events
+
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
         return State(
@@ -479,3 +546,7 @@ class StateStore(StateView, ActionHandler):
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()
+
+        if self._updates_callback is not None:
+            self._updates_callback(self._update_events)
+            self._update_events = []

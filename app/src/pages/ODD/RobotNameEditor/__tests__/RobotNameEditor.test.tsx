@@ -1,9 +1,11 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { useTrackEvent } from '/app/redux/analytics'
 import {
@@ -25,6 +27,10 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux-resources/config')
+
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockNavigate = vi.fn()
 
@@ -74,12 +80,13 @@ describe('RobotNameEditor', () => {
 
   it('should display a letter when typing a letter and confirming calls the track event', async () => {
     render()
+    const user = userEvent.setup()
     const input = screen.getByRole('textbox')
-    fireEvent.click(screen.getByRole('button', { name: 'a' }))
-    fireEvent.click(screen.getByRole('button', { name: 'b' }))
-    fireEvent.click(screen.getByRole('button', { name: 'c' }))
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'b' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
     expect(input).toHaveValue('abc')
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalled()
     })
@@ -87,7 +94,8 @@ describe('RobotNameEditor', () => {
 
   it('should show an error message when tapping confirm without typing anything', async () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
@@ -96,33 +104,35 @@ describe('RobotNameEditor', () => {
     })
   })
 
-  it('should show an error message when typing an existing name - connectable robot', () => {
+  it('should show an error message when typing an existing name - connectable robot', async () => {
     render()
+    const user = userEvent.setup()
     const input = screen.getByRole('textbox')
-    fireEvent.click(screen.getByRole('button', { name: 'c' }))
-    fireEvent.click(screen.getByRole('button', { name: 'o' }))
-    fireEvent.click(screen.getByRole('button', { name: 'n' }))
-    fireEvent.click(screen.getByRole('button', { name: 'n' }))
-    fireEvent.click(screen.getByRole('button', { name: 'e' }))
-    fireEvent.click(screen.getByRole('button', { name: 'c' }))
-    fireEvent.click(screen.getByRole('button', { name: 't' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
+    await user.click(screen.getByRole('button', { name: 'o' }))
+    await user.click(screen.getByRole('button', { name: 'n' }))
+    await user.click(screen.getByRole('button', { name: 'n' }))
+    await user.click(screen.getByRole('button', { name: 'e' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
+    await user.click(screen.getByRole('button', { name: 't' }))
     expect(input).toHaveValue('connect')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
 
     screen.queryByText('Oops! Name is already in use. Choose a different name.')
   })
 
-  it('should show an error message when typing an existing name - reachable robot', () => {
+  it('should show an error message when typing an existing name - reachable robot', async () => {
     render()
+    const user = userEvent.setup()
     const input = screen.getByRole('textbox')
-    fireEvent.click(screen.getByRole('button', { name: 'r' }))
-    fireEvent.click(screen.getByRole('button', { name: 'e' }))
-    fireEvent.click(screen.getByRole('button', { name: 'a' }))
-    fireEvent.click(screen.getByRole('button', { name: 'c' }))
-    fireEvent.click(screen.getByRole('button', { name: 'h' }))
+    await user.click(screen.getByRole('button', { name: 'r' }))
+    await user.click(screen.getByRole('button', { name: 'e' }))
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
+    await user.click(screen.getByRole('button', { name: 'h' }))
     expect(input).toHaveValue('reach')
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
 
     screen.queryByText('Oops! Name is already in use. Choose a different name.')
   })
@@ -140,10 +150,11 @@ describe('RobotNameEditor', () => {
     screen.getByText('Confirm')
   })
 
-  it('should call a mock function when tapping back button', () => {
+  it('should call a mock function when tapping back button', async () => {
     vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
-    fireEvent.click(screen.getByTestId('name_back_button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('name_back_button'))
     expect(mockNavigate).toHaveBeenCalledWith('/robot-settings')
   })
 
@@ -159,7 +170,7 @@ describe('RobotNameEditor', () => {
     ).toBeInTheDocument()
   })
 
-  it('should block further input while invalid char is present', async () => {
+  it('should keep additional typed characters while an invalid char is present', async () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'a!' } })
@@ -168,7 +179,7 @@ describe('RobotNameEditor', () => {
     })
     fireEvent.change(input, { target: { value: 'a!b' } })
     await waitFor(() => {
-      expect(input).toHaveValue('a!')
+      expect(input).toHaveValue('a!b')
     })
     expect(
       screen.getByText("Character '!' is not supported")

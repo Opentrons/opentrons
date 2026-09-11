@@ -27,8 +27,10 @@ import {
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getIsSlotAVacuumDock } from '@opentrons/step-generation'
 
 import {
   DECK_SETUP_TOOLS_WIDTH_REM,
@@ -108,7 +110,6 @@ export function DeckSetupContainer(
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
-
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -155,48 +156,46 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const _getSlotFromRawLocation = (location: string): string => {
+  // Returns the actual slot/addressable area for positioning
+  const _getSlotForPositioning = (location: string): string => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
-    return isOnHopper
-      ? location.split('hopper')[1]
-      : isOnVacuumDock
-        ? location.split('vacuumDock')[1]
-        : location
+    if (isOnHopper) {
+      return location.split('hopper')[1]
+    }
+    return location
   }
 
   const _getZoomInOffsetFromRawLocation = (location: string): number => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
     if (isOnHopper) {
       return HOPPER_ZOOM_OFFSET_POSTITION
     }
-    if (isOnVacuumDock) {
+    if (getIsSlotAVacuumDock(location)) {
       return VACUUM_DOCK_ZOOM_OFFSET_POSITION
     }
     return 0
   }
 
   const addEquipment = (location: string): void => {
-    const slot = _getSlotFromRawLocation(location)
+    const slotForPositioning = _getSlotForPositioning(location)
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
-      slot: location,
+      slot: location, // Keep using fake location for slot info
       deckDef,
     })
 
     const cutoutId =
       getCutoutIdForAddressableArea(
-        slot as AddressableAreaName,
+        slotForPositioning as AddressableAreaName,
         deckDef.cutoutFixtures
       ) ?? null
     if (cutoutId == null) {
       console.error('expected to find a cutoutId but could not')
     }
-    dispatch(selectZoomedIntoSlot({ slot: location, cutout: cutoutId }))
+    dispatch(selectZoomedIntoSlot({ slot: location, cutout: cutoutId })) // Keep using fake location
 
     const zoomInSlotPosition = getPositionFromSlotId(
-      slot ?? '',
+      slotForPositioning ?? '',
       deckDef,
       _getZoomInOffsetFromRawLocation(location)
     )
@@ -428,7 +427,14 @@ export function DeckSetupContainer(
                   />
                   <SlotLabels
                     robotType={robotType}
-                    show4thColumn={stagingAreaFixturesAndStacker.length > 0}
+                    show4thColumn={
+                      stagingAreaFixturesAndStacker.length > 0 ||
+                      Object.values(activeDeckSetup.modules).some(
+                        ({ type }) =>
+                          type === FLEX_STACKER_MODULE_TYPE ||
+                          type === VACUUM_MODULE_TYPE
+                      )
+                    }
                   />
                 </>
               )}

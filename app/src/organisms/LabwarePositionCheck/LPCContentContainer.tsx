@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   Box,
   COLORS,
@@ -189,12 +188,13 @@ function DesktopFooterContent({
           </SecondaryButton>
         )}
         {primaryBtnAlert ? (
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             disabled={buttonIsDisabled}
             onClick={onClickButton}
           >
             {desktopFooterBtnCopy}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         ) : (
           <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
             {desktopFooterBtnCopy}

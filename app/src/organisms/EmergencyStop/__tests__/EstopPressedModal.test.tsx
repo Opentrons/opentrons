@@ -8,6 +8,7 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
@@ -19,6 +20,10 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/modules')
 
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+
 const render = (props: ComponentProps<typeof EstopPressedModal>) => {
   return renderWithProviders(<EstopPressedModal {...props} />, {
     i18nInstance: i18n,
@@ -27,6 +32,7 @@ const render = (props: ComponentProps<typeof EstopPressedModal>) => {
 
 describe('EstopPressedModal - Touchscreen', () => {
   let props: ComponentProps<typeof EstopPressedModal>
+  const mockAcknowledgeEstopDisengage = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -36,8 +42,9 @@ describe('EstopPressedModal - Touchscreen', () => {
       setIsWaitingForResumeOperation: vi.fn(),
     }
     vi.mocked(getIsOnDevice).mockReturnValue(true)
+    mockAcknowledgeEstopDisengage.mockReset()
     vi.mocked(useAcknowledgeEstopDisengageMutation).mockReturnValue({
-      setEstopPhysicalStatus: vi.fn(),
+      acknowledgeEstopDisengage: mockAcknowledgeEstopDisengage,
     } as any)
 
     vi.mocked(usePlacePlateReaderLid).mockReturnValue({
@@ -69,28 +76,39 @@ describe('EstopPressedModal - Touchscreen', () => {
   })
 
   it('should call a mock function when clicking resume robot operations', () => {
+    props.isEngaged = false
     render(props)
     fireEvent.click(screen.getByText('Resume robot operations'))
-    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
-    expect(usePlacePlateReaderLid).toHaveBeenCalled()
+    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+    expect(mockAcknowledgeEstopDisengage).toHaveBeenCalled()
   })
 
   it('should call a mock function to place the labware to a slot', () => {
+    props.isEngaged = false
+    const handlePlaceReaderLid = vi.fn()
     vi.mocked(usePlacePlateReaderLid).mockReturnValue({
-      handlePlaceReaderLid: vi.fn(),
+      handlePlaceReaderLid,
       isValidPlateReaderMove: true,
       isExecuting: true,
+    })
+    mockAcknowledgeEstopDisengage.mockImplementation((_vars, options) => {
+      options?.onSuccess?.({} as any, undefined, undefined)
     })
 
     render(props)
     fireEvent.click(screen.getByText('Resume robot operations'))
-    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
-    expect(usePlacePlateReaderLid).toHaveBeenCalled()
+    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+    expect(handlePlaceReaderLid).toHaveBeenCalled()
   })
 })
 
 describe('EstopPressedModal - Desktop', () => {
   let props: ComponentProps<typeof EstopPressedModal>
+  const mockAcknowledgeEstopDisengage = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -100,8 +118,9 @@ describe('EstopPressedModal - Desktop', () => {
       setIsWaitingForResumeOperation: vi.fn(),
     }
     vi.mocked(getIsOnDevice).mockReturnValue(false)
+    mockAcknowledgeEstopDisengage.mockReset()
     vi.mocked(useAcknowledgeEstopDisengageMutation).mockReturnValue({
-      setEstopPhysicalStatus: vi.fn(),
+      acknowledgeEstopDisengage: mockAcknowledgeEstopDisengage,
     } as any)
 
     vi.mocked(usePlacePlateReaderLid).mockReturnValue({
@@ -146,10 +165,14 @@ describe('EstopPressedModal - Desktop', () => {
   })
 
   it('should call a mock function when clicking resume robot operations', () => {
+    props.isEngaged = false
     render(props)
     fireEvent.click(
       screen.getByRole('button', { name: 'Resume robot operations' })
     )
-    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
+    expect(useAcknowledgeEstopDisengageMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+    expect(mockAcknowledgeEstopDisengage).toHaveBeenCalled()
   })
 })

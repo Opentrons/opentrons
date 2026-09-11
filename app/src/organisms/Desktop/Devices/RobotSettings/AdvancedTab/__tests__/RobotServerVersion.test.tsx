@@ -42,7 +42,7 @@ describe('RobotSettings RobotServerVersion', () => {
 
   it('should render title and description', () => {
     render()
-    screen.getByText('Robot Server Version')
+    screen.getByText('Robot server version')
     screen.getByText('View latest release notes on')
     screen.getByText('v7.7.7')
   })

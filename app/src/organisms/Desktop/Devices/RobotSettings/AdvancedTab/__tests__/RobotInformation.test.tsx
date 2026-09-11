@@ -46,9 +46,9 @@ describe('RobotSettings RobotInformation', () => {
 
   it('should render item title', () => {
     render()
-    screen.getByText('Robot Serial Number')
-    screen.getByText('Firmware Version')
-    screen.getByText('Supported Protocol API Versions')
+    screen.getByText('Robot serial number')
+    screen.getByText('Firmware version')
+    screen.getByText('Supported Protocol API versions')
   })
 
   it('should not render serial number, firmware version and supported protocol api versions', () => {

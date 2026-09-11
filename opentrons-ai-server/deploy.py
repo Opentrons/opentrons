@@ -81,7 +81,7 @@ class Deploy:
 
     def build_docker_image(self) -> None:
         print(f"Building Docker image {self.config.IMAGE_NAME}:{self.config.TAG}")
-        # Build from repo root so Dockerfile COPY paths like 'api/docs/v2' resolve
+        # Build from repo root; synced API docs live under api/storage/api_docs/docs/v2
         self.docker_client.images.build(
             path="..", dockerfile="opentrons-ai-server/Dockerfile", tag=f"{self.config.IMAGE_NAME}:{self.config.TAG}"
         )

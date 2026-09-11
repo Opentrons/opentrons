@@ -7,7 +7,9 @@ import * as Fernet from 'fernet'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  createRobotHttpsAgent,
   decryptFromOTDetails,
+  getCertificateFilename,
   validateCert,
   validateCertShouldLoad,
   validateCertShouldVerify,
@@ -25,6 +27,28 @@ vi.mock('../log', () => {
 })
 
 const promisifiedPBKDF = promisify(pbkdf2)
+
+describe('getCertificateFilename', () => {
+  it('strips colons from fingerprint256 so filenames are Windows-safe', () => {
+    const certificate = {
+      fingerprint256:
+        '02:5E:62:C9:4B:61:1A:1E:3E:28:37:D6:64:81:34:C4:4E:BB:30:81:18:E9:01:D7:84:B4:C9:AA:6B:2A:65:0B',
+    } as X509Certificate
+    expect(getCertificateFilename(certificate)).toBe(
+      '025E62C94B611A1E3E2837D6648134C44EBB308118E901D784B4C9AA6B2A650B.cer'
+    )
+  })
+})
+
+describe('createRobotHttpsAgent', () => {
+  it('returns an https.Agent that trusts installed robot CAs', () => {
+    const agent = createRobotHttpsAgent()
+    expect(agent.options.rejectUnauthorized).toBe(true)
+    expect(
+      agent.options.checkServerIdentity?.('10.0.0.1', {} as any)
+    ).toBeUndefined()
+  })
+})
 
 describe('fernet decryption', () => {
   it('should decrypt some data given the password', async () => {

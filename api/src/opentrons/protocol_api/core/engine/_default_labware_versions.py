@@ -160,6 +160,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "opentrons_tough_12_reservoir_22ml": 3,
         "opentrons_tough_1_reservoir_300ml": 3,
         "opentrons_tough_4_reservoir_72ml": 2,
+        "nest_8_reservoir_22ml": 2,
     },
 }
 

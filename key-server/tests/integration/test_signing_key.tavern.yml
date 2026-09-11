@@ -1,0 +1,49 @@
+test_name: Log signing
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Get signing key
+    request:
+      method: GET
+      url: '{run_server.base_url}/keys/external/logSigning/publicKey'
+    response:
+      status_code: 200
+      json:
+        data:
+          publicKeyPem: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n"
+          hashedKey: 'sha256:7joao5sCagU94b_QvDskeDWJGikWPJJdsrlG6kSuWiI='
+  - name: Get message signature with a none hash
+    request:
+      method: POST
+      url: '{run_server.base_url}/keys/internal/logSigning/signMessage'
+      json:
+        data:
+          message: 'hello world'
+          previousHash: null
+    response:
+      status_code: 200
+      json:
+        data:
+          message: 'hello world'
+          messageHash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
+          messageSignature: 'ed25519:4ZvNo2ZJ4GuRPowoTSLBmlzoOaUpVZKpq86QwWlz0t17gisEsXOCTSJgSwhGiJvxFQwWV-H1RyzdlMPace5oBA=='
+          signatureVersion: 1
+  - name: Get message signature with provided hash
+    request:
+      method: POST
+      url: '{run_server.base_url}/keys/internal/logSigning/signMessage'
+      json:
+        data:
+          message: 'hello world'
+          previousHash: 'sha256:YXNsZGhhbHNkaGFzZGE='
+    response:
+      status_code: 200
+      json:
+        data:
+          message: 'hello world'
+          messageHash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
+          messageSignature: 'ed25519:Mtkdob5mctnAD_VK17h5CT0WuwV-UvYCfsReze2o_KAfG74SQIYCzD8AHBljAel4jhO9DTAQRWhW3lB4fOSaBQ=='
+          signatureVersion: 1

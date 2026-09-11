@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
+import { type DocumentationState } from '@opentrons/react-api-client'
 
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
@@ -11,13 +12,19 @@ import type { CameraImageSettings } from '@opentrons/api-client'
 interface PreviewSettingsProps {
   settings: CameraImageSettings
   runId: string | null
+  documentationState: DocumentationState
 }
 
 export function PreviewSettings({
   settings,
   runId,
+  documentationState,
 }: PreviewSettingsProps): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings, runId)
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(
+    settings,
+    runId,
+    documentationState
+  )
 
   return (
     <div className={styles.container}>

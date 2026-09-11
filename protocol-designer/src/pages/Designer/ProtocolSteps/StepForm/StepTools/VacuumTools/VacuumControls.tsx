@@ -76,7 +76,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
 
   const ventState = vacuumModuleState?.ventStatus ?? VACUUM_VENT_OPEN
   const ventToSwitch =
-    ventState === VACUUM_VENT_SET_OPEN
+    ventState === VACUUM_VENT_OPEN
       ? VACUUM_VENT_SET_CLOSED
       : VACUUM_VENT_SET_OPEN
 
@@ -102,6 +102,9 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     />
   )
 
+  const isPumpOn =
+    vacuumModuleState?.currentPumpActivity.type === 'indefiniteHold'
+
   // Pump / Vent
   if (formData.programType === VACUUM_PROGRAM_STATE) {
     sections.push(
@@ -109,18 +112,20 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
         key="state-type"
         title={t('vacuum.controls.state.label')}
         options={[
-          ...[
-            vacuumModuleState?.currentPumpActivity == null ||
-            vacuumModuleState.currentPumpActivity.type === 'pumpDeactivated'
-              ? {
-                  label: t('vacuum.controls.state.options.pump.on'),
-                  value: VACUUM_STATE_PUMP_ON,
-                }
-              : {
+          ...(isPumpOn
+            ? [
+                {
                   label: t('vacuum.controls.state.options.pump.off'),
                   value: VACUUM_STATE_PUMP_OFF,
                 },
-          ],
+              ]
+            : []),
+          {
+            label: t(
+              `vacuum.controls.state.options.pump.${isPumpOn ? 'change' : 'on'}`
+            ),
+            value: VACUUM_STATE_PUMP_ON,
+          },
           {
             label: t(`vacuum.controls.state.options.vent.${ventToSwitch}`),
             value: ventToSwitch,

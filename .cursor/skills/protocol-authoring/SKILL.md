@@ -197,6 +197,7 @@ D  [ D1 ]  [ D2 ]  [ D3 ]  [ D4 ]
 | `flex_8channel_50`    | 8        | 1–50 µL   |
 | `flex_8channel_200`   | 8        | 1–200 µL  |
 | `flex_8channel_1000`  | 8        | 5–1000 µL |
+| `flex_96channel_200`  | 96       | 1–200 µL  |
 | `flex_96channel_1000` | 96       | 5–1000 µL |
 
 ### OT-2

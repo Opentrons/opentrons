@@ -60,10 +60,7 @@ export const mockDiscoveryClientRobotWithHealthSerial = {
 }
 
 export const mockBaseRobot: BaseRobot = {
-  // NOTE(mc, 2020-11-10): it's important that name and displayName are
-  // different in this fixture to ensure proper test coverage
   name: 'opentrons-robot-name',
-  displayName: 'robot-name',
   seen: false,
   local: null,
   health: null,

@@ -17,7 +17,7 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
-const INSTRUCTIONS_URL = 'support.opentrons.com/s/modules'
+const INSTRUCTIONS_URL = 'https://docs.opentrons.com/modules'
 
 interface SetupInstructionsModalProps {
   setShowSetupInstructionsModal: (showSetupInstructionsModal: boolean) => void

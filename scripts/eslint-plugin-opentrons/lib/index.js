@@ -6,4 +6,6 @@ module.exports.rules = {
   'no-imports-across-applications': require('./rules/no-imports-across-applications'),
   'no-margins-in-css': require('./rules/no-margins-in-css'),
   'no-margins-inline': require('./rules/no-margins-inline'),
+  'no-direct-use-mutation': require('./rules/no-direct-use-mutation'),
+  'no-direct-mutating': require('./rules/no-direct-mutating'),
 }

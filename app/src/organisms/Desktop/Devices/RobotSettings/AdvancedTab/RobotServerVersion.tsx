@@ -56,7 +56,6 @@ export function RobotServerVersion({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             paddingBottom={SPACING.spacing4}
-            id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_version')}
           </LegacyStyledText>
@@ -75,7 +74,6 @@ export function RobotServerVersion({
             <Link
               external
               href={GITHUB_LINK}
-              id="AdvancedSettings_GitHubLink"
               css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
           </LegacyStyledText>

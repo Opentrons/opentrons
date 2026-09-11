@@ -23,10 +23,8 @@ import type { FunctionComponent, ReactNode } from 'react'
 vi.mock('/app/redux-resources/robots')
 vi.mock('../useProtocolRunAnalyticsData')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/pipettes')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/robot-settings')
 
 const RUN_ID = 'runId'
 const ROBOT_NAME = 'otie'

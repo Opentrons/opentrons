@@ -1,4 +1,4 @@
-import { createAxiosConfig, DEFAULT_HEADERS, POST, request } from '../request'
+import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -8,18 +8,9 @@ export function createAuthorization(
   config: HostConfig,
   registrationToken: RegistrationToken
 ): ResponsePromise<AuthorizationToken> {
-  return request<AuthorizationToken>(
-    POST,
-    '/system/authorize',
-    null,
-    {
-      ...config,
+  return request<AuthorizationToken>(POST, '/system/authorize', config, {
+    headers: {
+      authenticationBearer: registrationToken.token,
     },
-    createAxiosConfig({
-      headers: {
-        authenticationBearer: registrationToken.token,
-        ...DEFAULT_HEADERS,
-      },
-    })
-  )
+  })
 }

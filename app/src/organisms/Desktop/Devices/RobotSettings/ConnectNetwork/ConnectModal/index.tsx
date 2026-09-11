@@ -11,11 +11,11 @@ import { FormModal } from './FormModal'
 
 import type { TFunction } from 'i18next'
 import type { Control, Resolver } from 'react-hook-form'
+import type { WifiKey } from '@opentrons/api-client'
 import type {
   ConnectFormValues,
   EapOption,
   WifiConfigureRequest,
-  WifiKey,
   WifiNetwork,
 } from '../types'
 

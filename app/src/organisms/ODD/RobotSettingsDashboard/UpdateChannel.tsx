@@ -21,6 +21,7 @@ import {
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
 import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
@@ -60,9 +61,16 @@ export function UpdateChannel({
     ? channelOptions.filter(option => option.value !== 'alpha')
     : channelOptions
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    dispatch(updateConfigValue('update.channel', event.target.value))
-  }
+  const handleChangeAndLog = useHandleAndLog<ChangeEvent<HTMLInputElement>>(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateConfigValue('update.channel', event.target.value))
+    },
+    'change_update_channel',
+    (event: ChangeEvent<HTMLInputElement>) => ({
+      action: 'change update channel',
+      message: `User changed update channel to ${event.target.value}`,
+    })
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -94,7 +102,7 @@ export function UpdateChannel({
                 type="radio"
                 value={radio.value}
                 checked={radio.value === channel}
-                onChange={handleChange}
+                onChange={handleChangeAndLog}
               />
               <SettingButtonLabel
                 htmlFor={radio.label}

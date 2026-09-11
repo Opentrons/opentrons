@@ -18,9 +18,7 @@ export type PipetteWizardStep =
   | AttachWasteChuteStep
 
 export type PipetteWizardFlow =
-  | typeof FLOWS.ATTACH
-  | typeof FLOWS.DETACH
-  | typeof FLOWS.CALIBRATE
+  typeof FLOWS.ATTACH | typeof FLOWS.DETACH | typeof FLOWS.CALIBRATE
 
 export interface BaseStep {
   mount: PipetteMount
@@ -88,6 +86,9 @@ export interface PipetteWizardStepProps {
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: Dispatch<SetStateAction<string | null>>
   errorMessage: string | null
+  isDoorOpenError: boolean
+  setIsDoorOpenError: Dispatch<SetStateAction<boolean>>
+  dismissDoorOpenError: () => void
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
 }

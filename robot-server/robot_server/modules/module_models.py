@@ -21,6 +21,9 @@ from opentrons.hardware_control.modules import (
     PlatformState,
     SpeedStatus,
     TemperatureStatus,
+    VacuumModuleStatus,
+    VacuumOperationMode,
+    VentStatus,
 )
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
 from opentrons.protocol_engine import ModuleModel
@@ -401,9 +404,33 @@ class FlexStackerModule(
 class VacuumModuleData(BaseModel):
     """Live data from a Vacuum module."""
 
-    status: str = Field(
+    status: VacuumModuleStatus = Field(
         ...,
         description="Overall status of the module.",
+    )
+    currentPressure: Optional[float] = Field(
+        ...,
+        description="Current gauge pressure in mbar.",
+    )
+    targetPressure: Optional[float] = Field(
+        ...,
+        description="Target gauge pressure in mbar, if set.",
+    )
+    currentPower: Optional[float] = Field(
+        ...,
+        description="Current pump power as a percentage.",
+    )
+    targetPower: Optional[float] = Field(
+        ...,
+        description="Target pump power as a percentage, if set.",
+    )
+    ventStatus: VentStatus = Field(
+        ...,
+        description="Whether the vent valve is open or closed.",
+    )
+    modeType: VacuumOperationMode = Field(
+        ...,
+        description="Whether the module is in pressure or power control mode.",
     )
     errorDetails: Optional[str] = Field(
         ...,

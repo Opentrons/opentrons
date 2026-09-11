@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Chip, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
@@ -27,8 +28,12 @@ export function SetupOffsetsHeader({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId } = useUpdateClientLPC()
+  const documentationState = useDocumentationState()
 
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       dispatch(appliedOffsetsToRun(runId))

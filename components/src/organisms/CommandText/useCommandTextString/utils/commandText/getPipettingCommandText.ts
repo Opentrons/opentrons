@@ -1,4 +1,4 @@
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
 import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
@@ -9,8 +9,12 @@ import { getLabwareName } from '../getLabwareName'
 import { getLoadedLabware } from '../getLoadedLabware'
 import { getWellRange } from '../getWellRange'
 
-import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
-import type { GetCommandText } from '../..'
+import type {
+  PipetteName,
+  PipettingRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { HandlesCommands } from '../..'
 
 export const getPipettingCommandText = ({
   command,
@@ -18,7 +22,7 @@ export const getPipettingCommandText = ({
   commandTextData,
   robotType,
   t,
-}: GetCommandText): string => {
+}: HandlesCommands<PipettingRunTimeCommand>): string => {
   const labwareId =
     command != null && 'labwareId' in command.params
       ? (command.params.labwareId as string)
@@ -32,7 +36,7 @@ export const getPipettingCommandText = ({
     0,
     commandTextData.commands.findIndex(c => c.id === command?.id)
   )
-  const labwareLocation =
+  const labwareLocationFromCommands =
     allPreviousCommands != null
       ? getFinalLabwareLocation(
           labwareId,
@@ -40,9 +44,21 @@ export const getPipettingCommandText = ({
         )
       : null
 
+  const loadedLabware =
+    commandTextData != null
+      ? getLoadedLabware(commandTextData.labware ?? [], labwareId)
+      : null
+
+  // Prefer location derived from prior commands; fall back to the run's loaded
+  // labware location (needed when command history IDs don't match, e.g. fixit
+  // commands documented against protocol-analysis command lists).
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
-    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
+    location:
+      labwareLocationFromCommands?.locationSequence ??
+      labwareLocationFromCommands?.location ??
+      loadedLabware?.location ??
+      null,
     robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],
@@ -142,10 +158,6 @@ export const getPipettingCommandText = ({
       })
     }
     case 'dropTip': {
-      const loadedLabware =
-        commandTextData != null
-          ? getLoadedLabware(commandTextData.labware ?? [], labwareId)
-          : null
       const labwareDefinitions =
         commandTextData != null
           ? getLabwareDefinitionsFromCommands(
@@ -223,6 +235,35 @@ export const getPipettingCommandText = ({
     }
     case 'pressureDispense': {
       return t('pressurizing_to_dispense', { volume, flow_rate: flowRate })
+    }
+    case 'verifyTipPresence': {
+      const pipetteId = command.params.pipetteId
+      const pipette = commandTextData?.pipettes.find(
+        pipette => pipette.id === pipetteId
+      )
+      const mount =
+        pipette?.mount === 'left' ? t('left_mount') : t('right_mount')
+      const presence = !!command.params.expectedState
+        ? t(command.params.expectedState)
+        : ''
+
+      const pipetteName = getPipetteSpecsV2(pipette?.pipetteName)?.displayName
+
+      return t('verifying_tip_presence', {
+        presence,
+        pipette: pipetteName,
+        mount,
+      })
+    }
+    case 'getTipPresence': {
+      const pipetteId = command.params.pipetteId
+      const pipette = commandTextData?.pipettes.find(
+        pipette => pipette.id === pipetteId
+      )
+      const pipetteName = getPipetteSpecsV2(pipette?.pipetteName)?.displayName
+      return t('get_tip_presence', {
+        pipette: pipetteName,
+      })
     }
     default: {
       console.warn(

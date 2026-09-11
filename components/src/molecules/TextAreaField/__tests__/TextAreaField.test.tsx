@@ -69,4 +69,11 @@ describe('TextAreaField', () => {
     render(props)
     screen.getByText('information')
   })
+
+  it('applies multiline layout classes when multiline prop is true', () => {
+    props.multiline = true
+    render(props)
+    const textarea = screen.getByRole('textbox', { name: 'textAreaField' })
+    expect(textarea.className).toMatch(/textarea_multiline/)
+  })
 })

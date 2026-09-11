@@ -12,6 +12,7 @@ export type UnsafeRunTimeCommand =
   | UnsafeEngageAxesRunTimeCommand
   | UnsafeUngripLabwareRunTimeCommand
   | UnsafePlaceLabwareRunTimeCommand
+  | UnsafeFlexStackerManualRetrieveRunTimeCommand
   | UnsafeFlexStackerCloseLatchRunTimeCommand
   | UnsafeFlexStackerOpenLatchRunTimeCommand
   | UnsafeFlexStackerPrepareShuttleRunTimeCommand
@@ -110,7 +111,7 @@ export interface UnsafeFlexStackerManualRetrieveCreateCommand extends CommonComm
   commandType: 'unsafe/flexStacker/manualRetrieve'
   params: UnsafeFlexStackerManualRetrieveParams
 }
-export interface UnsafeFlexStackerManualRetrieveLatchRunTimeCommand
+export interface UnsafeFlexStackerManualRetrieveRunTimeCommand
   extends
     CommonCommandRunTimeInfo,
     UnsafeFlexStackerManualRetrieveCreateCommand {

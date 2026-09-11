@@ -45,6 +45,8 @@ export interface FixitCommandTypeUtils {
   reportMap: (dropTipMap: DropTipWizardRouteOverride | null) => void
   /* If supplied, begin drop tip flows on the specified route & step. If no step is supplied, begin at the start of the route. */
   routeOverride?: DropTipWizardRouteOverride
+  /* Called when the user backs out of the initial documentation modal. */
+  onDocumentationCancel?: () => void
 }
 
 export type DropTipWizardContainerProps = DropTipWizardProps & {
@@ -64,8 +66,4 @@ export type DropTipWizardContainerProps = DropTipWizardProps & {
  * Drop-tip/Blowout location types
  */
 export type ValidDropTipBlowoutLocation =
-  | 'trash-bin'
-  | 'fixed-trash'
-  | 'waste-chute'
-  | 'labware'
-  | 'deck'
+  'trash-bin' | 'fixed-trash' | 'waste-chute' | 'labware' | 'deck'

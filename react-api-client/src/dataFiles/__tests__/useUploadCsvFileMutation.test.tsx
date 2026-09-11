@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { uploadCsvFile } from '@opentrons/api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 import { useUploadCsvFileMutation } from '../useUploadCsvFileMutation'
 
@@ -45,9 +46,13 @@ describe('useUploadCsvFileMutation', () => {
   it('should return no data if no host', () => {
     vi.mocked(useHost).mockReturnValue(null)
 
-    const { result } = renderHook(() => useUploadCsvFileMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUploadCsvFileMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     expect(result.current.data).toBeUndefined()
   })
 
@@ -55,9 +60,13 @@ describe('useUploadCsvFileMutation', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(uploadCsvFile).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useUploadCsvFileMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUploadCsvFileMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     expect(result.current.data).toBeUndefined()
     result.current.uploadCsvFile(mockFilePath).catch(_ => {})
     await waitFor(() => {
@@ -74,7 +83,11 @@ describe('useUploadCsvFileMutation', () => {
       data: mockUploadResponse,
     } as Response<UploadedCsvFileResponse>)
 
-    const { result } = renderHook(() => useUploadCsvFileMutation(), { wrapper })
+    const { result } = renderHook(
+      () =>
+        useUploadCsvFileMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      { wrapper }
+    )
     await waitFor(() => result.current.uploadCsvFile(mockFilePath))
 
     await waitFor(() => {
@@ -88,7 +101,11 @@ describe('useUploadCsvFileMutation', () => {
       data: mockUploadResponse,
     } as Response<UploadedCsvFileResponse>)
 
-    const { result } = renderHook(() => useUploadCsvFileMutation(), { wrapper })
+    const { result } = renderHook(
+      () =>
+        useUploadCsvFileMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      { wrapper }
+    )
     await waitFor(() => result.current.uploadCsvFile(mockFile))
 
     await waitFor(() => {

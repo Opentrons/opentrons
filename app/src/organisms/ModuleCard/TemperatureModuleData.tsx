@@ -7,7 +7,7 @@ import {
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
 
-import type { TemperatureStatus } from '/app/redux/modules/api-types'
+import type { TemperatureStatus } from '@opentrons/api-client'
 
 interface TemperatureModuleProps {
   moduleStatus: TemperatureStatus

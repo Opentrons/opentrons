@@ -12,7 +12,6 @@ import { ChooseEnum } from '../ChooseEnum'
 
 import type { ComponentProps } from 'react'
 
-vi.mocked('../../../../ToasterOven')
 const render = (props: ComponentProps<typeof ChooseEnum>) => {
   return renderWithProviders(<ChooseEnum {...props} />, {
     i18nInstance: i18n,
@@ -58,16 +57,16 @@ describe('ChooseEnum', () => {
   it('calls the prop if reset default is clicked when the default has changed', () => {
     render(props)
     fireEvent.click(screen.getByText('Restore default value'))
-    expect(props.setParameter).toHaveBeenCalled()
+    expect(props.setParameter).toHaveBeenCalledWith('none', 'DEFAULT_OFFSETS')
   })
-  it('calls does not call prop if reset default is clicked when the default has not changed', () => {
+  it('still restores the default if reset default is clicked when already at the default', () => {
     props = {
       ...props,
       rawValue: 'none',
     }
     render(props)
     fireEvent.click(screen.getByText('Restore default value'))
-    expect(props.setParameter).not.toHaveBeenCalled()
+    expect(props.setParameter).toHaveBeenCalledWith('none', 'DEFAULT_OFFSETS')
   })
   it('should render the text and buttons for choice param', () => {
     render(props)

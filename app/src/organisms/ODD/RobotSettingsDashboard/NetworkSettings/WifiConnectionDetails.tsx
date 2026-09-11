@@ -19,14 +19,15 @@ import {
 } from '@opentrons/components'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { getNetworkInterfaces } from '/app/redux/networking'
-import { useWifiList } from '/app/resources/networking/hooks'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisplayWifiList } from '../../NetworkSettings'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 const FETCH_WIFI_LIST_MS = 5000
 
@@ -48,9 +49,7 @@ export function WifiConnectionDetails({
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName, FETCH_WIFI_LIST_MS)
-  const { wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi } = useNetworkInterfaces(robotName)
   const noData = i18n.format(t('shared:no_data'), 'titleCase')
   const ipAddress = wifi?.ipAddress != null ? wifi.ipAddress : noData
   const subnetMask = wifi?.subnetMask != null ? wifi.subnetMask : noData

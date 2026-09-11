@@ -1,0 +1,21 @@
+.button {
+	display: flex;
+	width: 1.5rem;
+	height: 1.5rem;
+	align-items: center;
+	justify-content: center;
+	padding: var(--spacing-2);
+	border-radius: var(--border-radius-full);
+	background-color: var(--black-90);
+	color: var(--white);
+	cursor: pointer;
+}
+
+.button:hover {
+	background-color: var(--black-80);
+}
+
+.button:focus-visible {
+	outline: 2px solid var(--blue-50);
+	outline-offset: 2px;
+}

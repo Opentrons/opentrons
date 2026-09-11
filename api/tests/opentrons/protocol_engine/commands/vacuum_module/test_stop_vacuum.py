@@ -47,8 +47,12 @@ async def test_stop_vacuum(
     )
     result = await subject.execute(data)
 
-    decoy.verify(await vm_hardware.set_vacuum_state(enable_vacuum=False))
+    decoy.verify(await vm_hardware.stop_vacuum())
+
+    expected_state_update = update_types.StateUpdate()
+    expected_state_update.update_vacuum_module_pump_engaged("input-vacuum-id", False)
+
     assert result == SuccessData(
         public=expected_result,
-        state_update=update_types.StateUpdate(),
+        state_update=expected_state_update,
     )

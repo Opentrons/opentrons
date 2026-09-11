@@ -19,6 +19,13 @@ Refer to the [Settings list section](#settings-list) below for definitions of th
 
 Many of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time. The following list describes all the currently available settings.
 
+### Automatically Download Updates
+
+Choose whether your Flex will download robot software updates in the background as soon as they become available. This setting is available in robot software version 9.1.1 and later, and is off by default.
+
+!!! note
+    When this setting is on, software downloads may occur at any time that Flex is connected to the internet, even while running a protocol.
+
 ### Camera
 
 Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.

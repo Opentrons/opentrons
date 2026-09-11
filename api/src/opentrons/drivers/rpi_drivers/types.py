@@ -4,7 +4,7 @@ import enum
 import re
 from dataclasses import dataclass
 from itertools import groupby
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from opentrons.hardware_control.types import BoardRevision
 
@@ -278,6 +278,31 @@ class USBPort:
         the list here.
         """
         return hash(self.name)
+
+    @staticmethod
+    def to_pyro_dict(obj: "USBPort") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "name": obj.name,
+            "port_number": obj.port_number,
+            "port_group": obj.port_group,
+            "hub": obj.hub,
+            "hub_port": obj.hub_port,
+            "device_path": obj.device_path,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "USBPort":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return USBPort(
+            name=data["name"],
+            port_number=int(data["port_number"]),
+            port_group=data["port_group"],
+            hub=data["hub"],
+            hub_port=int(data["hub_port"]) if data["hub_port"] is not None else None,
+            device_path=data["device_path"],
+        )
 
 
 class GPIOPin:

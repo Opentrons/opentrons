@@ -8,6 +8,7 @@ import {
   getReplacementFixtureForFixtureRemoval,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { AddFixtureModal } from '/app/organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -44,7 +45,9 @@ export function useDeckConfigurationEditingTools(
     useNotifyDeckConfigurationQuery({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const documentationState = useDocumentationState()
+  const { updateDeckConfiguration } =
+    useUpdateDeckConfigurationMutation(documentationState)
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
   const [addressableAreaId, setAddressableAreaId] =
     useState<AddressableAreaNamesWithFakes | null>(null)
@@ -92,6 +95,7 @@ export function useDeckConfigurationEditingTools(
     addFixtureModal:
       targetCutoutId != null && addressableAreaId != null ? (
         <AddFixtureModal
+          updateDeckConfiguration={updateDeckConfiguration}
           cutoutId={targetCutoutId}
           addressableAreaId={addressableAreaId}
           closeModal={() => {

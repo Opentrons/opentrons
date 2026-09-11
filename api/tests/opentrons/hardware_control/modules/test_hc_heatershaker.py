@@ -4,6 +4,7 @@ from typing import Any, AsyncGenerator
 import pytest
 from decoy import Decoy
 
+from . import require_live_data_real_string
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -172,6 +173,7 @@ async def test_initial_live_data(simulating_module: modules.HeaterShaker) -> Non
         },
         "status": "idle",
     }
+    require_live_data_real_string(simulating_module)
 
 
 async def test_updated_live_data(simulating_module: modules.HeaterShaker) -> None:
@@ -192,6 +194,7 @@ async def test_updated_live_data(simulating_module: modules.HeaterShaker) -> Non
         },
         "status": "running",
     }
+    require_live_data_real_string(simulating_module)
 
 
 async def test_deactivated_updated_live_data(
@@ -214,6 +217,7 @@ async def test_deactivated_updated_live_data(
         },
         "status": "running",
     }
+    require_live_data_real_string(simulating_module)
     await simulating_module.deactivate()
     assert simulating_module.live_data == {
         "data": {
@@ -228,6 +232,7 @@ async def test_deactivated_updated_live_data(
         },
         "status": "idle",
     }
+    require_live_data_real_string(simulating_module)
 
 
 async def fake_get_rpm(*args: Any, **kwargs: Any) -> RPM:

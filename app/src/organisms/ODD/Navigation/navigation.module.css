@@ -47,7 +47,7 @@
   height: 3.75rem;
   flex: none;
   align-content: center;
-  border-radius: var(--border-radius-200);
+  border-radius: var(--border-radius-full);
   background-color: var(--black-90);
   color: var(--white);
   font-size: var(--font-size-28);

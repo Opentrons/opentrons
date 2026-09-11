@@ -14,3 +14,7 @@ export interface LeafNode {
 }
 
 export type GroupedCommands = Array<LeafNode | ParentNode>
+
+// at this moment desktop is for the desktop app and web is for opentrons ai.
+// if the exising projects need a specific behavior, we'll need to change this type more project specific
+export type AppType = 'desktop' | 'web'

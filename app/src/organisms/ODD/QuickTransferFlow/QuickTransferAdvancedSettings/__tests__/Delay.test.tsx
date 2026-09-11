@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -41,18 +42,20 @@ describe('Delay', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for delay aspirate', () => {
+  it('renders text, buttons for delay aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Delay after aspirating')
     screen.getByText('Save')
     screen.getByText('Delay after each aspiration and air gap')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons for delay dispense', () => {
+  it('renders text, buttons for delay dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
     screen.getByText('Delay before dispensing')
@@ -60,39 +63,41 @@ describe('Delay', () => {
     screen.getByText('Delay after each dispense')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons, input field, and keyboard for delay before aspirating - volume', () => {
+  it('renders text, buttons, input field, and keyboard for delay before aspirating - volume', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Delay duration (seconds)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: '.' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '0' }))
     screen.getByText('Value must be between 0.1 to 9999999999')
     screen.getByText('Save')
   })
 
-  it('should call dispatch when clicking save button', () => {
+  it('should call dispatch when clicking save button', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Delay duration (seconds)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: '.' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_DELAY_ASPIRATE',
       delaySettings: {
@@ -106,9 +111,10 @@ describe('Delay', () => {
       },
     })
   })
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

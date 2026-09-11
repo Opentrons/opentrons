@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -207,37 +208,40 @@ describe('BlowOut', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for blowout fist screen', () => {
+  it('renders text, buttons for blowout fist screen', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Blowout after dispensing')
     screen.getByText('Save')
     screen.getByText('Blow extra air through the tip')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons for blowout second screen', () => {
+  it('renders text, buttons for blowout second screen', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Select blowout location')
     screen.getByText('Destination well')
     screen.getByText('Source well')
     screen.getByText('Trash bin in A3')
   })
 
-  it('renders text, buttons for blowout third screen', () => {
+  it('renders text, buttons for blowout third screen', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Select blowout location')
     screen.getByText('Destination well')
     screen.getByText('Source well')
     screen.getByText('Trash bin in A3')
-    fireEvent.click(screen.getByText('Source well'))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Source well'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Blowout speed (µL/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
@@ -245,18 +249,19 @@ describe('BlowOut', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
-  it('should call dispatch when clicking save button', () => {
+  it('should call dispatch when clicking save button', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Select blowout location')
     screen.getByText('Destination well')
     screen.getByText('Source well')
     screen.getByText('Trash bin in A3')
-    fireEvent.click(screen.getByText('Source well'))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Source well'))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_BLOW_OUT',
       blowOutSettings: {
@@ -272,9 +277,10 @@ describe('BlowOut', () => {
     })
   })
 
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

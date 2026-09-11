@@ -1,12 +1,9 @@
-import { useCallback, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useSelfQuery } from '@opentrons/react-api-client'
 
-import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
-
-import type { State } from '/app/redux/types'
+import { getLocalRobotAuthState } from '/app/redux/robot-auth'
 
 interface UseAccountInfoResult {
   isLoggedIn: boolean
@@ -16,10 +13,10 @@ interface UseAccountInfoResult {
   fullName: string | null
 }
 
-/** Returns information about the currently logged-in account. */
+/** Returns information about the currently logged-in account of the current robot. */
 export function useAccountInfo(): UseAccountInfoResult {
   const authState = useSelector(getLocalRobotAuthState)
-  const username = authState?.username ?? null
+  const username = authState?.user.username ?? null
   const isLoggedIn = username != null
   const query = useSelfQuery()
   const fullName = query.data?.data.fullName ?? null
@@ -28,24 +25,4 @@ export function useAccountInfo(): UseAccountInfoResult {
     () => ({ isLoggedIn, username, fullName }),
     [isLoggedIn, username, fullName]
   )
-}
-
-/** Returns a function that logs out of the current account. */
-export function useLogOut(): () => void {
-  const dispatch = useDispatch()
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
-  const logOut = useCallback(() => {
-    if (localRobotName == null) {
-      console.warn("Couldn't determine the local robot.")
-    } else {
-      dispatch(
-        logOutOrTimeOut({
-          robotName: localRobotName,
-        })
-      )
-    }
-  }, [dispatch, localRobotName])
-  return logOut
 }

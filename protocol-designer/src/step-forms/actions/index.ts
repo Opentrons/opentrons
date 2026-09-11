@@ -71,8 +71,7 @@ export interface StackerLabwareCreationFinishAction {
 }
 
 export type StackerLabwareActions =
-  | StackerLabwareCreationStartAction
-  | StackerLabwareCreationFinishAction
+  StackerLabwareCreationStartAction | StackerLabwareCreationFinishAction
 
 export const stackerLabwareCreationStart =
   (): StackerLabwareCreationStartAction => ({

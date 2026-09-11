@@ -1,6 +1,7 @@
 import { Chip, RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { MultiDeckLabelTagBtns as MultiDeckLabelTagBtnsComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -40,7 +41,9 @@ export default {
       if: { arg: 'hasColThreeSecondaryBtn', eq: true },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface MultiDeckLabelTagBtnsStoryProps {

@@ -46,6 +46,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons/SmallButton'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
@@ -93,7 +94,9 @@ export const LocationConflictModal = (
 
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const documentationState = useDocumentationState()
+  const { updateDeckConfiguration } =
+    useUpdateDeckConfigurationMutation(documentationState)
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId

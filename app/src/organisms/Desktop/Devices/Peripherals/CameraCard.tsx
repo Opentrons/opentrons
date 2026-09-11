@@ -18,6 +18,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import {
@@ -57,12 +58,14 @@ export function CameraCard({
     },
   })
 
+  const documentationState = useDocumentationState()
+
   const {
     isCameraEnabled,
     toggleCameraEnabled,
     isLiveVideoEnabled,
     isRecoveryCaptureEnabled,
-  } = useCameraUsageSettings()
+  } = useCameraUsageSettings(documentationState)
 
   const toggleControls = (): void => {
     setShowControls(!showControls)

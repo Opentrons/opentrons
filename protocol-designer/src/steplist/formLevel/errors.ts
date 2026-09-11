@@ -3,11 +3,11 @@ import {
   getMinXYDimension,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  VACUUM_MAX_PRESSURE_MBAR,
+  VACUUM_MIN_PRESSURE_MBAR,
 } from '@opentrons/shared-data'
 import {
   MANUAL,
-  VACUUM_MAX_PRESSURE_MBAR,
-  VACUUM_MIN_PRESSURE_MBAR,
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
@@ -85,7 +85,7 @@ export interface FormError {
   location: FormErrorLocationType[]
   //  used for top-level form warnings see formLevel/warnings.tsx
   body?: ReactNode
-  //  for multi-step forms
+  //  for multi-step forms; 0-indexed
   page?: number
   //  for mix and moveLiquid tools
   tab?: LiquidHandlingTab
@@ -658,6 +658,14 @@ const VACUUM_MODULE_ID_REQUIRED: FormError = {
   location: ['field'],
   showOnReopen: true,
 }
+const DROP_TIP_LOCATION_REQUIRED: FormError = {
+  title: 'Select tip drop location',
+  dependentFields: ['dropTip_location'],
+  location: ['field'],
+  page: 3,
+  showOnReopen: true,
+}
+
 export type FormErrorChecker = (
   arg: HydratedFormData,
   moduleEntities?: ModuleEntities
@@ -1652,6 +1660,12 @@ export const vacuumDurationRequired = (
     !pumpDurationTime
     ? VACUUM_DURATION_REQUIRED
     : null
+}
+export const tipDropLocationRequired = (
+  fields: HydratedMixFormData | HydratedMoveLiquidFormData
+): FormError | null => {
+  const { dropTip_location } = fields
+  return dropTip_location == null ? DROP_TIP_LOCATION_REQUIRED : null
 }
 
 export const vacuumModuleIdRequired = (

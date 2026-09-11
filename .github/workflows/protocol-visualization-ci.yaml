@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'typescript project build'
         run: make -C protocol-visualization build-ts
@@ -37,9 +37,3 @@ jobs:
         run: make -C protocol-visualization test-cov
       - name: 'vite lib build'
         run: make -C protocol-visualization lib
-      - name: 'Upload coverage report'
-        if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
-        with:
-          files: ./coverage/lcov.info
-          flags: protocol-visualization

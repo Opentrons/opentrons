@@ -8,7 +8,7 @@ import type { SmallButton } from '/app/atoms/buttons'
 const meta: Meta<typeof ChildNavigationComponent> = {
   title: 'ODD/Organisms/ChildNavigation',
   component: ChildNavigationComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 export default meta
 

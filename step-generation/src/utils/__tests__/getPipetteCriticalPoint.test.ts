@@ -38,7 +38,7 @@ describe('getPipetteCriticalPoint', () => {
     channels: 8,
   } as unknown as PipetteEntity
 
-  it('returns center point for COLUMN configuration when labware has one row', () => {
+  it('returns primary nozzle position for COLUMN configuration (centering handled by getPipetteCenteringYOffset)', () => {
     const result = getPipetteCriticalPoint(
       COLUMN as NozzleConfigurationStyle,
       mock96chPipetteEntity,
@@ -46,8 +46,8 @@ describe('getPipetteCriticalPoint', () => {
       fixture12Trough as LabwareDefinition
     )
 
-    // midpoint between A1 [0,0,0] and H1 [70,0,0] → [35,0,0]
-    expect(result).toEqual({ x: 35, y: 0, z: 0 })
+    // COLUMN centering is handled by getPipetteCenteringYOffset, not here
+    expect(result).toEqual({ x: 0, y: 0, z: 0 })
   })
 
   it('returns center point for ROW configuration when labware has one row', () => {
@@ -62,7 +62,7 @@ describe('getPipetteCriticalPoint', () => {
     expect(result).toEqual({ x: 0, y: 55, z: 0 })
   })
 
-  it('uses primary nozzle as backLeftPoint correctly for different nozzle', () => {
+  it('returns primary nozzle position for COLUMN configuration with A12 primary nozzle', () => {
     const result = getPipetteCriticalPoint(
       COLUMN as NozzleConfigurationStyle,
       mock96chPipetteEntity,
@@ -70,8 +70,8 @@ describe('getPipetteCriticalPoint', () => {
       fixture12Trough as LabwareDefinition
     )
 
-    // midpoint between A12 [0,110,0] and H12 [70,110,0] → [35,110,0]
-    expect(result).toEqual({ x: 35, y: 110, z: 0 })
+    // COLUMN centering is handled by getPipetteCenteringYOffset, not here
+    expect(result).toEqual({ x: 0, y: 110, z: 0 })
   })
 
   it('returns default position when labware has more than one column', () => {

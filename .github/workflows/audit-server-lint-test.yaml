@@ -1,0 +1,70 @@
+# This workflow runs tests and lint on non-release branches pushed that alter
+# the audit-server subpackage
+
+name: 'audit-server test/lint'
+
+on:
+  push:
+    paths: &paths
+      - 'audit-server/**'
+      - 'Makefile'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+      - '.github/workflows/audit-server-lint-test.yaml'
+      - '.github/actions/python/**'
+      - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
+    branches: # ignore any release-related thing (handled elsewhere)
+      - 'edge'
+    tags-ignore:
+      - '*'
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths: *paths
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'audit-server linting'
+    timeout-minutes: 10
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'audit-server'
+      - name: Lint
+        run: make -C audit-server lint
+  test:
+    name: 'audit-server tests'
+    timeout-minutes: 10
+    needs: [lint]
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'audit-server'
+      - name: Test
+        run: make -C audit-server test

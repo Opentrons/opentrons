@@ -5,6 +5,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { updateConfigValue } from '/app/redux/config'
 
 import { WelcomeModal } from '../WelcomeModal'
@@ -53,7 +54,9 @@ describe('WelcomeModal', () => {
       'A place to run protocols, manage your instruments, and view robot status.'
     )
     screen.getByText('Next')
-    expect(vi.mocked(useCreateLiveCommandMutation)).toBeCalledWith()
+    expect(vi.mocked(useCreateLiveCommandMutation)).toBeCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: animationCommand,
       waitUntilComplete: false,

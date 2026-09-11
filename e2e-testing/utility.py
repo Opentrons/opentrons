@@ -1,10 +1,11 @@
 import functools
 import re
+from pathlib import Path
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
 
-from automation.pd_pages import LandingPage, ProtocolEditorPage
+from automation.pd_pages import DeckConfigPage, LandingPage, ProtocolEditorPage
 
 # Todo add from eyes import eyes_check
 
@@ -56,7 +57,30 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
+def assert_export_downloads_clean_protocol(
+    page: Page,
+    editor: ProtocolEditorPage,
+    exports_dir: Path,
+    *,
+    filename: str,
+    export_timeout: int = 60000,
+) -> Path:
+    """Export the open protocol and assert the timeline stays error-free."""
+    expect(page.get_by_text("Protocol has timeline errors", exact=False)).to_have_count(0, timeout=5000)
+    destination = exports_dir / filename
+    editor.export_protocol(destination, timeout=export_timeout)
+    assert destination.exists(), f"Export did not create {destination}"
+    assert destination.stat().st_size > 0, f"Export file is empty: {destination}"
+    return destination
+
+
+def import_protocol_and_open_editor(
+    page: Page,
+    PROTOCOL_PATH: str,
+    migration: bool,
+    *,
+    migration_timeout: int = 15000,
+) -> None:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
@@ -72,8 +96,8 @@ def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: b
     landing.upload_protocol_file(PROTOCOL_PATH)
 
     if migration:
-        _dismiss_migration_modal(page)
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
+        _dismiss_migration_modal(page, timeout=migration_timeout)
+    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=migration_timeout)
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
     return ProtocolEditorPage(page)
@@ -84,15 +108,17 @@ def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> N
     # Todo add eyes_check(page, test_name, checkpoint_name)
 
 
-def _dismiss_migration_modal(page: Page) -> None:
-    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-    overlay.wait_for(state="visible", timeout=5000)
-    if overlay.is_visible():
+def _dismiss_migration_modal(page: Page, *, timeout: int = 15000) -> None:
+    """Dismiss the migration modal if it appears; otherwise continue to metadata."""
+    migration_prompt = page.get_by_text("Your protocol was made in an older version of Protocol Designer")
+    metadata_heading = page.get_by_text("Protocol Metadata")
+    expect(migration_prompt.or_(metadata_heading).first).to_be_visible(timeout=timeout)
+
+    if migration_prompt.is_visible():
         page.get_by_role("button", name="Import", exact=True).click()
-        expect(overlay).not_to_be_visible()
+        expect(metadata_heading).to_be_visible(timeout=timeout)
     else:
         print("Migration modal did not appear, proceeding with test.")
-        pass
 
 
 def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
@@ -116,16 +142,11 @@ def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute:
         page.get_by_test_id("BasicsButtons_gripper_yes").get_by_text("Yes").click()
     else:
         page.get_by_test_id("BasicsButtons_gripper_no").get_by_text("No").click()
-    if tc:
-        page.get_by_test_id("BasicsButtons_thermocycler_yes").get_by_text("Yes").click()
-    else:
-        page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
-    if waste_chute:
-        page.get_by_test_id("BasicsButtons_wasteChute_yes").get_by_text("Yes").click()
-    else:
-        page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
     confirm_button = page.get_by_role("button", name="Confirm")
     confirm_button.click()
+
+    deck_config = DeckConfigPage(page)
+    deck_config.configure_initial_deck_hardware(tc=tc, waste_chute=waste_chute)
 
 
 def start_new_create_protocol(page: Page) -> None:

@@ -89,9 +89,9 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
-    border-radius: ${isOnDevice
-      ? BORDERS.borderRadius12
-      : BORDERS.borderRadius8};
+    border-radius: ${
+      isOnDevice ? BORDERS.borderRadius12 : BORDERS.borderRadius8
+    };
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,

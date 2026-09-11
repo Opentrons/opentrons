@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { getClientData, updateClientData } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -37,12 +37,14 @@ export function useReadModifyWriteClientData<T = DefaultClientData>(
 ): UseReadModifyWriteClientDataMutationResult<T> {
   const host = useHost()
 
+  // Client data endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<
     ClientDataResponse<T>,
     AxiosError,
     ClientDataAlterer<T>
   >(
-    [host, 'client_data', key],
+    getQueryKey(host, 'client_data', key),
     modifier =>
       getClientData<T>(host!, key)
         .then(response => modifier(response?.data?.data ?? null))

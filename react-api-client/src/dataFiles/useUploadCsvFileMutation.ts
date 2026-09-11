@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { uploadCsvFile } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -16,6 +17,8 @@ import type {
   HostConfig,
   UploadedCsvFileResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseUploadCsvFileMutationResult = UseMutationResult<
   UploadedCsvFileResponse,
@@ -36,6 +39,7 @@ export type UseUploadCsvFileMutationOption = UseMutationOptions<
 >
 
 export function useUploadCsvFileMutation(
+  documentationState: DocumentationState,
   options: UseUploadCsvFileMutationOption = {},
   hostOverride?: HostConfig | null
 ): UseUploadCsvFileMutationResult {
@@ -44,20 +48,29 @@ export function useUploadCsvFileMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     UploadedCsvFileResponse,
     AxiosError<ErrorResponse>,
     FileData
   >(
-    (fileData: FileData) =>
-      uploadCsvFile(host!, fileData).then(response => {
+    documentationState,
+    ['upload_csv'],
+    getQueryKey(host, 'dataFiles'),
+    ({
+      variables: fileData,
+      userNotes,
+    }: DocumentedMutationParameters<FileData>) =>
+      uploadCsvFile(host!, fileData, userNotes).then(response => {
         queryClient
-          .invalidateQueries([host, 'dataFiles'])
+          .invalidateQueries(getQueryKey(host, 'dataFiles'))
           .then(() =>
-            queryClient.setQueryData([host, 'dataFiles'], response.data)
+            queryClient.setQueryData(
+              getQueryKey(host, 'dataFiles', response.data.data.id),
+              response.data
+            )
           )
           .catch((e: Error) => {
-            throw e
+            console.error(`error invalidating data files query: ${e.message}`)
           })
         return response.data
       }),

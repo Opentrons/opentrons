@@ -227,7 +227,6 @@ export const RunPreviewComponent = (
             borderRadius={SPACING.spacing32}
             display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
             onClick={makeHandleScrollToStep(currentRunCommandIndex)}
-            id="RunLog_jumpToCurrentStep"
           >
             {t('view_current_step')}
           </PrimaryButton>

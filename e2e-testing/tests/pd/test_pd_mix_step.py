@@ -8,7 +8,7 @@ from eyes import Eyes
 from utility import import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
-# ToDo fix after merge pnpm pr
+# Ending deck keeps the 1000 µL tip rack on C2 (do not dispose it before Mix).
 LABWARE_OPTION = "B4 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
 PIPETTE_OPTION = "Flex 1-Channel 1000 µL"
 TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
@@ -23,8 +23,6 @@ def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
 
     mix_form = MixStepForm(page)
     protocol_editor.add_step("Mix")
-    # currently there is a divergence in the number of parts in the mix step form
-    # between 8.6.2 prod (1/3) and what's in edge (1/4)
 
     mix_form.select_pipette(PIPETTE_OPTION)
     mix_form.select_tiprack(TIPRACK_OPTION)

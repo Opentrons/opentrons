@@ -49,9 +49,7 @@ export interface SelectOptionGroup {
 export type SelectOptionOrGroup = SelectOption | SelectOptionGroup
 
 export type SelectPlacement =
-  | typeof PLACEMENT_AUTO
-  | typeof PLACEMENT_BOTTOM
-  | typeof PLACEMENT_TOP
+  typeof PLACEMENT_AUTO | typeof PLACEMENT_BOTTOM | typeof PLACEMENT_TOP
 
 export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 

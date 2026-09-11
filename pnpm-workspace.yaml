@@ -26,3 +26,25 @@ onlyBuiltDependencies:
   - sharp
 
 minimumReleaseAge: 10080 # 1 week
+
+minimumReleaseAgeExclude:
+  # https://github.com/electron-userland/electron-builder/releases/tag/electron-builder%4026.16.1
+  # for https://github.com/electron-userland/electron-builder/issues/10167
+  - electron-builder
+  - builder-util
+  - dmg-builder
+  - app-builder-lib
+  - electron-publish
+  - electron-builder-squirrel-windows
+
+catalog:
+  lodash: 4.18.1
+  react-i18next: 14.0.0
+  react-router-dom: 6.24.1
+  '@types/lodash': 4.17.24
+
+catalogs:
+  react18:
+    react: 18.2.0
+    react-dom: 18.2.0
+    '@types/react-dom': 18.2.0

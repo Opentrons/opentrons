@@ -9,7 +9,7 @@ import {
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
+} from '/app/resources/instruments/__fixtures__'
 
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'

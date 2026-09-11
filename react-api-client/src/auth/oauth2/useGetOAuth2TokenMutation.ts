@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { getOAuth2Token } from '@opentrons/api-client'
 
-import { useHost } from '../../api'
+import { getQueryKey, useHost } from '../../api'
 
 import type {
   UseMutateFunction,
@@ -43,8 +43,10 @@ export function useGetOAuth2TokenMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
+  // Auth endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation -- directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this function.
   const mutation = useMutation(
-    [host, 'auth/oauth2/token'],
+    getQueryKey(host, 'auth/oauth2/token'),
     body => getOAuth2Token(host!, body),
     options
   )

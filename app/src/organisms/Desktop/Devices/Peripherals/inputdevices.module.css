@@ -2,10 +2,9 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-
-  /* Refactor the parent container to use `gap`. */
-  margin-top: var(--spacing-16);
-  margin-bottom: var(--spacing-16);
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
   gap: var(--spacing-16);
 }
 

@@ -25,7 +25,6 @@ export function Ot2ProtocolModal({
   return createPortal(
     <Modal
       type="warning"
-      marginLeft="0"
       onClose={onClose}
       title={t('redirect_to_ot2_pd.title')}
       footer={

@@ -37,6 +37,8 @@ export function useDeleteCalibrationMutation(
 ): UseDeleteCalibrationMutationResult {
   const host = useHost()
 
+  // OT-2 only.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<EmptyResponse, unknown, DeleteCalRequestParams>(
     (requestParams: DeleteCalRequestParams) =>
       deleteCalibration(host!, requestParams).then(response => response.data),

@@ -18,6 +18,7 @@ from ..resources import (
     ModelUtils,
     ModuleDataProvider,
     PeripheralDataProvider,
+    labware_validation,
     pipette_data_provider,
 )
 from ..state.modules import HardwareModule
@@ -673,13 +674,11 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        is_deck_slot_compatible = (
-            True
-            if definition.parameters.isDeckSlotCompatible is None
-            else definition.parameters.isDeckSlotCompatible
-        )
-
-        if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
+        if isinstance(location, DeckSlotLocation) and (
+            not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            )
+        ):
             raise ValueError(
                 f"Lid Labware {load_name} cannot be loaded onto a Deck Slot."
             )

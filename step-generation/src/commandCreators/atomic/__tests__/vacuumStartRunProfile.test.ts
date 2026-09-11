@@ -80,7 +80,7 @@ describe('vacuumStartRunProfile', () => {
           key: expect.any(String),
           params: {
             moduleId: vacuumModuleId,
-            profile: [{ ...args.profile[0], ventAfter: true }],
+            steps: [{ ...args.profile[0], ventAfter: true }],
             taskId: 'mock_vacuum_module_task_1',
             ventAfter: true,
           },
@@ -88,9 +88,10 @@ describe('vacuumStartRunProfile', () => {
       ],
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
-    profile=[
+    steps=[
         {
-            "gauge_pressure": 55,
+            "gauge_pressure_mbar": 55,
+            "enable_pump": True,
             "hold_time_seconds": 12,
             "vent_after": False,
         }
@@ -128,7 +129,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
           key: expect.any(String),
           params: {
             moduleId: vacuumModuleId,
-            profile: [{ ...args.profile[0], ventAfter: false }],
+            steps: [{ ...args.profile[0], ventAfter: false }],
             taskId: 'mock_vacuum_module_task_1',
             ventAfter: false,
           },
@@ -136,9 +137,10 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
       ],
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
-    profile=[
+    steps=[
         {
-            "power_percent": 30,
+            "percent_power": 30,
+            "enable_pump": True,
             "hold_time_seconds": 5,
             "vent_after": False,
         }

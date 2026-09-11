@@ -68,7 +68,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         1fr
       )"
     >
-      <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
+      <Box marginRight={SPACING.spacing24}>
         <RobotWorkSpace
           viewBox={`${viewBox.minX} ${viewBox.minY} ${xDimensionOverride} ${viewBox.yDimension}`}
         >
@@ -82,7 +82,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
       <Box marginRight={SPACING.spacing16}>
-        <LegacyStyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
+        <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
           {displayCategory}
         </LegacyStyledText>
       </Box>
@@ -93,15 +93,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box>
-            <LegacyStyledText forwardedAs="h3" id="LabwareCard_labwareName">
-              {displayName}
-            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="h3">{displayName}</LegacyStyledText>
             {isCustomDefinition ? (
-              <LegacyStyledText
-                forwardedAs="label"
-                color={COLORS.grey50}
-                id="LabwareCard_customDef"
-              >
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('custom_def')}
               </LegacyStyledText>
             ) : (
@@ -113,7 +107,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 />
                 <LegacyStyledText
                   forwardedAs="label"
-                  id="LabwareCard_opentronsDef"
                   marginLeft={SPACING.spacing4}
                 >
                   {t('branded:opentrons_def')}
@@ -126,7 +119,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               forwardedAs="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.grey60}
-              id="LabwareCard_apiName"
             >
               {t('api_name')}
             </LegacyStyledText>
@@ -153,11 +145,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('date_added')}
               </LegacyStyledText>
-              <LegacyStyledText
-                forwardedAs="label"
-                color={COLORS.grey50}
-                id="LabwareCard_dateAdded"
-              >
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {format(new Date(modified), 'MM/dd/yyyy')}
               </LegacyStyledText>
             </Flex>

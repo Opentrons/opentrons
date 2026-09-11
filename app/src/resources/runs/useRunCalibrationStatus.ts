@@ -1,10 +1,10 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useDeckCalibrationStatus } from '/app/resources/calibration'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
+import { INEXACT_MATCH, MATCH } from '/app/resources/runs/constants'
 
 import { useMostRecentCompletedAnalysis, useRunPipetteInfoByMount } from '.'
 

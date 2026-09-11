@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -34,7 +35,9 @@ async def get_calibration_status(
     instr_offset = InstrumentCalibrationStatus(  # always load default values
         right=DEFAULT_INSTR_OFFSET, left=DEFAULT_INSTR_OFFSET
     )
-    deck_cal = hardware.robot_calibration.deck_calibration
+    deck_cal = await asyncio.to_thread(
+        lambda: hardware.robot_calibration.deck_calibration
+    )
     status = cal_model.CalibrationStatus(**helpers.convert_to_dict(deck_cal.status))
     deck_cal_data = DeckCalibrationData(
         type=MatrixType.attitude,
@@ -48,7 +51,8 @@ async def get_calibration_status(
 
     return CalibrationStatus(
         deckCalibration=DeckCalibrationStatus(
-            status=hardware.validate_calibration(), data=deck_cal_data
+            status=await asyncio.to_thread(hardware.validate_calibration),
+            data=deck_cal_data,
         ),
         instrumentCalibration=instr_offset,
     )

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { FloatingActionButton } from '/app/atoms/buttons'
+import { TouchFloatingActionButton } from '/app/atoms/buttons'
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -46,10 +46,11 @@ export function ProtocolSetupOffsets(
         <div className={styles.setup_offset_container}>
           <SetupOffsetsHeader {...props} />
           <SetupOffsetsTable {...props} />
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={t('labware_position_check')}
             iconName="reticle"
             onClick={onLPCLaunchClick}
+            aria-label={t('proceed_labware_position_check')}
           />
         </div>
       )}

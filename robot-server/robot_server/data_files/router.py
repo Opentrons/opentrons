@@ -1,17 +1,19 @@
 """Router for /dataFiles endpoints."""
 
-import asyncio
+import os
 from datetime import datetime
+from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, AsyncIterator, Final, Literal, Optional, Union
+from typing import Annotated, Final, Literal, Optional, Union
 
 from fastapi import Depends, File, Form, Query, Response, UploadFile, status
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 
-from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -45,9 +47,16 @@ from .models import (
     FileNotFound,
     ImageFileMetadata,
     NoImagesFound,
-    ZipCreationFailed,
+)
+from .zip_utils import (
+    build_run_zip_filename,
+    collect_existing_run_images,
+    create_zip_for_download,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.persistence.fastapi_dependencies import (
+    get_persistence_directory_root,
+)
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.dependencies import get_run_data_manager, get_run_store
 from robot_server.runs.router.base_router import RunNotFound
@@ -60,10 +69,55 @@ from robot_server.service.notifications.publishers import (
     get_data_file_publisher,
 )
 
+LOG = getLogger(__name__)
+
 datafiles_router = LightRouter()
 
 _DEFAULT_IMAGE_METADATA_LIST_LENGTH: Final = 99
 _DEFAULT_IMAGE_METADATA_CURSOR: Final = 0
+
+_FILE_PATH_ROOT_ALLOWLISTS = [
+    "/data",
+    "/var/lib/opentrons-robot-server",
+    "/var/lib/jupyter/data",
+    "/home",
+    "/var/user-packages",
+    "/media",
+    "/run/media",
+    "/userfs/media",
+    "/dev/null",
+    "/Users",
+]
+_FILE_PATH_COMPONENT_DENYLISTS = [
+    "BOOT-mmcblk0p1",
+    "RFS-mmcblk0p2",
+    "RFS2-mmcblk0p3",
+    "mmcblk0p1",
+    "mmcblk0p2",
+    "mmcblk0p3",
+]
+
+
+def sanitize_path(path: str | None) -> str | None:
+    """Raise if a path is unacceptable."""
+    if path is None:
+        return path
+    realpath = os.path.realpath(path)
+    for allowed_root in _FILE_PATH_ROOT_ALLOWLISTS:
+        if os.path.commonpath([realpath, allowed_root]) == allowed_root:
+            break
+    else:
+        LOG.error(f"Data file upload path {path} does not use an allowed root")
+        raise FileNotFound(detail=f"{path} is not allowed").as_error(
+            status.HTTP_403_FORBIDDEN
+        )
+    for denied_component in _FILE_PATH_COMPONENT_DENYLISTS:
+        if denied_component in path:
+            LOG.error(f"Data file upload path {path} uses a banned component")
+            raise FileNotFound(detail=f"{path} is not allowed").as_error(
+                status.HTTP_403_FORBIDDEN
+            )
+    return realpath
 
 
 class MultipleDataFileSources(ErrorDetails):
@@ -98,11 +152,9 @@ class DataFileInUse(ErrorDetails):
     datafiles_router.post,
     path="/dataFiles",
     summary="Upload a data file",
-    description=dedent(
-        """
+    description=dedent("""
         Upload data file(s) to your device.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
@@ -118,7 +170,10 @@ class DataFileInUse(ErrorDetails):
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("upload data file")),
+    ],
 )
 async def upload_data_file(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
@@ -151,7 +206,9 @@ async def upload_data_file(
             detail="You must provide either a file or a file_path in the request."
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
     try:
-        [buffered_file] = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
+        [buffered_file] = await file_reader_writer.read(
+            files=[file or Path(sanitize_path(file_path))]  # type: ignore[arg-type, list-item]
+        )
     except FileNotFoundError as e:
         raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     # TODO (spp, 2024-06-18): probably also validate CSV file *contents*
@@ -310,9 +367,11 @@ async def get_all_data_files(
                     id=data_file_info.id,
                     name=data_file_info.name,
                     createdAt=data_file_info.created_at,
-                    source=DataFileSource.GENERATED
-                    if data_file_info.generated
-                    else DataFileSource.UPLOADED,
+                    source=(
+                        DataFileSource.GENERATED
+                        if data_file_info.generated
+                        else DataFileSource.UPLOADED
+                    ),
                 )
                 for data_file_info in data_files
             ],
@@ -330,7 +389,10 @@ async def get_all_data_files(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[DataFileInUse]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("delete data file")),
+    ],
 )
 async def delete_file_by_id(
     dataFileId: str,
@@ -382,7 +444,7 @@ async def get_data_files_by_run_id(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -424,8 +486,7 @@ async def get_data_files_by_run_id(
     datafiles_router.get,
     path="/dataFiles/{runId}/images",
     summary="Get a list of image-specific metadata for all camera image files associated with a given run.",
-    description=dedent(
-        """
+    description=dedent("""
         Get a list of image-specific metadata for camera image files associated with a given run.
         "\n\n"
         The camera image file metadata are returned in order from newest to oldest.
@@ -435,8 +496,7 @@ async def get_data_files_by_run_id(
         "\n\n"
         This endpoint returns camera image file metadata. Use `GET /runs/{runId}/images/{fileName}`
          to get a specific camera image file.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[ImageFileMetadata]},
     },
@@ -505,19 +565,20 @@ async def get_run_image_metadata(
     datafiles_router.delete,
     path="/dataFiles/{runId}/images",
     summary="Delete all camera images for a run",
-    description=dedent(
-        """
+    description=dedent("""
         Delete all camera image files associated with a run from both the database
         and filesystem storage.
 
         This operation cannot be undone.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("delete images for run")),
+    ],
 )
 async def delete_run_images(
     runId: str,
@@ -534,7 +595,7 @@ async def delete_run_images(
         data_file_publisher: The data file MQTT event publisher.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -550,20 +611,17 @@ async def delete_run_images(
 @datafiles_router.get(
     path="/dataFiles/{runId}/images/download",
     summary="Download all camera images for a run as a zip file",
-    description=dedent(
-        """
+    description=dedent("""
         Download all camera image files associated with a run as a single zip archive.
 
         The zip file will contain all JPEG images captured during the protocol run.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {
             "content": {"application/zip": {}},
             "description": "A zip file containing all camera images for the run",
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoImagesFound]},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[ZipCreationFailed]},
     },
 )
 async def download_run_images(
@@ -571,126 +629,39 @@ async def download_run_images(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-) -> StreamingResponse:
+    persistence_directory_root: Annotated[
+        Path, Depends(get_persistence_directory_root)
+    ],
+) -> FileResponse:
     """Download all camera images for a run as a zip file.
-
-    Streams the resultant zip file via a spawned subprocess.
 
     Arguments:
         runId: The run ID associated with the camera image files.
         data_files_store: Store for data files database access.
         run_store: Store for run data management.
         protocol_store: Store for protocol storage access.
+        persistence_directory_root: Persistence directory used for zip staging.
     """
-    info_slice = data_files_store.get_files_info_by_run_mime_type(
-        run_id=runId,
-        mime_type=MimeType.IMAGE_JPEG,
-        offset=0,
-        limit=None,
-    )
-
-    if not info_slice.file_info:
-        raise NoImagesFound(detail=f"No images found for run '{runId}'").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
-
-    existing_files = []
-    for file_info in info_slice.file_info:
-        image_path = Path(file_info.path)
-        if image_path.exists() and image_path.is_file():
-            existing_files.append((image_path, file_info.name))
+    existing_files = collect_existing_run_images(runId, data_files_store)
 
     if not existing_files:
         raise NoImagesFound(
             detail=f"No accessible images found for run '{runId}'"
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    zip_filename = _build_zip_filename(
-        run_id=runId, run_store=run_store, protocol_store=protocol_store
+    run = run_store.get(runId)
+    zip_filename = build_run_zip_filename(
+        run=run,
+        protocol_store=protocol_store,
+        fallback_filename=f"{runId}_images.zip",
+    )
+    zip_path, cleanup = await create_zip_for_download(
+        existing_files, persistence_directory_root
     )
 
-    return StreamingResponse(
-        _stream_zip_from_subprocess(existing_files),
+    return FileResponse(
+        path=zip_path,
         media_type="application/zip",
-        headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
+        filename=zip_filename,
+        background=BackgroundTask(cleanup),
     )
-
-
-async def _stream_zip_from_subprocess(
-    files: list[tuple[Path, str]],
-    chunk_size: int = 65536,
-) -> AsyncIterator[bytes]:
-    """Offload zipping to a subprocess, yielding the final zip file chunks, `chunk_size` bytes in size."""
-    process = None
-
-    try:
-        file_paths = [str(file_path) for file_path, _ in files]
-
-        process = await asyncio.create_subprocess_exec(
-            "zip",
-            "-q",  # quiet
-            "-j",  # junk paths (store only filenames)
-            "-",  # write zip output to stdout
-            *file_paths,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        if process.stdout is None:
-            raise RuntimeError("stdout was not captured")
-        if process.stderr is None:
-            raise RuntimeError("stderr was not captured")
-
-        while True:
-            chunk = await process.stdout.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
-
-        await process.wait()
-
-        if process.returncode != 0:
-            stderr_output = await process.stderr.read()
-            error_msg = stderr_output.decode() if stderr_output else "Unknown error"
-            raise Exception(
-                f"zip command failed with code {process.returncode}: {error_msg}"
-            )
-
-    except Exception as e:
-        # Clean up process if still running
-        if process is not None and process.returncode is None:
-            process.kill()
-            await process.wait()
-
-        raise ZipCreationFailed(
-            detail=f"Unexpected error during zip creation: {str(e)}"
-        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
-
-
-def _build_zip_filename(
-    run_id: str, run_store: RunStore, protocol_store: ProtocolStore
-) -> str:
-    run_info = run_store.get(run_id)
-    protocol_id = run_info.protocol_id if run_info else None
-
-    if protocol_id is not None:
-        protocol = protocol_store.get(protocol_id)
-        protocol_name = (
-            protocol.source.metadata.get(
-                "protocolName", protocol.source.files[0].path.name
-            )
-            if protocol is not None
-            else None
-        )
-        robot_name = config.name()
-        timestamp = run_info.created_at.strftime("%Y%m%d_%H%M%S")
-        final_str = f"{robot_name}_{_sanitize_str(protocol_name)}_{timestamp}.zip"
-
-        return final_str
-
-    return f"{run_id}_images.zip"
-
-
-def _sanitize_str(input_str: str) -> str:
-    """Ensure that the input string contains only alphanumeric characters."""
-    return "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in input_str)

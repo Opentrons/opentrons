@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -10,15 +11,22 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getLocalRobot } from '/app/redux/discovery'
+import { logOut } from '/app/redux/robot-auth'
 
 import styles from './account.module.css'
-import { useAccountInfo, useLogOut } from './hooks'
+import { useAccountInfo } from './hooks'
+
+import type { State } from '/app/redux/types'
 
 export function Account(): JSX.Element {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { isLoggedIn, username, fullName } = useAccountInfo()
-  const logOut = useLogOut()
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -34,7 +42,13 @@ export function Account(): JSX.Element {
           navigate(-1)
         }}
         buttonText={t('access_control:log_out')}
-        onClickButton={logOut}
+        onClickButton={() => {
+          if (localRobotName == null) {
+            console.warn("Couldn't identify the robot to log out of.")
+          } else {
+            dispatch(logOut({ robotName: localRobotName }))
+          }
+        }}
         buttonType="tertiaryHighLight"
       />
       <div className={styles.rows}>

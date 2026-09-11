@@ -1,6 +1,6 @@
 import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
 
-import { useShouldShowLoggedOutOverlay } from './hooks'
+import { useShouldShowLoggedOutOverlay } from './hooks/useShouldShowLoggedOutOverlay'
 import { showLoginModal, useIsLoginModalOpen } from './LoginModal'
 
 export function LoggedOutOverlayMount(): JSX.Element | null {

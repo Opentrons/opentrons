@@ -39,7 +39,8 @@ export const getLoadCommandText = ({
           pipetteModel != null
             ? (getPipetteSpecsV2(pipetteModel)?.displayName ?? '')
             : '',
-        mount_name: command.params.mount === 'left' ? t('left') : t('right'),
+        mount_name:
+          command.params.mount === 'left' ? t('left_mount') : t('right_mount'),
       })
     }
     case 'loadModule': {

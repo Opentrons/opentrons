@@ -66,7 +66,7 @@ class NetworkInfo:
     def __init__(
         self,
         can_messenger: CanMessenger,
-        usb_messenger: Optional[BinaryMessenger] = None,
+        usb_messenger: BinaryMessenger,
     ) -> None:
         """Construct.
 
@@ -176,7 +176,7 @@ class NetworkInfo:
 class UsbNetworkInfo:
     """This class is responsible for keeping track of usb devices."""
 
-    def __init__(self, usb_messenger: Optional[BinaryMessenger]) -> None:
+    def __init__(self, usb_messenger: BinaryMessenger) -> None:
         """Construct.
 
         Args:
@@ -221,9 +221,6 @@ class UsbNetworkInfo:
         """
         event = asyncio.Event()
         targets: Dict[USBTarget, DeviceInfoCache] = dict()
-        if self._usb_messenger is None:
-            self._device_info_cache = {}
-            return targets
 
         if not devices:
             return targets

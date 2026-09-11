@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RECOVERY_MAP } from '../../constants'
 import { useCleanupRecoveryState } from '../useCleanupRecoveryState'
 
+import type { IRecoveryMap } from '../../types'
+
 describe('useCleanupRecoveryState', () => {
   let props: Parameters<typeof useCleanupRecoveryState>[0]
-  let mockSetRM: ReturnType<typeof vi.fn>
+  let mockSetRM = vi.fn<(map: IRecoveryMap) => void>()
 
   beforeEach(() => {
     mockSetRM = vi.fn()

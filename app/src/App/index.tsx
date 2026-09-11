@@ -7,7 +7,7 @@ import { GlobalStyle } from '/app/atoms/GlobalStyle'
 import { getConfig } from '/app/redux/config'
 
 import { DesktopApp } from './DesktopApp'
-import { useWindowType } from './hooks'
+import { useWindowType } from './hooks/useWindowType'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
 import { SecondaryWindowApp } from './SecondaryWindowApp'

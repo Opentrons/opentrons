@@ -10,7 +10,6 @@ export function getEncryptedCACertificates(
   return request<EncryptedCACertificates>(
     GET,
     '/keys/external/ca/encryptedCerts',
-    null,
     config
   )
 }

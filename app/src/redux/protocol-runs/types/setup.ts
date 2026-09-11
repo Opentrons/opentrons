@@ -1,13 +1,20 @@
 import type { CameraImageSettings } from '@opentrons/api-client'
 import type { CameraId } from '@opentrons/shared-data'
 import type {
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
+  updateCameraUsageSettings,
+  updateRunSetupStepsComplete,
+  updateRunSetupStepsRequired,
+} from '../actions'
+import type {
   CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
-  UPDATE_RUN_SETUP_STEPS_COMPLETE,
-  UPDATE_RUN_SETUP_STEPS_REQUIRED,
 } from '../constants'
 
 export type RobotCalibrationStepKey = typeof ROBOT_CALIBRATION_STEP_KEY
@@ -59,68 +66,11 @@ export interface RunSetupStatus {
   [CAMERA_SETUP_STEP_KEY]: CameraStepState
 }
 
-export interface UpdateRunSetupStepsCompleteAction {
-  type: typeof UPDATE_RUN_SETUP_STEPS_COMPLETE
-  payload: {
-    runId: string
-    complete: Partial<{ [Step in StepKey]: boolean }>
-  }
-}
-
-export interface UpdateRunSetupStepsRequiredAction {
-  type: typeof UPDATE_RUN_SETUP_STEPS_REQUIRED
-  payload: {
-    runId: string
-    required: Partial<{ [Step in StepKey]: boolean }>
-  }
-}
-
-export interface UpdateCameraEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    cameraEnabled: boolean
-  }
-}
-
-export interface UpdateCameraErrorRecoveryEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    recoveryEnabled: boolean
-  }
-}
-export interface UpdateLivestreamEnabled {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    liveStreamEnabled: boolean
-  }
-}
-
-export interface UpdateAllCameraSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    liveStreamEnabled: boolean
-    recoveryEnabled: boolean
-    cameraEnabled: boolean
-  }
-}
-
-export interface UpdateCameraSpecificImageSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
-  payload: {
-    runId: string
-    cameraId: string
-    cameraImageSettings: CameraImageSettings
-  }
-}
 export type RunSetupStepsAction =
-  | UpdateRunSetupStepsCompleteAction
-  | UpdateRunSetupStepsRequiredAction
-  | UpdateCameraEnablement
-  | UpdateAllCameraSettings
-  | UpdateLivestreamEnabled
-  | UpdateCameraErrorRecoveryEnablement
-  | UpdateCameraSpecificImageSettings
+  | ReturnType<typeof updateRunSetupStepsComplete>
+  | ReturnType<typeof updateRunSetupStepsRequired>
+  | ReturnType<typeof updateCameraEnablement>
+  | ReturnType<typeof updateCameraRecoveryEnablement>
+  | ReturnType<typeof updateCameraStreamEnablement>
+  | ReturnType<typeof updateCameraUsageSettings>
+  | ReturnType<typeof updateCameraSpecificSettings>

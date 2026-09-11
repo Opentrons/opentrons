@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Box,
@@ -72,13 +71,14 @@ function DropTipPrimaryBtn({
         disabled={primaryBtnDisabled}
       />
       {primaryBtnStyle === 'alertStyle' ? (
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           css={DESKTOP_ONLY_BUTTON}
           onClick={primaryBtnOnClick}
           disabled={primaryBtnDisabled}
         >
           {primaryBtnTextOverride ?? t('continue')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       ) : (
         <PrimaryButton
           css={DESKTOP_ONLY_BUTTON}

@@ -12,7 +12,6 @@ export function getCameraImageSettings(
   return request<CameraImageSettingsResponse>(
     GET,
     `/camera/cameraSettings/${cameraId}`,
-    null,
     config
   )
 }

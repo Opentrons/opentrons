@@ -11,10 +11,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT } from '@opentrons/shared-data'
 
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
-import { LEFT } from '/app/redux/pipettes'
 import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,

@@ -42,7 +42,6 @@ export function FeatureFlags(): JSX.Element {
             <LegacyStyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              id={`FeatureFlags_${flag}_text`}
             >
               {t(`__dev_internal__${flag}`)}
             </LegacyStyledText>
@@ -50,7 +49,6 @@ export function FeatureFlags(): JSX.Element {
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}
               onClick={() => dispatch(() => toggleDevInternalFlag(flag))}
-              id={`FeatureFlags_${flag}_button`}
             />
           </Flex>
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (

@@ -5,11 +5,10 @@ import {
   dropTip,
   dropTipInTrash,
   dropTipInWasteChute,
+  getCommandCreatorFromStepArgs,
   getPipetteIdFromCCArgs,
   reduceCommandCreators,
 } from '@opentrons/step-generation'
-
-import { commandCreatorFromStepArgs } from '../file-data/helpers'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type * as StepGeneration from '@opentrons/step-generation'
@@ -43,7 +42,7 @@ export const generateRobotStateTimeline = (
       stepIndex
     ): StepGeneration.CurriedCommandCreator[] => {
       const { stepNumber, name, description } = args
-      const baseCreator = commandCreatorFromStepArgs(args)
+      const baseCreator = getCommandCreatorFromStepArgs(args)
       // unsupported command creator in args.commandCreatorFnName
       if (baseCreator === null) {
         return acc
@@ -67,7 +66,7 @@ export const generateRobotStateTimeline = (
 
         // no eager tip dropping if this step returns tip
         const dropTipLabware =
-          'dropTipLocation' in args
+          'dropTipLocation' in args && args.commandCreatorFnName !== 'dropTip'
             ? invariantContext.labwareEntities[args.dropTipLocation]
             : null
         const isReturnTip =

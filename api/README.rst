@@ -2,10 +2,6 @@
 Opentrons
 =============
 
-.. image:: https://badgen.net/codecov/c/github/Opentrons/opentrons
-   :target: https://codecov.io/gh/Opentrons/opentrons
-   :alt: Coverage Status
-
 .. image:: https://badgen.net/pypi/v/opentrons
    :target: https://pypi.org/project/opentrons/
    :alt: Download From PyPI

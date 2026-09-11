@@ -5,3 +5,12 @@ export { useAcknowledgeEstopDisengageMutation } from './useAcknowledgeEstopDisen
 export { useSetLightsMutation } from './useSetLightsMutation'
 export { useRobotSettingsQuery } from './useRobotSettingsQuery'
 export { useUpdateRobotSettingMutation } from './useUpdateRobotSettingMutation'
+export {
+  resetConfigOptionsQueryKey,
+  useResetConfigOptionsQuery,
+} from './useResetConfigOptionsQuery'
+export { usePostResetConfigMutation } from './usePostResetConfigMutation'
+export type {
+  UsePostResetConfigMutationOptions,
+  UsePostResetConfigMutationResult,
+} from './usePostResetConfigMutation'

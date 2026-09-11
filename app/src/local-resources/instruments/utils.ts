@@ -10,6 +10,8 @@ import type {
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 
 export interface IsPartialTipConfigParams {
   channel: 1 | 8 | 96
@@ -78,4 +80,17 @@ export function getPipetteMatch(
         i.instrumentName === loadedPipette.pipetteName
     ) ?? null
   )
+}
+
+export function getCalibratedPipetteForModuleSetup(
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
+): PipetteInformation | null {
+  if (attachedPipettes.left?.data.calibratedOffset?.last_modified != null) {
+    return attachedPipettes.left
+  } else if (
+    attachedPipettes.right?.data.calibratedOffset?.last_modified != null
+  ) {
+    return attachedPipettes.right
+  }
+  return null
 }

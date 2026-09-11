@@ -12,7 +12,10 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../constants'
+import {
+  HOPPER_STACKER_LOCATION,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+} from '../constants'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -49,8 +52,8 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.28' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
-export const PD_APPLICATION_VERSION = '8.11.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.30' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
+export const PD_APPLICATION_VERSION = '9.0.1' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
@@ -130,14 +133,25 @@ export function getLoadAdapters(
     .map(adapter => {
       const { id, def, pythonName } = adapter
       const { parameters, namespace, version } = def
-      // 2nd item in stack is the slot the adapter is on
+
       const adapterSlot = labwareRobotState[id].stack[1]
-      const onModule = moduleEntities[adapterSlot] != null
+      const adapterModuleId = labwareRobotState[id].stack.find(
+        entityId => entityId in moduleEntities
+      )
+      const isOnVacuumDock = labwareRobotState[id].stack.some(
+        element => element === VACUUM_DOCK_ADDRESSABLE_AREA
+      )
 
       let parentName: string
-      let locationArg: string | undefined
-      if (onModule) {
-        parentName = moduleEntities[adapterSlot].pythonName
+      let locationArg: string | null = null
+      if (adapterModuleId != null) {
+        const adapterModule = moduleEntities[adapterModuleId]
+        ;[parentName, locationArg] = isOnVacuumDock
+          ? [
+              PROTOCOL_CONTEXT_NAME,
+              `location=${adapterModule.pythonName}.manifold_dock`,
+            ]
+          : [adapterModule.pythonName, null]
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${

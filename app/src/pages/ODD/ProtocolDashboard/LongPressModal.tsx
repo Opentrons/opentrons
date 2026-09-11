@@ -16,6 +16,7 @@ import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
@@ -45,6 +46,7 @@ export function LongPressModal({
   const pinned = pinnedProtocolIds.includes(protocolId)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
+  const documentationState = useDocumentationState()
 
   // This looks totally bonkers, and it is. This construction is to make
   // it easier to use in unit tests, where we have to mock both the mutation
@@ -54,7 +56,7 @@ export function LongPressModal({
   //
   // Having the empty function fallback lets the mocks get called. In real use it
   // shouldn't ever get needed.
-  const createRunUse = useCreateRunMutation({
+  const createRunUse = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       const runId: string = data.data.id
       navigate(`/runs/${runId}/setup`)

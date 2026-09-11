@@ -11,12 +11,14 @@ import type {
 export function addLabwareOffsetToRun(
   config: HostConfig,
   runId: string,
-  data: LegacyLabwareOffsetCreateData | LabwareOffsetCreateData
+  data: LegacyLabwareOffsetCreateData | LabwareOffsetCreateData,
+  userNotes: string
 ): ResponsePromise<LabwareOffset>
 export function addLabwareOffsetToRun(
   config: HostConfig,
   runId: string,
-  data: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
+  data: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[],
+  userNotes: string
 ): ResponsePromise<LabwareOffset[]>
 export function addLabwareOffsetToRun(
   config: HostConfig,
@@ -25,7 +27,8 @@ export function addLabwareOffsetToRun(
     | LegacyLabwareOffsetCreateData
     | LegacyLabwareOffsetCreateData[]
     | LabwareOffsetCreateData
-    | LabwareOffsetCreateData[]
+    | LabwareOffsetCreateData[],
+  userNotes: string
 ): ResponsePromise<LabwareOffset | LabwareOffset[]> {
   return request<
     LabwareOffset | LabwareOffset[],
@@ -36,5 +39,8 @@ export function addLabwareOffsetToRun(
         | LabwareOffsetCreateData
         | LabwareOffsetCreateData[]
     }
-  >(POST, `/runs/${runId}/labware_offsets`, { data }, config)
+  >(POST, `/runs/${runId}/labware_offsets`, config, {
+    body: { data },
+    userNotes,
+  })
 }

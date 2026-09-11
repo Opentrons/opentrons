@@ -37,34 +37,40 @@ function UploadInput(props: UploadInputProps): JSX.Element {
     }
   }
 
-  const Label = isButton ? PrimaryButton : 'label'
-
   const labelText = isButton
     ? 'Upload labware file'
     : 'Drag and drop labware file here'
 
-  const labelProps = isButton
-    ? {
-        onClick: handleButtonClick,
-        className: styles.upload_button,
-      }
-    : { onDrop: onUpload, className: styles.file_drop }
+  const input = (
+    <>
+      {!isButton ? (
+        <Icon name="upload" className={styles.file_drop_icon} />
+      ) : null}
+      <span className={styles.label_text}>{labelText}</span>
+      <input
+        className={styles.file_input}
+        type="file"
+        onChange={onUpload}
+        ref={fileInputRef}
+        style={{ display: isButton ? 'none' : 'block' }}
+      />
+    </>
+  )
 
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
-      <Label {...labelProps}>
-        {!isButton ? (
-          <Icon name="upload" className={styles.file_drop_icon} />
-        ) : null}
-        <span className={styles.label_text}>{labelText}</span>
-        <input
-          className={styles.file_input}
-          type="file"
-          onChange={onUpload}
-          ref={fileInputRef}
-          style={{ display: isButton ? 'none' : 'block' }}
-        />
-      </Label>
+      {isButton ? (
+        <PrimaryButton
+          onClick={handleButtonClick}
+          className={styles.upload_button}
+        >
+          {input}
+        </PrimaryButton>
+      ) : (
+        <label onDrop={onUpload} className={styles.file_drop}>
+          {input}
+        </label>
+      )}
     </div>
   )
 }

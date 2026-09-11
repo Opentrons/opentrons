@@ -134,7 +134,6 @@ const MOCK_STATE: State = {
 // flexConnectable is connectable because health is defined and healthStatus is "ok"
 const EXPECTED_FLEX_CONNECTABLE = {
   name: 'flexConnectable',
-  displayName: 'flexConnectable',
   status: CONNECTABLE,
   local: false,
   seen: true,
@@ -150,7 +149,6 @@ const EXPECTED_FLEX_CONNECTABLE = {
 // flexReachableError is reachable because healthStatus is "notOk" (responded with error)
 const EXPECTED_FLEX_REACHABLE_ERROR = {
   name: 'flexReachableError',
-  displayName: 'flexReachableError',
   status: REACHABLE,
   local: false,
   seen: true,
@@ -166,7 +164,6 @@ const EXPECTED_FLEX_REACHABLE_ERROR = {
 // flexReachableSeen is reachable because it was recently seen, even though IP is unreachable
 const EXPECTED_FLEX_REACHABLE_SEEN = {
   name: 'flexReachableSeen',
-  displayName: 'flexReachableSeen',
   status: REACHABLE,
   local: false,
   seen: true,
@@ -182,7 +179,6 @@ const EXPECTED_FLEX_REACHABLE_SEEN = {
 // flexUnreachable is unreachable because IP is unreachable and not seen recently
 const EXPECTED_FLEX_UNREACHABLE = {
   name: 'flexUnreachable',
-  displayName: 'flexUnreachable',
   status: UNREACHABLE,
   local: false,
   seen: false,
@@ -198,7 +194,6 @@ const EXPECTED_FLEX_UNREACHABLE = {
 // flexNoAddress is unreachable because we don't have any IP addresses for it
 const EXPECTED_FLEX_NO_ADDRESS = {
   name: 'flexNoAddress',
-  displayName: 'flexNoAddress',
   status: UNREACHABLE,
   local: null,
   seen: false,
@@ -287,9 +282,7 @@ describe('discovery selectors', () => {
         },
         robot: { connection: { connectedTo: '' } },
       },
-      expected: [
-        expect.objectContaining({ name: 'opentrons-foo', displayName: 'foo' }),
-      ],
+      expected: [expect.objectContaining({ name: 'opentrons-foo' })],
     },
     {
       name: 'handles legacy IPv6 robots by wrapping IP in [] and setting as local',

@@ -2,11 +2,9 @@ import logging
 import os
 import re
 import socket
-import time
 from pathlib import Path
 from typing import Any, List, Tuple, cast
 
-import Pyro5.api as pyro
 import Pyro5.errors as pyro_errors
 
 from ._version import version
@@ -35,7 +33,9 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.util import logging_config
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
+
+_OT3API_PYRONAME = "OT3API"
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
@@ -127,7 +127,6 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             ThreadManager.nonblocking_builder(OT3API.build_hardware_controller),
-            use_usb_bus=ff.rear_panel_integration(),
             status_bar_enabled=ff.status_bar_enabled(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
@@ -161,32 +160,22 @@ async def initialize() -> ThreadManagedHardware:
     return await _create_thread_manager()
 
 
-def identify_hardware_process() -> HardwareControlAPI:
+async def identify_hardware_process() -> HardwareControlAPI:
     """
     Identify the Pyro Proxy for the OT3API and return a wrapped hardware instance.
     """
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
-    pyro.config.COMMTIMEOUT = 100
     try:
         # Find the OT3API on the nameserver
-        # todo(chb, 03-31-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate
-        ot3_process_proxy = None
-        start_time = time.monotonic()
-        with pyro.locate_ns() as ns:
-            while time.monotonic() - start_time < 60:
-                if "OT3API" in ns.list():
-                    ot3_process_proxy = pyro.Proxy(ns.list()["OT3API"])  # type: ignore[no-untyped-call]
-                    break
-                time.sleep(0.01)
+        ot3_process_proxy = await wait_for_proxy(proxy_name=_OT3API_PYRONAME)
 
         if ot3_process_proxy is None:
             raise pyro_errors.CommunicationError(
                 "Opentrons-robot-server could not find OT3API URI on Pyro5 Nameserver."
             )
         else:
-            ot3_process_async_client = AsyncClientPyroObject(ot3_process_proxy)
-            hardware_api = cast(HardwareControlAPI, ot3_process_async_client)
+            hardware_api = cast(HardwareControlAPI, ot3_process_proxy)
             # Register hardware types for the robot server process
             register_hardware_types()
             log.info("Opentrons Hardware API Subprocess identified and ready for use.")

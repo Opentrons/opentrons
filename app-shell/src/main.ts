@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerAudit } from './audit'
 import { registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
@@ -17,6 +18,7 @@ import {
   registerDiscoverySecondaryWindow,
   unregisterDiscovery,
 } from './discovery'
+import { registerDownloadHandlers } from './fs/ipc'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -127,6 +129,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerUpdate(dispatch),
           registerRobotUpdate(dispatch),
           registerLabware(dispatch, window),
+          registerAudit(dispatch, window),
           registerSystemInfo(dispatch),
           registerProtocolStorage(dispatch),
           registerUsb(dispatch),
@@ -229,6 +232,7 @@ async function startUp(): Promise<void> {
     }
   })
   await registerCertIPC()
+  registerDownloadHandlers(mainWindow)
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }

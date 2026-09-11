@@ -46,13 +46,12 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
       }
     : null
 
-  const taskPython = taskId == null ? '' : `${taskId} = `
-
   const percentPowerArg = `percent_power=${formatPyValue(percentPower)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
   const allArgsPython = [percentPowerArg, ...holdArgsPython]
+  const taskPython = isTimedHold ? `${taskId} = ` : ''
   const python = `${taskPython}${module.pythonName}.start_set_vacuum_power(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
   return {
     commands: [

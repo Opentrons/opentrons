@@ -2,13 +2,14 @@
 
 from logging import getLogger
 from pathlib import Path
-from shutil import rmtree
 from tempfile import mkdtemp
 from typing import Optional
 
 from anyio import Path as AsyncPath
 from anyio import to_thread
 from typing_extensions import Final
+
+from server_utils.persistence.persistence_directory import clear_directory_contents
 
 _log = getLogger(__name__)
 
@@ -60,12 +61,14 @@ async def prepare_images_directory(images_directory: Optional[Path]) -> Path:
         return new_temporary_directory
     else:
         if await _is_marked_for_reset(directory_to_reset=images_directory):
-            _log.info(f"{images_directory} was marked for reset. Deleting it.")
-            # FIXME(jh, 2025-10-16): Like the persistance dir, this can leave the images dir
-            # in a half-deleted state if it deletes the marker file, and then some
-            # of the other files, and then the device is power-cycled before it can
-            # finish.
-            await to_thread.run_sync(rmtree, images_directory)
+            _log.info(
+                f"{images_directory} was marked for reset. Clearing its contents."
+            )
+            # FIXME(jh, 2025-10-16): Like the persistence dir, this can leave the
+            # images dir in a half-cleared state if it deletes the marker file,
+            # and then some of the other files, and then the device is power-cycled
+            # before it can finish.
+            await to_thread.run_sync(clear_directory_contents, images_directory)
 
         await AsyncPath(images_directory).mkdir(parents=True, exist_ok=True)
         _log.info(f"Using directory {images_directory} for images.")

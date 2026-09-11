@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -41,18 +42,20 @@ describe('Mix', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for mix aspirate', () => {
+  it('renders text, buttons for mix aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Mix before aspirating')
     screen.getByText('Continue')
     screen.getByText('Aspirate and dispense repeatedly before main aspiration')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Disabled'))
+    await user.click(screen.getByText('Disabled'))
     screen.getByText('Save')
   })
 
-  it('renders text, buttons for mix dispense', () => {
+  it('renders text, buttons for mix dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
     screen.getByText('Mix after dispensing')
@@ -60,30 +63,32 @@ describe('Mix', () => {
     screen.getByText('Aspirate and dispense repeatedly before main aspiration')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons, input field, and keyboard for mix before aspirating - volume', () => {
+  it('renders text, buttons, input field, and keyboard for mix before aspirating - volume', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Mix volume (µL)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Value must be between 1 to 10')
   })
 
-  it('renders text, buttons, input field, and keyboard for mix before aspirating - repetitions', () => {
+  it('renders text, buttons, input field, and keyboard for mix before aspirating - repetitions', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Mix repetitions')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
@@ -92,17 +97,18 @@ describe('Mix', () => {
     screen.getByText('Save')
   })
 
-  it('should call dispatch when clicking save button', () => {
+  it('should call dispatch when clicking save button', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Mix repetitions')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_MIX_ON_ASPIRATE',
       mixSettings: {
@@ -117,9 +123,10 @@ describe('Mix', () => {
       },
     })
   })
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

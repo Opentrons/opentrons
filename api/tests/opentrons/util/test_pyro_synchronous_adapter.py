@@ -17,11 +17,14 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
 )
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -53,11 +56,7 @@ def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
             assert name in pyro_object_members
 
         # Now check to ensure that things thate aren't supposed to be there (like private methods) aren't present
-        if "__" not in name and (
-            name.startswith("_")
-            or (inspect.ismethod(attr) and inspect.isclass(attr.__self__))
-            or isinstance(attr, TypeVar)
-        ):
+        if "__" not in name and (name.startswith("_") or isinstance(attr, TypeVar)):
             assert name not in pyro_object_members
 
 
@@ -82,7 +81,7 @@ async def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -93,30 +92,18 @@ async def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
 
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
     # Access property, method and async method, assert expected response between client and server
-    door_state = ot3_proxy.door_state
+    door_state = ot3_async._proxy.door_state  # type: ignore
     assert door_state is hw_types.DoorState.CLOSED
 
-    estop_state = ot3_proxy.get_estop_state()
+    estop_state = ot3_async._proxy.get_estop_state()  # type: ignore
     assert estop_state is hw_types.EstopState.DISENGAGED
 
-    tip_status = ot3_proxy.get_tip_presence_status(mount=hw_types.OT3Mount.LEFT)
+    tip_status = ot3_async._proxy.get_tip_presence_status(mount=hw_types.OT3Mount.LEFT)  # type: ignore
     assert tip_status is hw_types.TipStateType.ABSENT
 
     # Clean up client resources.
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore

@@ -1,0 +1,14 @@
+.device_details_container {
+  display: flex;
+  min-width: 36rem;
+  height: max-content;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-16) var(--spacing-48);
+  gap: var(--spacing-16);
+}
+
+.tab_group {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-4);
+}

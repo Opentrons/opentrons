@@ -1,4 +1,4 @@
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, LEFT } from '@opentrons/shared-data'
 
 import type {
   Run,
@@ -7,7 +7,8 @@ import type {
 } from '@opentrons/api-client'
 import type { LoadedPipette } from '@opentrons/shared-data'
 
-// Return the pipetteId for the pipette in the protocol with the highest channel count.
+// Return the pipetteId for the pipette in the protocol with the fewest channels.
+// On a channel-count tie, prefer the left-most mount.
 export function getActivePipetteId(pipettes: LoadedPipette[]): string | null {
   if (pipettes.length < 1) {
     console.warn(
@@ -16,10 +17,18 @@ export function getActivePipetteId(pipettes: LoadedPipette[]): string | null {
     return null
   } else {
     return pipettes.reduce((acc, pip) => {
-      return (getPipetteNameSpecs(acc.pipetteName)?.channels ?? 0) >
-        (getPipetteNameSpecs(pip.pipetteName)?.channels ?? 0)
-        ? pip
-        : acc
+      const accChannels = getPipetteNameSpecs(acc.pipetteName)?.channels ?? 0
+      const pipChannels = getPipetteNameSpecs(pip.pipetteName)?.channels ?? 0
+
+      if (pipChannels !== accChannels) {
+        return pipChannels < accChannels ? pip : acc
+      }
+
+      if (pip.mount === LEFT && acc.mount !== LEFT) {
+        return pip
+      }
+
+      return acc
     }, pipettes[0]).id
   }
 }

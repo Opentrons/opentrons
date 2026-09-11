@@ -36,7 +36,6 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_showHeaterShakerAttachmentModal"
         >
           {t('heater_shaker_attach_visible')}
         </LegacyStyledText>
@@ -48,7 +47,6 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
         label="show_heater_shaker_modal"
         toggledOn={!isHeaterShakerAttachmentModalVisible}
         onClick={toggleHeaterShakerModalVisibility}
-        id="AdvancedSettings_showHeaterShakerAttachmentBtn"
       />
     </Flex>
   )

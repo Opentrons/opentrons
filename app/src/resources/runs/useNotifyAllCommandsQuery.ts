@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -17,16 +19,19 @@ export function useNotifyAllCommandsQuery<TError = Error>(
   // running to succeeded, that may change the useAllCommandsQuery response, but it
   // will not necessarily change the command links. We might need an MQTT topic
   // covering "any change in `GET /runs/{id}/commands`".
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs/commands_links',
     options,
   })
 
   const httpQueryResult = useAllCommandsQuery(runId, params, queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

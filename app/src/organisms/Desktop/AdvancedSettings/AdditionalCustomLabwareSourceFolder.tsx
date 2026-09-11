@@ -44,7 +44,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_customLabware"
         >
           {t('additional_labware_folder_title')}
         </LegacyStyledText>
@@ -65,7 +64,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
             css={TYPOGRAPHY.pRegular}
             color={COLORS.black90}
             onClick={() => dispatch(openCustomLabwareDirectory())}
-            id="AdvancedSettings_sourceFolderLink"
           >
             {labwarePath}
             <Icon
@@ -88,7 +86,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
               properties: {},
             })
           }}
-          id="AdvancedSettings_changeLabwareSource"
         >
           {labwarePath !== ''
             ? t('change_folder_button')

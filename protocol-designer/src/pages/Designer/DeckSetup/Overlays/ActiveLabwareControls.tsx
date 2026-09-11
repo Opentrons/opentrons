@@ -11,7 +11,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
@@ -50,6 +53,7 @@ export function ActiveLabwareControls(
   const pendingCreationStateForHopper = useSelector(getPendingCreationState)
   const timelineIsBeingComputed = useSelector(getTimelineIsBeingComputed)
   const isSlotAHopper = getIsSlotAHopper(itemId)
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(itemId)
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
 
@@ -68,7 +72,8 @@ export function ActiveLabwareControls(
       : getFullStackFromLabwaresOnDeck(
           Object.values(activeDeckSetup.labware),
           itemId,
-          isSlotAHopper
+          isSlotAHopper,
+          isSlotAVacuumDock
         )
 
   const stackerModuleId = fullStack.find(

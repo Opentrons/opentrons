@@ -42,8 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
-
 const isLocal = (ip: string): boolean => {
   return (
     RE_HOSTNAME_IPV6_LL.test(ip) ||
@@ -109,7 +107,6 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         const serverHealthStatus = addr?.serverHealthStatus ?? null
         const baseRobot = {
           ...robotState,
-          displayName: makeDisplayName(robotName),
           local: ip !== null ? isLocal(ip) : null,
           seen: addr?.seen === true,
           robotModel: makeRobotModel(
@@ -168,7 +165,7 @@ export const getConnectableRobots: GetConnectableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -178,7 +175,7 @@ export const getReachableRobots: GetReachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -188,7 +185,7 @@ export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -200,7 +197,7 @@ export const getAllRobots: GetAllRobots = createSelector(
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
     orderBy(
       concat<DiscoveredRobot>(cr, rr, ur),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -211,7 +208,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   (cr: ViewableRobot[], rr: ViewableRobot[]) =>
     orderBy(
       concat<ViewableRobot>(cr, rr),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )

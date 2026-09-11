@@ -16,7 +16,7 @@ export function updateClientData<T = DefaultClientData>(
   return request<ClientDataResponse<T>, ClientDataRequest<T>>(
     PUT,
     `/clientData/${key}`,
-    { data: clientData },
-    config
+    config,
+    { body: { data: clientData } }
   )
 }

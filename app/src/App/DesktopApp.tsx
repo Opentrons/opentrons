@@ -9,7 +9,6 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
@@ -30,14 +29,20 @@ import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
+import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
+import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
+import { showDownloadLogsModal } from '../organisms/Desktop/DownloadAuditLogsModal'
+import { showLoginModal } from '../organisms/Desktop/LoginModal'
+import { showSignRunModal } from '../organisms/Desktop/SignRunModal/SignRun'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
-import { useSoftwareUpdatePoll } from './hooks'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
@@ -46,6 +51,8 @@ import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
+  useRefreshAccessTokenOnActivity()
+  useTrackRobotRestarts()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
 
@@ -81,7 +88,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: DeviceDetails,
       name: 'Device',
-      path: '/devices/:robotName',
+      path: '/devices/:robotName/:deviceDetailsTab?',
     },
     {
       Component: CalibrationDashboard,
@@ -112,64 +119,81 @@ export const DesktopApp = (): JSX.Element => {
 
   return (
     <LocalizationProvider>
-      <NiceModal.Provider>
-        <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-          <ReactQueryDevtools />
-          <SystemLanguagePreferenceModal />
-          <Navbar routes={desktopRoutes} />
+      <DocumentationRequiredModalContext.Provider
+        value={{
+          showDocumentationRequiredModal,
+          showLoginModal,
+          showSignRunModal,
+          showDownloadLogsModal,
+        }}
+      >
+        <RobotUpdateProvider>
           <ToasterOven>
-            <EmergencyStopContext.Provider
-              value={{
-                isEmergencyStopModalDismissed,
-                setIsEmergencyStopModalDismissed,
-              }}
-            >
-              <Box width="100%" height="100vh">
-                <Alerts>
-                  <Routes>
-                    {desktopRoutes.map(({ Component, path }: RouteProps) => {
-                      return (
-                        <Route
-                          key={path}
-                          element={
-                            <Box
-                              key={Component.name}
-                              display="flex"
-                              flexDirection="column"
-                              height="100%"
-                            >
-                              <Breadcrumbs />
-                              <Box
-                                position={POSITION_RELATIVE}
-                                width="100%"
-                                flex="1"
-                                minHeight="0"
-                              >
-                                <Box
-                                  width="100%"
-                                  height="100%"
-                                  backgroundColor={COLORS.grey10}
-                                  overflow={OVERFLOW_AUTO}
-                                >
-                                  <ModalPortalRoot />
-                                  <Component />
-                                </Box>
-                              </Box>
-                            </Box>
+            <NiceModal.Provider>
+              <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+                <ReactQueryDevtools />
+                <SystemLanguagePreferenceModal />
+                <Navbar routes={desktopRoutes} />
+
+                <EmergencyStopContext.Provider
+                  value={{
+                    isEmergencyStopModalDismissed,
+                    setIsEmergencyStopModalDismissed,
+                  }}
+                >
+                  <Box width="100%" height="100vh">
+                    <Alerts>
+                      <Routes>
+                        {desktopRoutes.map(
+                          ({ Component, path }: RouteProps) => {
+                            return (
+                              <Route
+                                key={path}
+                                element={
+                                  <Box
+                                    key={Component.name}
+                                    display="flex"
+                                    flexDirection="column"
+                                    height="100%"
+                                  >
+                                    <Breadcrumbs />
+                                    <Box
+                                      position={POSITION_RELATIVE}
+                                      width="100%"
+                                      flex="1"
+                                      minHeight="0"
+                                    >
+                                      <Box
+                                        width="100%"
+                                        height="100%"
+                                        backgroundColor={COLORS.grey10}
+                                        overflow={OVERFLOW_AUTO}
+                                      >
+                                        <ModalPortalRoot />
+                                        <Component />
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                }
+                                path={path}
+                              />
+                            )
                           }
-                          path={path}
+                        )}
+                        <Route
+                          path="*"
+                          element={<Navigate to="/protocols" />}
                         />
-                      )
-                    })}
-                    <Route path="*" element={<Navigate to="/protocols" />} />
-                  </Routes>
-                  <RobotControlTakeover />
-                </Alerts>
-              </Box>
-            </EmergencyStopContext.Provider>
+                      </Routes>
+                      <RobotControlTakeover />
+                    </Alerts>
+                  </Box>
+                </EmergencyStopContext.Provider>
+              </ErrorBoundary>
+            </NiceModal.Provider>
           </ToasterOven>
-        </ErrorBoundary>
-      </NiceModal.Provider>
+        </RobotUpdateProvider>
+      </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>
   )
 }
@@ -178,19 +202,12 @@ function RobotControlTakeover(): JSX.Element | null {
   const deviceRouteMatch = useMatch('/devices/:robotName/*')
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
-  if (deviceRouteMatch == null || robot == null || robotName == null) {
+  if (robotName == null) {
     return null
   }
 
   return (
-    <ApiHostProvider
-      key={robot.name}
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider key={robotName} robotName={robotName}>
       <FlexOnlyRobotControlTakeover robotName={robotName} />
       <AllRobotsRobotControlTakeover robotName={robotName} />
     </ApiHostProvider>

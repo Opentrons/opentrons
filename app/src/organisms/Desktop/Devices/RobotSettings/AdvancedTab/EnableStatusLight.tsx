@@ -15,15 +15,13 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { useLEDLights } from '/app/resources/robot-settings'
 
 interface EnableStatusLightProps {
-  robotName: string
   isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
-  robotName,
   isEstopNotDisengaged,
 }: EnableStatusLightProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights()
 
   return (
     <Flex
@@ -36,7 +34,6 @@ export function EnableStatusLight({
           <LegacyStyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Enable_Status_Light"
           >
             {t('enable_status_light')}
           </LegacyStyledText>
@@ -49,7 +46,6 @@ export function EnableStatusLight({
         label="enable_status_light"
         toggledOn={lightsEnabled}
         onClick={toggleLights}
-        id="RobotSettings_enableStatusLightToggleButton"
         disabled={isEstopNotDisengaged}
       />
     </Flex>

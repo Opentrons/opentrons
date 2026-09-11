@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   Banner,
   Btn,
+  CodeBlock,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -20,7 +21,6 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { CodeBlock } from '/app/atoms/CodeBlock'
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
 import type { MouseEventHandler } from 'react'

@@ -14,6 +14,7 @@ from .types import (
     LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    ModuleStateSummary,
     ModuleType,
     UploadFunction,
 )
@@ -112,6 +113,16 @@ class AbstractModule(AbstractDevice):
     def error_callback(self, exc: Exception) -> None:
         """Called from within the module object when an asynchronous hardware error occurrs."""
         self._error_callback(exc, self.model(), self.port, self.serial_number)
+
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            f"inject_async_gcode_response is not supported by {self.model()}"
+        )
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
@@ -229,3 +240,14 @@ class AbstractModule(AbstractDevice):
             else:
                 # success
                 return
+
+    async def get_state_summary(self) -> ModuleStateSummary:
+        """Get a summary of module data friendly to remote calls."""
+        return ModuleStateSummary(
+            model=self.model(),
+            usb_port=self.usb_port,
+            has_available_update=self.has_available_update(),
+            device_info={k: v for k, v in self.device_info.items()},
+            live_data=self.live_data,
+            serial_number=self.serial_number,
+        )

@@ -6,6 +6,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { TrashCutoutId } from '@opentrons/components'
 import type { CutoutId, RunTimeCommand } from '@opentrons/shared-data'
 
@@ -17,7 +18,7 @@ interface FixtureCommandSummaryProps {
 
 export function FixtureCommandSummary(
   props: FixtureCommandSummaryProps
-): JSX.Element {
+): ReactNode {
   const { cutoutId, commandType, type } = props
   const commandSummary = useCommandTypeSummaries(commandType)
 

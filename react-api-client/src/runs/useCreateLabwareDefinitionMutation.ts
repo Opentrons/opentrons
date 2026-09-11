@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createLabwareDefinition } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type { CreateLabwareDefinitionResponsePayload } from '@opentrons/api-client'
@@ -28,7 +28,8 @@ export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<
 export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinitionMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
-
+  // Directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this hook.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<
     CreateLabwareDefinitionResponsePayload,
     unknown,
@@ -36,9 +37,11 @@ export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinition
   >(({ runId, data }) =>
     createLabwareDefinition(host!, runId, data)
       .then(response => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         return response.data
       })
       .catch((e: Error) => {

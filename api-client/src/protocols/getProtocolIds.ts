@@ -7,5 +7,5 @@ import type { ProtocolsIds } from './types'
 export function getProtocolIds(
   config: HostConfig
 ): ResponsePromise<ProtocolsIds> {
-  return request<ProtocolsIds>(GET, `/protocols/ids`, null, config)
+  return request<ProtocolsIds>(GET, `/protocols/ids`, config)
 }

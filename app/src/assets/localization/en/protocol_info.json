@@ -7,6 +7,7 @@
   "continue_proceed_to_calibrate": "Proceed to Calibrate",
   "continue_verify_calibrations": "Verify pipette and labware calibrations",
   "create_or_download": "Create or download a new protocol",
+  "create_quick_transfer": "Create Quick Transfer",
   "creation_method": "Creation Method",
   "custom_labware_not_supported": "Robot doesn't support custom labware",
   "date_added": "Date Added",

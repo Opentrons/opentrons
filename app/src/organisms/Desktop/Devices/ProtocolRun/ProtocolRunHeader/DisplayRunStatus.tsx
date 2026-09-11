@@ -11,11 +11,18 @@ interface DisplayRunStatusProps {
   runStatus: RunStatus | null
 }
 
+interface RunStatusChipResult {
+  chipType: ChipType
+  showIcon: boolean
+  statusText: string
+  pulse?: boolean
+  iconOverrideName?: IconName
+}
 // Styles the run status chip.
 const getRunStatusChip = (
   runStatus: RunStatus | null,
   t: TFunction
-): [ChipType, boolean, boolean, string, IconName?] => {
+): RunStatusChipResult => {
   let text: string
   if (runStatus === RUN_STATUS_AWAITING_RECOVERY) {
     text = t('paused_on_error')
@@ -24,38 +31,48 @@ const getRunStatusChip = (
   }
   const run_status_string = `${String(runStatus)}`
   switch (run_status_string) {
-    case 'canceled':
     case 'paused':
     case 'idle':
-      return ['neutral', false, false, text]
+      return { chipType: 'neutral', showIcon: false, statusText: text }
     case 'failed':
     case 'awaiting-recovery':
-      return ['error', true, false, text]
+      return { chipType: 'error', showIcon: true, statusText: text }
     case 'running':
-      return ['success', true, true, text, 'circle']
+      return {
+        chipType: 'success',
+        showIcon: true,
+        pulse: true,
+        statusText: text,
+        iconOverrideName: 'circle',
+      }
     case 'succeeded':
-      return ['success', true, false, text]
+      return { chipType: 'success', showIcon: true, statusText: text }
+    case 'stopped':
+      return { chipType: 'warning', showIcon: true, statusText: text }
     default:
-      return ['neutral', false, false, text]
+      return { chipType: 'neutral', showIcon: false, statusText: text }
   }
 }
 
 // Styles the run status copy.
 export function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const [chipType, icon, pulse, statusText, iconName] = getRunStatusChip(
-    props.runStatus,
-    t as TFunction
-  )
+  const {
+    chipType,
+    showIcon,
+    statusText,
+    pulse = false,
+    iconOverrideName,
+  } = getRunStatusChip(props.runStatus, t as TFunction)
   return (
     <Flex alignItems={ALIGN_CENTER}>
       {props.runStatus != null && (
         <Chip
           text={statusText}
           type={chipType}
-          hasIcon={icon}
+          hasIcon={showIcon}
           pulseIcon={pulse}
-          iconName={iconName}
+          iconName={iconOverrideName}
           chipSize={'small'}
         />
       )}

@@ -7,10 +7,5 @@ import type { CACertPassword } from './types'
 export function getCACertPassword(
   config: HostConfig
 ): ResponsePromise<CACertPassword> {
-  return request<CACertPassword>(
-    GET,
-    '/keys/internal/ca/password',
-    null,
-    config
-  )
+  return request<CACertPassword>(GET, '/keys/internal/ca/password', config)
 }

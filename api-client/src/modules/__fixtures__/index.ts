@@ -1,3 +1,12 @@
+import type {
+  FlexStackerModule,
+  HeaterShakerModule,
+  MagneticModule,
+  TemperatureModule,
+  ThermocyclerModule,
+  VacuumModule,
+} from '../types'
+
 export const mockModulesResponse = [
   {
     id: '3feb840a3fa2dac2409b977f1e330f54f50e6231',
@@ -220,4 +229,284 @@ export const v2MockModulesResponse = [
       height: 4.0,
     },
   },
+]
+
+export const mockTemperatureModule: TemperatureModule = {
+  id: 'tempdeck_id',
+  moduleModel: 'temperatureModuleV1',
+  moduleType: 'temperatureModuleType',
+  serialNumber: 'abc123',
+  hardwareRevision: 'temp_deck_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    currentTemperature: 25,
+    targetTemperature: null,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_tempdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockTemperatureModuleGen2: TemperatureModule = {
+  id: 'tempdeck_id',
+  moduleModel: 'temperatureModuleV2',
+  moduleType: 'temperatureModuleType',
+  serialNumber: 'abc123',
+  hardwareRevision: 'temp_deck_v20.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    currentTemperature: 25,
+    targetTemperature: null,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_tempdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockMagneticModule: MagneticModule = {
+  id: 'magdeck_id',
+  moduleModel: 'magneticModuleV1',
+  moduleType: 'magneticModuleType',
+  serialNumber: 'def456',
+  hardwareRevision: 'mag_deck_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    engaged: false,
+    height: 42,
+    status: 'disengaged',
+  },
+  usbPort: {
+    path: '/dev/ot_module_magdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockMagneticModuleGen2: MagneticModule = {
+  id: 'magdeck_id',
+  moduleModel: 'magneticModuleV2',
+  moduleType: 'magneticModuleType',
+  serialNumber: 'def456',
+  hardwareRevision: 'mag_deck_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    engaged: false,
+    height: 42,
+    status: 'disengaged',
+  },
+  usbPort: {
+    path: '/dev/ot_module_magdeck0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockThermocycler: ThermocyclerModule = {
+  id: 'thermocycler_id',
+  moduleModel: 'thermocyclerModuleV1',
+  moduleType: 'thermocyclerModuleType',
+  serialNumber: 'ghi789',
+  hardwareRevision: 'thermocycler_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    lidStatus: 'open',
+    lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
+    lidTemperature: null,
+    currentTemperature: null,
+    targetTemperature: null,
+    holdTime: null,
+    rampRate: null,
+    currentCycleIndex: null,
+    totalCycleCount: null,
+    currentStepIndex: null,
+    totalStepCount: null,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockThermocyclerGen2: ThermocyclerModule = {
+  id: 'thermocycler_id2',
+  moduleModel: 'thermocyclerModuleV2',
+  moduleType: 'thermocyclerModuleType',
+  serialNumber: 'ghi789',
+  hardwareRevision: 'thermocycler_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    lidStatus: 'open',
+    lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
+    lidTemperature: null,
+    currentTemperature: null,
+    targetTemperature: null,
+    holdTime: null,
+    rampRate: null,
+    currentCycleIndex: null,
+    totalCycleCount: null,
+    currentStepIndex: null,
+    totalStepCount: null,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler2',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockHeaterShaker: HeaterShakerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemperature: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_heatershaker0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockApiHeaterShaker: HeaterShakerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemperature: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: {
+    hub: true,
+    portGroup: 'unknown',
+    port: 1,
+    path: '/dev/ot_module_heatershaker0',
+  },
+}
+
+export const mockFlexStacker: FlexStackerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'fsm123',
+  hardwareRevision: 'flexstacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    latchState: 'closed',
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+    installDetected: true,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
+    port: 1,
+    hub: true,
+    hubPort: 1,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockFlexStackerMissingShuttle: FlexStackerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'fsm123',
+  hardwareRevision: 'flexstacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    latchState: 'closed',
+    platformState: 'unknown',
+    hopperDoorState: 'closed',
+    installDetected: true,
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
+    port: 1,
+    hub: true,
+    hubPort: 2,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockVacuumModule: VacuumModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'vacuumModuleV1',
+  moduleType: 'vacuumModuleType',
+  serialNumber: 'vac123',
+  hardwareRevision: 'vacuum_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    currentPressure: null,
+    targetPressure: null,
+    currentPower: null,
+    targetPower: null,
+    ventStatus: 'closed',
+    modeType: 'pressure',
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
+    port: 1,
+    hub: true,
+    hubPort: 1,
+    portGroup: 'unknown',
+  },
+}
+
+export const mockFetchModulesSuccessActionPayloadModules = [
+  mockMagneticModule,
+  mockTemperatureModule,
+  mockThermocycler,
 ]

@@ -114,7 +114,6 @@ export function SetupTipLengthCalibrationButton({
         })
       }}
       css={TYPOGRAPHY.labelSemiBold}
-      id="TipRackCalibration_recalibrateTipRackLink"
     >
       {t('recalibrate')}
     </Link>
@@ -134,7 +133,6 @@ export function SetupTipLengthCalibrationButton({
                   hasBlockModalResponse: null,
                 })
               }}
-              id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
             >

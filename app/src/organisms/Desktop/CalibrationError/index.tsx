@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -13,6 +12,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
@@ -111,7 +111,8 @@ export function CalibrationError({
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           onClick={() => {
             setIsClosing(true)
             onClose()
@@ -119,7 +120,7 @@ export function CalibrationError({
           disabled={isClosing}
         >
           {t('exit')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

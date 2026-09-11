@@ -9,7 +9,7 @@ import {
   useConditionalConfirm,
   WizardHeader,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { getQueryKey, useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -111,9 +111,11 @@ export function CalibrateDeck({
   }
 
   function cleanUpAndExit(): void {
-    queryClient.invalidateQueries([host, 'calibration']).catch((e: Error) => {
-      console.error(`error invalidating calibration queries: ${e.message}`)
-    })
+    queryClient
+      .invalidateQueries(getQueryKey(host, 'calibration'))
+      .catch((e: Error) => {
+        console.error(`error invalidating calibration queries: ${e.message}`)
+      })
     if (
       exitBeforeDeckConfigCompletion &&
       currentStep !== Sessions.DECK_STEP_CALIBRATION_COMPLETE

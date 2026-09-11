@@ -107,12 +107,10 @@ export type RunTimeCommand =
 export type RunCommandError = RunCommandErrorUndefined | DefinedRunCommandError
 
 export type DefinedRunCommandError =
-  | RunCommandRobotActionError
-  | RunCommandFlexStackerError
+  RunCommandRobotActionError | RunCommandFlexStackerError
 
 export type RunCommandRobotActionError =
-  | RunCommandErrorOverpressure
-  | RunCommandErrorTipPhysicallyAttached
+  RunCommandErrorOverpressure | RunCommandErrorTipPhysicallyAttached
 
 export type Failed<CommandT extends RunTimeCommand> = Omit<CommandT, 'result'>
 

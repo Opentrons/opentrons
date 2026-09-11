@@ -9,9 +9,7 @@ export const DEPRECATED_FLAGS = [
 
 // union of feature flag string constant IDs
 export type FlagTypes =
-  | 'enablePrereleaseMode'
-  | 'enablePDProtocolGeneration'
-  | 'enableAnalytics'
+  'enablePrereleaseMode' | 'enablePDProtocolGeneration' | 'enableAnalytics'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = ['enableAnalytics']

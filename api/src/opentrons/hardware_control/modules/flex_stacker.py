@@ -65,6 +65,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -413,6 +414,7 @@ class FlexStacker(mod_abc.AbstractModule):
         dfu_info = await update.find_dfu_device(pid=DFU_PID, expected_device_count=3)
         return dfu_info
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 

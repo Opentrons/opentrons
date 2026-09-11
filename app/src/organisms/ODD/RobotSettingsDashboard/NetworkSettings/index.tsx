@@ -106,9 +106,9 @@ function NetworkSettingButton({
 }: NetworkSettingButtonProps): JSX.Element {
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${chipType === 'success'
-        ? COLORS.green40
-        : COLORS.grey50};
+      background-color: ${
+        chipType === 'success' ? COLORS.green40 : COLORS.grey50
+      };
     }
   `
 

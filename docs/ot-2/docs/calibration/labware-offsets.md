@@ -7,7 +7,7 @@ Labware offsets are fine-tuned positional coordinates that help the OT-2 align a
 
 You can reuse labware offsets in other protocols, but only for an exact labware-and-slot combination. Opentrons recommends running Labware Position Check before every protocol run to help ensure positional accuracy.
 
-You can also define offsets directly in Python API protocols using `set_offset`. However, because these offsets are written into the code, they cannot be adjusted via the Opentrons App; you must edit the Python script to make changes. See [Setting Labware Offsets](../../python-api/advanced-control/jupyter.md#setting-labware-offsets).
+You can also define offsets directly in Python API protocols using `set_offset`. However, because these offsets are written into the code, they cannot be adjusted via the Opentrons OT-2 App; you must edit the Python script to make changes. See [Setting Labware Offsets](../../python-api/advanced-control/jupyter.md#setting-labware-offsets).
 
 !!! note
     Labware Position Check is designed to correct minor, millimeter-scale variations. If you need to compensate for multi-centimeter offsets, you may have a manufacturing defect in your labware. For persistent misalignment issues, contact Opentrons Support.

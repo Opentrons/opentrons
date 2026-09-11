@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { mockTemperatureModuleGen2 } from '@opentrons/api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -10,8 +11,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
-import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import {
   getDoesModuleRequireCalibration,

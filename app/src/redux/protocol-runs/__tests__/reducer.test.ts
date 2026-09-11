@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
   updateRunSetupStepsComplete,
   updateRunSetupStepsRequired,
 } from '../actions'
@@ -89,6 +91,50 @@ describe('protocol runs reducer', () => {
         required: false,
         complete: false,
       },
+    })
+  })
+
+  it('updates a single camera setting (enablement path)', () => {
+    const nextState = protocolRunReducer(
+      {
+        'some-run-id': {
+          setup: SETUP_INITIAL,
+        },
+      },
+      updateCameraStreamEnablement('some-run-id', true)
+    )
+
+    expect(
+      nextState['some-run-id']?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+    ).toEqual({
+      ...CAMERA_STEP,
+      liveStreamEnabled: true,
+    })
+    expect(
+      nextState['some-run-id']?.setup[Constants.CAMERA_SETUP_STEP_KEY].complete
+    ).toBe(false)
+  })
+
+  it('writes per-camera image settings (specific-settings path)', () => {
+    const imageSettings = { brightness: 5 } as any
+    const nextState = protocolRunReducer(
+      {
+        'some-run-id': {
+          setup: SETUP_INITIAL,
+        },
+      },
+      updateCameraSpecificSettings(
+        'some-run-id',
+        'ot_system_camera',
+        imageSettings
+      )
+    )
+
+    expect(
+      nextState['some-run-id']?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+        .cameraImageSettings
+    ).toEqual({
+      ot_system_camera: imageSettings,
     })
   })
 })

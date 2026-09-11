@@ -10,10 +10,9 @@ export function getPlaintextCACertificates(
   return request<PlaintextCACertificates>(
     GET,
     '/keys/external/ca/plaintextCerts',
-    null,
+    config,
     {
-      ...config,
-      secure: true,
+      requiresSecureTransport: true,
     }
   )
 }

@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../../request'
+import { GET, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
@@ -12,8 +12,7 @@ export function getRunCommandErrors(
   return request<RunCommandErrors>(
     GET,
     `/runs/${runId}/commandErrors`,
-    null,
     config,
-    params && createAxiosConfig({ params })
+    { queryParams: { ...params } }
   )
 }

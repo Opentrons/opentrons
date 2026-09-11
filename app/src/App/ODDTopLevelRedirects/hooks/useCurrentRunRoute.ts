@@ -21,11 +21,11 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   const hasRunStarted = runRecord?.data.startedAt != null
   const runStatus = runRecord?.data.status
 
-  if (isFetching) {
+  if (isFetching || runRecord?.data.id !== currentRunId) {
     return null
   } else if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
+    runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
@@ -37,7 +37,7 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   } else if (hasRunStarted) {
     return `/runs/${runId}/run`
   } else {
-    // includes runs cancelled before starting and runs not yet started
+    console.error(`Unexpected run route found for run ${runId}`, runStatus)
     return null
   }
 }

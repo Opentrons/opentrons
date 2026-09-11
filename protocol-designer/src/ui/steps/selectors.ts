@@ -2,6 +2,8 @@ import last from 'lodash/last'
 import uniq from 'lodash/uniq'
 import { createSelector } from 'reselect'
 
+import { COMMAND_CREATOR_ARGS_FOR_OAI } from '@opentrons/shared-data'
+
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import { getLabwareOnModule } from '../modules/utils'
@@ -167,10 +169,10 @@ export const getHoveredStepLabware = createSelector(
     if (
       !(stepArgs.commandCreatorFnName === 'delay') &&
       !(stepArgs.commandCreatorFnName === 'comment') &&
-      !(stepArgs.commandCreatorFnName === 'captureImage')
+      !(stepArgs.commandCreatorFnName === 'captureImage') &&
+      !COMMAND_CREATOR_ARGS_FOR_OAI.includes(stepArgs.commandCreatorFnName)
     ) {
       console.warn(
-        //  @ts-expect-error: should only reach this warning when new step is added and
         //  highlighted wells is not yet implemented
         `getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`
       )

@@ -5,7 +5,12 @@ from time import monotonic as time_monotonic
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.actions import ActionDispatcher, PauseAction, PauseSource
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    MarkProtocolPauseDeferredAction,
+    PauseAction,
+    PauseSource,
+)
 from opentrons.protocol_engine.execution.run_control import RunControlHandler
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import StateStore
@@ -53,13 +58,52 @@ async def test_pause(
 ) -> None:
     """It should be able to execute a pause."""
     decoy.when(mock_state_store.config).then_return(_make_config(ignore_pause=False))
+    decoy.when(mock_state_store.commands.get_is_awaiting_recovery()).then_return(False)
+    decoy.when(mock_state_store.commands.get_is_running()).then_return(True)
     await subject.wait_for_resume()
     decoy.verify(
         mock_action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL)),
         await mock_state_store.wait_for(
-            condition=mock_state_store.commands.get_is_running
+            condition=subject._can_resume_from_protocol_pause
         ),
     )
+    decoy.verify(
+        mock_action_dispatcher.dispatch(MarkProtocolPauseDeferredAction()),
+        times=0,
+    )
+
+
+async def test_pause_marks_deferred_when_unblocked_for_recovery(
+    decoy: Decoy,
+    mock_state_store: StateStore,
+    mock_action_dispatcher: ActionDispatcher,
+    subject: RunControlHandler,
+) -> None:
+    """It should remember when recovery interrupted an in-flight protocol pause."""
+    decoy.when(mock_state_store.config).then_return(_make_config(ignore_pause=False))
+    decoy.when(mock_state_store.commands.get_is_awaiting_recovery()).then_return(True)
+    decoy.when(mock_state_store.commands.get_is_running()).then_return(False)
+
+    await subject.wait_for_resume()
+
+    decoy.verify(
+        mock_action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL)),
+        mock_action_dispatcher.dispatch(MarkProtocolPauseDeferredAction()),
+    )
+
+
+async def test_pause_unblocks_when_awaiting_recovery(
+    decoy: Decoy,
+    mock_state_store: StateStore,
+    mock_action_dispatcher: ActionDispatcher,
+    subject: RunControlHandler,
+) -> None:
+    """Protocol pauses should not block fixit commands once recovery starts."""
+    decoy.when(mock_state_store.config).then_return(_make_config(ignore_pause=False))
+    decoy.when(mock_state_store.commands.get_is_running()).then_return(False)
+    decoy.when(mock_state_store.commands.get_is_awaiting_recovery()).then_return(True)
+
+    assert subject._can_resume_from_protocol_pause() is True
 
 
 async def test_pause_analysis(

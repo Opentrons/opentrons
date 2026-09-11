@@ -8,7 +8,6 @@ import { i18n } from '/app/i18n'
 import { FailedToConnect } from '../FailedToConnect'
 
 import type { ComponentProps } from 'react'
-import type { RequestState } from '/app/redux/robot-api/types'
 
 const render = (props: ComponentProps<typeof FailedToConnect>) => {
   return renderWithProviders(
@@ -21,24 +20,12 @@ const render = (props: ComponentProps<typeof FailedToConnect>) => {
   )
 }
 
-const failureState = {
-  status: 'failure',
-  response: {
-    method: 'POST',
-    path: '/wifi/configure',
-    status: 401,
-  },
-  error: {
-    message: 'mockError',
-  },
-} as RequestState
-
 describe('ConnectedResult', () => {
   let props: ComponentProps<typeof FailedToConnect>
 
   beforeEach(() => {
     props = {
-      requestState: failureState,
+      errorMessage: 'mockError',
       selectedSsid: 'mockSsid',
       handleChangeNetwork: vi.fn(),
       handleTryAgain: vi.fn(),
@@ -61,6 +48,7 @@ describe('ConnectedResult', () => {
     props.isInvalidPassword = false
     render(props)
     screen.getByText('Failed to connect to mockSsid')
+    screen.getByText('mockError')
     screen.getByText('Try again')
     screen.getByText('Change network')
   })

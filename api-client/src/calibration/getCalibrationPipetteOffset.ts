@@ -10,7 +10,6 @@ export function getCalibrationPipetteOffset(
   return request<AllPipetteOffsetCalibrations>(
     GET,
     '/calibration/pipette_offset',
-    null,
     config
   )
 }

@@ -11,6 +11,7 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -20,6 +21,7 @@ import {
   formatPyStr,
   getCutoutIdByAddressableArea,
   getIsLabwareCompatibleWithStack,
+  getIsSlotAVacuumDock,
   getLabwareHasLiquid,
   getLargestStackInSlot,
   getNearestParentInStack,
@@ -187,6 +189,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       initialModuleState.lidOpen !== true
     ) {
       errors.push(errorCreators.absorbanceReaderLidClosed())
+    } else if (
+      initialModuleState.type === VACUUM_MODULE_TYPE &&
+      initialModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const destModuleId =
@@ -235,6 +242,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       if (destModuleState.lidOpen !== true) {
         errors.push(errorCreators.absorbanceReaderLidClosed())
       }
+    } else if (
+      destModuleState.type === VACUUM_MODULE_TYPE &&
+      destModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const isLabwareIdATiprackLid =
@@ -322,7 +334,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       : []
 
     const cutoutIdFromAddressableAreaName =
-      !isWasteChuteLocation && !is4thColumnSlot
+      !isWasteChuteLocation &&
+      !is4thColumnSlot &&
+      !getIsSlotAVacuumDock(newLocation.addressableAreaName)
         ? getCutoutIdByAddressableArea(
             newLocation.addressableAreaName as AddressableAreaName,
             isOt2TrashLocation ? 'fixedTrashSlot' : 'trashBinAdapter',
@@ -346,6 +360,19 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {
       location = Object.values(wasteChuteEntities)[0]?.pythonName ?? ''
+    } else if (getIsSlotAVacuumDock(newLocation.addressableAreaName)) {
+      // Python location for the vacuum dock is a property of its module named `manifold_dock`
+      const [foundVacuumModuleId] =
+        Object.entries(prevRobotState.modules).find(
+          ([, module]) => module.moduleState.type === VACUUM_MODULE_TYPE
+        ) ?? []
+      if (
+        foundVacuumModuleId != null &&
+        moduleEntities[foundVacuumModuleId] != null
+      ) {
+        const { pythonName } = moduleEntities[foundVacuumModuleId]
+        location = `${pythonName}.manifold_dock`
+      }
     } else {
       location = ''
     }
@@ -353,10 +380,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 
   // check compatibility of stack to move to
   if (parentSlotForSlotCompatibility != null) {
-    const largestStackInSlot = getLargestStackInSlot(
-      prevRobotState.labware,
-      parentSlotForSlotCompatibility
-    )
+    const largestStackInSlot = getLargestStackInSlot({
+      slot: parentSlotForSlotCompatibility,
+      labwareState: prevRobotState.labware,
+      modulesState: prevRobotState.modules,
+    })
 
     const slot = getSlotInLocationStack(largestStackInSlot)
     const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(

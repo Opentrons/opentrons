@@ -10,12 +10,13 @@ import type {
 
 export function updateDeckConfiguration(
   config: HostConfig,
-  deckConfig: DeckConfiguration
+  deckConfig: DeckConfiguration,
+  userNotes: string
 ): ResponsePromise<DeckConfigurationResponse> {
   return request<DeckConfigurationResponse, UpdateDeckConfigurationRequest>(
     PUT,
     '/deck_configuration',
-    { data: { cutoutFixtures: deckConfig } },
-    config
+    config,
+    { body: { data: { cutoutFixtures: deckConfig } }, userNotes }
   )
 }

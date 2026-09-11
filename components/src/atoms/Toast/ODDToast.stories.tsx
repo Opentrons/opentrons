@@ -17,7 +17,7 @@ import type { Meta, Story } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(

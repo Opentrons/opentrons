@@ -15,8 +15,7 @@ export interface ChangePythonPathOverrideConfigAction {
 }
 
 export type ProtocolAnalysisAction =
-  | OpenPythonInterpreterDirectoryAction
-  | ChangePythonPathOverrideConfigAction
+  OpenPythonInterpreterDirectoryAction | ChangePythonPathOverrideConfigAction
 
 export const openPythonInterpreterDirectory =
   (): OpenPythonInterpreterDirectoryAction => ({

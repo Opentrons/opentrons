@@ -52,7 +52,6 @@ export function FileUploadMessagesModal(): JSX.Element | null {
 
   return (
     <Modal
-      marginLeft="0"
       type={message?.isError ? 'error' : 'info'}
       title={title}
       {...(!isMigration

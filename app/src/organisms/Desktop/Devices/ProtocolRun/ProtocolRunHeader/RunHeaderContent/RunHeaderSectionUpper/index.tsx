@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { AlertPrimaryButton, BORDERS, StyledText } from '@opentrons/components'
+import { BORDERS, PrimaryButton, StyledText } from '@opentrons/components'
 
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
@@ -53,10 +53,10 @@ export function RunHeaderSectionUpper(
       <div className={styles.buttons_container}>
         <div className={styles.buttons_inner}>
           {isCancellableStatus(runStatus) && (
-            <AlertPrimaryButton
+            <PrimaryButton
+              variant="warning"
               borderRadius={BORDERS.borderRadiusFull}
               onClick={handleCancelRunClick}
-              id="RunHeader_cancelRunButton"
             >
               <StyledText
                 oddStyle="bodyTextSemiBold"
@@ -64,7 +64,7 @@ export function RunHeaderSectionUpper(
               >
                 {t('cancel_run')}
               </StyledText>
-            </AlertPrimaryButton>
+            </PrimaryButton>
           )}
           <ActionButton {...props}></ActionButton>
         </div>

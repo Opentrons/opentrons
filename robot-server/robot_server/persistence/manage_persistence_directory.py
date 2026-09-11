@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from anyio import to_thread
 from typing_extensions import Final
 
 from server_utils.persistence.folder_migrator import MigrationOrchestrator
@@ -27,8 +28,12 @@ from ._migrations import (
     v13_to_v14,
     v14_to_v15,
     v15_to_v16,
+    v16_to_v17,
+    v17_to_v18,
+    v18_to_v19,
 )
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
+from .protocol_user_permissions import grant_protocol_user_access
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 
@@ -67,16 +72,28 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             v12_to_v13.Migration12to13(subdirectory="13"),
             v13_to_v14.Migration13to14(subdirectory="14"),
             v14_to_v15.Migration14to15(subdirectory="15"),
-            v15_to_v16.Migration15to16(subdirectory=LATEST_VERSION_DIRECTORY),
+            v15_to_v16.Migration15to16(subdirectory="16"),
+            v16_to_v17.Migration16to17(subdirectory="17"),
+            v17_to_v18.Migration17to18(subdirectory="18"),
+            v18_to_v19.Migration18to19(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )
 
 
 async def prepare_active_subdirectory(prepared_root: Path) -> Path:
-    """Return the active persistence subdirectory after preparing it, if necessary."""
+    """Return the active persistence subdirectory after preparing it, if necessary.
+
+    After migrations, grant the `ot-protocol` user access to protocol files.
+    Directories are setgid so later uploads inherit that group. oe-core's systemd-tmpfiles
+    only chowns paths that already exist at boot, so this must run here, since the first CRS
+    reset recreates the tree after tmpfiles has already finished.
+    """
     orchestrator = make_migration_orchestrator(prepared_root)
-    return await server_utils_prepare_active_subdirectory(orchestrator)
+    subdirectory = await server_utils_prepare_active_subdirectory(orchestrator)
+    await to_thread.run_sync(grant_protocol_user_access, subdirectory)
+
+    return subdirectory
 
 
 async def prepare_root(persistence_directory_root: Path | None) -> Path:

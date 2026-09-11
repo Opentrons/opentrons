@@ -10,7 +10,7 @@ import { useAttachedModules } from '/app/resources/modules'
 
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]

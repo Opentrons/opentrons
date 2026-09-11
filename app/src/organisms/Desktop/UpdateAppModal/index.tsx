@@ -136,7 +136,6 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
         marginLeft={SPACING.spacing32}
       >
         {t('release_notes')}

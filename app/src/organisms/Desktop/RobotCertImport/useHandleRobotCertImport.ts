@@ -6,7 +6,7 @@ import {
   getEncryptedCACertificates,
   getPlaintextCACertificates,
 } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import {
   tryInstallEncryptedRobotCertificate,
@@ -19,10 +19,10 @@ export interface UseHandleRobotCertImportProps {
 
 export interface UseHandleRobotCertImportResult {
   passwordError: string | null
-  setPasswordValue: (password: string) => unknown
+  setPasswordValue: (password: string) => void
   passwordValue: string
   importInProgress: boolean
-  tryImport: () => unknown
+  tryImport: () => void
 }
 export function useHandleRobotCertImport(
   props: UseHandleRobotCertImportProps
@@ -44,6 +44,8 @@ export function useHandleRobotCertImport(
       }
     }
 
+  // Auth endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const { status, mutate } = useMutation<boolean>({
     mutationFn: async () => {
       if (host == null) {
@@ -86,7 +88,7 @@ export function useHandleRobotCertImport(
       }
       return true
     },
-    mutationKey: [host!, 'encrypted_ca_certs'],
+    mutationKey: getQueryKey(host, 'encrypted_ca_certs'),
     onError: (err: any) => {
       setPasswordError((err as Error)?.message ?? t('invalid_password'))
     },

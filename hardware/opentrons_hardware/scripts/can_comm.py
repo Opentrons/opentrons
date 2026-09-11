@@ -8,9 +8,10 @@ from enum import Enum
 from logging.config import dictConfig
 from typing import Callable, Sequence, Type, TypeVar
 
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger, SerialUsbDriver
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_hardware.drivers.gpio import RemoteOT3GPIO
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
@@ -243,8 +244,10 @@ async def run_ui(driver: AbstractCanDriver) -> None:
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a gpio handler which will automatically release estop
-    gpio = OT3GPIO()
-    gpio.deactivate_estop()
+    usb_driver = SerialUsbDriver(asyncio.get_running_loop())
+    usb_messenger = BinaryMessenger(usb_driver)
+    gpio = RemoteOT3GPIO(usb_messenger)
+    await gpio.deactivate_estop()
     async with build.driver(build_settings(args)) as driver:
         await run_ui(driver)
 

@@ -41,7 +41,7 @@ export const vacuumStartRunProfile: CommandCreator<
 
   // explicitly attach the ventAfter param to the final step of the profile in accordance with PE command shape
   // there is no direct ventAfter param at the startRunProfile command params top level
-  const profileWithVentOnFinal: VacuumModuleStartRunProfileCreateCommand['params']['profile'] =
+  const profileWithVentOnFinal: VacuumModuleStartRunProfileCreateCommand['params']['steps'] =
     profile.map((step, index) => {
       if (index === profile.length - 1) {
         return { ...step, ventAfter }
@@ -58,7 +58,7 @@ export const vacuumStartRunProfile: CommandCreator<
         key: uuid(),
         params: {
           moduleId,
-          profile: profileWithVentOnFinal,
+          steps: profileWithVentOnFinal,
           ventAfter,
           taskId,
         },

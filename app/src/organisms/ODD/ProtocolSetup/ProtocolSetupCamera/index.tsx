@@ -4,12 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Chip, SPACING } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useAddCameraImageSettingsToRunMutation,
   useAddCameraSettingsToRunMutation,
 } from '@opentrons/react-api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -46,10 +48,14 @@ export function ProtocolSetupCamera(
   const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['update_camera_settings_for_run'],
+    runId
+  )
   const { mutateAsync: addCameraSettingsToRunAsync } =
-    useAddCameraSettingsToRunMutation()
+    useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =
-    useAddCameraImageSettingsToRunMutation(runId)
+    useAddCameraImageSettingsToRunMutation(documentationState, runId)
   const { makeSnackbar } = useToaster()
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)
@@ -101,7 +107,11 @@ export function ProtocolSetupCamera(
             : Promise.resolve(null)
         )
         .then(confirmCameraSettings)
-        .catch(() => {
+        .catch((error: unknown) => {
+          clearDocreport()
+          if (isDocumentedMutationError(error)) {
+            return
+          }
           // This request only fails if the camera is not connected to the robot.
           // We only want to surface the error if a user expects the camera to be enabled.
           if (cameraEnabled) {

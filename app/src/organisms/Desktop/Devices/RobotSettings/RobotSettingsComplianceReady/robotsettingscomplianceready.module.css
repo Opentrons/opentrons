@@ -1,0 +1,25 @@
+.page {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.section {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+}
+
+.section_accordion {
+  overflow: hidden;
+  padding: 0;
+}
+
+.section_accordion_overflow_visible {
+  overflow: visible;
+}

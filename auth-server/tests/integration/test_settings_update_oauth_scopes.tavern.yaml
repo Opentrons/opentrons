@@ -1,0 +1,69 @@
+test_name: Settings changes affect scopes on existing tokens
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Update all admin-credential requirements at once
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: false
+          requireAdminCredsForSignoffProtocol: false
+    response:
+      status_code: 200
+
+  - name: Login should include all optional user scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: updates.write protocols.write run_signoff.write
+      save:
+        json:
+          user_access_token: access_token
+
+  - name: Re-enable all admin-credential requirements at once
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: true
+    response:
+      status_code: 200
+
+  - name: Existing token introspection should reflect updated scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_absent: updates.write protocols.write run_signoff.write

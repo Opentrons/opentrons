@@ -41,7 +41,6 @@ export function DeviceReset({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing4}
-          id="AdvancedSettings_deviceReset"
         >
           {t('device_reset')}
         </LegacyStyledText>
@@ -52,7 +51,6 @@ export function DeviceReset({
       <TertiaryButton
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="RobotSettings_DeviceResetChooseButton"
         disabled={isRobotBusy}
       >
         {t('choose_reset_settings')}

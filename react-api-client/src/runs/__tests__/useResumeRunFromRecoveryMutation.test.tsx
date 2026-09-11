@@ -6,6 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { useResumeRunFromRecoveryMutation } from '..'
 import { mockResumeFromRecoveryAction, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -36,9 +37,13 @@ describe('useResumeRunFromRecoveryMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useResumeRunFromRecoveryMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useResumeRunFromRecoveryMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      { wrapper }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.resumeRunFromRecovery(RUN_ID_1))
@@ -53,9 +58,13 @@ describe('useResumeRunFromRecoveryMutation hook', () => {
       data: mockResumeFromRecoveryAction,
     } as Response<RunAction>)
 
-    const { result } = renderHook(useResumeRunFromRecoveryMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useResumeRunFromRecoveryMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      { wrapper }
+    )
     act(() => result.current.resumeRunFromRecovery(RUN_ID_1))
 
     await waitFor(() => {

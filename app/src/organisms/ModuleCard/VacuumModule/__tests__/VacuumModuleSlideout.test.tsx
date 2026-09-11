@@ -91,7 +91,7 @@ describe('VacuumModuleSlideout', () => {
     fireEvent.click(pressureButton)
 
     expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
-    expect(screen.getByText('Valid range between -200-0')).toBeInTheDocument()
+    expect(screen.getByText('Valid range between -800-0')).toBeInTheDocument()
     expect(screen.getByText('mbar')).toBeInTheDocument()
   })
 
@@ -142,7 +142,7 @@ describe('VacuumModuleSlideout', () => {
     fireEvent.click(pressureButton)
 
     screen.getByText('Gauge pressure')
-    screen.getByText('Valid range between -200-0')
+    screen.getByText('Valid range between -800-0')
   })
 
   it('calls setVacuumPressure with correct value when confirming in pressure mode', () => {

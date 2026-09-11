@@ -4,6 +4,8 @@ import {
   fixture12Trough,
   fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
@@ -1181,6 +1183,108 @@ describe('moveLabware', () => {
     expect(errors).toHaveLength(1)
     expect(errors[0]).toMatchObject({
       type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    })
+  })
+  it('should return an error when trying to move labware to a vacuum module while active', () => {
+    const VACUUM_MODULE_ID = 'vacuumModuleId'
+    const VACUUM_MODULE_SLOT = 'B1'
+
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [VACUUM_MODULE_ID]: {
+          id: VACUUM_MODULE_ID,
+          type: VACUUM_MODULE_TYPE,
+          model: VACUUM_MODULE_V1,
+          pythonName: 'mock_vacuum_module',
+        },
+      },
+    }
+
+    robotState = {
+      ...robotState,
+      modules: {
+        ...robotState.modules,
+        [VACUUM_MODULE_ID]: {
+          slot: VACUUM_MODULE_SLOT,
+          moduleState: {
+            type: VACUUM_MODULE_TYPE,
+            ventStatus: null,
+            numPumpActivitiesStarted: 1,
+            currentPumpActivity: {
+              type: 'indefiniteHold',
+              mode: 'pressure',
+              targetPressure: 10,
+            },
+          },
+        } as any,
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      strategy: 'usingGripper',
+      newLocation: { moduleId: VACUUM_MODULE_ID },
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'VACUUM_UNDER_PRESSURE',
+    })
+  })
+  it('should return an error when trying to move labware from a vacuum module while active', () => {
+    const VACUUM_MODULE_ID = 'vacuumModuleId'
+    const VACUUM_MODULE_SLOT = 'B1'
+
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        [VACUUM_MODULE_ID]: {
+          id: VACUUM_MODULE_ID,
+          type: VACUUM_MODULE_TYPE,
+          model: VACUUM_MODULE_V1,
+          pythonName: 'mock_vacuum_module',
+        },
+      },
+    }
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        [SOURCE_LABWARE]: {
+          stack: [SOURCE_LABWARE, VACUUM_MODULE_ID, VACUUM_MODULE_SLOT],
+        },
+      },
+      modules: {
+        ...robotState.modules,
+        [VACUUM_MODULE_ID]: {
+          slot: VACUUM_MODULE_SLOT,
+          moduleState: {
+            type: VACUUM_MODULE_TYPE,
+            ventStatus: null,
+            numPumpActivitiesStarted: 1,
+            currentPumpActivity: {
+              type: 'indefiniteHold',
+              mode: 'pressure',
+              targetPressure: 10,
+            },
+          },
+        } as any,
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      strategy: 'usingGripper',
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'VACUUM_UNDER_PRESSURE',
     })
   })
 })

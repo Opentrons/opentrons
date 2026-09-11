@@ -42,10 +42,7 @@ export interface NetworkInterface {
 }
 
 export type DriverStatus =
-  | typeof NOT_APPLICABLE
-  | typeof UNKNOWN
-  | typeof UP_TO_DATE
-  | typeof OUTDATED
+  typeof NOT_APPLICABLE | typeof UNKNOWN | typeof UP_TO_DATE | typeof OUTDATED
 
 export interface U2EAnalyticsProps {
   'U2E Vendor ID': number

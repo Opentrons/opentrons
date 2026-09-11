@@ -40,10 +40,7 @@ import type {
 import type { QuickTransferSummaryState } from '../types'
 
 export type MoveLiquidStepArgs =
-  | ConsolidateArgs
-  | DistributeArgs
-  | TransferArgs
-  | null
+  ConsolidateArgs | DistributeArgs | TransferArgs | null
 
 const uuid: () => string = uuidv4
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'

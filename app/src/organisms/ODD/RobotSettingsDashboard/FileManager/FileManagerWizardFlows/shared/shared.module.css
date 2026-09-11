@@ -1,0 +1,79 @@
+.overlay {
+  position: fixed;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(22 33 45 / 60%);
+  inset: 0;
+}
+
+.modal {
+  display: flex;
+  overflow: hidden;
+  width: 62rem;
+  height: 35.5rem;
+  flex-direction: column;
+  border-radius: var(--border-radius-12);
+  background-color: var(--white);
+  box-shadow: 0 0 1.25rem rgb(0 0 0 / 40%);
+}
+
+.body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--spacing-32);
+  gap: var(--spacing-24);
+}
+
+.question {
+  flex-shrink: 0;
+  color: var(--black-90);
+}
+
+.button_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  overflow-y: auto;
+}
+
+.scrollable_content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-24);
+  overflow-y: auto;
+}
+
+.no_usb_wrapper {
+  min-height: 0;
+  flex: 1;
+}
+
+.centered_content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-40);
+  gap: var(--spacing-24);
+}
+
+.status_text {
+  width: 100%;
+  color: var(--black-90);
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+}

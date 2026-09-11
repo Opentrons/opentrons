@@ -13,7 +13,7 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { useHost, useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -28,6 +28,7 @@ import {
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
 import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
@@ -35,7 +36,7 @@ import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 
 export const InstrumentDetail = (): JSX.Element => {
-  const host = useHost()
+  const robotName = useLocalRobotName()
   const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
@@ -95,7 +96,7 @@ export const InstrumentDetail = (): JSX.Element => {
                 onClick={() => {
                   handleInstrumentDetailOverflowMenu(
                     instrument,
-                    host,
+                    robotName,
                     enableDTWiz
                   )
                 }}

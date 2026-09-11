@@ -113,8 +113,6 @@ async def _main(
     mount: OT3Mount, mount_name: str, simulate: bool, time_min: int, z_axis: Axis
 ) -> None:
 
-    domain_url = "https://opentrons.atlassian.net"
-
     # make directory for tests. check if directory exists, make if doesn't.
     BASE_DIRECTORY = "/userfs/data/testing_data/z_axis_test/"
     if not os.path.exists(BASE_DIRECTORY):
@@ -143,7 +141,7 @@ async def _main(
                     f"Please add json file with the testing team \
 jira credentials to: {storage_directory}."
                 )
-            ticket = jira_tool.JiraTicket(domain_url, api_token, email)
+            ticket = jira_tool.JiraTicket(api_token, email)
             issue_key = ticket.get_ticket()
             break
         elif y_or_no == "N" or y_or_no == "n":

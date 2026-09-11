@@ -44,8 +44,7 @@ export interface PythonProtocolMetadata {
 
 // data may be a full JSON protocol or just a metadata dict from Python
 export type ProtocolData =
-  | JsonProtocolFile
-  | { metadata: PythonProtocolMetadata }
+  JsonProtocolFile | { metadata: PythonProtocolMetadata }
 
 export function parseProtocolData(
   file: File,

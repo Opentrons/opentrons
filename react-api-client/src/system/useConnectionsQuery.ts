@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getConnections } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { ActiveConnections } from '@opentrons/api-client'
@@ -12,7 +12,7 @@ export function useConnectionsQuery(
 ): UseQueryResult<ActiveConnections> {
   const host = useHost()
   const query = useQuery<ActiveConnections>(
-    [host, 'connections'],
+    getQueryKey(host, 'connections'),
     () => getConnections(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )

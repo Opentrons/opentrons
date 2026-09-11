@@ -1,5 +1,6 @@
-Docker Guide  
-=======================  
+Docker Guide
+=======================
+
 Included in this repo are the tools to run a containerized Opentrons robot stack in docker.
 
 This includes the `robot-server` connected to the hardware emulation application. The emulation application includes the Smoothie and magnetic, temperature, and thermocycler modules.

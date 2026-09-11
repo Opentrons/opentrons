@@ -11,7 +11,6 @@ export function getCsvFiles(
   return request<UploadedCsvFilesResponse>(
     GET,
     `/protocols/${protocolId}/dataFiles`,
-    null,
     config
   )
 }

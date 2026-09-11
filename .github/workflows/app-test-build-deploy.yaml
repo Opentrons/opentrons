@@ -4,7 +4,7 @@ name: 'App test, build, and deploy'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'app/**'
       - 'app-shell/**'
@@ -17,28 +17,17 @@ on:
       - '*.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/app-test-build-deploy.yaml'
+      - '.github/workflows/app-build-deploy.yaml'
+      - '.github/actions/app/determine-build-type/**'
       - '.github/workflows/utils.js'
       - 'vitest.config.*'
     branches:
       - '**'
     tags:
-      - 'v*'
+      - 'v[0-9]*.[0-9]*'
       - 'ot3@*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'app/**'
-      - 'app-shell/**'
-      - 'app-shell-odd/**'
-      - 'components/**'
-      - 'shared-data/**'
-      - 'discovery-client/**'
-      - '*.js'
-      - '*.json'
-      - 'pnpm-lock.yaml'
-      - 'scripts/**'
-      - '.vitest.config.*'
-  workflow_dispatch: {}
+    paths: *paths
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -66,22 +55,18 @@ jobs:
     timeout-minutes: 15 # if tests take longer than this, add more shards
     continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
-        # The run produces 2 outputs that we'll upload to temporary storage on Github:
-        # the vitest report in .vitest-reports/ and the coverage report in coverage/
+        # The run produces a vitest report in .vitest-reports/ that we'll upload to temporary storage on Github.
         run: |
-          make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
-          mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
+          make -C app test test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
       - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
         if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: frontend-unit-test-result-shard-${{matrix.shard}}
-          path: |
-            .vitest-reports/*
-            coverage/lcov-shard-*.info
+          path: .vitest-reports
           include-hidden-files: true
           retention-days: 1
 
@@ -90,23 +75,16 @@ jobs:
     runs-on: 'ubuntu-22.04'
     name: 'app frontend unit test merge shard results'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'Download frontend test result shards'
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: frontend-unit-test-result-shard-*
           merge-multiple: true
+          path: .vitest-reports
       - name: 'Merge frontend test report shards'
         run: pnpm vitest --merge-reports
-      - name: 'Merge frontend test coverage shards'
-        run: cat ./coverage/lcov-shard-*.info > ./coverage/lcov.info
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./coverage/lcov.info
-          flags: app
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   backend-unit-test:
     strategy:
@@ -120,9 +98,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
@@ -130,85 +106,25 @@ jobs:
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{matrix.shell}}/src" cov_opts="--coverage=true"
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./coverage/lcov.info
-          flags: app
+        run: make test-js-${{matrix.shell}}
 
   determine-build-type:
     runs-on: 'ubuntu-latest'
     name: 'Determine build variant and type'
+    permissions:
+      actions: read
+      contents: read
     outputs:
-      variants: ${{steps.determine-build-type.outputs.variants}}
-      type: ${{steps.determine-build-type.outputs.type}}
+      variants: ${{ steps.determine-build-type.outputs.variants }}
+      type: ${{ steps.determine-build-type.outputs.type }}
     steps:
-      - id: determine-build-type
-        run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
-            echo "No builds for pull requests"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
-            echo "internal-release release builds for ot3 tags"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ] ; then
-            echo "release release builds for v tags"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/internal-release')) }}" = "true" ] ; then
-            echo "internal-release develop builds for internal-release branches"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release')) }}" = "true" ] ; then
-            echo "Release develop builds for release branches"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            echo "both develop builds for edge"
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "internal-release as-release builds for app-build-internal + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "internal-release develop builds for app-build-internal suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build')) }}" = "true" ] ; then
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "release as-release builds for app-build + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "release develop builds for app-build suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
-
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "Both as-release builds for app-build-both + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "Both develop builds for app-build-both + as-release suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          fi
-
-      - name: set summary
-        run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: ./.github/actions/app/determine-build-type
+        id: determine-build-type
+        with:
+          edge-build-policy: once-per-day
+          skip-pull-requests: 'true'
+          workflow-file: app-test-build-deploy.yaml
 
   build-app:
     needs: [determine-build-type]
@@ -243,8 +159,9 @@ jobs:
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
              echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # So the build can extract the version number from Git history.
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
@@ -316,7 +233,7 @@ jobs:
           WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
-          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
+          APPLE_ID: ${{ vars.OT_APP_APPLE_ID_V2 }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python
@@ -457,7 +374,7 @@ jobs:
           mkdir -p ${{ runner.temp }}/upload_backup
           mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'restore upload folders after checkout'
         run: |
           # Restore upload folders from temp location
@@ -497,7 +414,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true
@@ -520,7 +437,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -565,7 +482,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true

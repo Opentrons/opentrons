@@ -315,14 +315,12 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-        kwargs["use_usb_bus"] = True  # type: ignore[assignment]
     try:
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     except Exception as e:
         if is_simulating:
             raise e
         print(e)
-        kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     await reset_api(api)
     return api
@@ -1660,3 +1658,11 @@ def get_input_number(
         else:
             ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
     return default
+
+
+def enable_stall_detection(api: SyncHardwareAPI, enable: bool) -> None:
+    """Toggle stall detection on or off."""
+    flags = api.hardware_feature_flags
+    flags.stall_detection_enabled = enable
+    # for some reason mypy gets the property method but isn't the seeing the setter as a member
+    api.hardware_feature_flags = flags  # type: ignore[attr-defined]

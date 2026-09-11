@@ -5,11 +5,15 @@ otupdate.common.config: Handlers for reading update server configuration
 import json
 import logging
 import os
-from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple, cast
+from typing import Annotated, Any, Dict, Mapping, NamedTuple, Optional, Tuple
 
-from aiohttp.web import Request
+import fastapi
 
-from . import constants
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 
 LOG = logging.getLogger(__name__)
 
@@ -21,7 +25,6 @@ REQUIRED_DATA = [
 ]
 DEFAULT_PATH = "/var/lib/otupdate/config.json"
 PATH_ENVIRONMENT_VARIABLE = "OTUPDATE_CONFIG_PATH"
-CONFIG_VARNAME = constants.APP_VARIABLE_PREFIX + "config"
 
 
 class Config(NamedTuple):
@@ -37,8 +40,24 @@ class Config(NamedTuple):
     #: The path to the x.509 certificate used to verify update files
 
 
-def config_from_request(req: Request) -> Config:
-    return cast(Config, req.app[CONFIG_VARNAME])
+_config_accessor = AppStateAccessor[Config]("otupdate_config")
+
+
+def install_config(app_state: AppState, config: Config) -> None:
+    """Store the server's configuration on global app state for later retrieval.
+
+    This should be done as part of server startup.
+    """
+    _config_accessor.set_on(app_state, config)
+
+
+def get_config(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> Config:
+    """A FastAPI dependency to retrieve the server's configuration."""
+    config = _config_accessor.get_from(app_state)
+    assert config is not None, "Forgot to install the config during server startup?"
+    return config
 
 
 def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:

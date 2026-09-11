@@ -14,16 +14,16 @@
       "use_current_settings": "Use current settings"
     },
     "liquid_class": {
-      "title": "Apply {{liquidClass}} liquid class settings",
-      "body": "Continuing will update this {{stepType}} step’s pipetting settings to the values of the {{liquidClass}} liquid class."
+      "body": "Continuing will update this {{stepType}} step’s pipetting settings to the values of the {{liquidClass}} liquid class.",
+      "title": "Apply {{liquidClass}} liquid class settings"
     },
     "no_liquid_class": {
-      "title": "Don’t use liquid class settings",
-      "body": "Continuing will undo any changes and clear all pipetting settings associated with the previously selected liquid class."
+      "body": "Continuing will undo any changes and clear all pipetting settings associated with the previously selected liquid class.",
+      "title": "Don’t use liquid class settings"
     },
     "other_fields": {
-      "title": "Update {{liquidClass}} liquid class settings?",
-      "body": "We noticed you changed the {{fieldNames}} in this {{stepType}} step. Do you want to use the current pipetting settings or update to the values of the {{liquidClass}} liquid class?"
+      "body": "We noticed you changed the {{fieldNames}} in this {{stepType}} step. Do you want to use the current pipetting settings or update to the values of the {{liquidClass}} liquid class?",
+      "title": "Update {{liquidClass}} liquid class settings?"
     },
     "steps": {
       "mix": "mix",
@@ -54,13 +54,13 @@
     "serialize_title": "Serialization"
   },
   "liquid_placement": {
-    "liquid": "Liquid",
-    "volume": "Volume",
     "errors": {
       "liquid_required": "Define a liquid",
       "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL",
       "volume_required": "Define a volume"
-    }
+    },
+    "liquid": "Liquid",
+    "volume": "Volume"
   },
   "pipette_mount_label": {
     "left": "(L)",
@@ -105,8 +105,8 @@
         "title": "Reference wavelength",
         "tooltip": "A reference wavelength is a baseline wavelength used for comparing measurements of other wavelengths."
       },
-      "reference_wavelength_parentheses": "(Reference wavelength)",
       "reference_wavelength_color_parentheses": "({{color}}, reference wavelength)",
+      "reference_wavelength_parentheses": "(Reference wavelength)",
       "wavelength": "Wavelength"
     },
     "field": {
@@ -148,8 +148,8 @@
           "always": "Always",
           "never": "Never",
           "once": "Once",
-          "perSource": "Per source",
-          "perDest": "Per destination"
+          "perDest": "Per destination",
+          "perSource": "Per source"
         },
         "option_tooltip": {
           "always": "Always aspirate with a fresh tip.",
@@ -169,11 +169,11 @@
         },
         "title": "Condition"
       },
-      "dropTip": {
-        "option": { "return": "Tip rack" }
-      },
       "delay": {
         "label": "delay"
+      },
+      "dropTip": {
+        "option": { "return": "Tip rack" }
       },
       "engageHeight": {
         "caption": "Recommended: 4mm",
@@ -365,8 +365,8 @@
         "label": "Tip tracking",
         "manual": {
           "description": {
-            "has_tips_one": "{{count}} pickup selected",
             "has_tips_multiple": "{{count}} pickups selected",
+            "has_tips_one": "{{count}} pickup selected",
             "no_tips": "No tips selected"
           },
           "title": "Select tips for manual tip tracking"
@@ -385,12 +385,12 @@
       "touchTip": {
         "label": "touch tip"
       },
-      "touchTip_speed": {
-        "label": "Touch tip speed"
-      },
       "touchTip_mmFromEdge": {
         "caption": "Valid range between {{min}} - {{max}}mm",
         "label": "Distance from edge"
+      },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
       },
       "useGripper": {
         "label": "use gripper",
@@ -451,15 +451,16 @@
       "no_labware_on_shuttle": "No labware on shuttle",
       "no_labware_on_stacker": "No labware on stacker",
       "no_labware_selected": "No labware selected",
-      "stacker_labware_not_defined": "Stacker labware not defined",
       "no_labware_selected_body": "Add labware to the stacker in the starting deck so that you can refill it later",
 
       "quantity": "Quantity: {{count}}",
       "selected_labware": "Select labware to refill into stacker",
       "shuttle": "Shuttle",
       "stacker": "Stacker",
+      "stacker_labware_not_defined": "Stacker labware not defined",
       "with_lid": { "standard": "With lid", "tiprack": "With tiprack lid" }
     },
+    "heat_or_cool": "Heat or cool",
     "labwareLabel": {
       "aspirate": "source",
       "dispense": "destination",
@@ -469,7 +470,6 @@
       "mixLabware": "labware",
       "movedLabware": "labware"
     },
-    "heat_or_cool": "Heat or cool",
     "mixRepetitions": "repetitions",
     "mixVolumeLabel": "mix volume",
     "multiDispenseOptionsLabel": "multi-dispense options",

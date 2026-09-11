@@ -31,17 +31,12 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   OT2_ROBOT_TYPE,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
-import {
-  getDisableModuleRestrictions,
-  getEnableMutlipleTempsOT2,
-} from '/protocol-designer/feature-flags/selectors'
+import { getDisableModuleRestrictions } from '/protocol-designer/feature-flags/selectors'
 import {
   deleteModule,
   getAllModuleSlotsByTypeOt2,
@@ -71,8 +66,7 @@ import type { StepType } from '/protocol-designer/form-types'
 import type { OT2ModuleType, ThunkDispatch } from '/protocol-designer/types'
 
 type MagneticModuleModels =
-  | typeof MAGNETIC_MODULE_V1
-  | typeof MAGNETIC_MODULE_V2
+  typeof MAGNETIC_MODULE_V1 | typeof MAGNETIC_MODULE_V2
 
 const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   heaterShakerModuleType: 'heaterShaker',
@@ -97,7 +91,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 export function Ot2Modules(): JSX.Element {
   const { t } = useTranslation(['onboarding', 'protocol_overview', 'shared'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const enable2TempModules = useSelector(getEnableMutlipleTempsOT2)
   const disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const savedSteps = useSelector(getSavedStepForms)
   const isDismissedModuleHint = useSelector(getDismissedHints).includes(
@@ -135,10 +128,6 @@ export function Ot2Modules(): JSX.Element {
         module => module.type === getModuleType(moduleModel)
       )
   )
-  const numberOfTemperatureModules = Object.values(modules).filter(
-    module => module.model === TEMPERATURE_MODULE_V2
-  )?.length
-
   const handleRemoveModule = (moduleId: string | null): void => {
     if (moduleId != null) {
       dispatch(deleteModule({ moduleId }))
@@ -210,12 +199,8 @@ export function Ot2Modules(): JSX.Element {
         }) as string
       )
     } else {
-      const moduleIdToDelete = Object.values(modules).find(module =>
-        enable2TempModules &&
-        moduleModel === TEMPERATURE_MODULE_V2 &&
-        numberOfTemperatureModules < 2
-          ? null
-          : module.type === moduleType
+      const moduleIdToDelete = Object.values(modules).find(
+        module => module.type === moduleType
       )?.id
       //   remove the module if it already exists on the deck
       handleRemoveModule(moduleIdToDelete ?? null)
@@ -343,11 +328,9 @@ export function Ot2Modules(): JSX.Element {
             addModule={moduleModel => {
               handleAddModuleButton(moduleModel)
             }}
-            enableMultipleTempModules={enable2TempModules}
-            numberOfTemps={numberOfTemperatureModules}
-            hasGen1Temp={Object.values(modules).some(
-              module => module.model === TEMPERATURE_MODULE_V1
-            )}
+            enableMultipleTempModules={false}
+            numberOfTemps={0}
+            hasGen1Temp={false}
           />
           {Object.keys(modules).length > 0 ? (
             <Flex

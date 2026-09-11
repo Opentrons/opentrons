@@ -10,6 +10,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { useRobotType } from '/app/redux-resources/robots'
@@ -34,6 +35,9 @@ vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 

@@ -1,6 +1,6 @@
 .button {
   display: flex;
-  width: 5.6875rem;
+  min-width: 5.6875rem;
   height: 2.25rem;
   align-items: center;
   justify-content: center;
@@ -34,14 +34,12 @@
 }
 
 .button_text {
-  overflow: hidden;
   color: var(--white);
   font-size: var(--font-size-h3);
   font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
   text-align: center;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

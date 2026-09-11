@@ -13,8 +13,16 @@ import { UpdateRobot } from '../UpdateRobot'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
+
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: mockStartUpdate,
+    isLoading: false,
+  }),
+}))
 
 const MOCK_STATE: State = {
   discovery: {
@@ -56,7 +64,7 @@ const mockSession: RobotUpdateSession = {
   fileInfo: null,
   token: null,
   pathPrefix: null,
-  step: 'restarting',
+  step: 'restart',
   stage: null,
   progress: 10,
   error: null,
@@ -112,6 +120,15 @@ describe('UpdateRobot', () => {
     )
     render()
     screen.getByText('Your software is already up to date!')
+  })
+
+  it('should keep showing the update when a session exists even if type is not upgrade', () => {
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(mockSession)
+    render()
+    screen.getByText('Downloading software...')
   })
 
   it('should render mock ErrorUpdateSoftware when an error occurs', () => {

@@ -3,11 +3,11 @@ title: "Opentrons OT-2: Importing Protocols"
 description: "Upload or import protocol files and understand protocol analysis in the app."
 ---
 
-Regardless of how you create them, every protocol begins as a file on your computer. You must import the protocol into the Opentrons App to transfer it to your OT-2.
+Regardless of how you create them, every protocol begins as a file on your computer. You must import the protocol into the Opentrons OT-2 App to transfer it to your OT-2.
 
 ## The Protocols tab
 
-By default, the Opentrons App opens to the **Protocols** tab. If you have a new robot and are opening the app for the first time, the app displays the protocol upload screen. If you have already imported protocols, the app displays a summary list.
+By default, the Opentrons OT-2 App opens to the **Protocols** tab. If you have a new robot and are opening the app for the first time, the app displays the protocol upload screen. If you have already imported protocols, the app displays a summary list.
 
 <figure class="side-by-side screenshot" markdown>
 ![Protocol tab screen with no protocols](../images/app-no-protocol.png)
@@ -30,10 +30,10 @@ To add another protocol to your existing list, click **Import** in the top right
 
 ## Protocol analysis
 
-The Opentrons App analyzes your protocol immediately upon import. _Protocol analysis_ transforms a protocol file (JSON or Python) into a series of robot commands.
+The Opentrons OT-2 App analyzes your protocol immediately upon import. _Protocol analysis_ transforms a protocol file (JSON or Python) into a series of robot commands.
 
 The app displays a warning if it detects errors in your protocol file. Correct the errors and re-import the protocol. If the analysis completes without errors, the protocol is ready to run on your OT-2.
 
 ## Additional features
 
-See the [Features Summary](./features-summary.md) for more information about other protocol controls and settings in the Opentrons App.
+See the [Features Summary](./features-summary.md) for more information about other protocol controls and settings in the Opentrons OT-2 App.

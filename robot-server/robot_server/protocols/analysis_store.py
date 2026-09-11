@@ -113,6 +113,7 @@ class AnalysisStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
+        access_control_status: bool,
         completed_store: Optional[CompletedAnalysisStore] = None,
     ) -> None:
         """Initialize the `AnalysisStore`."""
@@ -122,6 +123,7 @@ class AnalysisStore:
             memory_cache=MemoryCache(_CACHE_MAX_SIZE, str, CompletedAnalysisResource),
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
+        self._access_control_status = access_control_status
 
     def add_pending(
         self,
@@ -313,15 +315,9 @@ class AnalysisStore:
 
         If `protocol_id` doesn't point to a valid protocol, returns an empty list.
         """
-        completed_analysis_ids = self._completed_store.get_ids_by_protocol(
+        completed_analysis_summaries = self._completed_store.get_summaries_by_protocol(
             protocol_id=protocol_id
         )
-        completed_analysis_summaries = [
-            AnalysisSummary.model_construct(
-                id=analysis_id, status=AnalysisStatus.COMPLETED
-            )
-            for analysis_id in completed_analysis_ids
-        ]
 
         pending_analysis = self._pending_store.get_by_protocol(protocol_id=protocol_id)
         if pending_analysis is None:
@@ -444,6 +440,14 @@ class AnalysisStore:
                 return False
         return True
 
+    def get_access_control_status(self) -> bool:
+        """Return the current status of access control enablement from the Analysis Store."""
+        return self._access_control_status
+
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the current status of access control enablement for the Analysis Store."""
+        self._access_control_status = access_control_mode
+
 
 class _PendingAnalysisStore:
     """An in-memory store of protocol analyses that are pending.
@@ -508,4 +512,8 @@ class _PendingAnalysisStore:
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:
-    return AnalysisSummary(id=pending_analysis.id, status=pending_analysis.status)
+    return AnalysisSummary.model_construct(
+        id=pending_analysis.id,
+        status=pending_analysis.status,
+        result=None,
+    )

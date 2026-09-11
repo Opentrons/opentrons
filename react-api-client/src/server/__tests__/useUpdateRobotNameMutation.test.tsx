@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { updateRobotName } from '@opentrons/api-client'
 
 import { useUpdateRobotNameMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -41,9 +42,13 @@ describe('useUpdatedRobotNameMutation, hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(updateRobotName).mockRejectedValue('error')
 
-    const { result } = renderHook(() => useUpdateRobotNameMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateRobotNameMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.updateRobotName(newRobotName))
@@ -58,9 +63,13 @@ describe('useUpdatedRobotNameMutation, hook', () => {
       data: UPDATE_ROBOT_NAME_RESPONSE,
     } as Response<UpdatedRobotName>)
 
-    const { result } = renderHook(() => useUpdateRobotNameMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateRobotNameMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.updateRobotName(newRobotName))
 
     await waitFor(() => {

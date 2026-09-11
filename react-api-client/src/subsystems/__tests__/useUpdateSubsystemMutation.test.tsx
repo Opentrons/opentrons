@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { updateSubsystem } from '@opentrons/api-client'
 
 import { useUpdateSubsystemMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -46,9 +47,13 @@ describe('useUpdateSubsystemMutation hook', () => {
   it('should return no data if no host', () => {
     vi.mocked(useHost).mockReturnValue(null)
 
-    const { result } = renderHook(() => useUpdateSubsystemMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateSubsystemMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
   })
@@ -57,9 +62,13 @@ describe('useUpdateSubsystemMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(updateSubsystem).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useUpdateSubsystemMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateSubsystemMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     expect(result.current.data).toBeUndefined()
   })
 
@@ -69,9 +78,13 @@ describe('useUpdateSubsystemMutation hook', () => {
       data: SUBSYSTEM_UPDATE_RESPONSE,
     } as Response<SubsystemUpdateProgressData>)
 
-    const { result } = renderHook(() => useUpdateSubsystemMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateSubsystemMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.updateSubsystem(SUBSYSTEM))
 
     await waitFor(() => {

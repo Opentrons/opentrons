@@ -19,25 +19,31 @@ import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import absorbanceReaderManualQRCode from '/app/assets/images/absorbance_reader_instruction_manual_code.png'
+import heaterShakerManualQRCode from '/app/assets/images/heatershaker_setup_instructions_qr.png'
 import helpCenterQRCode from '/app/assets/images/module_instruction_code.png'
 import stackerInstallationQRCode from '/app/assets/images/stacker_installation_qr.png'
+import temperatureManualQRCode from '/app/assets/images/temperature_setup_instructions_qr.png'
+import thermocyclerManualQRCode from '/app/assets/images/thermocycler_setup_instructions_qr.png'
 import vacuumModuleManualQRCode from '/app/assets/images/vacuum_setup_instructions_qr.png'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
-const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
+const MODULE_SETUP_URL = 'https://docs.opentrons.com/modules'
 const ABSORBANCE_READER_MANUAL_URL =
-  'https://insights.opentrons.com/hubfs/Absorbance%20Plate%20Reader%20Instruction%20Manual.pdf'
-const FLEX_STACKER_INSTALL_DOCS_URL =
-  'https://docs.opentrons.com/stacker/installation/'
-// TODO: add vacuum module manual url
-const VACUUM_MODULE_MANUAL_URL = 'https://docs.opentrons.com/modules/'
-
+  'https://docs.opentrons.com/absorbance-plate-reader/'
+const FLEX_STACKER_INSTALL_DOCS_URL = 'https://docs.opentrons.com/stacker/'
+const VACUUM_MANUAL_URL = 'https://docs.opentrons.com/vacuum/'
+const THERMOCYCLER_MANUAL_URL = 'https://docs.opentrons.com/thermocycler/'
+const HEATERSHAKER_MANUAL_URL = 'https://docs.opentrons.com/heater-shaker/'
+const TEMPERATURE_MANUAL_URL = 'https://docs.opentrons.com/temperature-module/'
 interface ModuleSetupModalProps {
   close: () => void
   moduleDisplayName: string
@@ -53,25 +59,6 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
     'device_details',
   ])
 
-  const instructionText = (): string => {
-    const moduleType = getModuleType(moduleModel)
-    switch (moduleType) {
-      case ABSORBANCE_READER_TYPE:
-        return t('module_instructions_manual')
-      case FLEX_STACKER_MODULE_TYPE:
-        return t('module_instructions_quickstart', {
-          moduleName: t('device_details:stacker'),
-        })
-      case VACUUM_MODULE_TYPE:
-        return t('module_instructions_quickstart', {
-          moduleName: t('device_details:vacuum_module'),
-        })
-      default:
-        // Legacy module instructions direct user to the help center instead of the quickstart guide
-        return t('branded:modal_instructions')
-    }
-  }
-
   const instructionURL = (): string => {
     const moduleType = getModuleType(moduleModel)
     switch (moduleType) {
@@ -80,7 +67,13 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
       case FLEX_STACKER_MODULE_TYPE:
         return FLEX_STACKER_INSTALL_DOCS_URL
       case VACUUM_MODULE_TYPE:
-        return VACUUM_MODULE_MANUAL_URL
+        return VACUUM_MANUAL_URL
+      case THERMOCYCLER_MODULE_TYPE:
+        return THERMOCYCLER_MANUAL_URL
+      case HEATERSHAKER_MODULE_TYPE:
+        return HEATERSHAKER_MANUAL_URL
+      case TEMPERATURE_MODULE_TYPE:
+        return TEMPERATURE_MANUAL_URL
       default:
         return MODULE_SETUP_URL
     }
@@ -94,6 +87,12 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
         return stackerInstallationQRCode
       case VACUUM_MODULE_TYPE:
         return vacuumModuleManualQRCode
+      case THERMOCYCLER_MODULE_TYPE:
+        return thermocyclerManualQRCode
+      case HEATERSHAKER_MODULE_TYPE:
+        return heaterShakerManualQRCode
+      case TEMPERATURE_MODULE_TYPE:
+        return temperatureManualQRCode
       default:
         return helpCenterQRCode
     }
@@ -113,7 +112,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
-              {instructionText()}
+              {t('branded:setup_instructions_description')}
             </LegacyStyledText>
             <Link
               external

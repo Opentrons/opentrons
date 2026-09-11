@@ -16,8 +16,8 @@ import {
   OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
@@ -31,16 +31,13 @@ import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -57,19 +54,12 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const dispatch = useDispatch<Dispatch>()
 
   const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
   useSyncRobotClock(robotName)
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
   return robot != null ? (
-    <ApiHostProvider
-      key={robot.name}
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      robotName={robot.name}
-      token={token}
-    >
+    <ApiHostProvider key={robot.name} robotName={robotName}>
       <RobotCertRotator>
         <Box
           minWidth="32rem"
@@ -107,7 +97,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
   const runTimestamp = run.data?.data.createdAt ?? ''
   const runStatus = run?.data?.data.status ?? null
-  const { displayName: protocolName } = useProtocolDetailsForRun(runId)
+  const { displayName: protocolName } = useQuickProtocolDetailsForRun(runId)
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)

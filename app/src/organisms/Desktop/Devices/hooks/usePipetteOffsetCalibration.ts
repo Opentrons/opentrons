@@ -8,8 +8,8 @@ import {
 } from '/app/redux/calibration'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
+import type { AttachedPipette, Mount } from '@opentrons/api-client'
 import type { PipetteOffsetCalibration } from '/app/redux/calibration/types'
-import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 import type { State } from '/app/redux/types'
 
 export function usePipetteOffsetCalibration(
