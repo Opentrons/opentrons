@@ -1,10 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  RobotCoordsForeignObject,
-  RobotWorkSpace,
-} from '@opentrons/components'
+import { RobotCoordsForeignObject, RobotWorkSpace } from '@opentrons/components'
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { LabwareSlot } from '..'
