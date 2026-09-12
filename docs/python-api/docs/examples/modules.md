@@ -171,7 +171,7 @@ The miniprep protocol demonstrates several key operational principles of the Vac
 
 ### Dynamic stack configuration
 
-The Flex, Vacuum Module, and related hardware can adapt to changing filtration requirements mid-protocol. For example, the code commands the Flex Gripper alternate between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
+The Flex, Vacuum Module, and related hardware can adapt to changing filtration requirements mid-protocol. For example, the code commands the Gripper alternate between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
 
 ### Non-blocking operations and concurrency
 
@@ -179,7 +179,7 @@ Operational commands like start_set_vacuum_pressure() run asynchronously and ret
 
 ### Pressure profiles
 
-Pressure sensors in the Control Box allows the module to adapt vacuum depth to changing liquid volumes and membrane porosities across multiple protocol stages. As shown in the examples, the protocol applies a gentle pull (-330 mbar) to prevent damaging filters during clarification, uses an intermediate vacuum (-500 mbar) to quickly clear washes, and then finishes at the module's maximum vacuum capacity (-800 mbar) to dry the silica membrane for elution.
+Pressure sensors in the Control Box allows the module to apply multiple vacuum pressures based on liquid volumes and membrane porosities at different protocol stages. As shown in the examples, the protocol starts with a gentle vacuum (-330 mbar) during clarification, then uses an intermediate vacuum (-500 mbar) to quickly clear washes, and ends by running the module to its maximum capacity (-800 mbar) to dry the silica membrane for elution.
 
 ### Depressurization and Gripper safety
 
