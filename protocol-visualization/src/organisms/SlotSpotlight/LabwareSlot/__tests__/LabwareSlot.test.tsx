@@ -1,6 +1,10 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  RobotCoordsForeignObject,
+  RobotWorkSpace,
+} from '@opentrons/components'
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { LabwareSlot } from '..'
@@ -17,6 +21,8 @@ vi.mock('@opentrons/components', async importOriginal => {
   return {
     ...actual,
     LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
+    RobotWorkSpace: vi.fn(actual.RobotWorkSpace),
+    RobotCoordsForeignObject: vi.fn(actual.RobotCoordsForeignObject),
   }
 })
 
@@ -103,6 +109,7 @@ describe('LabwareSlot', () => {
   let props: ComponentProps<typeof LabwareSlot>
 
   beforeEach(() => {
+    vi.clearAllMocks()
     props = {
       topLabwareOnSlotId: MOCK_LABWARE_ID,
       labwareEntities: createMockLabwareEntities(),
@@ -199,24 +206,29 @@ describe('LabwareSlot', () => {
       },
     }
 
-    const { container } = render(props)
+    render(props)
     expect(screen.getByLabelText('stacked')).toBeInTheDocument()
     expect(screen.getByText('Top labware in stack')).toBeInTheDocument()
 
-    const svg = container.querySelector('svg')
-    expect(svg).not.toBeNull()
-    const viewBox = svg?.getAttribute('viewBox')?.split(' ').map(Number)
-    expect(viewBox).toEqual([0, 0, 133, 90.75])
+    expect(RobotWorkSpace).toHaveBeenCalledWith(
+      expect.objectContaining({ viewBox: '0 0 133 90.75' }),
+      expect.anything()
+    )
 
-    const foreignObject = container.querySelector('foreignObject')
-    expect(foreignObject).not.toBeNull()
+    expect(RobotCoordsForeignObject).toHaveBeenCalledWith(
+      expect.objectContaining({ x: 222, y: 141.5 }),
+      expect.anything()
+    )
+
     const badgeScale = 0.5
-    const badgeX = Number(foreignObject?.getAttribute('x')) * badgeScale
-    const badgeY = Number(foreignObject?.getAttribute('y')) * badgeScale
+    const viewBoxWidth = 133
+    const viewBoxHeight = 90.75
+    const badgeX = 222 * badgeScale
+    const badgeY = 141.5 * badgeScale
     // Same relative corner inset as the legacy 235/155 placement on ANSI plates.
     expect(badgeX).toBeCloseTo(111)
     expect(badgeY).toBeCloseTo(70.75)
-    expect(badgeX).toBeLessThan(viewBox?.[2] ?? 0)
-    expect(badgeY).toBeLessThan(viewBox?.[3] ?? 0)
+    expect(badgeX).toBeLessThan(viewBoxWidth)
+    expect(badgeY).toBeLessThan(viewBoxHeight)
   })
 })
