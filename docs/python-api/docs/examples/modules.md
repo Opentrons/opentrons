@@ -165,44 +165,28 @@ Collect the liquid.
     vacuum.move_to_dock(collar, use_gripper=True)
 ```
 
-## Procedure conclusion
+## Protocol takeaways
 
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: left;">Feature</th>
-      <th style="text-align: left;">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Dynamic stacking</strong></td>
-      <td>The module adapts to changing filtration requirements across protocol stages. In this workflow, the manifold transitions between collecting clarified lysate into an internal well plate, clearing high-volume binding and wash buffers directly into the base waste line, and recovering purified plasmid into an internal elution plate. Staging collars on the dock (slot A4) allows the Flex Gripper to assemble, seal, and swap these internal stacks autonomously.</td>
-    </tr>
-    <tr>
-      <td><strong>Concurrent operations</strong></td>
-      <td>Operational commands such as <code>start_set_vacuum_pressure()</code> run asynchronously and return a <code>Task</code> object. Because these calls do not halt protocol execution, the robot can perform liquid handling—such as preparing and dispensing binding buffers—or run adjacent modules while the vacuum pump operates in the background.</td>
-    </tr>
-    <tr>
-      <td><strong>Vacuum range</strong></td>
-      <td>Closed-loop pressure control adapts to membrane porosity and liquid volume across each step:<br>
-        <p>
-            <ul>
-                <li>-330 mbar prevents filter fouling during lysate clarification.</li>
-                <li>-500 mbar clears wash buffers to the waste carboy.
-                <li>-800 mbar (maximum capacity) dries the silica membrane prior to elution.</li>
-            </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>Pressurization lockout</strong></td>
-      <td>Moving labware while the manifold remains under vacuum triggers an API error. Setting <code>vent_after=True</code> with an <code>equalize_timeout_s</code> delay ensures the module vents to atmospheric pressure (<code>0</code> mbar) at the end of a cycle. Calling <code>ProtocolContext.wait_for_tasks()</code> synchronizes execution so the chamber fully depressurizes before the Flex Gripper attempts to unstack or transport labware.</td>
-    </tr>
-  </tbody>
-</table>
+The miniprep protocol demonstrates several key operational principles of the Vacuum Module API and hardware operations.
+
+### Dynamic stack configuration
+
+The Flex, Vacuum Module, and related hardware can adapt to changing filtration requirements mid-protocol. For example, the code commands the Flex Gripper alternate between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
+
+### Non-blocking operations and concurrency
+
+Operational commands like start_set_vacuum_pressure() run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or running other deck modules and pipetting while the Vacuum Module operates on its own.
+
+### Pressure profiles
+
+Pressure sensors in the Control Box allows the module to adapt vacuum depth to changing liquid volumes and membrane porosities across multiple protocol stages. As shown in the examples, the protocol applies a gentle pull (-330 mbar) to prevent damaging filters during clarification, uses an intermediate vacuum (-500 mbar) to quickly clear washes, and then finishes at the module's maximum vacuum capacity (-800 mbar) to dry the silica membrane for elution.
+
+### Depressurization and Gripper safety
+
+Attempting to move labware while the manifold remains under vacuum raises an API error. Setting vent_after=True with an equalize_timeout_s delay ensures the module vents to atmospheric pressure (0 mbar) at the end of a cycle. Synchronizing the background task with wait_for_tasks() ensures the system is depressurized before the Gripper attempts to move the collar or labware.
 
 ## Full protocol
 
 If you're interested in the complete Python protocol, you can review and copy this file here.
 
-<font color="red">¿Expand section with complete .py file? 600 lines. </font>
+<font color="red">¿Expand/drop-down section with complete .py file? 600 lines.</font>
