@@ -15,7 +15,7 @@ import styles from './runloading.module.css'
 import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
-const RUN_ERROR_TIMEOUT_DURATION = 30000 // 5 minutes
+const RUN_ERROR_TIMEOUT_DURATION = 300000
 
 function RunLoadingError(): ReactNode {
   const { t } = useTranslation('protocol_setup')
