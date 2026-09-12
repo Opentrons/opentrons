@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -22,12 +21,10 @@ import type { LabwareEntityExtended } from '../../DeckView'
 interface TipPickupSlotProps {
   tiprackEntity: LabwareEntityExtended
   robotState: RobotState
-  // when set, the header block is rendered into this element via portal
-  headerPortalEl?: HTMLElement | null
 }
 
 export function TipPickupSlot(props: TipPickupSlotProps): ReactNode {
-  const { tiprackEntity, robotState, headerPortalEl } = props
+  const { tiprackEntity, robotState } = props
   const { t } = useTranslation('protocol_visualization')
   const { id, def, nickName } = tiprackEntity
   const { tipState } = robotState
@@ -48,20 +45,16 @@ export function TipPickupSlot(props: TipPickupSlotProps): ReactNode {
     state => state !== NO
   ).length
 
-  const header = (
-    <div className={styles.header}>
-      {nickName != null ? (
-        <StyledText desktopStyle="bodyDefaultSemiBold">{nickName}</StyledText>
-      ) : null}
-      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-        {def.metadata.displayName}
-      </StyledText>
-    </div>
-  )
-
   return (
     <div className={styles.container}>
-      {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
+      <div className={styles.labware_summary}>
+        {nickName != null && (
+          <StyledText desktopStyle="bodyDefaultSemiBold">{nickName}</StyledText>
+        )}
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {def.metadata.displayName}
+        </StyledText>
+      </div>
       <div className={styles.main_content}>
         <RobotWorkSpace
           key={id}

@@ -1,17 +1,13 @@
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  Divider,
   LabwareRender,
-  MODULE_ICON_NAME_BY_TYPE,
   RobotCoordsForeignObject,
   RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
-  Tag,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import {
@@ -34,7 +30,6 @@ import type {
 import type {
   FlexStackerModuleState,
   LabwareEntities,
-  ModuleEntities,
   RobotState,
 } from '@opentrons/step-generation'
 
@@ -44,20 +39,10 @@ interface LabwareSlotContainerProps {
   commands: RunTimeCommand[]
   liquids: Liquid[]
   robotState: RobotState
-  moduleEntities: ModuleEntities
-  // when set, the header block is rendered into this element via portal
-  headerPortalEl?: HTMLElement | null
 }
 export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
-  const {
-    topLabwareOnSlotId,
-    labwareEntities,
-    commands,
-    liquids,
-    robotState,
-    moduleEntities,
-    headerPortalEl,
-  } = props
+  const { topLabwareOnSlotId, labwareEntities, commands, liquids, robotState } =
+    props
   const { labware, pipettes, liquidState, modules } = robotState
   const { t } = useTranslation('protocol_visualization')
   const [hoveredWellName, setHoveredWellName] = useState<string | null>(null)
@@ -158,87 +143,44 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
     id =>
       labware[id] != null && labwareEntities[id].labwareDefURI === topLabwareURI
   ).length
-  const quantity =
-    hopperGroups != null
-      ? hopperGroups.length
-      : stackQuantity > 0
-        ? stackQuantity
-        : (lidStackCommand?.params?.quantity ?? 1)
-  const adapterId = labware[topLabwareOnSlotId].stack.find(
-    id =>
-      labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&
-      !labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('adapter')
-  )
-  const stackItems =
-    labware[topLabwareOnSlotId]?.stack.filter(
-      item => item !== topLabwareOnSlotId
-    ) ?? []
-  const moduleStackItems = stackItems.filter(
-    item => moduleEntities[item] != null
-  )
-  const hasStackedLabware = stackItems.some(item => labware[item] != null)
-  const hasHopper = stackItems.includes(HOPPER_STACKER_LOCATION)
-  const showStackedIcon =
-    hasStackedLabware || (hopperGroups != null && hopperGroups.length > 1)
+  let quantity = lidStackCommand?.params?.quantity ?? 1
+  if (hopperGroups != null) {
+    quantity = hopperGroups.length
+  } else if (stackQuantity > 0) {
+    quantity = stackQuantity
+  }
 
-  const header = (
-    <div className={styles.header}>
-      {/* header icon part */}
-      <div className={styles.header_icons}>
-        <RobotInfoLabel
-          key="slotLabel"
-          deckLabel={hasHopper ? t('stacker_slot', { slot }) : slot}
-        />
-        {moduleStackItems.map((item, index) => (
-          <RobotInfoLabel
-            key={`${item}-${index}`}
-            iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
-          />
-        ))}
-        {showStackedIcon ? (
-          <RobotInfoLabel key="stackedIcon" iconName="stacked" />
-        ) : null}
-      </div>
-      {/* header icon part */}
-
-      {/* header text part */}
-      <div className={styles.header_container}>
-        <div className={styles.header_text}>
-          {labwareNickname != null ? (
-            <StyledText desktopStyle="captionSemiBold">
-              {labwareNickname}
-            </StyledText>
-          ) : null}
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {labwareDisplayName}
-          </StyledText>
-          {isTopLabwareLid ? (
-            <StyledText desktopStyle="captionSemiBold">
-              {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
-            </StyledText>
-          ) : null}
-        </div>
-        {quantity > 1 ? (
-          <div className={styles.tag_container}>
-            <Tag text={t('quantity', { quantity })} type="default" />
-          </div>
-        ) : null}
-      </div>
-      {adapterId != null ? (
-        <>
-          <Divider className={styles.full_width_divider} />
-          <StyledText desktopStyle="captionSemiBold">
-            {labwareEntities[adapterId].def.metadata.displayName}
-          </StyledText>
-        </>
-      ) : null}
-      {/* header text part */}
-    </div>
-  )
+  const showStackedBadge = quantity > 1
+  // Match the pre-change visual size and the ANSI-plate corner inset from
+  // x=235/y=155 (scale 0.5 → ~10mm from right, ~8mm from back). Anchor to
+  // each labware's viewBox so shorter lids keep that same relative corner.
+  const stackedBadgeScale = 0.5
+  const stackedBadgeInsetXMm = 10
+  const stackedBadgeInsetYMm = 8
+  const stackedBadgeViewBoxPadMm = 12
+  const stackedBadgeX =
+    (labwareViewBox.maxX - stackedBadgeInsetXMm) / stackedBadgeScale
+  const stackedBadgeY =
+    (labwareViewBox.maxY - stackedBadgeInsetYMm) / stackedBadgeScale
+  const viewBoxWidth =
+    labwareViewBox.xDimension +
+    (showStackedBadge ? stackedBadgeViewBoxPadMm : 0)
+  const viewBoxHeight =
+    labwareViewBox.yDimension +
+    (showStackedBadge ? stackedBadgeViewBoxPadMm : 0)
 
   return (
     <div className={styles.container}>
-      {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
+      <div className={styles.labware_summary}>
+        {labwareNickname != null && (
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {labwareNickname}
+          </StyledText>
+        )}
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {labwareDisplayName}
+        </StyledText>
+      </div>
       <div className={styles.body_container}>
         <WellTooltip
           ingredNames={ingredNames}
@@ -248,7 +190,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
             <div className={styles.labware_render_container}>
               <RobotWorkSpace
                 key={topLabwareOnSlotId}
-                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension + (quantity > 1 ? 10 : 0)} ${labwareViewBox.yDimension + (quantity > 1 ? 5 : 0)}`}
+                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${viewBoxWidth} ${viewBoxHeight}`}
               >
                 {() => (
                   <>
@@ -275,29 +217,27 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
                         }}
                       />
                     </g>
-                    {quantity > 1 ? (
-                      <>
-                        <g transform="scale(0.5)">
-                          <RobotCoordsForeignObject
-                            width="1.5rem"
-                            height="1.25rem"
-                            x={235}
-                            y={155}
-                          >
-                            <RobotInfoLabel
-                              height="1rem"
-                              svgSize="0.875rem"
-                              highlight
-                              iconName="stacked"
-                            />
-                          </RobotCoordsForeignObject>
-                        </g>
-                      </>
+                    {showStackedBadge ? (
+                      <g transform={`scale(${stackedBadgeScale})`}>
+                        <RobotCoordsForeignObject
+                          width="1.5rem"
+                          height="1.25rem"
+                          x={stackedBadgeX}
+                          y={stackedBadgeY}
+                        >
+                          <RobotInfoLabel
+                            height="1rem"
+                            svgSize="0.875rem"
+                            highlight
+                            iconName="stacked"
+                          />
+                        </RobotCoordsForeignObject>
+                      </g>
                     ) : null}
                   </>
                 )}
               </RobotWorkSpace>
-              {quantity > 1 ? (
+              {showStackedBadge ? (
                 <div className={styles.labware_text_align}>
                   <StyledText
                     desktopStyle="captionRegular"
