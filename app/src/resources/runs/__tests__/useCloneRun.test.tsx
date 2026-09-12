@@ -270,7 +270,7 @@ describe('useCloneRun hook', () => {
     } as any)
 
     const { result } = renderHook(
-      () => useCloneRun(RUN_ID_RTP, undefined, true),
+      () => useCloneRun(RUN_ID_RTP, { triggerAnalysis: true }),
       { wrapper }
     )
     result.current && result.current.cloneRun()
