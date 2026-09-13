@@ -220,6 +220,94 @@ class CompletedAnalysis(BaseModel):
     )
 
 
+class AnalysisPreview(BaseModel):
+    """A lightweight view of a completed analysis that omits `commands`.
+
+    Use this instead of the full analysis document when the caller only needs
+    metadata, loaded equipment, run-time parameters, or a few flags that would
+    otherwise require scanning the command list in the client.
+    """
+
+    id: str = Field(..., description="Unique identifier of this analysis resource")
+    status: Literal[AnalysisStatus.COMPLETED] = Field(
+        ...,
+        description="Status marking the analysis as completed",
+    )
+    result: AnalysisResult = Field(
+        ...,
+        description="Whether the protocol is expected to run successfully",
+    )
+    robotType: Optional[RobotType] = Field(
+        default=None,
+        description=(
+            "The type of robot that this protocol can run on."
+            " This field was added in v7.1.0. It will be `null` or omitted"
+            " in analyses that were originally created on older versions."
+        ),
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
+    )
+    labware: List[LoadedLabware] = Field(
+        default_factory=list,
+        description=(
+            "Labware used by the protocol."
+            "\n\n"
+            "If a piece of labware moves between locations as part of the protocol,"
+            " its *final* location will be reported in this list,"
+            " not its *initial* location."
+        ),
+    )
+    pipettes: List[LoadedPipette] = Field(
+        default_factory=list,
+        description="Pipettes used by the protocol",
+    )
+    modules: List[LoadedModule] = Field(
+        default_factory=list,
+        description="Modules that have been loaded into the run.",
+    )
+    liquids: List[Liquid] = Field(
+        default_factory=list,
+        description="Liquids used by the protocol",
+    )
+    errors: List[ErrorOccurrence] = Field(
+        default_factory=list,
+        description=(
+            "The protocol's fatal error, if there was one."
+            " For historical reasons, this is an array,"
+            " but it won't have more than one element."
+        ),
+    )
+    commandPreconditions: Optional[CommandPreconditions] = Field(
+        default=None,
+        description="Optional preconditions for commands used in this run.",
+    )
+    usesGripper: bool = Field(
+        ...,
+        description=(
+            "Whether the protocol uses the gripper to move labware"
+            " (`moveLabware` with `strategy: usingGripper`)."
+        ),
+    )
+    requiredAddressableAreas: List[str] = Field(
+        default_factory=list,
+        description=(
+            "Addressable areas the protocol uses, derived from load/move commands."
+        ),
+    )
+    commandCount: int = Field(
+        ...,
+        description="Number of commands in the full analysis document.",
+    )
+
+
 AnalysisParameterType = Union[float, bool, str, None]
 
 

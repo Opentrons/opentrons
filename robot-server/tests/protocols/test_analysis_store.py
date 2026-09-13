@@ -184,6 +184,8 @@ async def test_add_pending(
     with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
         # Unlike get(), get_as_document() should raise if the analysis is pending.
         await subject.get_as_document("analysis-id")
+    with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
+        await subject.get_preview("analysis-id")
 
 
 async def test_returned_in_order_added(

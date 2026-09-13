@@ -5,20 +5,36 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from logging import getLogger
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Any, Dict, List, Mapping, Optional, Type, TypeVar, Union
 
 import anyio.to_thread
 import sqlalchemy
-from pydantic import ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
+from opentrons.protocol_engine import (
+    ErrorOccurrence,
+    Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+)
+from opentrons.protocol_engine.types import CommandPreconditions, RunTimeParameter
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
+from opentrons_shared_data.robot.types import RobotType
 
 from .analysis_memcache import MemoryCache
 from .analysis_models import (
+    AnalysisPreview,
     AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
     CompletedAnalysis,
+)
+from .analysis_preview import (
+    PREVIEW_COMMAND_TYPES,
+    ExtractedCommand,
+    required_addressable_areas,
+    uses_gripper,
 )
 from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
 from robot_server.persistence.database import sqlite_rowid
@@ -32,6 +48,16 @@ from robot_server.persistence.tables import (
 _log = getLogger(__name__)
 
 MAX_ANALYSES_TO_STORE = 5
+_PREVIEW_CACHE_MAX_SIZE = 5
+
+_ERROR_LIST_ADAPTER = TypeAdapter(List[ErrorOccurrence])
+_PIPETTE_LIST_ADAPTER = TypeAdapter(List[LoadedPipette])
+_MODULE_LIST_ADAPTER = TypeAdapter(List[LoadedModule])
+_LABWARE_LIST_ADAPTER = TypeAdapter(List[LoadedLabware])
+_LIQUID_LIST_ADAPTER = TypeAdapter(List[Liquid])
+_RTP_LIST_ADAPTER = TypeAdapter(List[RunTimeParameter])
+
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
 
 
 class UnreadableAnalysisError(ValueError):
@@ -145,6 +171,8 @@ class CompletedAnalysisStore:
     # is a major compute bottleneck. It can take minutes for long protocols.
     # Caching it can speed up the overall HTTP response time by ~10x (after the first request).
     _memcache: MemoryCache[str, CompletedAnalysisResource]
+    _preview_cache: MemoryCache[str, AnalysisPreview]
+    _preview_cache_lock: asyncio.Lock
 
     # This is a lock for performance, not correctness.
     #
@@ -168,6 +196,8 @@ class CompletedAnalysisStore:
         self._current_analyzer_version = current_analyzer_version
         self._memcache = memory_cache
         self._memcache_lock = asyncio.Lock()
+        self._preview_cache = MemoryCache(_PREVIEW_CACHE_MAX_SIZE, str, AnalysisPreview)
+        self._preview_cache_lock = asyncio.Lock()
 
     async def get_by_id(self, analysis_id: str) -> Optional[CompletedAnalysisResource]:
         """Return the analysis with the given ID, if it exists."""
@@ -211,6 +241,89 @@ class CompletedAnalysisStore:
                 return None
 
         return document
+
+    async def get_preview(self, analysis_id: str) -> Optional[AnalysisPreview]:
+        """Return a commands-free preview of the analysis, if it exists."""
+        async with self._preview_cache_lock:
+            try:
+                return self._preview_cache.get(analysis_id)
+            except KeyError:
+                pass
+
+            try:
+                preview = await anyio.to_thread.run_sync(
+                    self._get_preview_sync,
+                    analysis_id,
+                    abandon_on_cancel=True,
+                )
+            except ValidationError as error:
+                raise UnreadableAnalysisError(analysis_id, str(error)) from error
+
+            if preview is not None:
+                self._preview_cache.insert(analysis_id, preview)
+            return preview
+
+    def _get_preview_sync(self, analysis_id: str) -> Optional[AnalysisPreview]:
+        with self._sql_engine.begin() as transaction:
+            try:
+                fields_row = transaction.execute(
+                    _preview_fields_statement(analysis_id)
+                ).one()
+            except sqlalchemy.exc.NoResultFound:
+                return None
+            command_rows = transaction.execute(
+                _preview_command_rows_statement(analysis_id)
+            ).all()
+
+        extracted_commands = [
+            ExtractedCommand(
+                command_type=row.command_type,
+                strategy=row.strategy,
+                new_location_slot=row.new_location_slot,
+                new_location_aa=row.new_location_aa,
+                location_slot=row.location_slot,
+                location_aa=row.location_aa,
+                load_name=row.load_name,
+                module_model=row.module_model,
+                addressable_area_name=row.addressable_area_name,
+            )
+            for row in command_rows
+            if row.command_type is not None
+        ]
+
+        robot_type: Optional[RobotType] = fields_row.robot_type
+        labware = _parse_json_list(_LABWARE_LIST_ADAPTER, fields_row.labware)
+        command_count = fields_row.command_count
+        if command_count is None:
+            command_count = 0
+
+        if fields_row.result is None:
+            raise UnreadableAnalysisError(
+                analysis_id, "completed analysis is missing result"
+            )
+
+        return AnalysisPreview(
+            id=fields_row.id,
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult(fields_row.result),
+            robotType=robot_type,
+            errors=_parse_json_list(_ERROR_LIST_ADAPTER, fields_row.errors),
+            pipettes=_parse_json_list(_PIPETTE_LIST_ADAPTER, fields_row.pipettes),
+            modules=_parse_json_list(_MODULE_LIST_ADAPTER, fields_row.modules),
+            labware=labware,
+            liquids=_parse_json_list(_LIQUID_LIST_ADAPTER, fields_row.liquids),
+            runTimeParameters=_parse_json_list(
+                _RTP_LIST_ADAPTER, fields_row.run_time_parameters
+            ),
+            commandPreconditions=_parse_optional_model(
+                CommandPreconditions, fields_row.command_preconditions
+            ),
+            usesGripper=uses_gripper(extracted_commands),
+            requiredAddressableAreas=required_addressable_areas(
+                extracted_commands, labware, robot_type
+            ),
+            commandCount=int(command_count),
+        )
 
     async def get_by_protocol(
         self, protocol_id: str
@@ -376,6 +489,7 @@ class CompletedAnalysisStore:
         analyses_to_delete = analyses_ids[: -MAX_ANALYSES_TO_STORE + 1]
         for analysis_id in analyses_to_delete:
             self._memcache.remove(analysis_id)
+            self._preview_cache.remove(analysis_id)
 
         # Delete the RTP table rows that reference the analyses being deleted
         delete_primitive_rtp_statement = (
@@ -414,3 +528,88 @@ class CompletedAnalysisStore:
         self._memcache.insert(
             completed_analysis_resource.id, completed_analysis_resource
         )
+
+
+def _json_extract(source: Any, path: str) -> Any:
+    """SQLite json_extract."""
+    return sqlalchemy.func.json_extract(source, path)
+
+
+def _preview_fields_statement(analysis_id: str) -> Any:
+    """Select small analysis fields without loading $.commands into Python."""
+    blob = analysis_table.c.completed_analysis
+    return sqlalchemy.select(
+        analysis_table.c.id,
+        _json_extract(blob, "$.status").label("status"),
+        _json_extract(blob, "$.result").label("result"),
+        _json_extract(blob, "$.robotType").label("robot_type"),
+        _json_extract(blob, "$.errors").label("errors"),
+        _json_extract(blob, "$.pipettes").label("pipettes"),
+        _json_extract(blob, "$.modules").label("modules"),
+        _json_extract(blob, "$.labware").label("labware"),
+        _json_extract(blob, "$.liquids").label("liquids"),
+        _json_extract(blob, "$.runTimeParameters").label("run_time_parameters"),
+        _json_extract(blob, "$.commandPreconditions").label("command_preconditions"),
+        sqlalchemy.func.json_array_length(_json_extract(blob, "$.commands")).label(
+            "command_count"
+        ),
+    ).where(analysis_table.c.id == analysis_id)
+
+
+def _preview_command_rows_statement(analysis_id: str) -> Any:
+    """Walk $.commands in SQLite and return only the fragments preview flags need."""
+    commands_json = sqlalchemy.func.coalesce(
+        _json_extract(analysis_table.c.completed_analysis, "$.commands"),
+        "[]",
+    )
+    cmd = sqlalchemy.func.json_each(commands_json).table_valued(
+        "value", name="cmd", joins_implicitly=True
+    )
+    command_value = cmd.c.value
+    command_type = _json_extract(command_value, "$.commandType")
+    return (
+        sqlalchemy.select(
+            command_type.label("command_type"),
+            _json_extract(command_value, "$.params.strategy").label("strategy"),
+            _json_extract(command_value, "$.params.newLocation.slotName").label(
+                "new_location_slot"
+            ),
+            _json_extract(
+                command_value, "$.params.newLocation.addressableAreaName"
+            ).label("new_location_aa"),
+            _json_extract(command_value, "$.params.location.slotName").label(
+                "location_slot"
+            ),
+            _json_extract(command_value, "$.params.location.addressableAreaName").label(
+                "location_aa"
+            ),
+            _json_extract(command_value, "$.params.loadName").label("load_name"),
+            _json_extract(command_value, "$.params.model").label("module_model"),
+            _json_extract(command_value, "$.params.addressableAreaName").label(
+                "addressable_area_name"
+            ),
+        )
+        .select_from(analysis_table)
+        .where(analysis_table.c.id == analysis_id)
+        .where(command_type.in_(PREVIEW_COMMAND_TYPES))
+    )
+
+
+def _parse_json_list(
+    adapter: TypeAdapter[List[_ModelT]], raw: Optional[object]
+) -> List[_ModelT]:
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        return adapter.validate_json(raw)
+    return adapter.validate_python(raw)
+
+
+def _parse_optional_model(
+    model: Type[_ModelT], raw: Optional[object]
+) -> Optional[_ModelT]:
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        return model.model_validate_json(raw)
+    return model.model_validate(raw)

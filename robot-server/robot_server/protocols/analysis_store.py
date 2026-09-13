@@ -30,6 +30,7 @@ from opentrons_shared_data.robot.types import RobotType
 
 from .analysis_memcache import MemoryCache
 from .analysis_models import (
+    AnalysisPreview,
     AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
@@ -307,6 +308,20 @@ class AnalysisStore:
         )
         if completed_analysis_document is not None:
             return completed_analysis_document
+        else:
+            raise AnalysisNotFoundError(analysis_id=analysis_id)
+
+    async def get_preview(self, analysis_id: str) -> AnalysisPreview:
+        """Get a commands-free preview of a completed analysis.
+
+        Raises:
+            AnalysisNotFoundError: If there is no completed analysis with the given ID.
+                Unlike `get()`, this is raised if the analysis exists, but is pending.
+            UnreadableAnalysisError: If stored preview fields cannot be parsed.
+        """
+        preview = await self._completed_store.get_preview(analysis_id=analysis_id)
+        if preview is not None:
+            return preview
         else:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
 

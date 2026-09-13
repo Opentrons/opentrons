@@ -278,6 +278,16 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_analysis_preview(
+        self, protocol_id: str, analysis_id: str
+    ) -> Response:
+        """GET /protocols/{protocol_id}/analyses/{analysis_id}/preview."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses/{analysis_id}/preview"
+        )
+        response.raise_for_status()
+        return response
+
     async def delete_run(self, run_id: str) -> Response:
         """DELETE /runs/{run_id}."""
         response = await self.httpx_client.delete(f"{self.base_url}/runs/{run_id}")

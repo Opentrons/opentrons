@@ -226,6 +226,92 @@ async def test_get_by_analysis_id_as_document(
     }
 
 
+async def test_get_preview_omits_commands_and_derives_flags(
+    subject: CompletedAnalysisStore,
+    protocol_store: ProtocolStore,
+    sql_engine: Engine,
+) -> None:
+    """It should preview an analysis without parsing Command models or returning commands."""
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    dummy_aspirates = [{"commandType": "aspirate", "params": {}} for _ in range(250)]
+    commands = dummy_aspirates + [
+        {
+            "commandType": "moveLabware",
+            "params": {
+                "labwareId": "lw",
+                "strategy": "usingGripper",
+                "newLocation": {"slotName": "A1"},
+            },
+        },
+        {
+            "commandType": "loadLabware",
+            "params": {
+                "location": {"slotName": "D1"},
+                "loadName": "opentrons_96_tiprack_300ul",
+            },
+        },
+        {
+            "commandType": "loadModule",
+            "params": {
+                "model": "heaterShakerModuleV1",
+                "location": {"slotName": "D3"},
+            },
+        },
+        {
+            "commandType": "moveToAddressableArea",
+            "params": {"addressableAreaName": "movableTrashB3"},
+        },
+    ]
+    completed_analysis = {
+        "id": "analysis-id",
+        "status": "completed",
+        "result": "ok",
+        "robotType": "OT-3 Standard",
+        "errors": [],
+        "pipettes": [],
+        "modules": [],
+        "labware": [
+            {
+                "id": "trash",
+                "loadName": "opentrons_1_trash_3200ml_fixed",
+                "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",
+                "location": {"slotName": "A3"},
+            }
+        ],
+        "liquids": [],
+        "runTimeParameters": [],
+        "commands": commands,
+    }
+    with sql_engine.begin() as transaction:
+        transaction.execute(
+            analysis_table.insert().values(
+                id="analysis-id",
+                protocol_id="protocol-id",
+                analyzer_version="3",
+                completed_analysis=json.dumps(completed_analysis),
+            )
+        )
+
+    preview = await subject.get_preview("analysis-id")
+    assert preview is not None
+    assert "commands" not in preview.model_dump()
+    assert preview.id == "analysis-id"
+    assert preview.status == AnalysisStatus.COMPLETED
+    assert preview.result == AnalysisResult.OK
+    assert preview.robotType == "OT-3 Standard"
+    assert preview.commandCount == 254
+    assert preview.usesGripper is True
+    assert "A1" in preview.requiredAddressableAreas
+    assert "D1" in preview.requiredAddressableAreas
+    assert "heaterShakerV1D3" in preview.requiredAddressableAreas
+    assert "movableTrashB3" in preview.requiredAddressableAreas
+    assert "movableTrashA3" in preview.requiredAddressableAreas
+    assert preview.labware[0].loadName == "opentrons_1_trash_3200ml_fixed"
+
+    missing = await subject.get_preview("no-such-analysis")
+    assert missing is None
+
+
 async def test_get_ids_by_protocol(
     subject: CompletedAnalysisStore, protocol_store: ProtocolStore
 ) -> None:

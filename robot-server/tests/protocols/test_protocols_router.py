@@ -43,6 +43,7 @@ from robot_server.data_files.models import DataFile
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.analyses_manager import AnalysesManager
 from robot_server.protocols.analysis_models import (
+    AnalysisPreview,
     AnalysisRequest,
     AnalysisResult,
     AnalysisStatus,
@@ -79,6 +80,7 @@ from robot_server.protocols.router import (
     get_protocol_analyses,
     get_protocol_analysis_as_document,
     get_protocol_analysis_by_id,
+    get_protocol_analysis_preview,
     get_protocol_by_id,
     get_protocol_data_files,
     get_protocol_ids,
@@ -1724,6 +1726,83 @@ async def test_get_protocol_analysis_as_document_analysis_not_found(
 
     with pytest.raises(ApiError) as exc_info:
         await get_protocol_analysis_as_document(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"
+
+
+async def test_get_protocol_analysis_preview(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a commands-free preview by ID."""
+    preview = AnalysisPreview(
+        id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
+        result=AnalysisResult.OK,
+        pipettes=[],
+        labware=[],
+        modules=[],
+        liquids=[],
+        errors=[],
+        usesGripper=False,
+        requiredAddressableAreas=[],
+        commandCount=0,
+    )
+
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get_preview("analysis-id")).then_return(preview)
+
+    result = await get_protocol_analysis_preview(
+        protocolId="protocol-id",
+        analysisId="analysis-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.status_code == 200
+    assert result.content.data == preview
+
+
+async def test_get_protocol_analysis_preview_protocol_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_preview(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_preview_analysis_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the analysis preview does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get_preview("analysis-id")).then_raise(
+        AnalysisNotFoundError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_preview(
             protocolId="protocol-id",
             analysisId="analysis-id",
             protocol_store=protocol_store,
