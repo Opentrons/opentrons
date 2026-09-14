@@ -22,7 +22,7 @@ export function UserAccountFullNameField<T extends FieldValues>({
   return (
     <div className={styles.field_group}>
       <StyledText desktopStyle="bodyDefaultRegular">
-        {t('desktop_legal_name')}
+        {t('legal_name')}
       </StyledText>
       <div className={styles.field_group_value}>
         <Controller
@@ -31,7 +31,7 @@ export function UserAccountFullNameField<T extends FieldValues>({
           rules={{
             validate: value =>
               (value as string).trim() !== '' ||
-              (t('desktop_add_user_legal_name_required_error') as string),
+              (t('add_user_legal_name_required_error') as string),
           }}
           render={({ field, fieldState }) => (
             <InputField

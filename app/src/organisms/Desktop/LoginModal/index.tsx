@@ -238,7 +238,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     if (formData.newPassword !== formData.confirmPassword) {
       updateSetNewPasswordFormData(setScreen, {
         confirmPasswordError: t(
-          'access_control:desktop_password_expired_mismatch'
+          'access_control:password_expired_mismatch'
         ) as string,
       })
       return false
@@ -308,7 +308,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   return createPortal(
     <>
       <Modal
-        title={t('access_control:desktop_login_modal_header')}
+        title={t('access_control:login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
         // Login is 10001 so it sits above SignRun (1000) and documentation (10000).
         // Drop to 9999 on set-new-password so the documentation modal is visible.
@@ -427,10 +427,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
     <>
       <div className={styles.text_container}>
         <StyledText desktopStyle="headingSmallBold">
-          {t('access_control:desktop_login_form_heading')}
+          {t('access_control:login_form_heading')}
         </StyledText>
         <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-          {t('access_control:desktop_login_form_subheading')}
+          {t('access_control:login_form_subheading')}
         </StyledText>
       </div>
 
@@ -524,10 +524,10 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
     <>
       <div className={styles.text_container}>
         <StyledText desktopStyle="headingSmallBold">
-          {t('access_control:desktop_password_expired_heading')}
+          {t('access_control:password_expired_heading')}
         </StyledText>
         <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-          {t('access_control:desktop_password_expired_subheading')}
+          {t('access_control:password_expired_subheading')}
         </StyledText>
       </div>
 
@@ -537,7 +537,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           autoFocus
           name="newPassword"
           title={t(
-            'access_control:desktop_password_expired_new_password_field'
+            'access_control:password_expired_new_password_field'
           )}
           type={showNewPassword ? 'text' : 'password'}
           value={formData.newPassword}
@@ -560,7 +560,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           ref={confirmPasswordInputRef}
           name="confirmPassword"
           title={t(
-            'access_control:desktop_password_expired_confirm_password_field'
+            'access_control:password_expired_confirm_password_field'
           )}
           type={showConfirmPassword ? 'text' : 'password'}
           value={formData.confirmPassword}

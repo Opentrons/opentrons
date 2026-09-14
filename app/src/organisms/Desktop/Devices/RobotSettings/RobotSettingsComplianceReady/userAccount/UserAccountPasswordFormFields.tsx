@@ -28,7 +28,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
     <div className={styles.fields_row}>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_new_password')}
+          {t('new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -42,7 +42,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
                 }
                 return (
                   hasOnlyAllowedCredentialCharacters(password) ||
-                  (t('desktop_password_invalid_characters') as string)
+                  (t('password_invalid_characters') as string)
                 )
               },
             }}
@@ -59,7 +59,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
       </div>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_confirm_new_password')}
+          {t('confirm_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -68,7 +68,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             rules={{
               validate: value =>
                 (value as string) === (password as string) ||
-                (t('desktop_password_mismatch') as string),
+                (t('password_mismatch') as string),
             }}
             render={({ field, fieldState }) => (
               <PasswordInputField

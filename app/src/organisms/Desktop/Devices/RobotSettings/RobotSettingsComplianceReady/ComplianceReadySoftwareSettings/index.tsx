@@ -211,26 +211,24 @@ export function ComplianceReadySoftwareSettings({
   return (
     <Accordion
       id="compliance-ready-software-settings"
-      title={t('desktop_compliance_ready_software_settings')}
+      title={t('compliance_ready_software_settings')}
     >
       <div className={styles.content}>
         <ComplianceReadySettingsSection
-          titleKey="desktop_login_and_security"
+          titleKey="login_and_security"
           isLastSection={false}
         >
           <InputSetting
             key={`maxNumberOfLoginAttempts-${settingsInputResetKey}`}
-            label={t(
-              'desktop_maximum_login_attempts_before_account_deactivation'
-            )}
+            label={t('maximum_login_attempts_before_account_deactivation')}
             value={String(fieldValues.maxNumberOfLoginAttempts)}
-            units={t('desktop_logins')}
+            units={t('logins')}
             min={1}
             max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
             validate={value =>
               isValidMaxNumberOfLoginAttempts(value)
                 ? null
-                : t('desktop_maximum_login_attempts_invalid', {
+                : t('maximum_login_attempts_invalid', {
                     max: MAX_NUMBER_OF_LOGIN_ATTEMPTS,
                   })
             }
@@ -241,7 +239,7 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <ComplianceReadyToggleField
             id="passwordResetEnabled"
-            labelKey="desktop_require_password_change_after_time"
+            labelKey="require_password_change_after_time"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange('passwordResetEnabled', toggledOn)
@@ -249,14 +247,14 @@ export function ComplianceReadySoftwareSettings({
           >
             <InputSetting
               key={`passwordResetTime-${settingsInputResetKey}`}
-              label={t('desktop_length_of_time')}
+              label={t('length_of_time')}
               value={String(fieldValues.passwordResetTime)}
-              units={t('desktop_days')}
+              units={t('days')}
               min={MIN_PASSWORD_RESET_TIME_DAYS}
               validate={value =>
                 isValidPasswordResetTime(value)
                   ? null
-                  : t('desktop_password_reset_time_invalid', {
+                  : t('password_reset_time_invalid', {
                       min: MIN_PASSWORD_RESET_TIME_DAYS,
                     })
               }
@@ -269,13 +267,13 @@ export function ComplianceReadySoftwareSettings({
           <ComplianceReadyToggleField
             key={passwordComplexityToggleKey}
             id="passwordComplexityEnabled"
-            labelKey="desktop_require_password_complexity_requirements"
+            labelKey="require_password_complexity_requirements"
             values={fieldValues}
             onToggleChange={handlePasswordComplexityEnabledToggle}
           >
             <ComplianceReadyToggleField
               id="passwordComplexitySpecialCharacters"
-              labelKey="desktop_require_special_characters"
+              labelKey="require_special_characters"
               values={fieldValues}
               onToggleChange={toggledOn => {
                 handleToggleChange(
@@ -286,15 +284,15 @@ export function ComplianceReadySoftwareSettings({
             />
             <InputSetting
               key={`passwordComplexityMinimumLength-${settingsInputResetKey}`}
-              label={t('desktop_minimum_password_length')}
+              label={t('minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
-              units={t('desktop_characters')}
+              units={t('characters')}
               min={1}
               max={MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
               validate={value =>
                 isValidPasswordComplexityMinimumLength(value)
                   ? null
-                  : t('desktop_minimum_password_length_invalid', {
+                  : t('minimum_password_length_invalid', {
                       max: MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
                     })
               }
@@ -309,25 +307,25 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <InputSetting
             key={`idleLogout-${settingsInputResetKey}`}
-            label={t('desktop_auto_logout_inactivity_length')}
+            label={t('auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
-            units={t('desktop_minutes')}
+            units={t('mins')}
             validate={value =>
               isValidLogoutIdleTime(value)
                 ? null
-                : t('desktop_idle_logout_must_be_greater_than_zero')
+                : t('idle_logout_must_be_greater_than_zero')
             }
             onBlur={value => handleAuthSettingInputBlur('idleLogout', value)}
           />
         </ComplianceReadySettingsSection>
 
         <ComplianceReadySettingsSection
-          titleKey="desktop_actions_requiring_admin_credentials"
+          titleKey="actions_requiring_admin_credentials"
           isLastSection={false}
         >
           <ComplianceReadyToggleField
             id="requireAdminCredsWhenUpdatingRobotSoftware"
-            labelKey="desktop_require_admin_credentials_to_update_robots"
+            labelKey="require_admin_credentials_to_update_robots"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange(
@@ -339,7 +337,7 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsWhenSendingProtocolToRobot"
-            labelKey="desktop_require_admin_credentials_to_send_protocols"
+            labelKey="require_admin_credentials_to_send_protocols"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange(
@@ -351,7 +349,7 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsForSignoffProtocol"
-            labelKey="desktop_require_admin_credentials_to_sign_protocol_run_records"
+            labelKey="require_admin_credentials_to_sign_protocol_run_records"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange(
@@ -363,12 +361,12 @@ export function ComplianceReadySoftwareSettings({
         </ComplianceReadySettingsSection>
 
         <ComplianceReadySettingsSection
-          titleKey="desktop_audit_log_requirements"
+          titleKey="audit_log_requirements"
           isLastSection={false}
         >
           <ComplianceReadyToggleField
             id="requireReasonForInteraction"
-            labelKey="desktop_require_documentation_for_robot_actions"
+            labelKey="require_documentation_for_robot_actions"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange('requireReasonForInteraction', toggledOn)
@@ -376,11 +374,9 @@ export function ComplianceReadySoftwareSettings({
           >
             <InputSetting
               key={`minLengthOfReasonForInteraction-${settingsInputResetKey}`}
-              label={t(
-                'desktop_minimum_length_for_documentation_for_robot_actions'
-              )}
+              label={t('minimum_length_for_documentation_for_robot_actions')}
               value={String(fieldValues.minLengthOfReasonForInteraction)}
-              units={t('desktop_characters')}
+              units={t('characters')}
               onBlur={value =>
                 handleAuditSettingInputBlur(
                   'minLengthOfReasonForInteraction',
@@ -392,7 +388,7 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <ComplianceReadyToggleField
             id="requireSignoffForProtocolLog"
-            labelKey="desktop_require_signoff_for_protocol_log"
+            labelKey="require_signoff_for_protocol_log"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange('requireSignoffForProtocolLog', toggledOn)
@@ -402,20 +398,17 @@ export function ComplianceReadySoftwareSettings({
           <ComplianceReadyToggleField
             id="requireLogsToBeSavedInApp"
             labelKey="branded:require_logs_to_be_saved_in_app"
-            detailKey="desktop_require_logs_to_be_saved_in_app_description"
+            detailKey="require_logs_to_be_saved_in_app_description"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange('requireLogsToBeSavedInApp', toggledOn)
             }}
           />
         </ComplianceReadySettingsSection>
-        <ComplianceReadySettingsSection
-          titleKey="desktop_robot_storage"
-          isLastSection
-        >
+        <ComplianceReadySettingsSection titleKey="robot_storage" isLastSection>
           <ComplianceReadyToggleField
             id="deleteOverMaxOnDiskProtocols"
-            labelKey="desktop_automatically_delete_protocol_run_logs"
+            labelKey="automatically_delete_protocol_run_logs"
             values={fieldValues}
             onToggleChange={toggledOn => {
               handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
@@ -425,12 +418,10 @@ export function ComplianceReadySoftwareSettings({
       </div>
       {showPasswordComplexityConfirmModal ? (
         <SettingsConfirmationModal
-          title={t('desktop_require_password_complexity_modal_title') as string}
-          heading={
-            t('desktop_require_password_complexity_modal_heading') as string
-          }
+          title={t('require_password_complexity_modal_title') as string}
+          heading={t('require_password_complexity_modal_heading') as string}
           description={
-            t('desktop_require_password_complexity_modal_description') as string
+            t('require_password_complexity_modal_description') as string
           }
           confirmLabel={t('shared:confirm') as string}
           onConfirm={handlePasswordComplexityConfirm}

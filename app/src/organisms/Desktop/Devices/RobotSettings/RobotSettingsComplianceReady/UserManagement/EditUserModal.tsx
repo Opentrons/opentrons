@@ -71,12 +71,12 @@ export function EditUserModal({
   const { username, fullName, accountType } = watch()
   const accountTypeOptions: DropdownOption[] =
     MANAGEABLE_USER_ACCOUNT_TYPES.map(type => ({
-      name: t(`desktop_user_role_${type}`),
+      name: t(`user_role_${type}`),
       value: type,
     }))
   const fallbackAccountType = MANAGEABLE_USER_ACCOUNT_TYPES[0] ?? 'admin'
   const fallbackOption: DropdownOption = {
-    name: t(`desktop_user_role_${fallbackAccountType}`),
+    name: t(`user_role_${fallbackAccountType}`),
     value: fallbackAccountType,
   }
   const selectedAccountTypeOption =
@@ -144,7 +144,7 @@ export function EditUserModal({
       overflow="visible"
       header={
         <WizardHeader
-          title={t('desktop_edit_user')}
+          title={t('edit_user')}
           onExit={handleClose}
           hideStepText
           exitButtonCopy={t('shared:exit')}
@@ -175,7 +175,7 @@ export function EditUserModal({
                       shouldValidate: true,
                     })
                   }}
-                  title={t('desktop_role')}
+                  title={t('role')}
                   width="100%"
                 />
               </div>
