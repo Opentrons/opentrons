@@ -62,7 +62,7 @@ export function UserManagementTableRow({
           {user.fullName}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular" className={styles.cell}>
-          {t(`desktop_user_role_${user.accountType}`)}
+          {t(`user_role_${user.accountType}`)}
         </StyledText>
         <div className={styles.cell}>
           <Chip
@@ -71,8 +71,8 @@ export function UserManagementTableRow({
             hasIcon={false}
             text={
               user.locked
-                ? t('desktop_user_status_locked')
-                : t('desktop_user_status_active')
+                ? t('user_status_locked')
+                : t('user_status_active')
             }
           />
         </div>
@@ -86,27 +86,27 @@ export function UserManagementTableRow({
               <div className={styles.overflow_menu}>
                 {canEdit ? (
                   <MenuItem onClick={handleMenuAction(onEdit)}>
-                    {t('desktop_edit_user')}
+                    {t('edit_user')}
                   </MenuItem>
                 ) : null}
                 {canDelete ? (
                   <MenuItem onClick={handleMenuAction(onDelete)}>
-                    {t('desktop_delete_user')}
+                    {t('delete_user')}
                   </MenuItem>
                 ) : null}
                 {canLockOrUnlock && user.locked ? (
                   <MenuItem onClick={handleMenuAction(onActivate)}>
-                    {t('desktop_unlock_user')}
+                    {t('unlock_user')}
                   </MenuItem>
                 ) : null}
                 {canResetPassword ? (
                   <MenuItem onClick={handleMenuAction(onResetPassword)}>
-                    {t('desktop_reset_password')}
+                    {t('reset_password')}
                   </MenuItem>
                 ) : null}
                 {canLockOrUnlock && !user.locked ? (
                   <MenuItem onClick={handleMenuAction(onDeactivate)}>
-                    {t('desktop_lock_user')}
+                    {t('lock_user')}
                   </MenuItem>
                 ) : null}
               </div>

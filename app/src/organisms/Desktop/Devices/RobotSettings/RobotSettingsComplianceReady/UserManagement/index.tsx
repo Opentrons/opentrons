@@ -59,16 +59,16 @@ function UserManagementTable({
     <div className={styles.list}>
       <div className={styles.header_row}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_username')}
+          {t('username')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_legal_name')}
+          {t('legal_name')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_role')}
+          {t('role')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_status')}
+          {t('status')}
         </StyledText>
         <span className={styles.overflow_cell_inner} aria-hidden />
       </div>
@@ -145,7 +145,7 @@ export function UserManagement({
     void deleteUser(deletedUsername)
       .then(() => {
         makeToast(
-          t('desktop_delete_user_success_banner') as string,
+          t('delete_user_success_banner') as string,
           SUCCESS_TOAST,
           { closeButton: true }
         )
@@ -174,7 +174,7 @@ export function UserManagement({
       .then(response => {
         setUserToActivate(null)
         makeToast(
-          t('desktop_activate_user_success_banner') as string,
+          t('activate_user_success_banner') as string,
           SUCCESS_TOAST,
           { closeButton: true }
         )
@@ -198,7 +198,7 @@ export function UserManagement({
     void resetUserPassword(resetUsername)
       .then(response => {
         makeToast(
-          t('desktop_reset_password_success_banner') as string,
+          t('reset_password_success_banner') as string,
           SUCCESS_TOAST,
           { closeButton: true }
         )
@@ -235,7 +235,7 @@ export function UserManagement({
     })
       .then(() => {
         makeToast(
-          t('desktop_lock_user_success_banner') as string,
+          t('lock_user_success_banner') as string,
           SUCCESS_TOAST,
           { closeButton: true }
         )
@@ -250,7 +250,7 @@ export function UserManagement({
   }
 
   return (
-    <Accordion id="user-management" title={t('desktop_user_management')}>
+    <Accordion id="user-management" title={t('user_management')}>
       <div className={styles.content}>
         <UserManagementTable
           users={users}
@@ -266,7 +266,7 @@ export function UserManagement({
             onClick={() => {
               setShowAddUserModal(true)
             }}
-            text={t('desktop_add_user')}
+            text={t('add_user')}
             textAlignment="left"
           />
         </div>
@@ -276,7 +276,7 @@ export function UserManagement({
           robotName={robotName}
           onUserCreated={() => {
             makeToast(
-              t('desktop_add_user_created_banner') as string,
+              t('add_user_created_banner') as string,
               SUCCESS_TOAST,
               { closeButton: true }
             )
@@ -292,7 +292,7 @@ export function UserManagement({
           user={userToEdit}
           onUserUpdated={() => {
             makeToast(
-              t('desktop_edit_user_success_banner') as string,
+              t('edit_user_success_banner') as string,
               SUCCESS_TOAST,
               { closeButton: true }
             )
@@ -304,9 +304,9 @@ export function UserManagement({
       ) : null}
       {userToDelete != null ? (
         <SettingsConfirmationModal
-          title={t('desktop_delete_user_modal_title') as string}
-          heading={t('desktop_delete_user_modal_heading') as string}
-          description={t('desktop_delete_user_modal_description') as string}
+          title={t('delete_user_modal_title') as string}
+          heading={t('delete_user_modal_heading') as string}
+          description={t('delete_user_modal_description') as string}
           confirmLabel={t('shared:delete') as string}
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
@@ -316,10 +316,10 @@ export function UserManagement({
       ) : null}
       {userToActivate != null ? (
         <SettingsConfirmationModal
-          title={t('desktop_activate_user_modal_title') as string}
-          heading={t('desktop_activate_user_modal_heading') as string}
-          description={t('desktop_activate_user_modal_description') as string}
-          confirmLabel={t('desktop_unlock_user') as string}
+          title={t('activate_user_modal_title') as string}
+          heading={t('activate_user_modal_heading') as string}
+          description={t('activate_user_modal_description') as string}
+          confirmLabel={t('unlock_user') as string}
           isConfirmDisabled={isUnlockingUser || isResettingPasswordAfterUnlock}
           onConfirm={handleActivateConfirm}
           onCancel={() => {
@@ -329,10 +329,10 @@ export function UserManagement({
       ) : null}
       {userToDeactivate != null ? (
         <SettingsConfirmationModal
-          title={t('desktop_lock_user_modal_title') as string}
-          heading={t('desktop_lock_user_modal_heading') as string}
-          description={t('desktop_lock_user_modal_description') as string}
-          confirmLabel={t('desktop_lock_user') as string}
+          title={t('lock_user_modal_title') as string}
+          heading={t('lock_user_modal_heading') as string}
+          description={t('lock_user_modal_description') as string}
+          confirmLabel={t('lock_user') as string}
           isConfirmDisabled={isUpdatingUser}
           onConfirm={handleDeactivateConfirm}
           onCancel={() => {
@@ -342,10 +342,10 @@ export function UserManagement({
       ) : null}
       {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
         <SettingsConfirmationModal
-          title={t('desktop_reset_password') as string}
-          heading={t('desktop_reset_password_modal_heading') as string}
-          description={t('desktop_reset_password_modal_description') as string}
-          confirmLabel={t('desktop_reset_password') as string}
+          title={t('reset_password') as string}
+          heading={t('reset_password_modal_heading') as string}
+          description={t('reset_password_modal_description') as string}
+          confirmLabel={t('reset_password') as string}
           isConfirmDisabled={isResettingPassword}
           onConfirm={handleResetPasswordConfirm}
           onCancel={handleResetPasswordCancel}
@@ -355,7 +355,7 @@ export function UserManagement({
         <OneTimePasswordModal
           password={resetPasswordTemporaryPassword}
           message={
-            t('desktop_reset_password_one_time_password_message') as string
+            t('reset_password_one_time_password_message') as string
           }
           onConfirm={handleResetPasswordCancel}
           onClose={handleResetPasswordCancel}

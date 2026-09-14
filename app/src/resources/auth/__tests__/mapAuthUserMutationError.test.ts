@@ -29,7 +29,7 @@ describe('mapAuthUserMutationError', () => {
       field: 'username',
       error: {
         type: 'server',
-        message: 'desktop_username_invalid_characters',
+        message: 'username_invalid_characters',
       },
     })
   })
@@ -47,7 +47,7 @@ describe('mapAuthUserMutationError', () => {
       field: 'password',
       error: {
         type: 'server',
-        message: 'desktop_password_too_short',
+        message: 'password_too_short',
       },
     })
   })

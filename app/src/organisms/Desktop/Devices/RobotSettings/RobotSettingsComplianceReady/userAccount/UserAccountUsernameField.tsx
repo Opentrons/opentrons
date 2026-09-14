@@ -25,22 +25,22 @@ export function UserAccountUsernameField<T extends FieldValues>({
 }: UserAccountUsernameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const requiredError = t(
-    'desktop_personal_account_settings_username_required_error'
+    'personal_account_settings_username_required_error'
   ) as string
   const tooLongError =
     usernameMaxLength != null
-      ? (t('desktop_username_characters_max', {
+      ? (t('username_characters_max', {
           maxLength: usernameMaxLength,
         }) as string)
       : null
   const invalidCharactersError = t(
-    'desktop_username_invalid_characters'
+    'username_invalid_characters'
   ) as string
 
   return (
     <div className={styles.field_group}>
       <StyledText desktopStyle="bodyDefaultRegular">
-        {t('desktop_username')}
+        {t('username')}
       </StyledText>
       <div className={styles.field_group_value}>
         <Controller
