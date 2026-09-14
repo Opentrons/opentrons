@@ -5,7 +5,7 @@ description: How to use the Vacuum Module in a Python protocol.
 
 The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection.
 
-The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, labware movement, and vacuum control.
+The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, labware loading, and vacuum control.
 
 For hardware-related information, see the [Vacuum Module Instruction Manual](../../modules/index.md). <!--- landing page for now --->
 
