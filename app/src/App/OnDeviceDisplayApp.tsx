@@ -68,6 +68,7 @@ import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/req
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { RunLoading } from '../pages/ODD/RunLoading/RunLoading'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -113,6 +114,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/runs/:runId/run',
   '/runs/:runId/setup',
   '/runs/:runId/summary',
+  '/run-loading',
   '/welcome',
 ] as const
 
@@ -165,6 +167,8 @@ function getPathComponent(
       return <ProtocolSetup />
     case '/runs/:runId/summary':
       return <RunSummary />
+    case '/run-loading':
+      return <RunLoading />
     case '/welcome':
       return <Welcome />
   }

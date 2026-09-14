@@ -91,8 +91,10 @@ function useFlexLPCLabwareInfo({
   const storedOffsets = useMemo(
     () =>
       lwOffsetsData?.data ??
-      (searchLwOffsetsParams?.filters?.length === 0 ? [] : undefined),
-    [lwOffsetsData?.data, searchLwOffsetsParams?.filters]
+      (protocolData != null && searchLwOffsetsParams?.filters?.length === 0
+        ? []
+        : undefined),
+    [lwOffsetsData?.data, searchLwOffsetsParams?.filters, protocolData]
   )
 
   const labwareInfo = useMemo(
