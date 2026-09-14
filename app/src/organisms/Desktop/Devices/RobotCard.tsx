@@ -97,24 +97,27 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         justifyContent={JUSTIFY_FLEX_START}
         width="100%"
       >
-        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
-        <ReachableBanner robot={robot} />
-        {showRecoveryBanner ? (
-          <ErrorRecoveryBanner
-            recoveryIntent={recoveryIntent}
-            marginRight={SPACING.spacing24}
-          />
-        ) : null}
-        <SignAndDownloadRunBanner robotName={robotName} />
-        {showRobotOutOfStorageNotification ? (
-          <RobotOutOfStorageNotification
-            robotName={robotName}
-            onCloseClick={e => {
-              e?.stopPropagation()
-              setShowRobotOutOfStorageNotification(false)
-            }}
-          />
-        ) : null}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing12}
+          paddingRight={SPACING.spacing24}
+        >
+          <UpdateRobotBanner robot={robot} />
+          <ReachableBanner robot={robot} />
+          {showRecoveryBanner ? (
+            <ErrorRecoveryBanner recoveryIntent={recoveryIntent} />
+          ) : null}
+          <SignAndDownloadRunBanner robotName={robotName} />
+          {showRobotOutOfStorageNotification ? (
+            <RobotOutOfStorageNotification
+              robotName={robotName}
+              onCloseClick={e => {
+                e?.stopPropagation()
+                setShowRobotOutOfStorageNotification(false)
+              }}
+            />
+          ) : null}
+        </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <Flex gap={SPACING.spacing16}>
             <img

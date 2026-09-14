@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import clsx from 'clsx'
 
 import { InlineNotification } from '@opentrons/components'
 
 import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSigningOrDownloadingRequired'
-
-import styles from './signanddownloadrunbanner.module.css'
 
 const COPY_BY_BANNER_TYPE = {
   signing: {
@@ -22,12 +19,10 @@ const COPY_BY_BANNER_TYPE = {
 
 export interface SignAndDownloadRunBannerProps {
   robotName: string
-  onRobotOverview?: boolean
 }
 
 export function SignAndDownloadRunBanner({
   robotName,
-  onRobotOverview = false,
 }: SignAndDownloadRunBannerProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
@@ -43,20 +38,12 @@ export function SignAndDownloadRunBanner({
     COPY_BY_BANNER_TYPE[bannerType]
 
   return (
-    // reserves room for the robot card's overflow menu in the top right corner
-    <div
-      className={clsx(styles.banner_wrapper, {
-        [styles.displayed_on_robot_overview]: onRobotOverview,
-      })}
-    >
-      <InlineNotification
-        type="alert"
-        heading={t(headingKey)}
-        message={t(messageKey)}
-        linkText={t(linkTextKey)}
-        onLinkClick={onLinkClick}
-        className={styles.notification}
-      />
-    </div>
+    <InlineNotification
+      type="alert"
+      heading={t(headingKey)}
+      message={t(messageKey)}
+      linkText={t(linkTextKey)}
+      onLinkClick={onLinkClick}
+    />
   )
 }
