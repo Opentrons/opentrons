@@ -97,7 +97,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         justifyContent={JUSTIFY_FLEX_START}
         width="100%"
       >
-        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
+        <UpdateRobotBanner robot={robot} />
         <ReachableBanner robot={robot} />
         {showRecoveryBanner ? (
           <ErrorRecoveryBanner
