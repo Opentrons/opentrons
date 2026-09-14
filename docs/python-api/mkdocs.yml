@@ -58,7 +58,7 @@ nav:
       - Protocol Examples: examples/index.md
       - Protocol Template: examples/template.md
       - Liquid Handling Examples: examples/liquid-handling.md
-      - Vacuum Module Examples: examples/modules.md
+      - Vacuum Module Examples: examples/vacuum-module.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
   - API Reference:
       - Protocols: reference/protocols.md
