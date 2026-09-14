@@ -18,11 +18,11 @@ import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 const RUN_ERROR_TIMEOUT_DURATION = 300000
 
 function RunLoadingError(): ReactNode {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'branded'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('error_starting_run'),
     iconName: 'information',
-    iconColor: COLORS.black90,
+    iconColor: COLORS.yellow50,
     hasExitIcon: true,
   }
   const documentationState = useDocumentationState()
@@ -33,14 +33,14 @@ function RunLoadingError(): ReactNode {
     <OddModal header={modalHeader} modalSize="medium">
       <div className={styles.run_loading_error_container}>
         <StyledText oddStyle="bodyTextRegular">
-          {t('error_starting_run_description')}
+          {`${t('error_starting_run_description')} ${t('branded:issue_persists_contact_support')}`}
         </StyledText>
         <div className={styles.run_loading_error_button_row}>
           <SmallButton
             onClick={() => {
               navigate('/dashboard')
             }}
-            buttonType="secondary"
+            buttonType="primary"
             buttonText={t('return_to_dashboard')}
             className={styles.run_loading_error_button}
           />
