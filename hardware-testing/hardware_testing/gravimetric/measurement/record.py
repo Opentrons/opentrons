@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from statistics import stdev
 from subprocess import Popen
 from threading import Thread, Event
-from time import sleep, time
+from time import monotonic, sleep, time
 from typing import List, Optional, Callable, Generator
 
 from hardware_testing.data import (
@@ -258,22 +258,20 @@ class GravimetricRecorderConfig:
 
 
 def _record_get_remaining_time(stamp: float, period: float) -> float:
-    return (stamp + period) - time()
+    return (stamp + period) - monotonic()
 
 
 def _record_did_exceed_time(stamp: float, period: Optional[float] = None) -> bool:
-    if not stamp:
-        return True
-    if not period:
+    if period is None:
         return False
     return _record_get_remaining_time(stamp, period) <= 0
 
 
-def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -> float:
-    if len(samples) < 2:
+def _record_get_interval_overlap(sample_times: List[float], period: float) -> float:
+    if len(sample_times) < 2:
         return 0
-    real_time = samples.duration
-    ideal_time = (len(samples) - 1) * period
+    real_time = sample_times[-1] - sample_times[0]
+    ideal_time = (len(sample_times) - 1) * period
     return real_time - ideal_time
 
 
@@ -478,29 +476,36 @@ class GravimetricRecorder:
             length = 0
         interval = 1.0 / self._cfg.frequency
         self._recording = GravimetricRecording()
-        _start_time = time()
+        monotonic_sample_times: List[float] = []
+        recording_wall_start = time()
+        recording_monotonic_start = monotonic()
         while self.is_recording:
             if length and len(self._recording) >= length:
                 break
-            if _record_did_exceed_time(_start_time, timeout):
+            if _record_did_exceed_time(recording_monotonic_start, timeout):
                 break
             interval_w_overlap = interval - _record_get_interval_overlap(
-                self._recording, interval
+                monotonic_sample_times, interval
             )
-            if not len(self._recording) or _record_did_exceed_time(
-                self._recording.end_time, interval_w_overlap
+            if not monotonic_sample_times or _record_did_exceed_time(
+                monotonic_sample_times[-1], interval_w_overlap
             ):
                 mass = self._scale.read()
                 if self._cfg.stable and not mass.stable:
                     self._recording.clear()  # delete all previously recorded samples
+                    monotonic_sample_times.clear()
                     continue
+                sample_monotonic_time = monotonic()
                 _s = GravimetricSample(
                     grams=mass.grams,
                     stable=mass.stable,
-                    time=mass.time,
+                    # Keep report timestamps continuous across system clock corrections.
+                    time=recording_wall_start
+                    + (sample_monotonic_time - recording_monotonic_start),
                     tag=self._sample_tag,
                 )
                 self._recording.append(_s)
+                monotonic_sample_times.append(sample_monotonic_time)
                 self._reading_samples.set()
                 if callable(on_new_sample):
                     on_new_sample(self._recording)

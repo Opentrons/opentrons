@@ -1,7 +1,7 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator, Callable
-from contextlib import contextmanager
+from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator, Callable, Sequence
+from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, asdict, replace
 from statistics import median
 from time import time
@@ -51,6 +51,7 @@ from hardware_testing.data.ui import (  # noqa: F401
 )
 
 from hardware_testing.drivers import asair_sensor as AsairDriver
+from hardware_testing.drivers import LCUS_4 as LCUS4Driver
 from hardware_testing.drivers import ImpactProtectionV2
 from hardware_testing.drivers import (
     ImpactProtection_96ch as ImpactProtection96chDriver,
@@ -134,7 +135,9 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed blank"}
+metadata = {
+    "protocolName": "Gravimetric QC V3 speed blank P1000S/P1000M fan temp gate"
+}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -144,8 +147,29 @@ SCALE_STABILITY_POLL_SECONDS = 1.0
 SCALE_STABILITY_TIMEOUT_SECONDS = SCALE_SECONDS_TO_TRUE_STABILIZE
 SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE = 15.0
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
-PIPETTE_IDLE_CURRENT_AMPS = 0.1
+# Cooling waits use a true zero-current motor state. The motor is disengaged
+# before these register values are written; this does not power down the
+# pipette electronics or guarantee that the stem will cool below ambient.
+PIPETTE_IDLE_CURRENT_AMPS = 0.0
 PIPETTE_CURRENT_TOLERANCE_AMPS = 0.01
+# Production reports showed the smallest absolute Min %D bias when the 5-uL
+# capacity started at roughly 24.5-25.0 C. The capacity mean then typically
+# falls around 25.0-25.5 C as the stem warms. This is a cooling ceiling, not a
+# heater target: a stem below 24.5 C is accepted immediately.
+P1000S_PREFERRED_START_TEMPERATURE_MIN_C = 25.1
+P1000S_PREFERRED_START_TEMPERATURE_MAX_C = 25.6
+# Production P1000M results use the slightly lower model-specific start band.
+P1000M_PREFERRED_START_TEMPERATURE_MIN_C = 24.0
+P1000M_PREFERRED_START_TEMPERATURE_MAX_C = 24.5
+# Keep the 26 C value in diagnostics for comparison with production data. It is
+# not an automatic post-engagement shutoff threshold.
+P1000_TEST_TEMPERATURE_MAX_C = 26.0
+P1000_TEST_TEMPERATURE_POLL_SECONDS = 5.0
+P1000_TEST_TEMPERATURE_TIMEOUT_SECONDS = 30.0 * 60.0
+# LCUS-4 channel 1 is wired to the fixture fan. A pipette below the preferred
+# range is accepted immediately; the fan is only used to cool an over-target
+# stem, so this phase never adds heat to the pipette motor.
+P1000_COOLING_RELAY_CHANNEL = 1
 EVAPORATION_MAD_SCALE = 1.4826
 EVAPORATION_OUTLIER_SIGMA = 3.5
 EVAPORATION_SCALE_RESOLUTION_UL = 0.1
@@ -2407,6 +2431,25 @@ def _can_use_dedicated_dry_blank_tip(
     return fixture_settings.pipette_channels != 96 or fixture_settings.single_tip_96
 
 
+def _uses_p1000_temperature_gate(
+    fixture_settings: FixtureSettings,
+) -> bool:
+    """Apply fan cooling to either mount's P1000S or P1000M test."""
+    return _get_p1000_temperature_target(fixture_settings) is not None
+
+
+def _notify_p1000_pre_measurement_state(
+    fixture_settings: FixtureSettings,
+    state_log_callback: Optional[Callable[[str], None]],
+) -> None:
+    """Log the active P1000S/P1000M state before measurements."""
+    if (
+        _uses_p1000_temperature_gate(fixture_settings)
+        and state_log_callback is not None
+    ):
+        state_log_callback("pre-measurement")
+
+
 def _run(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
@@ -2431,6 +2474,7 @@ def _run(
     fixture_settings.pipette._retract()
     last_probed_tip_size = first_tip_size
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    _notify_p1000_pre_measurement_state(fixture_settings, state_log_callback)
     if fixture_settings.run_evaporation:
         blank_tip = first_tip
         if _can_use_dedicated_dry_blank_tip(fixture_settings):
@@ -4219,6 +4263,11 @@ PIPETTE_AXES_BY_MOUNT: Dict[str, Axis] = {
     "left": Axis.P_L,
     "right": Axis.P_R,
 }
+Z_AXES_BY_MOUNT: Dict[str, Axis] = {
+    "left": Axis.Z_L,
+    "right": Axis.Z_R,
+}
+COOLING_Z_AXES: Tuple[Axis, ...] = tuple(Z_AXES_BY_MOUNT.values())
 
 
 def _resolve_hardware_result(hw_api: Any, result: Any) -> Any:
@@ -4251,7 +4300,7 @@ def _present_pipette_axes(ctx: ProtocolContext) -> Dict[str, Axis]:
     }
 
 
-def _read_pipette_motor_engaged(ctx: ProtocolContext, axis: Axis) -> bool:
+def _read_motor_engaged(ctx: ProtocolContext, axis: Axis) -> bool:
     """Read engagement from the backend before changing an axis state."""
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
@@ -4273,14 +4322,14 @@ def _capture_pipette_motor_states(
         axis: _PipetteMotorState(
             run_current=run_current,
             hold_current=hold_current,
-            engaged=_read_pipette_motor_engaged(ctx, axis),
+            engaged=_read_motor_engaged(ctx, axis),
         )
         for axis in axes.values()
-        for run_current, hold_current in [_read_pipette_currents(ctx, axis)]
+        for run_current, hold_current in [_read_motor_currents(ctx, axis)]
     }
 
 
-def _read_pipette_currents(
+def _read_motor_currents(
     ctx: ProtocolContext, axis: Axis
 ) -> Tuple[float, float]:
     """Read the live backend current values, with a legacy API fallback."""
@@ -4296,6 +4345,26 @@ def _read_pipette_currents(
             float(current_settings[axis].run_current),
             float(current_settings[axis].hold_current),
         )
+
+
+def _read_default_motor_currents(
+    ctx: ProtocolContext, axes: Sequence[Axis]
+) -> Dict[Axis, Tuple[float, float]]:
+    """Read system-default run and hold currents for the current gantry load."""
+    hw_api = ctx._core.get_hardware()
+    current_settings = hw_api._backend.get_current_settings(hw_api.gantry_load)
+    try:
+        return {
+            axis: (
+                float(current_settings[axis].run_current),
+                float(current_settings[axis].hold_current),
+            )
+            for axis in axes
+        }
+    except KeyError as error:
+        raise RuntimeError(
+            f"System default current is unavailable for {error.args[0]}"
+        ) from error
 
 
 def _read_capacity_test_currents(
@@ -4319,21 +4388,21 @@ def _read_capacity_test_currents(
     return capacity_test_currents
 
 
-def _set_pipette_currents(
+def _set_motor_currents(
     ctx: ProtocolContext,
     axis: Axis,
     run_current: float,
     hold_current: float,
 ) -> None:
-    """Set both run and hold current for one pipette axis."""
+    """Set both run and hold current for one motor axis."""
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
     _resolve_hardware_result(hw_api, backend.set_active_current({axis: run_current}))
     _resolve_hardware_result(hw_api, backend.set_hold_current({axis: hold_current}))
 
 
-def _set_pipette_engaged(ctx: ProtocolContext, axis: Axis, engaged: bool) -> None:
-    """Set one pipette motor's engagement state."""
+def _set_motor_engaged(ctx: ProtocolContext, axis: Axis, engaged: bool) -> None:
+    """Set one motor's engagement state."""
     hw_api = ctx._core.get_hardware()
     if engaged:
         _resolve_hardware_result(hw_api, hw_api.engage_axes([axis]))
@@ -4341,26 +4410,26 @@ def _set_pipette_engaged(ctx: ProtocolContext, axis: Axis, engaged: bool) -> Non
         _resolve_hardware_result(hw_api, hw_api.disengage_axes([axis]))
 
 
-def _verify_pipette_engagement(
+def _verify_motor_engagement(
     ctx: ProtocolContext, axis: Axis, expected: bool
 ) -> None:
     """Fail if hardware did not accept the requested motor state."""
-    actual = _read_pipette_motor_engaged(ctx, axis)
+    actual = _read_motor_engaged(ctx, axis)
     if actual != expected:
         raise RuntimeError(
-            f"Pipette motor {axis.name} engagement mismatch: "
+            f"Motor {axis.name} engagement mismatch: "
             f"expected {expected}, got {actual}"
         )
 
 
-def _verify_pipette_currents(
+def _verify_motor_currents(
     ctx: ProtocolContext,
     axis: Axis,
     expected_run_current: float,
     expected_hold_current: float,
 ) -> None:
     """Fail if a current write was overwritten by instrument setup."""
-    actual_run_current, actual_hold_current = _read_pipette_currents(ctx, axis)
+    actual_run_current, actual_hold_current = _read_motor_currents(ctx, axis)
     if not math.isclose(
         actual_run_current,
         expected_run_current,
@@ -4371,7 +4440,7 @@ def _verify_pipette_currents(
         abs_tol=PIPETTE_CURRENT_TOLERANCE_AMPS,
     ):
         raise RuntimeError(
-            f"Pipette motor {axis.name} current mismatch: "
+            f"Motor {axis.name} current mismatch: "
             f"expected run/hold {expected_run_current}/{expected_hold_current} A, "
             f"got {actual_run_current}/{actual_hold_current} A"
         )
@@ -4397,37 +4466,25 @@ def _stabilize_scale_before_evaporation(
 def _wait_for_scale_stability(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
-    timeout_seconds: float = SCALE_STABILITY_TIMEOUT_SECONDS,
 ) -> None:
-    """Wait for a stable recorder window before engaging the test pipette."""
+    """Wait a fixed 180 seconds before engaging the test pipette.
+
+    The test pipette remains disengaged for the entire delay. This restores the
+    production-style fixed baseline wait instead of ending early when a recent
+    recorder window happens to look stable.
+    """
     if ctx.is_simulating():
         return
-    start_time = time()
-    while time() - start_time < timeout_seconds:
-        recording = list(fixture_settings.recorder.recording)
-        if recording:
-            window_start = time() - SCALE_STABILITY_WINDOW_SECONDS
-            recent = [sample for sample in recording if sample.time >= window_start]
-            if len(recent) >= 2 and recent[-1].time - recent[0].time >= (
-                SCALE_STABILITY_WINDOW_SECONDS * 0.9
-            ):
-                grams = [sample.grams for sample in recent]
-                if all(sample.stable for sample in recent) and (
-                    max(grams) - min(grams) <= SCALE_STABILITY_MAX_SPAN_GRAMS
-                ):
-                    print_info(
-                        "Scale stability gate passed: "
-                        f"{recent[-1].time - recent[0].time:.1f}s window, "
-                        f"{max(grams) - min(grams):.4f} g span."
-                    )
-                    return
-        ctx.delay(
-            seconds=SCALE_STABILITY_POLL_SECONDS,
-            msg="Waiting for measured scale stability before test pipette engage",
-        )
-    raise RuntimeError(
-        "Scale stability gate did not pass; test pipette remains disengaged "
-        f"after {timeout_seconds:g}s."
+    ctx.delay(
+        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
+        msg=(
+            f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE:g}s for scale baseline "
+            "to stabilize before test pipette engage"
+        ),
+    )
+    print_info(
+        "Fixed scale stabilization wait completed: "
+        f"{SCALE_SECONDS_TO_TRUE_STABILIZE:g}s."
     )
 
 
@@ -4440,6 +4497,9 @@ class _DualPipetteHeatGuard:
     entry_states: Dict[Axis, _PipetteMotorState]
     capacity_test_currents: Dict[Axis, Tuple[float, float]]
     active_mount: Optional[str] = None
+    cooling_z_axes: Tuple[Axis, ...] = ()
+    inactive_test_z_axes: Tuple[Axis, ...] = ()
+    mount_activation_pending_cleanup: bool = False
 
     def _apply_mount_state(self, mount: str, active: bool) -> None:
         """Apply and read back the complete two-motor protection state."""
@@ -4453,10 +4513,16 @@ class _DualPipetteHeatGuard:
                 if is_active
                 else (PIPETTE_IDLE_CURRENT_AMPS, PIPETTE_IDLE_CURRENT_AMPS)
             )
-            _set_pipette_currents(self.ctx, axis, run_current, hold_current)
-            _set_pipette_engaged(self.ctx, axis, is_active)
-            _verify_pipette_currents(self.ctx, axis, run_current, hold_current)
-            _verify_pipette_engagement(self.ctx, axis, is_active)
+            if is_active:
+                # Restore the capacity-test defaults before energizing the motor.
+                _set_motor_currents(self.ctx, axis, run_current, hold_current)
+                _set_motor_engaged(self.ctx, axis, True)
+            else:
+                # Stop coil current first, then zero both current registers.
+                _set_motor_engaged(self.ctx, axis, False)
+                _set_motor_currents(self.ctx, axis, run_current, hold_current)
+            _verify_motor_currents(self.ctx, axis, run_current, hold_current)
+            _verify_motor_engagement(self.ctx, axis, is_active)
             if not is_active:
                 print_info(
                     f"{candidate_mount} mount is idle: motor {axis.name} "
@@ -4495,8 +4561,12 @@ class _DualPipetteHeatGuard:
         )
 
     def activate_mount(self, mount: str) -> bool:
-        """Enable one mount after scale stabilization and return whether to home."""
+        """Enable one mount and Z while disabling the unused side's motors."""
         previous_mount = self.active_mount
+        self.configure_z_axes_for_test(mount)
+        # Set this before the hardware writes so cleanup also covers a partial
+        # activation failure.
+        self.mount_activation_pending_cleanup = True
         self._apply_mount_state(mount, active=True)
         self.active_mount = mount
         return (
@@ -4505,9 +4575,209 @@ class _DualPipetteHeatGuard:
         )
 
     def deactivate_mount(self, mount: str) -> None:
-        """Cool both motors during the transition between fixture runs."""
-        self._apply_mount_state(mount, active=False)
-        self.active_mount = mount
+        """Cool both plungers and restore the Z disabled for one-side testing."""
+        try:
+            if self.mount_activation_pending_cleanup:
+                self._apply_mount_state(mount, active=False)
+                self.active_mount = mount
+                self.mount_activation_pending_cleanup = False
+        finally:
+            self.restore_inactive_z_axes_after_test()
+
+    def home_robot_for_cooling(self, mount: str) -> None:
+        """Move the gantry to physical Home before entering the cooling state.
+
+        ProtocolContext.home() homes the complete movement system, including
+        both pipette plungers. Temporarily energize both plungers with their
+        capacity-test default currents so that homing is controlled, then put
+        both plungers back into the verified disengaged, zero-current state and
+        disable both Z motors so their electronic brakes hold. The caller may
+        turn on the cooling fan only after this method returns.
+        """
+        if mount not in self.axes_by_mount:
+            raise RuntimeError(f"Pipette axis for {mount} mount is not present")
+
+        try:
+            for candidate_mount, axis in self.axes_by_mount.items():
+                run_current, hold_current = self.capacity_test_currents[axis]
+                _set_motor_currents(
+                    self.ctx, axis, run_current, hold_current
+                )
+                _set_motor_engaged(self.ctx, axis, True)
+                _verify_motor_currents(
+                    self.ctx, axis, run_current, hold_current
+                )
+                _verify_motor_engagement(self.ctx, axis, True)
+                print_info(
+                    f"{candidate_mount} mount temporarily engaged at capacity-test "
+                    "current for cooling-position Home."
+                )
+            # InstrumentContext.home() only homes one mount's Z and plunger.
+            # The fan is installed at the gantry Home position, so home the
+            # complete movement system through ProtocolContext instead.
+            self.ctx.home()
+        finally:
+            # A Home failure must never leave either plunger energized, and the
+            # fan caller must never proceed unless this zero-current verification
+            # succeeds.
+            self._apply_mount_state(mount, active=False)
+            self.active_mount = mount
+
+        self.disengage_z_axes_for_cooling()
+        print_info(
+            "P1000_COOLING_HOME "
+            + json.dumps(
+                {
+                    "stage": "physical-home-ready",
+                    "test_mount": mount,
+                    "plunger_current_amps": PIPETTE_IDLE_CURRENT_AMPS,
+                    "plungers_engaged": False,
+                    "z_axes_braked": [axis.name for axis in self.cooling_z_axes],
+                },
+                sort_keys=True,
+            )
+        )
+
+    def disengage_z_axes_for_cooling(self) -> None:
+        """Disable both Z motors so their electronic brakes hold during cooling."""
+        hw_api = self.ctx._core.get_hardware()
+        axes = tuple(
+            axis
+            for axis in COOLING_Z_AXES
+            if not hasattr(hw_api, "axis_is_present") or hw_api.axis_is_present(axis)
+        )
+        missing = [axis.name for axis in COOLING_Z_AXES if axis not in axes]
+        if missing:
+            raise RuntimeError(
+                "Cooling requires both pipette Z axes; missing: " + ", ".join(missing)
+            )
+
+        # Track the axes before the command so cleanup retries restoration if the
+        # hardware call partially succeeds.
+        self.cooling_z_axes = axes
+        _resolve_hardware_result(hw_api, hw_api.disengage_axes(list(axes)))
+        for axis in axes:
+            _verify_motor_engagement(self.ctx, axis, False)
+        print_info(
+            "DUAL_Z_AXES "
+            + json.dumps(
+                {
+                    "stage": "braked-for-cooling",
+                    "motor_engaged": {axis.name: False for axis in axes},
+                },
+                sort_keys=True,
+            )
+        )
+
+    def restore_z_axes_after_cooling(self) -> None:
+        """Restore system-default Z currents, then re-home both Z axes."""
+        if not self.cooling_z_axes:
+            return
+        axes = self.cooling_z_axes
+        self._restore_z_axes_to_defaults(axes, "cooling-default-current-restored")
+        self.cooling_z_axes = ()
+
+    def configure_z_axes_for_test(self, mount: str) -> None:
+        """Keep the test Z enabled and disable the unused Z during one-side test."""
+        if mount not in Z_AXES_BY_MOUNT:
+            raise RuntimeError(f"Z axis for {mount} mount is unavailable")
+        if self.cooling_z_axes:
+            raise RuntimeError("Cooling Z axes must be restored before testing")
+        if self.inactive_test_z_axes:
+            raise RuntimeError("Previous inactive test Z axis has not been restored")
+
+        hw_api = self.ctx._core.get_hardware()
+        active_axis = Z_AXES_BY_MOUNT[mount]
+        axes = tuple(
+            axis
+            for axis in COOLING_Z_AXES
+            if not hasattr(hw_api, "axis_is_present") or hw_api.axis_is_present(axis)
+        )
+        if active_axis not in axes:
+            raise RuntimeError(f"Test Z axis {active_axis.name} is not present")
+        inactive_axes = tuple(axis for axis in axes if axis != active_axis)
+        if not inactive_axes:
+            raise RuntimeError("No inactive Z axis is available for heat reduction")
+
+        default_currents = _read_default_motor_currents(self.ctx, axes)
+        for axis in axes:
+            run_current, hold_current = default_currents[axis]
+            _verify_motor_currents(self.ctx, axis, run_current, hold_current)
+        _verify_motor_engagement(self.ctx, active_axis, True)
+
+        # Record pending restoration before the hardware call so cleanup also
+        # covers a command that only partially disables the requested axes.
+        self.inactive_test_z_axes = axes
+        _resolve_hardware_result(hw_api, hw_api.disengage_axes(list(inactive_axes)))
+        _verify_motor_engagement(self.ctx, active_axis, True)
+        for axis in inactive_axes:
+            _verify_motor_engagement(self.ctx, axis, False)
+        self.inactive_test_z_axes = inactive_axes
+        print_info(
+            "DUAL_TEST_Z_AXES "
+            + json.dumps(
+                {
+                    "stage": "single-side-test",
+                    "test_mount": mount,
+                    "active_z_axis": active_axis.name,
+                    "inactive_z_axes": [axis.name for axis in inactive_axes],
+                    "motor_engaged": {
+                        axis.name: axis == active_axis for axis in axes
+                    },
+                },
+                sort_keys=True,
+            )
+        )
+
+    def restore_inactive_z_axes_after_test(self) -> None:
+        """Restore defaults and home Z axes disabled during one-side testing."""
+        if not self.inactive_test_z_axes:
+            return
+        axes = self.inactive_test_z_axes
+        self._restore_z_axes_to_defaults(axes, "test-default-current-restored")
+        self.inactive_test_z_axes = ()
+
+    def _restore_z_axes_to_defaults(
+        self, axes: Tuple[Axis, ...], stage: str
+    ) -> None:
+        """Apply system-default currents and home the requested Z axes."""
+        hw_api = self.ctx._core.get_hardware()
+        backend = hw_api._backend
+        default_currents = _read_default_motor_currents(self.ctx, axes)
+        _resolve_hardware_result(
+            hw_api,
+            backend.set_active_current(
+                {axis: default_currents[axis][0] for axis in axes}
+            ),
+        )
+        _resolve_hardware_result(
+            hw_api,
+            backend.set_hold_current(
+                {axis: default_currents[axis][1] for axis in axes}
+            ),
+        )
+        _resolve_hardware_result(hw_api, hw_api.home(list(axes)))
+        for axis in axes:
+            run_current, hold_current = default_currents[axis]
+            _verify_motor_currents(self.ctx, axis, run_current, hold_current)
+            _verify_motor_engagement(self.ctx, axis, True)
+        print_info(
+            "DUAL_Z_AXES "
+            + json.dumps(
+                {
+                    "stage": stage,
+                    "currents_amps": {
+                        axis.name: {
+                            "run": default_currents[axis][0],
+                            "hold": default_currents[axis][1],
+                        }
+                        for axis in axes
+                    },
+                    "motor_engaged": {axis.name: True for axis in axes},
+                },
+                sort_keys=True,
+            )
+        )
 
     def activate_pipette(self, pipette: InstrumentContext, needs_home: bool) -> None:
         """Home after idle recovery, then verify configured test current remains."""
@@ -4520,22 +4790,30 @@ class _DualPipetteHeatGuard:
             raise RuntimeError("No active pipette mount is available for verification")
         active_axis = self.axes_by_mount[self.active_mount]
         run_current, hold_current = self.capacity_test_currents[active_axis]
-        _verify_pipette_currents(self.ctx, active_axis, run_current, hold_current)
-        _verify_pipette_engagement(self.ctx, active_axis, True)
+        _verify_motor_currents(self.ctx, active_axis, run_current, hold_current)
+        _verify_motor_engagement(self.ctx, active_axis, True)
 
     def restore(self) -> None:
-        """Restore every pipette's entry current and engagement state."""
+        """Restore Z defaults and every pipette's entry motor state."""
         errors: List[str] = []
+        try:
+            self.restore_inactive_z_axes_after_test()
+        except Exception as error:
+            errors.append(f"inactive test Z axes: {error}")
+        try:
+            self.restore_z_axes_after_cooling()
+        except Exception as error:
+            errors.append(f"cooling Z axes: {error}")
         for axis, state in self.entry_states.items():
             try:
-                _set_pipette_currents(
+                _set_motor_currents(
                     self.ctx, axis, state.run_current, state.hold_current
                 )
-                _set_pipette_engaged(self.ctx, axis, state.engaged)
-                _verify_pipette_currents(
+                _set_motor_engaged(self.ctx, axis, state.engaged)
+                _verify_motor_currents(
                     self.ctx, axis, state.run_current, state.hold_current
                 )
-                _verify_pipette_engagement(self.ctx, axis, state.engaged)
+                _verify_motor_engagement(self.ctx, axis, state.engaged)
             except Exception as error:
                 errors.append(f"{axis.name}: {error}")
         if errors:
@@ -4543,6 +4821,343 @@ class _DualPipetteHeatGuard:
                 "Failed to restore pipette motor state after dual run: "
                 + "; ".join(errors)
             )
+
+
+def _read_mount_stem_temperature(ctx: ProtocolContext, mount: str) -> float:
+    """Read one valid stem temperature for the active-mount temperature gate."""
+    temperature = float(
+        get_sync_hw_api(ctx).read_stem_temperature(
+            Mount.string_to_mount(mount), True
+        )
+    )
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise RuntimeError(
+            f"Invalid {mount} stem temperature for temperature gate: {temperature}"
+        )
+    return temperature
+
+
+@dataclass(frozen=True)
+class _P1000TemperatureTarget:
+    """Model-specific fan-cooling target for the start of capacity testing."""
+
+    model: str
+    minimum_c: float
+    maximum_c: float
+
+
+def _get_p1000_temperature_target(
+    fixture_settings: FixtureSettings,
+) -> Optional[_P1000TemperatureTarget]:
+    """Return the P1000S/P1000M target, or None for P50 and other models."""
+    if (
+        fixture_settings.mount not in {"left", "right"}
+        or fixture_settings.pipette_volume != 1000
+    ):
+        return None
+    if fixture_settings.pipette_channels == 1:
+        return _P1000TemperatureTarget(
+            model="P1000S",
+            minimum_c=P1000S_PREFERRED_START_TEMPERATURE_MIN_C,
+            maximum_c=P1000S_PREFERRED_START_TEMPERATURE_MAX_C,
+        )
+    if fixture_settings.pipette_channels == 8:
+        return _P1000TemperatureTarget(
+            model="P1000M",
+            minimum_c=P1000M_PREFERRED_START_TEMPERATURE_MIN_C,
+            maximum_c=P1000M_PREFERRED_START_TEMPERATURE_MAX_C,
+        )
+    return None
+
+
+def _p1000_temperature_zone(
+    temperature: float, target: _P1000TemperatureTarget
+) -> str:
+    """Classify a start temperature without turning the preferred range into a gate."""
+    if temperature < target.minimum_c:
+        return "below-preferred"
+    if temperature <= target.maximum_c:
+        return "preferred"
+    if temperature <= P1000_TEST_TEMPERATURE_MAX_C:
+        return "above-preferred-safe"
+    return "over-ceiling"
+
+
+def _log_p1000_temperature_gate(
+    fixture_settings: FixtureSettings,
+    stage: str,
+    temperature: float,
+    elapsed_seconds: float,
+    fan_relay: Optional[LCUS4Driver.LCUS4Base] = None,
+    relay_status: Optional[Any] = None,
+) -> None:
+    """Write temperature-gate diagnostics without changing the production CSV."""
+    target = _get_p1000_temperature_target(fixture_settings)
+    if target is None:
+        raise RuntimeError("P1000 fan temperature target is unavailable")
+    snapshot = _capture_dual_mount_state(
+        fixture_settings.ctx,
+        _present_pipette_axes(fixture_settings.ctx),
+        known_stem_temperatures={fixture_settings.mount: temperature},
+    )
+    relay_state = (
+        _relay_status_for_log(fan_relay, relay_status)
+        if fan_relay is not None
+        else {}
+    )
+    print_info(
+        "P1000_TEMPERATURE_GATE "
+        + json.dumps(
+            {
+                "test_mount": fixture_settings.mount,
+                "pipette_model": target.model,
+                "stage": stage,
+                "elapsed_seconds": round(elapsed_seconds, 1),
+                "temperature_c": temperature,
+                "temperature_zone": _p1000_temperature_zone(temperature, target),
+                "preferred_start_min_c": target.minimum_c,
+                "preferred_start_max_c": target.maximum_c,
+                "cooling_target_max_c": target.maximum_c,
+                "target_max_c": P1000_TEST_TEMPERATURE_MAX_C,
+                "fan_relay": relay_state,
+                **snapshot,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+@contextmanager
+def _cool_p1000_with_fan_and_activate(
+    fixture_settings: FixtureSettings,
+    heat_guard: _DualPipetteHeatGuard,
+) -> Generator[Optional[LCUS4Driver.LCUS4Base], None, None]:
+    """Cool an idle P1000S or P1000M with LCUS-4 channel 1 before testing.
+
+    The heat guard first moves the complete robot to physical Home, where the fan
+    is installed, verifies every present plunger at zero current, and disengages
+    both Z motors so their electronic brakes hold during cooling. Channel 1 is
+    energized only after that sequence and only while the selected P1000 is
+    above the empirical start target. As soon as the target is reached the relay
+    is turned off and verified, both Z axes are restored to system-default
+    currents and re-homed. The unused side's Z motor is then disabled before
+    the test plunger is engaged, while the active Z remains at system defaults.
+    """
+    if fixture_settings.ctx.is_simulating():
+        yield None
+        return
+
+    mount = fixture_settings.mount
+    target = _get_p1000_temperature_target(fixture_settings)
+    if target is None:
+        raise RuntimeError("P1000 fan temperature target is unavailable")
+    start_time = time()
+    relay: Optional[LCUS4Driver.LCUS4Base] = None
+    mount_activated = False
+    entered_test = False
+    try:
+        # The relay must remain off until both pipettes are physically at the
+        # fan location and their plunger motors are verified disengaged at 0 A.
+        heat_guard.home_robot_for_cooling(mount)
+        temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+        _log_p1000_temperature_gate(
+            fixture_settings,
+            "cooling-home-zero-current",
+            temperature,
+            time() - start_time,
+        )
+        relay = LCUS4Driver.BuildLCUS4(simulate=False, ctx=fixture_settings.ctx)
+        print_info(
+            "P1000_FAN_RELAY "
+            + json.dumps(
+                {
+                    "stage": "connected",
+                    "channel": P1000_COOLING_RELAY_CHANNEL,
+                    "device": relay.get_version(),
+                    "status": _relay_status_for_log(relay),
+                },
+                sort_keys=True,
+            )
+        )
+        relay.turn_on(P1000_COOLING_RELAY_CHANNEL)
+        fan_on_status = relay.get_status()
+        if not fan_on_status.is_on(P1000_COOLING_RELAY_CHANNEL):
+            raise RuntimeError(
+                f"LCUS-4 channel 1 did not turn on for {target.model} cooling"
+            )
+        print_info(
+            "P1000_FAN_RELAY "
+            + json.dumps(
+                {
+                    "stage": "fan-on",
+                    "channel": P1000_COOLING_RELAY_CHANNEL,
+                    "status": _relay_status_for_log(relay, fan_on_status),
+                },
+                sort_keys=True,
+            )
+        )
+
+        status_for_next_log: Optional[Any] = fan_on_status
+        while time() - start_time < P1000_TEST_TEMPERATURE_TIMEOUT_SECONDS:
+            elapsed_seconds = time() - start_time
+            temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+
+            if temperature <= target.maximum_c:
+                # The fan must be off and confirmed off before any test current
+                # is restored. This ordering is intentional for thermal control.
+                relay.turn_off(P1000_COOLING_RELAY_CHANNEL)
+                fan_off_status = relay.get_status()
+                if fan_off_status.is_on(P1000_COOLING_RELAY_CHANNEL):
+                    raise RuntimeError(
+                        f"LCUS-4 channel 1 remained on after {target.model} cooling"
+                    )
+                heat_guard.restore_z_axes_after_cooling()
+                # Mark this before the write sequence so a partial activation is
+                # also returned to the idle state by the context cleanup.
+                mount_activated = True
+                needs_home = heat_guard.activate_mount(mount)
+                heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+                temperature = _read_mount_stem_temperature(
+                    fixture_settings.ctx, mount
+                )
+                _log_p1000_temperature_gate(
+                    fixture_settings,
+                    "ready-fan-off-current-restored",
+                    temperature,
+                    time() - start_time,
+                    fan_relay=relay,
+                    relay_status=fan_off_status,
+                )
+                entered_test = True
+                yield relay
+                return
+
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                "cooling-fan-on-disengaged",
+                temperature,
+                elapsed_seconds,
+                fan_relay=relay,
+                relay_status=status_for_next_log,
+            )
+            status_for_next_log = None
+            fixture_settings.ctx.delay(
+                seconds=P1000_TEST_TEMPERATURE_POLL_SECONDS,
+                msg=(
+                    f"Cooling {mount} {target.model} with LCUS-4 channel 1 to "
+                    f"{target.maximum_c:.1f} C: "
+                    f"{temperature:.3f} C"
+                ),
+            )
+
+        temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+        raise RuntimeError(
+            f"{mount} {target.model} did not cool to the "
+            f"{target.maximum_c:.1f} C preferred "
+            "test-start target "
+            f"within {P1000_TEST_TEMPERATURE_TIMEOUT_SECONDS:g}s; "
+            f"last temperature was {temperature:.3f} C."
+        )
+    finally:
+        if mount_activated and heat_guard.mount_activation_pending_cleanup:
+            try:
+                heat_guard.deactivate_mount(mount)
+            except Exception as error:
+                print_warning(f"Unable to idle {mount} after fan gate error: {error}")
+        if relay is not None:
+            # Always issue an OFF command during cleanup. This also covers a
+            # transport error after the ON frame was sent.
+            try:
+                relay.turn_off(P1000_COOLING_RELAY_CHANNEL)
+            except Exception as error:
+                print_warning(f"Unable to turn off LCUS-4 channel 1: {error}")
+            try:
+                print_info(
+                    "P1000_FAN_RELAY "
+                    + json.dumps(
+                        {
+                            "stage": "closed",
+                            "channel": P1000_COOLING_RELAY_CHANNEL,
+                            "status": _relay_status_for_log(relay),
+                        },
+                        sort_keys=True,
+                    )
+                )
+            except Exception:
+                pass
+            try:
+                relay.close()
+            except Exception as error:
+                print_warning(f"Unable to close LCUS-4 relay: {error}")
+        try:
+            heat_guard.restore_inactive_z_axes_after_test()
+        except Exception as error:
+            print_warning(
+                "Unable to restore the inactive Z axis after one-side testing: "
+                f"{error}"
+            )
+        try:
+            heat_guard.restore_z_axes_after_cooling()
+        except Exception as error:
+            print_warning(
+                "Unable to restore system-default Z-axis currents and home after "
+                f"fan cooling: {error}"
+            )
+        if not entered_test:
+            # FixtureSettings.build() already created a report and opened the
+            # recorder before the fan gate runs. Persist those files if the
+            # relay cannot connect or the temperature timeout aborts the run.
+            try:
+                _finalize_fixture_data_before_upload(fixture_settings)
+            except Exception as error:
+                print_warning(
+                    f"Unable to finalize {target.model} fixture after fan-gate error: "
+                    f"{error}"
+                )
+
+
+def _relay_status_for_log(
+    relay: LCUS4Driver.LCUS4Base,
+    status: Optional[Any] = None,
+) -> Dict[str, Any]:
+    """Return relay state for run_output.txt without affecting CSV/report data."""
+    try:
+        if status is None:
+            status = relay.get_status()
+        return {
+            "channel_1_on": bool(status.is_on(P1000_COOLING_RELAY_CHANNEL)),
+        }
+    except Exception as error:
+        return {"status_error": str(error)}
+
+
+def _verify_p1000_temperature_before_measurement(
+    fixture_settings: FixtureSettings,
+    stage: str,
+) -> None:
+    """Log the active P1000S/P1000M temperature without changing motor state.
+
+    The active pipette is intentionally not disengaged or recool-triggered if
+    it rises above 26 C. This preserves the requested continuous test flow;
+    the reading remains available in run_output.txt for %D correlation.
+    """
+    if fixture_settings.ctx.is_simulating():
+        return
+    mount = fixture_settings.mount
+    target = _get_p1000_temperature_target(fixture_settings)
+    if target is None:
+        return
+    temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+    _log_p1000_temperature_gate(
+        fixture_settings,
+        (
+            f"{stage}-passed"
+            if temperature <= P1000_TEST_TEMPERATURE_MAX_C
+            else f"{stage}-over-ceiling-allowed"
+        ),
+        temperature,
+        0.0,
+    )
 
 
 @contextmanager
@@ -4573,12 +5188,18 @@ def _dual_pipette_heat_guard(
 
 
 def _capture_dual_mount_state(
-    ctx: ProtocolContext, axes_by_mount: Dict[str, Axis]
+    ctx: ProtocolContext,
+    axes_by_mount: Dict[str, Axis],
+    known_stem_temperatures: Optional[Dict[str, float]] = None,
 ) -> Dict[str, Any]:
     """Capture diagnostic state without touching report or production CSV data."""
     motor_states = _capture_pipette_motor_states(ctx, axes_by_mount)
     stem_temperatures: Dict[str, Optional[float]] = {}
+    known_stem_temperatures = known_stem_temperatures or {}
     for mount in ("left", "right"):
+        if mount in known_stem_temperatures:
+            stem_temperatures[mount] = known_stem_temperatures[mount]
+            continue
         try:
             stem_temperatures[mount] = float(
                 get_sync_hw_api(ctx).read_stem_temperature(
@@ -4627,6 +5248,25 @@ def _record_dual_mount_stem_temperatures(
     )
 
 
+def _handle_dual_mount_test_state(
+    fixture_settings: FixtureSettings,
+    mount: str,
+    heat_guard: Optional[_DualPipetteHeatGuard],
+    phase: str,
+) -> None:
+    """Apply the active P1000 fan temperature gate, then log both mounts."""
+    try:
+        if _uses_p1000_temperature_gate(
+            fixture_settings
+        ) and phase in {"pre-measurement", "first-blank"}:
+            _verify_p1000_temperature_before_measurement(fixture_settings, phase)
+    except Exception:
+        if heat_guard is not None:
+            heat_guard.deactivate_mount(mount)
+        raise
+    _record_dual_mount_stem_temperatures(fixture_settings, phase)
+
+
 def _record_dual_mount_after_test(
     fixture_settings: FixtureSettings,
     heat_guard: Optional[_DualPipetteHeatGuard],
@@ -4640,11 +5280,14 @@ def _record_dual_mount_after_test(
             heat_guard.deactivate_mount(mount)
 
 
-def _should_manage_dual_pipette_heat(
-    mounts_to_test: List[str],
-) -> bool:
-    """Manage both plunger motors only when both mounts are tested."""
-    return "left" in mounts_to_test and "right" in mounts_to_test
+def _should_manage_dual_pipette_heat(csv_settings: CSVSettings) -> bool:
+    """Manage single-side motor heat for dual P50S/P50M/P1000S/P1000M."""
+    return (
+        "left" in csv_settings.mounts_to_test
+        and "right" in csv_settings.mounts_to_test
+        and csv_settings.pipette_channels in (1, 8)
+        and csv_settings.pipette_volume in (50, 1000)
+    )
 
 
 def _load_96ch_tiprack_on_adapter(
@@ -5184,7 +5827,7 @@ def run(ctx: ProtocolContext) -> None:
         )
     if dual_multi_extension_deck:
         _prepare_dual_multi_extension_deck_layout(ctx, csv_settings)
-    manage_dual_heat = _should_manage_dual_pipette_heat(csv_settings.mounts_to_test)
+    manage_dual_heat = _should_manage_dual_pipette_heat(csv_settings)
     dual_mount = manage_dual_heat
 
     # Keep one guard around build, test, report finalization, and the mount
@@ -5216,38 +5859,55 @@ def run(ctx: ProtocolContext) -> None:
                 )
                 _record_dual_mount_stem_temperatures(fixture_settings, "post-build")
                 if fixture_settings.run_evaporation:
-                    # Use the same pre-engagement scale gate for both mounts. The
-                    # tested pipette remains disengaged while the recorder confirms
-                    # that the loaded scale baseline is stable.
+                    # Use the same fixed 180s pre-engagement wait for both mounts.
+                    # The tested pipette remains disengaged for the entire delay.
                     _wait_for_scale_stability(ctx, fixture_settings)
                 _record_dual_mount_stem_temperatures(fixture_settings, "pre-engage")
-            needs_home = False
-            if heat_guard is not None:
-                needs_home = heat_guard.activate_mount(mount)
-                heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
-            after_test_callback: Optional[Callable[[], None]] = None
-            state_log_callback: Optional[Callable[[str], None]] = None
-            if dual_mount:
-                after_test_callback = partial(
-                    _record_dual_mount_after_test,
-                    fixture_settings,
-                    heat_guard,
-                    mount,
-                )
-                state_log_callback = partial(
-                    _record_dual_mount_stem_temperatures, fixture_settings
-                )
-            # Both mounts use the same short post-activation restabilization. The
-            # pre-engagement scale gate above handles the longer idle baseline
-            # wait without heating the pipette motor.
-            scale_stabilization_seconds = SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE
-            _run_fixture(
-                ctx,
-                fixture_settings,
-                after_test_callback,
-                scale_stabilization_seconds=scale_stabilization_seconds,
-                state_log_callback=state_log_callback,
+            p1000_fan_gate = (
+                heat_guard is not None
+                and _uses_p1000_temperature_gate(fixture_settings)
             )
+            fan_context = (
+                _cool_p1000_with_fan_and_activate(
+                    fixture_settings,
+                    cast(_DualPipetteHeatGuard, heat_guard),
+                )
+                if p1000_fan_gate
+                else nullcontext()
+            )
+            with fan_context:
+                needs_home = False
+                if heat_guard is not None and not p1000_fan_gate:
+                    needs_home = heat_guard.activate_mount(mount)
+                    heat_guard.activate_pipette(
+                        fixture_settings.pipette, needs_home
+                    )
+                after_test_callback: Optional[Callable[[], None]] = None
+                state_log_callback: Optional[Callable[[str], None]] = None
+                if dual_mount:
+                    after_test_callback = partial(
+                        _record_dual_mount_after_test,
+                        fixture_settings,
+                        heat_guard,
+                        mount,
+                    )
+                    state_log_callback = partial(
+                        _handle_dual_mount_test_state,
+                        fixture_settings,
+                        mount,
+                        heat_guard,
+                    )
+                # Both mounts use the same short post-activation restabilization.
+                # The fixed 180s pre-engagement wait above handles the longer idle
+                # baseline wait without heating the pipette motor.
+                scale_stabilization_seconds = SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE
+                _run_fixture(
+                    ctx,
+                    fixture_settings,
+                    after_test_callback,
+                    scale_stabilization_seconds=scale_stabilization_seconds,
+                    state_log_callback=state_log_callback,
+                )
             mounts_remaining = csv_settings.mounts_to_test[mount_index + 1 :]
             if (
                 dual_multi_extension_deck

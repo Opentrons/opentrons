@@ -134,7 +134,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed blank"}
+metadata = {"protocolName": "Gravimetric QC V3 speed blank fix"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -160,18 +160,18 @@ DUAL_MULTI_TRASH_SLOT = "A1"
 
 @dataclass(frozen=True)
 class EvaporationRateObservation:
-    """One direction-aware blank interval used to estimate evaporation rate."""
+    """One blank interval used to estimate the shared background rate."""
 
     trial: int
     phase: str
     elapsed_seconds: float
-    signed_volume_ul: float
+    volume_ul: float
     rate_ul_per_second: float
 
 
 @dataclass(frozen=True)
-class EvaporationPhaseRateEstimate:
-    """Validated evaporation rate for one blank phase."""
+class EvaporationBackgroundRateEstimate:
+    """Validated rate and interval decisions for all blank measurements."""
 
     rate_ul_per_second: float
     valid: bool
@@ -186,7 +186,7 @@ class EvaporationPhaseRateEstimate:
 
 @dataclass(frozen=True)
 class EvaporationRateEstimate:
-    """Validated, direction-specific evaporation rates."""
+    """Validated background rate kept in the production-shaped result form."""
 
     aspirate_evaporation_rate: float
     dispense_evaporation_rate: float
@@ -1478,6 +1478,25 @@ def retract_and_wait(
         fixture_settings.env_sensor,
         False,  # Shorten is always false
         fixture_settings.scale_delay,
+        strict_stability=True,
+        stability_retries=2,
+    )
+    print_info(
+        "MEASUREMENT_DIAGNOSTICS "
+        + json.dumps(
+            {
+                "tag": m_tag,
+                "mode": mode.value,
+                "blank": blank,
+                "grams_average": m_data.grams_average,
+                "grams_min": m_data.grams_min,
+                "grams_max": m_data.grams_max,
+                "grams_span": m_data.grams_max - m_data.grams_min,
+                "samples_count": m_data.samples_count,
+                "samples_duration": m_data.samples_duration,
+            },
+            sort_keys=True,
+        )
     )
     report.store_measurement(fixture_settings.test_report, m_tag, m_data)
     _MEASUREMENTS.append(
@@ -1822,9 +1841,17 @@ def run_one_test(
     if fixture_settings.lld_every_tip:
         fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     elif last_measurement:
-        volume_lost_since_last_trial = calculate_change_in_volume(
+        volume_lost_since_last_trial = _calculate_signed_change_in_volume(
             last_measurement, pre_aspirate, liq
         )
+        if volume_lost_since_last_trial < 0 or not math.isfinite(
+            volume_lost_since_last_trial
+        ):
+            print_warning(
+                "Ignoring non-physical inter-trial mass gain while updating "
+                f"liquid height: {volume_lost_since_last_trial} uL"
+            )
+            volume_lost_since_last_trial = 0.0
         if not fixture_settings.ctx.is_simulating():
             fixture_settings.liquid_source.load_liquid(
                 fixture_settings.liquid,
@@ -1872,8 +1899,7 @@ def _run_and_store_trial(
     channel: int,
     last_measurement: Optional[MeasurementData],
     liq: SupportedLiquid,
-    aspirate_evaporation_rate: float,
-    dispense_evaporation_rate: float,
+    evaporation_rate: float,
 ) -> Tuple[List[MeasurementData], float, float]:
     """Run one complete trial and store its in-memory report updates."""
     trial_measurements = run_one_test(
@@ -1886,40 +1912,45 @@ def _run_and_store_trial(
         last_measurement,
     )
     aspirate_evaporation = _timed_evaporation_compensation(
-        aspirate_evaporation_rate,
+        evaporation_rate,
         trial_measurements[0],
         trial_measurements[1],
         "aspirate",
     )
     dispense_evaporation = _timed_evaporation_compensation(
-        dispense_evaporation_rate,
+        evaporation_rate,
         trial_measurements[1],
         trial_measurements[2],
         "dispense",
     )
     print_info(
         "Timed evaporation correction: "
-        f"aspirate_rate={aspirate_evaporation_rate:.6f} uL/s, "
-        f"dispense_rate={dispense_evaporation_rate:.6f} uL/s, "
+        f"background_rate={evaporation_rate:.6f} uL/s, "
         f"aspirate={aspirate_evaporation:.6f} uL, "
         f"dispense={dispense_evaporation:.6f} uL"
     )
     asp_with_evap = (
-        calculate_change_in_volume(
-            trial_measurements[0],
-            trial_measurements[1],
-            liq,
+        _calculate_directional_volume(
+            trial_measurements[0], trial_measurements[1], liq, "aspirate"
         )
         - aspirate_evaporation
     )
     disp_with_evap = (
-        calculate_change_in_volume(
-            trial_measurements[1],
-            trial_measurements[2],
-            liq,
+        _calculate_directional_volume(
+            trial_measurements[1], trial_measurements[2], liq, "dispense"
         )
         + dispense_evaporation
     )
+    if not math.isfinite(asp_with_evap) or not math.isfinite(disp_with_evap):
+        raise RuntimeError(
+            f"Non-finite corrected volume at channel {channel}, trial {trial}, "
+            f"volume {volume}: aspirate={asp_with_evap}, dispense={disp_with_evap}"
+        )
+    if asp_with_evap <= 0 or disp_with_evap <= 0:
+        raise RuntimeError(
+            f"Non-positive corrected volume at channel {channel}, trial {trial}, "
+            f"volume {volume}: aspirate={asp_with_evap}, dispense={disp_with_evap}"
+        )
 
     full_tip_increment = (
         len(fixture_settings.channels) == 8 and fixture_settings.increment
@@ -1946,6 +1977,56 @@ def _run_and_store_trial(
     )
 
     return trial_measurements, asp_with_evap, disp_with_evap
+
+
+def _calculate_directional_volume(
+    before: MeasurementData,
+    after: MeasurementData,
+    liq: SupportedLiquid,
+    phase: str,
+) -> float:
+    """Calculate a volume only when the scale moved in the expected direction."""
+    mass_delta = after.grams_average - before.grams_average
+    if phase == "aspirate":
+        expected = mass_delta < 0
+        volume = _calculate_signed_change_in_volume(before, after, liq)
+    elif phase == "dispense":
+        expected = mass_delta > 0
+        volume = _calculate_signed_change_in_volume(after, before, liq)
+    else:
+        raise ValueError(f"Unknown gravimetric phase: {phase}")
+    print_info(
+        "DIRECTIONAL_VOLUME "
+        + json.dumps(
+            {
+                "phase": phase,
+                "mass_delta_grams": mass_delta,
+                "expected_direction": expected,
+                "volume_ul": volume,
+            },
+            sort_keys=True,
+        )
+    )
+    if not expected or not math.isfinite(volume) or volume <= 0:
+        raise RuntimeError(
+            f"Invalid {phase} measurement direction: "
+            f"mass delta={mass_delta:.9f} g, volume={volume} uL"
+        )
+    return volume
+
+
+def _calculate_checked_stats(
+    values: List[float], target_volume: float, label: str
+) -> Tuple[float, float, float]:
+    """Reject invalid values before they enter the production report statistics."""
+    if not values or not all(math.isfinite(value) for value in values):
+        raise RuntimeError(f"Invalid non-finite values for {label}: {values}")
+    average = sum(values) / len(values)
+    if not math.isfinite(average) or average <= 0:
+        raise RuntimeError(f"Invalid non-positive average for {label}: {average}")
+    if not math.isfinite(target_volume) or target_volume <= 0:
+        raise RuntimeError(f"Invalid target volume for {label}: {target_volume}")
+    return helpers._calculate_stats(values, target_volume)
 
 
 def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
@@ -2017,51 +2098,22 @@ def _get_max_evaporation_compensation(
 
 def _log_evaporation_diagnostics(
     observations: List[EvaporationRateObservation],
-    phase_estimates: Dict[str, EvaporationPhaseRateEstimate],
+    estimate: EvaporationBackgroundRateEstimate,
     *,
     valid: bool,
     fallback_reason: Optional[str],
 ) -> None:
-    phase_diagnostics = {
-        phase: {
-            "rate_ul_per_second": estimate.rate_ul_per_second,
-            "valid": estimate.valid,
-            "fallback_reason": estimate.fallback_reason,
-            "required_intervals": estimate.required_count,
-            "accepted_intervals": len(estimate.accepted_indexes),
-            "center_rate_ul_per_second": estimate.center_rate,
-            "mad_rate_ul_per_second": estimate.mad_rate,
-            "outlier_tolerance_rate_ul_per_second": estimate.outlier_tolerance_rate,
-            "legacy_compensation_ul": estimate.legacy_compensation_ul,
-        }
-        for phase, estimate in phase_estimates.items()
-    }
-    accepted_indexes = set().union(
-        *(estimate.accepted_indexes for estimate in phase_estimates.values())
-    )
+    accepted_indexes = estimate.accepted_indexes
     payload = {
         "valid": valid,
         "fallback_reason": fallback_reason,
-        "aspirate_evaporation_rate": phase_estimates[
-            "aspirate"
-        ].rate_ul_per_second,
-        "dispense_evaporation_rate": phase_estimates[
-            "dispense"
-        ].rate_ul_per_second,
-        "phase_estimates": phase_diagnostics,
+        "background_evaporation_rate_ul_per_second": estimate.rate_ul_per_second,
+        "legacy_compensation_ul": estimate.legacy_compensation_ul,
+        "required_intervals": estimate.required_count,
         "accepted_intervals": len(accepted_indexes),
+        "rejected_intervals": len(observations) - len(accepted_indexes),
         "total_intervals": len(observations),
         "scale_resolution_ul": EVAPORATION_SCALE_RESOLUTION_UL,
-        "phase_intervals": {
-            phase: {
-                "total": sum(
-                    observation.phase == phase for observation in observations
-                ),
-                "required": phase_estimates[phase].required_count,
-                "accepted": len(phase_estimates[phase].accepted_indexes),
-            }
-            for phase in ("aspirate", "dispense")
-        },
         "intervals": [
             {
                 "trial": observation.trial,
@@ -2071,9 +2123,9 @@ def _log_evaporation_diagnostics(
                     if math.isfinite(observation.elapsed_seconds)
                     else None
                 ),
-                "signed_volume_ul": (
-                    observation.signed_volume_ul
-                    if math.isfinite(observation.signed_volume_ul)
+                "volume_ul": (
+                    observation.volume_ul
+                    if math.isfinite(observation.volume_ul)
                     else None
                 ),
                 "rate_ul_per_second": (
@@ -2093,115 +2145,95 @@ def _robust_evaporation_rate(
     observations: List[EvaporationRateObservation],
     fixture_settings: FixtureSettings,
 ) -> EvaporationRateEstimate:
-    """Return independent direction-aware rates after robust filtering."""
+    """Return one robust rate from all blank intervals.
 
-    def _estimate_phase(phase: str) -> EvaporationPhaseRateEstimate:
-        phase_observations = [
-            (index, observation)
-            for index, observation in enumerate(observations)
-            if observation.phase == phase
-        ]
-        required_count = max(
-            EVAPORATION_MIN_VALID_INTERVALS,
-            math.ceil(len(phase_observations) * EVAPORATION_MIN_VALID_FRACTION),
+    Blank measurements contain no liquid transfer, so aspirate/dispense labels
+    are only diagnostic.  Matching production, each interval uses the absolute
+    gravimetric change and all intervals share one background rate.
+    """
+    required_count = max(
+        EVAPORATION_MIN_VALID_INTERVALS,
+        math.ceil(len(observations) * EVAPORATION_MIN_VALID_FRACTION),
+    )
+    finite_observations = [
+        (index, observation)
+        for index, observation in enumerate(observations)
+        if observation.elapsed_seconds > 0
+        and math.isfinite(observation.elapsed_seconds)
+        and math.isfinite(observation.volume_ul)
+        and math.isfinite(observation.rate_ul_per_second)
+        and observation.volume_ul >= 0
+        and observation.rate_ul_per_second >= 0
+    ]
+    if len(finite_observations) < required_count:
+        reason = (
+            f"only {len(finite_observations)}/{len(observations)} finite intervals"
         )
-        finite_observations = [
-            (index, observation)
-            for index, observation in phase_observations
-            if observation.elapsed_seconds > 0
-            and math.isfinite(observation.elapsed_seconds)
-            and math.isfinite(observation.signed_volume_ul)
-            and math.isfinite(observation.rate_ul_per_second)
-        ]
-        if len(finite_observations) < required_count:
-            reason = (
-                f"only {len(finite_observations)}/{len(phase_observations)} "
-                "finite intervals"
-            )
-            print_warning(
-                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
-                "using 0 uL/s"
-            )
-            return EvaporationPhaseRateEstimate(
-                rate_ul_per_second=0.0,
-                valid=False,
-                fallback_reason=reason,
-                legacy_compensation_ul=0.0,
-                accepted_indexes=set(),
-                required_count=required_count,
-                center_rate=None,
-                mad_rate=None,
-                outlier_tolerance_rate=None,
-            )
+        print_warning(
+            f"Background evaporation rate is invalid ({reason}); using 0 uL/s"
+        )
+        estimate = EvaporationBackgroundRateEstimate(
+            rate_ul_per_second=0.0,
+            valid=False,
+            fallback_reason=reason,
+            legacy_compensation_ul=0.0,
+            accepted_indexes=set(),
+            required_count=required_count,
+            center_rate=None,
+            mad_rate=None,
+            outlier_tolerance_rate=None,
+        )
+        _log_evaporation_diagnostics(
+            observations, estimate, valid=False, fallback_reason=reason
+        )
+        return EvaporationRateEstimate(
+            aspirate_evaporation_rate=0.0,
+            dispense_evaporation_rate=0.0,
+            valid=False,
+            fallback_reason=reason,
+            legacy_aspirate_compensation_ul=0.0,
+            legacy_dispense_compensation_ul=0.0,
+        )
 
-        finite_rates = [
-            observation.rate_ul_per_second
-            for _, observation in finite_observations
-        ]
-        center_rate = float(median(finite_rates))
-        mad_rate = float(median(abs(rate - center_rate) for rate in finite_rates))
-        representative_elapsed = float(
-            median(
-                observation.elapsed_seconds
-                for _, observation in finite_observations
-            )
+    finite_rates = [
+        observation.rate_ul_per_second for _, observation in finite_observations
+    ]
+    center_rate = float(median(finite_rates))
+    mad_rate = float(median(abs(rate - center_rate) for rate in finite_rates))
+    representative_elapsed = float(
+        median(
+            observation.elapsed_seconds for _, observation in finite_observations
         )
-        resolution_tolerance_rate = (
-            EVAPORATION_SCALE_RESOLUTION_UL / representative_elapsed
+    )
+    resolution_tolerance_rate = (
+        EVAPORATION_SCALE_RESOLUTION_UL / representative_elapsed
+    )
+    outlier_tolerance_rate = max(
+        resolution_tolerance_rate,
+        EVAPORATION_OUTLIER_SIGMA * EVAPORATION_MAD_SCALE * mad_rate,
+    )
+    accepted = [
+        (index, observation)
+        for index, observation in finite_observations
+        if abs(observation.rate_ul_per_second - center_rate)
+        <= outlier_tolerance_rate
+    ]
+    accepted_indexes = {index for index, _ in accepted}
+    reason: Optional[str] = None
+    if len(accepted) < required_count:
+        reason = (
+            f"only {len(accepted)}/{len(observations)} intervals passed filtering"
         )
-        outlier_tolerance_rate = max(
-            resolution_tolerance_rate,
-            EVAPORATION_OUTLIER_SIGMA * EVAPORATION_MAD_SCALE * mad_rate,
+        print_warning(
+            f"Background evaporation rate is invalid ({reason}); using 0 uL/s"
         )
-        accepted = [
-            (index, observation)
-            for index, observation in finite_observations
-            if abs(observation.rate_ul_per_second - center_rate)
-            <= outlier_tolerance_rate
-        ]
-        accepted_indexes = {index for index, _ in accepted}
-        if len(accepted) < required_count:
-            reason = (
-                f"only {len(accepted)}/{len(phase_observations)} intervals "
-                "passed filtering"
-            )
-            print_warning(
-                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
-                "using 0 uL/s"
-            )
-            return EvaporationPhaseRateEstimate(
-                rate_ul_per_second=0.0,
-                valid=False,
-                fallback_reason=reason,
-                legacy_compensation_ul=0.0,
-                accepted_indexes=accepted_indexes,
-                required_count=required_count,
-                center_rate=center_rate,
-                mad_rate=mad_rate,
-                outlier_tolerance_rate=outlier_tolerance_rate,
-            )
-
+        rate_ul_per_second = 0.0
+        legacy_compensation_ul = 0.0
+        valid = False
+    else:
         rate_ul_per_second = float(
             median(observation.rate_ul_per_second for _, observation in accepted)
         )
-        if rate_ul_per_second < 0:
-            reason = f"median rate indicates mass gain ({rate_ul_per_second:.6f} uL/s)"
-            print_warning(
-                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
-                "using 0 uL/s"
-            )
-            return EvaporationPhaseRateEstimate(
-                rate_ul_per_second=0.0,
-                valid=False,
-                fallback_reason=reason,
-                legacy_compensation_ul=0.0,
-                accepted_indexes=accepted_indexes,
-                required_count=required_count,
-                center_rate=center_rate,
-                mad_rate=mad_rate,
-                outlier_tolerance_rate=outlier_tolerance_rate,
-            )
-
         max_compensation_ul = _get_max_evaporation_compensation(fixture_settings)
         largest_blank_compensation = rate_ul_per_second * max(
             observation.elapsed_seconds for _, observation in accepted
@@ -2212,61 +2244,41 @@ def _robust_evaporation_rate(
                 f"{max_compensation_ul:.6f} uL"
             )
             print_warning(
-                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
-                "using 0 uL/s"
+                f"Background evaporation rate is invalid ({reason}); using 0 uL/s"
             )
-            return EvaporationPhaseRateEstimate(
-                rate_ul_per_second=0.0,
-                valid=False,
-                fallback_reason=reason,
-                legacy_compensation_ul=0.0,
-                accepted_indexes=accepted_indexes,
-                required_count=required_count,
-                center_rate=center_rate,
-                mad_rate=mad_rate,
-                outlier_tolerance_rate=outlier_tolerance_rate,
+            rate_ul_per_second = 0.0
+            legacy_compensation_ul = 0.0
+            valid = False
+        else:
+            legacy_compensation_ul = rate_ul_per_second * float(
+                median(observation.elapsed_seconds for _, observation in accepted)
             )
+            valid = True
 
-        legacy_compensation_ul = rate_ul_per_second * float(
-            median(observation.elapsed_seconds for _, observation in accepted)
-        )
-        return EvaporationPhaseRateEstimate(
-            rate_ul_per_second=rate_ul_per_second,
-            valid=True,
-            fallback_reason=None,
-            legacy_compensation_ul=legacy_compensation_ul,
-            accepted_indexes=accepted_indexes,
-            required_count=required_count,
-            center_rate=center_rate,
-            mad_rate=mad_rate,
-            outlier_tolerance_rate=outlier_tolerance_rate,
-        )
-
-    phase_estimates = {
-        phase: _estimate_phase(phase) for phase in ("aspirate", "dispense")
-    }
-    fallback_reasons = [
-        f"{phase}: {estimate.fallback_reason}"
-        for phase, estimate in phase_estimates.items()
-        if estimate.fallback_reason
-    ]
-    fallback_reason = "; ".join(fallback_reasons) or None
-    valid = all(estimate.valid for estimate in phase_estimates.values())
-    aspirate_estimate = phase_estimates["aspirate"]
-    dispense_estimate = phase_estimates["dispense"]
+    estimate = EvaporationBackgroundRateEstimate(
+        rate_ul_per_second=rate_ul_per_second,
+        valid=valid,
+        fallback_reason=None if valid else reason,
+        legacy_compensation_ul=legacy_compensation_ul,
+        accepted_indexes=accepted_indexes,
+        required_count=required_count,
+        center_rate=center_rate,
+        mad_rate=mad_rate,
+        outlier_tolerance_rate=outlier_tolerance_rate,
+    )
     _log_evaporation_diagnostics(
         observations,
-        phase_estimates,
+        estimate,
         valid=valid,
-        fallback_reason=fallback_reason,
+        fallback_reason=estimate.fallback_reason,
     )
     return EvaporationRateEstimate(
-        aspirate_evaporation_rate=aspirate_estimate.rate_ul_per_second,
-        dispense_evaporation_rate=dispense_estimate.rate_ul_per_second,
+        aspirate_evaporation_rate=rate_ul_per_second,
+        dispense_evaporation_rate=rate_ul_per_second,
         valid=valid,
-        fallback_reason=fallback_reason,
-        legacy_aspirate_compensation_ul=aspirate_estimate.legacy_compensation_ul,
-        legacy_dispense_compensation_ul=dispense_estimate.legacy_compensation_ul,
+        fallback_reason=estimate.fallback_reason,
+        legacy_aspirate_compensation_ul=legacy_compensation_ul,
+        legacy_dispense_compensation_ul=legacy_compensation_ul,
     )
 
 
@@ -2322,9 +2334,11 @@ def calculate_evaporation(
             ("dispense", blank[1], blank[2]),
         ):
             elapsed_seconds = _measurement_elapsed_seconds(before, after)
-            signed_volume_ul = _calculate_signed_change_in_volume(before, after, liq)
+            # Match production: blank drift is an absolute gravimetric change.
+            # The aspirate/dispense labels are retained only for diagnostics.
+            blank_volume_ul = calculate_change_in_volume(before, after, liq)
             rate_ul_per_second = (
-                signed_volume_ul / elapsed_seconds
+                blank_volume_ul / elapsed_seconds
                 if elapsed_seconds > 0 and math.isfinite(elapsed_seconds)
                 else math.nan
             )
@@ -2333,7 +2347,7 @@ def calculate_evaporation(
                     trial=trial,
                     phase=phase,
                     elapsed_seconds=elapsed_seconds,
-                    signed_volume_ul=signed_volume_ul,
+                    volume_ul=blank_volume_ul,
                     rate_ul_per_second=rate_ul_per_second,
                 )
             )
@@ -2344,28 +2358,11 @@ def calculate_evaporation(
         estimate.legacy_aspirate_compensation_ul,
         estimate.legacy_dispense_compensation_ul,
     )
-    phase_elapsed_seconds = {"aspirate": 0.0, "dispense": 0.0}
-    for blank in blank_measurments:
-        for phase, before, after in (
-            ("aspirate", blank[0], blank[1]),
-            ("dispense", blank[1], blank[2]),
-        ):
-            elapsed_seconds = _measurement_elapsed_seconds(before, after)
-            if elapsed_seconds <= 0 or not math.isfinite(elapsed_seconds):
-                continue
-            phase_elapsed_seconds[phase] += elapsed_seconds
-    observed_elapsed_seconds = sum(phase_elapsed_seconds.values())
-    if blank_measurments and observed_elapsed_seconds > 0:
-        weighted_blank_rate = (
-            estimate.aspirate_evaporation_rate
-            * phase_elapsed_seconds["aspirate"]
-            + estimate.dispense_evaporation_rate
-            * phase_elapsed_seconds["dispense"]
-        ) / observed_elapsed_seconds
+    if blank_measurments:
         total_blank_seconds = _measurement_elapsed_seconds(
             blank_measurments[0][0], blank_measurments[-1][-1]
         )
-        volume_lost_during_blank = weighted_blank_rate * max(
+        volume_lost_during_blank = estimate.aspirate_evaporation_rate * max(
             0.0, total_blank_seconds
         )
     else:
@@ -2459,12 +2456,7 @@ def _run(
             scale_stabilization_seconds=scale_stabilization_seconds,
             state_log_callback=state_log_callback,
         )
-        aspirate_evaporation_rate = (
-            evaporation_estimate.aspirate_evaporation_rate
-        )
-        dispense_evaporation_rate = (
-            evaporation_estimate.dispense_evaporation_rate
-        )
+        evaporation_rate = evaporation_estimate.aspirate_evaporation_rate
         last_measurement: Optional[MeasurementData] = (
             blank_measurments[-1][-1] if blank_measurments else None
         )
@@ -2472,8 +2464,7 @@ def _run(
         ctx.comment(
             "evaporation blank disabled: skip scale stabilization and blank trials"
         )
-        aspirate_evaporation_rate = 0.0
-        dispense_evaporation_rate = 0.0
+        evaporation_rate = 0.0
         report.store_average_evaporation(
             fixture_settings.test_report,
             0.0,
@@ -2570,11 +2561,8 @@ def _run(
                                     ctx, fixture_settings, liq, blank_tip
                                 )
                             )
-                            aspirate_evaporation_rate = (
+                            evaporation_rate = (
                                 evaporation_estimate.aspirate_evaporation_rate
-                            )
-                            dispense_evaporation_rate = (
-                                evaporation_estimate.dispense_evaporation_rate
                             )
                             if blank_measurments:
                                 last_measurement = blank_measurments[-1][-1]
@@ -2595,8 +2583,7 @@ def _run(
                             channel,
                             last_measurement,
                             liq,
-                            aspirate_evaporation_rate,
-                            dispense_evaporation_rate,
+                            evaporation_rate,
                         )
                         measurements[volume].append(trial_measurements)
                         print_info(
@@ -2611,12 +2598,20 @@ def _run(
                         aspirate_average,
                         aspirate_cv,
                         aspirate_d,
-                    ) = helpers._calculate_stats(actual_asp_list_channel, volume)
+                    ) = _calculate_checked_stats(
+                        actual_asp_list_channel,
+                        volume,
+                        f"channel {channel} aspirate {volume}uL",
+                    )
                     (
                         dispense_average,
                         dispense_cv,
                         dispense_d,
-                    ) = helpers._calculate_stats(actual_disp_list_channel, volume)
+                    ) = _calculate_checked_stats(
+                        actual_disp_list_channel,
+                        volume,
+                        f"channel {channel} dispense {volume}uL",
+                    )
                     aspirate_data_list = [elem[1] for elem in measurements[volume]]
                     dispense_data_list = [elem[2] for elem in measurements[volume]]
                     # Average Celsius
@@ -2682,10 +2677,18 @@ def _run(
             with _batch_report_update(fixture_settings.test_report):
                 for trial in range(fixture_settings.trials):
                     aspirate_average, aspirate_cv, aspirate_d = (
-                        helpers._calculate_stats(trial_asp_dict[trial], volume)
+                        _calculate_checked_stats(
+                            trial_asp_dict[trial],
+                            volume,
+                            f"trial {trial} aspirate {volume}uL",
+                        )
                     )
                     dispense_average, dispense_cv, dispense_d = (
-                        helpers._calculate_stats(trial_disp_dict[trial], volume)
+                        _calculate_checked_stats(
+                            trial_disp_dict[trial],
+                            volume,
+                            f"trial {trial} dispense {volume}uL",
+                        )
                     )
                     report.store_volume_per_trial(
                         report=fixture_settings.test_report,
@@ -2707,11 +2710,15 @@ def _run(
                         d=dispense_d,
                         flag="isolated" if fixture_settings.isolate_volumes else "",
                     )
-                aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                    actual_asp_list_all, volume
+                aspirate_average, aspirate_cv, aspirate_d = _calculate_checked_stats(
+                    actual_asp_list_all,
+                    volume,
+                    f"all aspirate {volume}uL",
                 )
-                dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                    actual_disp_list_all, volume
+                dispense_average, dispense_cv, dispense_d = _calculate_checked_stats(
+                    actual_disp_list_all,
+                    volume,
+                    f"all dispense {volume}uL",
                 )
                 report.store_volume_all(
                     report=fixture_settings.test_report,

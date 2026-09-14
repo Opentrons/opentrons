@@ -8,6 +8,11 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 
 
+# The Asair sensor reports temperature and humidity, but not atmospheric
+# pressure. Shenzhen is near sea level, so use standard atmospheric pressure.
+FIXED_AIR_PRESSURE_PASCALS = 101_325.0
+
+
 @dataclass
 class EnvironmentData:
     """Environment data."""
@@ -34,7 +39,7 @@ def read_environment_data(
         humidity_pipette=humidity_pipette,
         celsius_air=env_data.temperature,
         humidity_air=env_data.relative_humidity,
-        pascals_air=1000,
+        pascals_air=FIXED_AIR_PRESSURE_PASCALS,
         celsius_liquid=25.0,
     )
     return d

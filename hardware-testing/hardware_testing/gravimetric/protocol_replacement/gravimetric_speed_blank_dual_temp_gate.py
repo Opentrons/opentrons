@@ -134,7 +134,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed blank"}
+metadata = {"protocolName": "Gravimetric QC V3 speed blank dual temp gate"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -146,6 +146,17 @@ SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE = 15.0
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
 PIPETTE_IDLE_CURRENT_AMPS = 0.1
 PIPETTE_CURRENT_TOLERANCE_AMPS = 0.01
+# Production reports showed the smallest absolute dispense %D bias when the
+# 5-uL measurement ran at roughly 24.5-25.0 C on average. Because the stem
+# warms during the ten trials, that corresponds to an observed pre-test target
+# of roughly 24.0-24.5 C. This is advisory only: do not heat a cool pipette.
+P1000S_PREFERRED_START_TEMPERATURE_MIN_C = 24.0
+P1000S_PREFERRED_START_TEMPERATURE_MAX_C = 24.5
+# Keep the 26 C value in diagnostics for comparison with production data. It is
+# not an automatic post-engagement shutoff threshold.
+P1000S_TEST_TEMPERATURE_MAX_C = 26.0
+P1000S_TEST_TEMPERATURE_POLL_SECONDS = 5.0
+P1000S_TEST_TEMPERATURE_TIMEOUT_SECONDS = 30.0 * 60.0
 EVAPORATION_MAD_SCALE = 1.4826
 EVAPORATION_OUTLIER_SIGMA = 3.5
 EVAPORATION_SCALE_RESOLUTION_UL = 0.1
@@ -2407,6 +2418,29 @@ def _can_use_dedicated_dry_blank_tip(
     return fixture_settings.pipette_channels != 96 or fixture_settings.single_tip_96
 
 
+def _uses_p1000s_temperature_gate(
+    fixture_settings: FixtureSettings,
+) -> bool:
+    """Apply the temperature ceiling to either mount's P1000S test."""
+    return (
+        fixture_settings.mount in {"left", "right"}
+        and fixture_settings.pipette_channels == 1
+        and fixture_settings.pipette_volume == 1000
+    )
+
+
+def _notify_p1000s_pre_measurement_state(
+    fixture_settings: FixtureSettings,
+    state_log_callback: Optional[Callable[[str], None]],
+) -> None:
+    """Run the active P1000S gate at the last boundary before measurements."""
+    if (
+        _uses_p1000s_temperature_gate(fixture_settings)
+        and state_log_callback is not None
+    ):
+        state_log_callback("pre-measurement")
+
+
 def _run(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
@@ -2431,6 +2465,7 @@ def _run(
     fixture_settings.pipette._retract()
     last_probed_tip_size = first_tip_size
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    _notify_p1000s_pre_measurement_state(fixture_settings, state_log_callback)
     if fixture_settings.run_evaporation:
         blank_tip = first_tip
         if _can_use_dedicated_dry_blank_tip(fixture_settings):
@@ -4545,6 +4580,162 @@ class _DualPipetteHeatGuard:
             )
 
 
+def _read_mount_stem_temperature(ctx: ProtocolContext, mount: str) -> float:
+    """Read one valid stem temperature for the active-mount temperature gate."""
+    temperature = float(
+        get_sync_hw_api(ctx).read_stem_temperature(
+            Mount.string_to_mount(mount), True
+        )
+    )
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise RuntimeError(
+            f"Invalid {mount} stem temperature for temperature gate: {temperature}"
+        )
+    return temperature
+
+
+def _p1000s_temperature_zone(temperature: float) -> str:
+    """Classify a start temperature without turning the preferred range into a gate."""
+    if temperature < P1000S_PREFERRED_START_TEMPERATURE_MIN_C:
+        return "below-preferred"
+    if temperature <= P1000S_PREFERRED_START_TEMPERATURE_MAX_C:
+        return "preferred"
+    if temperature <= P1000S_TEST_TEMPERATURE_MAX_C:
+        return "above-preferred-safe"
+    return "over-ceiling"
+
+
+def _log_p1000s_temperature_gate(
+    fixture_settings: FixtureSettings,
+    stage: str,
+    temperature: float,
+    elapsed_seconds: float,
+) -> None:
+    """Write temperature-gate diagnostics without changing the production CSV."""
+    snapshot = _capture_dual_mount_state(
+        fixture_settings.ctx, _present_pipette_axes(fixture_settings.ctx)
+    )
+    print_info(
+        "P1000S_TEMPERATURE_GATE "
+        + json.dumps(
+            {
+                "test_mount": fixture_settings.mount,
+                "stage": stage,
+                "elapsed_seconds": round(elapsed_seconds, 1),
+                "temperature_c": temperature,
+                "temperature_zone": _p1000s_temperature_zone(temperature),
+                "preferred_start_min_c": P1000S_PREFERRED_START_TEMPERATURE_MIN_C,
+                "preferred_start_max_c": P1000S_PREFERRED_START_TEMPERATURE_MAX_C,
+                "cooling_target_max_c": P1000S_PREFERRED_START_TEMPERATURE_MAX_C,
+                "target_max_c": P1000S_TEST_TEMPERATURE_MAX_C,
+                **snapshot,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+def _activate_mount_at_preferred_temperature(
+    fixture_settings: FixtureSettings,
+    heat_guard: _DualPipetteHeatGuard,
+) -> None:
+    """Cool to the empirical start target before activating the pipette.
+
+    A stem below 24.0 C is accepted immediately; the protocol never heats to
+    reach the preferred interval. A stem above 24.5 C stays disengaged until it
+    cools, while an active pipette is left running even if it later exceeds
+    26.0 C. That later reading is logged for analysis only.
+    """
+    mount = fixture_settings.mount
+    start_time = time()
+    mount_active = False
+    ready = False
+    try:
+        while time() - start_time < P1000S_TEST_TEMPERATURE_TIMEOUT_SECONDS:
+            elapsed_seconds = time() - start_time
+            temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+
+            if not mount_active:
+                if temperature > P1000S_PREFERRED_START_TEMPERATURE_MAX_C:
+                    _log_p1000s_temperature_gate(
+                        fixture_settings,
+                        "cooling-disengaged",
+                        temperature,
+                        elapsed_seconds,
+                    )
+                    fixture_settings.ctx.delay(
+                        seconds=P1000S_TEST_TEMPERATURE_POLL_SECONDS,
+                        msg=(
+                            f"Cooling {mount} P1000S to the preferred "
+                            "24.5 C start target before engagement: "
+                            f"{temperature:.3f} C"
+                        ),
+                    )
+                    continue
+
+                needs_home = heat_guard.activate_mount(mount)
+                mount_active = True
+                heat_guard.activate_pipette(
+                    fixture_settings.pipette, needs_home
+                )
+                temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+                _log_p1000s_temperature_gate(
+                    fixture_settings,
+                    "engaged-for-test",
+                    temperature,
+                    time() - start_time,
+                )
+
+            _log_p1000s_temperature_gate(
+                fixture_settings,
+                (
+                    "pre-test-passed"
+                    if temperature <= P1000S_TEST_TEMPERATURE_MAX_C
+                    else "pre-test-over-ceiling-allowed"
+                ),
+                temperature,
+                time() - start_time,
+            )
+            ready = True
+            return
+
+        temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+        raise RuntimeError(
+            f"{mount} P1000S did not cool to the "
+            f"{P1000S_PREFERRED_START_TEMPERATURE_MAX_C:.1f} C preferred "
+            "test-start target "
+            f"within {P1000S_TEST_TEMPERATURE_TIMEOUT_SECONDS:g}s; "
+            f"last temperature was {temperature:.3f} C."
+        )
+    finally:
+        if not ready and mount_active:
+            heat_guard.deactivate_mount(mount)
+
+
+def _verify_p1000s_temperature_before_measurement(
+    fixture_settings: FixtureSettings,
+    stage: str,
+) -> None:
+    """Log the active P1000S temperature without changing motor state.
+
+    The active pipette is intentionally not disengaged or recool-triggered if
+    it rises above 26 C. This preserves the requested continuous test flow;
+    the reading remains available in run_output.txt for %D correlation.
+    """
+    mount = fixture_settings.mount
+    temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+    _log_p1000s_temperature_gate(
+        fixture_settings,
+        (
+            f"{stage}-passed"
+            if temperature <= P1000S_TEST_TEMPERATURE_MAX_C
+            else f"{stage}-over-ceiling-allowed"
+        ),
+        temperature,
+        0.0,
+    )
+
+
 @contextmanager
 def _dual_pipette_heat_guard(
     ctx: ProtocolContext,
@@ -4625,6 +4816,25 @@ def _record_dual_mount_stem_temperatures(
             sort_keys=True,
         )
     )
+
+
+def _handle_dual_mount_test_state(
+    fixture_settings: FixtureSettings,
+    mount: str,
+    heat_guard: Optional[_DualPipetteHeatGuard],
+    phase: str,
+) -> None:
+    """Apply the active P1000S temperature gate, then log both mounts."""
+    try:
+        if _uses_p1000s_temperature_gate(
+            fixture_settings
+        ) and phase in {"pre-measurement", "first-blank"}:
+            _verify_p1000s_temperature_before_measurement(fixture_settings, phase)
+    except Exception:
+        if heat_guard is not None:
+            heat_guard.deactivate_mount(mount)
+        raise
+    _record_dual_mount_stem_temperatures(fixture_settings, phase)
 
 
 def _record_dual_mount_after_test(
@@ -5223,8 +5433,15 @@ def run(ctx: ProtocolContext) -> None:
                 _record_dual_mount_stem_temperatures(fixture_settings, "pre-engage")
             needs_home = False
             if heat_guard is not None:
-                needs_home = heat_guard.activate_mount(mount)
-                heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+                if _uses_p1000s_temperature_gate(fixture_settings):
+                    _activate_mount_at_preferred_temperature(
+                        fixture_settings, heat_guard
+                    )
+                else:
+                    needs_home = heat_guard.activate_mount(mount)
+                    heat_guard.activate_pipette(
+                        fixture_settings.pipette, needs_home
+                    )
             after_test_callback: Optional[Callable[[], None]] = None
             state_log_callback: Optional[Callable[[str], None]] = None
             if dual_mount:
@@ -5235,7 +5452,10 @@ def run(ctx: ProtocolContext) -> None:
                     mount,
                 )
                 state_log_callback = partial(
-                    _record_dual_mount_stem_temperatures, fixture_settings
+                    _handle_dual_mount_test_state,
+                    fixture_settings,
+                    mount,
+                    heat_guard,
                 )
             # Both mounts use the same short post-activation restabilization. The
             # pre-engagement scale gate above handles the longer idle baseline

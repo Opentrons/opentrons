@@ -4,12 +4,13 @@ from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator, Cal
 from contextlib import contextmanager
 from dataclasses import dataclass, asdict, replace
 from statistics import median
-from time import time
+from time import monotonic, time
 import copy
 import json
 import math
 import traceback
 import asyncio
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import partial
 
 from opentrons.protocol_api import (
@@ -134,7 +135,9 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed blank"}
+metadata = {
+    "protocolName": "Gravimetric QC V3 speed blank P1000 passive temp gate"
+}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -144,8 +147,25 @@ SCALE_STABILITY_POLL_SECONDS = 1.0
 SCALE_STABILITY_TIMEOUT_SECONDS = SCALE_SECONDS_TO_TRUE_STABILIZE
 SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE = 15.0
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
-PIPETTE_IDLE_CURRENT_AMPS = 0.1
+# Cooling waits use a true zero-current motor state. The motor is disabled
+# before these register values are written; this does not power down the
+# pipette electronics or guarantee that the stem will cool below ambient.
+PIPETTE_IDLE_CURRENT_AMPS = 0.0
 PIPETTE_CURRENT_TOLERANCE_AMPS = 0.01
+# P1000M e84a857923: the supported whole-run start band with the best balance
+# across 5 uL and 1000 uL was 24.0-24.5 C (n=41, 87.8% report pass rate).
+P1000M_PREFERRED_START_TEMPERATURE_MIN_C = 24.0
+P1000M_PREFERRED_START_TEMPERATURE_MAX_C = 24.5
+# P1000S 1847cac710 regular: the best observed 5-uL first-temperature bias
+# band was 24.5-25.0 C (n=15, 93.3% report pass rate). It is below the n=20
+# stable-candidate requirement, so both model ranges are preconditioning
+# targets rather than acceptance limits.
+P1000S_PREFERRED_START_TEMPERATURE_MIN_C = 24.5
+P1000S_PREFERRED_START_TEMPERATURE_MAX_C = 25.0
+P1000_TEMPERATURE_POLL_SECONDS = 10.0
+P1000_TEMPERATURE_TIMEOUT_SECONDS = 60.0 * 60.0
+P1000_TEMPERATURE_STABLE_SAMPLES = 3
+CUSTOM_HARDWARE_CALL_TIMEOUT_SECONDS = 10.0
 EVAPORATION_MAD_SCALE = 1.4826
 EVAPORATION_OUTLIER_SIGMA = 3.5
 EVAPORATION_SCALE_RESOLUTION_UL = 0.1
@@ -791,7 +811,19 @@ class FixtureSettings(CSVSettings):
             )
             raise
 
-        ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
+        print_info(
+            f"FIXTURE_BUILD_STAGE pre-settle-delay mount={csv_settings.mount}"
+        )
+        ctx.delay(
+            seconds=3,
+            msg=(
+                f"Fixture initialization settle for {csv_settings.mount} mount; "
+                f"simulating={simulating}"
+            ),
+        )
+        print_info(
+            f"FIXTURE_BUILD_STAGE post-settle-delay mount={csv_settings.mount}"
+        )
 
         ot3api = ctx._core.get_hardware()
         robot_serial = str(ot3api.get_serial_number())
@@ -2484,6 +2516,7 @@ def _run(
 
     measurements: Dict[float, List[List[MeasurementData]]] = {}
     tip_sizes_done = []
+    first_volume_trial_pending = True
     for tip in fixture_settings.tip_sizes:
         deferred_96ch_probe = False
         if tip != last_probed_tip_size:
@@ -2579,6 +2612,10 @@ def _run(
                             if blank_measurments:
                                 last_measurement = blank_measurments[-1][-1]
                             remove_tip(fixture_settings)
+                        if first_volume_trial_pending:
+                            if state_log_callback is not None:
+                                state_log_callback("first-volume-trial")
+                            first_volume_trial_pending = False
                         print_header(
                             f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
                         )
@@ -4221,12 +4258,24 @@ PIPETTE_AXES_BY_MOUNT: Dict[str, Axis] = {
 }
 
 
-def _resolve_hardware_result(hw_api: Any, result: Any) -> Any:
-    """Resolve a backend coroutine when the hardware API is synchronously adapted."""
+def _resolve_hardware_result(
+    hw_api: Any,
+    result: Any,
+    operation: str = "custom hardware call",
+    timeout_seconds: float = CUSTOM_HARDWARE_CALL_TIMEOUT_SECONDS,
+) -> Any:
+    """Resolve a backend coroutine without allowing an unbounded wait."""
     if asyncio.iscoroutine(result):
-        return asyncio.run_coroutine_threadsafe(
+        future = asyncio.run_coroutine_threadsafe(
             result, hw_api._obj_to_adapt._loop
-        ).result()
+        )
+        try:
+            return future.result(timeout=timeout_seconds)
+        except FutureTimeoutError as error:
+            future.cancel()
+            raise TimeoutError(
+                f"{operation} did not complete within {timeout_seconds:g}s"
+            ) from error
     return result
 
 
@@ -4256,7 +4305,13 @@ def _read_pipette_motor_engaged(ctx: ProtocolContext, axis: Axis) -> bool:
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
     if hasattr(backend, "is_motor_engaged"):
-        return bool(_resolve_hardware_result(hw_api, backend.is_motor_engaged(axis)))
+        return bool(
+            _resolve_hardware_result(
+                hw_api,
+                backend.is_motor_engaged(axis),
+                operation=f"read {axis.name} motor engagement",
+            )
+        )
     engaged_axes = getattr(hw_api, "engaged_axes", None)
     if callable(engaged_axes):
         engaged_axes = engaged_axes()
@@ -4328,17 +4383,31 @@ def _set_pipette_currents(
     """Set both run and hold current for one pipette axis."""
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
-    _resolve_hardware_result(hw_api, backend.set_active_current({axis: run_current}))
-    _resolve_hardware_result(hw_api, backend.set_hold_current({axis: hold_current}))
+    _resolve_hardware_result(
+        hw_api,
+        backend.set_active_current({axis: run_current}),
+        operation=f"set {axis.name} run current to {run_current:g} A",
+    )
+    _resolve_hardware_result(
+        hw_api,
+        backend.set_hold_current({axis: hold_current}),
+        operation=f"set {axis.name} hold current to {hold_current:g} A",
+    )
 
 
 def _set_pipette_engaged(ctx: ProtocolContext, axis: Axis, engaged: bool) -> None:
     """Set one pipette motor's engagement state."""
     hw_api = ctx._core.get_hardware()
+    async_hw_api = hw_api._obj_to_adapt
     if engaged:
-        _resolve_hardware_result(hw_api, hw_api.engage_axes([axis]))
+        result = async_hw_api.engage_axes([axis])
     else:
-        _resolve_hardware_result(hw_api, hw_api.disengage_axes([axis]))
+        result = async_hw_api.disengage_axes([axis])
+    _resolve_hardware_result(
+        hw_api,
+        result,
+        operation=f"set {axis.name} engagement to {engaged}",
+    )
 
 
 def _verify_pipette_engagement(
@@ -4453,8 +4522,14 @@ class _DualPipetteHeatGuard:
                 if is_active
                 else (PIPETTE_IDLE_CURRENT_AMPS, PIPETTE_IDLE_CURRENT_AMPS)
             )
-            _set_pipette_currents(self.ctx, axis, run_current, hold_current)
-            _set_pipette_engaged(self.ctx, axis, is_active)
+            if is_active:
+                # Restore the capacity-test defaults before energizing the motor.
+                _set_pipette_currents(self.ctx, axis, run_current, hold_current)
+                _set_pipette_engaged(self.ctx, axis, True)
+            else:
+                # Stop coil current first, then zero both current registers.
+                _set_pipette_engaged(self.ctx, axis, False)
+                _set_pipette_currents(self.ctx, axis, run_current, hold_current)
             _verify_pipette_currents(self.ctx, axis, run_current, hold_current)
             _verify_pipette_engagement(self.ctx, axis, is_active)
             if not is_active:
@@ -4580,9 +4655,14 @@ def _capture_dual_mount_state(
     stem_temperatures: Dict[str, Optional[float]] = {}
     for mount in ("left", "right"):
         try:
+            hw_api = get_sync_hw_api(ctx)
             stem_temperatures[mount] = float(
-                get_sync_hw_api(ctx).read_stem_temperature(
-                    Mount.string_to_mount(mount), True
+                _resolve_hardware_result(
+                    hw_api,
+                    hw_api._obj_to_adapt.read_stem_temperature(
+                        Mount.string_to_mount(mount), True
+                    ),
+                    operation=f"read {mount} stem temperature",
                 )
             )
         except Exception as error:
@@ -4602,6 +4682,242 @@ def _capture_dual_mount_state(
             for mount, axis in axes_by_mount.items()
         },
     }
+
+
+@dataclass(frozen=True)
+class _PipetteTemperatureTarget:
+    """Model-specific first-capacity temperature preconditioning target."""
+
+    model: str
+    minimum_c: float
+    maximum_c: float
+
+
+def _get_p1000_temperature_target(
+    fixture_settings: FixtureSettings,
+) -> Optional[_PipetteTemperatureTarget]:
+    """Return the target for P1000S/P1000M, or None for every other model."""
+    if (
+        fixture_settings.mount not in {"left", "right"}
+        or fixture_settings.pipette_volume != 1000
+    ):
+        return None
+    if fixture_settings.pipette_channels == 1:
+        return _PipetteTemperatureTarget(
+            model="P1000S",
+            minimum_c=P1000S_PREFERRED_START_TEMPERATURE_MIN_C,
+            maximum_c=P1000S_PREFERRED_START_TEMPERATURE_MAX_C,
+        )
+    if fixture_settings.pipette_channels == 8:
+        return _PipetteTemperatureTarget(
+            model="P1000M",
+            minimum_c=P1000M_PREFERRED_START_TEMPERATURE_MIN_C,
+            maximum_c=P1000M_PREFERRED_START_TEMPERATURE_MAX_C,
+        )
+    return None
+
+
+def _read_mount_stem_temperature(ctx: ProtocolContext, mount: str) -> float:
+    """Read and validate one pipette stem temperature."""
+    hw_api = get_sync_hw_api(ctx)
+    temperature = float(
+        _resolve_hardware_result(
+            hw_api,
+            hw_api._obj_to_adapt.read_stem_temperature(
+                Mount.string_to_mount(mount), True
+            ),
+            operation=f"read {mount} stem temperature",
+        )
+    )
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise RuntimeError(
+            f"Invalid {mount} stem temperature for P1000 gate: {temperature}"
+        )
+    return temperature
+
+
+def _p1000_temperature_zone(
+    temperature: float, target: _PipetteTemperatureTarget
+) -> str:
+    """Classify a temperature without requiring a cold pipette to warm up."""
+    if temperature < target.minimum_c:
+        return "below-preferred-accepted"
+    if temperature <= target.maximum_c:
+        return "preferred"
+    return "cooling-required"
+
+
+def _log_p1000_temperature_gate(
+    fixture_settings: FixtureSettings,
+    target: _PipetteTemperatureTarget,
+    stage: str,
+    temperature: float,
+    elapsed_seconds: float,
+    stable_samples: int,
+) -> None:
+    """Write the passive-cooling decision and motor state to run_output.txt."""
+    snapshot = _capture_dual_mount_state(
+        fixture_settings.ctx, _present_pipette_axes(fixture_settings.ctx)
+    )
+    print_info(
+        "PIPETTE_TEMPERATURE_GATE "
+        + json.dumps(
+            {
+                "test_mount": fixture_settings.mount,
+                "pipette_model": target.model,
+                "stage": stage,
+                "elapsed_seconds": round(elapsed_seconds, 1),
+                "temperature_c": temperature,
+                "temperature_zone": _p1000_temperature_zone(
+                    temperature, target
+                ),
+                "preferred_start_min_c": target.minimum_c,
+                "preferred_start_max_c": target.maximum_c,
+                "stable_samples": stable_samples,
+                "required_stable_samples": P1000_TEMPERATURE_STABLE_SAMPLES,
+                "cooling_mode": "passive-zero-current-disengaged",
+                **snapshot,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+def _wait_for_p1000_passive_cooling(
+    fixture_settings: FixtureSettings,
+    heat_guard: _DualPipetteHeatGuard,
+    target: _PipetteTemperatureTarget,
+) -> None:
+    """Hold both plungers idle until the tested P1000 reaches its start target.
+
+    No relay or active cooling device is used. A stem below the preferred band
+    is accepted immediately instead of being heated. Temperatures inside the
+    preferred band must remain there for consecutive samples so a falling or
+    rising boundary reading cannot start the test by itself.
+    """
+    mount = fixture_settings.mount
+    heat_guard.deactivate_mount(mount)
+    start_time = monotonic()
+    stable_samples = 0
+
+    while True:
+        elapsed_seconds = monotonic() - start_time
+        temperature = _read_mount_stem_temperature(fixture_settings.ctx, mount)
+
+        if temperature < target.minimum_c:
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                "ready-below-preferred-no-heating",
+                temperature,
+                elapsed_seconds,
+                stable_samples,
+            )
+            return
+
+        if temperature <= target.maximum_c:
+            stable_samples += 1
+        else:
+            stable_samples = 0
+
+        if stable_samples >= P1000_TEMPERATURE_STABLE_SAMPLES:
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                "ready-preferred-band",
+                temperature,
+                elapsed_seconds,
+                stable_samples,
+            )
+            return
+
+        if elapsed_seconds >= P1000_TEMPERATURE_TIMEOUT_SECONDS:
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                "timeout",
+                temperature,
+                elapsed_seconds,
+                stable_samples,
+            )
+            raise RuntimeError(
+                f"{mount} {target.model} did not passively cool to "
+                f"{target.maximum_c:.1f} C within "
+                f"{P1000_TEMPERATURE_TIMEOUT_SECONDS:g}s; last temperature "
+                f"was {temperature:.3f} C. Check ambient temperature before "
+                "retrying; this protocol uses passive cooling only."
+            )
+
+        _log_p1000_temperature_gate(
+            fixture_settings,
+            target,
+            "waiting-passive-cooling",
+            temperature,
+            elapsed_seconds,
+            stable_samples,
+        )
+        fixture_settings.ctx.delay(
+            seconds=P1000_TEMPERATURE_POLL_SECONDS,
+            msg=(
+                f"Waiting for {mount} {target.model} stem to passively cool "
+                f"to {target.maximum_c:.1f} C: "
+                f"{temperature:.3f} C"
+            ),
+        )
+
+
+def _handle_dual_mount_test_state(
+    fixture_settings: FixtureSettings,
+    heat_guard: Optional[_DualPipetteHeatGuard],
+    mount: str,
+    phase: str,
+) -> None:
+    """Enforce the model-specific target at the first trial, then log state."""
+    target = _get_p1000_temperature_target(fixture_settings)
+    if phase == "first-volume-trial" and heat_guard is not None and target:
+        temperature = _read_mount_stem_temperature(
+            fixture_settings.ctx, mount
+        )
+        if temperature > target.maximum_c:
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                "first-volume-recool-required",
+                temperature,
+                0.0,
+                0,
+            )
+            _wait_for_p1000_passive_cooling(
+                fixture_settings, heat_guard, target
+            )
+            needs_home = heat_guard.activate_mount(mount)
+            heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+            temperature = _read_mount_stem_temperature(
+                fixture_settings.ctx, mount
+            )
+            post_restore_within_target = temperature <= target.maximum_c
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                (
+                    "first-volume-current-restored"
+                    if post_restore_within_target
+                    else "first-volume-current-restored-over-target"
+                ),
+                temperature,
+                0.0,
+                0,
+            )
+        else:
+            _log_p1000_temperature_gate(
+                fixture_settings,
+                target,
+                "first-volume-ready-observed",
+                temperature,
+                0.0,
+                int(temperature >= target.minimum_c),
+            )
+    _record_dual_mount_stem_temperatures(fixture_settings, phase)
 
 
 def _record_dual_mount_stem_temperatures(
@@ -5209,7 +5525,20 @@ def run(ctx: ProtocolContext) -> None:
                 mount=mount,
             )
             if heat_guard is not None:
+                ctx.delay(
+                    seconds=0,
+                    msg=(
+                        f"Fixture build complete for {mount} mount; "
+                        "applying dual-mount motor protection"
+                    ),
+                )
+                print_info(
+                    f"DUAL_HEAT_GUARD_STAGE post-build-reapply-start mount={mount}"
+                )
                 heat_guard.reapply_after_build(mount)
+                print_info(
+                    f"DUAL_HEAT_GUARD_STAGE post-build-reapply-complete mount={mount}"
+                )
             if dual_mount:
                 _record_dual_mount_stem_temperatures(
                     fixture_settings, "pre-build", pre_build_snapshot
@@ -5221,10 +5550,34 @@ def run(ctx: ProtocolContext) -> None:
                     # that the loaded scale baseline is stable.
                     _wait_for_scale_stability(ctx, fixture_settings)
                 _record_dual_mount_stem_temperatures(fixture_settings, "pre-engage")
+            temperature_target = _get_p1000_temperature_target(fixture_settings)
+            use_temperature_gate = (
+                heat_guard is not None and temperature_target is not None
+            )
+            if use_temperature_gate:
+                assert heat_guard is not None
+                assert temperature_target is not None
+                try:
+                    _wait_for_p1000_passive_cooling(
+                        fixture_settings, heat_guard, temperature_target
+                    )
+                except Exception:
+                    # The gate runs after build() but before _run_fixture(), so
+                    # finalize the newly opened recorder/report on a timeout or
+                    # sensor error. Production CSV structure remains unchanged.
+                    _finalize_fixture_data_before_upload(fixture_settings)
+                    raise
+                _record_dual_mount_stem_temperatures(
+                    fixture_settings, "temperature-ready"
+                )
             needs_home = False
             if heat_guard is not None:
                 needs_home = heat_guard.activate_mount(mount)
                 heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+            if use_temperature_gate:
+                _record_dual_mount_stem_temperatures(
+                    fixture_settings, "post-engage"
+                )
             after_test_callback: Optional[Callable[[], None]] = None
             state_log_callback: Optional[Callable[[str], None]] = None
             if dual_mount:
@@ -5235,7 +5588,10 @@ def run(ctx: ProtocolContext) -> None:
                     mount,
                 )
                 state_log_callback = partial(
-                    _record_dual_mount_stem_temperatures, fixture_settings
+                    _handle_dual_mount_test_state,
+                    fixture_settings,
+                    heat_guard,
+                    mount,
                 )
             # Both mounts use the same short post-activation restabilization. The
             # pre-engagement scale gate above handles the longer idle baseline

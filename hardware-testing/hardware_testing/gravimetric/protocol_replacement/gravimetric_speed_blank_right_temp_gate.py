@@ -134,7 +134,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed blank"}
+metadata = {"protocolName": "Gravimetric QC V3 speed blank right temp gate"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -146,6 +146,9 @@ SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE = 15.0
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
 PIPETTE_IDLE_CURRENT_AMPS = 0.1
 PIPETTE_CURRENT_TOLERANCE_AMPS = 0.01
+RIGHT_TEST_TEMPERATURE_MAX_C = 26.0
+RIGHT_TEST_TEMPERATURE_POLL_SECONDS = 5.0
+RIGHT_TEST_TEMPERATURE_TIMEOUT_SECONDS = 30.0 * 60.0
 EVAPORATION_MAD_SCALE = 1.4826
 EVAPORATION_OUTLIER_SIGMA = 3.5
 EVAPORATION_SCALE_RESOLUTION_UL = 0.1
@@ -2407,6 +2410,29 @@ def _can_use_dedicated_dry_blank_tip(
     return fixture_settings.pipette_channels != 96 or fixture_settings.single_tip_96
 
 
+def _uses_right_p1000s_temperature_gate(
+    fixture_settings: FixtureSettings,
+) -> bool:
+    """Limit the new temperature behavior to the requested right P1000S test."""
+    return (
+        fixture_settings.mount == "right"
+        and fixture_settings.pipette_channels == 1
+        and fixture_settings.pipette_volume == 1000
+    )
+
+
+def _notify_right_pre_measurement_state(
+    fixture_settings: FixtureSettings,
+    state_log_callback: Optional[Callable[[str], None]],
+) -> None:
+    """Run the right-side gate at the last boundary before measurements."""
+    if (
+        _uses_right_p1000s_temperature_gate(fixture_settings)
+        and state_log_callback is not None
+    ):
+        state_log_callback("pre-measurement")
+
+
 def _run(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
@@ -2431,6 +2457,7 @@ def _run(
     fixture_settings.pipette._retract()
     last_probed_tip_size = first_tip_size
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    _notify_right_pre_measurement_state(fixture_settings, state_log_callback)
     if fixture_settings.run_evaporation:
         blank_tip = first_tip
         if _can_use_dedicated_dry_blank_tip(fixture_settings):
@@ -4545,6 +4572,154 @@ class _DualPipetteHeatGuard:
             )
 
 
+def _read_mount_stem_temperature(ctx: ProtocolContext, mount: str) -> float:
+    """Read one valid stem temperature for the right-side temperature gate."""
+    temperature = float(
+        get_sync_hw_api(ctx).read_stem_temperature(
+            Mount.string_to_mount(mount), True
+        )
+    )
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise RuntimeError(
+            f"Invalid {mount} stem temperature for temperature gate: {temperature}"
+        )
+    return temperature
+
+
+def _log_right_temperature_gate(
+    fixture_settings: FixtureSettings,
+    stage: str,
+    temperature: float,
+    elapsed_seconds: float,
+) -> None:
+    """Write temperature-gate diagnostics without changing the production CSV."""
+    snapshot = _capture_dual_mount_state(
+        fixture_settings.ctx, _present_pipette_axes(fixture_settings.ctx)
+    )
+    print_info(
+        "RIGHT_TEMPERATURE_GATE "
+        + json.dumps(
+            {
+                "stage": stage,
+                "elapsed_seconds": round(elapsed_seconds, 1),
+                "temperature_c": temperature,
+                "target_max_c": RIGHT_TEST_TEMPERATURE_MAX_C,
+                **snapshot,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+def _activate_right_mount_below_temperature_ceiling(
+    fixture_settings: FixtureSettings,
+    heat_guard: _DualPipetteHeatGuard,
+) -> None:
+    """Cool the right pipette only when needed, then leave it active at <=26 C."""
+    start_time = time()
+    right_active = False
+    ready = False
+    try:
+        while time() - start_time < RIGHT_TEST_TEMPERATURE_TIMEOUT_SECONDS:
+            elapsed_seconds = time() - start_time
+            temperature = _read_mount_stem_temperature(
+                fixture_settings.ctx, "right"
+            )
+
+            if not right_active:
+                if temperature > RIGHT_TEST_TEMPERATURE_MAX_C:
+                    _log_right_temperature_gate(
+                        fixture_settings,
+                        "cooling-disengaged",
+                        temperature,
+                        elapsed_seconds,
+                    )
+                    fixture_settings.ctx.delay(
+                        seconds=RIGHT_TEST_TEMPERATURE_POLL_SECONDS,
+                        msg=(
+                            "Cooling right pipette before engagement: "
+                            f"{temperature:.3f} C"
+                        ),
+                    )
+                    continue
+
+                needs_home = heat_guard.activate_mount("right")
+                right_active = True
+                heat_guard.activate_pipette(
+                    fixture_settings.pipette, needs_home
+                )
+                temperature = _read_mount_stem_temperature(
+                    fixture_settings.ctx, "right"
+                )
+                _log_right_temperature_gate(
+                    fixture_settings,
+                    "engaged-for-test",
+                    temperature,
+                    time() - start_time,
+                )
+
+            if temperature <= RIGHT_TEST_TEMPERATURE_MAX_C:
+                _log_right_temperature_gate(
+                    fixture_settings,
+                    "pre-test-passed",
+                    temperature,
+                    time() - start_time,
+                )
+                ready = True
+                return
+
+            _log_right_temperature_gate(
+                fixture_settings,
+                "overshoot-recool",
+                temperature,
+                time() - start_time,
+            )
+            heat_guard.deactivate_mount("right")
+            right_active = False
+            fixture_settings.ctx.delay(
+                seconds=RIGHT_TEST_TEMPERATURE_POLL_SECONDS,
+                msg=(
+                    "Right pipette exceeded temperature window; cooling before retry: "
+                    f"{temperature:.3f} C"
+                ),
+            )
+
+        temperature = _read_mount_stem_temperature(fixture_settings.ctx, "right")
+        raise RuntimeError(
+            "Right pipette did not cool to the 26.0 C test-start ceiling "
+            f"within {RIGHT_TEST_TEMPERATURE_TIMEOUT_SECONDS:g}s; "
+            f"last temperature was {temperature:.3f} C."
+        )
+    finally:
+        if not ready and right_active:
+            heat_guard.deactivate_mount("right")
+
+
+def _verify_right_temperature_before_measurement(
+    fixture_settings: FixtureSettings,
+    stage: str,
+) -> None:
+    """Require the active right pipette to be no warmer than 26 C."""
+    temperature = _read_mount_stem_temperature(fixture_settings.ctx, "right")
+    if temperature > RIGHT_TEST_TEMPERATURE_MAX_C:
+        _log_right_temperature_gate(
+            fixture_settings,
+            f"{stage}-too-hot",
+            temperature,
+            0.0,
+        )
+        raise RuntimeError(
+            f"Right pipette reached {temperature:.3f} C before {stage}; "
+            "measurement will not start above the 26.0 C ceiling."
+        )
+    _log_right_temperature_gate(
+        fixture_settings,
+        f"{stage}-passed",
+        temperature,
+        0.0,
+    )
+
+
 @contextmanager
 def _dual_pipette_heat_guard(
     ctx: ProtocolContext,
@@ -4625,6 +4800,25 @@ def _record_dual_mount_stem_temperatures(
             sort_keys=True,
         )
     )
+
+
+def _handle_dual_mount_test_state(
+    fixture_settings: FixtureSettings,
+    mount: str,
+    heat_guard: Optional[_DualPipetteHeatGuard],
+    phase: str,
+) -> None:
+    """Apply the right temperature gate at measurement boundaries, then log."""
+    try:
+        if _uses_right_p1000s_temperature_gate(
+            fixture_settings
+        ) and phase in {"pre-measurement", "first-blank"}:
+            _verify_right_temperature_before_measurement(fixture_settings, phase)
+    except Exception:
+        if heat_guard is not None:
+            heat_guard.deactivate_mount(mount)
+        raise
+    _record_dual_mount_stem_temperatures(fixture_settings, phase)
 
 
 def _record_dual_mount_after_test(
@@ -5223,8 +5417,15 @@ def run(ctx: ProtocolContext) -> None:
                 _record_dual_mount_stem_temperatures(fixture_settings, "pre-engage")
             needs_home = False
             if heat_guard is not None:
-                needs_home = heat_guard.activate_mount(mount)
-                heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+                if _uses_right_p1000s_temperature_gate(fixture_settings):
+                    _activate_right_mount_below_temperature_ceiling(
+                        fixture_settings, heat_guard
+                    )
+                else:
+                    needs_home = heat_guard.activate_mount(mount)
+                    heat_guard.activate_pipette(
+                        fixture_settings.pipette, needs_home
+                    )
             after_test_callback: Optional[Callable[[], None]] = None
             state_log_callback: Optional[Callable[[str], None]] = None
             if dual_mount:
@@ -5235,7 +5436,10 @@ def run(ctx: ProtocolContext) -> None:
                     mount,
                 )
                 state_log_callback = partial(
-                    _record_dual_mount_stem_temperatures, fixture_settings
+                    _handle_dual_mount_test_state,
+                    fixture_settings,
+                    mount,
+                    heat_guard,
                 )
             # Both mounts use the same short post-activation restabilization. The
             # pre-engagement scale gate above handles the longer idle baseline
