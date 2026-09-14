@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './Select.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
@@ -49,9 +50,7 @@ export interface SelectOptionGroup {
 export type SelectOptionOrGroup = SelectOption | SelectOptionGroup
 
 export type SelectPlacement =
-  | typeof PLACEMENT_AUTO
-  | typeof PLACEMENT_BOTTOM
-  | typeof PLACEMENT_TOP
+  typeof PLACEMENT_AUTO | typeof PLACEMENT_BOTTOM | typeof PLACEMENT_TOP
 
 export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 
@@ -93,7 +92,7 @@ const CLEAR_STYLES: StylesConfig<SelectOption> = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps): JSX.Element {
+export function Select(props: SelectProps): ReactNode {
   return (
     <ReactSelect
       {...props}
@@ -107,7 +106,7 @@ export function Select(props: SelectProps): JSX.Element {
 
 function DropdownIndicator(
   props: DropdownIndicatorProps<SelectOption>
-): JSX.Element {
+): ReactNode {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
       <div
@@ -124,7 +123,7 @@ function DropdownIndicator(
   )
 }
 
-const Menu = (props: MenuProps<SelectOption>): JSX.Element => (
+const Menu = (props: MenuProps<SelectOption>): ReactNode => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

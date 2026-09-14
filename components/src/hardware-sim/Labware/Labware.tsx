@@ -16,7 +16,7 @@ import {
   Well,
 } from './labwareInternals'
 
-import type { RefObject } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
@@ -86,7 +86,7 @@ const LabwareDetailGroup = styled.g`
  *
  * For example, hiding the outline of the labware for certain ODD flows.
  */
-export const Labware = (props: LabwareProps): JSX.Element => {
+export const Labware = (props: LabwareProps): ReactNode => {
   const {
     definition,
     positioningMode,

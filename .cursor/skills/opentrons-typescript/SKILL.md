@@ -218,7 +218,7 @@ color: var(--grey-60);
 background: var(--white);
 
 /* Typography */
-font-size: var(--font-size-p);
+font-size: var(--font-size-13);
 font-weight: var(--font-weight-semi-bold);
 
 /* Border radius */

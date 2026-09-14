@@ -8,14 +8,33 @@ from pathlib import Path
 import argparse
 from typing import List, Dict, Any, Tuple
 import os
+from dataclasses import dataclass
+
+
+@dataclass
+class JiraCredentials:
+    """A class containing Jira token and associated email."""
+
+    email: str
+    api_token: str
+
+
+def get_credentials(storage_directory: str) -> JiraCredentials:
+    """Opens and parses local Jira credentials file."""
+    credentials_path = os.path.join(storage_directory, "jiraCredentials.json")
+    with open(credentials_path) as f:
+        jiraCreds = json.load(f)
+    email = jiraCreds["Jira API"]["email"]
+    api_token = jiraCreds["Jira API"]["key"]
+    return JiraCredentials(email, api_token)
 
 
 class JiraTicket:
     """Connects to JIRA ticket site."""
 
-    def __init__(self, url: str, api_token: str, email: str) -> None:
+    def __init__(self, api_token: str, email: str) -> None:
         """Connect to jira."""
-        self.url = url
+        self.url = "https://opentrons.atlassian.net"
         self.api_token = api_token
         self.email = email
         self.auth = HTTPBasicAuth(email, api_token)
@@ -25,7 +44,7 @@ class JiraTicket:
         }
 
     def issues_on_board(self, project_key: str) -> List[List[Any]]:
-        """Print Issues on board."""
+        """Return all Issues on specified Jira board."""
         all_issues = self.get_project_issues(project_key)
         issues_dict = all_issues["issues"]
         issue_ids = []
@@ -111,6 +130,7 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         labels: list,
+        parent: str,
     ) -> Tuple[str, str]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
@@ -143,6 +163,10 @@ class JiraTicket:
             print(f"Software version {affects_versions} added.")
         else:
             print("Software version of robot not in jira releases.")
+        issue_key = ""
+        issue_url = ""
+        if parent:
+            data["fields"]["parent"] = {"key": parent}
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue",
@@ -150,13 +174,15 @@ class JiraTicket:
                 auth=self.auth,
                 json=data,
             )
-            response.raise_for_status()
             response_str = str(response.content)
+            response.raise_for_status()
             issue_url = response.json().get("self")
             issue_key = response.json().get("key")
             print(f"issue key: {issue_key}")
             print(f"issue url: {issue_url}")
             if issue_key is None:
+                issue_key = ""
+                issue_url = ""
                 print("Error: Could not create issue. No key returned.")
         except requests.exceptions.HTTPError:
             print(f"HTTP error occurred. Response content: {response_str}")
@@ -167,7 +193,11 @@ class JiraTicket:
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
         file = {
-            "file": (attachment_path, open(attachment_path, "rb"), "application-type")
+            "file": (
+                os.path.basename(attachment_path),
+                open(attachment_path, "rb"),
+                "application-type",
+            )
         }
         JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
         attachment_url = f"{self.url}/rest/api/3/issue/{issue_id}/attachments"
@@ -258,6 +288,11 @@ class JiraTicket:
         component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
         response = requests.get(component_url, headers=self.headers, auth=self.auth)
         components_list = response.json()
+        if not isinstance(components_list, list):
+            print(
+                f"Failed to get components for project '{project_id}': {components_list}"
+            )
+            return []
         return components_list
 
     def comment(self, content_list: List[Dict[str, Any]], issue_key: str) -> None:
@@ -334,10 +369,9 @@ if __name__ == "__main__":
         help="JIRA Board ID. RABR is 217",
     )
     args = parser.parse_args()
-    url = "https://opentrons.atlassian.net"
 
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
-    ticket = JiraTicket(url, api_token, email)
+    ticket = JiraTicket(api_token, email)

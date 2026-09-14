@@ -5,7 +5,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface LegacyOffsetVectorProps extends StyleProps {
@@ -15,9 +15,7 @@ interface LegacyOffsetVectorProps extends StyleProps {
   as?: ComponentProps<typeof LegacyStyledText>['as']
 }
 
-export function LegacyOffsetVector(
-  props: LegacyOffsetVectorProps
-): JSX.Element {
+export function LegacyOffsetVector(props: LegacyOffsetVectorProps): ReactNode {
   const { x, y, z, as = 'h6', ...styleProps } = props
   return (
     <Flex {...styleProps}>

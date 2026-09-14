@@ -11,7 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OnOffToggle(props: { isOn: boolean }): ReactNode {
   const { t } = useTranslation('shared')
   return (
     <Flex

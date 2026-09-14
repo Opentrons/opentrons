@@ -64,12 +64,15 @@ import {
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { FileCard } from './FileCard'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '/app/atoms/Slideout'
 import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
+
+export { SendingButtonLabel } from './SendingButtonLabel'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -138,7 +141,7 @@ interface ChooseRobotSlideoutProps
 
 export function ChooseRobotSlideout(
   props: ChooseRobotSlideoutProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const {
     isExpanded,

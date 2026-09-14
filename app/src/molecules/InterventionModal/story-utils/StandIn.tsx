@@ -6,7 +6,7 @@ export function StandInContent({
   children,
 }: {
   children?: ReactNode
-}): JSX.Element {
+}): ReactNode {
   return (
     <Box
       border="4px dashed #A864FFFF"

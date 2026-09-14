@@ -377,6 +377,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
                 )
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
+                    current_labware_definition
+                )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(

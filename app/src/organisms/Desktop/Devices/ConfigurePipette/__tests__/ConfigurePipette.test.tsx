@@ -5,8 +5,8 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getConfig } from '/app/redux/config'
-import { mockPipetteSettingsFieldsMap } from '/app/redux/pipettes/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
+import { mockPipetteSettingsFieldsMap } from '/app/resources/instruments/__fixtures__'
 
 import { ConfigurePipette } from '../../ConfigurePipette'
 

@@ -14,9 +14,10 @@ import {
 import { LabwareLocationField } from './LabwareLocationField'
 import { MoveLabwareField } from './MoveLabwareField'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function MoveLabwareTools(props: StepFormProps): JSX.Element {
+export function MoveLabwareTools(props: StepFormProps): ReactNode {
   const { propsForFields } = props
   const { t, i18n } = useTranslation(['application', 'form', 'tooltip'])
   const robotType = useSelector(getRobotType)

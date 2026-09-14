@@ -10,6 +10,8 @@ import {
 
 import * as Sessions from '/app/redux/sessions'
 
+import type { ReactNode } from 'react'
+
 interface InvalidationWarningProps {
   sessionType:
     | typeof Sessions.SESSION_TYPE_DECK_CALIBRATION
@@ -18,7 +20,7 @@ interface InvalidationWarningProps {
 
 export function InvalidationWarning(
   props: InvalidationWarningProps
-): JSX.Element {
+): ReactNode {
   const { sessionType } = props
   const { t } = useTranslation('robot_calibration')
   let warningBody: JSX.Element

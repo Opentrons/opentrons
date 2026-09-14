@@ -65,7 +65,11 @@ describe('useAccountInfo', () => {
 
   it('returns username and fullName when logged in', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue({
-      username: 'test-user',
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
       accessToken: 'token',
       refreshToken: null,
       expiresAt: null,
@@ -76,7 +80,6 @@ describe('useAccountInfo', () => {
           username: 'test-user',
           fullName: 'Test User Name',
           accountType: 'user',
-          scopes: [],
           locked: false,
           resetPassword: false,
         },
@@ -96,7 +99,11 @@ describe('useAccountInfo', () => {
 
   it('returns null fullName while profile is loading', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue({
-      username: 'test-user',
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
       accessToken: 'token',
       refreshToken: null,
       expiresAt: null,
@@ -114,7 +121,11 @@ describe('useAccountInfo', () => {
 
   it('returns null fullName when profile request errors', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue({
-      username: 'test-user',
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
       accessToken: 'token',
       refreshToken: null,
       expiresAt: null,

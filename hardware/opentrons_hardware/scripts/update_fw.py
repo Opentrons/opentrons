@@ -4,13 +4,12 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from typing_extensions import Final
 
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.drivers.binary_usb import (
-    BinaryMessenger,
     SerialUsbDriver,
     build_rear_panel_driver,
     build_rear_panel_messenger,
@@ -59,14 +58,9 @@ async def run(args: argparse.Namespace) -> None:
     retry_count = args.retry_count
     timeout_seconds = args.timeout_seconds
     erase = not args.no_erase
-    usb_messenger: Optional[BinaryMessenger] = None
-    try:
-        usb_driver: SerialUsbDriver = await build_rear_panel_driver()
-        usb_messenger = build_rear_panel_messenger(usb_driver)
-        usb_messenger.start()
-    except IOError as e:
-        if args.target == "rear-panel":
-            raise e
+    usb_driver: SerialUsbDriver = await build_rear_panel_driver()
+    usb_messenger = build_rear_panel_messenger(usb_driver)
+    usb_messenger.start()
 
     update_details = {
         TARGETS[args.target]: args.file,

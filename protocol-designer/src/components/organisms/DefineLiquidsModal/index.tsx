@@ -44,7 +44,7 @@ import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { Ingredient } from '@opentrons/step-generation'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -58,9 +58,7 @@ const liquidEditFormSchema: any = Yup.object().shape({
 interface DefineLiquidsModalProps {
   onClose: () => void
 }
-export function DefineLiquidsModal(
-  props: DefineLiquidsModalProps
-): JSX.Element {
+export function DefineLiquidsModal(props: DefineLiquidsModalProps): ReactNode {
   const { onClose } = props
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const { t } = useTranslation(['liquids', 'shared'])
@@ -181,7 +179,6 @@ export function DefineLiquidsModal(
       }}
     >
       <Modal
-        marginLeft="0"
         zIndexOverlay={15}
         width="37.125rem"
         title={

@@ -9,6 +9,7 @@ from decoy import Decoy
 import opentrons.protocol_runner as protocol_runner
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
+from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -83,8 +84,11 @@ async def test_load_orchestrator(
     decoy: Decoy,
     analysis_store: AnalysisStore,
     run_process_pyro_provider: RunProcessPyroProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should load the appropriate run orchestrator."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     robot_type: RobotType = "OT-3 Standard"
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -135,8 +139,11 @@ async def test_analyze(
     decoy: Decoy,
     analysis_store: AnalysisStore,
     run_process_pyro_provider: RunProcessPyroProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should be able to start a protocol analysis and update the analysis store when completed."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     robot_type: RobotType = "OT-3 Standard"
 
     protocol_resource = ProtocolResource(
@@ -244,6 +251,7 @@ async def test_analyze(
             command_preconditions=command_preconditions,
         )
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
 
     await subject.analyze(
         analysis_id="analysis-id",
@@ -271,8 +279,11 @@ async def test_analyze_updates_pending_on_error(
     decoy: Decoy,
     analysis_store: AnalysisStore,
     run_process_pyro_provider: RunProcessPyroProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should update pending analysis with an internal error."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     robot_type: RobotType = "OT-3 Standard"
 
     protocol_resource = ProtocolResource(
@@ -323,7 +334,7 @@ async def test_analyze_updates_pending_on_error(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -331,6 +342,7 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )

@@ -372,6 +372,19 @@ class CANBusBusError(CommunicationError):
         super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
 
 
+class KeyStorageUnavailableError(CommunicationError):
+    """An error indicating a low-level communications failure with key storage."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a KeyStorageUnavailableError."""
+        super().__init__(ErrorCodes.KEY_STORAGE_UNAVAILABLE, message, detail, wrapping)
+
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
@@ -1342,6 +1355,22 @@ class MissingConfigurationData(GeneralError):
         )
 
 
+class AuditLoggingError(GeneralError):
+    """An error indicating an audit logging failure.
+
+    Raised when audit log storage or ingest operations fail.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an AuditLoggingError."""
+        super().__init__(ErrorCodes.AUDIT_LOGGING_ERROR, message, detail, wrapping)
+
+
 class VacuumModuleUnknownError(RoboticsControlError):
     """An error indicating that some unknown issue has happened with the vacuum module."""
 
@@ -1382,7 +1411,7 @@ class VacuumModuleUnknownError(RoboticsControlError):
         )
 
 
-class VacuumModulePressureNotReachedError(RoboticsControlError):
+class VacuumModulePressureNotReachedError(RoboticsInteractionError):
     """An error indicating that the target pressure was not reached in the vacuum module."""
 
     def __init__(
@@ -1422,7 +1451,7 @@ class VacuumModulePressureNotReachedError(RoboticsControlError):
         )
 
 
-class VacuumModuleWasteFullError(RoboticsControlError):
+class VacuumModuleWasteFullError(RoboticsInteractionError):
     """An error indicating that the vacuum module waste container is full."""
 
     def __init__(

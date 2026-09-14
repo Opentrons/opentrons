@@ -21,6 +21,11 @@ from opentrons.protocol_engine.commands.vacuum_module.start_set_vacuum_pressure 
     StartSetVacuumPressureParams,
     StartSetVacuumPressureResult,
 )
+from opentrons.protocol_engine.commands.wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksParams,
+    WaitForTasksResult,
+)
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
     never_recover,
@@ -36,6 +41,7 @@ from opentrons.protocol_engine.state.module_substates.vacuum_module_substate imp
 )
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import LoadedModule, ModuleModel
+from opentrons.protocol_engine.types.tasks import FinishedTask
 
 
 @pytest.fixture
@@ -108,6 +114,7 @@ def test_finish_task_dispatches_fail_for_associated_start_command(
     decoy.when(model_utils.generate_id()).then_return("defined-error-id")
     decoy.when(state_store.commands.get_is_awaiting_recovery()).then_return(False)
     decoy.when(state_store.commands.get_is_terminal()).then_return(False)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
     decoy.when(state_store.commands.get("start-command-id")).then_return(start_command)
     decoy.when(state_store.commands.get_error_recovery_policy()).then_return(
         lambda config, failed_command, defined_error_data: (
@@ -168,6 +175,7 @@ def test_try_recover_from_module_error_uses_resolver(
     decoy.when(model_utils.generate_id()).then_return("defined-error-id")
     decoy.when(state_store.commands.get_is_awaiting_recovery()).then_return(False)
     decoy.when(state_store.commands.get_is_terminal()).then_return(False)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
     decoy.when(state_store.commands.get("start-command-id")).then_return(start_command)
     decoy.when(state_store.commands.get_error_recovery_policy()).then_return(
         lambda config, failed_command, defined_error_data: (
@@ -231,6 +239,7 @@ def test_orchestrator_skips_unhandled_errors(
 ) -> None:
     """It should ignore task failures that no resolver handles."""
     timestamp = datetime.now()
+    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
     decoy.when(state_store.tasks.get_originating_command_id("task-1")).then_return(
         "start-command-id"
     )
@@ -266,6 +275,7 @@ def test_try_recover_from_module_error_returns_false_for_non_recoverable_policy(
     decoy.when(model_utils.generate_id()).then_return("defined-error-id")
     decoy.when(state_store.commands.get_is_awaiting_recovery()).then_return(False)
     decoy.when(state_store.commands.get_is_terminal()).then_return(False)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
     decoy.when(state_store.commands.get("start-command-id")).then_return(start_command)
     decoy.when(state_store.commands.get_error_recovery_policy()).then_return(
         never_recover
@@ -304,3 +314,181 @@ def test_try_recover_from_module_error_returns_false_for_non_recoverable_policy(
 
     assert recovered is False
     decoy.verify(action_dispatcher.dispatch(matchers.Anything()), times=0)
+
+
+def _wait_for_tasks_command(timestamp: datetime) -> WaitForTasks:
+    return WaitForTasks.model_construct(
+        id="wait-command-id",
+        key="wait-command-key",
+        createdAt=timestamp,
+        commandType="waitForTasks",
+        status=CommandStatus.RUNNING,
+        params=WaitForTasksParams(task_ids=["task-1"]),
+        result=WaitForTasksResult(task_ids=["task-1"]),
+    )
+
+
+def test_finish_task_skips_start_command_when_wait_for_tasks_is_running(
+    decoy: Decoy,
+    subject: AssociatedCommandErrorRecoveryOrchestrator,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """A running waitForTasks should own recovery instead of the start command."""
+    timestamp = datetime.now()
+    decoy.when(state_store.tasks.get_originating_command_id("task-1")).then_return(
+        "start-command-id"
+    )
+    decoy.when(state_store.commands.get_running_command_id()).then_return(
+        "wait-command-id"
+    )
+    decoy.when(state_store.commands.get("wait-command-id")).then_return(
+        _wait_for_tasks_command(timestamp)
+    )
+
+    subject.handle_action(
+        FinishTaskAction(
+            task_id="task-1",
+            finished_at=timestamp,
+            error=ErrorOccurrence(
+                id="task-error-id",
+                createdAt=timestamp,
+                errorType="VacuumModuleWasteFullError",
+                errorCode="3041",
+                detail="Vacuum Module Waste Container Full",
+            ),
+        )
+    )
+
+    decoy.verify(action_dispatcher.dispatch(matchers.Anything()), times=0)
+
+
+def test_try_recover_from_module_error_defers_to_running_wait_for_tasks(
+    decoy: Decoy,
+    subject: AssociatedCommandErrorRecoveryOrchestrator,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """Late async errors should not fail start_* while waitForTasks is running."""
+    timestamp = datetime.now()
+    decoy.when(
+        state_store.modules.get_has_module_probably_matching_hardware_details(
+            ModuleModel.VACUUM_MODULE_V1, "VM123"
+        )
+    ).then_return(True)
+    decoy.when(state_store.modules.get_all()).then_return(
+        [
+            LoadedModule.model_construct(
+                id="vacuum-module-id",
+                model=ModuleModel.VACUUM_MODULE_V1,
+                serialNumber="VM123",
+            )
+        ]
+    )
+    decoy.when(
+        state_store.tasks.get_last_background_command_id("vacuum-module-id")
+    ).then_return("start-command-id")
+    decoy.when(state_store.commands.get_running_command_id()).then_return(
+        "wait-command-id"
+    )
+    decoy.when(state_store.commands.get("wait-command-id")).then_return(
+        _wait_for_tasks_command(timestamp)
+    )
+    decoy.when(state_store.tasks.get_originating_command_id("task-1")).then_return(
+        "start-command-id"
+    )
+
+    recovered = subject.try_recover_from_module_error(
+        module_model=ModuleModel.VACUUM_MODULE_V1,
+        module_serial="VM123",
+        error=VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
+    )
+
+    assert recovered is True
+    decoy.verify(action_dispatcher.dispatch(matchers.Anything()), times=0)
+
+
+def test_try_recover_from_module_error_recovers_start_after_waited_task_succeeded(
+    decoy: Decoy,
+    subject: AssociatedCommandErrorRecoveryOrchestrator,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+) -> None:
+    """Late async after a succeeded waited task is start_* recovery, not swallowed."""
+    timestamp = datetime.now()
+    start_command = _start_command(timestamp)
+    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
+    decoy.when(model_utils.generate_id()).then_return("defined-error-id")
+    decoy.when(state_store.commands.get_is_awaiting_recovery()).then_return(False)
+    decoy.when(state_store.commands.get_is_terminal()).then_return(False)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(
+        "wait-command-id"
+    )
+    decoy.when(state_store.commands.get("wait-command-id")).then_return(
+        _wait_for_tasks_command(timestamp)
+    )
+    decoy.when(state_store.commands.get("start-command-id")).then_return(start_command)
+    decoy.when(state_store.commands.get_error_recovery_policy()).then_return(
+        lambda config, failed_command, defined_error_data: (
+            ErrorRecoveryType.WAIT_FOR_RECOVERY
+        )
+    )
+    decoy.when(
+        state_store.modules.get_has_module_probably_matching_hardware_details(
+            ModuleModel.VACUUM_MODULE_V1, "VM123"
+        )
+    ).then_return(True)
+    decoy.when(state_store.modules.get_all()).then_return(
+        [
+            LoadedModule.model_construct(
+                id="vacuum-module-id",
+                model=ModuleModel.VACUUM_MODULE_V1,
+                serialNumber="VM123",
+            )
+        ]
+    )
+    decoy.when(
+        state_store.tasks.get_last_background_command_id("vacuum-module-id")
+    ).then_return("start-command-id")
+    decoy.when(state_store.tasks.get_originating_command_id("task-1")).then_return(
+        "start-command-id"
+    )
+    decoy.when(state_store.tasks.get("task-1")).then_return(
+        FinishedTask(
+            id="task-1",
+            createdAt=timestamp,
+            finishedAt=timestamp,
+            error=None,
+        )
+    )
+    decoy.when(
+        state_store.modules.get_vacuum_module_substate("vacuum-module-id")
+    ).then_return(
+        VacuumModuleSubState(
+            module_id=VacuumModuleId("vacuum-module-id"),
+            pump_engaged=False,
+        )
+    )
+
+    recovered = subject.try_recover_from_module_error(
+        module_model=ModuleModel.VACUUM_MODULE_V1,
+        module_serial="VM123",
+        error=VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
+    )
+
+    assert recovered is True
+    decoy.verify(
+        action_dispatcher.dispatch(
+            BeginAwaitingRecoveryAction(
+                command_id="start-command-id",
+                command=start_command,
+                error_id="defined-error-id",
+                failed_at=timestamp,
+                error=matchers.Anything(),
+                notes=matchers.Anything(),
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            )
+        ),
+        times=1,
+    )

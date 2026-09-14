@@ -31,6 +31,7 @@ import { SetupFixtureList } from './SetupFixtureList'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupModulesMap } from './SetupModulesMap'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
@@ -50,7 +51,7 @@ export const SetupModuleAndDeck = ({
   runId,
   hasModules,
   protocolAnalysis,
-}: SetupModuleAndDeckProps): JSX.Element => {
+}: SetupModuleAndDeckProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view') as string,
@@ -139,7 +140,6 @@ export const SetupModuleAndDeck = ({
             !moduleCalibrationStatus.complete
           }
           onClick={expandLabwarePositionCheckStep}
-          id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >

@@ -40,7 +40,7 @@ interface InstrumentCardProps extends StyleProps {
  * a component for a gripper or pipette instrument
  * TODO(bh, 2022-10-26): explore adding banner section, using within PipetteCard component
  */
-export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
+export function InstrumentCard(props: InstrumentCardProps): ReactNode {
   const {
     description,
     hasDivider = false,

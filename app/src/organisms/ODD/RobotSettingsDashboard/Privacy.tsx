@@ -14,10 +14,12 @@ import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
 } from '/app/redux/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
 import { OnOffToggle } from './OnOffToggle'
 import { RobotSettingButton } from './RobotSettingButton'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -29,11 +31,20 @@ interface PrivacyProps {
 export function Privacy({
   robotName,
   setCurrentOption,
-}: PrivacyProps): JSX.Element {
+}: PrivacyProps): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
 
   const appAnalyticsOptedIn = useSelector(getAnalyticsOptedIn)
+
+  const handleChange = useHandleAndLog<boolean>(
+    () => dispatch(toggleAnalyticsOptedIn()),
+    'toggle_analytics',
+    (optedIn: boolean) => ({
+      action: 'toggled analytics',
+      message: `user ${optedIn ? 'opted in to' : 'opted out of'} analytics`,
+    })
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -62,7 +73,9 @@ export function Privacy({
             settingInfo={t('branded:share_display_usage_description')}
             dataTestId="RobotSettingButton_share_app_analytics"
             rightElement={<OnOffToggle isOn={appAnalyticsOptedIn} />}
-            onClick={() => dispatch(toggleAnalyticsOptedIn())}
+            onClick={() => {
+              handleChange(!appAnalyticsOptedIn)
+            }}
           />
         </Flex>
       </Flex>

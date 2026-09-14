@@ -21,7 +21,6 @@ import {
   createUserInput,
   resolveErrorMessage,
 } from '/ai-client/resources/utils'
-import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
   getPreFixText,
   getUpdateOrCreatePrompt,
@@ -181,7 +180,8 @@ export function useInputPromptController(
     )}`
     setRequestId(newRequestId)
 
-    const currentProtocolFormat = detectProtocolFormat(userPrompt, chatHistory)
+    // PD protocol format was removed in AUTH-2850; the app only generates Python protocols now.
+    const currentProtocolFormat: ProtocolFormat = 'Python'
 
     const validatedFiles = prepareValidatedFiles(isUpdateOrCreateRequest)
     if (validatedFiles === null) return
@@ -228,9 +228,7 @@ export function useInputPromptController(
         createProtocol,
         updateProtocol,
         isRegenerateRequest,
-        detectProtocolFormat(
-          isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
-        )
+        currentProtocolFormat
       )
       if (isUpdateOrCreateRequest && config.data !== promptData) {
         ;(config as any).data = promptData

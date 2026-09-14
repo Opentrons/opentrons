@@ -27,6 +27,7 @@ import {
   TYPOGRAPHY,
   WARNING_TOAST,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useToaster } from '../ToasterOven'
 import {
@@ -161,6 +162,12 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             return recoveryCommands.homeExceptPlungers()
           } else {
             return recoveryCommands.homePipetteZAxes()
+          }
+        })
+        .catch((error: unknown) => {
+          // Cancelling the documentation modal should return to the splash unchanged.
+          if (isDocumentedMutationError(error)) {
+            return toggleERWizAsActiveUser(false, false)
           }
         })
         .finally(() => {

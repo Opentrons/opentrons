@@ -17,6 +17,7 @@ import {
 
 import { ModuleTableItem } from './ModuleTableItem'
 
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   DeckDefinition,
@@ -32,7 +33,7 @@ interface ModuleTableProps {
   runId: string
 }
 
-export function ModuleTable(props: ModuleTableProps): JSX.Element {
+export function ModuleTable(props: ModuleTableProps): ReactNode {
   const {
     attachedProtocolModuleMatches,
     deckDef,

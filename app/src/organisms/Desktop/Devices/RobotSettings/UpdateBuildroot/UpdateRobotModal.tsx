@@ -32,9 +32,10 @@ import {
   robotUpdateChangelogSeen,
   UPGRADE,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { useIsOEMMode } from '/app/resources/robot-settings'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { RobotSystemType } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -72,7 +73,7 @@ export function UpdateRobotModal({
   systemType,
   updateType,
   closeModal,
-}: UpdateRobotModalProps): JSX.Element {
+}: UpdateRobotModalProps): ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
   const isOEMMode = useIsOEMMode()
@@ -81,7 +82,7 @@ export function UpdateRobotModal({
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const robotUpdateVersion = useSelector((state: State) => {
     return getRobotUpdateVersion(state, robotName) ?? ''
   })
@@ -126,7 +127,6 @@ export function UpdateRobotModal({
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
       >
         {t('release_notes')}
       </ExternalLink>
@@ -141,7 +141,7 @@ export function UpdateRobotModal({
         <PrimaryButton
           onClick={() => {
             dispatch(downloadRobotUpdate())
-            dispatchStartRobotUpdate(robotName)
+            startUpdate(robotName)
           }}
           css={FOOTER_BUTTON_STYLE}
           disabled={updateDisabled}

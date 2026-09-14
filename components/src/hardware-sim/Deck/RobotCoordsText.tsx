@@ -18,7 +18,7 @@ export interface RobotCoordsTextProps extends ComponentProps<'text'> {
  * This component surgically undoes the wrapper's transformation so the child text is
  * displayed right-side-up.
  */
-export function RobotCoordsText(props: RobotCoordsTextProps): JSX.Element {
+export function RobotCoordsText(props: RobotCoordsTextProps): ReactNode {
   const { x, y, children, canHighlight = true, ...additionalProps } = props
   return (
     <text

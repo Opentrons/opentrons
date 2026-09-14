@@ -26,7 +26,7 @@ import { TOO_MANY_DECIMALS } from './constants'
 import { TipPositionZOnlyView } from './TipPositionZOnlyView'
 import * as utils from './utils'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { StepFieldName } from '/protocol-designer/form-types'
 
 interface ZTipPositionModalProps {
@@ -38,7 +38,7 @@ interface ZTipPositionModalProps {
   isIndeterminate?: boolean
 }
 
-export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
+export function ZTipPositionModal(props: ZTipPositionModalProps): ReactNode {
   const {
     isIndeterminate,
     name,
@@ -144,7 +144,6 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
 
   return createPortal(
     <Modal
-      marginLeft="0"
       type="info"
       width="37.125rem"
       closeOnOutsideClick

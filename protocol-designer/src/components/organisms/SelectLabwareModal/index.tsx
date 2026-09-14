@@ -82,7 +82,7 @@ import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { CategoryExpand } from '/protocol-designer/pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -109,9 +109,7 @@ export interface LabwareInfo {
   def: LabwareDefinition2
 }
 
-export function SelectLabwareModal(
-  props: SelectLabwareModalProps
-): JSX.Element {
+export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
   const { slot, onClose, onConfirm, slotFull, moduleHasLabware = false } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
@@ -335,6 +333,15 @@ export function SelectLabwareModal(
         return !isFilterPlate
       }
 
+      // spacer on the module: still allow filter plates (they sit on the spacer)
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        mainModuleTopIsSpacer &&
+        (parameters.quirks ?? []).includes('filterPlate')
+      ) {
+        return false
+      }
+
       // for main vacuum module area with existing labware, filter explicitly
       // (skip when only a bare spacer is present — treat like an empty module)
       if (
@@ -527,7 +534,6 @@ export function SelectLabwareModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t('add_labware')}
       type="info"
       width="37.125rem"

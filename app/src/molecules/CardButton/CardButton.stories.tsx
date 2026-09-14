@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof CardButtonComponent> = {
   title: 'ODD/Molecules/CardButton',
   component: CardButtonComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     iconName: {
       control: {

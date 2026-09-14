@@ -21,16 +21,17 @@ import {
 } from '/app/App/hooks/useGetModulesNeedingSetup'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
-
-import { useSendIdentifyModule } from './hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import type { SendIdentifyModule } from './types'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -39,6 +40,7 @@ interface SelectModuleProps {
   setSelectedModule: (module: AttachedModule | null) => void
   setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
+  sendIdentifyModule: SendIdentifyModule
 }
 
 interface ModuleNameAndPort {
@@ -54,6 +56,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
     setSelectedModule,
     setShowLaunchSetup,
     attachedModuleOnLaunch = null,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -64,18 +67,32 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   // Every module that needs setup, but not all are guaranteed to be able to be set up
   // right now (e.g. because they need calibration but we don't have a pipette)
   const allNeedingSetup = useGetModulesNeedingSetup()
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const newModules =
     attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
   // if there are more modules that need setup than modules that can be set up, then
   // it follows that some modules need setup but cannot be set up. in that case we want
   // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
+  let unsetupableModulesWarning: string | undefined
+  if (hasUnsetupabbleModules) {
+    if (getCalibratedPipetteForModuleSetup(attachedPipettes) == null) {
+      if (attachedPipettes.left != null || attachedPipettes.right != null) {
+        unsetupableModulesWarning = t(
+          'calibrate_a_pipette_to_set_up_more_modules'
+        )
+      } else {
+        unsetupableModulesWarning = t(
+          'connect_a_pipette_to_set_up_more_modules'
+        )
+      }
+    }
+  }
   // And our special short-circuit flows where we never show a menu if there's only one
   // entry should be avoided if we have that warning
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
   // Unless, of course, we're being invoked by a caller giving us a specific module
   const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
-  const sendIdentifyModule = useSendIdentifyModule()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const name = getModuleDisplayName(module.moduleModel)
@@ -186,11 +203,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
             onSelect={event => {
               handleModuleSelected(event.target.value)
             }}
-            subText={
-              hasUnsetupabbleModules
-                ? t('connect_a_pipette_to_set_up_more_modules')
-                : null
-            }
+            subText={unsetupableModulesWarning}
             scroll={true}
           />
         </Flex>

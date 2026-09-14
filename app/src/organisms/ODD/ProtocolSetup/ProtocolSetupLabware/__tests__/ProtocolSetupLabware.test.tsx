@@ -6,6 +6,7 @@ import { when } from 'vitest-when'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
+  usePostLogMessageMutation,
 } from '@opentrons/react-api-client'
 import {
   getStackedItemsOnStartingDeck,
@@ -15,6 +16,11 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  createReasonNotRequiredDocumentationState,
+} from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -40,6 +46,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ...actual,
     useCreateLiveCommandMutation: vi.fn(),
     useModulesQuery: vi.fn(),
+    usePostLogMessageMutation: vi.fn(),
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
@@ -50,6 +57,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
+vi.mock('/app/local-resources/access-control/useDocumentationState')
 vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/analysis/getProtocolModulesInfo')
 vi.mock('/app/resources/deck_configuration')
@@ -59,6 +67,7 @@ const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
 const mockRefetch = vi.fn()
 const mockCreateLiveCommand = vi.fn()
+const mockPostLogMessage = vi.fn()
 
 const render = () => {
   let confirmed = false
@@ -92,12 +101,18 @@ describe('ProtocolSetupLabware', () => {
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRecentAnalysis, ot3StandardDeckDef as any)
       .thenReturn(mockProtocolModuleInfo)
+    vi.mocked(useDocumentationState).mockReturnValue(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     vi.mocked(useModulesQuery).mockReturnValue({
       ...mockUseModulesQueryOpen,
       refetch: mockRefetch,
     } as any)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(usePostLogMessageMutation).mockReturnValue({
+      postLogMessage: mockPostLogMessage,
     } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
@@ -164,11 +179,11 @@ describe('ProtocolSetupLabware', () => {
 
   it('renders the Labware Setup page', () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
-    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Display Map View' })
   })
 
   it('correctly navigates with the nav button', () => {
@@ -180,10 +195,10 @@ describe('ProtocolSetupLabware', () => {
   it('should toggle between map view and list view', () => {
     render()
     expect(screen.queryByText('Map View')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     expect(screen.queryByText('List View')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display Map View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
@@ -191,7 +206,7 @@ describe('ProtocolSetupLabware', () => {
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -210,7 +225,7 @@ describe('ProtocolSetupLabware', () => {
       refetch: mockRefetch,
     } as any)
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -228,7 +243,7 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryOpening as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Opening...')
   })
 
@@ -237,7 +252,7 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryClosing as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Closing...')
   })
 
@@ -246,7 +261,25 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryUnknown as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Open')
+  })
+
+  it('sends a message to the audit log when CRS is on and placements are confirmed', () => {
+    vi.mocked(useDocumentationState).mockReturnValue(
+      createReasonNotRequiredDocumentationState()
+    )
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placements' }))
+    expect(mockPostLogMessage).toHaveBeenCalledWith(
+      {
+        action: 'confirmed liquid and labware placements',
+        message:
+          'user confirmed liquid and labware placements before running protocol',
+      },
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+      })
+    )
   })
 })

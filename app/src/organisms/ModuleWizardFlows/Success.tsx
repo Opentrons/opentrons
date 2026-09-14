@@ -18,8 +18,7 @@ import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
-
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -37,7 +36,7 @@ interface SuccessProps extends ModuleSetupWizardMaybePipetteStepProps {
   attachedModuleOnLaunch?: AttachedModule | null
 }
 
-export function Success(props: SuccessProps): JSX.Element {
+export function Success(props: SuccessProps): ReactNode {
   const {
     proceed,
     attachedModule,
@@ -46,9 +45,9 @@ export function Success(props: SuccessProps): JSX.Element {
     isOnDevice,
     restartSetup,
     setSelectedModule,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyModule = useSendIdentifyModule()
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 

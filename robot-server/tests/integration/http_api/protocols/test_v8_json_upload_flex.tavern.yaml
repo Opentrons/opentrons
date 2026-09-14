@@ -72,6 +72,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              result: ok
         links:
           referencingRuns: []
   - name: Get protocol analysis by ID

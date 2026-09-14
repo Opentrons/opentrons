@@ -17,13 +17,14 @@ import { HandleEnter } from '/protocol-designer/components/atoms'
 
 import { WizardBody } from './WizardBody'
 
+import type { ReactNode } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { WizardTileProps } from './types'
 
 interface AddMetadataProps extends WizardTileProps {
   analyticsStartTime: Date
 }
-export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
+export function AddMetadata(props: AddMetadataProps): ReactNode {
   const { goBack, proceed, watch, register, analyticsStartTime } = props
   const { t } = useTranslation(['onboarding', 'shared'])
   const dispatch = useDispatch()

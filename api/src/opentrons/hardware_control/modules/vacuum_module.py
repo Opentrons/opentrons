@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
+from dataclasses import replace
 from typing import (
     Any,
     Awaitable,
@@ -25,6 +26,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons.config import IS_ROBOT
+from opentrons.config import feature_flags as ff
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
@@ -121,7 +123,7 @@ DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
 # Waste-full detection defaults
 # See waste_detector.hpp in opentrons-modules repo for details
 DEFAULT_WASTE_CONFIG = WasteConfigParameters(
-    waste_detection_enabled=False,
+    waste_detection_enabled=True,
     p_window_start=0.10,
     p_window_end=0.95,
     baseline_fast_factor=0.75,
@@ -132,6 +134,14 @@ DEFAULT_WASTE_CONFIG = WasteConfigParameters(
     min_window_time=700.0,  # ms
     max_window_time=20000.0,  # ms
 )
+
+
+def desired_waste_detection_enabled() -> bool:
+    """Whether waste-full detection should be enabled on the device."""
+    return (
+        DEFAULT_WASTE_CONFIG.waste_detection_enabled
+        and not ff.vacuum_module_waste_detection_disabled()
+    )
 
 
 class VacuumModule(mod_abc.AbstractModule):
@@ -194,7 +204,14 @@ class VacuumModule(mod_abc.AbstractModule):
         )
 
         # Configure the default parameters
-        await module._configure_device()
+        try:
+            await module._configure_device()
+        except Exception:
+            log.warning(
+                "Could not configure vacuum module defaults on port %s.",
+                port,
+                exc_info=True,
+            )
 
         try:
             await poller.start()
@@ -249,6 +266,12 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
+        """Forward poller/firmware faults as async module errors."""
+        # Parse mismatches (e.g. an M121 pressure line consumed as M123 pump
+        # state) are comms glitches, not firmware faults. Do not escalate them
+        # as ASYNCHRONOUS_MODULE_ERROR or a run can be stopped.
+        if isinstance(exception, ValueError):
+            return
         self.error_callback(self._to_enumerated_error(exception))
 
     def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
@@ -304,7 +327,7 @@ class VacuumModule(mod_abc.AbstractModule):
         # Waste detection parameters
         waste = DEFAULT_WASTE_CONFIG
         await self._driver.set_waste_configs(
-            waste.waste_detection_enabled,
+            desired_waste_detection_enabled(),
             waste.p_window_start,
             waste.p_window_end,
             waste.baseline_fast_factor,
@@ -341,7 +364,6 @@ class VacuumModule(mod_abc.AbstractModule):
                     port=self.port, loop=self.loop
                 )
                 self._reader._driver = self._driver
-            await self._configure_device()
             self._unsubscribe_init = self._reader.set_initialized_callback(
                 self._initialized_callback
             )
@@ -350,6 +372,7 @@ class VacuumModule(mod_abc.AbstractModule):
             )
             await self._poller.stop()
             await self._poller.start()
+            await self._configure_device()
         except BaseException:
             log.exception("Got an error when trying to reconnect vacuum module.")
 
@@ -423,7 +446,7 @@ class VacuumModule(mod_abc.AbstractModule):
             "currentPower": self._reader.pump_state.current_pwm,
             "targetPower": self._reader.get_target_power(),
             "ventStatus": self._reader.vacuum_state.vent_state.formatted,
-            "modeType": self._reader.operation_mode,
+            "modeType": self._reader.operation_mode.value,
         }
         return {"status": self.status.value, "data": data}
 
@@ -837,6 +860,7 @@ class VacuumModuleReader(Reader):
             pump_running=False,
             manual_control=False,
         )
+        self._waste_config = replace(DEFAULT_WASTE_CONFIG)
         self.operation_mode = VacuumOperationMode.PRESSURE
         self._driver = driver
         self.initialized = False
@@ -900,7 +924,9 @@ class VacuumModuleReader(Reader):
     async def read(self) -> None:
         await self.update_vacuum_state()
         await self.update_pump_state()
+        await self._sync_waste_detection_enabled()
         if not self.initialized or self._refresh_state:
+            await self.update_waste_configs()
             initialized = True
             self._refresh_state = False
             # We are done initializing, sync the led state
@@ -940,7 +966,11 @@ class VacuumModuleReader(Reader):
         self._refresh_state = True
 
     def on_error(self, exception: Exception) -> None:
-        self._driver.reset_serial_buffers()
+        try:
+            self._driver.reset_serial_buffers()
+        except Exception:
+            # Port is often already gone on unplug; still record the poll error.
+            log.debug("Could not reset serial buffers after poll error", exc_info=True)
         self._set_error(exception)
 
     def _set_error(self, exception: Optional[Exception]) -> None:
@@ -969,6 +999,17 @@ class VacuumModuleReader(Reader):
         if self.target_power is not None:
             self._power_readings.insert(0, self.pump_state.current_pwm)
             self._power_readings.pop()
+
+    async def update_waste_configs(self) -> None:
+        """Get latest waste detection config from driver and save updated values."""
+        self._waste_config = await self._driver.get_waste_configs()
+
+    async def _sync_waste_detection_enabled(self) -> None:
+        """Apply the waste-detection feature flag if it differs from last host value."""
+        desired = desired_waste_detection_enabled()
+        if self._waste_config.waste_detection_enabled != desired:
+            await self._driver.set_waste_configs(desired)
+            self._waste_config.waste_detection_enabled = desired
 
     def set_operation_mode(self, mode_type: VacuumOperationMode) -> None:
         self.operation_mode = mode_type

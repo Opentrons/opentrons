@@ -9,6 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface TouchControlProps {
   title: string
   isActive: boolean
@@ -104,7 +106,7 @@ const StyledTouchButton = styled(Btn)<{
   }
 `
 
-export function TouchControlButton(props: TouchControlProps): JSX.Element {
+export function TouchControlButton(props: TouchControlProps): ReactNode {
   const { title, isActive, onClick, subText, isOnDevice } = props
   return (
     <StyledTouchButton

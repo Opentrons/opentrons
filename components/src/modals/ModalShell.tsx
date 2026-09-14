@@ -51,7 +51,7 @@ export interface ModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function ModalShell(props: ModalShellProps): JSX.Element {
+export function ModalShell(props: ModalShellProps): ReactNode {
   const {
     onOutsideClick,
     zIndex = 10,
@@ -157,4 +157,7 @@ const Header = styled.div`
   background-color: ${COLORS.white};
   position: ${POSITION_STICKY};
   top: 0;
+  overflow: hidden;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 `

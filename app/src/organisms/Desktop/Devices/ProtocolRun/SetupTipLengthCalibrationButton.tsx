@@ -27,6 +27,7 @@ import { useRunHasStarted } from '/app/resources/runs'
 
 import { useDeckCalibrationData } from '../hooks'
 
+import type { ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
@@ -48,7 +49,7 @@ export function SetupTipLengthCalibrationButton({
   tipRackDefinition,
   isExtendedPipOffset,
   disabled,
-}: SetupTipLengthCalibrationButtonProps): JSX.Element {
+}: SetupTipLengthCalibrationButtonProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
@@ -114,7 +115,6 @@ export function SetupTipLengthCalibrationButton({
         })
       }}
       css={TYPOGRAPHY.labelSemiBold}
-      id="TipRackCalibration_recalibrateTipRackLink"
     >
       {t('recalibrate')}
     </Link>
@@ -134,7 +134,6 @@ export function SetupTipLengthCalibrationButton({
                   hasBlockModalResponse: null,
                 })
               }}
-              id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
             >

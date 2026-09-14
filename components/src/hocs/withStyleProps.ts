@@ -2,7 +2,12 @@ import { createElement, forwardRef } from 'react'
 
 import { isntStyleProp, styleProps } from '../primitives/style-props'
 
-import type { ComponentProps, ComponentType, ForwardedRef } from 'react'
+import type {
+  ComponentProps,
+  ComponentType,
+  ForwardedRef,
+  ReactNode,
+} from 'react'
 import type { StyleProps } from '../primitives/types'
 
 /**
@@ -36,7 +41,7 @@ export function withStyleProps<T extends ComponentType<any>>(
     (
       { style, ...props }: ComponentProps<T> & StyleProps,
       ref: ForwardedRef<unknown>
-    ): JSX.Element => {
+    ): ReactNode => {
       const stylePropsStyles = styleProps(props)
       const combinedStyles = { ...stylePropsStyles, ...style }
 

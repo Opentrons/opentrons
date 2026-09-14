@@ -7,11 +7,12 @@ import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function VacuumReconnectWasteTube(
   props: RecoveryContentProps
-): JSX.Element {
+): ReactNode {
   const { routeUpdateActions } = props
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
 

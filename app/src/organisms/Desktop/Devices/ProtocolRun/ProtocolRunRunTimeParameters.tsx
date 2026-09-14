@@ -38,6 +38,7 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -46,7 +47,7 @@ interface ProtocolRunRuntimeParametersProps {
 }
 export function ProtocolRunRuntimeParameters({
   runId,
-}: ProtocolRunRuntimeParametersProps): JSX.Element {
+}: ProtocolRunRuntimeParametersProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const run = useNotifyRunQuery(runId, {
@@ -167,7 +168,7 @@ interface RunTimeParametersBannerProps {
 
 function RunTimeParametersBanner({
   isRunTerminal,
-}: RunTimeParametersBannerProps): JSX.Element {
+}: RunTimeParametersBannerProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (
@@ -198,7 +199,7 @@ interface StyledTableRowComponentProps {
 
 const StyledTableRowComponent = (
   props: StyledTableRowComponentProps
-): JSX.Element => {
+): ReactNode => {
   const { parameter, index, isLast, t } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (

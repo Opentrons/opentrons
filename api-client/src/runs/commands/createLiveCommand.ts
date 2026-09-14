@@ -9,12 +9,13 @@ import type { CreateCommandParams } from './types'
 export function createLiveCommand(
   config: HostConfig,
   data: CreateCommand,
-  params?: CreateCommandParams
+  params?: CreateCommandParams,
+  userNotes?: string
 ): ResponsePromise<CommandData> {
   return request<CommandData, { data: CreateCommand }>(
     POST,
     `/commands`,
     config,
-    { queryParams: { ...params }, body: { data } }
+    { queryParams: { ...params }, body: { data }, userNotes }
   )
 }

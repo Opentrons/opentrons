@@ -2,7 +2,7 @@ import clsx from 'clsx'
 
 import styles from './concurrentgroupchild.module.css'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 
 interface ConcurrentGroupChildProps {
   type: 'step' | 'checkpoint'
@@ -27,7 +27,7 @@ interface ConcurrentGroupChildProps {
  */
 export function ConcurrentGroupChild(
   props: PropsWithChildren<ConcurrentGroupChildProps>
-): JSX.Element {
+): ReactNode {
   const { type, children } = props
   return (
     <li

@@ -7,11 +7,12 @@ import {
 
 import { SlotDetailsEmptyState } from '../../molecules/SlotDetailsEmptyState'
 import { ModuleContainer } from '../ModuleContainer'
-import { LabwareSlot } from '../SecondWindow/LabwareSlot'
-import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
-import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
+import { LabwareSlot } from '../SlotSpotlight/LabwareSlot'
+import { TipDisposalSlot } from '../SlotSpotlight/TipDisposalSlot'
+import { TipPickupSlot } from '../SlotSpotlight/TipPickupSlot'
 import styles from './slotdetails.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   LoadLabwareRunTimeCommand,
@@ -30,9 +31,17 @@ interface SlotDetailsProps {
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
+  headerPortalEl?: HTMLElement | null
 }
-export function SlotDetails(props: SlotDetailsProps): JSX.Element {
-  const { slotId, robotState, invariantContext, analysis, liquids } = props
+export function SlotDetails(props: SlotDetailsProps): ReactNode {
+  const {
+    slotId,
+    robotState,
+    invariantContext,
+    analysis,
+    liquids,
+    headerPortalEl,
+  } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
@@ -96,13 +105,13 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     if (topMostLabwareOnSlot == null) {
       return null
     }
-    if (isTopmostLabwareATiprack === true) {
+    if (isTopmostLabwareATiprack) {
       return 'tiprack'
     }
     return 'labware'
   }
 
-  const renderLabwareContent = (): JSX.Element | null => {
+  const renderLabwareContent = (): ReactNode | null => {
     const labwareType = getLabwareType()
     if (topMostLabwareOnSlot == null) {
       return null
@@ -113,6 +122,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           <TipPickupSlot
             tiprackEntity={labwareEntitiesExtended[topMostLabwareOnSlot]}
             robotState={robotState}
+            headerPortalEl={headerPortalEl}
           />
         )
       case 'labware':
@@ -124,6 +134,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             liquids={liquids}
             robotState={robotState}
             moduleEntities={moduleEntities}
+            headerPortalEl={headerPortalEl}
           />
         )
       default:
@@ -135,7 +146,10 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     <>
       {isSlotEmpty ? (
         <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState slotId={slotId} />
+          <SlotDetailsEmptyState
+            slotId={slotId}
+            headerPortalEl={headerPortalEl}
+          />
         </div>
       ) : null}
       <div className={styles.slot_container}>
@@ -145,6 +159,9 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             <TipDisposalSlot
               robotState={robotState}
               disposalType={disposalType}
+              headerPortalEl={
+                topMostLabwareOnSlot == null ? headerPortalEl : undefined
+              }
             />
           ) : null}
           {moduleOnSlot != null ? (
@@ -153,6 +170,11 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
               slotId={mappedSlot}
+              headerPortalEl={
+                topMostLabwareOnSlot == null && disposalType == null
+                  ? headerPortalEl
+                  : undefined
+              }
             />
           ) : null}
         </div>

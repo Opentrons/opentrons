@@ -24,6 +24,7 @@ import {
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
 import type { FileMetadataFields } from '/protocol-designer/file-data'
 
 interface EditProtocolMetadataModalProps {
@@ -31,7 +32,7 @@ interface EditProtocolMetadataModalProps {
 }
 export function EditProtocolMetadataModal(
   props: EditProtocolMetadataModalProps
-): JSX.Element {
+): ReactNode {
   const { onClose } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['onboarding', 'shared'])
@@ -55,7 +56,6 @@ export function EditProtocolMetadataModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t('shared:edit_protocol_metadata')}
       type="info"
       onClose={onClose}

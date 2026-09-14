@@ -46,7 +46,7 @@ import { LiquidLayoutOverlayModalContainer } from '../OverlayModal/LiquidsOverla
 import { LabwareStackToolboxContainer } from './LabwareToolbox'
 import { LiquidToolboxContainer } from './LiquidToolbox'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type {
   ContentsByWell,
@@ -75,9 +75,7 @@ interface AssignLiquidsModalProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   assignLiquidsModalData: AssignLiquidsModalData
 }
-export function AssignLiquidsModal(
-  props: AssignLiquidsModalProps
-): JSX.Element | null {
+export function AssignLiquidsModal(props: AssignLiquidsModalProps): ReactNode {
   const {
     showLiquidOverflowMenu,
     setDefineLiquidModal,
@@ -174,7 +172,7 @@ export function AssignLiquidsModal(
                 size="extraLarge"
                 deckLabel={
                   getSlotInLocationStack(
-                    labware[labwareId].stack as string[],
+                    labware[labwareId].stack,
                     labwareIsOnHopper
                   ) ?? ''
                 }
@@ -277,7 +275,7 @@ interface AssignLiquidsModalContainerProps {
 
 export function AssignLiquidsModalContainer(
   props: AssignLiquidsModalContainerProps
-): JSX.Element | null {
+): ReactNode {
   const { showLiquidOverflowMenu, setDefineLiquidModal } = props
 
   // All selectors moved here

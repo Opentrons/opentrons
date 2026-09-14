@@ -1,0 +1,13 @@
+.actions_list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.action {
+  width: 100%;
+  padding: var(--spacing-16) var(--spacing-20);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-35);
+}

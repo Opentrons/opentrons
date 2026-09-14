@@ -7,11 +7,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { LabwareUploadMessage } from '/protocol-designer/labware-defs'
 
 export function LabwareUploadModalBody(props: {
   message: LabwareUploadMessage
-}): JSX.Element | null {
+}): ReactNode {
   const { message } = props
   const { t } = useTranslation('shared')
 

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -36,6 +37,7 @@ import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
@@ -43,9 +45,12 @@ import {
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
 import { ReachableBanner } from './ReachableBanner'
+import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -66,6 +71,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   )
 
   const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [
+    showRobotOutOfStorageNotification,
+    setShowRobotOutOfStorageNotification,
+  ] = useState<boolean>(isRobotOutOfStorage)
 
   return robot != null ? (
     <Flex
@@ -96,13 +106,22 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             marginRight={SPACING.spacing24}
           />
         ) : null}
+        <SignAndDownloadRunBanner robotName={robotName} />
+        {showRobotOutOfStorageNotification ? (
+          <RobotOutOfStorageNotification
+            robotName={robotName}
+            onCloseClick={e => {
+              e?.stopPropagation()
+              setShowRobotOutOfStorageNotification(false)
+            }}
+          />
+        ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <Flex gap={SPACING.spacing16}>
             <img
               src={FLEX_PNG}
               width="52.9px"
               height="50.14px"
-              id={`RobotCard_${String(robotName)}_robotImage`}
               alt="Flex image"
             />
             <RobotStatusHeader
@@ -199,7 +218,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   ) : null
 }
 
-function AttachedInstruments(props: { robotName: string }): JSX.Element {
+function AttachedInstruments(props: { robotName: string }): ReactNode {
   const { t, i18n } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
   const { data: pipettesData, isLoading: isPipetteQueryLoading } =

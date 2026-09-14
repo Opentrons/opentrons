@@ -21,11 +21,7 @@ import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 export type SmallButtonTypes =
-  | 'alert'
-  | 'primary'
-  | 'secondary'
-  | 'tertiaryLowLight'
-  | 'tertiaryHighLight'
+  'alert' | 'primary' | 'secondary' | 'tertiaryLowLight' | 'tertiaryHighLight'
 
 export type ButtonCategory = 'default' | 'rounded'
 
@@ -42,7 +38,7 @@ interface SmallButtonProps extends StyleProps {
   ariaDisabled?: boolean
 }
 
-export function SmallButton(props: SmallButtonProps): JSX.Element {
+export function SmallButton(props: SmallButtonProps): ReactNode {
   const {
     buttonType = 'primary',
     buttonText,
@@ -107,47 +103,56 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
   const SMALL_BUTTON_STYLE = css`
     color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+    background-color: ${
+      SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+    };
     cursor: ${CURSOR_DEFAULT};
-    border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadius40
-      : BORDERS.borderRadius16};
+    border-radius: ${
+      buttonCategory === 'rounded'
+        ? BORDERS.borderRadius40
+        : BORDERS.borderRadius16
+    };
     box-shadow: none;
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
       box-shadow: none;
     }
     &:hover {
       border: none;
       box-shadow: none;
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      };
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      };
     }
 
     &:active {
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
     }
 
     &:disabled {
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
 
     &[aria-disabled='true'] {
-      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      background-color: ${
+        SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
   `

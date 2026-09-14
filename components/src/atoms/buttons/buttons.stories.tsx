@@ -1,8 +1,6 @@
 import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { STYLE_PROPS } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { AlertPrimaryButton as AlertPrimaryButtonComponent } from './AlertPrimaryButton'
-import { AltPrimaryButton as AltPrimaryButtonComponent } from './AltPrimaryButton'
 import { BasicButton as BasicButtonComponent } from './BasicButton'
 import { PrimaryButton as PrimaryButtonComponent } from './PrimaryButton'
 import { SecondaryButton as SecondaryButtonComponent } from './SecondaryButton'
@@ -70,25 +68,26 @@ export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
   ),
 }
 
-export const AlertPrimaryButton: StoryObj<typeof AlertPrimaryButtonComponent> =
-  {
-    args: {
-      children: 'alert tertiary button',
-    },
-    render: args => (
-      <div style={BUTTON_CONTAINER_STYLE}>
-        <AlertPrimaryButtonComponent {...args} />
-      </div>
-    ),
-  }
-
-export const AltPrimaryButton: StoryObj<typeof AltPrimaryButtonComponent> = {
+export const WarningPrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
   args: {
+    variant: 'warning',
+    children: 'warning primary button',
+  },
+  render: args => (
+    <div style={BUTTON_CONTAINER_STYLE}>
+      <PrimaryButtonComponent {...args} />
+    </div>
+  ),
+}
+
+export const AltPrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
+  args: {
+    variant: 'alt',
     children: 'alt primary button',
   },
   render: args => (
     <div style={BUTTON_CONTAINER_STYLE}>
-      <AltPrimaryButtonComponent {...args} />
+      <PrimaryButtonComponent {...args} />
     </div>
   ),
 }

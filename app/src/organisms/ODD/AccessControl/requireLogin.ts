@@ -31,7 +31,7 @@ export async function requireLogin(
     return { username: currentUsername }
   }
 
-  const result = await showLoginModal(queryClient, hostConfig)
+  const result = await showLoginModal()
   if (result == null) return null
   return { username: result.username }
 }

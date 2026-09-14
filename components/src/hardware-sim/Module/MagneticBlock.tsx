@@ -1,6 +1,8 @@
 import { COLORS } from '../../helix-design-system'
 
-export function MagneticBlock(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function MagneticBlock(): ReactNode {
   return (
     <g id="magneticBlock">
       <g id="footprint">

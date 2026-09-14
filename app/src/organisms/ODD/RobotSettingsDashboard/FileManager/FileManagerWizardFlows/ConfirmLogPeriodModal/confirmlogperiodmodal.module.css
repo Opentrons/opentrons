@@ -1,0 +1,11 @@
+.buttons {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu_item {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-12);
+}

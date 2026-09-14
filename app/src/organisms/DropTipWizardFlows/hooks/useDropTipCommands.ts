@@ -11,6 +11,7 @@ import {
   MANAGED_PIPETTE_ID,
 } from '../constants'
 import { getAddressableAreaFromConfig } from '../utils'
+import { getDoorOpenErrorDetails } from './errors'
 
 import type { CommandData, PipetteData } from '@opentrons/api-client'
 import type {
@@ -86,7 +87,13 @@ export function useDropTipCommands({
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
-    [...actionsToDocument, 'end_drop_tips']
+    [...actionsToDocument, 'end_drop_tips'],
+    {
+      onError: () => {
+        setHasSeenClose(false)
+        toggleIsExiting()
+      },
+    }
   )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -111,7 +118,7 @@ export function useDropTipCommands({
               })
               .finally(() => {
                 deleteMaintenanceRun(activeMaintenanceRunId, {
-                  onSettled: () => {
+                  onSuccess: () => {
                     closeFlow()
                   },
                 })
@@ -179,12 +186,17 @@ export function useDropTipCommands({
           if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
             fixitCommandTypeUtils.errorOverrides.generalFailure()
           } else {
-            setErrorDetails({
-              type: error.errorType ?? null,
-              message: error.detail
-                ? `Error moving to position: ${error.detail}`
-                : 'Error moving to position: invalid addressable area.',
-            })
+            const doorOpenDetails = getDoorOpenErrorDetails(error)
+            if (doorOpenDetails != null) {
+              setErrorDetails(doorOpenDetails)
+            } else {
+              setErrorDetails({
+                type: error.errorType ?? null,
+                message: error.detail
+                  ? `Error moving to position: ${error.detail}`
+                  : 'Error moving to position: invalid addressable area.',
+              })
+            }
           }
           reject(error)
         })
@@ -213,9 +225,14 @@ export function useDropTipCommands({
             fixitCommandTypeUtils.errorOverrides.generalFailure()
           }
 
-          setErrorDetails({
-            message: `Error issuing jog command: ${error.message}`,
-          })
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            setErrorDetails({
+              message: `Error issuing jog command: ${error.message}`,
+            })
+          }
           resolve()
         })
     })
@@ -263,18 +280,23 @@ export function useDropTipCommands({
             ? fixitCommandTypeUtils.errorOverrides.blowoutFailed()
             : fixitCommandTypeUtils.errorOverrides.tipDropFailed()
         } else {
-          const operation = isBlowoutRoute ? 'blowout' : 'drop tip'
-          const type = 'errorType' in error ? error.errorType : undefined
-          const messageDetail =
-            'message' in error ? error.message : error.detail
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            const operation = isBlowoutRoute ? 'blowout' : 'drop tip'
+            const type = 'errorType' in error ? error.errorType : undefined
+            const messageDetail =
+              'message' in error ? error.message : error.detail
 
-          setErrorDetails({
-            type,
-            message:
-              messageDetail != null
-                ? `Error during ${operation}: ${messageDetail}`
-                : null,
-          })
+            setErrorDetails({
+              type,
+              message:
+                messageDetail != null
+                  ? `Error during ${operation}: ${messageDetail}`
+                  : null,
+            })
+          }
         }
         reject(error)
       }
@@ -328,9 +350,14 @@ export function useDropTipCommands({
         .then(() => handleCleanUpAndClose())
         .then(resolve)
         .catch((error: Error) => {
-          setErrorDetails({
-            message: `Error homing ${error}`,
-          })
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            setErrorDetails({
+              message: `Error homing ${error}`,
+            })
+          }
           resolve()
         })
     })

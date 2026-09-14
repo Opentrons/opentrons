@@ -8,7 +8,7 @@ const meta: Meta<typeof SmallButton> = {
   title: 'ODD/Atoms/Buttons/SmallButton',
   argTypes: { onClick: { action: 'clicked' } },
   component: SmallButton,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

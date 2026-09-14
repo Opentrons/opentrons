@@ -16,6 +16,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -26,9 +27,7 @@ interface UpdateResultsModalProps {
   instrument?: InstrumentData
 }
 
-export function UpdateResultsModal(
-  props: UpdateResultsModalProps
-): JSX.Element {
+export function UpdateResultsModal(props: UpdateResultsModalProps): ReactNode {
   const { isSuccess, shouldExit, onClose, instrument } = props
   const { i18n, t } = useTranslation(['firmware_update', 'shared', 'branded'])
 

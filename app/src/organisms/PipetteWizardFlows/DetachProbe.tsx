@@ -8,13 +8,14 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachProbeProps extends PipetteWizardStepProps {
   proceed: () => void
 }
 
-export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
+export const DetachProbe = (props: DetachProbeProps): ReactNode => {
   const {
     isRobotMoving,
     goBack,

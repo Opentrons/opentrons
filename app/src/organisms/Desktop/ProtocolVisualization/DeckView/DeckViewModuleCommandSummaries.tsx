@@ -6,6 +6,7 @@ import {
 
 import { ModuleCommandSummary } from './ModuleCommandSummary'
 
+import type { ReactNode } from 'react'
 import type {
   DeckDefinition,
   RobotType,
@@ -23,7 +24,7 @@ interface DeckViewModuleCommandSummariesProps {
 
 export function DeckViewModuleCommandSummaries(
   props: DeckViewModuleCommandSummariesProps
-): JSX.Element {
+): ReactNode {
   const {
     robotState,
     invariantContext,

@@ -34,4 +34,18 @@ describe('MenuList', () => {
     fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
   })
+
+  it('positions menu above trigger when opensUpward is true', () => {
+    render({ ...props, opensUpward: true })
+    const menu = screen.getByTestId('MenuList')
+    expect(menu.style.bottom).toBe('2.6rem')
+    expect(menu.style.top).toBe('')
+  })
+
+  it('positions menu below trigger when opensUpward is false', () => {
+    render({ ...props, opensUpward: false })
+    const menu = screen.getByTestId('MenuList')
+    expect(menu.style.top).toBe('2.6rem')
+    expect(menu.style.bottom).toBe('')
+  })
 })

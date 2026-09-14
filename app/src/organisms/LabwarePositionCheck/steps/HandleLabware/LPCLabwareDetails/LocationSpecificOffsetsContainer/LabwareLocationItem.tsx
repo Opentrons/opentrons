@@ -18,6 +18,7 @@ import {
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
@@ -32,7 +33,7 @@ export function LabwareLocationItem({
   locationSpecificOffsetDetails,
   commandUtils,
   slotCopy,
-}: LabwareLocationItemProps): JSX.Element {
+}: LabwareLocationItemProps): ReactNode {
   const { t: lpcTextT } = useTranslation('labware_position_check')
   const { toggleRobotMoving, handleCheckItemsPrepModules } = commandUtils
   const { locationDetails } = locationSpecificOffsetDetails

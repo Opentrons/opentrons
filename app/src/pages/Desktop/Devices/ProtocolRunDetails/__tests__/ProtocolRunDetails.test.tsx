@@ -20,7 +20,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunHasStarted,
   useRunStatuses,
 } from '/app/resources/runs'
@@ -123,7 +123,7 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: { createdAt: '123' } },
     } as any)
-    vi.mocked(useProtocolDetailsForRun).mockReturnValue({
+    vi.mocked(useQuickProtocolDetailsForRun).mockReturnValue({
       displayName: 'MOCK-PROTOCOL-NAME',
     } as any)
   })

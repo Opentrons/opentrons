@@ -6,6 +6,7 @@ import {
 } from '@opentrons/components'
 import { getModuleType } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
 
 export interface LabwareOffsetsDeckInfoLabelsProps {
@@ -16,7 +17,7 @@ export interface LabwareOffsetsDeckInfoLabelsProps {
 export function LabwareOffsetsDeckInfoLabels({
   detail,
   slotCopy,
-}: LabwareOffsetsDeckInfoLabelsProps): JSX.Element {
+}: LabwareOffsetsDeckInfoLabelsProps): ReactNode {
   const { closestBeneathModuleModel, lwModOnlyStackupDetails } =
     detail.locationDetails
 

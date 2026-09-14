@@ -29,6 +29,43 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
+@dataclass(frozen=True)
+class ModuleStateSummary:
+    model: str
+    usb_port: USBPort
+    has_available_update: bool
+    live_data: LiveData
+    device_info: dict[str, str]
+    serial_number: str | None
+
+    @staticmethod
+    def to_pyro_dict(obj: "ModuleStateSummary") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "model": obj.model,
+            "usb_port": USBPort.to_pyro_dict(obj.usb_port),
+            "has_available_update": obj.has_available_update,
+            "live_data": obj.live_data,
+            "device_info": obj.device_info,
+            "serial_number": obj.serial_number,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "ModuleStateSummary":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ModuleStateSummary(
+            model=data["model"],
+            usb_port=USBPort.from_pyro_dict(
+                f"{USBPort.__module__}.{USBPort.__qualname__}", data["usb_port"]
+            ),
+            has_available_update=data["has_available_update"],
+            live_data=data["live_data"],
+            device_info=data["device_info"],
+            serial_number=data["serial_number"],
+        )
+
+
 class VacuumModuleStepBase(TypedDict, total=False):
     enable_pump: bool
     hold_time_seconds: int | None

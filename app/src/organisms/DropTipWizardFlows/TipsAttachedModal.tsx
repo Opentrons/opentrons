@@ -8,24 +8,24 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useHomePipettes } from '/app/local-resources/instruments'
 import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
-import type { HostConfig } from '@opentrons/api-client'
+import type { ReactNode } from 'react'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
-type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
+type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
   aPipetteWithTip: PipetteWithTip
-  host: HostConfig | null
+  robotName: string | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
 }
 
@@ -38,9 +38,13 @@ export const handleTipsAttachedModal = (
 }
 
 const TipsAttachedModal = NiceModal.create(
-  (props: TipsAttachedModalProps): JSX.Element => {
-    const { aPipetteWithTip, host, setTipStatusResolved, ...homePipetteProps } =
-      props
+  (props: TipsAttachedModalProps): ReactNode => {
+    const {
+      aPipetteWithTip,
+      robotName,
+      setTipStatusResolved,
+      ...homePipetteProps
+    } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
@@ -51,7 +55,7 @@ const TipsAttachedModal = NiceModal.create(
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
-      onSettled: () => {
+      onSuccess: () => {
         modal.remove()
         void setTipStatusResolved()
       },
@@ -80,7 +84,7 @@ const TipsAttachedModal = NiceModal.create(
     const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
-      <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
+      <ApiHostProvider robotName={robotName}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText forwardedAs="p">

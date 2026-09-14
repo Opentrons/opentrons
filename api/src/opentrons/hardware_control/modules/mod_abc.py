@@ -14,6 +14,7 @@ from .types import (
     LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    ModuleStateSummary,
     ModuleType,
     UploadFunction,
 )
@@ -239,3 +240,14 @@ class AbstractModule(AbstractDevice):
             else:
                 # success
                 return
+
+    async def get_state_summary(self) -> ModuleStateSummary:
+        """Get a summary of module data friendly to remote calls."""
+        return ModuleStateSummary(
+            model=self.model(),
+            usb_port=self.usb_port,
+            has_available_update=self.has_available_update(),
+            device_info={k: v for k, v in self.device_info.items()},
+            live_data=self.live_data,
+            serial_number=self.serial_number,
+        )

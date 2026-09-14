@@ -97,9 +97,8 @@ export const getSelectedWellsCommonValues = createSelector(
       }
     }
     const initialWellContents:
-      | StepGeneration.LocationLiquidState
-      | null
-      | undefined = ingredsInLabware[Object.keys(selectedWells)[0]]
+      StepGeneration.LocationLiquidState | null | undefined =
+      ingredsInLabware[Object.keys(selectedWells)[0]]
     // TODO IMMEDIATELY why arbitrary 0th???
     const initialIngredId: string | null | undefined =
       initialWellContents && Object.keys(initialWellContents)[0]

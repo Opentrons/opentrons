@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
@@ -28,6 +29,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 import { Skeleton } from '/app/atoms/Skeleton'
 import {
@@ -37,8 +39,10 @@ import {
 import { useCloneRun } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
+import { ProtocolSetupFullSkeleton } from '../ProtocolSetup'
 import { useRerunnableStatusText } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -89,7 +93,7 @@ export function ProtocolWithLastRun({
   runData,
   protocolData,
   isProtocolFetching,
-}: ProtocolWithLastRunProps): JSX.Element {
+}: ProtocolWithLastRunProps): ReactNode {
   const { t, i18n } = useTranslation('device_details')
   const {
     missingProtocolHardware,
@@ -107,7 +111,11 @@ export function ProtocolWithLastRun({
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
-  const { cloneRun } = useCloneRun(runData.id)
+  const { cloneRun, isCloning } = useCloneRun(runData.id, run => {
+    if (run.data.id != null) {
+      navigate(`/runs/${run.data.id}/setup`)
+    }
+  })
   const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
   const protocolName =
@@ -159,9 +167,6 @@ export function ProtocolWithLastRun({
       navigate(`/protocols/${protocolId}`)
     } else {
       cloneRun()
-      // Navigate to a dummy setup skeleton until TopLevelRedirects routes to the proper setup page. Doing so prevents
-      // needing to manage complex UI state updates for protocol cards, overzealous dashboard rendering, and potential navigation pitfalls.
-      navigate('/runs/1234/setup')
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },
@@ -191,6 +196,10 @@ export function ProtocolWithLastRun({
     } else {
       return ''
     }
+  }
+
+  if (isCloning) {
+    return createPortal(<ProtocolSetupFullSkeleton />, getTopPortalEl())
   }
 
   return isProtocolFetching || isLookingForHardware ? (

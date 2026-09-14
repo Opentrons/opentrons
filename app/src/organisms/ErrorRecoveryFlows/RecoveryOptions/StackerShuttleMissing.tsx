@@ -8,11 +8,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerShuttleMissing(
-  props: RecoveryContentProps
-): JSX.Element {
+export function StackerShuttleMissing(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { STACKER_SHUTTLE_MISSING_RETRY } = RECOVERY_MAP

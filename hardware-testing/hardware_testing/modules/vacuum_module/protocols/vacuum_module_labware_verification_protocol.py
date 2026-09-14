@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.30",
+    "apiLevel": "2.31",
 }
 
 COLLAR_CHOICES: List[ParameterChoice] = [
@@ -50,6 +50,10 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
         "value": "millipore_96_wellplate_300ul_hts_filter",
     },
     {
+        "display_name": "Millipore 96 300µL HTS IP",
+        "value": "millipore_96_wellplate_300ul_hts_ip_filter",
+    },
+    {
         "display_name": "Millipore 96 300µL PCR",
         "value": "millipore_96_wellplate_300ul_pcr_filter",
     },
@@ -68,6 +72,26 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
     {
         "display_name": "Nunc 96 1000µL Filter",
         "value": "thermoscientificnunc_96_wellplate_1000ul_filter",
+    },
+    {
+        "display_name": "Cytiva 96 350µL Filter",
+        "value": "cytiva_96_wellplate_350ul_filter",
+    },
+    {
+        "display_name": "Cytiva 96 1000µL Long Tip",
+        "value": "cytiva_96_wellplate_1000ul_longtip_filter",
+    },
+    {
+        "display_name": "Cytiva 96 1000µL Short Tip",
+        "value": "cytiva_96_wellplate_1000ul_shorttip_filter",
+    },
+    {
+        "display_name": "Luna USP-096F 1000µL Silica",
+        "value": "lunanano_96_wellplate_1000ul_filter",
+    },
+    {
+        "display_name": "Empore C18-SD 96 1200µL Filter",
+        "value": "empore_96_wellplate_1200ul_c18_filter",
     },
     {
         "display_name": "InVitroVen Filter",
@@ -116,7 +140,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="filter_plate",
         display_name="Filter Plate",
         description="Filter plate loaded on the collar.",
-        default="millipore_96_wellplate_300ul_hts_filter",
+        default="cytiva_96_wellplate_1000ul_shorttip_filter",
         choices=FILTER_PLATE_CHOICES,
     )
     parameters.add_str(

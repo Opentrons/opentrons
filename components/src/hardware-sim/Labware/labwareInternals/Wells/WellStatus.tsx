@@ -3,6 +3,7 @@ import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'
 import { EmptyWell } from './EmptyWell'
 
+import type { ReactNode } from 'react'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { ParentType, WellType } from '../types'
 
@@ -15,7 +16,7 @@ interface WellStatusProps {
   showStroke?: boolean
 }
 
-export function WellStatus(props: WellStatusProps): JSX.Element {
+export function WellStatus(props: WellStatusProps): ReactNode {
   const {
     type,
     size,

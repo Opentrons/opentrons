@@ -18,6 +18,8 @@ import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
 
 import { getMainPagePortalEl } from './Portal'
 
+import type { ReactNode } from 'react'
+
 interface ResetSettingsModalProps {
   tab: 'aspirate' | 'dispense'
   onContinue: () => void
@@ -25,9 +27,7 @@ interface ResetSettingsModalProps {
   onScroll: () => void
   liquidClass?: string | null
 }
-export function ResetSettingsModal(
-  props: ResetSettingsModalProps
-): JSX.Element {
+export function ResetSettingsModal(props: ResetSettingsModalProps): ReactNode {
   const { tab, liquidClass, onContinue, onClose, onScroll } = props
   const { t, i18n } = useTranslation('protocol_steps')
 
@@ -42,7 +42,6 @@ export function ResetSettingsModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t(`protocol_steps:reset_settings`, { tab })}
       titleElement1={
         <Icon name="ot-alert" color={COLORS.yellow50} size="1.25rem" />

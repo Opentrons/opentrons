@@ -9,6 +9,7 @@ from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import FileHasher, FileReaderWriter, ProtocolReader
+from server_utils.auth.resource_server.fastapi import get_access_control_status
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -96,12 +97,15 @@ async def get_protocol_store(
 async def get_analysis_store(
     app_state: Annotated[AppState, Depends(get_app_state)],
     sql_engine: Annotated[SQLEngine, Depends(get_sql_engine)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> AnalysisStore:
     """Get a singleton AnalysisStore to keep track of created analyses."""
     analysis_store = _analysis_store_accessor.get_from(app_state)
 
     if analysis_store is None:
-        analysis_store = AnalysisStore(sql_engine=sql_engine)
+        analysis_store = AnalysisStore(
+            sql_engine=sql_engine, access_control_status=access_control_status
+        )
         _analysis_store_accessor.set_on(app_state, analysis_store)
 
     return analysis_store

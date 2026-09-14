@@ -23,10 +23,10 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
-import type { ChangeEventHandler, MouseEventHandler } from 'react'
+import type { ChangeEventHandler, MouseEventHandler, ReactNode } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
@@ -46,7 +46,7 @@ export function UpdateRobotSoftware({
   robotName,
   onUpdateStart,
   currentRun,
-}: UpdateRobotSoftwareProps): JSX.Element {
+}: UpdateRobotSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
@@ -54,7 +54,7 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const isRunActive =
     currentRun != null && !isTerminalRunStatus(currentRun.data.status)
 
@@ -64,7 +64,7 @@ export function UpdateRobotSoftware({
     if (files != null) {
       void remote.getFilePathFrom(files[0]).then(filePath => {
         if (files.length === 1 && !updateDisabled) {
-          dispatchStartRobotUpdate(robotName, filePath)
+          startUpdate(robotName, filePath)
           onUpdateStart()
         }
         // this is to reset the state of the file picker so users can reselect the same
@@ -87,7 +87,6 @@ export function UpdateRobotSoftware({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing8}
-            id="AdvancedSettings_updateRobotSoftware"
           >
             {t('update_robot_software')}
           </LegacyStyledText>
@@ -100,7 +99,6 @@ export function UpdateRobotSoftware({
         </Box>
         <TertiaryButton
           marginLeft={SPACING_AUTO}
-          id="AdvancedSettings_softwareUpdateButton"
           {...updateButtonProps}
           disabled={updateDisabled || isRunActive}
           onClick={handleClick}

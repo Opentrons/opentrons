@@ -16,6 +16,7 @@ import {
 
 import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '/protocol-designer/constants'
 
+import type { ReactNode } from 'react'
 import type { Initialization } from '@opentrons/step-generation'
 
 const getWavelengthDisplay = (
@@ -51,7 +52,7 @@ interface InitializationSettingsProps {
 
 export function InitializationSettings(
   props: InitializationSettingsProps
-): JSX.Element {
+): ReactNode {
   const { initialization } = props
   const { t } = useTranslation(['application', 'form'])
   const [targetProps, tooltipProps] = useHoverTooltip()

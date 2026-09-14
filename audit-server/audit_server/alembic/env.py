@@ -11,7 +11,7 @@ from audit_server.persistence.file_and_directory_names import (
     LATEST_VERSION_DIRECTORY,
 )
 from audit_server.persistence.orm_models import Base
-from audit_server.server_settings import get_settings
+from audit_server.server_configuration import get_configuration
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -34,11 +34,13 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-settings = get_settings()
+configuration = get_configuration()
 db_url = config.get_main_option("sqlalchemy.url")
 if db_url is None or db_url == "driver://user:pass@localhost/dbname":
-    if isinstance(settings.persistence_directory, Path):
-        db_path = settings.persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE
+    if isinstance(configuration.persistence_directory, Path):
+        db_path = (
+            configuration.persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE
+        )
         if not db_path.parent.is_dir():
             db_path.parent.mkdir(parents=True)
     else:

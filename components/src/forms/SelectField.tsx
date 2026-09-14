@@ -42,7 +42,7 @@ export interface SelectFieldProps {
   onLoseFocus?: (name: string) => void
 }
 
-export function SelectField(props: SelectFieldProps): JSX.Element {
+export function SelectField(props: SelectFieldProps): ReactNode {
   const {
     id,
     name,

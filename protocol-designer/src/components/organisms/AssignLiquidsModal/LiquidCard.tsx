@@ -28,6 +28,7 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 
 import { WellContents } from './WellContents'
 
+import type { ReactNode } from 'react'
 import type { SelectedContainerId } from '/protocol-designer/labware-ingred/reducers'
 import type { LiquidInfo } from './LiquidToolbox'
 
@@ -35,7 +36,7 @@ interface LiquidCardProps {
   info: LiquidInfo
 }
 
-export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
+export function LiquidCard({ info }: LiquidCardProps): ReactNode {
   const { name, color, liquidClassDisplayName, liquidIndex } = info
   const { t } = useTranslation('liquids')
   const dispatch = useDispatch()

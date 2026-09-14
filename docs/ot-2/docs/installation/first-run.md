@@ -3,13 +3,13 @@ title: "Opentrons OT-2: First Run"
 description: "Download the app, connect power and Ethernet, and power on the OT-2."
 ---
 
-The OT-2 is powered by an external power supply that converts AC wall current to the 36 VDC used by the robot's internal systems. You control the robot through the Opentrons App and a computer connected using the supplied Ethernet cable and dongle. This section guides you through downloading the Opentrons App, connecting your computer to the OT-2, and connecting the robot to the external power supply.
+The OT-2 is powered by an external power supply that converts AC wall current to the 36 VDC used by the robot's internal systems. You control the robot through the Opentrons OT-2 App and a computer connected using the supplied Ethernet cable and dongle. This section guides you through downloading the Opentrons OT-2 App, connecting your computer to the OT-2, and connecting the robot to the external power supply.
 
-## Installing the Opentrons App
+## Installing the Opentrons OT-2 App
 
 <div class="instruction-list" markdown>
 
-1. Download and install the Opentrons App on your computer. The app is available from Opentrons at <https://opentrons.com/ot-app>.
+1. Download and install the Opentrons OT-2 App on your computer. The app is available from Opentrons at <https://opentrons.com/ot-app>.
 
 2. Connect the Ethernet cable to the OT-2 and your computer. If your computer does not have an Ethernet port, use the provided Ethernet-to-USB dongle.
 
@@ -45,15 +45,15 @@ After turning on the power, it may take up to 45 seconds, or longer, before the 
 
 ## Making a LAN connection
 
-Along with a direct connection to a computer, you can also connect the OT-2 to your local area network (LAN) using the supplied Ethernet cable. For a LAN, just connect the Ethernet cable to the robot and a wall jack. You can also plug the Ethernet cable into a nearby network switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons App.
+Along with a direct connection to a computer, you can also connect the OT-2 to your local area network (LAN) using the supplied Ethernet cable. For a LAN, just connect the Ethernet cable to the robot and a wall jack. You can also plug the Ethernet cable into a nearby network switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons OT-2 App.
 
 ## Making a Wi-Fi connection
 
-If you need to connect to a Wi-Fi network that uses enterprise authentication (including [eduroam](https://eduroam.org/how/) and similar academic networks that require a username and password), first connect to the Opentrons App by Ethernet or USB to complete initial setup. Then use the Opentrons App and connect to the enterprise Wi-Fi network in the networking settings for your OT-2. To access the networking settings:
+If you need to connect to a Wi-Fi network that uses enterprise authentication (including [eduroam](https://eduroam.org/how/) and similar academic networks that require a username and password), first connect to the Opentrons OT-2 App by Ethernet or USB to complete initial setup. Then use the Opentrons OT-2 App and connect to the enterprise Wi-Fi network in the networking settings for your OT-2. To access the networking settings:
 
 <div class="instruction-list" markdown>
 
-1. Click Devices in the left sidebar of the Opentrons App.
+1. Click Devices in the left sidebar of the Opentrons OT-2 App.
 2. Click the three-dot menu (⋮) for your OT-2 and select **Robot Settings**.
 3. Click the Networking tab.
 4. Select your network from the dropdown menu or choose "Join other network..." and enter its SSID. Choose the enterprise authentication method that your network uses. See the following section for the supported security types.
@@ -87,7 +87,7 @@ Naming your robot lets you easily identify it in your lab environment. If you ha
 
 <div class="instruction-list" markdown>
 
-1. In the Opentrons App, click the **Devices** tab and select the OT-2 you want to work with.
+1. In the Opentrons OT-2 App, click the **Devices** tab and select the OT-2 you want to work with.
 2. Click the three-dot menu and then click **Robot settings**.
 3. Click the **Advanced** tab.
 4. In the About section, click **Rename robot**.

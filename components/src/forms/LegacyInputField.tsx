@@ -64,7 +64,7 @@ export interface LegacyInputFieldProps {
  * @deprecated Use `InputField`
  */
 
-export function LegacyInputField(props: LegacyInputFieldProps): JSX.Element {
+export function LegacyInputField(props: LegacyInputFieldProps): ReactNode {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,
@@ -95,7 +95,7 @@ export function LegacyInputField(props: LegacyInputFieldProps): JSX.Element {
 }
 
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
-function Input(props: LegacyInputFieldProps): JSX.Element {
+function Input(props: LegacyInputFieldProps): ReactNode {
   const error = props.error != null
   const value = props.isIndeterminate ? '' : (props.value ?? '')
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder

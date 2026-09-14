@@ -2,16 +2,25 @@
 
 from __future__ import annotations
 
+import typing
+
 import fastapi
 import pytest
 from starlette.testclient import TestClient
 
 from server_utils.audit.audit_server import (
+    AuditSettingsResponseData,
     Client,
+    GetLoggingEnabledData,
+    GetLogPeriodsData,
     LocalHTTPClient,
     NoOpClient,
+    PatchLoggingEnabledRequestData,
+    PatchLoggingEnabledResponseData,
+    StoreRobotLogSuccessData,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
+    TotalUsageSummaryData,
 )
 from server_utils.audit.fastapi import (
     build_audit_client,
@@ -60,8 +69,30 @@ def test_install_and_get_audit_client_via_dependency() -> None:
     class StubClient(Client):
         async def submit_log_message(
             self, message: SubmitAuditLogMessageData
-        ) -> SubmitAuditLogSuccessData:  # pragma: no cover - not exercised here
+        ) -> SubmitAuditLogSuccessData:
+            raise NotImplementedError()
+
+        async def get_settings(self) -> AuditSettingsResponseData:
+            raise NotImplementedError()
+
+        async def store_robot_log(
+            self, robot_log_file: typing.TextIO
+        ) -> StoreRobotLogSuccessData:
             raise NotImplementedError
+
+        async def get_logging_enabled(self) -> GetLoggingEnabledData:
+            raise NotImplementedError
+
+        async def set_logging_enabled(
+            self, setting: PatchLoggingEnabledRequestData
+        ) -> PatchLoggingEnabledResponseData:
+            raise NotImplementedError()
+
+        async def get_current_log_period(self) -> GetLogPeriodsData:
+            raise NotImplementedError()
+
+        async def get_filesystem_usage_summary(self) -> TotalUsageSummaryData:
+            raise NotImplementedError()
 
     stub_client = StubClient()
 

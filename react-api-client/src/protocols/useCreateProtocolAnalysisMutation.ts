@@ -51,7 +51,8 @@ export function useCreateProtocolAnalysisMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
-
+  // Protocol analysis endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<
     ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,

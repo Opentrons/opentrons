@@ -24,7 +24,7 @@ In a `transfer()`, aspiration and dispensing are the only required actions. You 
 9. Blow out
 10. Drop tip
 
-In a `transfer_with_liquid_class()`, your chosen liquid class definition specifies nearly all transfer behavior your Flex pipette will perform, like position information. For more information, see [Liquid Class Definitions](../liquid-class-definitions.md).
+In a `transfer_with_liquid_class()`, your chosen liquid class definition specifies nearly all transfer behavior your Flex pipette will perform, like position information. For more information, see [Liquid Class Definitions](../liquid-classes/definitions.md).
 
 A liquid class definition with every action enabled would proceed in this order:
 
@@ -114,7 +114,7 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 Since dispensing and touching the tip are both associated with the destination wells, those steps are performed at each of the two destination wells.
 
-If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blowout. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-class-definitions.md).
+If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blowout. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-classes/definitions.md).
 
 ## Tip refilling
 

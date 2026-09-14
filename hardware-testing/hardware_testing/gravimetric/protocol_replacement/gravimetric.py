@@ -60,7 +60,7 @@ from opentrons import version
 import sys
 
 metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.30"}
+requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -88,7 +88,7 @@ def _download_and_extract(version_str: str, base_dir: str) -> None:
         ver_file.write(version_str)
 
 
-if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
+if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
     # we're simulating or there is not a vaild hardware-testing yet
     base_dir = str(infer_config_base_dir())
     release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"

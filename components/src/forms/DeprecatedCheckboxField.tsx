@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './forms.module.css'
 
-import type { ChangeEventHandler, ComponentProps } from 'react'
+import type { ChangeEventHandler, ComponentProps, ReactNode } from 'react'
 
 /**
  * Checkbox Field Properties.
@@ -39,7 +39,7 @@ export interface DeprecatedCheckboxFieldProps {
  */
 export function DeprecatedCheckboxField(
   props: DeprecatedCheckboxFieldProps
-): JSX.Element {
+): ReactNode {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

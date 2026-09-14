@@ -10,7 +10,8 @@ import type { HostConfig } from '../types'
 export function addCapturePreviewImageToRun(
   config: HostConfig,
   runId: string,
-  data: CameraImageSettings
+  data: CameraImageSettings,
+  userNotes: string
 ): ResponsePromise<DownloadedPreviewImageFileResponse> {
   return request<
     DownloadedPreviewImageFileResponse,
@@ -18,5 +19,6 @@ export function addCapturePreviewImageToRun(
   >(POST, `/runs/${runId}/camera/capturePreviewImage`, config, {
     body: { data },
     responseType: 'blob',
+    userNotes,
   })
 }

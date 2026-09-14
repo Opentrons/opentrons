@@ -10,6 +10,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 interface ProtocolParametersProps {
@@ -18,7 +19,7 @@ interface ProtocolParametersProps {
 
 export function ProtocolParameters({
   runTimeParameters,
-}: ProtocolParametersProps): JSX.Element {
+}: ProtocolParametersProps): ReactNode {
   const { t } = useTranslation(['protocol_details', 'protocol_setup'])
 
   return (

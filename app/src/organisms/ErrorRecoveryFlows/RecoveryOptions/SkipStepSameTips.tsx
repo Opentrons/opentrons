@@ -2,9 +2,10 @@ import { RECOVERY_MAP } from '../constants'
 import { SkipStepInfo } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function SkipStepSameTips(props: RecoveryContentProps): JSX.Element {
+export function SkipStepSameTips(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { SKIP_STEP_WITH_SAME_TIPS } = RECOVERY_MAP

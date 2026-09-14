@@ -1,16 +1,17 @@
 {
-  "add_step": "Add Step",
   "add_off_deck": "+ Off-deck labware",
+  "add_step": "Add Step",
   "cancel": "cancel",
+  "clear_wells": "Clear Wells",
   "close": "close",
   "continue": "continue",
-  "clear_wells": "Clear Wells",
   "continue_to_liquids": "Continue to Liquids",
   "delete": "delete",
   "discard_changes": "discard changes",
   "done": "done",
   "edit": "edit",
   "edit_off_deck": "Edit off-deck labware",
+  "got_it": "Got It!",
   "new_liquid": "New Liquid",
   "no": "no",
   "notes": "notes",
@@ -20,8 +21,7 @@
   "restored": "restored",
   "save": "save",
   "swap": "swap",
-  "yes": "yes",
   "upload_custom_labware": "Upload custom labware",
   "upload_custom_tip_rack": "Upload custom tip rack",
-  "got_it": "Got It!"
+  "yes": "yes"
 }

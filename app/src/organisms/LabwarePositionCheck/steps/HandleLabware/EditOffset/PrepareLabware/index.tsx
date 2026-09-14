@@ -13,9 +13,10 @@ import {
 import { LPCDeck } from './LPCDeck'
 import { PlaceItemInstruction } from './PlaceItemInstruction'
 
+import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
-export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
+export function PrepareLabware(props: EditOffsetContentProps): ReactNode {
   const { runId, commandUtils, proceedSubstep, goBackSubstep, contentHeader } =
     props
   const { toggleRobotMoving, handleConfirmLwModulePlacement } = commandUtils

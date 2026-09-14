@@ -69,7 +69,7 @@ You can purchase adapters directly from Opentrons:
 
 The Heater-Shaker is fully programmable in [Protocol Designer](../../protocol-designer/index.md) and the [Python Protocol API](../../python-api/index.md). The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See [Heater-Shaker Module section](../../python-api/modules/heater-shaker.md) in the API documentation for details on adding parallel steps to your protocols.
 
-Outside of protocols, the Opentrons App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
+Outside of protocols, the Opentrons OT-2 App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
 
 ## Heater-Shaker specifications
 

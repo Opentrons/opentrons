@@ -1,6 +1,3 @@
-import { useCallback, useState } from 'react'
-import last from 'lodash/last'
-
 import flexStacker from '/app/assets/images/flex_stacker_no_labware.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
 import magneticModule from '/app/assets/images/magnetic_module_gen_2_transparent.png'
@@ -11,18 +8,13 @@ import thermoModuleGen2Closed from '/app/assets/images/thermocycler_gen_2_closed
 import thermoModuleGen2Opened from '/app/assets/images/thermocycler_gen_2_opened.png'
 import thermoModuleGen1Opened from '/app/assets/images/thermocycler_open_transparent.png'
 import vacuumModule from '/app/assets/images/vacuum_module_v1.png'
-import { updateModule } from '/app/redux/modules'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import { NO_CALIBRATION_TYPE } from './constants'
 
 import type { TFunction } from 'i18next'
+import type { AttachedModule, VacuumModuleStatus } from '@opentrons/api-client'
 import type { ChipType } from '@opentrons/components'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type {
-  AttachedModule,
-  VacuumModuleStatus,
-} from '/app/redux/modules/types'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   switch (attachedModule.moduleModel) {
@@ -56,59 +48,6 @@ export function getModuleCardImage(attachedModule: AttachedModule): string {
     default:
       return 'unknown module model, this is an error'
   }
-}
-
-type RequestIdsBySerialNumber = Record<string, string[]>
-type HandleModuleApiRequestsType = (robotName: string, moduleId: string) => void
-type GetLatestRequestIdType = (moduleId: string) => string | null
-
-export function useModuleApiRequests(): [
-  GetLatestRequestIdType,
-  HandleModuleApiRequestsType,
-] {
-  const [dispatchApiRequest] = useDispatchApiRequest()
-  const [requestIdsBySerial, setRequestIdsBySerial] =
-    useState<RequestIdsBySerialNumber>({})
-
-  const handleModuleApiRequests = (
-    robotName: string,
-    serialNumber: string
-  ): void => {
-    const action = dispatchApiRequest(updateModule(robotName, serialNumber))
-    const { requestId } = action.meta
-
-    if (requestId != null) {
-      if (serialNumber in requestIdsBySerial) {
-        setRequestIdsBySerial((prevState: RequestIdsBySerialNumber) => {
-          const existingRequestIds = prevState[serialNumber] || []
-          return {
-            ...prevState,
-            [serialNumber]: [...existingRequestIds, requestId],
-          }
-        })
-      } else {
-        setRequestIdsBySerial(prevState => {
-          return {
-            ...prevState,
-            [serialNumber]: [requestId],
-          }
-        })
-      }
-    }
-  }
-
-  const getLatestRequestId = useCallback(
-    (serialNumber: string): string | null => {
-      if (serialNumber in requestIdsBySerial) {
-        return last(requestIdsBySerial[serialNumber]) ?? null
-      } else {
-        return null
-      }
-    },
-    [requestIdsBySerial]
-  )
-
-  return [getLatestRequestId, handleModuleApiRequests]
 }
 
 export const getPumpStatusProps = (

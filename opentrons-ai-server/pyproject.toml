@@ -19,7 +19,7 @@ dependencies = [
     "gspread==6.1.4",
     "google-auth==2.36.0",
     "google-auth-oauthlib==1.2.1",
-    "anthropic==0.58.2",
+    "anthropic==0.120.2",
     "weave==0.51.54",
 ]
 

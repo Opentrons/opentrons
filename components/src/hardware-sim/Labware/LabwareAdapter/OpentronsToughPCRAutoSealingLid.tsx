@@ -1,4 +1,6 @@
-export function OpentronsToughPCRAutoSealingLid(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OpentronsToughPCRAutoSealingLid(): ReactNode {
   return (
     <svg id="TcDisposable" xmlns="http://www.w3.org/2000/svg" version="1.1">
       <g id="BgFill">

@@ -16,6 +16,7 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
+import type { ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
@@ -55,7 +56,7 @@ export function TipLengthCalibrationItems({
   isRobotBusy,
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
-}: TipLengthCalibrationItemsProps): JSX.Element {
+}: TipLengthCalibrationItemsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)

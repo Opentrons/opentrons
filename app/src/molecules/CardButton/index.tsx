@@ -17,6 +17,7 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 
 const CARD_BUTTON_STYLE = css`
@@ -77,7 +78,7 @@ interface CardButtonProps {
   disabled?: boolean
 }
 
-export function CardButton(props: CardButtonProps): JSX.Element {
+export function CardButton(props: CardButtonProps): ReactNode {
   const { title, iconName, description, destinationPath, disabled } = props
   const navigate = useNavigate()
 

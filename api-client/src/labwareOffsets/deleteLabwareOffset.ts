@@ -11,11 +11,13 @@ import type { StoredLabwareOffset } from './types'
  */
 export function deleteLabwareOffset(
   config: HostConfig,
-  id: string
+  id: string,
+  userNotes?: string
 ): ResponsePromise<{ data: StoredLabwareOffset }> {
   return request<{ data: StoredLabwareOffset }>(
     DELETE,
     `/labwareOffsets/${id}`,
-    config
+    config,
+    { userNotes }
   )
 }

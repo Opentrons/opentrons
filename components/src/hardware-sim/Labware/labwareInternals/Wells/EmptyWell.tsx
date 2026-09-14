@@ -4,6 +4,7 @@ import { COLORS } from '../../../../helix-design-system'
 import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
 
+import type { ReactNode } from 'react'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { ParentType } from '../types'
 
@@ -19,7 +20,7 @@ export function EmptyWell({
   wellMap,
   wellName,
   parentType,
-}: EmptyWellProps): JSX.Element {
+}: EmptyWellProps): ReactNode {
   const commonProps = {
     [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
   }

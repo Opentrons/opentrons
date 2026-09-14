@@ -9,7 +9,7 @@ import { i18n } from '/app/i18n'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
 
 import type { ComponentProps } from 'react'
-import type { FlexStackerModule } from '/app/redux/modules/types'
+import type { FlexStackerModule } from '@opentrons/api-client'
 
 const render = (props: ComponentProps<typeof FlexStackerModuleData>) => {
   return renderWithProviders(<FlexStackerModuleData {...props} />, {

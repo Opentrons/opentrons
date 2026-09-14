@@ -11,14 +11,15 @@ from robot_server.app_setup import app
 # Endpoints that are deliberately missing access control for some reason.
 IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     # /clientData is purely client-to-client communication, not actual robot control.
-    ("post", "/clientData"),
     ("put", "/clientData"),
     ("delete", "/clientData"),
     ("put", "/clientData/{key}"),
     ("delete", "/clientData/{key}"),
     # This is spiritually a GET endpoint. It doesn't actually control or modify anything.
     ("post", "/labwareOffsets/searches"),
-    # Protocol analyses are just disposable simulations.
+    # Although protocol analyses do store data on the robot and do indirectly affect
+    # system behavior, the client currently triggers them implicitly, and thus isn't
+    # prepared for them to require authentication or audit log notes.
     ("post", "/protocols/{protocolId}/analyses"),
 }
 

@@ -5,35 +5,39 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { resetConfig } from '/app/redux/robot-admin'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
 import { DeviceReset } from '../DeviceReset'
 
 import type { ComponentProps } from 'react'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
-vi.mock('/app/redux/robot-api')
+vi.mock('/app/resources/devices/hooks/useResetRobotConfigMutation')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+
+const mockPostResetConfig = vi.fn()
 
 const render = (props: ComponentProps<typeof DeviceReset>) => {
-  return renderWithProviders(
-    <DeviceReset {...props} />,
-
-    { i18nInstance: i18n }
-  )
+  return renderWithProviders(<DeviceReset {...props} />, {
+    i18nInstance: i18n,
+  })
 }
 
 describe('DeviceReset', () => {
   let props: ComponentProps<typeof DeviceReset>
-  let dispatchApiRequest: DispatchApiRequestType
 
   beforeEach(() => {
     props = {
       robotName: 'mockRobot',
       setCurrentOption: vi.fn(),
     }
-    dispatchApiRequest = vi.fn()
-    vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
+    mockPostResetConfig.mockReset()
+    vi.mocked(useResetRobotConfigMutation).mockReturnValue({
+      postResetConfig: mockPostResetConfig,
+      reset: vi.fn(),
+    } as any)
   })
 
   it('should render text and button', () => {
@@ -80,9 +84,7 @@ describe('DeviceReset', () => {
     fireEvent.click(clearButton)
     screen.getByText('Are you sure you want to reset your device?')
     fireEvent.click(screen.getByText('Confirm'))
-    expect(dispatchApiRequest).toBeCalledWith(
-      resetConfig('mockRobot', clearMockResetOptions)
-    )
+    expect(mockPostResetConfig).toBeCalledWith(clearMockResetOptions)
   })
 
   it('when tapping clear all stored data, all options are active', () => {
@@ -105,9 +107,7 @@ describe('DeviceReset', () => {
     fireEvent.click(clearButton)
     screen.getByText('Are you sure you want to reset your device?')
     fireEvent.click(screen.getByText('Confirm'))
-    expect(dispatchApiRequest).toBeCalledWith(
-      resetConfig('mockRobot', clearMockResetOptions)
-    )
+    expect(mockPostResetConfig).toBeCalledWith(clearMockResetOptions)
   })
 
   it('when tapping all options except clear all stored data, all options are active', () => {
@@ -134,9 +134,7 @@ describe('DeviceReset', () => {
     fireEvent.click(clearButton)
     screen.getByText('Are you sure you want to reset your device?')
     fireEvent.click(screen.getByText('Confirm'))
-    expect(dispatchApiRequest).toBeCalledWith(
-      resetConfig('mockRobot', clearMockResetOptions)
-    )
+    expect(mockPostResetConfig).toBeCalledWith(clearMockResetOptions)
   })
 
   it('when tapping clear all stored data and unselect one options, all options are not active', () => {
@@ -157,8 +155,6 @@ describe('DeviceReset', () => {
     fireEvent.click(clearButton)
     screen.getByText('Are you sure you want to reset your device?')
     fireEvent.click(screen.getByText('Confirm'))
-    expect(dispatchApiRequest).toBeCalledWith(
-      resetConfig('mockRobot', clearMockResetOptions)
-    )
+    expect(mockPostResetConfig).toBeCalledWith(clearMockResetOptions)
   })
 })

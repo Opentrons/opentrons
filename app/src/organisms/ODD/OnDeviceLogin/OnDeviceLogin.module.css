@@ -31,19 +31,6 @@
   color: var(--red-50);
 }
 
-.password_field_row {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-12);
-}
-
-.password_field_input {
-  flex: 1;
-}
-
 .keyboard_container {
   position: fixed;
   bottom: 0;
@@ -56,4 +43,9 @@
   z-index: 10001;
   background-color: var(--white);
   inset: 0;
+}
+
+/* Sit below the documentation overlay (z-index 1000) while choosing a new password. */
+.overlay_below_documentation {
+  z-index: 999;
 }

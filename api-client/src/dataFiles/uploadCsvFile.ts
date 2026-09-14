@@ -6,7 +6,8 @@ import type { FileData, UploadedCsvFileResponse } from './types'
 
 export function uploadCsvFile(
   config: HostConfig,
-  data: FileData
+  data: FileData,
+  userNotes?: string
 ): ResponsePromise<UploadedCsvFileResponse> {
   const formData = new FormData()
 
@@ -21,6 +22,7 @@ export function uploadCsvFile(
     config,
     {
       body: formData,
+      userNotes,
     }
   )
 }

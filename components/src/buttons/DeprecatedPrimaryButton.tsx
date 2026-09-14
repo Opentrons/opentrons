@@ -3,6 +3,7 @@ import cx from 'classnames'
 import { Button } from './Button'
 import styles from './buttons.module.css'
 
+import type { ReactNode } from 'react'
 import type { ButtonProps } from './Button'
 
 /**
@@ -11,7 +12,7 @@ import type { ButtonProps } from './Button'
  *
  * @deprecated Use {@link PrimaryButton}
  */
-export function DeprecatedPrimaryButton(props: ButtonProps): JSX.Element {
+export function DeprecatedPrimaryButton(props: ButtonProps): ReactNode {
   const className = cx(styles.button_primary, props.className, {
     [styles.inverted]: props.inverted,
   })

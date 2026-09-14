@@ -18,6 +18,7 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings, get_settings
 from api.utils.api_docs_metadata import get_default_api_level
+from api.utils.docs_links import synced_doc_path_to_production_url
 
 MessageType = Literal["create", "update"]
 
@@ -232,7 +233,9 @@ class AnthropicPredict:
             except Exception as e:
                 logger.warning("Error reading API doc file", extra={"path": str(filepath), "error": str(e)})
                 continue
-            xml_content += f"<file name='{filename}'>\n"
+            production_url = synced_doc_path_to_production_url(filename)
+            xml_content += f"<file name='{filename}' url='{production_url}'>\n"
+            xml_content += f"<production_url>{production_url}</production_url>\n"
             xml_content += "<content>\n"
             xml_content += content
             xml_content += "\n</content>\n"
@@ -270,9 +273,9 @@ class AnthropicPredict:
             model=self.model_helper,
             messages=msg,
             max_tokens=1024,
-            temperature=0.1,
             system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
+            thinking={"type": "disabled"},
         )
 
         files_content = response.content[0].text.strip()
@@ -295,7 +298,7 @@ class AnthropicPredict:
             system=self.system_prompt,
             tools=self.tools,
             metadata={"user_id": user_id},
-            temperature=0.0,
+            thinking={"type": "disabled"},
         ) as stream:
             response: Message = await stream.get_final_message()
 
@@ -631,7 +634,7 @@ class AnthropicPredict:
                 model=self.model_name,
                 system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
-                temperature=0.0,
+                thinking={"type": "disabled"},
             ) as stream:
                 response: Message = await stream.get_final_message()
             if response.content and response.content[0].type == "text":

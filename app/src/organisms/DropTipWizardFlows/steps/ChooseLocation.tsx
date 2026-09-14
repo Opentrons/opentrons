@@ -17,6 +17,7 @@ import { BLOWOUT_SUCCESS, DROP_TIP_SUCCESS, DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { AddressableAreaName } from '@opentrons/shared-data'
 import type {
   DropTipBlowoutLocationDetails,
@@ -43,7 +44,7 @@ export function ChooseLocation({
   proceedToRouteAndStep,
   toggleIsRobotPipetteMoving,
   modalStyle,
-}: ChooseLocationProps): JSX.Element {
+}: ChooseLocationProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
   const { moveToAddressableArea, blowoutOrDropTip } = dropTipCommands
 

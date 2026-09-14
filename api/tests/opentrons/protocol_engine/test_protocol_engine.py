@@ -366,6 +366,137 @@ def test_add_fixit_command(
     assert result == queued
 
 
+def test_add_wait_for_tasks_fixit_queues_originating_command_first(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A waitForTasks fixit should queue a new start_* before the rewritten wait."""
+    created_at = datetime(year=2021, month=1, day=1)
+    robot_type: RobotType = "OT-3 Standard"
+    wait_request = commands.WaitForTasksCreate(
+        params=commands.WaitForTasksParams(task_ids=["old-task"]),
+        intent=commands.CommandIntent.FIXIT,
+    )
+    start_create = commands.vacuum_module.StartSetVacuumPressureCreate(
+        params=commands.vacuum_module.StartSetVacuumPressureParams(
+            moduleId="vacuum-module-id",
+            gaugePressure=-800.0,
+            taskId="new-task",
+        ),
+        intent=commands.CommandIntent.FIXIT,
+    )
+    rewritten_wait = wait_request.model_copy(
+        update={"params": commands.WaitForTasksParams(task_ids=["new-task"])}
+    )
+    queued_start = commands.vacuum_module.StartSetVacuumPressure(
+        id="start-command-id",
+        key="start-command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=start_create.params,
+        intent=commands.CommandIntent.FIXIT,
+    )
+    queued_wait = commands.WaitForTasks(
+        id="wait-command-id",
+        key="wait-command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=rewritten_wait.params,
+        intent=commands.CommandIntent.FIXIT,
+    )
+
+    monkeypatch.setattr(
+        "opentrons.protocol_engine.commands.background_task_recovery.expand_wait_for_tasks_fixit",
+        lambda *args, **kwargs: ([start_create], ["new-task"]),
+    )
+
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+    decoy.when(
+        slot_standardization.standardize_command(wait_request, robot_type)
+    ).then_return(wait_request)
+    decoy.when(
+        slot_standardization.standardize_command(start_create, robot_type)
+    ).then_return(start_create)
+
+    ids = iter(["start-command-id", "wait-command-id"])
+    decoy.when(model_utils.generate_id()).then_do(lambda prefix="": next(ids))
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    def _stub_queued_start(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("start-command-id")).then_return(
+            queued_start
+        )
+
+    def _stub_queued_wait(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("wait-command-id")).then_return(queued_wait)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="start-command-id",
+                created_at=created_at,
+                request=start_create,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="start-command-id",
+            created_at=created_at,
+            request=start_create,
+            request_hash=None,
+        )
+    )
+    decoy.when(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
+            QueueCommandAction(
+                command_id="start-command-id",
+                created_at=created_at,
+                request=start_create,
+                request_hash=None,
+            )
+        )
+    ).then_do(_stub_queued_start)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="wait-command-id",
+                created_at=created_at,
+                request=rewritten_wait,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="wait-command-id",
+            created_at=created_at,
+            request=rewritten_wait,
+            request_hash=None,
+        )
+    )
+    decoy.when(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
+            QueueCommandAction(
+                command_id="wait-command-id",
+                created_at=created_at,
+                request=rewritten_wait,
+                request_hash=None,
+            )
+        )
+    ).then_do(_stub_queued_wait)
+
+    result = subject.add_command(wait_request)
+
+    assert result == queued_wait
+
+
 def test_add_fixit_command_raises(
     decoy: Decoy,
     state_store: StateStore,

@@ -83,7 +83,7 @@ describe('GalleryItemCard', () => {
 
     render(mockProps)
     expect(screen.queryByAltText('camera-photo')).toBeNull()
-    expect(screen.getAllByTestId('Skeleton'))
+    expect(screen.getAllByRole('status'))
   })
 
   it('shows "View image" on hover', async () => {
@@ -92,7 +92,7 @@ describe('GalleryItemCard', () => {
     render(mockProps)
 
     expect(screen.queryByAltText('camera-photo')).toBeNull()
-    expect(screen.getAllByTestId('Skeleton'))
+    expect(screen.getAllByRole('status'))
   })
 
   it('renders appropriate card copy when there is an image', () => {

@@ -12,6 +12,8 @@ import { renderWithProviders } from '../../../../../../testing/utils'
 import { getModuleDisplayLocation } from '../../getModuleDisplayLocation'
 import { getIdentifyModuleCommandText } from '../getIdentifyModuleCommandText'
 
+import type { ReactNode } from 'react'
+
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getModuleDisplayLocation')
 
@@ -30,7 +32,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getIdentifyModuleCommandText({
     command,

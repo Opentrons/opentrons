@@ -6,6 +6,7 @@ import pytest
 from decoy import Decoy, matchers
 from fastapi import status
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import (
@@ -32,7 +33,12 @@ async def hardware_ot2(decoy: Decoy) -> API:
 @pytest.fixture
 async def hardware_ot3(decoy: Decoy, request: pytest.FixtureRequest) -> "OT3API":
     request.node.add_marker("ot3_only")
-    return decoy.mock(cls="OT3API")
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return decoy.mock(cls=OT3API)
+    except ImportError:
+        return None  # type: ignore[return-type]
 
 
 @pytest.fixture
@@ -53,8 +59,11 @@ async def thread_manager_ot3(
     return thread_manager
 
 
-async def test_estop_ignored_ot2(thread_manager_ot2: ThreadManagedHardware) -> None:
+async def test_estop_ignored_ot2(
+    decoy: Decoy, thread_manager_ot2: ThreadManagedHardware, mock_feature_flags: None
+) -> None:
     """Test that we can use the dependency on OT-2."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     assert await require_estop_in_good_state(hardware_resource=thread_manager_ot2)
 
 
@@ -74,10 +83,11 @@ async def test_estop_ot3(
     decoy: Decoy,
     estop_state: EstopState,
     error_code: Optional[ErrorCode],
+    mock_feature_flags: None,
 ) -> None:
     """Test that ot3 hardware will check estop state."""
-
-    decoy.when(hardware_ot3.estop_status).then_return(
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(await hardware_ot3.get_estop_status()).then_return(
         EstopOverallStatus(
             state=estop_state,
             left_physical_state=EstopPhysicalStatus.NOT_PRESENT,

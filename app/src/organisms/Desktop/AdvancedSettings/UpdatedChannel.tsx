@@ -18,11 +18,11 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
 import type { Dispatch } from '/app/redux/types'
 
-export function UpdatedChannel(): JSX.Element {
+export function UpdatedChannel(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const channel = useSelector(getUpdateChannel)
@@ -55,7 +55,6 @@ export function UpdatedChannel(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_updatedChannel"
         >
           {t('update_channel')}
         </LegacyStyledText>

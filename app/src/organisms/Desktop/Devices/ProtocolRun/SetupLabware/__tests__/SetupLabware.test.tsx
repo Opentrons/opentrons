@@ -4,9 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { useHoverTooltip } from '@opentrons/components'
+import { usePostLogMessageMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  createReasonNotRequiredDocumentationState,
+} from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import {
   useLPCDisabledReason,
@@ -21,11 +27,20 @@ import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTy
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
   return {
     ...actual,
     useHoverTooltip: vi.fn(),
+  }
+})
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    usePostLogMessageMutation: vi.fn(),
   }
 })
 vi.mock('../SetupLabwareList')
@@ -36,9 +51,11 @@ vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/local-resources/access-control/useDocumentationState')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
+const mockPostLogMessage = vi.fn()
 
 const render = () => {
   let labwareConfirmed = false
@@ -89,6 +106,12 @@ describe('SetupLabware', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
     vi.mocked(useHoverTooltip).mockReturnValue([{}, {}] as any)
     vi.mocked(useRunHasStarted).mockReturnValue(false)
+    vi.mocked(useDocumentationState).mockReturnValue(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
+    vi.mocked(usePostLogMessageMutation).mockReturnValue({
+      postLogMessage: mockPostLogMessage,
+    } as any)
   })
 
   afterEach(() => {
@@ -115,5 +138,23 @@ describe('SetupLabware', () => {
     })
 
     expect(btn).toBeDisabled()
+  })
+
+  it('sends a message to the audit log when CRS is on and placements are confirmed', () => {
+    vi.mocked(useDocumentationState).mockReturnValue(
+      createReasonNotRequiredDocumentationState()
+    )
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placements' }))
+    expect(mockPostLogMessage).toHaveBeenCalledWith(
+      {
+        action: 'confirm liquid and labware placements',
+        message:
+          'user confirmed liquid and labware placements before running protocol',
+      },
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+      })
+    )
   })
 })

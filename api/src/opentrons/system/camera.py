@@ -18,7 +18,6 @@ from opentrons.config import (
 )
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraError,
-    CameraProvider,
     CameraSettings,
     ImageParameters,
 )
@@ -142,7 +141,7 @@ def robot_supports_livestream(robot_type: RobotType) -> bool:
 async def update_live_stream_status(
     robot_type: RobotType,
     stream_status: bool,
-    camera_provider: CameraProvider,
+    camera_settings: CameraSettings,
     override_settings: Optional[CameraSettings] = None,
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
@@ -159,7 +158,7 @@ async def update_live_stream_status(
     if override_settings is not None:
         camera_enable_settings = override_settings
     else:
-        camera_enable_settings = await camera_provider.get_camera_settings()
+        camera_enable_settings = camera_settings
     status = "OFF"
     if (
         stream_status

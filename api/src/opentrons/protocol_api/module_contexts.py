@@ -1203,7 +1203,7 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 27)
     @publish(command=cmds.heater_shaker_set_shake_speed)
     def set_shake_speed(self, rpm: int) -> Task:
-        """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking.
+        """Sets the Heater-Shaker's shake speed in RPM and returns a [`Task`][opentrons.protocol_api.Task] that represents concurrent shaking.
 
         !!! note
             Before shaking, this command will retract the pipettes upward if they are
@@ -1868,19 +1868,19 @@ class VacuumModuleContext(ModuleContext):
     Moving labware to or from the Vacuum Module is blocked while the pump is running
     or while the system is still under vacuum. To move labware, stop the pump, then open the vent, and wait for the pressure to return to atmospheric (0 mbar).
 
-    *New in version 2.30*
+    *New in version 2.31*
     """
 
     _core: VacuumModuleCore
 
     @property
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
     @property
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def max_gauge_pressure_mbar(self) -> int:
         """The maximum (deepest) vacuum pressure supported by the module (-800 mbar).
 
@@ -1889,7 +1889,7 @@ class VacuumModuleContext(ModuleContext):
         return self._core.get_max_gauge_pressure_mbar()
 
     @property
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def min_gauge_pressure_mbar(self) -> int:
         """The minimum vacuum pressure supported by the module (0 mbar, or atmospheric pressure).
 
@@ -1898,7 +1898,7 @@ class VacuumModuleContext(ModuleContext):
         return self._core.get_min_gauge_pressure_mbar()
 
     @property
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def manifold_dock(self) -> ModuleFixtureLocation:
         """Deck location for the Vacuum Module manifold dock / staging area.
 
@@ -1914,7 +1914,7 @@ class VacuumModuleContext(ModuleContext):
         area_name = f"{self.model}Dock{base_slot[0]}4"
         return ModuleFixtureLocation(addressable_area_name=area_name)
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def load_adapter_to_dock(
         self,
         name: str,
@@ -1957,7 +1957,7 @@ class VacuumModuleContext(ModuleContext):
 
         return adapter
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     def move_to_dock(
         self,
         labware: Labware,
@@ -1994,7 +1994,7 @@ class VacuumModuleContext(ModuleContext):
             drop_offset=_drop_offset,
         )
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_start_set_vacuum_pressure)
     def start_set_vacuum_pressure(
         self,
@@ -2033,7 +2033,7 @@ class VacuumModuleContext(ModuleContext):
 
         return Task(api_version=self._api_version, core=task)
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_start_set_vacuum_power)
     def start_set_vacuum_power(
         self,
@@ -2072,7 +2072,7 @@ class VacuumModuleContext(ModuleContext):
 
         return Task(api_version=self._api_version, core=task)
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_stop_vacuum)
     def stop_vacuum_pump(self) -> None:
         """Stop the vacuum pump and disable active pressure and power control.
@@ -2081,7 +2081,7 @@ class VacuumModuleContext(ModuleContext):
         """
         self._core.stop_vacuum()
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_start_execute_profile)
     def start_execute_profile(
         self,
@@ -2135,7 +2135,7 @@ class VacuumModuleContext(ModuleContext):
         )
         return Task(api_version=self._api_version, core=task)
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_open_vent)
     def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
         """Open the vent valve to bring the system to atmospheric pressure (0 mbar).
@@ -2147,7 +2147,7 @@ class VacuumModuleContext(ModuleContext):
         """
         self._core.open_vent(equalize_timeout_s=equalize_timeout_s)
 
-    @requires_version(2, 30)
+    @requires_version(2, 31)
     @publish(command=cmds.vacuum_module_close_vent)
     def close_vent(self) -> None:
         """Close the vent so the system can hold vacuum.

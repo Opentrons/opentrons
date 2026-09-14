@@ -9,6 +9,8 @@ import {
 
 import styles from './vacuumtools.module.css'
 
+import type { ReactNode } from 'react'
+
 /**
  * Generic for 2-button radio groups for various vacuum module control selections
  */
@@ -27,7 +29,7 @@ interface VacuumControlsGroupProps<T extends string> {
 
 export function VacuumControlsGroup<T extends string>(
   props: VacuumControlsGroupProps<T>
-): JSX.Element {
+): ReactNode {
   const { title, options, selectedValue, onChange, titleTooltip } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (

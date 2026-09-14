@@ -147,7 +147,7 @@ def get_deploy_config() -> DeployConfig:
         labware_library=ApplicationConfig(
             name="labware_library",
             s3_bucket="opentrons.staging.labware",
-            cloudfront_id="E8IWASMDOWHYP",
+            cloudfront_id="E2IRNVL4J3NTI3",
             url="https://staging.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
@@ -181,7 +181,7 @@ def get_deploy_config() -> DeployConfig:
         labware_library=ApplicationConfig(
             name="labware_library",
             s3_bucket="opentrons.production.labware",
-            cloudfront_id="E16BZZXDTINN0S",
+            cloudfront_id="E1KMXWBD4WUZ4P",
             url="https://labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(

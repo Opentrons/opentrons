@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated, Callable, Optional
+from typing import Annotated, Any, Callable, Coroutine, Optional
 
 from fastapi import Depends
 
@@ -21,8 +21,10 @@ class _RunHooks:
 
     run_id: str
     get_current_command: Callable[[str], Optional[CommandPointer]]
-    get_recovery_target_command: Callable[[str], Optional[CommandPointer]]
-    get_state_summary: Callable[[str], Optional[StateSummary]]
+    get_recovery_target_command: Callable[
+        [str], Coroutine[Any, Any, Optional[CommandPointer]]
+    ]
+    get_state_summary: Callable[[str], Coroutine[Any, Any, Optional[StateSummary]]]
 
 
 @dataclass
@@ -57,12 +59,14 @@ class RunsPublisher:
         )
 
     # TODO(jh, 08-01-25): Free run_hooks and engine_state_slice during run cleanup for more predictable protocol engine GC.
-    def start_publishing_for_run(
+    async def start_publishing_for_run(
         self,
         run_id: str,
         get_current_command: Callable[[str], Optional[CommandPointer]],
-        get_recovery_target_command: Callable[[str], Optional[CommandPointer]],
-        get_state_summary: Callable[[str], Optional[StateSummary]],
+        get_recovery_target_command: Callable[
+            [str], Coroutine[Any, Any, Optional[CommandPointer]]
+        ],
+        get_state_summary: Callable[[str], Coroutine[Any, Any, Optional[StateSummary]]],
     ) -> None:
         """Initialize RunsPublisher with necessary information derived from the current run.
 
@@ -137,8 +141,10 @@ class RunsPublisher:
 
     async def _handle_recovery_target_command_change(self) -> None:
         if self._run_hooks is not None and self._engine_state_slice is not None:
-            new_recovery_target_command = self._run_hooks.get_recovery_target_command(
-                self._run_hooks.run_id
+            new_recovery_target_command = (
+                await self._run_hooks.get_recovery_target_command(
+                    self._run_hooks.run_id
+                )
             )
             if (
                 self._engine_state_slice.recovery_target_command
@@ -152,7 +158,7 @@ class RunsPublisher:
     async def _handle_relevant_engine_change(self) -> None:
         """Publish a refetch flag if relevant engine changes occur."""
         if self._run_hooks is not None and self._engine_state_slice is not None:
-            new_state_summary = self._run_hooks.get_state_summary(
+            new_state_summary = await self._run_hooks.get_state_summary(
                 self._run_hooks.run_id
             )
 

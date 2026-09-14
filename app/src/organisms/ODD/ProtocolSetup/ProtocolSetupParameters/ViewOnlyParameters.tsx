@@ -12,7 +12,7 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import styles from './viewonlyparameters.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetupScreens } from '../types'
 
 export interface ViewOnlyParametersProps {
@@ -23,7 +23,7 @@ export interface ViewOnlyParametersProps {
 export function ViewOnlyParameters({
   runId,
   setSetupScreen,
-}: ViewOnlyParametersProps): JSX.Element {
+}: ViewOnlyParametersProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)

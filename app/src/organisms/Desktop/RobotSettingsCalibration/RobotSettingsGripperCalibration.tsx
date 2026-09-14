@@ -26,6 +26,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 
 import { formatLastCalibrated } from './CalibrationDetails/utils'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const StyledTable = styled.table`
@@ -58,7 +59,7 @@ interface RobotSettingsGripperCalibrationProps {
 
 export function RobotSettingsGripperCalibration(
   props: RobotSettingsGripperCalibrationProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('device_settings')
   const { gripper, robotName } = props
   const {

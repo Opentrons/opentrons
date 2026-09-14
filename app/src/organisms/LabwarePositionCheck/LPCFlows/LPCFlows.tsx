@@ -1,5 +1,6 @@
 import { LPCWizardContainer } from '/app/organisms/LabwarePositionCheck/LPCWizardContainer'
 
+import type { ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   DocumentationState,
@@ -36,6 +37,6 @@ export interface LPCFlowsProps {
   addActionToDocument: (action: DocumentedAction) => void
 }
 
-export function LPCFlows(props: LegacySupportLPCFlowsProps): JSX.Element {
+export function LPCFlows(props: LegacySupportLPCFlowsProps): ReactNode {
   return <LPCWizardContainer {...props} />
 }

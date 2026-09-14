@@ -4,22 +4,20 @@ Update session object for tracking state across multiple calls
 
 import base64
 import enum
-import functools
 import logging
 import os
 import shutil
 import uuid
-from collections import namedtuple
-from typing import Mapping, Optional, Union
+from typing import Mapping, NamedTuple, Optional, Union
 
-from aiohttp import web
+from server_utils.fastapi_utils.app_state import AppState, AppStateAccessor
 
-from . import config, constants
-
-SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
-Value = namedtuple("Value", ("short", "human"))
+
+class Value(NamedTuple):
+    short: str
+    human: str
 
 
 class Stages(enum.Enum):
@@ -36,15 +34,24 @@ class UpdateSession:
     State machine for update sessions
     """
 
-    def __init__(self, storage_path: str) -> None:
+    def __init__(
+        self,
+        *,
+        storage_path: str,
+        auto_commit_and_restart: bool,
+    ) -> None:
         self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode().strip("=")
+
         self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ""
         self._error: Optional[Value] = None
+
         self._storage_path = storage_path
+        self._auto_commit_and_restart = auto_commit_and_restart
+
         self._setup_dl_area()
-        self._rootfs_file: Optional[str] = None
+
         LOG.info(f"update session: created {self._token}")
 
     def _setup_dl_area(self) -> None:
@@ -52,10 +59,10 @@ class UpdateSession:
             shutil.rmtree(self._storage_path)
         os.makedirs(self._storage_path, mode=0o700, exist_ok=True)
 
-    def __del__(self) -> None:
-        if hasattr(self, "_storage_path"):
-            shutil.rmtree(self._storage_path)
-        LOG.info(f"Update session: removed {getattr(self, '_token', '<unknown>')}")
+    def close(self) -> None:
+        """Clean up the storage used by this session."""
+        shutil.rmtree(self._storage_path)
+        LOG.info(f"Update session: removed {self._token}")
 
     def set_stage(self, stage: Stages) -> None:
         """Convenience method to set the stage and lookup message"""
@@ -80,8 +87,8 @@ class UpdateSession:
         return self._storage_path
 
     @property
-    def rootfs_file(self) -> Optional[str]:
-        return self._rootfs_file
+    def auto_commit_and_restart(self) -> bool:
+        return self._auto_commit_and_restart
 
     @property
     def token(self) -> str:
@@ -131,31 +138,14 @@ class UpdateSession:
             }
 
 
-def session_from_request(request: web.Request) -> Optional[UpdateSession]:
-    return request.app.get(SESSION_VARNAME, None)
+_session_accessor = AppStateAccessor[UpdateSession]("otupdate_session")
 
 
-def active_session_check(handler):
-    """decorator to check session status"""
+def get_current_session(app_state: AppState) -> UpdateSession | None:
+    """Return the update session currently active on this server, if there is one."""
+    return _session_accessor.get_from(app_state)
 
-    @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
-        # checks if session exists!
-        if session_from_request(request) is not None:
-            LOG.warning("check_session: active session exists!")
-            return web.json_response(
-                data={
-                    "message": "An update session is already active on this robot",
-                    "error": "session-already-active",
-                },
-                status=409,
-            )
-        else:
-            session = UpdateSession(
-                config.config_from_request(request).download_storage_path
-            )
-            request.app[SESSION_VARNAME] = session
-            return web.json_response(data={"token": session.token}, status=201)
-        return await handler(request)
 
-    return decorated
+def set_current_session(app_state: AppState, session: UpdateSession | None) -> None:
+    """Set (or, with `None`, clear) the update session active on this server."""
+    _session_accessor.set_on(app_state, session)

@@ -45,7 +45,7 @@ import { getStackerModuleStateFromSlot } from '../AssignLiquidsModal/utils'
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
 import { getAllLabwareWithoutLids } from '../utils'
 
-import type { Dispatch, MouseEvent, SetStateAction } from 'react'
+import type { Dispatch, MouseEvent, ReactNode, SetStateAction } from 'react'
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -56,7 +56,7 @@ interface LabwareCardOverflowMenuProps {
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
-): JSX.Element | null {
+): ReactNode | null {
   const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
   const navigate = useNavigate()

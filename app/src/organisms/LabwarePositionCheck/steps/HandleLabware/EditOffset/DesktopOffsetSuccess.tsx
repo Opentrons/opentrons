@@ -24,6 +24,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type { State } from '/app/redux/types'
 
@@ -33,7 +34,7 @@ interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
 
 export function DesktopOffsetSuccess(
   props: DesktopOffsetSuccessProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const flowType = useSelector(selectSelectedLwFlowType(props.runId))

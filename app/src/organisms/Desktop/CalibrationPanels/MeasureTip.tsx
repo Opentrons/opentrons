@@ -38,6 +38,7 @@ import * as Sessions from '/app/redux/sessions'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
+import type { ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
@@ -80,7 +81,7 @@ const assetMapBlock: {
   },
 }
 
-export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
+export function MeasureTip(props: CalibrationPanelProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands, calBlock, isMulti, mount, sessionType } = props
 

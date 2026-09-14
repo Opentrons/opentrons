@@ -35,6 +35,8 @@ log = logging.getLogger(__name__)
 TEMP_POLL_INTERVAL_SECS = 1.0
 SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 
+READER_ERROR_DEBOUNCE = DEFAULT_COMMAND_RETRIES * 4
+
 
 class TempDeck(mod_abc.AbstractModule):
     """Hardware control interface for an attached Temperature Module."""
@@ -141,10 +143,11 @@ class TempDeck(mod_abc.AbstractModule):
         self._driver = driver
         self._reader = reader
         self._poller = poller
-        self._reader.set_error_callback(self.error_callback)
+        self._unsubscribe_reader = self._reader.set_error_callback(self.error_callback)
 
     async def soft_cleanup(self) -> None:
         """Stop the poller task."""
+        self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
 
@@ -230,7 +233,7 @@ class TempDeck(mod_abc.AbstractModule):
             "targetTemp": self.target,
         }
         return {
-            "status": self.status,
+            "status": self.status.value,
             "data": data,
         }
 
@@ -344,7 +347,7 @@ class TempDeckReader(Reader):
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
         self._error_callback: Optional[Callable[[Exception], None]] = None
-        self._debounce_count = DEFAULT_COMMAND_RETRIES
+        self._debounce_count = READER_ERROR_DEBOUNCE
 
     async def read(self) -> None:
         """Read the module's current and target temperatures.
@@ -352,7 +355,7 @@ class TempDeckReader(Reader):
         Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
         # reset on success
-        self._debounce_count = DEFAULT_COMMAND_RETRIES
+        self._debounce_count = READER_ERROR_DEBOUNCE
 
     def set_error_callback(
         self, error_callback: Callable[[Exception], None]
@@ -372,4 +375,4 @@ class TempDeckReader(Reader):
                 )
             else:
                 self._error_callback(exception)
-                self._debounce_count = DEFAULT_COMMAND_RETRIES
+                self._debounce_count = READER_ERROR_DEBOUNCE

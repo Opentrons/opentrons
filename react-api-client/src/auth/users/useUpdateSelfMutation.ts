@@ -1,8 +1,10 @@
-import { useMutation } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateSelf } from '@opentrons/api-client'
 
-import { getQueryKey, useHost } from '../../api'
+import { useDocumentedMutation } from '../../accessControl'
+import { useHost } from '../../api'
+import { getSelfQueryKey } from './useSelfQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -15,6 +17,8 @@ import type {
   HostConfig,
   UpdateSelfRequest,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../../accessControl'
+import type { DocumentedMutationParameters } from '../../accessControl/types'
 
 export type UseUpdateSelfMutationResult = UseMutationResult<
   AuthUserResponse,
@@ -28,22 +32,39 @@ export type UseUpdateSelfMutationResult = UseMutationResult<
   >
 }
 
+export type UseUpdateSelfMutationOptions = UseMutationOptions<
+  AuthUserResponse,
+  AxiosError,
+  UpdateSelfRequest
+>
+
 export function useUpdateSelfMutation(
-  options: UseMutationOptions<
-    AuthUserResponse,
-    AxiosError,
-    UpdateSelfRequest
-  > = {},
+  documentationState: DocumentationState,
+  options: UseUpdateSelfMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseUpdateSelfMutationResult {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
+  const selfQueryKey = getSelfQueryKey(host)
 
-  const mutation = useMutation(
-    getQueryKey(host, 'auth', 'users', 'self'),
-    (body: UpdateSelfRequest) =>
-      updateSelf(host!, body).then(response => response.data),
+  const mutation = useDocumentedMutation<
+    AuthUserResponse,
+    AxiosError,
+    UpdateSelfRequest
+  >(
+    documentationState,
+    ['update_self'],
+    selfQueryKey,
+    ({
+      variables: body,
+      userNotes,
+    }: DocumentedMutationParameters<UpdateSelfRequest>) =>
+      updateSelf(host!, body, userNotes).then(response => {
+        queryClient.setQueryData(selfQueryKey, response.data)
+        return response.data
+      }),
     options
   )
 

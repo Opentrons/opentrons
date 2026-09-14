@@ -4,11 +4,8 @@ import os
 import re
 import subprocess
 import zipfile
-from unittest import mock
 
 import pytest
-
-from otupdate import buildroot
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -132,25 +129,3 @@ def otupdate_config(request, tmpdir, testing_cert):
 # This can be used to replace file_actions.RootPartitions elements as long
 # as the callee doesn’t actually do identity checking
 FakeRootPartElem = collections.namedtuple("FakeRootPartElem", ("name", "value"))
-
-
-@pytest.fixture
-def testing_partition(monkeypatch, tmpdir):
-    partfile = os.path.join(tmpdir, "fake-partition")
-    find_unused = mock.Mock()
-    monkeypatch.setattr(buildroot.file_actions, "_find_unused_partition", find_unused)
-    find_unused.return_value = FakeRootPartElem(
-        "TWO", buildroot.file_actions.Partition(2, partfile)
-    )
-    return partfile
-
-
-@pytest.fixture
-def testing_partition2(monkeypatch, tmpdir):
-    partfile = os.path.join(tmpdir, "fake-partition")
-    find_unused = mock.Mock()
-    monkeypatch.setattr(buildroot.file_actions, "_find_unused_partition", find_unused)
-    find_unused.return_value = FakeRootPartElem(
-        "TWO", buildroot.file_actions.Partition(2, partfile)
-    )
-    return partfile
