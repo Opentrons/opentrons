@@ -48,7 +48,7 @@ function LoggedOutMessage(): JSX.Element {
 
   return (
     <InfoScreen
-      content={t('desktop_login_to_manage_compliance_ready_software_settings')}
+      content={t('login_to_manage_compliance_ready_software_settings')}
     />
   )
 }
@@ -92,7 +92,7 @@ export function PersonalAccountSettings({
         <>
           <div className={styles.header}>
             <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('desktop_personal_account_settings') as string}
+              {t('personal_account_settings') as string}
             </StyledText>
             {!isEditing && (
               <BasicButton
@@ -102,7 +102,7 @@ export function PersonalAccountSettings({
                   setIsEditing(true)
                 }}
               >
-                {t('desktop_edit')}
+                {t('edit')}
               </BasicButton>
             )}
           </div>
@@ -118,7 +118,7 @@ export function PersonalAccountSettings({
               />
             ) : (
               <>
-                <FieldRow label={t('desktop_username')}>
+                <FieldRow label={t('username')}>
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
                     className={styles.field_value_text}
@@ -127,7 +127,7 @@ export function PersonalAccountSettings({
                   </StyledText>
                 </FieldRow>
                 <Divider />
-                <FieldRow label={t('desktop_legal_name')}>
+                <FieldRow label={t('legal_name')}>
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
                     className={styles.field_value_text}
@@ -136,12 +136,12 @@ export function PersonalAccountSettings({
                   </StyledText>
                 </FieldRow>
                 <Divider />
-                <FieldRow label={t('desktop_password')}>
+                <FieldRow label={t('password')}>
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
                     className={styles.field_value_text}
                   >
-                    {t('desktop_password_placeholder') as string}
+                    {t('password_placeholder') as string}
                   </StyledText>
                 </FieldRow>
               </>

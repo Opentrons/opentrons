@@ -29,7 +29,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'username' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_personal_account_settings_username_exists_error'),
+        message: t('personal_account_settings_username_exists_error'),
       },
     }
   } else if (errorId === 'usernameContainsInvalidCharacters') {
@@ -37,7 +37,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'username' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_username_invalid_characters'),
+        message: t('username_invalid_characters'),
       },
     }
   } else if (errorId === 'passwordTooShort') {
@@ -49,10 +49,10 @@ export function mapAuthUserMutationError<T extends FieldValues>(
         type: 'server',
         message:
           requiredLength != null
-            ? t('desktop_password_too_short', {
+            ? t('password_too_short', {
                 minLength: requiredLength,
               })
-            : t('desktop_personal_account_settings_save_error'),
+            : t('personal_account_settings_save_error'),
       },
     }
   } else if (errorId === 'passwordMissingSpecialCharacters') {
@@ -60,7 +60,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'password' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_password_missing_special_characters'),
+        message: t('password_missing_special_characters'),
       },
     }
   } else if (errorId === 'passwordContainsInvalidCharacters') {
@@ -68,7 +68,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'password' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_password_invalid_characters'),
+        message: t('password_invalid_characters'),
       },
     }
   } else if (errorId === 'passwordPreviouslyUsed') {
@@ -76,7 +76,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'password' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_password_previously_used'),
+        message: t('password_previously_used'),
       },
     }
   } else {
@@ -84,7 +84,7 @@ export function mapAuthUserMutationError<T extends FieldValues>(
       field: 'confirmPassword' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_personal_account_settings_save_error'),
+        message: t('personal_account_settings_save_error'),
       },
     }
   }
@@ -114,7 +114,7 @@ export function mapSetNewPasswordError(error: unknown, t: TFunction): string {
       ns: 'access_control',
     })
   } else if (errorId === 'passwordPreviouslyUsed') {
-    return t('desktop_password_previously_used')
+    return t('password_previously_used')
   } else {
     return t('set_new_password_error_update_failed', {
       ns: 'access_control',
