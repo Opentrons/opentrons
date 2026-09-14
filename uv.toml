@@ -1,0 +1,8 @@
+# Pinned uv version for local development and CI (astral-sh/setup-uv version-file).
+#
+# uv does not merge config files: the nearest uv.toml or pyproject.toml with a
+# [tool.uv] table wins outright. This file therefore only covers projects that have
+# no [tool.uv] of their own; every project that does have one repeats
+# required-version. Bump all of them together, along with oe-core's Dockerfile,
+# which runs `uv export --frozen` inside this tree for Flex builds.
+required-version = "==0.12.1"
