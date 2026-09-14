@@ -1,5 +1,5 @@
 ---
-title: "Python API: Module Examples"
+title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 

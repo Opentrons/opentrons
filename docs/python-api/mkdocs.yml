@@ -56,7 +56,9 @@ nav:
       - Robot Motor Control: advanced-control/robot-motors.md
   - Examples:
       - Protocol Examples: examples/index.md
-      - Module Examples: examples/modules.md
+      - Protocol Template: examples/template.md
+      - Liquid Handling Examples: examples/liquid-handling.md
+      - Vacuum Module Examples: examples/modules.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
   - API Reference:
       - Protocols: reference/protocols.md
