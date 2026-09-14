@@ -2,12 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  ALIGN_CENTER,
   Banner,
   Btn,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
@@ -44,30 +42,20 @@ export function UpdateRobotBanner(
         e.stopPropagation()
       }}
       flexDirection={DIRECTION_COLUMN}
-      // Match SignAndDownloadRunBanner: leave room for overflow menu.
-      width={`calc(100% - ${SPACING.spacing24})`}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
-        <Flex
-          width="100%"
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing8}
+        <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing4}>
+          {t('branded:robot_software_update_required')}
+        </LegacyStyledText>
+        <Btn
+          onClick={() => {
+            handleUpdateBuildroot(robot)
+          }}
+          css={TYPOGRAPHY.pRegular}
+          textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >
-          <LegacyStyledText forwardedAs="p">
-            {t('branded:robot_software_update_required')}
-          </LegacyStyledText>
-          <Btn
-            onClick={() => {
-              handleUpdateBuildroot(robot)
-            }}
-            css={TYPOGRAPHY.pRegular}
-            textDecoration={TYPOGRAPHY.textDecorationUnderline}
-            whiteSpace="nowrap"
-          >
-            {t('view_update')}
-          </Btn>
-        </Flex>
+          {t('view_update')}
+        </Btn>
       </Banner>
     </Flex>
   ) : null
