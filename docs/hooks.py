@@ -21,15 +21,3 @@ def on_post_build(config, **kwargs) -> None:
     """
     site_dir = Path(config["site_dir"])
     write_build_info_html(site_dir / "info" / "index.html")
-
-
-
-def on_post_build(config, **kwargs) -> None:
-    """Write ``site/info/index.html`` after every MkDocs build or serve rebuild.
-
-    Args:
-        config: MkDocs config mapping; ``site_dir`` is the output directory.
-        **kwargs: Additional MkDocs hook arguments (unused).
-    """
-    site_dir = Path(config["site_dir"])
-    write_build_info_html(site_dir / "info" / "index.html")

@@ -2,8 +2,12 @@
 
 The HTML layout matches ``scripts/git-version-v2.mjs`` ``generateBuildInfoHtml``.
 Docs CI is Python-only, so this shells out to git instead of importing that
-module. Tag prefixes follow docs production/staging tags (``mkdocs-``,
-``staging-mkdocs-``), not ``docs@``.
+module.
+
+Unlike Designer, docs releases are not semver. They are datestamp tags whose
+format has changed over time (``mkdocs-2026-09-01``, ``mkdocs-20251210``,
+``MKDOCS-202508210900``), so the newest tag is found by tag creation date and
+reported verbatim rather than parsed into a version number.
 """
 
 from __future__ import annotations
@@ -14,81 +18,15 @@ import os
 import platform
 import subprocess
 import sys
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Sequence
-
-from packaging.version import InvalidVersion, Version
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROJECT = "docs"
-# Production prefix first so it wins when versions are identical.
-TAG_PREFIXES: tuple[str, ...] = ("mkdocs-", "staging-mkdocs-")
-DEV_VERSION = "0.0.0-dev"
-
-
-@dataclass(frozen=True)
-class ParsedTag:
-    """A docs tag split into prefix and comparable version."""
-
-    tag: str
-    prefix: str
-    version: Version
-
-
-def parse_docs_tag(tag: str, prefixes: Sequence[str] = TAG_PREFIXES) -> ParsedTag | None:
-    """Parse a docs tag into prefix and semver, or return None if invalid.
-
-    Args:
-        tag: Full git tag name, for example ``mkdocs-v2.1.0``.
-        prefixes: Prefixes to try, longest-match not required because callers
-            should list more-specific prefixes that do not collide.
-
-    Returns:
-        Parsed tag, or None when the name has no matching prefix or the
-        remainder is not a valid version (optional leading ``v`` is stripped).
-    """
-    for prefix in prefixes:
-        if tag.startswith(prefix):
-            remainder = tag[len(prefix) :]
-            if remainder.startswith("v") and remainder[1:2].isdigit():
-                remainder = remainder[1:]
-            try:
-                return ParsedTag(tag=tag, prefix=prefix, version=Version(remainder))
-            except InvalidVersion:
-                return None
-    return None
-
-
-def pick_latest_tag(
-    tags: Sequence[str], prefixes: Sequence[str] = TAG_PREFIXES
-) -> str | None:
-    """Return the highest-version docs tag, preferring production on ties.
-
-    Args:
-        tags: Tag names reachable from HEAD.
-        prefixes: Prefix priority, lower index wins when versions are equal.
-
-    Returns:
-        The selected tag name, or None if nothing parsed.
-    """
-    parsed = [item for tag in tags if (item := parse_docs_tag(tag, prefixes)) is not None]
-    if not parsed:
-        return None
-    prefix_rank = {prefix: index for index, prefix in enumerate(prefixes)}
-    parsed.sort(key=lambda item: (item.version, -prefix_rank.get(item.prefix, 99)), reverse=True)
-    return parsed[0].tag
-
-
-def version_from_tag(tag: str | None) -> str:
-    """Return the version substring for display, or the dev fallback."""
-    if tag is None:
-        return DEV_VERSION
-    parsed = parse_docs_tag(tag)
-    if parsed is None:
-        return DEV_VERSION
-    return str(parsed.version)
+PRODUCTION_TAG_PATTERNS: tuple[str, ...] = ("mkdocs-*", "MKDOCS-*")
+STAGING_TAG_PATTERNS: tuple[str, ...] = ("staging-mkdocs-*", "staging-MKDOCS-*")
+TAG_PATTERNS: tuple[str, ...] = PRODUCTION_TAG_PATTERNS + STAGING_TAG_PATTERNS
+UNTAGGED_VERSION = "untagged"
 
 
 def _git(*args: str) -> str:
@@ -117,37 +55,76 @@ def _utc_timestamp(now: datetime) -> str:
     return now.strftime("%Y%m%d-%H%M%S")
 
 
-def _list_merged_tags() -> list[str]:
-    tags: list[str] = []
-    for prefix in TAG_PREFIXES:
-        output = _git_optional("tag", "--merged", "HEAD", "--list", f"{prefix}*")
-        if output:
-            tags.extend(line for line in output.splitlines() if line)
-    return tags
+def _current_branch() -> str:
+    """Return the branch this build is from, preferring GitHub PR metadata.
+
+    Detached CI checkouts report ``HEAD`` from git; ``GITHUB_HEAD_REF`` is the
+    pull-request source branch and ``GITHUB_REF_NAME`` is the pushed branch.
+    """
+    head_ref = os.environ.get("GITHUB_HEAD_REF")
+    if head_ref:
+        return head_ref
+    if os.environ.get("GITHUB_REF_TYPE") == "branch":
+        ref_name = os.environ.get("GITHUB_REF_NAME")
+        if ref_name:
+            return ref_name
+    local = _git_optional("rev-parse", "--abbrev-ref", "HEAD")
+    if local and local != "HEAD":
+        return local
+    return "detached"
+
+
+def _header_label(git_info: dict[str, object]) -> str:
+    if "error" in git_info:
+        return "unknown"
+    branch = str(git_info.get("branch") or "").strip()
+    if branch and branch != "detached":
+        return branch
+    short = str(git_info.get("shortSha") or "").strip()
+    return short or "unknown"
 
 
 def _tags_at_head() -> list[str]:
-    output = _git_optional(
-        "tag",
-        "--points-at",
-        "HEAD",
-        "--list",
-        *[f"{prefix}*" for prefix in TAG_PREFIXES],
-    )
+    output = _git_optional("tag", "--points-at", "HEAD", "--list", *TAG_PATTERNS)
     tags = [line for line in output.splitlines() if line] if output else []
     return tags or ["(none)"]
 
 
+def _merged_docs_tags() -> list[str]:
+    """Return docs tags reachable from HEAD, newest tag creation date first.
+
+    Production tags sort ahead of staging tags created at the same time.
+    """
+    output = _git_optional(
+        "tag",
+        "--merged",
+        "HEAD",
+        "--list",
+        *TAG_PATTERNS,
+        "--format=%(creatordate:unix)%09%(refname:short)",
+    )
+    dated: list[tuple[int, int, str]] = []
+    for line in output.splitlines():
+        created, _, tag = line.partition("\t")
+        if not tag or not created.isdigit():
+            continue
+        is_staging = tag.startswith("staging-")
+        dated.append((int(created), -int(is_staging), tag))
+    dated.sort(reverse=True)
+    return [tag for _, _, tag in dated]
+
+
 def resolve_docs_version() -> str:
-    """Resolve the docs version from tags reachable from HEAD."""
-    latest = pick_latest_tag(_list_merged_tags())
-    if latest is None:
+    """Return the newest docs tag reachable from HEAD, or the untagged fallback."""
+    tags = _merged_docs_tags()
+    if not tags:
         print(
-            f"Could not find a version for {PROJECT} - using {DEV_VERSION}",
+            f"Could not find a {PROJECT} tag reachable from HEAD"
+            f" - using {UNTAGGED_VERSION}",
             file=sys.stderr,
         )
-        return DEV_VERSION
-    return version_from_tag(latest)
+        return UNTAGGED_VERSION
+    return tags[0]
 
 
 def _esc(value: object) -> str:
@@ -168,7 +145,7 @@ def _info_item(label: str, value: str, *, href: str | None = None) -> str:
 
 def render_build_info_html(
     *,
-    version: str,
+    latest_docs_tag: str,
     now: datetime,
     is_ci: bool,
     git_info: dict[str, object],
@@ -177,7 +154,7 @@ def render_build_info_html(
     """Render the diagnostics page HTML.
 
     Args:
-        version: Display version.
+        latest_docs_tag: Newest docs tag reachable from HEAD, or ``untagged``.
         now: Build clock (UTC).
         is_ci: Whether this is a CI build.
         git_info: Git metadata or ``{"error": ...}``.
@@ -191,6 +168,7 @@ def render_build_info_html(
     badge_class = "ci" if is_ci else "local"
     badge_label = "CI Build" if is_ci else "Local Build"
     runtime = sys.version.split()[0]
+    header_label = _header_label(git_info)
 
     if "error" in git_info:
         git_section = f"""
@@ -351,6 +329,8 @@ def render_build_info_html(
             display: inline-block;
             margin-top: 1rem;
             font-family: 'Monaco', 'Courier New', monospace;
+            max-width: 100%;
+            overflow-wrap: anywhere;
         }}
         .content {{
             padding: 2rem;
@@ -466,7 +446,7 @@ def render_build_info_html(
     <div class="container">
         <div class="header">
             <h1>🔧 Build Information</h1>
-            <div class="version">{_esc(version)}</div>
+            <div class="version">{_esc(header_label)}</div>
             <div style="margin-top: 1rem;">
                 <span class="badge {badge_class}">{badge_label}</span>
             </div>
@@ -476,7 +456,7 @@ def render_build_info_html(
                 <h2>📦 Build Details</h2>
                 <div class="info-grid">
                     {_info_item("Project", PROJECT)}
-                    {_info_item("Version", version)}
+                    {_info_item("Latest Docs Tag", latest_docs_tag)}
                     {_info_item("Build Timestamp", timestamp)}
                     {_info_item("Build Date (ISO)", build_date)}
                     {_info_item("Python Version", runtime)}
@@ -502,11 +482,8 @@ def collect_git_info() -> dict[str, object]:
     """Collect git metadata for the current HEAD."""
     try:
         commit_sha = _git("rev-parse", "HEAD")
-        branch = _git_optional("rev-parse", "--abbrev-ref", "HEAD") or _env(
-            "GITHUB_HEAD_REF", _env("GITHUB_REF_NAME", "")
-        )
         return {
-            "branch": branch,
+            "branch": _current_branch(),
             "tags": _tags_at_head(),
             "commitSha": commit_sha,
             "shortSha": commit_sha[:7],
@@ -594,7 +571,7 @@ def write_build_info_html(output_path: Path) -> Path:
     now = datetime.now(timezone.utc)
     is_ci = os.environ.get("CI") == "true"
     html_document = render_build_info_html(
-        version=resolve_docs_version(),
+        latest_docs_tag=resolve_docs_version(),
         now=now,
         is_ci=is_ci,
         git_info=collect_git_info(),
