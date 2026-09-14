@@ -108,33 +108,18 @@ Keep in mind these best practices and limitations when including Gripper movemen
 
 The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The module has an operational range from 0 mbar (atmospheric pressure) to -800 mbar, where lower (more negative) values represent a deeper vacuum.
 
-Vacuum commands prefixed with `start_` (e.g., `start_set_vacuum_pressure()` or `start_set_vacuum_power()`) are non-blocking commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module. See [Concurrent Module Actions](concurrent.md) for more information about operating multiple modules simultaneously.
+Vacuum commands prefixed with `start_` (e.g., `start_set_vacuum_pressure()` or `start_set_vacuum_power()`) are concurrent commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module.
 
-The following sections describe how to configure minimum and maximum vacuum pressure, set pressure levels, control the pump's duty cycle (power), and work with multi-step vacuum profiles.
+The following sections describe how to set pressure levels, control the pump's duty cycle (power), and work with multi-step vacuum profiles.
 
-### Minimum and maximum pressure limits
+### Closed-loop pressure control
 
-Two properties set the operational minimum and maximum gauge pressure limits for the Vacuum Module:
+You can set the Vacuum Module to reach and hold a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. With closed-loop pressure control, the module actively monitors its internal pressure sensors to:
 
-* [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]: Returns `0` mbar (atmospheric pressure). However, you may never (or rarely) use this command. Instead, to vent or return the system to atmospheric pressure, call [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] or set `vent_after=True` rather than specifying `min_gauge_pressure_mbar`.
+- Maintain the specified vacuum.
+- Stop the pump and raise an error if the waste carboy fills up and the mechanical float valve closes.
 
-* [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]: Returns `-800` mbar, the maximum vacuum supported by the module. You can pass `max_gauge_pressure_mbar` in code to run the module at full vacuum capacity.
-
-```python
-# Setting maximum vacuum pressure
-vacuum_task = vacuum.start_set_vacuum_pressure(
-    gauge_pressure_mbar=vacuum.max_gauge_pressure_mbar,
-    duration_s=30,
-    vent_after=True,
-    equalize_timeout_s=5
-)
-```
-
-### Pressure control
-
-You can set the Vacuum Module to reach and maintain a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. When using this method, the module actively monitors its pressure sensor to maintain the target pressure.
-
-Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+This method runs asynchronously and returns a [`Task`][opentrons.protocol_api.Task] object. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ```python
 # Set system pressure to -300 mbar for 30 seconds and then equalize to atmospheric
@@ -151,11 +136,18 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 protocol.wait_for_tasks([vacuum_task])
 ```
 
-### Power control
+### Open-loop power control
 
-You can set the Vacuum Module to run the pump motor at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]. When using this method, the module does not use sensor data. Instead, the pump runs at the set duty cycle level.
+You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]. With open-loop power control, the pump:
 
-Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+- Runs at the specified power level and duration only.
+- Does not monitor sensor feedback or adjust motor speed.
+
+<!-- note to reviewers: "deadhead" is a real engineering term that indicates a blocked pump. Use is accurate here. -->
+!!! warning "Carboy overflow risk"
+    Because `start_set_vacuum_power()` does not read sensor feedback, the module cannot detect when the waste carboy is full. If the carboy float valve closes, the pump will continue running without raising an error. Use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
+
+Like pressure control, this method runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ```python
 # Run pump at 60% power for 20 seconds
