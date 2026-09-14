@@ -61,6 +61,7 @@ export function IndividualCommand({
   scrollTargetId,
   listElement,
 }: IndividualCommandProps): ReactNode {
+  const { t } = useTranslation('protocol_visualization')
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
