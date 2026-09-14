@@ -152,9 +152,7 @@ export function RobotOverview({
                       </Flex>
                       <LegacyStyledText
                         forwardedAs="p"
-                        color={
-                          isRobotViewable ? COLORS.black90 : COLORS.grey40
-                        }
+                        color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                       >
                         {t('lights')}
                       </LegacyStyledText>
