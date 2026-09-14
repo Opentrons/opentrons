@@ -249,4 +249,8 @@ You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumMo
 
 ## Use cases
 
+Text and link commented out until after merge. Link won't work until then and causes build failure because the princess is in another castle.
+
+<!--- Uncomment after merge into docs-10.2 branch
 See the [Vacuum Module Examples](../examples/vacuum-module.md) for a miniprep use case and sample code.
+--->
