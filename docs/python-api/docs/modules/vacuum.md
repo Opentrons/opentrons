@@ -42,7 +42,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ## Collars and spacers
 
-Collars and spacers are modular components that you use to create deck stacks for different types vacuum filtration protocols. Specific combinations configure the module to collect samples or extract liquids directly to the waste collection carboy. The following sections describe how to stage collars and spacers on the Vacuum Module deck adapter.
+Collars and spacers are modular components that you use to create deck stacks for different types of vacuum filtration protocols. 
 
 ### Staging collars
 
@@ -68,14 +68,14 @@ filter_plate = collar.load_labware(
 
 ### Staging spacers
 
-Spacers fit inside collars (and the vacuum base). Spacers are used to raise a collection well plate so it's closer a filter plate. Narrowing the gap between these well plates helps reduce droplet deflection under vacuum pressure. Spacers are optional. Types and load names are shown below.
+Spacers fit inside collars (and the vacuum base). Spacers are used to raise a collection well plate so it's closer to a filter plate. 
 
 | Spacer | Height | Load Name |
 |:----|:----|:----|
 | **Short** | 27 mm | `opentrons_vacuum_manifold_spacer_short` |
 | **Tall** | 34 mm | `opentrons_vacuum_manifold_spacer_tall` |
 
-Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [`load_adapter()`][opentrons.protocol_api.VacuumModuleContext.load_adapter]
+Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [`load_adapter()`][opentrons.protocol_api.VacuumModuleContext.load_adapter]:
 
 ```python
 # Load a short spacer on the manifold base
@@ -132,7 +132,7 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 
 ### Pressure control
 
-You can set the Vacuum Module to reach and maintain a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. When using this method, the module actively monitors its pressure sensor to maintain the target vacuum.
+You can set the Vacuum Module to reach and maintain a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. When using this method, the module actively monitors its pressure sensor to maintain the target pressure.
 
 Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
