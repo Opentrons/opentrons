@@ -212,6 +212,32 @@ describe('useDocumentedMutation', () => {
     expect(mutationFn).toHaveBeenCalledTimes(2)
   })
 
+  it('propagates a null rejection without reading isAxiosError', async () => {
+    const mutationFn = vi.fn().mockRejectedValue(null)
+
+    const { result } = renderHook(
+      () =>
+        useDocumentedMutation<number, unknown, number>(
+          createReasonNotRequiredDocumentationState(),
+          ['play_run'],
+          testMutationKey,
+          ({ variables: n }) => mutationFn(n),
+          {}
+        ),
+      { wrapper }
+    )
+
+    act(() => {
+      result.current.mutate(5)
+    })
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
+    expect(result.current.error).toBeNull()
+    expect(mutationFn).toHaveBeenCalledTimes(1)
+  })
+
   it('propagates non-401 errors without prompting for login', async () => {
     const askForLogin = vi.fn()
     const mutationFn = vi.fn().mockRejectedValue({

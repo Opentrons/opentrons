@@ -35,7 +35,7 @@
 
 .button_text {
   color: inherit;
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);

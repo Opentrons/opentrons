@@ -20,8 +20,12 @@ import {
   getAuthInputPatch,
   getFieldValuesFromSettings,
   isValidLogoutIdleTime,
+  isValidMaxNumberOfLoginAttempts,
   isValidPasswordComplexityMinimumLength,
+  isValidPasswordResetTime,
+  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+  MIN_PASSWORD_RESET_TIME_DAYS,
 } from './complianceReadySettingsHelper'
 import {
   isAuditServerSettingKey,
@@ -81,13 +85,14 @@ export function ComplianceReadySoftwareSettings({
   ] = useState(false)
   const [passwordComplexityToggleKey, setPasswordComplexityToggleKey] =
     useState(0)
+  const [settingsInputResetKey, setSettingsInputResetKey] = useState(0)
   const authSettingsQuery = useAuthSettingsQuery()
   const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
     useGetRobotServerAccessControlSettingsQuery()
-  const { mutate: patchAuthSettings } =
+  const { mutateAsync: patchAuthSettings } =
     useAuthSettingsMutation(documentationState)
-  const { mutate: patchAuditSettings } =
+  const { mutateAsync: patchAuditSettings } =
     useAuditSettingsMutation(documentationState)
   const { mutate: patchRobotServerAccessControlSettings } =
     usePatchRobotServerAccessControlSettingsMutation(documentationState)
@@ -106,23 +111,37 @@ export function ComplianceReadySoftwareSettings({
     ]
   )
 
-  const handleAuthSettingInputBlur = (
+  const revertSettingsInputs = (): void => {
+    setSettingsInputResetKey(key => key + 1)
+  }
+
+  const handleAuthSettingInputBlur = async (
     id: AuthSettingFieldId,
     value: string
-  ): void => {
+  ): Promise<void> => {
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
-      patchAuthSettings(authPatch)
+      try {
+        await patchAuthSettings(authPatch)
+      } catch (error) {
+        revertSettingsInputs()
+        throw error
+      }
     }
   }
 
-  const handleAuditSettingInputBlur = (
+  const handleAuditSettingInputBlur = async (
     id: AuditServerSettingFieldId,
     value: string
-  ): void => {
+  ): Promise<void> => {
     const auditPatch = getAuditInputPatch(id, value, fieldValues)
     if (auditPatch != null) {
-      patchAuditSettings(auditPatch)
+      try {
+        await patchAuditSettings(auditPatch)
+      } catch (error) {
+        revertSettingsInputs()
+        throw error
+      }
     }
   }
 
@@ -194,15 +213,24 @@ export function ComplianceReadySoftwareSettings({
           isLastSection={false}
         >
           <InputSetting
-            key={String(fieldValues.maxNumberOfLoginAttempts)}
+            key={`maxNumberOfLoginAttempts-${settingsInputResetKey}`}
             label={t(
               'desktop_maximum_login_attempts_before_account_deactivation'
             )}
             value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
-            onBlur={value => {
+            min={1}
+            max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
+            validate={value =>
+              isValidMaxNumberOfLoginAttempts(value)
+                ? null
+                : t('desktop_maximum_login_attempts_invalid', {
+                    max: MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+                  })
+            }
+            onBlur={value =>
               handleAuthSettingInputBlur('maxNumberOfLoginAttempts', value)
-            }}
+            }
           />
           <Divider />
           <ComplianceReadyToggleField
@@ -214,13 +242,21 @@ export function ComplianceReadySoftwareSettings({
             }}
           >
             <InputSetting
-              key={String(fieldValues.passwordResetTime)}
+              key={`passwordResetTime-${settingsInputResetKey}`}
               label={t('desktop_length_of_time')}
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
-              onBlur={value => {
+              min={MIN_PASSWORD_RESET_TIME_DAYS}
+              validate={value =>
+                isValidPasswordResetTime(value)
+                  ? null
+                  : t('desktop_password_reset_time_invalid', {
+                      min: MIN_PASSWORD_RESET_TIME_DAYS,
+                    })
+              }
+              onBlur={value =>
                 handleAuthSettingInputBlur('passwordResetTime', value)
-              }}
+              }
             />
           </ComplianceReadyToggleField>
           <Divider />
@@ -243,7 +279,7 @@ export function ComplianceReadySoftwareSettings({
               }}
             />
             <InputSetting
-              key={String(fieldValues.passwordComplexityMinimumLength)}
+              key={`passwordComplexityMinimumLength-${settingsInputResetKey}`}
               label={t('desktop_minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
@@ -256,17 +292,17 @@ export function ComplianceReadySoftwareSettings({
                       max: MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
                     })
               }
-              onBlur={value => {
+              onBlur={value =>
                 handleAuthSettingInputBlur(
                   'passwordComplexityMinimumLength',
                   value
                 )
-              }}
+              }
             />
           </ComplianceReadyToggleField>
           <Divider />
           <InputSetting
-            key={String(fieldValues.idleLogout)}
+            key={`idleLogout-${settingsInputResetKey}`}
             label={t('desktop_auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
@@ -275,9 +311,7 @@ export function ComplianceReadySoftwareSettings({
                 ? null
                 : t('desktop_idle_logout_must_be_greater_than_zero')
             }
-            onBlur={value => {
-              handleAuthSettingInputBlur('idleLogout', value)
-            }}
+            onBlur={value => handleAuthSettingInputBlur('idleLogout', value)}
           />
         </ComplianceReadySettingsSection>
 
@@ -335,18 +369,18 @@ export function ComplianceReadySoftwareSettings({
             }}
           >
             <InputSetting
-              key={String(fieldValues.minLengthOfReasonForInteraction)}
+              key={`minLengthOfReasonForInteraction-${settingsInputResetKey}`}
               label={t(
                 'desktop_minimum_length_for_documentation_for_robot_actions'
               )}
               value={String(fieldValues.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
-              onBlur={value => {
+              onBlur={value =>
                 handleAuditSettingInputBlur(
                   'minLengthOfReasonForInteraction',
                   value
                 )
-              }}
+              }
             />
           </ComplianceReadyToggleField>
           <Divider />

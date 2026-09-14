@@ -9,6 +9,7 @@ import {
 } from 'electron-devtools-installer'
 import fse from 'fs-extra'
 
+import { registerAudit } from './audit'
 import {
   getConfig,
   getOverrides,
@@ -156,6 +157,7 @@ function startUp(): void {
     registerNotify(dispatch, mainWindow),
     registerDataFiles(dispatch),
     registerSystemInfo(dispatch),
+    registerAudit(dispatch),
   ]
 
   registerUsbDeviceHandlers()

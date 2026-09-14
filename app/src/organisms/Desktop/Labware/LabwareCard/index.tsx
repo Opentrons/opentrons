@@ -5,6 +5,7 @@ import startCase from 'lodash/startCase'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -58,6 +59,7 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
       role="link"
       backgroundColor={COLORS.white}
       color={COLORS.black90}
+      borderRadius={BORDERS.borderRadius8}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
       height="auto"

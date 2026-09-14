@@ -61,6 +61,7 @@ export function fetchText(input: Request, init?: RequestInit): Promise<string> {
 
 export interface FetchToFileOptions {
   onProgress: (progress: DownloadProgress) => unknown
+  onResponse: (response: Response) => unknown
   signal: AbortSignal
 }
 
@@ -71,6 +72,7 @@ export function fetchToFile(
   options?: Partial<FetchToFileOptions>
 ): Promise<string> {
   return fetch(input, { signal: options?.signal }).then(response => {
+    options?.onResponse?.(response)
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) ?? null
 

@@ -38,6 +38,7 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
+  useDisableVacuumModuleWasteDetection,
   useLEDLights,
 } from '/app/resources/robot-settings'
 
@@ -86,6 +87,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const { lightsEnabled, toggleLights } = useLEDLights()
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
+  const { wasteDetectionDisabled, toggleWasteDetection } =
+    useDisableVacuumModuleWasteDetection()
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
   const automaticSoftwareUpdateDownloadsEnabled =
     useSelector(getConfig)?.update?.automaticallyDownloadUpdates
@@ -303,6 +306,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
           iconName="ot-flex-stacker"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
+        />
+        <RobotSettingButton
+          settingName={t('disable_vacuum_module_waste_detection')}
+          dataTestId="RobotSettingButton_disable_vacuum_module_waste_detection"
+          settingInfo={t('disable_vacuum_module_waste_detection_description')}
+          iconName="ot-vacuum"
+          rightElement={<OnOffToggle isOn={wasteDetectionDisabled} />}
+          onClick={toggleWasteDetection}
         />
         <RobotSettingButton
           settingName={t('app_settings:update_channel')}

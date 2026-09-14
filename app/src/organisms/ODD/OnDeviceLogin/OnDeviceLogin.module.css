@@ -44,3 +44,8 @@
   background-color: var(--white);
   inset: 0;
 }
+
+/* Sit below the documentation overlay (z-index 1000) while choosing a new password. */
+.overlay_below_documentation {
+  z-index: 999;
+}
