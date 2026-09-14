@@ -15,6 +15,8 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 interface FailedToConnectProps {
   selectedSsid: string
   errorMessage?: string | null
@@ -29,7 +31,7 @@ export function FailedToConnect({
   handleTryAgain,
   handleChangeNetwork,
   isInvalidPassword,
-}: FailedToConnectProps): JSX.Element {
+}: FailedToConnectProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (

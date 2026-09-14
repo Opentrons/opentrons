@@ -2,6 +2,7 @@
   "attach_probe": "Attach probe to pipette",
   "begin_calibration": "Begin calibration",
   "calibrate": "Calibrate",
+  "calibrate_a_pipette_to_set_up_more_modules": "Calibrate a pipette to set up more modules.",
   "calibrate_pipette": "Calibrate pipettes before proceeding to module calibration",
   "calibration": "{{module}} Calibration",
   "calibration_adapter_heatershaker": "Calibration Adapter",

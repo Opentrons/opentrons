@@ -1,102 +1,76 @@
-import { useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useMutation } from 'react-query'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import last from 'lodash/last'
 
 import { GET, request } from '@opentrons/api-client'
-import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
-import type { IconProps } from '@opentrons/components'
+import type { UseMutationResult } from 'react-query'
 
-interface UseDownloadRobotLogsResult {
-  downloadLogs: (usbPath?: string) => Promise<void>
-  isDownloading: boolean
-  hasError: boolean
+export interface DownloadRobotLogsVariables {
+  usbPath?: string
+}
+
+type UseDownloadRobotLogsResult = UseMutationResult<
+  void,
+  unknown,
+  DownloadRobotLogsVariables
+> & {
   canDownload: boolean
 }
 
 export function useDownloadRobotLogs(
   robotName: string
 ): UseDownloadRobotLogsResult {
-  const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
   const host = useHost()
-  const { makeToast, eatToast } = useToaster()
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [hasError, setHasError] = useState(false)
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const canDownload =
     robot?.status === CONNECTABLE && robot?.health?.logs != null
 
-  const downloadLogs = (usbPath?: string): Promise<void> => {
-    if (!canDownload || host == null || robot?.health?.logs == null) {
-      return Promise.reject(
-        new Error('Unable to download robot logs: robot is not connectable')
-      )
+  const downloadLogs = async ({
+    usbPath,
+  }: DownloadRobotLogsVariables): Promise<void> => {
+    const logs = robot?.health?.logs
+    if (!canDownload || host == null || logs == null) {
+      throw new Error('Unable to download robot logs: robot is not connectable')
     }
 
-    setIsDownloading(true)
-    setHasError(false)
-    const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
-    const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
-      disableTimeout: true,
-      icon: toastIcon,
-    })
-
     const zip = new JSZip()
-    return Promise.all(
-      robot.health.logs.map(log => {
+    const results = await Promise.allSettled(
+      logs.map(async log => {
         const logFileName = last(log.split('/')) ?? 'robot.log'
-        return request<string>(GET, log, host)
-          .then(res => {
-            zip.file(logFileName, res.data)
-          })
-          .catch((e: Error) => {
-            makeToast(e.message, ERROR_TOAST, { closeButton: true })
-          })
+        const res = await request<string>(GET, log, host)
+        zip.file(logFileName, res.data)
       })
     )
-      .then(() => zip.generateAsync({ type: 'arraybuffer' }))
-      .then(async buffer => {
-        const filename = `${robotName}_logs.zip`
-        if (usbPath != null) {
-          await saveFileToUsb(`${usbPath}/${filename}`, buffer)
-        } else {
-          saveAs(new Blob([buffer]), filename)
-        }
-      })
-      .then(() => {
-        eatToast(toastId)
-        if (isMounted.current) {
-          setIsDownloading(false)
-        }
-      })
-      .catch((e: Error) => {
-        eatToast(toastId)
-        makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) {
-          setHasError(true)
-          setIsDownloading(false)
-        }
-        throw e
-      })
+
+    // If every single log failed to download, abort early without generating an empty zip file
+    if (
+      results.length > 0 &&
+      results.every(result => result.status === 'rejected')
+    ) {
+      throw new Error('Failed to download any of the robot logs.')
+    }
+
+    const buffer = await zip.generateAsync({ type: 'arraybuffer' })
+    const filename = `${robotName}_logs.zip`
+    if (usbPath != null) {
+      await saveFileToUsb(`${usbPath}/${filename}`, buffer)
+    } else {
+      saveAs(new Blob([buffer]), filename)
+    }
   }
 
-  return { downloadLogs, isDownloading, hasError, canDownload }
+  // Downloading logs doesn't mutate robot state, so it doesn't need
+  // to go through useDocumentedMutation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
+  const mutation = useMutation(downloadLogs)
+
+  return { ...mutation, canDownload }
 }

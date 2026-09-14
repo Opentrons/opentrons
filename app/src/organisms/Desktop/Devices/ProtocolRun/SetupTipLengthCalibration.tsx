@@ -16,6 +16,8 @@ import { useRunPipetteInfoByMount } from '/app/resources/runs'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 
+import type { ReactNode } from 'react'
+
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string
@@ -24,7 +26,7 @@ interface SetupTipLengthCalibrationProps {
 export function SetupTipLengthCalibration({
   robotName,
   runId,
-}: SetupTipLengthCalibrationProps): JSX.Element {
+}: SetupTipLengthCalibrationProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 

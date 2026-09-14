@@ -12,13 +12,14 @@ access to protocol related files.
 import os
 from pathlib import Path
 
-from server_utils.persistence.folder_migrator import Migration
+from server_utils.persistence.folder_migrator import (
+    PROTOCOL_DIR_PERMISSIONS,
+    PROTOCOL_FILE_PERMISSIONS,
+    Migration,
+)
 
 from ..file_and_directory_names import PROTOCOLS_DIRECTORY
 from ._util import copy_contents
-
-PROTOCOL_FILE_PERMISSIONS = 0o640
-PROTOCOL_DIR_PERMISSIONS = 0o750
 
 
 class Migration16to17(Migration):

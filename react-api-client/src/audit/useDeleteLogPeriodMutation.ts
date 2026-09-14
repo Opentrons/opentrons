@@ -6,13 +6,16 @@ import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
 import type { DocumentationState } from '../accessControl'
-import type { DocumentedMutationParameters } from '../accessControl/types'
+import type {
+  DocumentedAction,
+  DocumentedMutationParameters,
+} from '../accessControl/types'
 
 export interface DeleteLogPeriodParams {
   logPeriodId: string
@@ -26,7 +29,7 @@ export type UseDeleteLogPeriodMutationResult = UseMutationResult<
   unknown,
   DeleteLogPeriodParams
 > & {
-  deleteLogPeriod: UseMutateFunction<
+  deleteLogPeriod: UseMutateAsyncFunction<
     EmptyResponse,
     unknown,
     DeleteLogPeriodParams
@@ -41,6 +44,7 @@ export type UseDeleteLogPeriodMutationOptions = UseMutationOptions<
 
 export function useDeleteLogPeriodMutation(
   documentationState: DocumentationState,
+  actionsToDocument?: DocumentedAction[],
   options: UseDeleteLogPeriodMutationOptions = {}
 ): UseDeleteLogPeriodMutationResult {
   const host = useHost()
@@ -52,7 +56,7 @@ export function useDeleteLogPeriodMutation(
     DeleteLogPeriodParams
   >(
     documentationState,
-    ['delete_log_period'],
+    [...(actionsToDocument ?? []), 'delete_log_period'],
     ({
       variables: { logPeriodId, deletionKey },
       userNotes,
@@ -72,6 +76,6 @@ export function useDeleteLogPeriodMutation(
 
   return {
     ...mutation,
-    deleteLogPeriod: mutation.mutate,
+    deleteLogPeriod: mutation.mutateAsync,
   }
 }

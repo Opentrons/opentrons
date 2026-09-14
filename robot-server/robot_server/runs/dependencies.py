@@ -24,6 +24,10 @@ from .run_data_manager import RunDataManager
 from .run_orchestrator_store import NoRunCoordinator, RunOrchestratorStore
 from .run_process_pyro_provider import RunProcessPyroProvider
 from .run_store import RunStore
+from robot_server.access_control.settings.store import (
+    AccessControlSettingStore,
+    get_access_control_setting_store,
+)
 from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
@@ -196,8 +200,8 @@ async def get_run_orchestrator_store(
             register_run_orchestrator_store_to_pyro_resource(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )
-            pyro_resource = get_pyro_resource()
-            hardware_api.register_callback(
+            pyro_resource = await get_pyro_resource()
+            await hardware_api.register_callback_async(
                 pyro_resource.create_run_hardware_event_callback()
             )
 
@@ -219,7 +223,10 @@ async def get_is_okay_to_create_maintenance_run(
         orchestrator = run_orchestrator_store.run_coordinator
     except NoRunCoordinator:
         return True
-    return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
+    return (
+        not await orchestrator.run_has_started()
+        or await orchestrator.get_is_run_terminal()
+    )
 
 
 async def get_run_data_manager(
@@ -235,6 +242,9 @@ async def get_run_data_manager(
     camera_setting_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    access_control_setting_store: Annotated[
+        AccessControlSettingStore, Depends(get_access_control_setting_store)
+    ],
     file_provider: Annotated[FileProvider, Depends(get_file_provider)],
 ) -> RunDataManager:
     """Get a singleton run data manager to keep track of current/historical run data."""
@@ -246,6 +256,7 @@ async def get_run_data_manager(
             run_store=run_store,
             error_recovery_setting_store=error_recovery_setting_store,
             camera_setting_store=camera_setting_store,
+            access_control_setting_store=access_control_setting_store,
             runs_publisher=runs_publisher,
             file_provider=file_provider,
         )

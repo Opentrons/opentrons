@@ -5,7 +5,7 @@ import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import styles from './wificredentialform.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WifiScreenOption } from './'
 
 interface WifiCredentialFormProps {
@@ -20,7 +20,7 @@ export function WifiCredentialForm({
   password,
   setCurrentOption,
   setPassword,
-}: WifiCredentialFormProps): JSX.Element {
+}: WifiCredentialFormProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

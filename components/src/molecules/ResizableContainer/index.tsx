@@ -18,6 +18,10 @@ export interface ResizableContainerProps {
   edge: 'left' | 'right'
   // the default width of the container
   defaultWidth?: number
+  // for custom styling
+  className?: string
+  // for inline styling
+  style?: CSSProperties
 }
 
 export const ResizableContainer: React.FC<ResizableContainerProps> = (
@@ -30,6 +34,8 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
     maxWidth,
     edge,
     defaultWidth,
+    className,
+    style: customStyle,
   } = props
   const [width, setWidth] = useState<number | null>(defaultWidth ?? null)
   const [isResizing, setIsResizing] = useState(false)
@@ -87,12 +93,18 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
     document.body.style.userSelect = ''
   }
 
-  const style: CSSProperties = width !== null ? { width: `${width}px` } : {}
+  const containerStyle: CSSProperties = {
+    ...customStyle,
+    ...(width !== null ? { width: `${width}px` } : {}),
+  }
 
   return (
-    <div ref={containerRef} className={styles.container} style={style}>
+    <div
+      ref={containerRef}
+      className={clsx(styles.container, className)}
+      style={containerStyle}
+    >
       {children}
-
       {/* handle part */}
       <div
         role="separator"

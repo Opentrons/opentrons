@@ -39,6 +39,7 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
 import type { State } from '/app/redux/types'
 
@@ -102,6 +103,7 @@ export function RobotOverview({
               <ReachableBanner robot={robot} />
             </Box>
             <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
+            <SignAndDownloadRunBanner robotName={robotName} />
             {showRecoveryBanner ? (
               <ErrorRecoveryBanner
                 recoveryIntent={recoveryIntent}

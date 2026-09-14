@@ -37,14 +37,13 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.fastapi import get_audit_logger
+from server_utils.audit.fastapi import get_audit_logger, get_supplied_user_notes
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,
     get_app_state,
 )
-from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -85,6 +84,9 @@ from robot_server.service.legacy.models.settings import (
     PipetteSettingsInfo,
     PipetteSettingsUpdate,
     RobotConfigs,
+)
+from robot_server.service.pyro_utils.pyro_resource import (
+    start_initializing_pyro_resource,
 )
 
 log = logging.getLogger(__name__)
@@ -127,6 +129,7 @@ async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> 
     # rerun the hardware API setup
     start_initializing_hardware(
         app_state=app_state,
+        pyro_task=start_initializing_pyro_resource(app_state=app_state),
         callbacks=[
             (start_light_control_task, True),
             (mark_light_control_startup_finished, False),
@@ -266,8 +269,8 @@ async def post_log_level_local(
     for logger_name in ("opentrons", "robot_server", "uvicorn"):
         logging.getLogger(logger_name).setLevel(level.level_id)
     # Update and save settings
-    await hardware.update_config(log_level=level_name)
-    robot_configs.save_robot_settings(hardware.config)
+    new_config = await hardware.update_config(log_level=level_name)
+    robot_configs.save_robot_settings(new_config)
 
     return V1BasicResponse(message=f"log_level set to {level}")
 
@@ -404,9 +407,10 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
-    if isinstance(hardware.config, OT3Config):
-        return hardware.config.model_dump()
-    return asdict(hardware.config)
+    config = await hardware.update_config()
+    if isinstance(config, OT3Config):
+        return config.model_dump()
+    return asdict(config)
 
 
 @router.get(

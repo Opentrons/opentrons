@@ -9,12 +9,12 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
+import { useCloseCurrentRun } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AnalysisFailedModalProps {
@@ -27,9 +27,8 @@ interface AnalysisFailedModalProps {
 export function AnalysisFailedModal({
   errors,
   protocolId,
-  runId,
   setShowAnalysisFailedModal,
-}: AnalysisFailedModalProps): JSX.Element {
+}: AnalysisFailedModalProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
   const modalHeader: OddModalHeaderBaseProps = {
@@ -39,13 +38,13 @@ export function AnalysisFailedModal({
     hasExitIcon: true,
   }
 
-  const documentationState = useDocumentationState()
-  const { isLoading: isDismissing, mutateAsync: dismissCurrentRunAsync } =
-    useDismissCurrentRunMutation(documentationState)
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleRestartSetup = (): void => {
-    dismissCurrentRunAsync(runId).then(() => {
-      navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+    closeCurrentRun({
+      onSuccess: () => {
+        navigate(protocolId != null ? `/protocols/${protocolId}` : '/protocols')
+      },
     })
   }
 
@@ -86,9 +85,9 @@ export function AnalysisFailedModal({
           onClick={handleRestartSetup}
           buttonText={t('restart_setup')}
           buttonType="alert"
-          iconName={isDismissing ? 'ot-spinner' : null}
+          iconName={isClosingCurrentRun ? 'ot-spinner' : null}
           iconPlacement="startIcon"
-          disabled={isDismissing}
+          disabled={isClosingCurrentRun}
         />
       </Flex>
     </OddModal>

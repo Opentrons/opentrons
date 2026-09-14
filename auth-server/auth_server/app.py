@@ -46,15 +46,17 @@ from auth_server.persistence.persistence_directory import (
     prepare_root,
 )
 from auth_server.server_settings import AuthServerSettings, get_settings
+from auth_server.settings.models import (
+    AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+    AUTH_SERVER_AUDIT_SYSTEM_NAME,
+)
 from auth_server.settings.router import router as settings_router
 from auth_server.settings.store import SettingsStore, install_settings_store
 from auth_server.users.router import router as users_router
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import UserDataManager
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
-_AUTH_SERVER_AUDIT_SYSTEM_NAME = "system"
-_AUTH_SERVER_AUDIT_SYSTEM_FULLNAME = "authentication subsystem"
+
 _LOG = logging.getLogger(__name__)
 
 
@@ -77,8 +79,8 @@ async def _do_oauth_audit_log(
             SubmitAuditLogMessageData(
                 action=action,
                 message=message,
-                accountName=_AUTH_SERVER_AUDIT_SYSTEM_NAME,
-                legalName=_AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+                accountName=AUTH_SERVER_AUDIT_SYSTEM_NAME,
+                legalName=AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
                 reason=None,
             )
         )
@@ -116,10 +118,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             lambda action, message: _oauth_audit_log(audit_client, action, message),
         )
         install_oauth2_backend(app.state, oauth2_backend)
-        user_service = UserDataManager(
-            user_store=user_store, settings_store=settings_store
-        )
-        user_service.seed_initial_users()
         install_settings_store(app.state, settings_store)
         authentication_checker = build_authentication_checker(
             settings_store, oauth2_backend

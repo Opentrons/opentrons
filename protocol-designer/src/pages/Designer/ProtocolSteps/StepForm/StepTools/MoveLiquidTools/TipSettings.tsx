@@ -17,6 +17,7 @@ import { DropTipField } from '../../PipetteFields'
 import { ChangeTipField } from '../../PipetteFields/ChangeTipField'
 import { TipTrackingField } from '../../PipetteFields/TipTrackingField'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -26,7 +27,7 @@ interface TipSettingsProps {
   stepType: 'moveLiquid' | 'mix'
 }
 
-export function TipSettings(props: TipSettingsProps): JSX.Element {
+export function TipSettings(props: TipSettingsProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const { propsForFields, formData, stepType } = props
   const pipetteEntities = useSelector(getPipetteEntities)

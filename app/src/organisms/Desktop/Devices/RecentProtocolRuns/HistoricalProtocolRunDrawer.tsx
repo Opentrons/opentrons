@@ -52,6 +52,7 @@ import { OffsetTag } from '../../../LabwarePositionCheck'
 import { DownloadCsvFileLink } from '../DownloadCsvFileLink'
 import { useDeckCalibrationData } from '../hooks'
 
+import type { ReactNode } from 'react'
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
@@ -368,7 +369,7 @@ function ImagesFileDataRow({
   run: RunData
   protocolName: string
   robotName: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
   const { reportPhotoAccessUsage } = useCameraAnalytics({

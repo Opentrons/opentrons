@@ -104,9 +104,11 @@ class AbstractVacuumModuleDriver(Protocol):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
         ...
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:

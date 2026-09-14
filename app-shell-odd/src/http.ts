@@ -61,6 +61,7 @@ export function fetchText(input: Request, init?: RequestInit): Promise<string> {
 
 export interface FetchToFileOptions {
   onProgress: (progress: DownloadProgress) => unknown
+  onResponse: (response: Response) => unknown
   signal: AbortSignal
 }
 
@@ -71,6 +72,7 @@ export function fetchToFile(
   options?: Partial<FetchToFileOptions>
 ): Promise<string> {
   return fetch(input, { signal: options?.signal }).then(response => {
+    options?.onResponse?.(response)
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) ?? null
 
@@ -125,14 +127,32 @@ export function fetchToFile(
 export function postFile(
   input: RequestInput,
   name: string,
-  source: string
+  source: string,
+  init?: RequestInit
 ): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
     createReadStream(source, reject).then(readStream =>
       new Promise<Response>(resolve => {
         const body = new FormData()
         body.append(name, readStream)
-        resolve(fetch(input, { body, method: 'POST' }))
+        const formHeaders =
+          typeof body.getHeaders === 'function' ? body.getHeaders() : {}
+        const initHeaders =
+          init?.headers != null && !Array.isArray(init.headers)
+            ? (init.headers as Record<string, string>)
+            : {}
+
+        resolve(
+          fetch(input, {
+            ...init,
+            body,
+            method: 'POST',
+            headers: {
+              ...formHeaders,
+              ...initHeaders,
+            },
+          })
+        )
       }).then(resolve)
     )
   })

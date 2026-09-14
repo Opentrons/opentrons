@@ -46,9 +46,11 @@ export const useLinkedDocumentationState = (
 
   useEffect(() => {
     return () => {
-      clearDocreport()
+      // Clear React state only. Do not null docreport on the current documentationState object
+      // async follow-up mutations may still hold a reference to it after unmount.
+      setDocreport(undefined)
     }
-  }, [clearDocreport, resetKey])
+  }, [resetKey])
 
   const onPromptForDocumentation = useCallback(
     (report: DocumentationReport) => {

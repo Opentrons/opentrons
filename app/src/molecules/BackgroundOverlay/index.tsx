@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 
-import type { ComponentProps, MouseEventHandler } from 'react'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 
 const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};
@@ -16,7 +16,7 @@ export interface BackgroundOverlayProps extends ComponentProps<typeof Flex> {
   onClick: MouseEventHandler
 }
 
-export function BackgroundOverlay(props: BackgroundOverlayProps): JSX.Element {
+export function BackgroundOverlay(props: BackgroundOverlayProps): ReactNode {
   const { onClick, ...flexProps } = props
 
   return (

@@ -51,6 +51,9 @@ export function ProtocolVisualization(
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
+  const [showStepDetails, setShowStepDetails] = useState<boolean>(
+    appType !== 'web'
+  )
 
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -296,20 +299,20 @@ export function ProtocolVisualization(
             }}
             selectedRunTimeCommand={selectedRunTimeCommand}
           />
-          <PlayBackControls
-            isPlaying={isPlaying}
-            handlePlayPause={handlePlayPause}
-            currentCommandIndex={filteredSelectedCommandIndex}
-            numCommandLength={filteredCommands.length}
-            commands={filteredCommands}
-            setSelectedCommand={setSelectedCommand}
-            milliSecondsPerFrame={milliSecondsPerFrame}
-            setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-            // 将来のサイドバー制御をバインド可能
-            onClickStepDetail={() => {
-              console.log('Toggle sidebar action')
-            }}
-          />
+          <div className={styles.controls_container}>
+            <PlayBackControls
+              isPlaying={isPlaying}
+              handlePlayPause={handlePlayPause}
+              currentCommandIndex={filteredSelectedCommandIndex}
+              numCommandLength={filteredCommands.length}
+              commands={filteredCommands}
+              setSelectedCommand={setSelectedCommand}
+              milliSecondsPerFrame={milliSecondsPerFrame}
+              setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+              showStepDetails={showStepDetails}
+              onClickStepDetails={setShowStepDetails}
+            />
+          </div>
         </div>
         {/* Gutter between center & right */}
         <div
@@ -319,20 +322,22 @@ export function ProtocolVisualization(
           }}
         />
         {/* Right Column is resizable */}
-        <div
-          className={styles.right_column}
-          style={{ width: `${rightWidth}px` }}
-        >
-          {selectedRunTimeCommand != null ? (
-            <StepDetailContainer
-              commands={commands}
-              robotState={robotState}
-              invariantContext={invariantContext}
-              currentCommand={selectedRunTimeCommand}
-              liquids={liquids}
-            />
-          ) : null}
-        </div>
+        {showStepDetails ? (
+          <div
+            className={styles.right_column}
+            style={{ width: `${rightWidth}px` }}
+          >
+            {selectedRunTimeCommand != null ? (
+              <StepDetailContainer
+                commands={commands}
+                robotState={robotState}
+                invariantContext={invariantContext}
+                currentCommand={selectedRunTimeCommand}
+                liquids={liquids}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </>
   )

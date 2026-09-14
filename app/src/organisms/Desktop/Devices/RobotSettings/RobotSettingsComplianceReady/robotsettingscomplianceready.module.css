@@ -19,3 +19,7 @@
   overflow: hidden;
   padding: 0;
 }
+
+.section_accordion_overflow_visible {
+  overflow: visible;
+}

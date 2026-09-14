@@ -14,7 +14,7 @@ import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '/app/atoms/buttons'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface ShortTrashBinProps {
@@ -25,7 +25,7 @@ interface ShortTrashBinProps {
 export function ShortTrashBin({
   settings,
   isRobotBusy,
-}: ShortTrashBinProps): JSX.Element {
+}: ShortTrashBinProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { updateRobotSetting } = useUpdateRobotSettingMutation(
     ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE

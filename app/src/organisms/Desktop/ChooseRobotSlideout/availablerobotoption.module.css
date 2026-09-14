@@ -1,0 +1,28 @@
+.details {
+  display: flex;
+  flex-direction: column;
+  margin: var(--spacing-8) 0 var(--spacing-16) var(--spacing-16);
+}
+
+.details_with_chip {
+  margin-bottom: 0;
+}
+
+/* StatusLabel applies 4px vertical margins; Figma stacks the chip flush. */
+.compliance_chip {
+  margin-top: calc(-1 * var(--spacing-4));
+  margin-bottom: calc(-1 * var(--spacing-4));
+}
+
+.robot_image {
+  width: 4rem;
+  height: 3.5625rem;
+}
+
+.sending_label {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+}

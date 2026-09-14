@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -25,9 +24,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getQueryKey,
   useCreateRunMutation,
-  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
@@ -57,6 +54,7 @@ import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationMod
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 
+import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
@@ -75,7 +73,7 @@ const QuickTransferHeader = ({
   chipText,
   isScrolled,
   isTransferFetching,
-}: QuickTransferHeaderProps): JSX.Element => {
+}: QuickTransferHeaderProps): ReactNode => {
   const navigate = useNavigate()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
@@ -199,7 +197,7 @@ interface TransferSectionTabsProps {
 const TransferSectionTabs = ({
   currentOption,
   setCurrentOption,
-}: TransferSectionTabsProps): JSX.Element => {
+}: TransferSectionTabsProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   const options = transferSectionTabOptions
 
@@ -224,7 +222,7 @@ interface SummaryProps {
   date: string | null
 }
 
-const Summary = ({ description, date }: SummaryProps): JSX.Element => {
+const Summary = ({ description, date }: SummaryProps): ReactNode => {
   const { t } = useTranslation(['protocol_info', 'shared'])
   return (
     <Flex
@@ -308,9 +306,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   )
 
   const dispatch = useDispatch<Dispatch>()
-  const host = useHost()
   const { makeSnackbar } = useToaster()
-  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
@@ -328,15 +324,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   const pinned = pinnedTransferIds.includes(transferId)
   const documentationState = useDocumentationState()
 
-  const { createRun } = useCreateRunMutation(documentationState, {
-    onSuccess: data => {
-      queryClient
-        .invalidateQueries(getQueryKey(host, 'runs'))
-        .catch((e: Error) => {
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        })
-    },
-  })
+  const { createRun } = useCreateRunMutation(documentationState)
 
   const handlePinClick = (): void => {
     if (!pinned) {

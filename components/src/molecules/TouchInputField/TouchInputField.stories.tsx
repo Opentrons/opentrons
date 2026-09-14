@@ -5,7 +5,7 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { TouchInputField as TouchInputFieldComponent } from './'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { ChangeEvent, ComponentProps } from 'react'
+import type { ChangeEvent, ComponentProps, ReactNode } from 'react'
 
 const meta: Meta<typeof TouchInputFieldComponent> = {
   title: 'Helix/Molecules/TouchInputField',
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof TouchInputFieldComponent>
 
 function TouchInputFieldStory(
   args: ComponentProps<typeof TouchInputFieldComponent>
-): JSX.Element {
+): ReactNode {
   const [value, setValue] = useState(args.value)
 
   return (
@@ -45,7 +45,7 @@ function TouchInputFieldStory(
 
 function TouchInputFieldWithErrorStory(
   args: ComponentProps<typeof TouchInputFieldComponent>
-): JSX.Element {
+): ReactNode {
   const [value, setValue] = useState(args.value)
 
   return (

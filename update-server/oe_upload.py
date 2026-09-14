@@ -68,6 +68,7 @@ async def do_update(  # noqa: C901
         async with aiohttp.ClientSession(timeout=timeout) as login_session:
             access_token = await log_in(login_session, host, username, password)
         headers["Authorization"] = f"Bearer {access_token}"
+        headers["Opentrons-User-Notes"] = "a" * 128
 
     async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
         root = host + "/server/update"
@@ -118,6 +119,10 @@ async def do_update(  # noqa: C901
             sys.exit(-1)
 
         status = await file_resp.json()
+        while status["stage"] == "awaiting-file":
+            sys.stdout.write("waiting for validation to begin\r\n")
+            status = await poll_status(session, token, root)
+
         while status["stage"] == "validating":
             sys.stdout.write(f"{status['message']}: {status['progress'] * 100:.0f}%\r")
             status = await poll_status(session, token, root)

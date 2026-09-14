@@ -23,6 +23,7 @@ from opentrons.hardware_control.types import SubSystem, SubSystemState
 from opentrons.protocol_engine import DeckType, ModuleModel
 from opentrons.protocol_engine.types import Vec3f
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.modules.module_data_mapper import ModuleDataMapper
 from robot_server.modules.module_identifier import ModuleIdentity
 from robot_server.modules.module_models import (
@@ -127,6 +128,7 @@ def test_maps_magnetic_module_data(
     expected_output_data: MagneticModuleData,
     expected_compatible: bool,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
@@ -145,7 +147,11 @@ def test_maps_magnetic_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -201,6 +207,7 @@ def test_maps_temperature_module_data(
     status: str,
     data: hc_types.TemperatureModuleData,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -220,7 +227,11 @@ def test_maps_temperature_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -312,6 +323,7 @@ def test_maps_thermocycler_module_data(
     status: str,
     data: hc_types.ThermocyclerData,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -331,7 +343,11 @@ def test_maps_thermocycler_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -422,6 +438,7 @@ def test_maps_heater_shaker_module_data(
     status: str,
     data: hc_types.HeaterShakerData,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -441,7 +458,11 @@ def test_maps_heater_shaker_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -525,6 +546,7 @@ def test_maps_flex_stacker_module_data(
     status: str,
     data: hc_types.FlexStackerData,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
     decoy: Decoy,
 ) -> None:
     """It should map hardware data to a flex stacker."""
@@ -544,21 +566,26 @@ def test_maps_flex_stacker_module_data(
         hub_port=1,
         device_path="1.0/tty/ttyACM1/dev",
     )
-    decoy.when(hardware_api.attached_subsystems).then_return(
-        {
-            SubSystem.rear_panel: SubSystemState(
-                ok=True,
-                current_fw_version=63,
-                next_fw_version=63,
-                fw_update_needed=False,
-                current_fw_sha="",
-                pcba_revision=rear_panel_rev,
-                update_state=None,
-            )
-        }
+    hardware_state_store._attached_subsystems = {
+        SubSystem.rear_panel: SubSystemState(
+            ok=True,
+            current_fw_version=63,
+            next_fw_version=63,
+            fw_update_needed=False,
+            current_fw_sha="",
+            pcba_revision=rear_panel_rev,
+            update_state=None,
+        )
+    }
+    decoy.when(hardware_api.attached_subsystems).then_raise(
+        RuntimeError("cant touch this")
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -643,6 +670,7 @@ def test_maps_vacuum_module_data(
     data: hc_types.VacuumModuleData,
     expected_vent_status: str,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should map hardware data to a vacuum module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -662,7 +690,11 @@ def test_maps_vacuum_module_data(
         device_path="1.0/tty/ttyACM0/dev",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    subject = ModuleDataMapper(
+        deck_type=deck_type,
+        hardware=hardware_api,
+        hardware_state_store=hardware_state_store,
+    )
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,

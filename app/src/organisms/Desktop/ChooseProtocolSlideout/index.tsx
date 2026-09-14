@@ -62,9 +62,10 @@ import {
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
 
+import { SendingButtonLabel } from '../ChooseRobotSlideout'
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
@@ -225,6 +226,9 @@ export function ChooseProtocolSlideoutComponent(
       : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isCreatingRun) {
+      return
+    }
     if (selectedProtocol != null) {
       trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
       const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
@@ -595,14 +599,10 @@ export function ChooseProtocolSlideoutComponent(
   const singlePageFooter = (
     <PrimaryButton
       onClick={handleProceed}
-      disabled={isCreatingRun || selectedProtocol == null}
+      disabled={selectedProtocol == null}
       width="100%"
     >
-      {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size="1rem" />
-      ) : (
-        t('shared:proceed_to_setup')
-      )}
+      {isCreatingRun ? <SendingButtonLabel /> : t('shared:proceed_to_setup')}
     </PrimaryButton>
   )
 
@@ -613,7 +613,7 @@ export function ChooseProtocolSlideoutComponent(
           setCurrentPage(2)
         }}
         width="100%"
-        disabled={isCreatingRun || selectedProtocol == null}
+        disabled={selectedProtocol == null}
       >
         {t('shared:continue_to_param')}
       </PrimaryButton>
@@ -637,19 +637,7 @@ export function ChooseProtocolSlideoutComponent(
           disabled={hasParamError}
           {...targetPropsHover}
         >
-          {isCreatingRun ? (
-            <Flex
-              gridGap={SPACING.spacing4}
-              alignItems={ALIGN_CENTER}
-              whiteSpace={NO_WRAP}
-              marginLeft={`-${SPACING.spacing4}`}
-            >
-              <Icon name="ot-spinner" spin size="1rem" />
-              {t('shared:confirm_values')}
-            </Flex>
-          ) : (
-            t('shared:confirm_values')
-          )}
+          {isCreatingRun ? <SendingButtonLabel /> : t('shared:confirm_values')}
         </PrimaryButton>
         {hasMissingFileParam ? (
           <Tooltip tooltipProps={tooltipPropsHover}>
@@ -738,7 +726,7 @@ interface StoredProtocolListProps {
   robot: Robot
 }
 
-function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
+function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
   const {
     selectedProtocol,
     handleSelectProtocol,

@@ -16,6 +16,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -34,7 +35,7 @@ export function EstopMissingModal({
   closeModal,
   isDismissedModal,
   setIsDismissedModal,
-}: EstopMissingModalProps): JSX.Element {
+}: EstopMissingModalProps): ReactNode {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return createPortal(
@@ -62,7 +63,7 @@ interface EstopMissingTouchscreenModalProps extends Omit<
 
 function TouchscreenModal({
   robotName,
-}: EstopMissingTouchscreenModalProps): JSX.Element {
+}: EstopMissingTouchscreenModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -99,7 +100,7 @@ function DesktopModal({
   robotName,
   closeModal,
   setIsDismissedModal,
-}: EstopMissingDesktopModalProps): JSX.Element {
+}: EstopMissingDesktopModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const handleCloseModal = (): void => {

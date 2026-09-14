@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,6 +13,7 @@ import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -34,10 +35,12 @@ export function DocumentationRequired({
   onClose,
   minReportLength,
   initialDocreport,
-}: DocumentationRequiredProps): JSX.Element {
+}: DocumentationRequiredProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [error, setError] = useState<string | null>(null)
+
+  const formId = useId()
 
   const handleInputChange = (value: string): void => {
     setInputText(value)
@@ -46,10 +49,15 @@ export function DocumentationRequired({
 
   const trimmedNote = inputText.trim()
   const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
     if (trimmedNote.length < minReportLength) {
       setError(
-        '' + t('must_be_at_least_characters', { minLength: minReportLength })
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
       )
       return
     }
@@ -59,7 +67,7 @@ export function DocumentationRequired({
   const footer = (
     <div className={styles.button_container}>
       <SecondaryButton onClick={onClose}>{t('cancel_action')}</SecondaryButton>
-      <PrimaryButton onClick={handleConfirm} disabled={trimmedNote === ''}>
+      <PrimaryButton type="submit" form={formId}>
         {t('shared:confirm')}
       </PrimaryButton>
     </div>
@@ -76,10 +84,11 @@ export function DocumentationRequired({
       overflowY="hidden"
       footer={footer}
     >
-      <div className={styles.container}>
+      <form className={styles.container} id={formId} onSubmit={handleConfirm}>
         <div className={styles.text_area_container}>
           <div className={styles.text_area_field_fill}>
             <TextAreaField
+              autoFocus
               multiline
               value={inputText}
               error={error}
@@ -102,7 +111,7 @@ export function DocumentationRequired({
             className={styles.action_list}
           />
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

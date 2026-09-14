@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 
@@ -19,7 +19,7 @@ interface NeedHelpLinkProps extends ComponentProps<typeof Flex> {
   href?: string
 }
 
-export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
+export function NeedHelpLink(props: NeedHelpLinkProps): ReactNode {
   const { href = SUPPORT_PAGE_URL, ...flexProps } = props
   const { t } = useTranslation('robot_calibration')
   return (

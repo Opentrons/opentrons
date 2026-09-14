@@ -1,6 +1,5 @@
 """Tests for /subsystems routes."""
 
-import inspect
 from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Set
 
@@ -9,8 +8,6 @@ from decoy import Decoy
 from fastapi import Request, Response
 from starlette.datastructures import URL, MutableHeaders
 
-from opentrons.config import feature_flags
-from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
@@ -20,9 +17,9 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
 )
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.errors.error_responses import ApiError
+from robot_server.hardware import HardwareStateStore
 from robot_server.subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     ProcessDetails,
@@ -81,32 +78,6 @@ def ot3_hardware_api(decoy: Decoy) -> "OT3API":
     return decoy.mock(cls=OT3API)
 
 
-@pytest.fixture()
-def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHardware:
-    """Mock thread manager."""
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
-    except ImportError:
-        pytest.skip("Cannot run on OT-2 (for now)")
-    manager = decoy.mock(cls=ThreadManagedHardware)
-    decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
-    decoy.when(manager.wraps_instance(OT3API)).then_return(True)
-    return manager
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
-
-
 def _build_attached_subsystem(
     subsystem: HWSubSystem,
     ok: bool = True,
@@ -153,16 +124,18 @@ def _build_subsystem_data(
 )
 async def test_get_attached_subsystems(
     ot3_hardware_api: "OT3API",
-    thread_manager: ThreadManagedHardware,
+    hardware_state_store: HardwareStateStore,
     subsystems: Set[HWSubSystem],
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
     """It should return all subsystems the hardware says are present."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     subsystem_state = _build_attached_subsystems(subsystems)
-    decoy.when(ot3_hardware_api.attached_subsystems).then_return(subsystem_state)
-    resp = await get_attached_subsystems(thread_manager)
+    hardware_state_store._attached_subsystems = subsystem_state
+    decoy.when(ot3_hardware_api.attached_subsystems).then_raise(
+        RuntimeError("Not allowed to touch this")
+    )
+    resp = await get_attached_subsystems(hardware_store=hardware_state_store)
     assert resp.status_code == 200
     responses = [
         _build_subsystem_data(SubSystem.from_hw(subsystem), state)
@@ -182,17 +155,19 @@ async def test_get_attached_subsystems(
 )
 async def test_get_attached_subsystem(
     ot3_hardware_api: "OT3API",
-    thread_manager: ThreadManagedHardware,
+    hardware_state_store: HardwareStateStore,
     subsystem: SubSystem,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
     """It should return data for present subsystems."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     subsystems_dict = _build_attached_subsystems({subsystem.to_hw()})
     status = subsystems_dict[subsystem.to_hw()]
-    decoy.when(ot3_hardware_api.attached_subsystems).then_return(subsystems_dict)
-    response = await get_attached_subsystem(subsystem, thread_manager)
+    decoy.when(ot3_hardware_api.attached_subsystems).then_raise(
+        RuntimeError("not allowed to touch this")
+    )
+    hardware_state_store._attached_subsystems = subsystems_dict
+    response = await get_attached_subsystem(subsystem, hardware_state_store)
     assert response.status_code == 200
     assert response.content.data == PresentSubsystem(
         name=subsystem,
@@ -205,12 +180,14 @@ async def test_get_attached_subsystem(
 
 
 async def test_get_attached_subsystem_handles_not_present_subsystem(
-    ot3_hardware_api: "OT3API", thread_manager: ThreadManagedHardware, decoy: Decoy
+    ot3_hardware_api: "OT3API", hardware_state_store: HardwareStateStore, decoy: Decoy
 ) -> None:
     """It should return an error for a non-present subsystem."""
-    decoy.when(ot3_hardware_api.attached_subsystems).then_return({})
+    decoy.when(ot3_hardware_api.attached_subsystems).then_raise(
+        RuntimeError("not allowed to touch this")
+    )
     with pytest.raises(ApiError) as exc_info:
-        await get_attached_subsystem(SubSystem.gantry_x, thread_manager)
+        await get_attached_subsystem(SubSystem.gantry_x, hardware_state_store)
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "SubsystemNotPresent"
 

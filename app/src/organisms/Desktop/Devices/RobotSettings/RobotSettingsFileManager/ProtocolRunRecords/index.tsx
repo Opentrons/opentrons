@@ -7,6 +7,7 @@ import {
   INFO_TOAST,
   InfoScreen,
   StyledText,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
@@ -26,6 +27,7 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
 interface ProtocolRunRecordsProps {
@@ -34,7 +36,7 @@ interface ProtocolRunRecordsProps {
 
 export function ProtocolRunRecords({
   robotName,
-}: ProtocolRunRecordsProps): JSX.Element {
+}: ProtocolRunRecordsProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
@@ -43,7 +45,7 @@ export function ProtocolRunRecords({
     [runData?.data]
   )
   const documentationState = useDocumentationState()
-  const { downloadRuns, isDownloading: isDownloadingRuns } =
+  const { mutateAsync: downloadSelectedRuns, status: downloadRunsStatus } =
     useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns, deletingIds } =
     useDeleteSelectedRuns(documentationState)
@@ -69,18 +71,19 @@ export function ProtocolRunRecords({
       handleNoRunsSelected('download')
       return
     }
-    if (!isDownloadingRuns) {
+    if (downloadRunsStatus !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
         t('downloading_run_records') as string,
         INFO_TOAST,
         { disableTimeout: true, icon: toastIcon }
       )
-      void downloadRuns(
-        runs.filter(run => {
-          return selectedIds.has(run.id)
+      void downloadSelectedRuns({
+        runs: runs.filter(run => selectedIds.has(run.id)),
+      })
+        .then(() => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
-      )
         .catch((e: Error) => {
           makeToast(e.message, ERROR_TOAST, { closeButton: true })
         })
@@ -101,7 +104,7 @@ export function ProtocolRunRecords({
   const handleConfirmDeleteSelected = (): void => {
     setShowDeleteRecordsModal(false)
     const selectedRuns = runs.filter(run => selectedIds.has(run.id))
-    void downloadRuns(selectedRuns)
+    void downloadSelectedRuns({ runs: selectedRuns })
       .then(successfullyDownloadedRuns => {
         if (successfullyDownloadedRuns.length < selectedRuns.length) {
           makeToast(t('some_runs_not_deleted') as string, WARNING_TOAST, {

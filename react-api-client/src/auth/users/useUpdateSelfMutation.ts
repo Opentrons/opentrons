@@ -1,7 +1,10 @@
+import { useQueryClient } from 'react-query'
+
 import { updateSelf } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../../accessControl'
-import { getQueryKey, useHost } from '../../api'
+import { useHost } from '../../api'
+import { getSelfQueryKey } from './useSelfQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -43,6 +46,8 @@ export function useUpdateSelfMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
+  const selfQueryKey = getSelfQueryKey(host)
 
   const mutation = useDocumentedMutation<
     AuthUserResponse,
@@ -51,12 +56,15 @@ export function useUpdateSelfMutation(
   >(
     documentationState,
     ['update_self'],
-    getQueryKey(host, 'auth', 'users', 'self'),
+    selfQueryKey,
     ({
       variables: body,
       userNotes,
     }: DocumentedMutationParameters<UpdateSelfRequest>) =>
-      updateSelf(host!, body, userNotes).then(response => response.data),
+      updateSelf(host!, body, userNotes).then(response => {
+        queryClient.setQueryData(selfQueryKey, response.data)
+        return response.data
+      }),
     options
   )
 

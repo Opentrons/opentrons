@@ -9,6 +9,7 @@ import type {
   ComponentPropsWithoutRef,
   CSSProperties,
   MouseEventHandler,
+  ReactNode,
 } from 'react'
 
 type NativeTextareaProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'title'>
@@ -23,8 +24,6 @@ interface TouchTextAreaFieldProps extends NativeTextareaProps {
   caption?: string | null
   /** horizontal text alignment for label, textarea, and (sub)captions */
   textAlign?: 'left' | 'center'
-  /** if true, style the background of textarea field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to support focus when tapping text area */
   onWrapperClick?: MouseEventHandler<HTMLDivElement>
   /** optional prop to override textarea field border radius */
@@ -44,13 +43,12 @@ interface TouchTextAreaFieldProps extends NativeTextareaProps {
 export const TouchTextAreaField = forwardRef<
   HTMLTextAreaElement,
   TouchTextAreaFieldProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const {
     label,
     error,
     caption,
     textAlign = 'left',
-    hasBackgroundError = false,
     onWrapperClick,
     borderRadius,
     padding,
@@ -82,7 +80,6 @@ export const TouchTextAreaField = forwardRef<
   const textareaClasses = clsx(
     styles.textarea,
     hasError && styles.textarea_error,
-    hasBackgroundError && styles.textarea_background_error,
     multiline && styles.textarea_multiline
   )
 

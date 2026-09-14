@@ -15,6 +15,8 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 export interface HeadlineTagBtnProps {
   headline: string
   buttonText: string
@@ -28,7 +30,7 @@ export function HeadlineTagBtn({
   buttonText,
   tag,
   onClick,
-}: HeadlineTagBtnProps): JSX.Element {
+}: HeadlineTagBtnProps): ReactNode {
   return (
     <Flex css={CONTAINER_STYLE}>
       <Flex css={HEADLINE_CONTENT_STYLE}>

@@ -15,6 +15,7 @@ import {
 } from './ConfigFormGroup'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
 
+import type { ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type {
   PipetteSettingsField,
@@ -47,7 +48,7 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
-export function ConfigForm(props: ConfigFormProps): JSX.Element {
+export function ConfigForm(props: ConfigFormProps): ReactNode {
   const { updateInProgress, formId, settings, updateSettings, groupLabels } =
     props
 

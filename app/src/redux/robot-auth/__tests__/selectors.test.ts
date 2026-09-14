@@ -101,8 +101,54 @@ describe('robot auth selectors', () => {
       ).toBe(true)
     })
 
-    it('returns false when the logged-in user is not an admin', () => {
+    it('returns true when the logged-in user is a service account', () => {
+      expect(
+        getIsAdminForRobot(
+          makeTestState({
+            perRobotAuthStates: {
+              robotA: {
+                user: {
+                  username: 'service',
+                  fullName: 'Service Account',
+                  accountType: 'service',
+                },
+                accessToken: 'token',
+                refreshToken: null,
+                expiresAt: null,
+              },
+            },
+            mostRecentRobotName: 'robotA',
+          }),
+          'robotA'
+        )
+      ).toBe(true)
+    })
+
+    it('returns false when the logged-in user is a regular user', () => {
       expect(getIsAdminForRobot(stateWithRobotA, 'robotA')).toBe(false)
+    })
+
+    it('returns false when the logged-in user is an auditor', () => {
+      expect(
+        getIsAdminForRobot(
+          makeTestState({
+            perRobotAuthStates: {
+              robotA: {
+                user: {
+                  username: 'auditor',
+                  fullName: 'Auditor User',
+                  accountType: 'auditor',
+                },
+                accessToken: 'token',
+                refreshToken: null,
+                expiresAt: null,
+              },
+            },
+            mostRecentRobotName: 'robotA',
+          }),
+          'robotA'
+        )
+      ).toBe(false)
     })
   })
 

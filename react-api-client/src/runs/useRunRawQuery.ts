@@ -7,11 +7,13 @@ import { getQueryKey, useHost } from '../api'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   DownloadedRunResponse,
+  GetRunDownloadParams,
   RequestConfig,
 } from '@opentrons/api-client'
 
 export function useRunRawQuery(
   runId: string,
+  params: GetRunDownloadParams = {},
   options?: UseQueryOptions<DownloadedRunResponse>,
   responseType?: RequestConfig<unknown>['responseType']
 ): UseQueryResult<DownloadedRunResponse> {
@@ -22,8 +24,11 @@ export function useRunRawQuery(
   }
 
   const query = useQuery<DownloadedRunResponse>(
-    getQueryKey(host, 'runs', runId, 'download'),
-    () => getRunRaw(host!, runId, responseType).then(response => response.data),
+    getQueryKey(host, 'runs', runId, 'download', params),
+    () =>
+      getRunRaw(host!, runId, params, responseType).then(
+        response => response.data
+      ),
     allOptions
   )
   return query

@@ -1,5 +1,6 @@
 export { getLogPeriodSummaries } from './getLogPeriodSummaries'
 export { getLogPeriodRaw } from './getLogPeriodRaw'
+export { getLogPeriodDetails } from './getLogPeriodDetails'
 export { deleteLogPeriod } from './deleteLogPeriod'
 export { postLogMessage } from './postLogMessage'
 export * from './constants'

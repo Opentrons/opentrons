@@ -120,7 +120,7 @@ export interface AttachingModuleAction {
  * DocumentedActions for one-off mutations without more needed context.
  * These should match keys in audit_log.json
  */
-type AuditLogAction =
+export type AuditLogAction =
   | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
@@ -149,6 +149,7 @@ type AuditLogAction =
   | 'create_protocol'
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
+  | 'create_run'
   | 'dismiss_run'
   | 'retry_action'
   | 'shutdown_robot'
@@ -182,8 +183,12 @@ type AuditLogAction =
   | 'apply_offsets'
   | 'update_subsystem'
   | 'update_module'
+  | 'update_robot_software'
   | 'update_settings'
   | 'create_user'
+  | 'update_user'
+  | 'delete_user'
+  | 'reset_user_password'
   | 'delete_log_period'
   | 'sign_run'
   | 'delete_log_periods'
@@ -193,6 +198,8 @@ type AuditLogAction =
   | 'toggle_devtools'
   | 'change_language'
   | 'toggle_analytics'
+  | 'download_log_period'
+  | 'unlock_user'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

@@ -20,14 +20,14 @@ const render = (props: ComponentProps<typeof Skeleton>) => {
 describe('Skeleton', () => {
   it('renders Skeleton with correct dimensions/style', () => {
     const props = {
-      width: 'mockWidth',
-      height: 'mockHeight',
-      backgroundSize: 'mockBackgroundSize',
+      width: '10rem',
+      height: '2rem',
+      backgroundSize: '99rem',
     }
     render(props)
     const skeleton = screen.getByRole('status')
     expect(skeleton).toHaveStyle('animation: shimmer 2s infinite linear')
-    expect(skeleton).toHaveStyle(`width : ${props.width}`)
+    expect(skeleton).toHaveStyle(`width: ${props.width}`)
     expect(skeleton).toHaveStyle(`height: ${props.height}`)
     expect(skeleton).toHaveStyle(`background-size: ${props.backgroundSize}`)
   })

@@ -38,6 +38,7 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type {
   Dispatch,
   MouseEvent as ReactMouseEvent,
+  ReactNode,
   SetStateAction,
 } from 'react'
 import type { IconName } from '@opentrons/components'
@@ -71,7 +72,7 @@ export interface ConnectedStepContainerProps {
 // We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepContainer(
   props: ConnectedStepContainerProps
-): JSX.Element {
+): ReactNode {
   const {
     stepId,
     iconName,

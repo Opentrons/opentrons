@@ -1,0 +1,53 @@
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
+import { SPACING } from '@opentrons/components'
+
+import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { OddModal } from '/app/molecules/OddModal'
+import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
+
+import type { ReactNode } from 'react'
+
+export function DownloadAuditLogsModal(): ReactNode {
+  const { t } = useTranslation('branded')
+
+  return (
+    <OddModal>
+      <OddInfoScreen
+        type="neutral"
+        header={t('download_audit_logs_in_opentrons_app')}
+        subText={t('download_audit_logs_on_device_description')}
+        padding={SPACING.spacing24}
+        gridGap={SPACING.spacing16}
+      />
+    </OddModal>
+  )
+}
+
+const DownloadAuditLogsModalImpl = NiceModal.create(
+  ({ logPeriodId }: { logPeriodId: string }): ReactNode => {
+    const modal = useModal()
+    const { isLoading, isDeleted, isError } = useIsLogDeleted(logPeriodId)
+
+    useEffect(() => {
+      if (isLoading) {
+        return
+      }
+      if (isDeleted) {
+        modal.resolve(true)
+        modal.remove()
+      } else if (isError) {
+        modal.reject(new Error('Failed to delete logs'))
+        modal.remove()
+      }
+    }, [isDeleted, isError, isLoading, modal])
+
+    return <DownloadAuditLogsModal />
+  }
+)
+
+/** Open the ODD download audit logs modal. */
+export const showDownloadLogsModal = (logPeriodId: string): Promise<boolean> =>
+  NiceModal.show(DownloadAuditLogsModalImpl, { logPeriodId })

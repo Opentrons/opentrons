@@ -26,9 +26,10 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
+export function AdditionalCustomLabwareSourceFolder(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const labwarePath = useSelector(getCustomLabwareDirectory)

@@ -3,6 +3,9 @@
 import datetime
 from typing import Any, Callable
 
+from box import Box
+from requests import Response
+
 from audit_server.log_ingest.models import AuditLogMessage, SubmitAuditLogMessageData
 
 
@@ -54,3 +57,13 @@ def _loggedat_is_recent_utc_iso(parsed: datetime.datetime) -> bool:
     if (now - parsed).total_seconds() > 60:
         return False
     return True
+
+
+def save_deletion_key(response: Response) -> Box:
+    return Box(
+        {
+            "log_period_deletion_key": response.headers[
+                "opentrons-log-period-deletion-key"
+            ]
+        }
+    )

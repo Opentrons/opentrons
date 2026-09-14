@@ -17,6 +17,7 @@ import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
 
+import type { ReactNode } from 'react'
 import type { StepType } from '../shared/types'
 
 interface DownloadDiagnosticFilesWizardProps {
@@ -25,19 +26,19 @@ interface DownloadDiagnosticFilesWizardProps {
 
 export function DownloadDiagnosticFilesWizard({
   onClose,
-}: DownloadDiagnosticFilesWizardProps): JSX.Element {
+}: DownloadDiagnosticFilesWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
 
   const [step, setStep] = useState<StepType>(STEP_TYPES.USB)
   const [errorSubText, setErrorSubText] = useState('')
 
-  const { downloadLogs } = useDownloadRobotLogs(robotName)
+  const { mutateAsync: downloadLogs } = useDownloadRobotLogs(robotName)
   const { downloadCalibration } = useDownloadCalibrationData(robotName)
 
   const handleContinueFromUsb = (usbPath: string): void => {
     setStep(STEP_TYPES.DOWNLOADING)
-    Promise.all([downloadLogs(usbPath), downloadCalibration(usbPath)])
+    Promise.all([downloadLogs({ usbPath }), downloadCalibration(usbPath)])
       .then(() => {
         setStep(STEP_TYPES.SUCCESS)
       })

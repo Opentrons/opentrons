@@ -27,7 +27,7 @@ import { LiquidIcon } from '../LiquidIcon'
 import { RobotInfoLabel } from '../RobotInfoLabel'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { FocusEventHandler, MouseEvent } from 'react'
+import type { FocusEventHandler, MouseEvent, ReactNode } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -89,7 +89,7 @@ export interface DropdownMenuProps {
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
 
-export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
+export function DropdownMenu(props: DropdownMenuProps): ReactNode {
   const {
     filterOptions,
     onClick,

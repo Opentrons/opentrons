@@ -22,6 +22,7 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 
 export type * from './types'
@@ -42,7 +43,7 @@ function ProgressTrackerItem({
   taskIndex,
   taskListLength,
   isComplete = false,
-}: ProgressTrackerItemProps): JSX.Element {
+}: ProgressTrackerItemProps): ReactNode {
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
   const isTaskListComplete = activeIndex == null
@@ -201,7 +202,7 @@ function SubTask({
   markedBad,
   generalClickHandler,
   generalTaskDisabledReason,
-}: SubTaskProps): JSX.Element {
+}: SubTaskProps): ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
@@ -336,7 +337,7 @@ function Task({
   markedBad,
   generalClickHandler,
   generalTaskDisabledReason,
-}: TaskProps): JSX.Element {
+}: TaskProps): ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [activeTaskIndex] = activeIndex ?? []
 
@@ -519,7 +520,7 @@ export function TaskList({
   taskList,
   generalTaskClickHandler,
   generalTaskDisabledReason,
-}: TaskListProps): JSX.Element {
+}: TaskListProps): ReactNode {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       {taskList.map(

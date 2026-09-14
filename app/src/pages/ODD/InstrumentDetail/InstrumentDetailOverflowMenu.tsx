@@ -26,7 +26,7 @@ import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
-import type { ComponentProps, MouseEventHandler } from 'react'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 interface InstrumentDetailsOverflowMenuProps {
@@ -48,7 +48,7 @@ export const handleInstrumentDetailOverflowMenu = (
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
-  (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
+  (props: InstrumentDetailsOverflowMenuProps): ReactNode => {
     const { instrument, robotName, enableDTWiz } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()

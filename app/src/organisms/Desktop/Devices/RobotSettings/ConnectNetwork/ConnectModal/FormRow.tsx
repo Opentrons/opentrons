@@ -31,7 +31,7 @@ const StyledInputWrapper = styled.div`
   }
 `
 
-export const FormRow = (props: FormRowProps): JSX.Element => {
+export const FormRow = (props: FormRowProps): ReactNode => {
   const { label, labelFor, children } = props
 
   return (

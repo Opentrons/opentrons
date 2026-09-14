@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import first from 'lodash/first'
 
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   NO_WRAP,
   PrimaryButton,
   SecondaryButton,
@@ -37,7 +35,7 @@ import {
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
 
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotSlideout, SendingButtonLabel } from '../ChooseRobotSlideout'
 import { RobotOutOfStorageModal } from '../Devices/RobotOutOfStorageModal.tsx'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
@@ -82,8 +80,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
-  const runTimeParameters =
-    storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+  const runTimeParameters = useMemo(
+    () => mostRecentAnalysis?.runTimeParameters ?? [],
+    [mostRecentAnalysis]
+  )
 
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] =
     useState<RunTimeParameter[]>(runTimeParameters)
@@ -91,14 +91,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
-  useEffect(
-    () => {
-      setRunTimeParametersOverrides(runTimeParameters)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [protocolKey]
-  )
+  useEffect(() => {
+    setRunTimeParametersOverrides(runTimeParameters)
+    setHasMissingFileParam(
+      runTimeParameters.some(parameter => parameter.type === 'csv_file')
+    )
+  }, [protocolKey, runTimeParameters])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -150,6 +148,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     runTimeParameters?.length > 0 ? ['confirm_parameters'] : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isCreatingRun) {
+      return
+    }
     if (isRobotOutOfStorage) {
       setShowRobotOutOfStorageModal(true)
       return
@@ -247,18 +248,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const singlePageButton = (
     <PrimaryButton
       disabled={
-        isCreatingRun ||
-        selectedRobot == null ||
-        isSelectedRobotOnDifferentSoftwareVersion
+        selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
       }
       width="100%"
       onClick={handleProceed}
     >
-      {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size="1rem" />
-      ) : (
-        t('shared:proceed_to_setup')
-      )}
+      {isCreatingRun ? <SendingButtonLabel /> : t('shared:proceed_to_setup')}
     </PrimaryButton>
   )
 
@@ -283,7 +278,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               onClick={handleProceedToRTP}
               width="100%"
               disabled={
-                isCreatingRun ||
                 selectedRobot == null ||
                 isSelectedRobotOnDifferentSoftwareVersion
               }
@@ -312,15 +306,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               {...targetProps}
             >
               {isCreatingRun ? (
-                <Flex
-                  gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
-                  whiteSpace={NO_WRAP}
-                  marginLeft={`-${SPACING.spacing4}`}
-                >
-                  <Icon name="ot-spinner" spin size="1rem" />
-                  {t('shared:confirm_values')}
-                </Flex>
+                <SendingButtonLabel />
               ) : (
                 t('shared:confirm_values')
               )}

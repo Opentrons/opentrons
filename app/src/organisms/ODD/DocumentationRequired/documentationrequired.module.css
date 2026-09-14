@@ -1,5 +1,6 @@
 .container {
   display: flex;
+  width: 100%;
   height: 100%;
   flex-direction: column;
 }
@@ -7,10 +8,9 @@
 .content_container {
   display: flex;
   width: 100%;
-  max-width: 59rem;
   flex: 1;
   flex-direction: column;
-  padding: 0 var(--spacing-60) var(--spacing-120);
+  padding: 0 6.25rem var(--spacing-120);
   margin-top: 7.75rem;
   gap: var(--spacing-24);
 }
@@ -51,4 +51,17 @@
   z-index: 1000;
   background-color: var(--white);
   inset: 0;
+}
+
+.actions_view_list {
+  max-height: 28.625rem;
+  color: var(--black-90);
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+  overflow-y: auto;
+}
+
+.actions_view_list::-webkit-scrollbar {
+  display: none;
 }

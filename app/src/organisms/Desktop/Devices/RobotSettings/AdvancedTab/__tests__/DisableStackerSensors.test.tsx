@@ -35,7 +35,7 @@ describe('DisableStackerSensors', () => {
 
   it('should render text and toggle button', () => {
     render(props)
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText('Disable Stacker sensors for labware detection')
     screen.getByText(
       'Applies to x- axis and z-axis for all connected Stackers.'
     )

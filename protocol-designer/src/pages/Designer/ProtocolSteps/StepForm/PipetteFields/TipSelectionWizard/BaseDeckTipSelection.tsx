@@ -38,6 +38,7 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
+import type { ReactNode } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
@@ -64,7 +65,7 @@ interface BaseDeckTipSelectionProps {
 
 export function BaseDeckTipSelection(
   props: BaseDeckTipSelectionProps
-): JSX.Element {
+): ReactNode {
   const {
     controls,
     hoveredId,

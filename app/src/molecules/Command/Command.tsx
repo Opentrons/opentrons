@@ -16,6 +16,7 @@ import { Skeleton } from '/app/atoms/Skeleton'
 
 import { CommandIcon } from './CommandIcon'
 
+import type { ReactNode } from 'react'
 import type { CommandTextData, StyleProps } from '@opentrons/components'
 import type {
   LabwareDefinition,
@@ -47,7 +48,7 @@ interface NonSkeletonCommandProps extends FundamentalProps {
 
 export type CommandProps = SkeletonCommandProps | NonSkeletonCommandProps
 
-export function Command(props: CommandProps): JSX.Element {
+export function Command(props: CommandProps): ReactNode {
   // This uses the dynamic function variant to work with storybook
   const isOnDevice = RESPONSIVENESS.isTouchscreenDynamic()
   return props.state === 'loading' ? (
@@ -129,7 +130,7 @@ const PROPS_BY_STATE: Record<
 
 export function CenteredCommand(
   props: Omit<NonSkeletonCommandProps, 'aligned'> & { isOnDevice: boolean }
-): JSX.Element {
+): ReactNode {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
@@ -185,7 +186,7 @@ export function CenteredCommand(
 
 export function LeftAlignedCommand(
   props: Omit<NonSkeletonCommandProps, 'aligned'> & { isOnDevice: boolean }
-): JSX.Element {
+): ReactNode {
   return (
     <Flex
       justifyContent={JUSTIFY_FLEX_START}

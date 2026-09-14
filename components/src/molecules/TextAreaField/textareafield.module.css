@@ -65,7 +65,7 @@
   border: 1px solid var(--grey-50);
   border-radius: var(--border-radius-4);
   background-color: var(--white);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   resize: none;
 }
@@ -88,11 +88,6 @@
   border: 1px solid var(--red-50);
 }
 
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .textarea_keyboard_focus:focus {
   border: 1px solid var(--blue-50);
   outline: 2px solid var(--blue-50);
@@ -102,7 +97,7 @@
 .label_text {
   padding-bottom: var(--spacing-4);
   color: var(--grey-60);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
 }

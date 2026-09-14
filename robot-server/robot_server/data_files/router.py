@@ -1,6 +1,8 @@
 """Router for /dataFiles endpoints."""
 
+import os
 from datetime import datetime
+from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
 from typing import Annotated, Final, Literal, Optional, Union
@@ -67,10 +69,55 @@ from robot_server.service.notifications.publishers import (
     get_data_file_publisher,
 )
 
+LOG = getLogger(__name__)
+
 datafiles_router = LightRouter()
 
 _DEFAULT_IMAGE_METADATA_LIST_LENGTH: Final = 99
 _DEFAULT_IMAGE_METADATA_CURSOR: Final = 0
+
+_FILE_PATH_ROOT_ALLOWLISTS = [
+    "/data",
+    "/var/lib/opentrons-robot-server",
+    "/var/lib/jupyter/data",
+    "/home",
+    "/var/user-packages",
+    "/media",
+    "/run/media",
+    "/userfs/media",
+    "/dev/null",
+    "/Users",
+]
+_FILE_PATH_COMPONENT_DENYLISTS = [
+    "BOOT-mmcblk0p1",
+    "RFS-mmcblk0p2",
+    "RFS2-mmcblk0p3",
+    "mmcblk0p1",
+    "mmcblk0p2",
+    "mmcblk0p3",
+]
+
+
+def sanitize_path(path: str | None) -> str | None:
+    """Raise if a path is unacceptable."""
+    if path is None:
+        return path
+    realpath = os.path.realpath(path)
+    for allowed_root in _FILE_PATH_ROOT_ALLOWLISTS:
+        if os.path.commonpath([realpath, allowed_root]) == allowed_root:
+            break
+    else:
+        LOG.error(f"Data file upload path {path} does not use an allowed root")
+        raise FileNotFound(detail=f"{path} is not allowed").as_error(
+            status.HTTP_403_FORBIDDEN
+        )
+    for denied_component in _FILE_PATH_COMPONENT_DENYLISTS:
+        if denied_component in path:
+            LOG.error(f"Data file upload path {path} uses a banned component")
+            raise FileNotFound(detail=f"{path} is not allowed").as_error(
+                status.HTTP_403_FORBIDDEN
+            )
+    return realpath
 
 
 class MultipleDataFileSources(ErrorDetails):
@@ -159,7 +206,9 @@ async def upload_data_file(
             detail="You must provide either a file or a file_path in the request."
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
     try:
-        [buffered_file] = await file_reader_writer.read(files=[file or Path(file_path)])  # type: ignore[arg-type, list-item]
+        [buffered_file] = await file_reader_writer.read(
+            files=[file or Path(sanitize_path(file_path))]  # type: ignore[arg-type, list-item]
+        )
     except FileNotFoundError as e:
         raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     # TODO (spp, 2024-06-18): probably also validate CSV file *contents*
@@ -395,7 +444,7 @@ async def get_data_files_by_run_id(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -546,7 +595,7 @@ async def delete_run_images(
         data_file_publisher: The data file MQTT event publisher.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 

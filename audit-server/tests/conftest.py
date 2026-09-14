@@ -67,11 +67,24 @@ def fake_auth_server(
     """
     port = unused_tcp_port_factory()
 
-    async def fake_auth_off(request: aiohttp.web.Request) -> aiohttp.web.Response:
-        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": False}})
+    async def fake_auth_on(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": True}})
+
+    async def fake_token_introspect(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "active": True,
+                "scope": "auth_settings.write audit_log.write audit_log.delete",
+                "username": "test",
+                "ot_fullname": "Test",
+            },
+        )
 
     app = aiohttp.web.Application()
-    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_off)
+    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_on)
+    app.router.add_post("/auth/oauth2/introspect", fake_token_introspect)
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)
 
@@ -174,8 +187,43 @@ def fake_robot_server(
             data={"name": "my robot", "robot_serial": "123abc"}
         )
 
+    async def fake_stub_runs(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": [
+                    {
+                        "id": "myRunId",
+                        "current": True,
+                        "protocolId": "myProtocolId",
+                        "createdAt": "2026-01-01T18:00:00.123456Z",
+                    }
+                ],
+                "links": {"current": {"href": "/runs/myRunId"}},
+            },
+        )
+
+    async def fake_stub_run_commands(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={"commands": [{"foo": "bar"}]},
+        )
+
+    async def fake_stub_protocol(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": {
+                    "files": [{"name": "my_cool_protocol.py"}],
+                    "metadata": {"protocolName": "Flex Cool Protocol"},
+                }
+            },
+        )
+
     app = aiohttp.web.Application()
     app.router.add_get("/health", fake_stub_health)
+    app.router.add_get("/runs", fake_stub_runs)
+    app.router.add_get("/runs/{runId}/commands", fake_stub_run_commands)
+    app.router.add_get("/protocols/{protocolId}", fake_stub_protocol)
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)
 

@@ -8,12 +8,14 @@ import {
   Tag,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface WellContentsProps {
   wellName: string
   volume: number
 }
 
-export function WellContents(props: WellContentsProps): JSX.Element {
+export function WellContents(props: WellContentsProps): ReactNode {
   const { wellName, volume } = props
   const { t } = useTranslation('liquids')
 

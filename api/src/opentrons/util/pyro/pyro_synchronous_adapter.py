@@ -5,6 +5,7 @@ import enum
 import functools
 import inspect
 import logging
+from dataclasses import is_dataclass
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -159,9 +160,18 @@ def pyro_behavior(
     return decorator  # type: ignore
 
 
-def synchronous(func: Callable[P, T]) -> Callable[P, T]:
+def synchronous(func: Callable[P, T]) -> Callable[P, T]:  # noqa: C901
     """Decorator that makes an async function callable synchronously."""
     if not inspect.iscoroutinefunction(func):
+
+        @functools.wraps(func)
+        def _do(*args: P.args, **kwargs: P.kwargs) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except BaseException:
+                log.exception(f"Pyro call of {func}")
+                raise
+
         return func  # no-op for non-async functions
 
     @functools.wraps(func)
@@ -189,7 +199,11 @@ def synchronous(func: Callable[P, T]) -> Callable[P, T]:
 
             # Execute the coroutine
             future = asyncio.run_coroutine_threadsafe(coro, loop)
-            return future.result()
+            try:
+                return future.result()
+            except BaseException:
+                log.exception(f"Pyro call of {func}")
+                raise
 
         else:
             raise RuntimeError("Instance event loop is not running.")
@@ -463,6 +477,7 @@ def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dic
     def _validations(arg: Any) -> Any:
         # NOTE: Extend this as further validations are needed
         arg = _validate_inbound_proxy(arg)
+        arg = _validate_inbound_iterable(arg)
         return arg
 
     validated_args = tuple()  # type: ignore
@@ -491,6 +506,19 @@ def _validate_inbound_proxy(arg: Any) -> Any:
                 arg = validated_arg
             except AttributeError:
                 arg = AsyncClientPyroObject(arg)
+    return arg
+
+
+def _validate_inbound_iterable(arg: Any) -> Any:
+    """Handle an argument which is an iterable that has been made safe for transport."""
+    if isinstance(arg, dict) and "_pyro_safe_translation" in arg:
+        # This dictionary is a pyro safe translation of a type, use that type to convert here
+        if arg["_pyro_safe_translation"] == "set":
+            arg = set(arg["data"])
+        else:
+            ValueError(
+                f"Inbound validation does not support format: {arg['_pyro_safe_translation']}"
+            )
     return arg
 
 
@@ -793,6 +821,10 @@ def convert_result_to_wrapped_dict(  # noqa: C901
         if isinstance(result, dict):
             if hasattr(return_types, "__args__"):
                 key_type, value_type = return_types.__args__
+                if is_dataclass(value_type):
+                    result = {
+                        key: value.to_pyro_dict(value) for key, value in result.items()
+                    }
                 # Filter out `typing.Optional`` typings to the inner type, only works for non-tuples
                 # todo(chb: 2025-04-01): Catch and error on cases where we have optional tuples, does that even happen?
                 try:

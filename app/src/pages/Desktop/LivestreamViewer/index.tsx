@@ -13,9 +13,11 @@ import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './livestream.module.css'
 
+import type { ReactNode } from 'react'
+
 const RUN_POLLING_INTERVAL_MS = 5000
 
-export function LivestreamViewer(): JSX.Element {
+export function LivestreamViewer(): ReactNode {
   // We make UI affordances when a run has ended, even if it is un-currented.
   // The livestream viewer makes the assumption that it will not *initially* render
   // for a run that is already historical.
@@ -76,7 +78,7 @@ export function LivestreamViewer(): JSX.Element {
   )
 }
 
-function LiveVideoChip(): JSX.Element {
+function LiveVideoChip(): ReactNode {
   const { t } = useTranslation('run_details')
 
   return (

@@ -6,8 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -21,6 +23,9 @@ import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('/app/resources/client_data/encryptionKeys')
 vi.mock('/app/redux/shell/remote', () => ({
   appShellListener: vi.fn(),
@@ -33,6 +38,10 @@ vi.mock('/app/redux-resources/robots', () => ({
 }))
 vi.mock('/app/redux/robot-auth', () => ({
   useAccessTokenForRobot: vi.fn(() => null),
+  logOut: vi.fn((payload: { robotName: string }) => ({
+    type: 'robotAuth/logOut',
+    payload,
+  })),
 }))
 
 const ROBOT_NAME = 'otie'
@@ -86,6 +95,12 @@ function mockLoginFailure(message: string): void {
   }))
 }
 
+function mockLoginAccountLocked(): void {
+  mockLoginFailure(
+    'Account locked. Please contact an administrator to unlock your account.'
+  )
+}
+
 function mockLoginSSLError(): void {
   const sslError = {
     isAxiosError: true,
@@ -103,13 +118,15 @@ function mockLoginSSLError(): void {
 function mockSetNewPasswordSuccess(
   onSubmit?: (username: string, password: string) => void
 ): void {
-  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
-    submitNewPassword: (username: string, password: string) => {
-      onSubmit?.(username, password)
-      onSuccess(username, TOKEN_RESPONSE)
-    },
-    isLoading: false,
-  }))
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+    (_documentationState, { onSuccess }) => ({
+      submitNewPassword: (username: string, password: string) => {
+        onSubmit?.(username, password)
+        onSuccess(username, password)
+      },
+      isLoading: false,
+    })
+  )
 }
 
 const renderAndOpenLoginModal = (): void => {
@@ -175,10 +192,59 @@ describe('LoginModal', () => {
   it('renders the login form when opened', () => {
     renderAndOpenLoginModal()
 
-    screen.getByText('Compliance Ready Software Login')
-    screen.getByLabelText('Username')
+    screen.getByText('Compliance Ready Software login')
+    expect(screen.getByLabelText('Username')).toHaveFocus()
     screen.getByLabelText('Password')
+    screen.getByRole('button', { name: 'Toggle password visibility' })
     screen.getByRole('button', { name: 'Forgot password?' })
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled()
+  })
+
+  it('masks the password and reveals it when the visibility toggle is clicked', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    const passwordInput = screen.getByLabelText('Password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    expect(passwordInput).toHaveValue('secret-password')
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Toggle password visibility' })
+    )
+
+    expect(passwordInput).toHaveAttribute('type', 'text')
+    expect(passwordInput).toHaveValue('secret-password')
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Toggle password visibility' })
+    )
+
+    expect(passwordInput).toHaveAttribute('type', 'password')
+  })
+
+  it('shows required field errors when log in is clicked with empty fields', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Username required')
+    screen.getByText('Password required')
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('shows a password required error when username is filled', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Password required')
+    expect(screen.queryByText('Username required')).toBeNull()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows forgot password content and returns to login on back', () => {
@@ -220,7 +286,7 @@ describe('LoginModal', () => {
       AUTH_USER,
       TOKEN_RESPONSE
     )
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    expect(screen.queryByText('Compliance Ready Software login')).toBeNull()
   })
 
   it('shows an error when authentication fails', () => {
@@ -237,7 +303,25 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
     screen.getByText('Test error message')
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
+  })
+
+  it('shows an account locked error when the account is locked', () => {
+    mockLoginAccountLocked()
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText(
+      'Account locked. Please contact an administrator to unlock your account.'
+    )
   })
 
   it('shows password expired view when login requires a new password', () => {
@@ -253,12 +337,90 @@ describe('LoginModal', () => {
     )
     screen.getByText('Your password has expired')
     screen.getByText('Create a new password to use')
-    screen.getByLabelText('New password')
-    screen.getByLabelText('Confirm password')
+    expect(screen.getByLabelText('New password')).toHaveFocus()
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(
+      screen.getAllByRole('button', { name: 'Toggle password visibility' })
+    ).toHaveLength(2)
     screen.getByRole('button', { name: 'Confirm' })
   })
 
-  it('submits a new password and closes on success', () => {
+  it('toggles new and confirm password visibility independently', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'new-password' },
+    })
+
+    const [newPasswordToggle, confirmPasswordToggle] = screen.getAllByRole(
+      'button',
+      { name: 'Toggle password visibility' }
+    )
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(newPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'false')
+
+    fireEvent.click(confirmPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+  })
+
+  it('logs out when closing the set new password view', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.click(
+      screen.getByTestId(
+        'ModalHeader_icon_close_Compliance Ready Software login'
+      )
+    )
+
+    expect(vi.mocked(logOut)).toHaveBeenCalledWith({ robotName: ROBOT_NAME })
+    expect(screen.queryByText('Your password has expired')).toBeNull()
+  })
+
+  it('returns to login after setting a new password', () => {
     mockLoginRequiringPasswordReset()
     mockSetNewPasswordSuccess(submitNewPassword)
 
@@ -275,7 +437,11 @@ describe('LoginModal', () => {
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
     expect(storeLoginState).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    screen.getByText('Password reset for alice')
+    screen.getByTestId('Toast_success')
+    screen.getByText('Compliance Ready Software login')
+    expect(screen.getByLabelText('Username')).toHaveValue('alice')
+    expect(screen.getByLabelText('Password')).toHaveValue('')
   })
 
   it('shows a mismatch error when confirm password does not match', () => {
@@ -346,9 +512,8 @@ describe('LoginModal', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
-    screen.getByText('Robot encryption key verification')
+    expect(screen.getAllByText('Robot encryption key')).toHaveLength(2)
     screen.getByText('Verify robot encryption key')
-    screen.getByLabelText('Robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()
   })
 })

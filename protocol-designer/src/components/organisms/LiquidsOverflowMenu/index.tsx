@@ -28,7 +28,7 @@ import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
-import type { MouseEvent, RefObject } from 'react'
+import type { MouseEvent, ReactNode, RefObject } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 const TOP_POSITION = '14.2rem'
@@ -45,7 +45,7 @@ export function LiquidsOverflowMenu({
   showLiquidsModal,
   overflowWrapperRef,
   targetWidth,
-}: LiquidsOverflowMenuProps): JSX.Element {
+}: LiquidsOverflowMenuProps): ReactNode {
   const location = useLocation()
   const { t } = useTranslation(['starting_deck_state'])
   const liquids = useSelector(getLiquidEntities)

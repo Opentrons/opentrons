@@ -38,6 +38,7 @@ import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { RequestState } from '/app/redux/robot-api/types'
@@ -70,7 +71,7 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 export function RobotSettingsCalibration({
   robotName,
   isRobotBusy,
-}: CalibrationProps): JSX.Element {
+}: CalibrationProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'robot_calibration',

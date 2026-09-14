@@ -61,7 +61,7 @@ const GO_BACK_BUTTON_TEXT_STYLE = css`
   }
 `
 
-export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
+export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
   const {
     isRobotMoving,
     goBack,

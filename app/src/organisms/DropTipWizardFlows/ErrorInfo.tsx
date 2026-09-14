@@ -16,12 +16,13 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from './types'
 
 export function ErrorInfo({
   errorComponents,
   errorDetails,
-}: DropTipWizardContainerProps): JSX.Element {
+}: DropTipWizardContainerProps): ReactNode {
   const { button, subHeader } = errorComponents
   const { t } = useTranslation('drop_tip_wizard')
 

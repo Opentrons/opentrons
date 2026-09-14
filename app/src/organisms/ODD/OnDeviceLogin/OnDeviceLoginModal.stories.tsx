@@ -60,6 +60,7 @@ export const Default: Story = {
     onCancel: action('onCancel'),
     loginError: null,
     onClearLoginError: action('onClearLoginError'),
+    passwordComplexity: null,
   },
 }
 

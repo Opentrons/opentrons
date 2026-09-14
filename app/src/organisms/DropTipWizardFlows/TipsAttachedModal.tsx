@@ -17,6 +17,7 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
+import type { ReactNode } from 'react'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
@@ -37,7 +38,7 @@ export const handleTipsAttachedModal = (
 }
 
 const TipsAttachedModal = NiceModal.create(
-  (props: TipsAttachedModalProps): JSX.Element => {
+  (props: TipsAttachedModalProps): ReactNode => {
     const {
       aPipetteWithTip,
       robotName,

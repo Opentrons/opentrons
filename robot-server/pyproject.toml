@@ -80,6 +80,7 @@ dev = [
     "types-requests==2.33.*",
     "zipp==3.21.0",
     "opentrons-hardware",
+    "watchfiles>=1.2.0,<2", # For uvicorn hot reloading.
 ]
 
 [tool.ruff.lint]

@@ -18,6 +18,7 @@ import {
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 interface RobotMotionLoaderProps extends LPCWizardContentProps {
@@ -25,7 +26,7 @@ interface RobotMotionLoaderProps extends LPCWizardContentProps {
   body?: string
 }
 
-export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
+export function LPCRobotInMotion(props: RobotMotionLoaderProps): ReactNode {
   const { header, body } = props
   const { t } = useTranslation('labware_position_check')
   const isOnDevice = useSelector(getIsOnDevice)

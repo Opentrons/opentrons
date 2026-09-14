@@ -9,6 +9,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { robotAuthReducer } from '/app/redux/robot-auth/slice'
 import {
@@ -29,6 +30,9 @@ vi.mock('/app/redux/discovery', async importOriginal => {
 })
 
 vi.mock('/app/resources/auth')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -56,12 +60,14 @@ function mockSuccessfulLogin(): void {
     isAuthLoading: false,
   }))
 
-  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
-    submitNewPassword: (username: string, _password: string) => {
-      onSuccess(username, OAUTH_RESPONSE)
-    },
-    isLoading: false,
-  }))
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+    (_documentationState, { onSuccess }) => ({
+      submitNewPassword: (username: string, password: string) => {
+        onSuccess(username, password)
+      },
+      isLoading: false,
+    })
+  )
 }
 
 function setupLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
@@ -211,18 +217,27 @@ describe('LoginModal', () => {
     expect(modalResolved).toBe(false)
   })
 
-  it('completes the new-password flow and resolves the modal', async () => {
-    mockSuccessfulLogin()
+  it('signs in after setting a new password', async () => {
+    let loginCallCount = 0
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
+        loginCallCount += 1
         onSuccess(
           username,
-          mockAuthUser({ resetPassword: true }),
+          mockAuthUser({ resetPassword: loginCallCount === 1 }),
           OAUTH_RESPONSE
         )
       },
       isAuthLoading: false,
     }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      (_documentationState, { onSuccess }) => ({
+        submitNewPassword: (username: string, password: string) => {
+          onSuccess(username, password)
+        },
+        isLoading: false,
+      })
+    )
 
     const clickOpenLoginModal = setupLoginModalTrigger()
     const resultPromise = clickOpenLoginModal()
@@ -240,6 +255,49 @@ describe('LoginModal', () => {
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
+    expect(await screen.findByText('Password updated')).toBeInTheDocument()
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
+  }, 10000)
+
+  it('returns to the new-password step with a policy error when setting a password fails', async () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+      submitPassword: (username: string, _password: string) => {
+        onSuccess(
+          username,
+          mockAuthUser({ resetPassword: true }),
+          OAUTH_RESPONSE
+        )
+      },
+      isAuthLoading: false,
+    }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      (_documentationState, { onError }) => ({
+        submitNewPassword: () => {
+          onError('Must include at least one special character')
+        },
+        isLoading: false,
+      })
+    )
+
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    void clickOpenLoginModal()
+    await waitForLoginModalOpen()
+
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'temp-pass')
+    clickPrimary('Confirm')
+
+    await screen.findByRole('heading', { name: 'New password' })
+
+    fillField('New password', 'newpass123')
+    clickPrimary('Next')
+    fillField('Confirm password', 'newpass123')
+    clickPrimary('Confirm')
+
+    expect(
+      await screen.findByText('Must include at least one special character')
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText('New password')).toBeInTheDocument()
   })
 })

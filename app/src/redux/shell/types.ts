@@ -70,11 +70,17 @@ export type ShellUpdateAction =
   | { type: 'shell:APPLY_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_PERCENTAGE'; payload: { percent: number } }
 
+export interface UsbMountPath {
+  path: string
+  // true if the device is a single-function USB mass-storage device
+  isMassStorage?: boolean
+}
+
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
   filePaths: string[]
-  usbMountPaths: string[]
+  usbMountPaths: UsbMountPath[]
   systemLanguage: string[] | null
   stepDetailViewerClosed: StepDetailViewerClosedState
 }
@@ -145,6 +151,7 @@ export interface RobotMassStorageDeviceAdded {
   type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED'
   payload: {
     rootPath: string
+    isMassStorage?: boolean
   }
   meta: { shell: true }
 }

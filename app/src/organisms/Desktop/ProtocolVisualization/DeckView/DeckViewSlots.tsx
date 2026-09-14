@@ -8,7 +8,7 @@ import { getSlotIsEmpty } from '../utils/getSlotIsEmpty'
 import { getStagingAreaAddressableAreas } from '../utils/getStagingAreaAddressableAreas'
 import { DeckViewOverlay } from './DeckViewOverlay'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
@@ -29,7 +29,7 @@ interface DeckViewSlotsProps {
   slotIdsBlockedBySpanning: string[]
 }
 
-export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
+export function DeckViewSlots(props: DeckViewSlotsProps): ReactNode {
   const {
     deckDef,
     robotType,

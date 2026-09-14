@@ -24,7 +24,68 @@ const FLEX_USB_DEVICE_FILTER = /sd[a-z]+[0-9]*$/
 // filter matches sda0, sdc9, sdb, VOLUME-sdc10
 const FLEX_USB_MOUNT_FILTER = /([^/]+-)?(sd[a-z]+[0-9]*)$/
 
+const USB_SYS_DEVICE_DIR = '/sys/bus/usb/devices'
+const SYS_BLOCK_DIR = '/sys/block'
+// USB device-class code for Mass Storage, per interface descriptor in sysfs.
+// https://www.usb.org/defined-class-codes
+const USB_MASS_STORAGE_INTERFACE_CLASS = '08'
+// a USB interface dir is named `<device>:<config>.<interface>`, e.g.
+// `1-1.3.4:1.2`; this captures the owning device name (`1-1.3.4`)
+const USB_INTERFACE_DIR_REGEX = /^(\d+-[\d.]+):\d+\.\d+$/
+
 const log = createLogger('mass-storage')
+
+export const isSingleFunctionMassStorageMount = async (
+  mountPath: string
+): Promise<boolean> => {
+  try {
+    // mount dirs are named `<LABEL>-sdX#` or `sdX#`; recover the block node
+    const blockName = mountPath.match(FLEX_USB_DEVICE_FILTER)?.[0]
+    if (blockName == null) {
+      return true
+    }
+    // a partition (sdb1) maps to its whole disk (sdb) under /sys/block
+    const diskName = blockName.replace(/[0-9]+$/, '')
+    // /sys/block/<disk>/device resolves into the backing USB device tree
+    const deviceRealPath = await fsPromises.realpath(
+      join(SYS_BLOCK_DIR, diskName, 'device')
+    )
+    const usbDeviceName = deviceRealPath
+      .split('/')
+      .map(segment => segment.match(USB_INTERFACE_DIR_REGEX)?.[1])
+      .find((name): name is string => name != null)
+    if (usbDeviceName == null) {
+      return true
+    }
+    const usbDeviceDir = join(USB_SYS_DEVICE_DIR, usbDeviceName)
+    const interfaceDirs = (await fsPromises.readdir(usbDeviceDir)).filter(
+      entry => entry.startsWith(`${usbDeviceName}:`)
+    )
+    if (interfaceDirs.length === 0) {
+      return true
+    }
+    const interfaceClasses = await Promise.all(
+      interfaceDirs.map(interfaceDir =>
+        fsPromises
+          .readFile(
+            join(usbDeviceDir, interfaceDir, 'bInterfaceClass'),
+            'utf-8'
+          )
+          .then(contents => contents.trim())
+          .catch(() => null)
+      )
+    )
+    return interfaceClasses.every(
+      interfaceClass => interfaceClass === USB_MASS_STORAGE_INTERFACE_CLASS
+    )
+  } catch (error) {
+    log.debug(
+      `Could not determine mass-storage status for ${mountPath}; treating as mass storage`,
+      error
+    )
+    return true
+  }
+}
 
 // These are for backoff algorithm
 // apply the delay from 1 sec 64 sec
@@ -103,8 +164,11 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
   log.info('watching for mass storage')
   let prevDirs: string[] = []
   const handleNewlyPresent = (path: string): Promise<string> => {
-    dispatch(robotMassStorageDeviceAdded(path))
-    return enumerateMassStorage(path)
+    return isSingleFunctionMassStorageMount(path)
+      .then(isMassStorage => {
+        dispatch(robotMassStorageDeviceAdded(path, isMassStorage))
+        return enumerateMassStorage(path)
+      })
       .then(contents => {
         log.debug(
           `mass storage device at ${path} enumerated: ${JSON.stringify(

@@ -12,6 +12,7 @@ from audit_server.app import app
 IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     # internal endpoints are covered by auth from the external interface
     ("post", "/audit/internal/logMessage"),
+    ("post", "/audit/internal/storeRobotLog"),
     ("patch", "/audit/internal/loggingEnabled"),
     # this is for logging a message and we don't need to log a message that we logged a message
     ("post", "/audit/external/logMessage"),

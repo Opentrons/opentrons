@@ -1,7 +1,6 @@
-import { act, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -10,41 +9,20 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
 import type { Mock } from 'vitest'
-import type { ChangeEvent, ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import type { TrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
-
 const render = (props: ComponentProps<typeof FlowRateEntry>) => {
   return renderWithProviders(<FlowRateEntry {...props} />, {
     i18nInstance: i18n,
   })
 }
-const getLastTouchInputFieldProps = (): ComponentProps<
-  typeof TouchInputField
-> => {
-  const lastCall = vi.mocked(TouchInputField).mock.calls.at(-1)
-  if (lastCall == null) {
-    throw new Error('TouchInputField was not rendered')
-  }
-  return lastCall[0] as ComponentProps<typeof TouchInputField>
-}
-const changeTouchInputValue = (value: string): void => {
-  act(() => {
-    getLastTouchInputFieldProps().onChange?.({
-      target: { value },
-    } as ChangeEvent<HTMLInputElement>)
-  })
+const changeTouchInputValue = (label: string, value: string): void => {
+  fireEvent.change(screen.getByLabelText(label), { target: { value } })
 }
 let mockTrackEventWithRobotSerial: Mock<TrackEventWithRobotSerial>
 
@@ -104,24 +82,14 @@ describe('FlowRate', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the flow rate aspirate screen, continue, and back buttons', () => {
+  it('renders the flow rate aspirate screen, continue, and back buttons', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Aspirate flow rate')
     screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Aspirate flow rate (µL/s)',
-        error: null,
-        type: 'text',
-        value: '35',
-        onBlur: expect.any(Function),
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Aspirate flow rate (µL/s)')).toHaveValue('35')
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
-    fireEvent.click(exitBtn)
+    await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
   })
 
@@ -132,64 +100,54 @@ describe('FlowRate', () => {
     }
     render(props)
     screen.getByText('Dispense flow rate')
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Dispense flow rate (µL/s)',
-        error: null,
-        type: 'text',
-        value: '62',
-        onBlur: expect.any(Function),
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Dispense flow rate (µL/s)')).toHaveValue('62')
   })
 
-  it('renders correct range if you enter incorrect value', () => {
+  it('renders correct range if you enter incorrect value', async () => {
     render(props)
+    const user = userEvent.setup()
     const deleteBtn = screen.getByText('del')
-    fireEvent.click(deleteBtn)
-    fireEvent.click(deleteBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Aspirate flow rate (µL/s)',
-        error: null,
-        type: 'text',
-        value: '',
-        onBlur: expect.any(Function),
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    await user.click(deleteBtn)
+    await user.click(deleteBtn)
+    expect(screen.getByLabelText('Aspirate flow rate (µL/s)')).toHaveValue('')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
 
-  it('calls dispatch when an in range value is entered and saved', () => {
+  it('calls dispatch when an in range value is entered and saved', async () => {
     render(props)
+    const user = userEvent.setup()
     const deleteBtn = screen.getByText('del')
-    fireEvent.click(deleteBtn)
-    fireEvent.click(deleteBtn)
+    await user.click(deleteBtn)
+    await user.click(deleteBtn)
     const numButton = screen.getByText('1')
-    fireEvent.click(numButton)
+    await user.click(numButton)
     const saveBtn = screen.getByText('Save')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('deletes external keyboard input with the stateless numerical keyboard', () => {
+  it('deletes external keyboard input with the numerical keyboard', async () => {
     render(props)
+    const user = userEvent.setup()
 
-    changeTouchInputValue('12')
-    fireEvent.click(screen.getByText('del'))
+    changeTouchInputValue('Aspirate flow rate (µL/s)', '12')
+    await user.click(screen.getByText('del'))
 
-    expect(getLastTouchInputFieldProps()).toEqual(
-      expect.objectContaining({
-        value: '1',
-      })
-    )
+    expect(screen.getByLabelText('Aspirate flow rate (µL/s)')).toHaveValue('1')
+  })
+
+  it('retains incomplete decimal input, shows an error, and disables save', () => {
+    render(props)
+    changeTouchInputValue('Aspirate flow rate (µL/s)', '1.')
+    const input = screen.getByLabelText('Aspirate flow rate (µL/s)')
+    expect(input).toHaveValue('1.')
+    screen.getByText('Enter a valid number')
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    changeTouchInputValue('Aspirate flow rate (µL/s)', '1.5')
+    expect(input).toHaveValue('1.5')
+    expect(screen.queryByText('Enter a valid number')).not.toBeInTheDocument()
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeEnabled()
   })
 })

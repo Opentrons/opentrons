@@ -22,6 +22,8 @@ import { useIsRobotBusy, useIsRobotViewable } from '/app/redux-resources/robots'
 
 import styles from '../DeviceDetails/devicedetails.module.css'
 
+import type { ReactNode } from 'react'
+
 interface DeviceDetailsComponentProps {
   robotName: string
 }
@@ -30,7 +32,7 @@ type DeviceDetailsTab = 'hardware' | 'deck-configuration' | 'run-history'
 
 export function DeviceDetailsComponent({
   robotName,
-}: DeviceDetailsComponentProps): JSX.Element {
+}: DeviceDetailsComponentProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { deviceDetailsTab } = useParams<{
     deviceDetailsTab?: DeviceDetailsTab

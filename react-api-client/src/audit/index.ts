@@ -1,5 +1,6 @@
 export { useDeleteLogPeriodMutation } from './useDeleteLogPeriodMutation'
 export { useLogPeriodRawQuery } from './useLogPeriodRawQuery'
 export { useLogPeriodSummariesQuery } from './useLogPeriodSummariesQuery'
+export { useLogPeriodDetailsQuery } from './useLogPeriodDetailsQuery'
 export { usePostLogMessageMutation } from './usePostLogMessageMutation'
 export * from './settings'

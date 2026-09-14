@@ -22,6 +22,7 @@ import { capitalizeFirstLetter } from '/protocol-designer/pages/Designer/Protoco
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 
 const MAX_STEP_NAME_LENGTH = 60
@@ -29,7 +30,7 @@ interface RenameStepModalProps {
   formData: FormData
   onClose: () => void
 }
-export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
+export function RenameStepModal(props: RenameStepModalProps): ReactNode {
   const { onClose, formData } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'shared', 'protocol_steps'])

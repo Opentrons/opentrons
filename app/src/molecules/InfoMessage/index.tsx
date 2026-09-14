@@ -13,12 +13,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface InfoMessageProps {
   title: string
   body?: string
 }
 
-export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
+export function InfoMessage({ title, body }: InfoMessageProps): ReactNode {
   return (
     <Flex
       backgroundColor={COLORS.blue30}

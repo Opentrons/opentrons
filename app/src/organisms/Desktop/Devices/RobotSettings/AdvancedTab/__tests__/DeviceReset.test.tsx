@@ -28,7 +28,7 @@ const render = (isRobotBusy = false) => {
 describe('RobotSettings DeviceReset', () => {
   it('should render title, description, and butoon', () => {
     render()
-    screen.getByText('Device Reset')
+    screen.getByText('Device reset')
     screen.getByText(
       'Reset labware calibration, boot scripts, and/or robot calibration to factory settings.'
     )

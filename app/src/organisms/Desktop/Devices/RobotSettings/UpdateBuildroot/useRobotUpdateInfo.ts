@@ -139,7 +139,6 @@ function determineUpdateStepFrom(
     reportedUpdateStep = 'finished'
   } else if (
     sessionStep === 'restart' ||
-    sessionStep === 'restarting' ||
     sessionStage === 'ready-for-restart'
   ) {
     reportedUpdateStep = 'restart'

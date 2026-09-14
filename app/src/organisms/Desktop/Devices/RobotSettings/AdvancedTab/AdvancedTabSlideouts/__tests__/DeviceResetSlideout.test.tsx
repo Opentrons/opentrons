@@ -97,7 +97,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
 
   it('should render title, description, checkboxes, links and button: OT-2', () => {
     render()
-    screen.getByText('Device Reset')
+    screen.getByText('Device reset')
     screen.getByText('Resets cannot be undone')
     screen.getByText('Clear individual data')
     screen.getByText(

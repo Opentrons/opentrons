@@ -27,7 +27,8 @@ interface UseRunActionMutations {
 
 export function useRunActionMutations(
   runId: string,
-  documentationState: DocumentationState
+  documentationState: DocumentationState,
+  playDocumentationState?: DocumentationState
 ): UseRunActionMutations {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -41,7 +42,7 @@ export function useRunActionMutations(
   }
 
   const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(
-    documentationState,
+    playDocumentationState ?? documentationState,
     [],
     {
       onSuccess,
@@ -55,18 +56,30 @@ export function useRunActionMutations(
     }
   )
 
-  const { stopRun, isLoading: isStopRunActionLoading } =
-    useStopRunMutation(documentationState)
+  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation(
+    documentationState,
+    [],
+    {
+      onSuccess,
+    }
+  )
 
   const {
     resumeRunFromRecovery,
     isLoading: isResumeRunFromRecoveryActionLoading,
-  } = useResumeRunFromRecoveryMutation(documentationState)
+  } = useResumeRunFromRecoveryMutation(documentationState, {
+    onSuccess,
+  })
 
   const {
     resumeRunFromRecoveryAssumingFalsePositive,
     isLoading: isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation(documentationState)
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   return {
     playRun: () => {

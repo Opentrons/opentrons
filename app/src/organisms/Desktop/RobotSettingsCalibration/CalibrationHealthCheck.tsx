@@ -34,6 +34,7 @@ import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
+import type { ReactNode } from 'react'
 import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
 import type { PipetteCalibrationsByMount } from '/app/resources/instruments/types'
@@ -63,7 +64,7 @@ export function CalibrationHealthCheck({
   isPending,
   robotName,
   isRobotBusy,
-}: CalibrationHealthCheckProps): JSX.Element {
+}: CalibrationHealthCheckProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'robot_calibration',

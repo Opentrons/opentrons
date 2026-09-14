@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
+
 interface Props {
   thresholdVector: [number, number, number]
 }
 
-export function ThresholdValue(props: Props): JSX.Element {
+export function ThresholdValue(props: Props): ReactNode {
   const value = props.thresholdVector.find(axis => axis > 0)
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, cast to value to string
   const formattedValue = parseFloat(value).toFixed(1)

@@ -41,6 +41,7 @@ import { removeOpentronsPhrases } from '/protocol-designer/utils'
 
 import { getShouldShowPipetteType, getTiprackOptions } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -66,7 +67,7 @@ export function PipetteConfiguration({
   pipetteConfig,
   leftPipette,
   rightPipette,
-}: PipetteConfigurationProps): JSX.Element {
+}: PipetteConfigurationProps): ReactNode {
   const { t } = useTranslation(['onboarding', 'shared'])
   const [allowAllTipracks, setAllowAllTipracks] = useState<boolean>(false)
   const dispatch = useDispatch<ThunkDispatch<any>>()

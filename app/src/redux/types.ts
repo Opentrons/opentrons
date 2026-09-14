@@ -4,7 +4,7 @@ import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
 import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
-import type { AuditAction, AuditState } from './audit/slice'
+import type { AuditAction, AuditState } from './audit'
 import type { CalibrationAction, CalibrationState } from './calibration/types'
 import type { ConfigAction, ConfigState } from './config/types'
 import type {

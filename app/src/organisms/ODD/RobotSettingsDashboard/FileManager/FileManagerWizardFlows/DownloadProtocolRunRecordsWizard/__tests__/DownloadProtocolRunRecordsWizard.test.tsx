@@ -6,7 +6,7 @@ import { i18n } from '/app/i18n'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getShellUsbMountPaths } from '/app/redux/shell'
+import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSelectedRuns'
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
@@ -39,7 +39,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
   beforeEach(() => {
     vi.mocked(useDocumentationState).mockReturnValue({} as any)
     vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
-    vi.mocked(getShellUsbMountPaths).mockReturnValue(['/mnt/usb1'])
+    vi.mocked(getShellUsbMassStorageMountPaths).mockReturnValue(['/mnt/usb1'])
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRun] },
     } as any)
@@ -48,12 +48,11 @@ describe('DownloadProtocolRunRecordsWizard', () => {
       eatToast: vi.fn(),
     } as any)
 
-    mockDownloadRuns = vi.fn().mockResolvedValue(undefined)
+    mockDownloadRuns = vi.fn().mockResolvedValue([mockRun])
     mockDeleteSelectedRuns = vi.fn().mockResolvedValue(undefined)
     vi.mocked(useDownloadSelectedRuns).mockReturnValue({
-      downloadRuns: mockDownloadRuns,
-      isDownloading: false,
-      hasError: false,
+      mutateAsync: mockDownloadRuns,
+      status: 'idle',
     } as any)
     vi.mocked(useDeleteSelectedRuns).mockReturnValue({
       deleteSelectedRuns: mockDeleteSelectedRuns,
@@ -78,7 +77,10 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     await waitFor(() => {
       screen.getByText('All protocol files downloaded')
     })
-    expect(mockDownloadRuns).toHaveBeenCalledWith([mockRun], '/mnt/usb1')
+    expect(mockDownloadRuns).toHaveBeenCalledWith({
+      runs: [mockRun],
+      callTimeUsbPath: '/mnt/usb1',
+    })
     expect(mockDeleteSelectedRuns).not.toHaveBeenCalled()
   })
 

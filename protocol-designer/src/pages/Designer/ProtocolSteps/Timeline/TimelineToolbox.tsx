@@ -38,7 +38,7 @@ import { DraggableSteps } from './DraggableSteps'
 import { PresavedStep } from './PresavedStep'
 import { TerminalItemStep } from './TerminalItemStep'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
@@ -51,7 +51,7 @@ interface TimelineToolboxProps {
 export function TimelineToolbox({
   sidebarWidth,
   showLiquidOverflowMenu,
-}: TimelineToolboxProps): JSX.Element {
+}: TimelineToolboxProps): ReactNode {
   const { t } = useTranslation([
     'protocol_steps',
     'protocol_overview',

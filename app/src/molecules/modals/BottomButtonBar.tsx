@@ -16,7 +16,7 @@ interface Props {
   description?: ReactNode | null
 }
 
-export function BottomButtonBar(props: Props): JSX.Element {
+export function BottomButtonBar(props: Props): ReactNode {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 

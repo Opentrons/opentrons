@@ -4,6 +4,8 @@ import { BasicButton, StyledText } from '@opentrons/components'
 
 import styles from './robotsettingsfilemanager.module.css'
 
+import type { ReactNode } from 'react'
+
 interface FileManagementSectionHeaderProps {
   titleText: string
   showButtons: boolean
@@ -13,7 +15,7 @@ interface FileManagementSectionHeaderProps {
 
 export function FileManagementSectionHeader(
   props: FileManagementSectionHeaderProps
-): JSX.Element {
+): ReactNode {
   const { titleText, onDownloadSelected, onDeleteSelected, showButtons } = props
   const { t } = useTranslation('device_details')
   return (
@@ -21,11 +23,15 @@ export function FileManagementSectionHeader(
       <StyledText desktopStyle="bodyLargeSemiBold">{titleText}</StyledText>
       {showButtons ? (
         <div className={styles.file_management_header_button_group}>
-          <BasicButton onClick={onDownloadSelected} iconName="download">
+          <BasicButton
+            onClick={onDownloadSelected}
+            iconName="download"
+            underLine
+          >
             {t('download_selected')}
           </BasicButton>
           {onDeleteSelected != null ? (
-            <BasicButton onClick={onDeleteSelected}>
+            <BasicButton onClick={onDeleteSelected} underLine>
               {t('delete_selected')}
             </BasicButton>
           ) : null}

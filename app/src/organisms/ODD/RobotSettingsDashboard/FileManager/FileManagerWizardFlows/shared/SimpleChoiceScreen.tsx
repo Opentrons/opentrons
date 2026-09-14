@@ -6,6 +6,8 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import styles from './shared.module.css'
 
+import type { ReactNode } from 'react'
+
 interface Choice<T> {
   value: T
   label: string
@@ -25,7 +27,7 @@ export function SimpleChoiceScreen<T>({
   selected,
   onSelect,
   onContinue,
-}: SimpleChoiceScreenProps<T>): JSX.Element {
+}: SimpleChoiceScreenProps<T>): ReactNode {
   const { t, i18n } = useTranslation('shared')
 
   return (

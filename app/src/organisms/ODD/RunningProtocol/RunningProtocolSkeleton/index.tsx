@@ -13,6 +13,7 @@ import { Skeleton } from '/app/atoms/Skeleton'
 import { PlayPauseButton } from '../shared/PlayPauseButton'
 import { StopButton } from '../shared/StopButton'
 
+import type { ReactNode } from 'react'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import type { ScreenOption } from '/app/pages/ODD/RunningProtocol'
 
@@ -25,7 +26,7 @@ interface RunningProtocolSkeletonProps {
 
 export function RunningProtocolSkeleton({
   currentOption,
-}: RunningProtocolSkeletonProps): JSX.Element {
+}: RunningProtocolSkeletonProps): ReactNode {
   return (
     <>
       {currentOption === 'CurrentRunningProtocolCommand' ? (

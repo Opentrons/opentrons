@@ -31,7 +31,7 @@ export interface HintProps {
   content: ReactNode
 }
 
-export function BlockingHintModal(props: HintProps): JSX.Element {
+export function BlockingHintModal(props: HintProps): ReactNode {
   const { content, hintKey, handleCancel, handleContinue } = props
   const { t, i18n } = useTranslation(['alert', 'shared'])
   const dispatch = useDispatch()

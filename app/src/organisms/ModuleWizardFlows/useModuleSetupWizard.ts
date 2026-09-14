@@ -8,6 +8,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -90,10 +91,7 @@ export function useModuleSetupWizard(
   const { currentStepIndex, currentStep, totalStepCount, attachedModule } =
     state
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette =
-    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
-      ? attachedPipettes.left
-      : attachedPipettes.right
+  const attachedPipette = getCalibratedPipetteForModuleSetup(attachedPipettes)
 
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -178,7 +176,6 @@ export function useModuleSetupWizard(
     {
       onSuccess: () => {
         setMaintenanceRunId(null)
-        handleClose()
       },
       onError: () => {
         setIsExiting(false)
@@ -207,7 +204,11 @@ export function useModuleSetupWizard(
           console.log(
             'closing module setup wizard: homed, clearing maintenance run'
           )
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunId, {
+            onSuccess: () => {
+              handleClose()
+            },
+          })
         })
         .catch(error => {
           if (isMaintenanceDoorOpenError(error)) {

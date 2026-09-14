@@ -19,6 +19,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      headers:
+        authorization: 'Bearer asdasd'
       json:
         data:
           loggingEnabled: true
@@ -45,6 +47,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      headers:
+        authorization: 'Bearer asdasd'
       json:
         data:
           loggingEnabled: false
@@ -97,6 +101,9 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        opentrons-user-notes: hello
+        authorization: 'Bearer asdasda'
       json:
         data:
           requireReasonForInteraction: false
@@ -130,6 +137,9 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        opentrons-user-notes: hello
+        authorization: 'Bearer asdasdasd'
       json:
         data:
           requireReasonForInteraction: false
@@ -145,6 +155,8 @@ stages:
     request:
       method: DELETE
       url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        authorization: 'Bearer asdasd'
     response:
       status_code: 200
       json:

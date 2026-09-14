@@ -23,6 +23,7 @@
     "@fontsource-variable/reddit-mono": "5.2.8",
     "@fontsource/dejavu-sans": "5.0.3",
     "@fontsource/public-sans": "5.0.3",
+    "@popperjs/core": "2.1.1",
     "@opentrons/api-client": "workspace:*",
     "@opentrons/components": "workspace:*",
     "@opentrons/discovery-client": "workspace:*",

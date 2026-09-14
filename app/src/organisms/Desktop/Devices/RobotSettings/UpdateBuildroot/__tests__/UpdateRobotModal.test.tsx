@@ -1,5 +1,4 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -15,11 +14,14 @@ import {
 
 import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 
-import type { Store } from 'redux'
 import type { ComponentProps } from 'react'
-import type { State } from '/app/redux/types'
+
+const mockStartUpdate = vi.hoisted(() => vi.fn())
 
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+}))
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
 
@@ -31,10 +33,8 @@ const render = (props: ComponentProps<typeof UpdateRobotModal>) => {
 
 describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
-  let store: Store<State>
   beforeEach(() => {
-    store = legacy_createStore(vi.fn(), {})
-    store.dispatch = vi.fn()
+    mockStartUpdate.mockClear()
     props = {
       robotName: 'test robot',
       releaseNotes: 'test notes',

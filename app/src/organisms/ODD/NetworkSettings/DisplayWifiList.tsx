@@ -21,6 +21,7 @@ import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
+import type { ReactNode } from 'react'
 import type { WifiNetwork } from '@opentrons/api-client'
 
 const NETWORK_ROW_STYLE = css`
@@ -71,7 +72,7 @@ export function DisplayWifiList({
   handleJoinAnotherNetwork,
   handleNetworkPress,
   isHeader = false,
-}: DisplayWifiListProps): JSX.Element {
+}: DisplayWifiListProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
 

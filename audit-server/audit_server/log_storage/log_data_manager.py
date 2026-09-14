@@ -4,21 +4,29 @@ import secrets
 from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
+from pathlib import Path
 from typing import Final
 
+from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import (
     AuditLoggingError,
     KeyStorageUnavailableError,
     PythonException,
 )
 
+from server_utils.audit import constants
 from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
-from . import constants
-from .models import LogPeriodSummary
-from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
+from .models import LogPeriodDetails, LogPeriodSummary, TotalUsageSummary
+from .store import (
+    LogStore,
+    NoActivePeriodError,
+    NoLogInPeriodError,
+    PeriodIsActiveError,
+)
 from .types import LogPeriodEntries, StoredLog
+from audit_server._version import version
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
     SettingsStore,
@@ -29,6 +37,10 @@ LOG = getLogger(__name__)
 # Number of random bytes behind each deletion key. urlsafe encoding produces a
 # longer string than this byte count.
 _DELETION_KEY_BYTES: Final = 32
+
+
+class InvalidDeletionKeyError(Exception):
+    """The specified deletion key does not correspond to the specified period id."""
 
 
 class _GetTime:
@@ -77,13 +89,41 @@ class LogDataManager:
         async with self._lock:
             return await self._do_store_log(log_message)
 
+    async def store_robot_log(
+        self, robot_log: UploadFile, robot_log_path: Path
+    ) -> str | None:
+        """Store a robot log to the active period."""
+        if not self._settings.get_logging_enabled():
+            return None
+        async with self._lock:
+            return await self._do_store_robot_log(robot_log, robot_log_path)
+
     def get_log_periods(self) -> list[LogPeriodSummary]:
         """Get a list of log periods, active or inactive."""
         return self._store.list_periods()
 
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
-        return self._store.get_period_entries(period_id)
+        entries = self._store.get_period_entries(period_id)
+        if isinstance(entries, Exception):
+            raise entries
+        return entries
+
+    def get_log_period_details(self, period_id: str) -> LogPeriodDetails:
+        """Get aggregate details for a log period."""
+        details = self._store.get_period_details(period_id)
+        if isinstance(details, Exception):
+            raise details
+        return details
+
+    def get_total_fs_usage(self) -> TotalUsageSummary:
+        """Get a summary of filesystem usage by stored logs."""
+        periods = self.get_log_periods()
+        details = [self.get_log_period_details(period.id) for period in periods]
+        return TotalUsageSummary(
+            totalUsageBytes=sum([period.totalSizeBytes for period in details]),
+            totalPeriods=len(details),
+        )
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.
@@ -92,9 +132,36 @@ class LogDataManager:
         distinct key, and previously issued keys for the same period remain
         valid.
         """
+        period = self._store.get_period_details(period_id)
+        if isinstance(period, Exception):
+            raise period
+        if period.endedAt is None:
+            raise PeriodIsActiveError()
         key = secrets.token_urlsafe(_DELETION_KEY_BYTES)
         self._deletion_keys[key] = period_id
         return key
+
+    async def delete_log_period(self, period_id: str, deletion_key: str) -> str:
+        """Delete a log period, rotating if necessary, and return the deleted period."""
+        try:
+            deletable_period = self._deletion_keys[deletion_key]
+        except KeyError:
+            raise InvalidDeletionKeyError()
+        if deletable_period != period_id:
+            raise InvalidDeletionKeyError()
+
+        async with self._lock:
+            robot_logs_to_delete = self._store.delete_period(period_id)
+        if isinstance(robot_logs_to_delete, Exception):
+            raise robot_logs_to_delete
+
+        for log_path in robot_logs_to_delete:
+            try:
+                Path(log_path).unlink()
+            except BaseException:
+                LOG.exception(f"Could not delete {log_path}")
+
+        return period_id
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()
@@ -123,6 +190,30 @@ class LogDataManager:
             raise AuditLoggingError(
                 message="Unable to store log", wrapping=[PythonException(stored)]
             )
+
+    async def _do_store_robot_log(
+        self, robot_log: UploadFile, robot_log_dir_path: Path
+    ) -> str:
+        contents_bytes = await robot_log.read()
+        contents = contents_bytes.decode("utf-8")
+        signed_contents, signing_exec = await self._sign_log(contents, None)
+        if signing_exec:
+            raise KeyStorageUnavailableError(
+                message="Unable to communicate with key server",
+                wrapping=[PythonException(signing_exec)],
+            )
+
+        assert robot_log.filename is not None
+        robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
+        while robot_log_path.is_file():
+            robot_log_path = robot_log_path.with_stem(f"{robot_log_path.stem}_copy")
+
+        with open(robot_log_path, "w") as fh:
+            fh.write(contents)
+
+        robot_log_hash = self._store.store_robot_log(signed_contents, robot_log_path)
+
+        return robot_log_hash
 
     def _build_system_message(self, action: str, message: str) -> str:
         """Build an audit log message originated by the system.
@@ -201,49 +292,53 @@ class LogDataManager:
         ending_messages.append(signed_end_log)
         return self._store.end_period(ending_messages)
 
+    async def _do_create_system_messages_with_signing_error_handling(
+        self, action: str, message: str, tail_hash: str | None
+    ) -> tuple[list[StoredLog], str]:
+        """Handle signed message creation with error handling (swallow) for boot."""
+        message = self._build_system_message(action=action, message=message)
+        signed_message, sign_error = await self._sign_log(message, tail_hash)
+        messages = [signed_message]
+        tail_hash = signed_message.message_hash
+        if sign_error:
+            sign_error_message = self._build_sign_error_message(sign_error, tail_hash)
+            messages.append(sign_error_message)
+            tail_hash = sign_error_message.message_hash
+        return messages, tail_hash
+
     async def _do_rotate_periods(self) -> str:
         """Execute a log period rotation while handling possible error cases."""
         stop_result = await self._stop_period()
-        start_messages: list[StoredLog] = []
-        start_message = self._build_system_message(
+        tracking_tail_hash = stop_result if isinstance(stop_result, str) else None
+        (
+            start_messages,
+            tracking_tail_hash,
+        ) = await self._do_create_system_messages_with_signing_error_handling(
             action=constants.ACTION_LOG_PERIOD_START,
             message=constants.MESSAGE_LOG_PERIOD_START,
+            tail_hash=tracking_tail_hash,
         )
-        tracking_tail_hash = stop_result if isinstance(stop_result, str) else None
-        signed_start, sign_error = await self._sign_log(
-            start_message, tracking_tail_hash
+        (
+            version_messages,
+            tracking_tail_hash,
+        ) = await self._do_create_system_messages_with_signing_error_handling(
+            action=constants.ACTION_ROBOT_VERSION,
+            message=version,
+            tail_hash=tracking_tail_hash,
         )
-        # our start message has to be the first thing in the log, even if there are
-        # errors from the previous log
-        start_messages.append(signed_start)
-        tracking_tail_hash = signed_start.message_hash
-        # signing errors are swallowed here because log rotation is an automated process
-        # during boot that we can't handle.
-        if sign_error:
-            sign_error_message = self._build_sign_error_message(
-                sign_error, tracking_tail_hash
-            )
-            start_messages.append(sign_error_message)
-            tracking_tail_hash = sign_error_message.message_hash
+        start_messages.extend(version_messages)
 
-        # now we can note if this is a start after an unstoppe dperiod
+        # now we can note if this is a start after an unstopped period
         if isinstance(stop_result, NoActivePeriodError):
-            was_no_period_error = self._build_system_message(
-                constants.ACTION_LOG_LOGGING_ERROR, constants.MESSAGE_NO_PREVIOUS_PERIOD
+            (
+                was_no_period_messages,
+                tracking_tail_hash,
+            ) = await self._do_create_system_messages_with_signing_error_handling(
+                action=constants.ACTION_LOG_LOGGING_ERROR,
+                message=constants.MESSAGE_NO_PREVIOUS_PERIOD,
+                tail_hash=tracking_tail_hash,
             )
-            was_no_period_signed, sign_error = await self._sign_log(
-                was_no_period_error, tracking_tail_hash
-            )
-            start_messages.append(was_no_period_signed)
-            tracking_tail_hash = was_no_period_signed.message_hash
-            # signing errors are swallowed here because log rotation is an automated
-            # process during boot that we can't handle.
-            if sign_error:
-                sign_error_message = self._build_sign_error_message(
-                    sign_error, tracking_tail_hash
-                )
-                start_messages.append(sign_error_message)
-                tracking_tail_hash = sign_error_message.message_hash
+            start_messages.extend(was_no_period_messages)
         return self._store.start_period(start_messages)
 
     async def _sign_log(

@@ -38,12 +38,6 @@ export interface UseRunHeaderDropTipResult {
   dropTipModalUtils: UseProtocolDropTipModalResult
   dropTipWizardUtils: RunHeaderDropTipWizProps
   resetTipStatus: TipAttachmentStatusResult['resetTipStatus']
-  /**
-   * True once tip status is known, tip check was skipped (already handled in
-   * error recovery), or the robot is OT-2 (no tip check). Used to avoid
-   * showing post-run modals (e.g. SignRun) before drop-tip can claim the UI.
-   */
-  isPostRunTipStatusSettled: boolean
 }
 
 // Handles all the tip related logic during a protocol run on the desktop app.
@@ -81,10 +75,9 @@ export function useRunHeaderDropTip({
     currentRunId: runId,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
     onSkipAndHome: () => {
-      // Clear tip state so the modal dismisses even when close is gated
-      // behind SignRun (run stays current, so !isRunCurrent never fires).
-      // Do not resetTipStatus — that nulls the settled tip-check count and
-      // can re-trigger tip check on a terminating run.
+      // Clear tip state so the modal dismisses even if run currentness briefly
+      // lags after close is requested. Do not resetTipStatus — that nulls the
+      // settled tip-check count and can re-trigger tip check on a terminating run.
       resolveAllTips()
       closeCurrentRun()
     },
@@ -129,10 +122,6 @@ export function useRunHeaderDropTip({
   const tipCheckSkippedBecauseER =
     runSummaryNoFixit != null &&
     lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
-  const isPostRunTipStatusSettled =
-    robotType === OT2_ROBOT_TYPE ||
-    tipCheckSkippedBecauseER ||
-    initialPipettesWithTipsCount !== null
 
   // Manage tip checking
   useEffect(
@@ -159,12 +148,9 @@ export function useRunHeaderDropTip({
   )
 
   // If the run terminates, close the run if no tips need handling. This marks
-  // the robot as "not busy" when drop tip CTAs are unnecessary, and is also
-  // the trigger for gated post-run flows (e.g. SignRun on cancel, where there
-  // is no terminal banner close button).
-  // Include closeCurrentRun so a gated close retries after the gate opens.
+  // the robot as "not busy" when drop tip CTAs are unnecessary.
   // Include tipCheckSkippedBecauseER: tip check is intentionally skipped after
-  // ER, but without this the close never fires and SignRun never opens.
+  // ER, but without this the close never fires.
   useEffect(() => {
     if (
       isRunTerminatingOrTerminal &&
@@ -189,7 +175,6 @@ export function useRunHeaderDropTip({
     dropTipModalUtils,
     dropTipWizardUtils: buildDTWizUtils(),
     resetTipStatus,
-    isPostRunTipStatusSettled,
   }
 }
 

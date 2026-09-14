@@ -31,7 +31,7 @@ import { getIsPipetteOverTrash } from '../utils/getIsPipetteOverTrash'
 import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   CutoutId,
@@ -77,7 +77,7 @@ const lightFill = COLORS.grey35
 const darkFill = COLORS.grey60
 const extraSize = 260
 
-export function DeckView(props: DeckViewProps): JSX.Element {
+export function DeckView(props: DeckViewProps): ReactNode {
   const {
     robotType,
     invariantContext,

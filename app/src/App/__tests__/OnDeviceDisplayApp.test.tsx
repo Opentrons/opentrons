@@ -92,6 +92,9 @@ vi.mock('../../molecules/LoggedOutOverlay')
 vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
   useTrackRobotRestarts: vi.fn(),
 }))
+vi.mock('/app/resources/robot-update/RobotUpdateProvider', () => ({
+  RobotUpdateProvider: ({ children }: { children: JSX.Element }) => children,
+}))
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -186,7 +189,21 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders ProtocolDashboard component from /protocols', () => {
     render('/protocols')
-    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalledWith(
+      expect.objectContaining({ isCRSEnabled: false }),
+      expect.anything()
+    )
+  })
+  it('hides CRS-incompatible ProtocolDashboard UI when access control is enabled', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: true } },
+      isSuccess: true,
+    } as any)
+    render('/protocols')
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalledWith(
+      expect.objectContaining({ isCRSEnabled: true }),
+      expect.anything()
+    )
   })
   it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
     render('/protocols/my-protocol-id')

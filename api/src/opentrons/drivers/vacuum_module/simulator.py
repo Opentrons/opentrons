@@ -30,6 +30,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.target_rpm = 0
         self.current_rpm = 0
         self._pending_async_error: Optional[SerialException] = None
+        self._waste_detection_enabled = False
 
     def inject_async_error(self, error: SerialException) -> None:
         """Queue an async module error to raise on the next polled driver read."""
@@ -162,14 +163,16 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
         pass
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:
         """Get the pressure control pid tunings."""
-        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0)
+        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     async def set_waste_configs(
         self,
@@ -185,8 +188,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         max_window_time: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
-        pass
+        self._waste_detection_enabled = enable_waste_full_detection
 
     async def get_waste_configs(self) -> WasteConfigParameters:
         """Get the waste full detection configs"""
-        return WasteConfigParameters(False, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        return WasteConfigParameters(
+            self._waste_detection_enabled, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        )

@@ -1224,6 +1224,63 @@ async def test_vacuum_module_dock_incompatibility_raises(
         await subject.execute(data)
 
 
+async def test_move_filter_plate_directly_on_vacuum_module_raises(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """It should reject moving a filter plate directly onto the vacuum module."""
+    new_location = ModuleLocation(moduleId="vacuum-module-id")
+    data = MoveLabwareParams(
+        labwareId="filter-plate-id",
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+    )
+
+    decoy.when(state_view.labware.get("filter-plate-id")).then_return(
+        LoadedLabware(
+            id="filter-plate-id",
+            loadName="empore_96_wellplate_1200ul_c18_filter",
+            definitionUri="opentrons/empore_96_wellplate_1200ul_c18_filter/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C1),
+            offsetId=None,
+        )
+    )
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="opentrons",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            isMovableAdapter=False,
+            loadName="empore_96_wellplate_1200ul_c18_filter",
+            quirks=["filterPlate"],
+        ),
+    )
+    decoy.when(state_view.labware.get_definition("filter-plate-id")).then_return(lw_def)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(new_location)
+    decoy.when(state_view.modules.get("vacuum-module-id")).then_return(
+        LoadedModule.model_construct(
+            id="vacuum-module-id",
+            model=ModuleModel.VACUUM_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName("A3")),
+            serialNumber="serial",
+        )
+    )
+    decoy.when(
+        state_view.labware.raise_if_labware_incompatible_with_vacuum_module(lw_def)
+    ).then_raise(
+        errors.LabwareIsNotAllowedInLocationError(
+            "Cannot place 'empore_96_wellplate_1200ul_c18_filter' directly"
+            " onto the vacuum module."
+        )
+    )
+
+    with pytest.raises(
+        errors.LabwareIsNotAllowedInLocationError, match="directly onto"
+    ):
+        await subject.execute(data)
+
+
 @pytest.mark.parametrize(
     "strategy",
     [

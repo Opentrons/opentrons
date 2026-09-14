@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -10,7 +9,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
-  getQueryKey,
   isDocumentedMutationError,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
@@ -37,6 +35,7 @@ import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ResetValuesModal } from './ResetValuesModal'
 
+import type { ReactNode } from 'react'
 import type { FileData } from '@opentrons/api-client'
 import type {
   ChoiceParameter,
@@ -58,11 +57,10 @@ interface ProtocolSetupParametersProps {
 export function ProtocolSetupParameters({
   protocolId,
   runTimeParameters,
-}: ProtocolSetupParametersProps): JSX.Element {
+}: ProtocolSetupParametersProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
   const host = useHost()
-  const queryClient = useQueryClient()
   const [chooseValueScreen, setChooseValueScreen] =
     useState<ChoiceParameter | null>(null)
   const [showNumericalInputScreen, setShowNumericalInputScreen] =
@@ -186,13 +184,6 @@ export function ProtocolSetupParameters({
   const { createRun, isLoading: isRunLoading } = useCreateRunMutation(
     documentationState,
     {
-      onSuccess: data => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
-          .catch((e: Error) => {
-            console.error(`could not invalidate runs cache: ${e.message}`)
-          })
-      },
       onError: error => {
         if (isDocumentedMutationError(error)) {
           setStartSetup(false)
@@ -283,6 +274,7 @@ export function ProtocolSetupParameters({
       setChooseCsvFileScreen(parameter)
     } else {
       // bad param
+      parameter.type satisfies never
       console.error('error: bad param. not expected to reach this')
     }
   }

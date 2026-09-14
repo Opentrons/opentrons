@@ -8,9 +8,10 @@ import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
 import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
 
+import type { ReactNode } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 
-export function CalibrationDashboard(): JSX.Element {
+export function CalibrationDashboard(): ReactNode {
   const { robotName } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams

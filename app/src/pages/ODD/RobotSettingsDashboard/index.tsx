@@ -41,11 +41,12 @@ import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 
 import { RobotSettingsList } from './RobotSettingsList'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function RobotSettingsDashboard(): JSX.Element {
+export function RobotSettingsDashboard(): ReactNode {
   const { i18n, t } = useTranslation('shared')
 
   // GENERAL ROBOT INFORMATION

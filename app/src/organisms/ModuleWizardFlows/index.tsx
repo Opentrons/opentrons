@@ -40,6 +40,7 @@ import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
@@ -452,7 +453,7 @@ export const handleModuleWizardFlows = (
 }
 
 const NiceModalModuleWizardFlows = NiceModal.create(
-  (props: ModuleWizardFlowsModalProps): JSX.Element => {
+  (props: ModuleWizardFlowsModalProps): ReactNode => {
     const modal = useModal()
     const closeFlow = (): void => {
       modal.remove()

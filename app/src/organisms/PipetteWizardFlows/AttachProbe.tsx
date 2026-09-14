@@ -234,7 +234,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       }
       proceedButtonText={
         is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? t('shared:continue')
+          ? i18n.format(t('shared:continue'), 'capitalize')
           : t('begin_calibration')
       }
       proceed={

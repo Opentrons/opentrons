@@ -12,7 +12,7 @@ export interface TwoColumnProps extends StyleProps {
 export function TwoColumn({
   children: [leftElement, rightElement],
   ...styleProps
-}: TwoColumnProps): JSX.Element {
+}: TwoColumnProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}

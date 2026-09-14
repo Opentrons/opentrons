@@ -122,6 +122,13 @@ class Run(ResourceModel):
             )
         ),
     ] = None
+    logPeriodId: str | None = Field(
+        ...,
+        description=(
+            "If the robot has audit logging enabled, the log period this run"
+            " was associated with."
+        ),
+    )
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest.",
@@ -220,6 +227,13 @@ class BadRun(ResourceModel):
             )
         ),
     ] = None
+    logPeriodId: str | None = Field(
+        ...,
+        description=(
+            "If the robot has audit logging enabled, the log period this run"
+            " was associated with."
+        ),
+    )
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest. If these could not be loaded for this bad run, this will be null.",

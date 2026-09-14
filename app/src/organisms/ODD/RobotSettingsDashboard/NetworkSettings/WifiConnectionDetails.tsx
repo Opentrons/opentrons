@@ -27,6 +27,7 @@ import {
 import { DisplayWifiList } from '../../NetworkSettings'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 
 const FETCH_WIFI_LIST_MS = 5000
@@ -42,7 +43,7 @@ export function WifiConnectionDetails({
   connectedWifiAuthType,
   handleNetworkPress,
   handleJoinAnotherNetwork,
-}: WifiConnectionDetailsProps): JSX.Element {
+}: WifiConnectionDetailsProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [showNetworkDetailModal, setShowNetworkDetailModal] =
     useState<boolean>(false)

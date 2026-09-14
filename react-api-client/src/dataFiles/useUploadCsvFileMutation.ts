@@ -65,12 +65,12 @@ export function useUploadCsvFileMutation(
           .invalidateQueries(getQueryKey(host, 'dataFiles'))
           .then(() =>
             queryClient.setQueryData(
-              getQueryKey(host, 'dataFiles'),
+              getQueryKey(host, 'dataFiles', response.data.data.id),
               response.data
             )
           )
           .catch((e: Error) => {
-            throw e
+            console.error(`error invalidating data files query: ${e.message}`)
           })
         return response.data
       }),

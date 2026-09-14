@@ -64,7 +64,7 @@ export interface WrapperProps extends React.ComponentProps<
   hasLink: boolean
 }
 
-function Wrapper(props: WrapperProps): JSX.Element {
+function Wrapper(props: WrapperProps): React.ReactNode {
   return (
     <InlineNotification
       {...props}

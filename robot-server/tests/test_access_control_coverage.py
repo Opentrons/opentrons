@@ -17,7 +17,9 @@ IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     ("delete", "/clientData/{key}"),
     # This is spiritually a GET endpoint. It doesn't actually control or modify anything.
     ("post", "/labwareOffsets/searches"),
-    # Protocol analyses are just disposable simulations.
+    # Although protocol analyses do store data on the robot and do indirectly affect
+    # system behavior, the client currently triggers them implicitly, and thus isn't
+    # prepared for them to require authentication or audit log notes.
     ("post", "/protocols/{protocolId}/analyses"),
 }
 

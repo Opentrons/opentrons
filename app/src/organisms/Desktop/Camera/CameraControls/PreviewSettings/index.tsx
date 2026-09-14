@@ -7,6 +7,7 @@ import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from './previewsettings.module.css'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 interface PreviewSettingsProps {
@@ -19,7 +20,7 @@ export function PreviewSettings({
   settings,
   runId,
   documentationState,
-}: PreviewSettingsProps): JSX.Element {
+}: PreviewSettingsProps): ReactNode {
   const { isLoading, imgPath, takePhoto } = usePreviewImage(
     settings,
     runId,
@@ -40,7 +41,7 @@ export function PreviewSettings({
   )
 }
 
-function PreviewImage({ imgPath }: { imgPath: string | null }): JSX.Element {
+function PreviewImage({ imgPath }: { imgPath: string | null }): ReactNode {
   const { t } = useTranslation('device_settings')
 
   if (imgPath != null) {
@@ -73,7 +74,7 @@ function PreviewImageBtn({
   isLoading,
   onClick,
   hasPreviewImg,
-}: PreviewImageBtnProps): JSX.Element {
+}: PreviewImageBtnProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

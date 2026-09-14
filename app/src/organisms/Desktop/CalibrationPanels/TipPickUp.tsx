@@ -23,6 +23,7 @@ import * as Sessions from '/app/redux/sessions'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
+import type { ReactNode } from 'react'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
@@ -30,7 +31,7 @@ const ASSET_MAP = {
   multi: multiDemoAsset,
   single: singleDemoAsset,
 }
-export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
+export function TipPickUp(props: CalibrationPanelProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands, isMulti } = props
 

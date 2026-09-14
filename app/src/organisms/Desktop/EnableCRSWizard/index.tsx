@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Controller,
@@ -6,7 +6,7 @@ import {
   useForm,
   useFormContext,
 } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -16,15 +16,20 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  setRefs,
   StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
+import { getPasswordComplexityError } from '/app/resources/auth/getPasswordComplexityError'
+import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { useHandleRobotCertImport } from '../RobotCertImport/useHandleRobotCertImport'
@@ -36,7 +41,7 @@ import type { ReactNode } from 'react'
 
 const WIZARD_MODAL_WIDTH = '31.25rem'
 const SERVICE_ACCOUNT_USERNAME = 'service'
-const SERVICE_ACCOUNT_FULL_NAME = 'Service Account (created by system)'
+const SERVICE_ACCOUNT_FULL_NAME = 'Service Account'
 const RECOVERY_ACCOUNT_USERNAME = 'recovery'
 const RECOVERY_ACCOUNT_FULL_NAME = 'Recovery Account (created by system)'
 
@@ -65,7 +70,7 @@ export const handleEnableCRSWizard = (props: EnableCRSWizardProps): void => {
 }
 
 const EnableCRSWizard = NiceModal.create(
-  (props: EnableCRSWizardProps): JSX.Element => {
+  (props: EnableCRSWizardProps): ReactNode => {
     const { robotName } = props
     const modal = useModal()
     const { t } = useTranslation('access_control')
@@ -154,7 +159,7 @@ function EnterServicePINPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -179,7 +184,7 @@ function EnterServicePINPage({
       header={header}
       footer={
         <div className={styles.footer}>
-          <SecondaryButton onClick={onBack}>
+          <SecondaryButton type="button" onClick={onBack}>
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton variant="warning" type="submit" form={formId}>
@@ -225,6 +230,9 @@ function EnterServicePINPage({
                 autoFocus
                 error={fieldState.error?.message}
                 {...field}
+                // Validate only on enable-button submit. Form mode is onBlur, so
+                // Cancel would otherwise mark an empty PIN incorrect on mousedown.
+                onBlur={undefined}
               />
             )}
           />
@@ -237,7 +245,7 @@ function EnterServicePINPage({
 function VerifyRobotEncryptionKeyPage({
   header,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'device_settings', 'shared'])
   const formId = useId()
 
@@ -293,10 +301,21 @@ function VerifyRobotEncryptionKeyPage({
         <div className={styles.step_body}>
           <div className={styles.text_block}>
             <StyledText desktopStyle="headingSmallBold">
-              {t('setup_wizard_verify_encryption_key_title')}
+              {t('device_settings:verify_robot_encryption_key')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_verify_encryption_key_description')}
+              <Trans
+                t={t}
+                i18nKey="device_settings:enter_the_encryption_key"
+                components={{
+                  b: (
+                    <StyledText
+                      desktopStyle="bodyDefaultSemiBold"
+                      display="inline"
+                    />
+                  ),
+                }}
+              />
             </StyledText>
           </div>
           <InputField
@@ -332,7 +351,7 @@ function CreateServiceAccountPage({
   onBack,
   onNext,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
 
   return (
@@ -386,7 +405,7 @@ function CreateAdminAccountPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -397,7 +416,9 @@ function CreateAdminAccountPage({
       header={header}
       footer={
         <div className={styles.footer}>
-          <SecondaryButton onClick={onBack}>{t('shared:back')}</SecondaryButton>
+          <SecondaryButton type="button" onClick={onBack}>
+            {t('shared:back')}
+          </SecondaryButton>
           <PrimaryButton type="submit" form={formId}>
             {t('shared:next')}
           </PrimaryButton>
@@ -432,10 +453,16 @@ function CreateAdminAccountPage({
               rules={{
                 required: t('setup_wizard_field_required'),
                 validate: value => {
+                  const username = value.trim()
+                  if (
+                    getUsernameValidationError(username) === 'invalidCharacters'
+                  ) {
+                    return t('setup_wizard_username_invalid_characters')
+                  }
                   const isReserved = [
                     SERVICE_ACCOUNT_USERNAME,
                     RECOVERY_ACCOUNT_USERNAME,
-                  ].includes(value)
+                  ].includes(username)
                   return isReserved ? t('setup_wizard_username_reserved') : true
                 },
               }}
@@ -445,6 +472,9 @@ function CreateAdminAccountPage({
                   autoFocus
                   error={fieldState.error?.message}
                   {...field}
+                  // Validate only on Next submit. Form mode is onBlur, so
+                  // Back would otherwise mark empty fields as required on mousedown.
+                  onBlur={undefined}
                 />
               )}
             />
@@ -457,6 +487,7 @@ function CreateAdminAccountPage({
                   title={t('setup_wizard_legal_name')}
                   error={fieldState.error?.message}
                   {...field}
+                  onBlur={undefined}
                 />
               )}
             />
@@ -471,10 +502,25 @@ function AdminPasswordPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, getValues, trigger } = useFormContext<FormValues>()
   const formId = useId()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(passwordInputRef, showPassword, true)
+  usePlaceCaretAtEndOnToggle(confirmPasswordInputRef, showConfirmPassword, true)
+
+  const handleTogglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+  }
+
+  const handleToggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(current => !current)
+  }
 
   return (
     <ModalShell
@@ -516,21 +562,37 @@ function AdminPasswordPage({
               control={control}
               rules={{
                 required: t('setup_wizard_field_required'),
-                minLength: {
-                  // Theoretically, the minimum password length is configurable on the server side,
-                  // but in practice, until Compliance Ready Software has been enabled,
-                  // there's no user-facing way to adjust it from the default of 8.
-                  value: 8,
-                  message: t('setup_wizard_password_too_short'),
+                validate: value => {
+                  const complexityError = getPasswordComplexityError(value, {
+                    // Until CRS is enabled there is no user-facing way to
+                    // change the server default of 8.
+                    minLength: 8,
+                    requireSpecialCharacters: false,
+                  })
+                  if (complexityError === 'tooShort') {
+                    return t('setup_wizard_password_too_short')
+                  }
+                  if (complexityError === 'invalidCharacters') {
+                    return t('setup_wizard_password_invalid_characters')
+                  }
+                  return true
                 },
               }}
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('login_form_password_field')}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoFocus
                   error={fieldState.error?.message}
                   {...field}
+                  ref={setRefs(field.ref, passwordInputRef)}
+                  rightElement={
+                    <PasswordVisibilityToggle
+                      isVisible={showPassword}
+                      onToggle={handleTogglePasswordVisibility}
+                      iconOnly
+                    />
+                  }
                 />
               )}
             />
@@ -546,9 +608,17 @@ function AdminPasswordPage({
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('setup_wizard_confirm_password')}
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   error={fieldState.error?.message}
                   {...field}
+                  ref={setRefs(field.ref, confirmPasswordInputRef)}
+                  rightElement={
+                    <PasswordVisibilityToggle
+                      isVisible={showConfirmPassword}
+                      onToggle={handleToggleConfirmPasswordVisibility}
+                      iconOnly
+                    />
+                  }
                 />
               )}
             />
@@ -565,7 +635,7 @@ function RecoveryAccountDetailsPage({
   onNext,
   recoveryAccountPassword,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { getValues } = useFormContext<FormValues>()
   const enableCRSMutation = useEnableCRSMutation()
@@ -598,62 +668,75 @@ function RecoveryAccountDetailsPage({
       width={WIZARD_MODAL_WIDTH}
       header={header}
       footer={
-        <div className={styles.footer}>
-          <SecondaryButton
-            // Unlike other pages, the "next" button is destructive here,
-            // so autofocus the "Back" button instead.
-            autoFocus
-            onClick={onBack}
-          >
-            {t('shared:back')}
-          </SecondaryButton>
-          <PrimaryButton
-            disabled={isLoading}
-            onClick={() => {
-              void handleCompleteSetup()
-            }}
-          >
-            {t('setup_wizard_complete_setup')}
-          </PrimaryButton>
-        </div>
+        isLoading ? null : (
+          <div className={styles.footer}>
+            <SecondaryButton
+              // Unlike other pages, the "next" button is destructive here,
+              // so autofocus the "Back" button instead.
+              autoFocus
+              onClick={onBack}
+            >
+              {t('shared:back')}
+            </SecondaryButton>
+            <PrimaryButton
+              onClick={() => {
+                void handleCompleteSetup()
+              }}
+            >
+              {t('setup_wizard_complete_setup')}
+            </PrimaryButton>
+          </div>
+        )
       }
     >
       <div className={styles.content}>
-        <div className={styles.recovery_content}>
-          <Icon name="error" className={styles.recovery_icon} />
-          <div className={styles.recovery_text}>
-            <StyledText desktopStyle="headingSmallBold">
-              {t('setup_wizard_recovery_account_details_title')}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_recovery_account_details_description')}
+        {isLoading ? (
+          <div className={styles.loading_content}>
+            <Icon name="ot-spinner" spin className={styles.loading_spinner} />
+            <StyledText
+              desktopStyle="headingSmallSemiBold"
+              className={styles.loading_text}
+            >
+              {t('setup_wizard_restarting_robot')}
             </StyledText>
           </div>
-          {submissionError != null ? (
-            <InlineNotification
-              type="error"
-              heading={t('setup_wizard_submission_error')}
-            />
-          ) : null}
-          <div className={styles.recovery_list}>
-            <div className={styles.detail_row}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {t('username')}
+        ) : (
+          <div className={styles.recovery_content}>
+            <Icon name="error" className={styles.recovery_icon} />
+            <div className={styles.recovery_text}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('setup_wizard_recovery_account_details_title')}
               </StyledText>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {RECOVERY_ACCOUNT_USERNAME}
+                {t('setup_wizard_recovery_account_details_description')}
               </StyledText>
             </div>
-            <div className={styles.detail_row}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {t('login_form_password_field')}
-              </StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {recoveryAccountPassword}
-              </StyledText>
+            {submissionError != null ? (
+              <InlineNotification
+                type="error"
+                heading={t('setup_wizard_submission_error')}
+              />
+            ) : null}
+            <div className={styles.recovery_list}>
+              <div className={styles.detail_row}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {t('username')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {RECOVERY_ACCOUNT_USERNAME}
+                </StyledText>
+              </div>
+              <div className={styles.detail_row}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {t('login_form_password_field')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {recoveryAccountPassword}
+                </StyledText>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </ModalShell>
   )

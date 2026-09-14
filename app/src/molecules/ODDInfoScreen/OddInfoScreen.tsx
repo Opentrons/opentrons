@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { IconName, ODDStyles, StyleProps } from '@opentrons/components'
 
 export type OddInfoScreenType =
@@ -59,7 +60,7 @@ const INFO_SCREEN_PROPS_BY_SIZE: Record<
   },
 }
 
-export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
+export function OddInfoScreen(props: OddInfoScreenProps): ReactNode {
   const {
     type,
     header,
@@ -105,7 +106,12 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
         gridGap={SPACING.spacing4}
         width="100%"
       >
-        <StyledText oddStyle={headerStyle}>{header}</StyledText>
+        <StyledText
+          textAlign={TYPOGRAPHY.textAlignCenter}
+          oddStyle={headerStyle}
+        >
+          {header}
+        </StyledText>
         {subText != null ? (
           <StyledText
             textAlign={TYPOGRAPHY.textAlignCenter}

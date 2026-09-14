@@ -76,7 +76,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('17 characters max')
     screen.getByRole('textbox')
     const renameButton = screen.getByRole('button', { name: 'Rename robot' })
@@ -96,7 +96,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('17 characters max')
     screen.getByRole('textbox')
     const renameButton = screen.getByRole('button', { name: 'Rename robot' })

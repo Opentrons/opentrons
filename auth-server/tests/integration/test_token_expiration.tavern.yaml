@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH idleLogout to 30

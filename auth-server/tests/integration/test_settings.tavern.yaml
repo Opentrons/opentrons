@@ -29,6 +29,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET initial settings
@@ -48,6 +49,18 @@ stages:
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: PATCH passwordResetTime below one day is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          passwordResetTime: 1.0
+    response:
+      status_code: 422
+
   - name: PATCH more settings
     request:
       method: PATCH
@@ -57,7 +70,7 @@ stages:
       json:
         data:
           idleLogout: 60.0
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -66,7 +79,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -83,7 +96,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -100,7 +113,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -116,6 +129,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to change some settings
@@ -126,7 +140,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -136,7 +150,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -145,12 +159,56 @@ stages:
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: Admin re-login after enabling password complexity
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testadmin
+        password: testadminpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          restricted_admin_token: access_token
+
+  - name: Admin sets a compliant password after complexity is enabled
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        Authorization: 'Bearer {restricted_admin_token}'
+      json:
+        data:
+          password: Testadminrenewed1!
+    response:
+      status_code: 200
+      strict:
+        - json:off
+
+  - name: Admin re-login with compliant password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testadmin
+        password: Testadminrenewed1!
+    response:
+      status_code: 200
+      save:
+        json:
+          current_admin_token: access_token
+
   - name: DELETE resets everything except accessControlEnabled to its default
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
       headers:
-        Authorization: '{admin_access_token}'
+        Authorization: 'Bearer {current_admin_token}'
     response:
       status_code: 200
       json:
@@ -169,6 +227,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to enable maxNumberOfLoginAttempts
@@ -179,12 +238,12 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
     response:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
@@ -218,6 +277,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET access control enabled default

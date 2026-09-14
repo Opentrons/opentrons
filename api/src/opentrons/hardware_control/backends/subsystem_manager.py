@@ -24,6 +24,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     ToolType,
     USBTarget,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
 from opentrons_hardware.firmware_update import FirmwareUpdate
 from opentrons_hardware.hardware_control import network, tools
 
@@ -442,3 +445,10 @@ class SubsystemManager:
 
     def set_event_callback(self, callback: Callable[[], None]) -> None:
         self._event_callback = callback
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[Set[NodeId]] = None
+    ) -> Dict[NodeId, GetMotorUsageResponse]:
+        return await self._network_info.get_motor_usage_data(
+            can_messenger=self._can_messenger, expected=expected_axes
+        )

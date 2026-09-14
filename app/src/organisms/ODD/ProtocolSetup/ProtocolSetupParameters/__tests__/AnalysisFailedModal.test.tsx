@@ -1,12 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
-
-import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
 
@@ -17,14 +14,9 @@ const PROTOCOL_ID = 'mockProtocolId'
 const RUN_ID = 'mockRunId'
 const mockSetShowAnalysisFailedModal = vi.fn()
 const mockNavigate = vi.fn()
-const mockDismissCurrentRunAsync = vi.fn(
-  () => new Promise(resolve => resolve({}))
-)
+const mockCloseCurrentRun = vi.fn()
 
-vi.mock('@opentrons/react-api-client')
-vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
-  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
-}))
+vi.mock('/app/resources/runs')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
@@ -43,12 +35,15 @@ describe('AnalysisFailedModal', () => {
   let props: ComponentProps<typeof AnalysisFailedModal>
 
   beforeEach(() => {
-    mockDismissCurrentRunAsync.mockClear()
-    when(vi.mocked(useDismissCurrentRunMutation))
-      .calledWith(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
-      .thenReturn({
-        mutateAsync: mockDismissCurrentRunAsync,
-      } as any)
+    mockCloseCurrentRun.mockClear()
+    mockNavigate.mockClear()
+    mockCloseCurrentRun.mockImplementation((options?: any) => {
+      options?.onSuccess?.()
+    })
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: false,
+    })
     props = {
       errors: [
         'analysis failed reason message 1',
@@ -76,9 +71,14 @@ describe('AnalysisFailedModal', () => {
     expect(mockSetShowAnalysisFailedModal).toHaveBeenCalled()
   })
 
-  it('should call mock dismiss current run function when tapping restart setup button', () => {
+  it('should close current run when tapping restart setup button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart setup'))
-    expect(mockDismissCurrentRunAsync).toHaveBeenCalledWith(RUN_ID)
+    expect(mockCloseCurrentRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+      })
+    )
+    expect(mockNavigate).toHaveBeenCalledWith(`/protocols/${PROTOCOL_ID}`)
   })
 })

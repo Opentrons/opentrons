@@ -5,7 +5,7 @@ from typing import Annotated, Literal, Sequence, TypedDict
 
 from pydantic import BaseModel, Field, SecretStr
 
-from server_utils.auth.scopes import Scope
+from auth_server.users.credential_characters import CREDENTIAL_ALLOWED_PATTERN
 
 
 # leave this outside of the db. this will not change.
@@ -18,40 +18,50 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
-# move this to db if we need to support updating scopes.
-ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
-    AccountType.ADMIN: set(Scope),  # all scopes
-    AccountType.SERVICE: set(Scope),  # all scopes
-    AccountType.USER: {
-        Scope.RESTART_WRITE,
-        Scope.ROBOT_CONTROL_WRITE,
-        Scope.ROBOT_SETTINGS_WRITE,
-        # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
-        Scope.UPDATES_WRITE,
-        # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
-        Scope.USERS_READ_SELF,
-        Scope.USERS_WRITE_SELF,
-        Scope.PROTOCOLS_WRITE,
-        Scope.AUDIT_LOG_WRITE,
-    },
-    # Auditors should have read-only access to everything. Our read-only endpoints are
-    # mostly accessible without authentication, but there are some exceptions. This
-    # just needs to have the scopes to cover those exceptions.
-    AccountType.AUDITOR: {Scope.USERS_READ_OTHERS},
-}
+# Hardcoded legal name for every new service account.
+SERVICE_ACCOUNT_FULL_NAME = "Service Account"
 
-# Scopes granted while resetPassword is true, before the user chooses a new password.
-RESET_PASSWORD_SCOPES: set[Scope] = {
-    Scope.USERS_READ_SELF,
-    Scope.USERS_WRITE_SELF,
-}
+USERNAME_MAX_LENGTH = 20
+
+Username = Annotated[
+    str,
+    Field(
+        max_length=USERNAME_MAX_LENGTH,
+        pattern=CREDENTIAL_ALLOWED_PATTERN,
+        description=(
+            "The username of the user. Letters, digits, and punctuation are allowed."
+        ),
+    ),
+]
+
+OptionalUsername = Annotated[
+    str | None,
+    Field(
+        default=None,
+        max_length=USERNAME_MAX_LENGTH,
+        pattern=CREDENTIAL_ALLOWED_PATTERN,
+        description=(
+            "The username of the user. Letters, digits, and punctuation are allowed."
+        ),
+    ),
+]
 
 
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    username: Annotated[str, Field(..., description="The username of the user.")]
-    password: Annotated[SecretStr, Field(..., description="The password for the user.")]
+    username: Username
+    password: Annotated[
+        SecretStr | None,
+        Field(
+            default=None,
+            description=(
+                "The password for the user. If omitted, the server generates a "
+                "temporary password and requires the user to set a new password "
+                "before full robot access."
+            ),
+        ),
+    ] = None
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
         AccountType, Field(..., description="The type of account for the user.")
@@ -61,10 +71,7 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    username: Annotated[
-        str | None,
-        Field(description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     password: Annotated[
         SecretStr | None,
         Field(description="The password for the user."),
@@ -78,9 +85,12 @@ class UpdateUser(BaseModel):
         Field(description="The type of account for the user."),
     ] = None
     locked: Annotated[
-        Literal[False] | None,
+        bool | None,
         Field(
-            description="Set to false to clear a failed-login lockout for this user.",
+            description=(
+                "Set to true to lock this user, or false to unlock the user "
+                "and clear a failed-login lockout."
+            ),
         ),
     ] = None
     resetPassword: Annotated[
@@ -98,10 +108,7 @@ class UpdateUser(BaseModel):
 class UpdateSelf(BaseModel):
     """Request body for updating the logged-in user."""
 
-    username: Annotated[
-        str | None,
-        Field(default=None, description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     fullName: Annotated[
         str | None,
         Field(default=None, description="The full name of the user."),
@@ -121,7 +128,10 @@ class UserResponse(BaseModel):
     locked: Annotated[
         bool,
         Field(
-            description="If true, this account is locked because of too many failed login attempts."
+            description=(
+                "If true, this account is locked because it was deactivated by an admin "
+                "or because of too many failed login attempts."
+            )
         ),
     ]
     resetPassword: Annotated[
@@ -137,15 +147,18 @@ class UserResponse(BaseModel):
     ]
 
 
-class ResetPasswordResponse(UserResponse):
-    """Response body for a password reset, including the new temporary password."""
+class TemporaryPasswordResponse(UserResponse):
+    """Response body for a user, optionally including a newly generated temporary password."""
 
     temporaryPassword: Annotated[
-        str,
+        str | None,
         Field(
-            description="The newly generated temporary password for the user.",
+            default=None,
+            description=(
+                "The newly generated temporary password for the user, if one was created."
+            ),
         ),
-    ]
+    ] = None
 
 
 # todo(mm, 2026-06-23): Deduplicate with robot-server's ErrorBody, via server-utils.
@@ -175,7 +188,25 @@ class PasswordMissingSpecialCharactersErrorDetails(BaseModel):
     id: Literal["passwordMissingSpecialCharacters"]
 
 
+class PasswordPreviouslyUsedErrorDetails(BaseModel):
+    """An error when a new password matches the user's current password."""
+
+    id: Literal["passwordPreviouslyUsed"]
+
+
 class UserAlreadyExistsErrorDetails(BaseModel):
     """An error when a username is already taken."""
 
     id: Literal["userAlreadyExists"]
+
+
+class UsernameContainsInvalidCharactersErrorDetails(BaseModel):
+    """An error when a username contains whitespace or other disallowed characters."""
+
+    id: Literal["usernameContainsInvalidCharacters"]
+
+
+class PasswordContainsInvalidCharactersErrorDetails(BaseModel):
+    """An error when a password contains whitespace or other disallowed characters."""
+
+    id: Literal["passwordContainsInvalidCharacters"]

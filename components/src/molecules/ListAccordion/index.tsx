@@ -39,7 +39,7 @@ export function ListAccordion({
   icon,
   children,
   tableHeaders,
-}: ListAccordionProps): JSX.Element {
+}: ListAccordionProps): ReactNode {
   const [isOpen, setIsOpen] = useState(false)
 
   return (

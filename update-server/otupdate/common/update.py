@@ -213,6 +213,11 @@ async def file_upload(
                 message="Request error: no field name for system zip",
             ),
         )
+    # set stage now to make sure that it takes effect in the response
+    # we're about to send, since we're now doing the validation in a
+    # background task that won't get a chance to run before the response is
+    # created
+    session.set_stage(Stages.VALIDATING)
 
     # Only one file can be validated and written. If the request carried several
     # acceptable parts, the last one is the one left on disk.

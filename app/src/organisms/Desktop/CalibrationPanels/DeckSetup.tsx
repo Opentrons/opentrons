@@ -27,13 +27,14 @@ import * as Sessions from '/app/redux/sessions'
 
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
 const DECK_VIEW_BOX = '-46 -10 488 390'
 
-export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
+export function DeckSetup(props: CalibrationPanelProps): ReactNode {
   const deckDef = useMemo(() => getDeckDefinitions().ot2_standard, [])
 
   const { t } = useTranslation('robot_calibration')

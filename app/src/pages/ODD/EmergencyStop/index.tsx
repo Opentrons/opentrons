@@ -19,9 +19,11 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 
-export function EmergencyStop(): JSX.Element {
+export function EmergencyStop(): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
 

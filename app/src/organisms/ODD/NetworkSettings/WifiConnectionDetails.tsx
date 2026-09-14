@@ -24,6 +24,7 @@ import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 
 interface WifiConnectionDetailsProps {
@@ -35,7 +36,7 @@ interface WifiConnectionDetailsProps {
 export function WifiConnectionDetails({
   ssid,
   authType,
-}: WifiConnectionDetailsProps): JSX.Element {
+}: WifiConnectionDetailsProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const localRobot = useSelector(getLocalRobot)
@@ -101,7 +102,7 @@ interface DisplayConnectionStatusProps {
 
 const DisplayConnectionStatus = ({
   ssid,
-}: DisplayConnectionStatusProps): JSX.Element => {
+}: DisplayConnectionStatusProps): ReactNode => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex

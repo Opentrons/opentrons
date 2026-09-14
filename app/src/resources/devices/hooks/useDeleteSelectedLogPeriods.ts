@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
+import { useDispatch } from 'react-redux'
 
 import { deleteLogPeriod } from '@opentrons/api-client'
 import {
@@ -8,9 +9,13 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { isForbiddenError } from '/app/local-resources/access-control/utils'
+import { logPeriodDeleteStarted } from '/app/redux/audit'
+
 import type { QueryKey } from 'react-query'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
+import type { Dispatch } from '/app/redux/types'
 
 interface UseDeleteSelectedLogPeriodsResult {
   deleteSelectedLogPeriods: (
@@ -18,12 +23,14 @@ interface UseDeleteSelectedLogPeriodsResult {
     deletionKeysByLogPeriodId: Record<string, string>
   ) => Promise<void>
   deletingIds: Set<string>
+  isLoading: boolean
 }
 
 export function useDeleteSelectedLogPeriods(
   documentationState: DocumentationState
 ): UseDeleteSelectedLogPeriodsResult {
   const host = useHost()
+  const dispatch = useDispatch<Dispatch>()
   const queryClient = useQueryClient()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
@@ -45,6 +52,7 @@ export function useDeleteSelectedLogPeriods(
 
       const processSequentially = async (): Promise<void> => {
         let hasDeleteError = false
+        let permissionError: unknown = null
         // process one logPeriod at a time so deletions are applied sequentially
         // rather than concurrently, and a single failure doesn't abort the rest
         // enforce deletion key is present for each deletion request
@@ -54,6 +62,7 @@ export function useDeleteSelectedLogPeriods(
             hasDeleteError = true
             continue
           }
+          dispatch(logPeriodDeleteStarted({ logPeriodId }))
           // deleteLogPeriod call is safe here within /app since we are wrapped in a useDocumentedMutation
           // eslint-disable-next-line opentrons/no-direct-mutating
           await deleteLogPeriod(
@@ -61,9 +70,17 @@ export function useDeleteSelectedLogPeriods(
             logPeriodId,
             { deletionKey },
             userNotes
-          ).catch(_ => (hasDeleteError = true))
+          ).catch(error => {
+            hasDeleteError = true
+            if (isForbiddenError(error)) {
+              permissionError = error
+            }
+          })
         }
 
+        if (permissionError != null && isForbiddenError(permissionError)) {
+          throw permissionError
+        }
         if (hasDeleteError) {
           throw new Error('One or more logPeriods failed to delete')
         }
@@ -109,5 +126,9 @@ export function useDeleteSelectedLogPeriods(
       .then(() => {})
   }
 
-  return { deleteSelectedLogPeriods, deletingIds }
+  return {
+    deleteSelectedLogPeriods,
+    deletingIds,
+    isLoading: mutation.isLoading,
+  }
 }
