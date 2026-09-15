@@ -25,6 +25,9 @@ export const remote: Remote = new Proxy(emptyRemote, {
   },
 })
 
+const FORM_URLENCODED_CONTENT_TYPE =
+  'application/x-www-form-urlencoded;charset=utf-8'
+
 // FormData and File objects can't be sent through invoke().
 // This converts them into simpler objects that can be.
 // app-shell will convert them back.
@@ -48,16 +51,37 @@ async function proxyFormData(formData: FormData): Promise<IPCSafeFormData> {
   return result
 }
 
+async function proxyRequestData(
+  config: AxiosRequestConfig
+): Promise<AxiosRequestConfig> {
+  const { data } = config
+
+  if (data instanceof FormData) {
+    return {
+      ...config,
+      data: { proxiedFormData: await proxyFormData(data) },
+    }
+  }
+
+  if (data instanceof URLSearchParams) {
+    return {
+      ...config,
+      data: data.toString(),
+      headers: {
+        ...config.headers,
+        'Content-Type': FORM_URLENCODED_CONTENT_TYPE,
+      },
+    }
+  }
+
+  return config
+}
+
 async function doAppShellRequest<Data>(
   target: 'usb:request' | 'internal-api:request',
   config: AxiosRequestConfig
 ): Promise<AxiosResponse<Data>> {
-  const { data } = config
-  const formDataProxy =
-    data instanceof FormData
-      ? { proxiedFormData: await proxyFormData(data) }
-      : data
-  const configProxy = { ...config, data: formDataProxy }
+  const configProxy = await proxyRequestData(config)
 
   const result = await remote.ipcRenderer.invoke(target, configProxy)
   if (result?.error != null) {

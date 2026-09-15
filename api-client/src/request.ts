@@ -19,6 +19,9 @@ export const DEFAULT_HEADERS = {
   'Opentrons-Version': '3',
 }
 
+const FORM_URLENCODED_CONTENT_TYPE =
+  'application/x-www-form-urlencoded;charset=utf-8'
+
 export const GET = 'GET'
 export const POST = 'POST'
 export const PATCH = 'PATCH'
@@ -100,8 +103,16 @@ export function request<
         { 'Opentrons-User-Notes': encodeURI(requestConfig.userNotes) }
       : {}
   const extraHeaders = requestConfig?.headers ?? {}
+  const body = requestConfig?.body
+  const urlEncodedBody =
+    body instanceof URLSearchParams ? body.toString() : null
+  const urlEncodedHeaders =
+    urlEncodedBody != null
+      ? { 'Content-Type': FORM_URLENCODED_CONTENT_TYPE }
+      : {}
   const headers = {
     ...DEFAULT_HEADERS,
+    ...urlEncodedHeaders,
     ...tokenHeader,
     ...userNotesHeader,
     ...extraHeaders,
@@ -133,7 +144,7 @@ export function request<
     baseURL,
     url,
     params,
-    data: requestConfig?.body,
+    data: urlEncodedBody ?? body,
     headers,
     responseType: requestConfig?.responseType,
   })

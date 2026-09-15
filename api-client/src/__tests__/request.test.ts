@@ -121,4 +121,22 @@ describe('request', () => {
 
     expect(lastBaseURL()).toBe('http://127.0.0.1:31950')
   })
+
+  it('serializes URLSearchParams bodies as form-urlencoded strings', async () => {
+    const body = new URLSearchParams({
+      grant_type: 'password',
+      username: 'admin',
+      password: 'secret',
+      client_id: 'opentrons_app',
+    })
+
+    await request(POST, '/auth/oauth2/token', hostConfig, { body })
+
+    expect(requestor).toHaveBeenCalledTimes(1)
+    const config = requestor.mock.calls[0][0] as AxiosRequestConfig
+    expect(config.data).toBe(body.toString())
+    expect(config.headers).toMatchObject({
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    })
+  })
 })
