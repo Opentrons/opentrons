@@ -41,6 +41,7 @@ export function NumericalKeyboard({
   const { beforeInputUpdate, onChange } = useSoftwareKeyboardControl({
     keyboardRef,
     inputElementRef,
+    numericKeyboard: true,
   })
 
   return (
