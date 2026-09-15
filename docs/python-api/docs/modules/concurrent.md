@@ -15,7 +15,7 @@ This section covers module tasks and explains how to run multiple module actions
 
 ## Module tasks
 
-When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action. 
+When you use a Heater-Shaker, Temperature, or a Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action. 
 
 | **Module** | **Concurrent commands** |
 | :----------|------------------------ |
