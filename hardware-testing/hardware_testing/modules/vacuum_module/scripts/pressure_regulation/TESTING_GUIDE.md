@@ -40,7 +40,8 @@ It is **not** the production `vacuum_module_qc` `CSVReport` schema.
 python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.run_hold_test \
   [--targets P ...] [--duration_s SEC] [--run-name NAME] \
   [--waste-detection | --no-waste-detection] \
-  [--output json|csv|both]
+  [--expect-trip | --no-expect-trip] [--bottle empty|full] \
+  [--g-sealed-max G] [--output json|csv|both]
 ```
 
 | Arg | Default | Meaning |
@@ -49,6 +50,9 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
 | `--duration_s` | `120` | Hold seconds per target |
 | `--run-name` | `unnamed` | Label stored in results |
 | `--waste-detection` / `--no-waste-detection` | **disabled** | Enable/disable waste full detection (`M127 E1` / `E0`) |
+| `--expect-trip` / `--no-expect-trip` | **false** | When waste is on, expect ERR401 / early stop |
+| `--bottle` | unset | `empty` or `full` (stored in results) |
+| `--g-sealed-max` | firmware default | Waste sealed threshold G (`M127 G`); lower = harder to trip |
 | `--output` | `json` | `json` (canonical, live HTML), `csv` (samples + summary), or `both` |
 
 Writes live results on the Flex:
@@ -75,6 +79,16 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
 # Custom hold with waste detection on
 python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.run_hold_test \
   --targets -200 -400 -800 --duration_s 90 --run-name waste_on --waste-detection
+
+# Full bottle, expect trip; tune G
+python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.run_hold_test \
+  --targets -300 --duration_s 120 --run-name full_waste \
+  --waste-detection --expect-trip --bottle full --g-sealed-max 0.40
+
+# Empty bottle, must not trip
+python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.run_hold_test \
+  --targets -100 -200 -300 -400 -500 -600 -700 -800 --duration_s 120 \
+  --run-name empty_water --waste-detection --no-expect-trip --bottle empty
 ```
 
 ### `make_report.py`

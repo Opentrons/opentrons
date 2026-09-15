@@ -40,6 +40,11 @@ SAMPLE_COLUMNS = [
     "abs_b",
     "atm",
     "vent",
+    "rpm",
+    "target_rpm",
+    "pwm",
+    "target_pwm",
+    "err401",
     "run_status",
 ]
 
@@ -48,6 +53,11 @@ SUMMARY_COLUMNS = [
     "target_mbar",
     "duration_s",
     "status",
+    "bottle",
+    "expect_trip",
+    "tripped",
+    "trip_t_s",
+    "pass",
     "n",
     "mean_current",
     "mean_err",
@@ -67,6 +77,10 @@ META_KEYS = (
     "duration_s",
     "sample_period_s",
     "waste_detection",
+    "waste_detection_enabled",
+    "g_sealed_max",
+    "bottle",
+    "expect_trip",
     "status",
     "current_target_mbar",
     "timestamp",
@@ -74,7 +88,10 @@ META_KEYS = (
 )
 
 _INT_META = frozenset({"duration_s"})
-_FLOAT_META = frozenset({"kp", "ki", "kd", "sample_period_s", "current_target_mbar"})
+_FLOAT_META = frozenset(
+    {"kp", "ki", "kd", "sample_period_s", "current_target_mbar", "g_sealed_max"}
+)
+_BOOL_META = frozenset({"waste_detection_enabled", "expect_trip"})
 _PREFERRED_RUN_FILES = (
     "results.json",
     "vacuum_pressure_hold_results.json",
@@ -281,9 +298,22 @@ def _atomic_write_text(path: Path, text: str) -> None:
 def _format_meta_value(value: Any) -> str:
     if value is None:
         return ""
+    if isinstance(value, bool):
+        return _format_bool(value)
     if isinstance(value, (list, tuple)):
         return ",".join(str(item) for item in value)
     return str(value)
+
+
+def _parse_bool(raw: str) -> Optional[bool]:
+    lowered = raw.strip().casefold()
+    if lowered in ("", "none", "null"):
+        return None
+    if lowered in ("1", "true", "yes", "on"):
+        return True
+    if lowered in ("0", "false", "no", "off"):
+        return False
+    raise ValueError(f"invalid bool value: {raw!r}")
 
 
 def _parse_meta_value(key: str, raw: str) -> Any:
@@ -295,7 +325,15 @@ def _parse_meta_value(key: str, raw: str) -> Any:
         return int(float(raw))
     if key in _FLOAT_META:
         return float(raw)
+    if key in _BOOL_META:
+        return _parse_bool(raw)
     return raw
+
+
+def _format_bool(value: Any) -> str:
+    if value is None:
+        return ""
+    return "true" if bool(value) else "false"
 
 
 def _parse_meta_comments(text: str) -> dict[str, Any]:
@@ -341,6 +379,15 @@ def _samples_csv_text(result: dict[str, Any]) -> str:
                     "abs_b": sample.get("abs_b"),
                     "atm": sample.get("atm"),
                     "vent": sample.get("vent"),
+                    "rpm": sample.get("rpm"),
+                    "target_rpm": sample.get("target_rpm"),
+                    "pwm": sample.get("pwm"),
+                    "target_pwm": sample.get("target_pwm"),
+                    "err401": (
+                        ""
+                        if sample.get("err401") is None
+                        else int(bool(sample.get("err401")))
+                    ),
                     "run_status": run_status,
                 }
             )
@@ -370,6 +417,15 @@ def _summary_csv_text(result: dict[str, Any]) -> str:
                 "target_mbar": run.get("target_mbar"),
                 "duration_s": run.get("duration_s", result.get("duration_s")),
                 "status": run.get("status", ""),
+                "bottle": run.get("bottle", result.get("bottle", "")),
+                "expect_trip": _format_bool(
+                    run.get("expect_trip", result.get("expect_trip"))
+                ),
+                "tripped": _format_bool(run.get("tripped")),
+                "trip_t_s": (
+                    "" if run.get("trip_t_s") is None else run.get("trip_t_s")
+                ),
+                "pass": _format_bool(run.get("pass")),
                 "n": _summary_cell(stats, "n"),
                 "mean_current": _summary_cell(stats, "mean_current"),
                 "mean_err": _summary_cell(stats, "mean_err"),
@@ -421,6 +477,11 @@ def _read_sample_rows(text: str) -> dict[float, list[dict[str, Any]]]:
             "abs_b": float(row["abs_b"]),
             "atm": float(row["atm"]),
             "vent": _to_int(row.get("vent", "")) or 0,
+            "rpm": _to_float(row.get("rpm", "")),
+            "target_rpm": _to_float(row.get("target_rpm", "")),
+            "pwm": _to_float(row.get("pwm", "")),
+            "target_pwm": _to_float(row.get("target_pwm", "")),
+            "err401": _parse_bool(row.get("err401", "") or ""),
             "_run_status": row.get("run_status", ""),
         }
         by_target.setdefault(target, []).append(sample)
@@ -455,6 +516,11 @@ def _read_summary_rows(path: Path) -> dict[float, dict[str, Any]]:
             by_target[target] = {
                 "duration_s": _to_int(row.get("duration_s", "")),
                 "status": row.get("status", ""),
+                "bottle": row.get("bottle") or None,
+                "expect_trip": _parse_bool(row.get("expect_trip", "") or ""),
+                "tripped": _parse_bool(row.get("tripped", "") or ""),
+                "trip_t_s": _to_float(row.get("trip_t_s", "")),
+                "pass": _parse_bool(row.get("pass", "") or ""),
                 "stats": stats,
             }
     return by_target
@@ -505,6 +571,13 @@ def _assemble_result(
             {
                 "target_mbar": target,
                 "duration_s": run_duration,
+                "bottle": summary.get("bottle", meta.get("bottle")),
+                "expect_trip": summary.get(
+                    "expect_trip", meta.get("expect_trip")
+                ),
+                "tripped": summary.get("tripped"),
+                "trip_t_s": summary.get("trip_t_s"),
+                "pass": summary.get("pass"),
                 "stats": stats,
                 "samples": clean_samples,
                 "status": status or ("complete" if clean_samples else ""),

@@ -69,11 +69,14 @@ def main() -> int:
     data = load_results(src)
     series_js = []
     stats_rows = []
+    waste_enabled = bool(data.get("waste_detection_enabled")) or str(
+        data.get("waste_detection", "")
+    ).startswith("enabled")
     for run in data.get("runs", []):
         samples = run.get("samples", [])
         t = [s["t_s"] for s in samples]
-        c = [s["current_mbar"] for s in samples]
-        e = [s["error_mbar"] for s in samples]
+        c = [s.get("current_mbar") for s in samples]
+        e = [s.get("error_mbar") for s in samples]
         target = run["target_mbar"]
         series_js.append(
             {
@@ -83,22 +86,36 @@ def main() -> int:
                 "error": e,
                 "stats": run.get("stats", {}),
                 "status": run.get("status", ""),
+                "tripped": run.get("tripped"),
+                "trip_t_s": run.get("trip_t_s"),
+                "expect_trip": run.get("expect_trip"),
+                "pass": run.get("pass"),
             }
         )
         st = run.get("stats", {})
         status = run.get("status", "")
+        waste_cells = (
+            f"<td>{run.get('bottle') or '—'}</td>"
+            f"<td>{run.get('expect_trip')}</td>"
+            f"<td>{run.get('tripped')}</td>"
+            f"<td>{run.get('trip_t_s') if run.get('trip_t_s') is not None else '—'}</td>"
+            f"<td>{run.get('pass')}</td>"
+            if waste_enabled
+            else ""
+        )
         if st.get("n", 0):
             stats_rows.append(
-                f"<tr><td>{target}</td><td>{status}</td>"
+                f"<tr><td>{target}</td><td>{status}</td>{waste_cells}"
                 f"<td>{st['mean_abs_err']:.2f}</td>"
                 f"<td>{st['mean_err']:.2f}</td><td>{st['stdev_err']:.2f}</td>"
                 f"<td>{st['p95_abs_err']:.2f}</td><td>{st['max_abs_err']:.2f}</td>"
                 f"<td>{st['n']}</td></tr>"
             )
         else:
+            colspan = 6 if not waste_enabled else 6
             stats_rows.append(
-                f"<tr><td>{target}</td><td>{status}</td>"
-                f"<td colspan='6'>{st.get('note', 'no steady data')}</td></tr>"
+                f"<tr><td>{target}</td><td>{status}</td>{waste_cells}"
+                f"<td colspan='{colspan}'>{st.get('note', 'no steady data')}</td></tr>"
             )
 
     payload = json.dumps(series_js)
@@ -108,6 +125,9 @@ def main() -> int:
         "firmware": data.get("firmware", ""),
         "timestamp": data.get("timestamp", ""),
         "waste": data.get("waste_detection", ""),
+        "bottle": data.get("bottle"),
+        "expect_trip": data.get("expect_trip"),
+        "g_sealed_max": data.get("g_sealed_max"),
         "duration_s": data.get("duration_s"),
         "sample_period_s": data.get("sample_period_s"),
         "status": status,
@@ -116,6 +136,7 @@ def main() -> int:
         "n_complete": sum(
             1 for r in data.get("runs", []) if r.get("status") == "complete"
         ),
+        "waste_enabled": waste_enabled,
     }
     refresh = "3" if status == "running" else "30"
 
@@ -171,7 +192,7 @@ def main() -> int:
       <span class="pill">hold {meta['duration_s']}s</span>
       <span class="pill">auto-refresh {refresh}s</span>
       <div style="margin-top:0.5rem">{meta['firmware']}</div>
-      <div>{meta['waste']} · {meta['timestamp']}</div>
+      <div>{meta['waste']} · bottle={meta['bottle']} · expect_trip={meta['expect_trip']} · G={meta['g_sealed_max']} · {meta['timestamp']}</div>
     </div>
   </header>
   <main>
@@ -180,7 +201,9 @@ def main() -> int:
       <table>
         <thead>
           <tr>
-            <th>Target</th><th>Status</th><th>Mean |err|</th><th>Mean err</th>
+            <th>Target</th><th>Status</th>
+            {('<th>Bottle</th><th>Expect trip</th><th>Tripped</th><th>Trip t</th><th>Waste pass</th>' if waste_enabled else '')}
+            <th>Mean |err|</th><th>Mean err</th>
             <th>Stdev</th><th>P95 |err|</th><th>Max |err|</th><th>N</th>
           </tr>
         </thead>

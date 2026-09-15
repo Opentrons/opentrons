@@ -67,11 +67,24 @@ def main(args) -> int:
                 (x for x in r.get("runs", []) if x.get("target_mbar") == tgt), None
             )
             st = (run or {}).get("stats") or {}
+            waste_bit = ""
+            if run is not None and (
+                run.get("tripped") is not None or run.get("pass") is not None
+            ):
+                waste_bit = (
+                    f"<br/><small>trip={run.get('tripped')} "
+                    f"expect={run.get('expect_trip')} "
+                    f"pass={run.get('pass')}</small>"
+                )
             if st.get("n"):
-                s = f"{st['mean_abs_err']:.2f} / {st.get('p2p', float('nan')):.2f} / {st['stdev_err']:.2f}"
+                s = (
+                    f"{st['mean_abs_err']:.2f} / "
+                    f"{st.get('p2p', float('nan')):.2f} / "
+                    f"{st['stdev_err']:.2f}{waste_bit}"
+                )
                 vals.append(st["mean_abs_err"])
             else:
-                s = "—"
+                s = f"—{waste_bit}" if waste_bit else "—"
                 vals.append(None)
             cells.append(f"<td data-v='{vals[-1]}'>{s}</td>")
         # highlight best mean_abs
@@ -115,6 +128,10 @@ def main(args) -> int:
     meta_rows = "".join(
         f"<tr><td>{run_label(r)}</td>"
         f"<td>{r.get('status')}</td><td>{r.get('timestamp')}</td>"
+        f"<td>{r.get('waste_detection', '')}</td>"
+        f"<td>{r.get('bottle')}</td>"
+        f"<td>{r.get('expect_trip')}</td>"
+        f"<td>{r.get('g_sealed_max')}</td>"
         f"<td>{r.get('firmware','')[:80]}</td></tr>"
         for r in runs
     )
@@ -150,7 +167,7 @@ def main(args) -> int:
     <div class="panel">
       <h2>Runs</h2>
       <table>
-        <thead><tr><th>Name</th><th>Status</th><th>Timestamp</th><th>Firmware</th></tr></thead>
+        <thead><tr><th>Name</th><th>Status</th><th>Timestamp</th><th>Waste</th><th>Bottle</th><th>Expect trip</th><th>G</th><th>Firmware</th></tr></thead>
         <tbody>{meta_rows}</tbody>
       </table>
     </div>

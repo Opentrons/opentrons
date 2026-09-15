@@ -144,6 +144,9 @@ def _single_summary_figure(
         f"{data.get('timestamp', '')}",
         str(data.get("firmware", "")),
         f"Waste: {data.get('waste_detection', '')}    "
+        f"Bottle: {data.get('bottle')}    "
+        f"Expect trip: {data.get('expect_trip')}    "
+        f"G: {data.get('g_sealed_max')}",
         f"Hold: {data.get('duration_s')}s    "
         f"Sample: {data.get('sample_period_s')}s",
     ]
@@ -153,6 +156,11 @@ def _single_summary_figure(
     headers = [
         "Target",
         "Status",
+        "Bottle",
+        "Expect",
+        "Tripped",
+        "Trip t",
+        "Pass",
         "Mean |err|",
         "Mean err",
         "Stdev",
@@ -163,11 +171,23 @@ def _single_summary_figure(
     table_rows = []
     for run in runs:
         stats = run.get("stats") or {}
+        waste_cols = [
+            str(run.get("bottle") or "—"),
+            str(run.get("expect_trip")),
+            str(run.get("tripped")),
+            (
+                "—"
+                if run.get("trip_t_s") is None
+                else f"{run.get('trip_t_s')}"
+            ),
+            str(run.get("pass")),
+        ]
         if stats.get("n"):
             table_rows.append(
                 [
                     f"{run.get('target_mbar')}",
                     str(run.get("status", "")),
+                    *waste_cols,
                     f"{stats['mean_abs_err']:.2f}",
                     f"{stats['mean_err']:.2f}",
                     f"{stats['stdev_err']:.2f}",
@@ -181,6 +201,7 @@ def _single_summary_figure(
                 [
                     f"{run.get('target_mbar')}",
                     str(run.get("status", "")),
+                    *waste_cols,
                     stats.get("note", "no steady data"),
                     "",
                     "",
