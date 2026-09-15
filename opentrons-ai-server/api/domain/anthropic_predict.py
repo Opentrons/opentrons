@@ -57,6 +57,14 @@ API_DOCS_ROOT: Path = ROOT_PATH / "api" / "storage" / "api_docs"
 API_DOCS_CONTENT_ROOT: Path = API_DOCS_ROOT / "docs" / "v2"
 API_DOCS_STRUCT_PATH: Path = API_DOCS_ROOT / "api_docs_struct.md"
 
+# Shown when _handle_response hits MAX_TOOL_ROUNDS (AUTH-3348); avoids generic "No response was generated".
+TOOL_ROUNDS_EXCEEDED_USER_MESSAGE = (
+    "This request needed more automated steps than Opentrons AI can run in one reply "
+    "(for example, chained documentation lookup, protocol generation, and simulation). "
+    "Please try again: generate the protocol in one message, then ask to simulate in a follow-up, "
+    "or simplify what you need in a single request."
+)
+
 
 class AnthropicPredict:
     # Safety cap on tool-call round trips per turn. Sonnet 5 is materially more agentic than
@@ -562,7 +570,7 @@ class AnthropicPredict:
                 "Exceeded max tool rounds without a final response",
                 extra={"user_id": user_id, "max_rounds": self.MAX_TOOL_ROUNDS},
             )
-            return None
+            return TOOL_ROUNDS_EXCEEDED_USER_MESSAGE
 
         text = "".join(block.text for block in response.content if block.type == "text").strip()
         if text:

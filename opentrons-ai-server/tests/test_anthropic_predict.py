@@ -13,7 +13,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 from anthropic.types import Message, MessageParam, TextBlock, ToolUseBlock, Usage
-from api.domain.anthropic_predict import AnthropicPredict
+from api.domain.anthropic_predict import TOOL_ROUNDS_EXCEEDED_USER_MESSAGE, AnthropicPredict
 from api.settings import get_settings
 
 
@@ -103,7 +103,7 @@ def test_handle_response_follows_chained_tool_calls_across_multiple_rounds(predi
 
 @pytest.mark.unit
 def test_handle_response_gives_up_after_max_tool_rounds(predict: AnthropicPredict) -> None:
-    """If the model never stops calling tools, bail out with None instead of looping forever."""
+    """If the model never stops calling tools, return a specific user message instead of looping forever."""
     tool_use = ToolUseBlock(id="tool_1", name="get_relevant_api_docs", input={"query": "x"}, type="tool_use")
     always_tool_use = _tool_use_message(tool_use)
 
@@ -112,7 +112,7 @@ def test_handle_response_gives_up_after_max_tool_rounds(predict: AnthropicPredic
 
     result = asyncio.run(predict._handle_response(always_tool_use, [], "user-1", "create"))
 
-    assert result is None
+    assert result == TOOL_ROUNDS_EXCEEDED_USER_MESSAGE
     assert predict._process_message.await_count == AnthropicPredict.MAX_TOOL_ROUNDS
 
 
