@@ -543,7 +543,7 @@ class AnthropicPredict:
         "No response was generated, please try again." It also only sent a tool_result for the
         *last* tool_use block, which violates the Anthropic API's requirement that every tool_use
         in a turn gets a matching tool_result whenever the model requests more than one tool at
-        once, causing a hard API error ("Something went wrong. Please try again."). See AUTH-3347.
+        once, causing a hard API error ("Something went wrong. Please try again.").
         """
         for _ in range(self.MAX_TOOL_ROUNDS):
             tool_uses = [block for block in response.content if block.type == "tool_use"]
