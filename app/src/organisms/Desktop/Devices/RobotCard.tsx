@@ -44,6 +44,7 @@ import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
+import styles from './notificationstack.module.css'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
@@ -98,6 +99,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         width="100%"
       >
         <Flex
+          className={styles.notification_stack}
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
           paddingRight={SPACING.spacing24}

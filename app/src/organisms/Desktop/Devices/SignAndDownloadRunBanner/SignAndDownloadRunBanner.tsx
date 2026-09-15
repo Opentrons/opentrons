@@ -23,14 +23,14 @@ export interface SignAndDownloadRunBannerProps {
 
 export function SignAndDownloadRunBanner({
   robotName,
-}: SignAndDownloadRunBannerProps): JSX.Element {
+}: SignAndDownloadRunBannerProps): JSX.Element | null {
   const { t } = useTranslation('access_control')
 
   const { isSigningRequired, isDownloadingRequired, onLinkClick } =
     useIsSigningOrDownloadingRequired(robotName)
 
   if (!isSigningRequired && !isDownloadingRequired) {
-    return <></>
+    return null
   }
 
   const bannerType = isSigningRequired ? 'signing' : 'downloading'

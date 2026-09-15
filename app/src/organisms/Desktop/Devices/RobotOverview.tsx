@@ -35,6 +35,7 @@ import {
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
 import { useUSBRegistration } from './hooks'
+import styles from './notificationstack.module.css'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
@@ -101,6 +102,7 @@ export function RobotOverview({
           <Box padding={SPACING.spacing8} width="100%">
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Flex
+                className={styles.notification_stack}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
                 paddingRight={SPACING.spacing24}
