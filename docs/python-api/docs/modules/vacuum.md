@@ -145,7 +145,7 @@ With open-loop power control, the module:
 - Does not monitor sensor data or adjust motor speed.
 - Operates strictly at the specified power level and duration.
 
-Unlike closed-loop pressure control, which maintains a precise vacuum for reproducible results across protocol runs, power control is primarily intended for utility tasks when exact pressure regulation is not required (e.g., quick liquid removal, line purging, or system flushing).
+Unlike closed-loop pressure control, which maintains a precise vacuum for reproducible results across protocol runs, power control is intended for utility tasks when exact pressure regulation is not required (e.g., quick liquid removal, line purging, or system flushing).
 
 You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
 
