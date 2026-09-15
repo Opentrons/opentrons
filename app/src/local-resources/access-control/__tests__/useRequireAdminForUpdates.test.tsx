@@ -103,29 +103,35 @@ function mockQueries({
   accountType = 'user',
   username = 'alice',
   isLoading = false,
+  isAccessControlLoading,
+  isAuthSettingsLoading,
+  isSelfLoading,
 }: {
   accessControlEnabled?: boolean
   requireAdmin?: boolean
   accountType?: 'admin' | 'service' | 'user' | 'auditor'
   username?: string | null
   isLoading?: boolean
+  isAccessControlLoading?: boolean
+  isAuthSettingsLoading?: boolean
+  isSelfLoading?: boolean
 } = {}): void {
   vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
     data: { data: { accessControlEnabled } },
-    isLoading,
+    isLoading: isAccessControlLoading ?? isLoading,
   } as ReturnType<typeof useAccessControlEnabledQuery>)
   vi.mocked(useAuthSettingsQuery).mockReturnValue({
     data: {
       data: { requireAdminCredsWhenUpdatingRobotSoftware: requireAdmin },
     },
-    isLoading,
+    isLoading: isAuthSettingsLoading ?? isLoading,
   } as ReturnType<typeof useAuthSettingsQuery>)
   vi.mocked(useSelfQuery).mockReturnValue({
     data:
       username == null
         ? undefined
         : { data: { username, accountType, fullName: 'Alice' } },
-    isLoading,
+    isLoading: isSelfLoading ?? isLoading,
   } as ReturnType<typeof useSelfQuery>)
 }
 
@@ -233,6 +239,23 @@ describe('useRequireAdminForUpdates', () => {
     expect(mockMakeToast).toHaveBeenCalled()
   })
 
+  it('does not retry admin-gate queries', () => {
+    renderHook(() => useRequireAdminForUpdates(ROBOT_NAME), { wrapper })
+
+    expect(useAccessControlEnabledQuery).toHaveBeenCalledWith(
+      { retry: false },
+      expect.objectContaining({ hostname: HOST.hostname })
+    )
+    expect(useAuthSettingsQuery).toHaveBeenCalledWith(
+      { retry: false },
+      expect.objectContaining({ hostname: HOST.hostname })
+    )
+    expect(useSelfQuery).toHaveBeenCalledWith(
+      { retry: false },
+      expect.objectContaining({ hostname: HOST.hostname })
+    )
+  })
+
   it('returns false without logging out while auth queries are loading', () => {
     mockQueries({ isLoading: true })
 
@@ -244,6 +267,22 @@ describe('useRequireAdminForUpdates', () => {
     expect(result.current.ensureCanUpdate()).toBe(false)
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockMakeToast).not.toHaveBeenCalled()
+  })
+
+  it('is not loading when CRS is off even if self and auth settings are loading', () => {
+    mockQueries({
+      accessControlEnabled: false,
+      isAccessControlLoading: false,
+      isAuthSettingsLoading: true,
+      isSelfLoading: true,
+    })
+
+    const { result } = renderHook(() => useRequireAdminForUpdates(ROBOT_NAME), {
+      wrapper,
+    })
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.ensureCanUpdate()).toBe(true)
   })
 
   it('does not auto-open login on ODD when logged out', () => {
