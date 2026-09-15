@@ -89,16 +89,13 @@ export function UpdateRobotSoftware({
       return
     }
 
-    void remote
-      .getFilePathFrom(file)
-      .then(filePath => {
-        if (filePath === '') {
-          return
-        }
-        pendingFilePathRef.current = filePath
-        setIsStarting(true)
-      })
-      .catch(() => {})
+    void remote.getFilePathFrom(file).then(filePath => {
+      if (filePath === '') {
+        return
+      }
+      pendingFilePathRef.current = filePath
+      setIsStarting(true)
+    })
   }
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
