@@ -39,6 +39,7 @@ export function PasswordChange({
           })
           setShowLengthOfTime(false)
         }}
+        min={1}
         max={3650}
       />
     )

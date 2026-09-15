@@ -32,7 +32,7 @@ export function AuditLogRequirements({
   const [showDocumentation, setShowDocumentation] = useState(false)
 
   const documentationValue = auditSettings?.requireReasonForInteraction
-    ? `${auditSettings.minLengthOfReasonForInteraction} ${t('characters')}`
+    ? `${auditSettings.minLengthOfReasonForInteraction ?? 0} ${t('characters')}`
     : t('off')
 
   if (showDocumentation) {
@@ -50,7 +50,7 @@ export function AuditLogRequirements({
   return (
     <div className={styles.container}>
       <ChildNavigation
-        header={t('audit_log_requirements_title')}
+        header={t('audit_log_requirements')}
         onClickBack={onClickBack}
       />
       <div className={styles.content}>
