@@ -1097,8 +1097,8 @@ export const FLEX_WIDTH_ALERT_INFO_STYLE = css`
   }
 `
 export const ICON_SIZE_ALERT_INFO_STYLE = css`
-  width: ${SPACING.spacing40};
-  height: ${SPACING.spacing40};
+  width: ${SPACING.spacing24};
+  height: ${SPACING.spacing24};
   @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
     width: ${SPACING.spacing60};
     height: ${SPACING.spacing60};
