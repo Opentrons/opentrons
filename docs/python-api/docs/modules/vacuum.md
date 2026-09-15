@@ -117,11 +117,9 @@ The following sections describe how to set pressure levels, control the pump's d
 With closed-loop pressure control, the module actively monitors its internal pressure sensors to:
 
 - Reach and maintain the specified vacuum.
-- Stop the pump and raise an error if the waste carboy fills up and the mechanical float valve closes (detection may take up to 30 seconds).
+- Stop the pump and raise an error if the carboy reaches capacity and the mechanical float valve closes (detection may take up to 30 seconds).
 
 You can set the Vacuum Module to reach and hold a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure].
-
-Like the open-loop power control method, `start_set_vacuum_pressure()` runs asynchronously and returns a [`Task`][opentrons.protocol_api.Task] object. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ```python
 # Set system pressure to -300 mbar for 30 seconds and then equalize to atmospheric
@@ -138,21 +136,19 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 protocol.wait_for_tasks([vacuum_task])
 ```
 
+Like the open-loop power control method, `start_set_vacuum_pressure()` runs asynchronously and returns a [`Task`][opentrons.protocol_api.Task] object. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
+
 ### Open-loop power control
 
-With open-loop power control, the module:
+The open-loop power control is intended for utility tasks where exact pressure regulation is not required (e.g., quick liquid removal, line purging, or system flushing). With open-loop power control, the module:
 
 - Does not monitor sensor data or adjust motor speed.
 - Operates strictly at the specified power level and duration.
 
-Unlike closed-loop pressure control, which maintains a precise vacuum for reproducible results across protocol runs, power control is intended for utility tasks when exact pressure regulation is not required (e.g., quick liquid removal, line purging, or system flushing).
-
-You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
-
 !!! warning "Carboy overflow risk"
     Because open-loop power control ignores sensor feedback, the module will continue to run even after the carboy reaches capacity and the float valve closes. Always empty the carboy before running a protocol and use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
 
-Like the closed-loop pressure control method, `start_set_vacuum_power()` runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
+You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
 
 ```python
 # Run pump at 60% power for 20 seconds
@@ -168,6 +164,8 @@ power_task = vacuum.start_set_vacuum_power(
 # Wait for power duration and pressure equalization to complete.
 protocol.wait_for_tasks([power_task])
 ```
+
+Like the closed-loop pressure control method, `start_set_vacuum_power()` runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ### Multi-step vacuum profiles
 
