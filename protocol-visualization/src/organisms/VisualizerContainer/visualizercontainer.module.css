@@ -43,6 +43,7 @@
   max-width: 37.5rem; /* 600px */
   flex-direction: column;
   flex-shrink: 0;
+  padding: var(--spacing-8);
   overflow-y: auto;
 }
 
