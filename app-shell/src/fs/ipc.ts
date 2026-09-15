@@ -153,9 +153,7 @@ export function registerDownloadHandlers(mainWindow: BrowserWindow): void {
 
       const entries = await Promise.allSettled(
         normalizedPaths.map(async ({ path: sourcePath, name: entryName }) => {
-          const url = buildRobotHttpUrl({ ip: hostname, port }, sourcePath, {
-            forceHttp: usb,
-          })
+          const url = buildRobotHttpUrl({ ip: hostname, port }, sourcePath)
           const response = await fetch(url, requestInit)
           if (response.status === 204) {
             throw createEmptyDownloadError()
@@ -213,9 +211,7 @@ export function registerDownloadHandlers(mainWindow: BrowserWindow): void {
       const agent = usb ? getSerialPortHttpAgent() : undefined
       const requestInit = agent != null ? { agent } : undefined
 
-      const url = buildRobotHttpUrl({ ip: hostname, port }, source, {
-        forceHttp: usb,
-      })
+      const url = buildRobotHttpUrl({ ip: hostname, port }, source)
 
       await fetchToFile(url, filePath, {
         requestInit,
