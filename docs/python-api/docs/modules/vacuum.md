@@ -114,12 +114,14 @@ The following sections describe how to set pressure levels, control the pump's d
 
 ### Closed-loop pressure control
 
-You can set the Vacuum Module to reach and hold a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. With closed-loop pressure control, the module actively monitors its internal pressure sensors to:
+With closed-loop pressure control, the module actively monitors its internal pressure sensors to:
 
-- Maintain the specified vacuum.
-- Stop the pump and raise an error if the waste carboy fills up and the mechanical float valve closes.
+- Reach and maintain the specified vacuum.
+- Stop the pump and raise an error if the waste carboy fills up and the mechanical float valve closes (detection may take up to 30 seconds).
 
-This method runs asynchronously and returns a [`Task`][opentrons.protocol_api.Task] object. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
+You can set the Vacuum Module to reach and hold a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure].
+
+Like the open-loop power control method, `start_set_vacuum_pressure()` runs asynchronously and returns a [`Task`][opentrons.protocol_api.Task] object. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ```python
 # Set system pressure to -300 mbar for 30 seconds and then equalize to atmospheric
@@ -138,16 +140,19 @@ protocol.wait_for_tasks([vacuum_task])
 
 ### Open-loop power control
 
-You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]. With open-loop power control, the pump:
+With open-loop power control, the module:
 
-- Runs at the specified power level and duration only.
-- Does not monitor sensor feedback or adjust motor speed.
+- Does not monitor sensor data or adjust motor speed.
+- Operates strictly at the specified power level and duration.
 
-<!-- note to reviewers: "deadhead" is a real engineering term that indicates a blocked pump. Use is accurate here. -->
+Unlike closed-loop pressure control, which maintains a precise vacuum for reproducible results across protocol runs, power control is primarily intended for utility tasks when exact pressure regulation is not required (e.g., quick liquid removal, line purging, or system flushing).
+
+You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
+
 !!! warning "Carboy overflow risk"
-    Because `start_set_vacuum_power()` does not read sensor feedback, the module cannot detect when the waste carboy is full. If the carboy float valve closes, the pump will continue running without raising an error. Use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
+    Because `start_set_vacuum_power()` does not read sensor data, the module cannot detect when the waste carboy is full. If the carboy float valve closes, the pump will continue running without raising an error. Use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
 
-Like pressure control, this method runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
+Like the closed-loop pressure control method, `start_set_vacuum_power()` runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
 ```python
 # Run pump at 60% power for 20 seconds
@@ -158,7 +163,7 @@ power_task = vacuum.start_set_vacuum_power(
     equalize_timeout_s=5
 )
 
-# Runs other pipetting or protocols actions while pump operates ...
+# Run other pipetting or protocols actions while pump operates...
 
 # Wait for power duration and pressure equalization to complete.
 protocol.wait_for_tasks([power_task])
