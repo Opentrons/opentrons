@@ -17,10 +17,9 @@ export function buildRobotHttpUrl(
   options: {
     token?: string | null
     secure?: boolean
-    forceHttp?: boolean
   } = {}
 ): string {
-  const { token, secure, forceHttp } = options
+  const { token, secure } = options
   const isLocalTransport =
     robot.ip === 'localhost' ||
     robot.ip === '127.0.0.1' ||
@@ -30,12 +29,11 @@ export function buildRobotHttpUrl(
   const requiresSecureTransport = Boolean(token) || Boolean(secure)
   // USB is an HTTP-only serial tunnel and loopback is ODD. Neither can
   // speak TLS, even when a token or secure flag is set. Matches api-client request().
-  const protocol =
-    forceHttp === true || isLocalTransport
-      ? 'http'
-      : (secure ?? false) || requiresSecureTransport
-        ? 'https'
-        : 'http'
+  const protocol = isLocalTransport
+    ? 'http'
+    : (secure ?? false) || requiresSecureTransport
+      ? 'https'
+      : 'http'
 
   const defaultPort =
     protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT

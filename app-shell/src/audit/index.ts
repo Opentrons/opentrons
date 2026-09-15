@@ -78,8 +78,7 @@ async function downloadAuditLog(
   const usb = hostname === OPENTRONS_USB
   const url = buildRobotHttpUrl(
     { ip: hostname, port },
-    `/audit/external/logPeriods/${logPeriodId}/download`,
-    { forceHttp: usb }
+    `/audit/external/logPeriods/${logPeriodId}/download`
   )
   const agent = usb ? getSerialPortHttpAgent() : undefined
   const requestInit = !!agent ? { agent } : undefined
