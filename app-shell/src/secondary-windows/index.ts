@@ -132,6 +132,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         return openStepDetailViewer({
           protocolKey: action.payload.protocolKey,
           slot: action.payload.slot,
+          offDeckLabwareId: action.payload.offDeckLabwareId,
           command: action.payload.command,
           robotState: action.payload.robotState,
           invariantContext: action.payload.invariantContext,
@@ -144,6 +145,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
       // Window exists, update its contents and focus it
       updateStepDetailViewerData(action.payload.protocolKey, {
         slot: action.payload.slot,
+        offDeckLabwareId: action.payload.offDeckLabwareId,
         command: action.payload.command,
         robotState: action.payload.robotState,
         analysis: action.payload.analysis,
@@ -156,6 +158,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
     case STEP_DETAIL_VIEWER_UPDATE:
       updateStepDetailViewerData(action.payload.protocolKey, {
         slot: action.payload.slot ?? undefined,
+        offDeckLabwareId: action.payload.offDeckLabwareId,
         command: action.payload.command,
         robotState: action.payload.robotState,
         analysis: action.payload.analysis,

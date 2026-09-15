@@ -28,6 +28,7 @@ interface UpdateStepDetailViewerDetails extends SecondaryWindowDetails {
 interface OpenStepDetailViewerParams {
   protocolKey: string
   slot: string
+  offDeckLabwareId?: string | null
   command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
@@ -84,6 +85,7 @@ export function createStepDetailViewerUi({
   invariantContext,
   command,
   slot,
+  offDeckLabwareId,
   liquids,
 }: OpenStepDetailViewerParams): BrowserWindow {
   log.debug('Creating step detail viewer window', { protocolKey })
@@ -96,6 +98,7 @@ export function createStepDetailViewerUi({
     invariantContext,
     command,
     slot,
+    offDeckLabwareId,
     liquids,
   })
 

@@ -1,11 +1,12 @@
 import { getIsTiprack } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  getFullStackFromLabwares,
   HOPPER_FAKE_LOCATIONS,
 } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
+
+import { getLabwareStackForSlot } from '../utils/getLabwareStackForSlot'
 
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
@@ -28,13 +29,21 @@ import type { LabwareEntityExtended } from '../DeckView'
 
 interface SlotDetailsProps {
   slotId: string
+  offDeckLabwareId?: string | null
   robotState: RobotState
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
 export function SlotDetails(props: SlotDetailsProps): ReactNode {
-  const { slotId, robotState, invariantContext, analysis, liquids } = props
+  const {
+    slotId,
+    offDeckLabwareId,
+    robotState,
+    invariantContext,
+    analysis,
+    liquids,
+  } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
@@ -46,7 +55,11 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
-  const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
+  const stackOfLabwareOnSlot = getLabwareStackForSlot(
+    labware,
+    slotId,
+    slotId === 'offDeck' ? offDeckLabwareId : undefined
+  )
   const isHopperSlot = HOPPER_FAKE_LOCATIONS.includes(slotId)
   const mappedSlot = isHopperSlot
     ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]

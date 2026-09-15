@@ -230,6 +230,7 @@ export interface StepDetailViewerOpenAction {
   payload: {
     protocolKey: string
     slot: string
+    offDeckLabwareId?: string | null
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
@@ -246,6 +247,7 @@ export interface StepDetailViewerUpdateAction {
   payload: {
     protocolKey: string
     slot: string | null
+    offDeckLabwareId?: string | null
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext

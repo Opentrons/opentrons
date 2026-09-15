@@ -19,6 +19,7 @@ interface StepDetailData {
   invariantContext: InvariantContext
   command: RunTimeCommand
   slot: string
+  offDeckLabwareId?: string | null
   liquids: Liquid[]
 }
 interface StepDetailViewerParams {
@@ -82,11 +83,13 @@ export function StepDetailViewer(): ReactNode {
   if (data === null) {
     return <div>no data found</div>
   }
-  const { slot, robotState, invariantContext, analysis, liquids } = data
+  const { slot, offDeckLabwareId, robotState, invariantContext, analysis, liquids } =
+    data
 
   return (
     <SlotDetails
       slotId={slot}
+      offDeckLabwareId={offDeckLabwareId}
       robotState={robotState}
       invariantContext={invariantContext}
       analysis={analysis}

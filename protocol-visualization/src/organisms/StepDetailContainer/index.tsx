@@ -1,5 +1,4 @@
 import { parseInitialPipetteNamesByMount } from '@opentrons/shared-data'
-import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { LabwareSlotContainer } from '../LabwareSlotContainer'
 import { PipetteContainer } from '../PipetteContainer'
@@ -7,6 +6,11 @@ import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 import { getActiveSlotForLabwareDetails } from '../utils/getActiveSlotForLabwareDetails'
 import { getActiveSlotForTiprackDetails } from '../utils/getActiveSlotForTiprackDetails'
+import {
+  getLabwareIdForStackLookup,
+  getLabwareStackForSlot,
+  getTiprackIdUnderPipette,
+} from '../utils/getLabwareStackForSlot'
 import { getIsPipetteActive } from '../utils/getIsPipetteActive'
 import styles from './stepdetailcontainer.module.css'
 
@@ -31,14 +35,21 @@ export function StepDetailContainer({
 }: StepDetailContainerProps): ReactNode {
   const { labwareEntities, pipetteEntities, moduleEntities } = invariantContext
   const { labware, pipettes } = robotState
+  const pipetteList = Object.values(pipettes)
+  const tiprackId = getTiprackIdUnderPipette(pipetteList)
+  const labwareIdForStack = getLabwareIdForStackLookup(
+    robotState,
+    invariantContext,
+    currentCommand
+  )
   const tiprackActiveSlot = getActiveSlotForTiprackDetails(
-    Object.values(pipettes),
+    pipetteList,
     robotState,
     invariantContext
   )
   const tiprackStack =
     tiprackActiveSlot != null
-      ? getFullStackFromLabwares(labware, tiprackActiveSlot)
+      ? getLabwareStackForSlot(labware, tiprackActiveSlot, tiprackId)
       : []
   const labwareActiveSlot = getActiveSlotForLabwareDetails(
     robotState,
@@ -47,7 +58,11 @@ export function StepDetailContainer({
   )
   const stackOfLabwareOnSlot =
     labwareActiveSlot != null
-      ? getFullStackFromLabwares(labware, labwareActiveSlot)
+      ? getLabwareStackForSlot(
+          labware,
+          labwareActiveSlot,
+          labwareIdForStack
+        )
       : []
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null

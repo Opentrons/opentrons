@@ -28,6 +28,7 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { StepDetailContainer } from '../StepDetailContainer'
+import { getLabwareIdForStackLookup } from '../utils/getLabwareStackForSlot'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent, ReactNode } from 'react'
@@ -169,10 +170,19 @@ export function VisualizerContainer(
       const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
       if (nextIndex < 0) return
 
+      const nextCommand = commands[nextIndex]
       const nextSpotlight = {
         protocolKey,
         slot: selectedSlot,
-        command: commands[nextIndex],
+        offDeckLabwareId:
+          selectedSlot === 'offDeck'
+            ? getLabwareIdForStackLookup(
+                robotState,
+                invariantContext,
+                nextCommand
+              )
+            : undefined,
+        command: nextCommand,
         robotState,
         invariantContext,
         analysis,
@@ -401,6 +411,14 @@ export function VisualizerContainer(
                 stepDetailViewerOpenAction({
                   protocolKey,
                   slot,
+                  offDeckLabwareId:
+                    slot === 'offDeck'
+                      ? getLabwareIdForStackLookup(
+                          robotState,
+                          invariantContext,
+                          selectedRunTimeCommand
+                        )
+                      : undefined,
                   command: selectedRunTimeCommand,
                   robotState,
                   invariantContext,
