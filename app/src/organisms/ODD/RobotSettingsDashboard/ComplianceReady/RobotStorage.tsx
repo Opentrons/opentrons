@@ -25,7 +25,7 @@ export function RobotStorage({
       <div className={styles.content}>
         <div className={styles.settings_list}>
           <ToggleSetting
-            title={t('require_admin_credentials_to_update_robots')}
+            title={t('automatically_delete_protocol_run_logs')}
             value={robotServerSettings?.deleteOverMaxOnDiskProtocols ?? false}
             onClick={() => {
               patchRobotServerSettings({

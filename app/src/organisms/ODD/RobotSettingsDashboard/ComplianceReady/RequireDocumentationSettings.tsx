@@ -71,8 +71,8 @@ export function RequireDocumentationSettings({
             </StyledText>
             <div className={styles.settings_preferences_list}>
               <SettingsListButton
-                key={t('just_length_of_time')}
-                title={t('just_length_of_time')}
+                key={t('minimum_length_for_documentation')}
+                title={t('minimum_length_for_documentation_description')}
                 value={`${auditSettings?.minLengthOfReasonForInteraction ?? 0} ${t('characters')}`}
                 onClick={() => {
                   setShowMinLength(true)

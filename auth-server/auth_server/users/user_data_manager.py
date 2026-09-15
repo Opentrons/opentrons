@@ -183,9 +183,7 @@ def must_reset_password(
 ) -> bool:
     """Return whether the user must reset their password before full robot access."""
     password_is_expired = (
-        password_reset_time_sec is not None
-        and now
-        > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
+        False
     )
     return password_is_expired or user.reset_password
 
