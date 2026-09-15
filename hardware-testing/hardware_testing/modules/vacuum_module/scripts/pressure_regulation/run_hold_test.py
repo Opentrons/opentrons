@@ -17,10 +17,26 @@ from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.errors import WasteContainerFull
 from opentrons.drivers.vacuum_module.types import VentState
 
-from hardware_testing.modules.common.utils import find_module_port
-from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
-    hold_results,
-)
+try:
+    from hardware_testing.modules.common.utils import find_module_port
+except ImportError:
+    from serial.tools.list_ports import comports
+
+    def find_module_port(vid: int, pid: int) -> str:
+        """Find a USB serial port by VID/PID when hardware_testing isn't installed."""
+        for port_info in comports():
+            if port_info.vid == vid and port_info.pid == pid:
+                print(f"Found module at port: {port_info.device}")
+                return str(port_info.device)
+        raise RuntimeError("could not find connected module.")
+
+
+try:
+    from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+        hold_results,
+    )
+except ImportError:
+    import hold_results  # type: ignore[no-redef,import-not-found]
 
 
 DEFAULT_CSV_PATH = hold_results.DEFAULT_CSV_PATH
@@ -304,31 +320,52 @@ async def main(args: argparse.Namespace) -> int:
             f"SerialNo:{info['serial']}"
         )
         print("M115:", fw, flush=True)
-        await pump.set_waste_configs(
-            enable_waste_full_detection=waste_detection,
-            g_sealed_max=g_sealed_max,
-        )
+        waste_kwargs: dict[str, Any] = {
+            "enable_waste_full_detection": waste_detection,
+        }
+        if "g_sealed_max" in pump.set_waste_configs.__code__.co_varnames:
+            waste_kwargs["g_sealed_max"] = g_sealed_max
+        elif g_sealed_max is not None:
+            print(
+                "warning: this vacuum driver has no g_sealed_max; ignoring --g-sealed-max",
+                flush=True,
+            )
+        await pump.set_waste_configs(**waste_kwargs)
         waste = await pump.get_waste_configs()
-        waste_label = _waste_label(waste.waste_detection_enabled, waste.g_sealed_max)
+        waste_g = getattr(waste, "g_sealed_max", None)
+        waste_label = _waste_label(waste.waste_detection_enabled, waste_g)
         print(f"waste detection: {waste_label}", flush=True)
         print("M128:", waste, flush=True)
         print("M121:", await pump.get_vacuum_state(), flush=True)
         await pump.set_pressure_control_tunings(kp=kp, ki=ki, kd=kd)
-        control_tunings = await pump.get_pressure_control_tunings()
-        print("M126:", control_tunings, flush=True)
+        try:
+            control_tunings = await pump.get_pressure_control_tunings()
+            print("M126:", control_tunings, flush=True)
+            kp_out, ki_out, kd_out = (
+                control_tunings.kp,
+                control_tunings.ki,
+                control_tunings.kd,
+            )
+        except (ValueError, TypeError, AttributeError) as exc:
+            print(
+                f"warning: get_pressure_control_tunings failed ({exc!r}); "
+                "using commanded Kp/Ki/Kd",
+                flush=True,
+            )
+            kp_out, ki_out, kd_out = kp, ki, kd
 
         result: dict[str, Any] = {
             "run_name": run_name,
             "firmware": fw,
             "targets": targets,
-            "kp": control_tunings.kp,
-            "ki": control_tunings.ki,
-            "kd": control_tunings.kd,
+            "kp": kp_out,
+            "ki": ki_out,
+            "kd": kd_out,
             "duration_s": duration_s,
             "sample_period_s": SAMPLE_PERIOD_S,
             "waste_detection": waste_label,
             "waste_detection_enabled": bool(waste.waste_detection_enabled),
-            "g_sealed_max": waste.g_sealed_max,
+            "g_sealed_max": waste_g,
             "bottle": bottle,
             "expect_trip": expect_trip,
             "runs": [],

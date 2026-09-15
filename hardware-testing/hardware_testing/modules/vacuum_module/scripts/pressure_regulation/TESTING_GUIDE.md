@@ -25,10 +25,16 @@ Uses `VacuumModuleDriver` (asyncio). Waste detection is **off by default**.
 |------|---------|
 | `run_hold_test.py` | Hold sweep via `VacuumModuleDriver`; writes live JSON and/or CSV |
 | `hold_results.py` | Shared JSON/CSV load/save used by the runner, reports, and converter |
-| `make_report.py` | Single-run HTML charts from one JSON or CSV |
-| `make_compare_report.py` | Multi-run comparison HTML from `runs/*/results.json` (or `.csv`) |
-| `convert_hold_results.py` | Convert archived results between JSON and CSV |
+| `reports.py` | Single-run and multi-run HTML/PDF report builders |
+| `cli.py` | Host CLI: `report`, `compare`, `convert` |
 | `flash_dfu_flex.sh` | DFU flash over Flex USB (**prefer ST-Link**) |
+
+Host tools (from this directory, or via `-m`):
+
+```bash
+python3 cli.py {report,compare,convert} ...
+python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation {report,compare,convert} ...
+```
 
 ### `run_hold_test.py`
 
@@ -91,30 +97,32 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
   --run-name empty_water --waste-detection --no-expect-trip --bottle empty
 ```
 
-### `make_report.py`
+### `cli.py report`
 
 ```bash
-python3 make_report.py [--input PATH] [--output PATH] [--format html|pdf|both]
+python3 cli.py report [--input PATH] [--output PATH] [--format html|pdf|both] [--refresh] [--title TEXT]
 ```
 
 | Arg | Default | Meaning |
 |-----|---------|---------|
 | `--input` | `results.json` | Hold-test `.json`, `.csv`, or a run directory |
 | `--output` | `index.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
-| `--format` | from `--output` suffix, else `html` | `html` (live Chart.js), `pdf` (matplotlib), or `both` |
+| `--format` | from `--output` suffix, else `html` | `html` (Chart.js), `pdf` (matplotlib), or `both` |
+| `--refresh` | off | Embed an HTML auto-refresh tag (3 s while running, 30 s when done) |
+| `--title` | `Vacuum module pressure report` | Report heading |
 
 PDF needs matplotlib on the host (`hardware-testing` dev extra).
 
 ```bash
-python3 make_report.py --input results.json --output index.html
-python3 make_report.py --input results.json --output index.pdf
-python3 make_report.py --input results.json --output index.html --format both
+python3 cli.py report --input results.json --output index.html
+python3 cli.py report --input results.json --output index.pdf
+python3 cli.py report --input results.json --output index.html --format both
 ```
 
-### `make_compare_report.py`
+### `cli.py compare`
 
 ```bash
-python3 make_compare_report.py [--runs-dir DIR] [--output PATH] [--format html|pdf|both]
+python3 cli.py compare [--runs-dir DIR] [--output PATH] [--format html|pdf|both] [--refresh] [--title TEXT]
 ```
 
 | Arg | Default | Meaning |
@@ -122,13 +130,15 @@ python3 make_compare_report.py [--runs-dir DIR] [--output PATH] [--format html|p
 | `--runs-dir` | `runs` | Dir of run folders with `results.json` or `results.csv` |
 | `--output` | `compare.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
 | `--format` | from `--output` suffix, else `html` | `html`, `pdf`, or `both` |
+| `--refresh` | off | Embed an HTML auto-refresh tag |
+| `--title` | `Vacuum module pressure report` | Report heading |
 
 Each folder prefers `results.json` when both formats are present.
 
-### `convert_hold_results.py`
+### `cli.py convert`
 
 ```bash
-python3 convert_hold_results.py --input PATH [--output PATH]
+python3 cli.py convert --input PATH [--output PATH]
 ```
 
 | Arg | Default | Meaning |
@@ -141,8 +151,8 @@ CSV → JSON rebuilds the nested document (stats from the summary file, or
 recomputed from samples).
 
 ```bash
-python3 convert_hold_results.py --input runs/23_1888194c_water_3x0p2mm/results.json
-python3 convert_hold_results.py --input results.csv --output results.json
+python3 cli.py convert --input runs/23_1888194c_water_3x0p2mm/results.json
+python3 cli.py convert --input results.csv --output results.json
 ```
 
 ---
@@ -176,8 +186,8 @@ cd $ART
 (
   while true; do
     scp -q -i $KEY -o StrictHostKeyChecking=no -o ConnectTimeout=5 root@$FLEX:/tmp/vacuum_pressure_hold_results.json $ART/results.json 2>/dev/null || true
-    python3 make_report.py --input results.json --output index.html 2>/dev/null || true
-    python3 make_compare_report.py --runs-dir runs --output compare.html 2>/dev/null || true
+    python3 cli.py report --input results.json --output index.html --refresh 2>/dev/null || true
+    python3 cli.py compare --runs-dir runs --output compare.html --refresh 2>/dev/null || true
     sleep 3
   done
 ) &
@@ -190,7 +200,7 @@ python3 -m http.server 8765 --bind 127.0.0.1
 | Live single-run | http://127.0.0.1:8765/ |
 | Multi-run compare | http://127.0.0.1:8765/compare.html |
 
-Single-run page auto-refreshes while status is `running`.
+With `--refresh`, the HTML auto-reloads (3 s while `running`, 30 s when done). Generated pages have no auto-refresh unless that flag is set.
 
 ---
 
@@ -206,7 +216,7 @@ scp -i $KEY root@$FLEX:/tmp/vacuum_pressure_hold_results.csv \
 scp -i $KEY root@$FLEX:/tmp/vacuum_pressure_hold_results_summary.csv \
   $ART/runs/$RUN_NAME/results_summary.csv || true
 
-python3 make_compare_report.py --runs-dir $ART/runs --output $ART/compare.html
+python3 cli.py compare --runs-dir $ART/runs --output $ART/compare.html
 ```
 
 **Layout:**
@@ -225,6 +235,7 @@ artifacts/pressure_hold_test/
 ```
 
 Compare table: **mean |error| / p2p / stdev** per target (best mean |error| highlighted).
+Waste rows also show trip / Trip t / expect / pass.
 
 ---
 
@@ -232,7 +243,7 @@ Compare table: **mean |error| / p2p / stdev** per target (best mean |error| high
 
 1. Flash A → sweep → save under `runs/00_…`  
 2. Flash B → sweep → save under `runs/01_…`  
-3. Open **compare.html**; prefer lower mean |error| and p2p/stdev on hold (last ~30 s).  
+3. Open **compare.html**; prefer lower mean |error| and p2p/stdev on hold (last ~30 s of enabled samples, or until trip).
 4. Keep Flex, module, dry filter/collar, and room conditions the same.
 
 ---

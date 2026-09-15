@@ -63,6 +63,7 @@ SUMMARY_COLUMNS = [
     "mean_err",
     "mean_abs_err",
     "stdev_err",
+    "p2p",
     "p95_abs_err",
     "max_abs_err",
     "note",
@@ -115,26 +116,56 @@ def writes_csv(output: str) -> bool:
     return output in (OUTPUT_CSV, OUTPUT_BOTH)
 
 
+STEADY_WINDOW_S = 30
+
+
 def steady_stats(samples: list[dict[str, Any]], duration_s: int) -> dict[str, Any]:
-    """Compute last-30s steady-state stats while the pump is enabled."""
-    steady = [
+    """Compute last-30s stats while the pump is enabled.
+
+    The window ends at the last enabled sample (early trip or stop), not the
+    commanded duration, so short runs still get stats. A full-length hold is
+    unchanged: last 30 s of the commanded interval.
+    """
+    enabled = [
         s
         for s in samples
-        if s["t_s"] >= (duration_s - 30) and s["t_s"] < duration_s and s["enabled"] == 1
+        if s.get("enabled") == 1
+        and s.get("t_s") is not None
+        and s.get("error_mbar") is not None
+        and s.get("current_mbar") is not None
+        and s["t_s"] < duration_s
     ]
+    if not enabled:
+        return {"n": 0, "note": "no enabled samples"}
+    t_end = max(float(s["t_s"]) for s in enabled)
+    t_start = max(0.0, t_end - STEADY_WINDOW_S)
+    steady = [s for s in enabled if float(s["t_s"]) >= t_start]
     if not steady:
-        return {"n": 0, "note": "no steady samples (pump stopped early?)"}
-    errs = [s["error_mbar"] for s in steady]
-    currents = [s["current_mbar"] for s in steady]
+        return {"n": 0, "note": "no steady samples"}
+    errs = [float(s["error_mbar"]) for s in steady]
+    currents = [float(s["current_mbar"]) for s in steady]
     return {
         "n": len(steady),
         "mean_current": statistics.mean(currents),
         "mean_err": statistics.mean(errs),
         "mean_abs_err": statistics.mean(abs(e) for e in errs),
         "stdev_err": statistics.stdev(errs) if len(errs) > 1 else 0.0,
+        "p2p": max(errs) - min(errs),
         "p95_abs_err": sorted(abs(e) for e in errs)[int(0.95 * (len(errs) - 1))],
         "max_abs_err": max(abs(e) for e in errs),
     }
+
+
+def _refresh_stats(result: dict[str, Any]) -> None:
+    duration_s = int(result.get("duration_s") or 0)
+    for run in result.get("runs") or []:
+        samples = run.get("samples") or []
+        if not samples:
+            continue
+        run_duration = int(run.get("duration_s") or duration_s or 0)
+        if run_duration <= 0:
+            continue
+        run["stats"] = steady_stats(samples, run_duration)
 
 
 def write_json(result: dict[str, Any], path: Path) -> Path:
@@ -203,7 +234,9 @@ def write_results(
 
 def load_json(path: Path) -> dict[str, Any]:
     """Load a hold-test JSON document."""
-    return json.loads(path.read_text())
+    data = json.loads(path.read_text())
+    _refresh_stats(data)
+    return data
 
 
 def load_csv(path: Path, summary_path: Optional[Path] = None) -> dict[str, Any]:
@@ -431,6 +464,7 @@ def _summary_csv_text(result: dict[str, Any]) -> str:
                 "mean_err": _summary_cell(stats, "mean_err"),
                 "mean_abs_err": _summary_cell(stats, "mean_abs_err"),
                 "stdev_err": _summary_cell(stats, "stdev_err"),
+                "p2p": _summary_cell(stats, "p2p"),
                 "p95_abs_err": _summary_cell(stats, "p95_abs_err"),
                 "max_abs_err": _summary_cell(stats, "max_abs_err"),
                 "note": _summary_cell(stats, "note"),
@@ -555,13 +589,11 @@ def _assemble_result(
         status = summary.get("status") or ""
         if not status and samples:
             status = str(samples[-1].get("_run_status") or "")
-        stats = summary.get("stats")
-        if not stats:
-            stats = (
-                steady_stats(samples, int(run_duration))
-                if samples
-                else {"n": 0, "note": "no steady samples (pump stopped early?)"}
-            )
+        stats = (
+            steady_stats(samples, int(run_duration))
+            if samples
+            else {"n": 0, "note": "no enabled samples"}
+        )
         clean_samples = []
         for sample in samples:
             cleaned = dict(sample)
@@ -572,9 +604,7 @@ def _assemble_result(
                 "target_mbar": target,
                 "duration_s": run_duration,
                 "bottle": summary.get("bottle", meta.get("bottle")),
-                "expect_trip": summary.get(
-                    "expect_trip", meta.get("expect_trip")
-                ),
+                "expect_trip": summary.get("expect_trip", meta.get("expect_trip")),
                 "tripped": summary.get("tripped"),
                 "trip_t_s": summary.get("trip_t_s"),
                 "pass": summary.get("pass"),
