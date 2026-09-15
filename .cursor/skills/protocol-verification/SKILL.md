@@ -37,10 +37,10 @@ Flex-only checks use `api/.venv/bin/...` from this monorepo (or current PyPI `op
 
 ## Entry Points
 
-| Tool     | Binary                                          | Notes                                 |
-| -------- | ----------------------------------------------- | ------------------------------------- |
-| Simulate | `api/.venv/bin/opentrons_simulate`              | Flex dev tree; OT-2 rejected          |
-| Analyze  | `api/.venv/bin/python -m opentrons.cli analyze` | Flex dev tree; OT-2 rejected          |
+| Tool                                       | Binary                                            | Notes                                               |
+| ------------------------------------------ | ------------------------------------------------- | --------------------------------------------------- |
+| Simulate                                   | `api/.venv/bin/opentrons_simulate`                | Flex dev tree; OT-2 rejected                        |
+| Analyze                                    | `api/.venv/bin/python -m opentrons.cli analyze`   | Flex dev tree; OT-2 rejected                        |
 | Simulate / analyze (OT-2 or mixed @ ≤2.28) | Separate venv with `opentrons==9.0.0` (see above) | Last unified PyPI release; not monorepo `api/.venv` |
 
 > **Do not use `uv run`** for one-off simulate/analyze calls. It checks and potentially rebuilds the venv on every invocation, adding significant latency. Call the venv binaries directly.
