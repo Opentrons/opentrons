@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { mockApiHeaterShaker, RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -18,7 +18,6 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
 import {
@@ -161,13 +160,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
     screen.getByText('Location')
     screen.getByText('Status')
     screen.getByText('Setup Instructions')
-    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Display Map View' })
   })
 
   it('should launch deck map on button click', () => {
     render()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display Map View' }))
   })
 
   it('should launch setup instructions modal on button click', () => {

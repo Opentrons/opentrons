@@ -1,6 +1,6 @@
 """Vacuum manifold 400mbar stress test protocol for the Opentrons Flex."""
 import asyncio
-from typing import Any
+from typing import Any, Optional
 from datetime import datetime
 from pathlib import Path
 from opentrons import protocol_api  # type: ignore[import]
@@ -9,6 +9,7 @@ import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.types import VentState
 from opentrons.hardware_control.ot3api import OT3API  # type: ignore[import]
+from hardware_testing.modules.common.utils import resolve_ot_module_symlink
 import dataclasses
 import time
 import traceback
@@ -119,14 +120,30 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def find_port_by_id(vendorId: int, productId: int) -> str:
-    """Find a serial port by USB vendor and product ID."""
+    """Find a serial port by USB vendor and product ID.
+
+    When an Opentrons udev symlink exists for that device
+    (``/dev/ttyACM5`` -> ``/dev/ot_module_vacuummodule5``), return the symlink
+    so scripts open the same path robot-server uses.
+    """
     ports = serial.tools.list_ports.comports()
     for port in ports:
         # ctx.comment(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
             # ctx.comment(f"port: {port.device}")
-            return port.device
+            return resolve_ot_module_symlink(port.device)
     return ""
+
+
+def _get_attached_module_driver(
+    api: OT3API,
+    port: str,
+) -> Optional[vacuum_module.VacuumModuleDriver]:
+    """Reuse api module driver when the module is already attached."""
+    for mod in api.attached_modules:
+        if mod.port == port and isinstance(mod, vacuum_module.VacuumModuleDriver):
+            return mod._driver
+    return None
 
 
 def _write_to_csv(
@@ -220,7 +237,11 @@ async def _setup_devices(
     loop = asyncio.get_event_loop()
     # Vacuum Manifold Driver
     port = find_port_by_id(VM_idVendor, VM_idProduct)
-    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=self._loop)
+    # Prefer the already-attached module driver so we do not open a second one
+    pump = _get_attached_module_driver(
+        self, port
+    ) or await vacuum_module.VacuumModuleDriver.create(port=port, loop=self._loop)
+
     await pump.set_waste_configs(False)
     # Arduino Water pump Driver
     m_port = find_port_by_id(Ard_idVendor, Ard_idProduct)

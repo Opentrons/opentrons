@@ -1013,7 +1013,7 @@ async def test_async_module_error_stops_on_match(
 
     decoy.verify(
         action_dispatcher.dispatch(action=validated_action),
-        queue_worker.cancel(),
+        queue_worker.cancel("asynchronous module error from thermocyclerModuleV1"),
     )
 
 
@@ -1096,7 +1096,7 @@ async def test_estop(
 
     decoy.verify(
         action_dispatcher.dispatch(action=validated_action),
-        queue_worker.cancel(),
+        queue_worker.cancel("E-stop Pressed"),
     )
 
 

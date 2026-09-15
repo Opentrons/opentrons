@@ -1,7 +1,6 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -14,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof TouchTip>) => {
   return renderWithProviders(<TouchTip {...props} />, {
@@ -84,14 +75,15 @@ describe('TouchTip', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the first touch tip screen, continue, and back buttons', () => {
+  it('renders the first touch tip screen, continue, and back buttons', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Touch tip after aspirating')
     screen.getByTestId('ChildNavigation_Primary_Button')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
-    fireEvent.click(exitBtn)
+    await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
   })
 
@@ -104,112 +96,99 @@ describe('TouchTip', () => {
     screen.getByText('Touch tip after dispensing')
   })
 
-  it('renders save button if you select enabled, then moves to second screen', () => {
+  it('renders save button if you select enabled, then moves to second screen', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
-    fireEvent.click(screen.getByText('1'))
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '',
-        onBlur: expect.any(Function),
-      }),
-      {}
-    )
+    await user.click(continueBtn)
+    await user.click(screen.getByText('1'))
+    await user.click(continueBtn)
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('')
   })
 
-  it('calls dispatch button if you select disabled and save', () => {
+  it('calls dispatch button if you select disabled and save', async () => {
     render(props)
+    const user = userEvent.setup()
     const disabledBtn = screen.getByText('Disabled')
-    fireEvent.click(disabledBtn)
+    await user.click(disabledBtn)
     const saveBtn = screen.getByText('Save')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('has correct range for aspirate', () => {
+  it('has correct range for aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const numOneButton = screen.getByText('1')
-    fireEvent.click(numOneButton)
-    fireEvent.click(continueBtn)
+    await user.click(numOneButton)
+    await user.click(continueBtn)
     const negButton = screen.getByText('-')
-    fireEvent.click(negButton)
+    await user.click(negButton)
     const numButton = screen.getByText('9')
-    fireEvent.click(numButton)
+    await user.click(numButton)
     const secondNumButton = screen.getByText('8')
-    fireEvent.click(secondNumButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: 'Value must be between -25 to 0',
-        type: 'text',
-        value: '-98',
-        onBlur: expect.any(Function),
-      }),
-      {}
-    )
+    await user.click(secondNumButton)
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-98')
+    screen.getByText('Value must be between -25 to 0')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
 
-  it('has correct range for dispense', () => {
+  it('has correct range for dispense', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       kind: 'dispense',
     }
     render(props)
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const numOneButton = screen.getByText('1')
-    fireEvent.click(numOneButton)
-    fireEvent.click(continueBtn)
+    await user.click(numOneButton)
+    await user.click(continueBtn)
     const numButton = screen.getByText('1')
-    fireEvent.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: 'Value must be between -100 to 0',
-        type: 'text',
-        value: '1',
-        onBlur: expect.any(Function),
-      }),
-      {}
-    )
+    await user.click(numButton)
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('1')
+    screen.getByText('Value must be between -100 to 0')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
 
-  it('calls dispatch when an in range value is entered and saved', () => {
+  it('calls dispatch when an in range value is entered and saved', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const numButton = screen.getByText('1')
-    fireEvent.click(numButton)
-    fireEvent.click(continueBtn)
+    await user.click(numButton)
+    await user.click(continueBtn)
     const saveBtn = screen.getByText('Save')
     const zeroButton = screen.getByText('0')
-    fireEvent.click(zeroButton)
-    fireEvent.click(saveBtn)
+    await user.click(zeroButton)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('renders previously set value saved in state for aspirate', () => {
+  it('renders previously set value saved in state for aspirate', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -219,23 +198,17 @@ describe('TouchTip', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const numButton = screen.getByText('0')
-    fireEvent.click(numButton)
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '-25',
-        onBlur: expect.any(Function),
-      }),
-      {}
-    )
+    await user.click(numButton)
+    await user.click(continueBtn)
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-25')
   })
 
-  it('renders previously set value saved in state for dispense', () => {
+  it('renders previously set value saved in state for dispense', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       kind: 'dispense',
@@ -246,19 +219,12 @@ describe('TouchTip', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const numButton = screen.getByText('0')
-    fireEvent.click(numButton)
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '-8',
-        onBlur: expect.any(Function),
-      }),
-      {}
-    )
+    await user.click(numButton)
+    await user.click(continueBtn)
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-8')
   })
 })

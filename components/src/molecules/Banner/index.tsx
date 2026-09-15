@@ -15,11 +15,13 @@ import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
 export type BannerType =
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'updating'
-  | 'informing'
+  'success' | 'warning' | 'error' | 'updating' | 'informing'
+
+/**
+ * the design team has stopped using Banner
+ *
+ * @deprecated Use `InlineNotification`
+ */
 
 export interface BannerProps extends StyleProps {
   /** name constant of the icon to display */

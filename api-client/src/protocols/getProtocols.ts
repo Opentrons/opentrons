@@ -5,5 +5,5 @@ import type { HostConfig } from '../types'
 import type { Protocols } from './types'
 
 export function getProtocols(config: HostConfig): ResponsePromise<Protocols> {
-  return request<Protocols>(GET, `/protocols`, null, config)
+  return request<Protocols>(GET, `/protocols`, config)
 }

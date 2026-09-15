@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
@@ -20,6 +19,7 @@ import {
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -167,9 +167,9 @@ export function CustomLabwareOverflowMenu(
                 >
                   {t('shared:cancel')}
                 </Btn>
-                <AlertPrimaryButton onClick={handleClickDelete}>
+                <PrimaryButton variant="warning" onClick={handleClickDelete}>
                   {t('yes_delete_def')}
-                </AlertPrimaryButton>
+                </PrimaryButton>
               </Flex>
             </Flex>
           </Modal>,

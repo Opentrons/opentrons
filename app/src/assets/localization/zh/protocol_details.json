@@ -84,7 +84,7 @@
   "send": "发送",
   "sending": "发送中",
   "show_in_folder": "在文件夹中显示",
-  "slot": "{{slotName}}号板位",
+  "slot": "{{slotName}}板位",
   "start_setup": "开始设置",
   "start_setup_customize_values": "开始设置以自定义值",
   "successfully_sent": "发送成功",

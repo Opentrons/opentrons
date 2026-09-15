@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import { useMenuHandleClickOutside } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { MediaContainerContent } from '/app/molecules/MediaContainerContent'
 import {
@@ -13,6 +15,7 @@ import {
 } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
@@ -37,23 +40,32 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
 
   const { setShowOverflowMenu } = useMenuHandleClickOutside()
   const robotType = useRobotType(robotName)
+  const host = useHost()
 
   const { reportPhotoAccessUsage } = useCameraAnalytics({
     source: SOURCE_RUN_RECORD,
     robotType,
   })
+  const imagePath = useImage(item.imageId)
   const onDownloadImage = (): void => {
     setShowOverflowMenu(false)
-    const a = document.createElement('a')
-    a.download = item.filename
-    a.href = imagePath ?? ''
-    a.click()
     reportPhotoAccessUsage({
       action: 'download',
     })
-    a.remove()
+    if (host == null) {
+      return
+    }
+    void saveFileFromUrl({
+      name: item.filename,
+      source: `/dataFiles/${item.imageId}/download`,
+      hostname: host.hostname,
+      port: host.port ?? null,
+    }).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
-  const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
   const { commandStep, totalSteps } = useCommandStepNumbers({
     currentCommand,

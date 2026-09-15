@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { deleteProtocol } from '@opentrons/api-client'
 
 import { useDeleteProtocolMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -37,12 +38,18 @@ describe('useDeleteProtocolMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(deleteProtocol).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useDeleteProtocolMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
-    result.current.deleteProtocol()
+    await expect(
+      result.current.deleteProtocol(protocolId)
+    ).rejects.toBeDefined()
     await waitFor(() => {
       expect(result.current.data).toBeUndefined()
     })
@@ -54,10 +61,16 @@ describe('useDeleteProtocolMutation hook', () => {
       data: DELETE_PROTOCOL_RESPONSE,
     } as Response<EmptyResponse>)
 
-    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
-      wrapper,
+    const { result } = renderHook(
+      () =>
+        useDeleteProtocolMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
+    await act(async () => {
+      await result.current.deleteProtocol(protocolId)
     })
-    act(() => result.current.deleteProtocol())
 
     await waitFor(() => {
       expect(result.current.data).toEqual(DELETE_PROTOCOL_RESPONSE)

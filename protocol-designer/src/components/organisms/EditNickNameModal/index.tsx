@@ -58,7 +58,6 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
       }}
     >
       <Modal
-        marginLeft="0"
         title={t('rename_labware')}
         type="info"
         onClose={onClose}

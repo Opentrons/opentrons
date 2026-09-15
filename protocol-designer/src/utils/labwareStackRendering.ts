@@ -33,12 +33,10 @@ export const getRenderingPositionFromBaseNode = (args: {
   const { baseNode, deckDef, deckConfiguration } = args
 
   // If the base node is not a slot or addressable area, return zeros.
-  if (
-    !(
-      typeof baseNode === 'object' &&
-      ('addressableAreaName' in baseNode || 'slotName' in baseNode)
-    )
-  ) {
+  if (!(
+    typeof baseNode === 'object' &&
+    ('addressableAreaName' in baseNode || 'slotName' in baseNode)
+  )) {
     return ZERO_COORDINATE_TUPLE
   }
   const addressableAreaName =

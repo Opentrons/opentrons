@@ -140,6 +140,26 @@ describe('shell selectors', () => {
     })
   })
 
+  describe('getIncludeProtocolSourceInRunDownload', () => {
+    it('should return true if saved value in config is true', () => {
+      const state: State = {
+        config: { protocols: { includeProtocolSourceInRunDownload: true } },
+      } as any
+      expect(Selectors.getIncludeProtocolSourceInRunDownload(state)).toEqual(
+        true
+      )
+    })
+
+    it('should return false if saved value in config is false', () => {
+      const state: State = {
+        config: { protocols: { includeProtocolSourceInRunDownload: false } },
+      } as any
+      expect(Selectors.getIncludeProtocolSourceInRunDownload(state)).toEqual(
+        false
+      )
+    })
+  })
+
   describe('getPathToPythonOverride', () => {
     it('should return path if path is specified', () => {
       const state: State = {

@@ -32,6 +32,8 @@ export interface InlineNotificationProps extends StyleProps {
   onCloseClick?: (() => void) | MouseEventHandler<HTMLButtonElement>
   linkText?: string
   onLinkClick?: (() => void) | MouseEventHandler<HTMLAnchorElement>
+
+  className?: string
 }
 
 const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
@@ -71,6 +73,7 @@ export function InlineNotification(
     type,
     linkText,
     onLinkClick,
+    className,
   } = props
   // TODO (sb: 8/20/25) RSQ-189 Remove punctuation from this component and add to translation strings
   // Temp fix (nd: 2/25/26): Avoid double-period for translations that already end in a period.
@@ -90,6 +93,7 @@ export function InlineNotification(
     <Flex
       data-testid={`InlineNotification_${type}`}
       css={INLINE_NOTIFICATION_WRAPPER_STYLES(backgroundColor, hug)}
+      className={className}
     >
       <Flex css={INLINE_NOTIFICATION_FLEX_STYLE}>
         <Box css={INLINE_NOTIFICATION_BOX_STYLE}>

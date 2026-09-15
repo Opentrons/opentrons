@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -16,7 +17,8 @@ export function CameraPreferences({
   robotName,
 }: CameraPreferencesProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const settings = useCameraUsageSettings()
+  const documentationState = useDocumentationState()
+  const settings = useCameraUsageSettings(documentationState)
 
   return (
     <CameraSettings

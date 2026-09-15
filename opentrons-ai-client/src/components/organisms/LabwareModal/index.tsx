@@ -131,7 +131,7 @@ export function LabwareModal({
     <>
       {displayLabwareModal &&
         createPortal(
-          <Modal type="info" title={t('add_opentrons_labware')} marginLeft="0">
+          <Modal type="info" title={t('add_opentrons_labware')}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <Flex

@@ -54,8 +54,32 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
    1. This will create a `.python-version` file in this directory.
 1. select the node version with `nvs` or `nvm` currently 22.11\*.
 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and python dependencies using `make setup`.
+   1. `make setup` also syncs Python API docs from the pinned mkdocs tag in the Makefile (`DOCS_TAG`).
 1. Install docker if you plan to run and build the docker container locally.
 1. `make teardown` will remove the virtual environment.
+
+### Python API documentation
+
+The LLM uses Python API docs from published mkdocs release tags (for example `mkdocs-2026-06-02`), not from the current branch checkout. The default tag is pinned in the Makefile as `DOCS_TAG`.
+
+```shell
+make sync-api-docs                              # sync the pinned DOCS_TAG
+make sync-api-docs DOCS_TAG=mkdocs-2026-06-02   # sync a specific tag
+make list-api-docs-tags                         # list available mkdocs tags
+```
+
+| Path                                            | Role                                                            |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| `api/storage/api_docs/docs/v2/`                 | Synced markdown (gitignored)                                    |
+| `api/storage/api_docs/api_docs_struct.md`       | Generated index fed to the doc-finder LLM (do not edit by hand) |
+| `api/storage/api_docs/api_docs_struct_about.md` | Committed curated `<about>` descriptions keyed by markdown path |
+| `api/storage/api_docs/.api-level`               | Default `apiLevel` from synced `mkdocs.yml` (gitignored)        |
+
+**Curation workflow:** Edit `api_docs_struct_about.md` with one `<about>` block per synced markdown path. `make sync-api-docs` regenerates `api_docs_struct.md` from that file.
+
+See **[docs/API_DOCS_CURATION.md](docs/API_DOCS_CURATION.md)** for the file format and how to add curation for new pages.
+
+`make setup`, `make local-run`, `make build`, and deploy targets run the sync step automatically.
 
 ### Run locally
 

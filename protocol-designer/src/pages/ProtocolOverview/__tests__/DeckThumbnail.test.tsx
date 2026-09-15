@@ -12,7 +12,10 @@ import {
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { LabwareOnDeck } from '../../../components/organisms'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import {
+  getDeckConfiguration,
+  getInitialDeckSetup,
+} from '../../../step-forms/selectors'
 import { DeckThumbnail } from '../DeckThumbnail'
 
 import type { ComponentProps } from 'react'
@@ -22,6 +25,9 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('../../../components/organisms')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../step-forms/selectors')
+vi.mock(
+  '../../Designer/DeckSetup/hooks/useUpdateDeckConfigurationFromStartingDeck'
+)
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
@@ -46,6 +52,7 @@ describe('DeckThumbnail', () => {
       robotType: FLEX_ROBOT_TYPE,
     }
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
+    vi.mocked(getDeckConfiguration).mockReturnValue({ deckConfig: [] } as any)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
       additionalEquipmentOnDeck: {},

@@ -5,6 +5,9 @@ import logging
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
@@ -38,8 +41,18 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.state.commands import (
+    CommandAnnotationsSlice,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.state.modules import FlexStackerSubstateNotification
+from opentrons.protocol_engine.state.pipettes import (
+    NozzleMapNotification,
+    TipAttachedNotification,
+)
+from opentrons.protocol_engine.state.state import EngineEventNotification
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CSVRuntimeParamPaths,
@@ -66,6 +79,7 @@ from .run_process import DirectedRunProcess
 from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 _log = logging.getLogger(__name__)
 
@@ -91,14 +105,16 @@ async def _do_handle_hardware_event(  # noqa: C901
             return
         # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
         # runner layer.
-        run_orchestrator_store.run_coordinator.estop()
+        await run_orchestrator_store.run_coordinator.estop()
         await run_orchestrator_store.run_coordinator.finish(error=EStopActivatedError())
     elif isinstance(event, AsynchronousModuleErrorNotification):
         if run_orchestrator_store.current_run_id is None:
             return
         should_finish = (
             await run_orchestrator_store.run_coordinator.asynchronous_module_error(
-                module_model=event.module_model, module_serial=event.module_serial
+                module_model=event.module_model,
+                module_serial=event.module_serial,
+                error=event.exception,
             )
         )
         if should_finish:
@@ -160,6 +176,35 @@ def _get_hardware_listener(
     return run_handler_in_engine_thread_from_hardware_thread
 
 
+async def construct_run_result(
+    run_coordinator: Union[RunOrchestrator, DirectedRunProcess],
+) -> RunResult:
+    """Construct a RunResult by querying a run coordinator.
+
+    Of note, in order to prevent copies of the data appearing in both the robot-server and
+    the protocol process the commands are deleted to preserve memory.
+    """
+    command_length = await run_coordinator.get_length()
+    commands: List[Command] = []
+    while command_length > 0:
+        latest_commands = await run_coordinator.get_command_slice(
+            cursor=max(0, command_length - 100),
+            length=100,
+            include_fixit_commands=True,
+        )
+        await run_coordinator.delete_command_slice_end(100)
+        commands[:0] = latest_commands.commands
+        command_length -= len(latest_commands.commands)
+
+    return RunResult(
+        state_summary=await run_coordinator.get_state_summary(),
+        commands=commands,
+        parameters=await run_coordinator.get_run_time_parameters(),
+        command_annotations=await run_coordinator.get_all_command_annotations(),
+        command_preconditions=await run_coordinator.get_preconditions(),
+    )
+
+
 class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -169,6 +214,7 @@ class RunOrchestratorStore:
         robot_type: RobotType,
         deck_type: DeckType,
         run_process_pyro_provider: RunProcessPyroProvider,
+        access_control_status: bool,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -179,6 +225,7 @@ class RunOrchestratorStore:
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
             run_process_pyro_provider: If in protocol subprocess mode, provides
                 the run process proxy when running a protocol.
+            access_control_status: Status of the Auth-Server access control enablement.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
@@ -186,10 +233,20 @@ class RunOrchestratorStore:
         self._run_coordinator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
             None
         )
+        self._current_run_id: Optional[str] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         self._run_process_pyro_provider = run_process_pyro_provider
         if not feature_flags.hardware_subprocess_enabled():
             hardware_api.register_callback(_get_hardware_listener(self))
+
+        # Locally stored engine state, updated via notifications
+        self._nozzle_maps: Optional[Mapping[str, NozzleMapInterface]] = None
+        self._tip_attached: Optional[Dict[str, bool]] = None
+        self._current_command: Optional[CommandPointer] = None
+        self._most_recent_finalized_command: Optional[CommandPointer] = None
+        self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
+        self._access_control_mode = access_control_status
+        self._run_result: Optional[RunResult] = None
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -201,8 +258,15 @@ class RunOrchestratorStore:
     @property
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current run orchestrator."""
-        return (
-            self.run_coordinator.run_id if self._run_coordinator is not None else None
+        return self._current_run_id
+
+    def default_run_orchestrator_door_watcher_callback_route_for_proxy(
+        self, event: HardwareEvent
+    ) -> None:
+        """Callback to expose the default run orchestrator door watcher callback to a remote processes."""
+        assert self._default_run_orchestrator is not None
+        self._default_run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
+            event
         )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
@@ -215,10 +279,17 @@ class RunOrchestratorStore:
         """
         if (
             self._run_coordinator is not None
-            and self.run_coordinator.run_has_started()
-            and not self.run_coordinator.run_has_stopped()
+            and await self.run_coordinator.run_has_started()
+            and not await self.run_coordinator.run_has_stopped()
         ):
             raise RunConflictError("A run is currently active")
+
+        proxy_door_callback = None
+        if ff.hardware_subprocess_enabled():
+            pyro_resource = await get_pyro_resource()
+            proxy_door_callback = (
+                pyro_resource.get_default_run_orchestrator_door_watcher_callback()
+            )
 
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
@@ -233,9 +304,23 @@ class RunOrchestratorStore:
                 # for example, there would be no equivalent to the `POST /runs/{id}/actions`
                 # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
+                updates_callback=self.update_engine_status_callback,
+                proxy_of_callback_for_handling_door_events=proxy_door_callback,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
+            )
+
+            # Initialize values for the default run orchestrator
+            self._clear_stored_engine_state()
+            self._nozzle_maps = await self._default_run_orchestrator.get_nozzle_maps()
+            self._tip_attached = await self._default_run_orchestrator.get_tip_attached()
+            self._current_command = (
+                await self._default_run_orchestrator.get_current_command()
+            )
+            self._most_recent_finalized_command = await self._default_run_orchestrator.get_most_recently_finalized_command()
+            self._flex_stacker_substate = (
+                await self._default_run_orchestrator.get_flex_stacker_substate()
             )
             return self._default_run_orchestrator
         return default_orchestrator
@@ -281,6 +366,7 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        self._run_result = None
         if feature_flags.protocol_subprocess_enabled():
             return await self.create_pyro(
                 run_id=run_id,
@@ -299,6 +385,7 @@ class RunOrchestratorStore:
 
         if self._run_coordinator is not None:
             raise RunConflictError("Another run is currently active.")
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -314,6 +401,7 @@ class RunOrchestratorStore:
             file_provider=file_provider,
             camera_provider=camera_provider,
             notify_publishers=notify_publishers,
+            updates_callback=self.update_engine_status_callback,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
@@ -339,10 +427,15 @@ class RunOrchestratorStore:
             orchestrator.prepare()
 
         for offset in labware_offsets:
-            orchestrator.add_labware_offset(offset)
+            await orchestrator.add_labware_offset(offset)
 
-        summary = orchestrator.get_state_summary()
+        summary = await orchestrator.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = orchestrator
+        self._current_run_id = run_id
+
+        await self._initialize_stored_engine_state()
+
         return summary
 
     async def clear(self) -> RunResult:
@@ -352,10 +445,7 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
-        if feature_flags.protocol_subprocess_enabled():
-            return await self.clear_pyro()
-
-        if self.run_coordinator.get_is_okay_to_clear():
+        if await self.run_coordinator.get_is_okay_to_clear():
             await self.run_coordinator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -364,23 +454,41 @@ class RunOrchestratorStore:
         else:
             raise RunConflictError("Current run is not idle or stopped.")
 
-        run_data = self.run_coordinator.get_state_summary()
-        commands = self.run_coordinator.get_all_commands()
-        run_time_parameters = self.run_coordinator.get_run_time_parameters()
-        command_annotations = self.run_coordinator.get_all_command_annotations()
-        preconditions = self.run_coordinator.get_preconditions()
+        try:
+            if self._run_result is not None:
+                result = self._run_result
+                self._run_result = None
+            else:
+                # Account for situations in which run() has not finished but clear() has been called
+                command_length = await self.run_coordinator.get_length()
+                commands: List[Command] = []
+                while command_length > 0:
+                    latest_commands = await self.run_coordinator.get_command_slice(
+                        cursor=len(commands),
+                        length=100,
+                        include_fixit_commands=True,
+                    )
+                    commands.extend(latest_commands.commands)
+                    command_length = command_length - len(latest_commands.commands)
 
-        if self._run_coordinator is not None:
-            self._run_coordinator.clear_command_history()
-            self._run_coordinator = None
+                result = RunResult(
+                    state_summary=await self.run_coordinator.get_state_summary(),
+                    commands=commands,
+                    parameters=await self.run_coordinator.get_run_time_parameters(),
+                    command_annotations=await self.run_coordinator.get_all_command_annotations(),
+                    command_preconditions=await self.run_coordinator.get_preconditions(),
+                )
 
-        return RunResult(
-            state_summary=run_data,
-            commands=commands,
-            parameters=run_time_parameters,
-            command_annotations=command_annotations,
-            command_preconditions=preconditions,
-        )
+            if self._run_coordinator is not None:
+                await self._run_coordinator.clear_command_history()
+                self._run_coordinator = None
+                self._current_run_id = None
+
+        finally:
+            if feature_flags.protocol_subprocess_enabled():
+                self._run_process_pyro_provider.set_active_process_as_used()
+
+        return result
 
     async def create_pyro(
         self,
@@ -405,98 +513,88 @@ class RunOrchestratorStore:
             error_recovery_is_enabled=error_recovery_is_enabled,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
-            proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
+            proxy_of_callback_for_handling_door_events=await run_process.register_hardware_door_event(),
         )
 
-        summary = run_process.get_state_summary()
+        summary = await run_process.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = run_process
+        self._current_run_id = run_id
+        await self._initialize_stored_engine_state()
         return summary
-
-    async def clear_pyro(self) -> RunResult:
-        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
-        if self.run_coordinator.get_is_okay_to_clear():
-            await self.run_coordinator.finish(
-                drop_tips_after_run=False,
-                set_run_status=False,
-                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-            )
-        else:
-            raise RunConflictError("Current run is not idle or stopped.")
-
-        run_data = self.run_coordinator.get_state_summary()
-
-        await self._run_process_pyro_provider.refresh()
-
-        self._run_coordinator = None
-
-        return RunResult(
-            state_summary=run_data,
-            commands=[],
-            parameters=[],
-            command_annotations=[],
-            command_preconditions=None,
-        )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
     # Can we delete them and make callers just call .run_orchestrator.play(), etc.?
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
-        self.run_coordinator.play(deck_configuration=deck_configuration)
+        await self.run_coordinator.play(deck_configuration=deck_configuration)
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start the run."""
-        return await self.run_coordinator.run(deck_configuration=deck_configuration)
+        await self.run_coordinator.run(deck_configuration=deck_configuration)
+        self._run_result = await construct_run_result(self.run_coordinator)
 
-    def pause(self) -> None:
+        return self._run_result
+
+    async def pause(self) -> None:
         """Pause the run."""
-        self.run_coordinator.pause()
+        await self.run_coordinator.pause()
 
     async def stop(self) -> None:
         """Stop the run."""
         await self.run_coordinator.stop()
 
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery mode."""
-        self.run_coordinator.resume_from_recovery(reconcile_false_positive)
+        await self.run_coordinator.resume_from_recovery(reconcile_false_positive)
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Finish the run."""
         await self.run_coordinator.finish(error=error)
 
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return self.run_coordinator.get_state_summary()
+        return await self.run_coordinator.get_state_summary()
 
-    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+    async def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
-        return self.run_coordinator.get_loaded_labware_definitions()
+        return await self.run_coordinator.get_loaded_labware_definitions()
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get the current nozzle map keyed by pipette id."""
-        return self.run_coordinator.get_nozzle_maps()
+        assert self._nozzle_maps is not None
+        return self._nozzle_maps
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        return self.run_coordinator.get_tip_attached()
+        assert self._tip_attached is not None
+        return self._tip_attached
 
-    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_coordinator.get_run_time_parameters()
+        return await self.run_coordinator.get_run_time_parameters()
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get the current (if any) Flex Stacker Substates keyed by modile id."""
-        return self.run_coordinator.get_flex_stacker_substate()
+        assert self._flex_stacker_substate is not None
+        return self._flex_stacker_substate
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""
-        return self.run_coordinator.get_current_command()
+        return self._current_command
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        return self.run_coordinator.get_most_recently_finalized_command()
+        return self._most_recent_finalized_command
 
-    def get_command_slice(
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        return await self.run_coordinator.get_commands_deleted()
+
+    async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
@@ -506,11 +604,11 @@ class RunOrchestratorStore:
             length: Length of slice to return.
             include_fixit_commands: Include fixit commands.
         """
-        return self.run_coordinator.get_command_slice(
+        return await self.run_coordinator.get_command_slice(
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self,
         cursor: int,
         length: int,
@@ -521,53 +619,53 @@ class RunOrchestratorStore:
             cursor: Requested index of first command error in the returned slice.
             length: Length of slice to return.
         """
-        return self.run_coordinator.get_command_error_slice(
+        return await self.run_coordinator.get_command_error_slice(
             cursor=cursor, length=length
         )
 
-    def get_command_errors(self) -> list[ErrorOccurrence]:
+    async def get_command_errors(self) -> list[ErrorOccurrence]:
         """Get all command errors."""
-        return self.run_coordinator.get_command_errors()
+        return await self.run_coordinator.get_command_errors()
 
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_coordinator.get_command_recovery_target()
+        return await self.run_coordinator.get_command_recovery_target()
 
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self.run_coordinator.get_command(command_id=command_id)
+        return await self.run_coordinator.get_command(command_id=command_id)
 
-    def get_total_command_annotations_count(self) -> int:
+    async def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations in the run."""
-        return self.run_coordinator.get_total_command_annotations_count()
+        return await self.run_coordinator.get_total_command_annotations_count()
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self,
         cursor: int,
         length: int,
     ) -> CommandAnnotationsSlice:
         """Get a slice of run commands."""
-        return self.run_coordinator.get_command_annotations_slice(
+        return await self.run_coordinator.get_command_annotations_slice(
             cursor=cursor, length=length
         )
 
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+    async def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the specified command annotation."""
-        return self.run_coordinator.get_command_annotation(annotation_id)
+        return await self.run_coordinator.get_command_annotation(annotation_id)
 
-    def get_status(self) -> EngineStatus:
+    async def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""
-        return self.run_coordinator.get_run_status()
+        return await self.run_coordinator.get_run_status()
 
-    def get_is_run_terminal(self) -> bool:
+    async def get_is_run_terminal(self) -> bool:
         """Get whether run is in a terminal state."""
-        return self.run_coordinator.get_is_run_terminal()
+        return await self.run_coordinator.get_is_run_terminal()
 
-    def get_camera_capture_image_settings(
+    async def get_camera_capture_image_settings(
         self, camera_id: str
     ) -> CameraCaptureImageSettings:
         """Get camera capture image settings to state."""
-        settings = self.run_coordinator.get_camera_capture_image_settings()
+        settings = await self.run_coordinator.get_camera_capture_image_settings()
 
         # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
         # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
@@ -585,21 +683,21 @@ class RunOrchestratorStore:
             saturation=settings["saturation"],
         )
 
-    def run_was_started(self) -> bool:
+    async def run_was_started(self) -> bool:
         """Get whether the run has started."""
-        return self.run_coordinator.run_has_started()
+        return await self.run_coordinator.run_has_started()
 
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
-        return self.run_coordinator.add_labware_offset(request)
+        return await self.run_coordinator.add_labware_offset(request)
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
-        return self.run_coordinator.add_labware_definition(definition)
+        return await self.run_coordinator.add_labware_definition(definition)
 
-    def set_error_recovery_policy(
+    async def set_error_recovery_policy(
         self,
         policy: error_recovery_policy.ErrorRecoveryPolicy,
         error_recovery_rules: List[ErrorRecoveryRule],
@@ -607,23 +705,29 @@ class RunOrchestratorStore:
     ) -> None:
         """Create run policy rules for error recovery."""
         if isinstance(self.run_coordinator, RunOrchestrator):
-            self.run_coordinator.set_error_recovery_policy(policy)
+            await self.run_coordinator.set_error_recovery_policy(policy)
         else:
-            self.run_coordinator.set_error_recovery_policy(
+            await self.run_coordinator.set_error_recovery_policy(
                 error_recovery_rules, error_recovery_is_enabled
             )
 
-    def add_camera_enablement_settings(
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the access control policy for the Run Orchestrator Store."""
+        self._access_control_mode = access_control_mode
+
+    async def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
     ) -> CameraSettings:
         """Add new camera enablement settings to state."""
-        return self.run_coordinator.add_camera_enablement_settings(enablement_settings)
+        return await self.run_coordinator.add_camera_enablement_settings(
+            enablement_settings
+        )
 
-    def add_camera_capture_image_settings(
+    async def add_camera_capture_image_settings(
         self, capture_image_settings: CameraCaptureImageSettings
     ) -> None:
         """Add new camera capture image settings to state."""
-        self.run_coordinator.add_camera_capture_image_settings(
+        await self.run_coordinator.add_camera_capture_image_settings(
             camera_id=capture_image_settings.cameraId,
             resolution=capture_image_settings.resolution,
             zoom=capture_image_settings.zoom,
@@ -663,3 +767,48 @@ class RunOrchestratorStore:
             # This is a background task kicked off by a hardware event,
             # so there's no one to propagate this exception to.
             _log.exception("Exception handling E-stop event.")
+
+    def update_engine_status_callback(
+        self, events: list[EngineEventNotification]
+    ) -> None:
+        """Handle protocol engine status updates for the run orchestrator store."""
+        for event in events:
+            if isinstance(event, NozzleMapNotification):
+                self._nozzle_maps = event.nozzle_maps
+
+            if isinstance(event, TipAttachedNotification):
+                self._tip_attached = event.tip_attached_dict
+
+            if isinstance(event, CurrentCommandNotification):
+                self._current_command = event.running_command_pointer
+
+            if isinstance(event, FinalizedCommandNotification):
+                self._most_recent_finalized_command = event.finalized_command_pointer
+                self._current_command = (
+                    event.running_command_pointer
+                    if event.running_command_pointer is not None
+                    else event.finalized_command_pointer
+                )
+
+            if isinstance(event, FlexStackerSubstateNotification):
+                self._flex_stacker_substate = event.stacker_substate_map
+
+    async def _initialize_stored_engine_state(self) -> None:
+        """Initialize the orchestrator store local engine state."""
+        self._nozzle_maps = await self.run_coordinator.get_nozzle_maps()
+        self._tip_attached = await self.run_coordinator.get_tip_attached()
+        self._current_command = await self.run_coordinator.get_current_command()
+        self._most_recent_finalized_command = (
+            await self.run_coordinator.get_most_recently_finalized_command()
+        )
+        self._flex_stacker_substate = (
+            await self.run_coordinator.get_flex_stacker_substate()
+        )
+
+    def _clear_stored_engine_state(self) -> None:
+        """Clear the stored engine state, called when creating a new run orchestrator so no state persists between runs."""
+        self._nozzle_maps = None
+        self._tip_attached = None
+        self._current_command = None
+        self._most_recent_finalized_command = None
+        self._flex_stacker_substate = None

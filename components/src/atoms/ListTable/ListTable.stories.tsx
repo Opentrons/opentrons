@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { Flex, VIEWPORT } from '@opentrons/components'
 
 import { ListTable as ListTableComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 
 import type { Meta, Story } from '@storybook/react'
 import type { ComponentProps } from 'react'
@@ -25,7 +26,9 @@ export default {
         'Prefer this component over SubListTable, since it contains the semantic HTML table tags. Include tr tags in the children when applicable. If a table is nested in ListTable, use SubListTable for the nested table.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface ListTableStoryProps extends ComponentProps<

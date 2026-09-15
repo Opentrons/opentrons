@@ -9,6 +9,7 @@ import {
 } from 'electron-devtools-installer'
 import fse from 'fs-extra'
 
+import { registerAudit } from './audit'
 import {
   getConfig,
   getOverrides,
@@ -18,6 +19,7 @@ import {
 } from './config'
 import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { registerDownloadHandlers } from './fs/ipc'
 import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
@@ -32,7 +34,7 @@ import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForBackendAndShowMainWindow } from './ui'
-import { registerSystemInfo } from './usb'
+import { registerSystemInfo, registerUsbDeviceHandlers } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
@@ -156,7 +158,11 @@ function startUp(): void {
     registerNotify(dispatch, mainWindow),
     registerDataFiles(dispatch),
     registerSystemInfo(dispatch),
+    registerAudit(dispatch),
   ]
+
+  registerUsbDeviceHandlers()
+  registerDownloadHandlers()
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })

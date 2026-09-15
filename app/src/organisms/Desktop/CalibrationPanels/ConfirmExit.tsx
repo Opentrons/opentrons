@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -10,6 +9,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -64,12 +64,13 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         <NeedHelpLink />
         <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={back}>{t('go_back')}</SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={exit}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Flex>

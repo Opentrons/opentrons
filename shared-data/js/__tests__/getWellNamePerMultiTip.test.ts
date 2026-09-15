@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import nest_8_reservoir_22ml from '../../labware/definitions/2/nest_8_reservoir_22ml/2.json'
 import fixture_12_trough from '../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_24_tuberack from '../../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture_96_plate from '../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_trash from '../../labware/fixtures/2/fixture_trash.json'
-import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
+import {
+  getWellNamePerMultiTip,
+  getWellNamePerRowMultiTip,
+} from '../helpers/getWellNamePerMultiTip'
 
 import type { LabwareDefinition } from '../types'
 
@@ -14,6 +18,7 @@ const fixture96Plate = fixture_96_plate as LabwareDefinition
 const fixture384Plate = fixture_384_plate as LabwareDefinition
 const fixture12Trough = fixture_12_trough as LabwareDefinition
 const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition
+const nest8Reservoir = nest_8_reservoir_22ml as LabwareDefinition
 const EIGHT_CHANNEL = 8
 
 describe('96 plate', () => {
@@ -159,5 +164,58 @@ describe('12 channel trough', () => {
 
   it('B1 => null (well does not exist)', () => {
     expect(getWellNamePerMultiTip(labware, 'B1', EIGHT_CHANNEL)).toEqual(null)
+  })
+})
+
+describe('getWellNamePerRowMultiTip', () => {
+  it('96 plate A1 => full row A', () => {
+    expect(getWellNamePerRowMultiTip(fixture96Plate, 'A1')).toEqual([
+      'A1',
+      'A2',
+      'A3',
+      'A4',
+      'A5',
+      'A6',
+      'A7',
+      'A8',
+      'A9',
+      'A10',
+      'A11',
+      'A12',
+    ])
+  })
+
+  it('12 trough A1 => one tip per column trough', () => {
+    expect(getWellNamePerRowMultiTip(fixture12Trough, 'A1')).toEqual([
+      'A1',
+      'A2',
+      'A3',
+      'A4',
+      'A5',
+      'A6',
+      'A7',
+      'A8',
+      'A9',
+      'A10',
+      'A11',
+      'A12',
+    ])
+  })
+
+  it('8-well row reservoir centers all tips in one trough', () => {
+    expect(getWellNamePerRowMultiTip(nest8Reservoir, 'A1')).toEqual([
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+      'A1',
+    ])
   })
 })

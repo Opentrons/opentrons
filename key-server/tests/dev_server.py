@@ -18,6 +18,13 @@ class DevServer:
         self.port: int = port
         self._base_dir = tempfile.TemporaryDirectory()
         self._mount_dir = tempfile.TemporaryDirectory()
+        signing_key_dir = Path(self._mount_dir.name) / "signing_keys"
+        signing_key_dir.mkdir(parents=True)
+        (signing_key_dir / "audit-signing-key.private").write_bytes(
+            (
+                Path(__file__).parent / "integration" / "audit-signing-key-test.private"
+            ).read_bytes()
+        )
 
     def __enter__(self) -> DevServer:
         return self

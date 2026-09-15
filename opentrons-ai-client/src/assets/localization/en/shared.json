@@ -1,9 +1,9 @@
 {
-  "email_verification_required_title": "Verify your email address",
   "email_verification_required_body": "Check your inbox for a verification email and click the link inside. Then click the button below.",
   "email_verification_required_check": "I've verified my email",
-  "email_verification_required_still_unverified": "Email not yet verified. Please try again.",
   "email_verification_required_logout": "Log out",
+  "email_verification_required_still_unverified": "Email not yet verified. Please try again.",
+  "email_verification_required_title": "Verify your email address",
   "error_boundary_description": "You need to reload the app. Contact support with the following error message:",
   "error_boundary_title": "An unknown error has occurred",
   "reload_app": "Reload app",

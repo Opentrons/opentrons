@@ -29,7 +29,6 @@ export function PreventRobotCaching(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_disableRobotCache"
         >
           {t('prevent_robot_caching')}
         </LegacyStyledText>
@@ -52,7 +51,6 @@ export function PreventRobotCaching(): JSX.Element {
         label="disable_robot_cache"
         toggledOn={disableRobotCache}
         onClick={() => dispatch(toggleConfigValue('discovery.disableCache'))}
-        id="AdvancedSettings_disableRobotCacheToggleButton"
       />
     </Flex>
   )

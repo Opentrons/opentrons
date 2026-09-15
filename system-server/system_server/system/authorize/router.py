@@ -6,6 +6,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response, status
 
+from server_utils.audit.fastapi import skip_audit_logger
+
 from .authorization import authorize_token
 from .models import PostAuthorizeResponse
 from system_server.connection import AuthorizationTracker
@@ -25,8 +27,7 @@ authorize_router = APIRouter()
     "/system/authorize",
     deprecated=True,
     summary="Obtain an authorization token for this session",
-    description=dedent(
-        """\
+    description=dedent("""\
         This was part of an experimental set of endpoints for authorization.
         It's kept for compatibility reasons. Do not use it in new code.
         Use the `/auth` endpoints instead.
@@ -34,11 +35,10 @@ authorize_router = APIRouter()
         Given a valid registration token from `/system/register`,
         this returns a new authorization token, which is not used for anything.
         It also adds an entry to `/system/connected`.
-        """
-    ),
+        """),
     response_model=PostAuthorizeResponse,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(check_registration_token_header)],
+    dependencies=[Depends(check_registration_token_header), Depends(skip_audit_logger)],
 )
 async def authorize(
     token: Annotated[str, Depends(get_registration_token_header)],

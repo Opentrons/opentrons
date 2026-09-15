@@ -12,7 +12,6 @@ export function getCommand(
   return request<CommandDetail>(
     GET,
     `/runs/${runId}/commands/${commandId}`,
-    null,
     config
   )
 }

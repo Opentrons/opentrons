@@ -168,14 +168,28 @@ Partial tip pickup requires the pipette to hover above adjacent deck slots, and 
 When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](../warnings-errors.md) to reduce collision risk. These errors can require you to change your well, tip, or deck selections in order to avoid risky situations. 
 
 <figure class="screenshot" markdown>
-  ![Pipette collision risk](../images/partial-tip-collision.png)
-  <figcaption>Protocol Designer shows a collision error because the tip rack in C2 blocks partial tip pickup from the rack in C3.</figcaption>
+  ![Pipette collision risk](../images/partial-tip-error.png)
+  <figcaption>Protocol Designer shows a collision error because the pipette could collide with the tip rack in slot C2.</figcaption>
 </figure> 
 
-Even though the tip rack above is full of pipette tips, the "not enough tips" warning tells you that there aren't enough tips that the pipette can safely access. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
+Even though the tip rack above is full, the "not enough tips" warning indicates that the pipette can't safely access them to complete your protocol step. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
 
-To fix the collision error, move the tip racks so they are no longer adjacent, or change your tip pickup selections.
+To fix the collision error in the example above, you can either:
+
+- Move the well plate from slot C3 so the labware items are no longer adjacent.
+- Change your tip pickup selections.
 
 Fix all errors before exporting to ensure your protocol runs successfully. You won't be able to run protocols with unresolved errors. 
+
+To make it easier to resolve tip pickup warnings, be sure **Manual tip tracking** is selected, then click to select tips for manual pickup. This form can show you which selection is causing the collision error, and which tip pickups could work for your step. 
+
+<figure class="screenshot" markdown>
+  ![Inaccessible tip selections](../images/inaccessible-tip-pickup.png)
+  <figcaption>The Flex 96-channel pipette can only access one tip in the rack.</figcaption>
+</figure>
+
+Here, the Flex 96-channel pipette can only access one tip in the rack (H8). Because of the deck layout, any other tip selection will cause a collision warning in your protocol. 
+
+
 
 

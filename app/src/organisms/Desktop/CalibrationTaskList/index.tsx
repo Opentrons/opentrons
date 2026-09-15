@@ -115,7 +115,6 @@ export function CalibrationTaskList({
         width: 50rem;
         height: 47.5rem;
       `}
-      marginLeft="0"
     >
       {showCompletionScreen ? (
         <Flex

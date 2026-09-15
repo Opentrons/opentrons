@@ -1,4 +1,4 @@
-import { createAxiosConfig, DELETE, request } from '../request'
+import { DELETE, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { EmptyResponse, HostConfig } from '../types'
@@ -11,11 +11,7 @@ export function deleteCalibration(
   const { calType, ...apiParams } = params
   const endpoint =
     params.calType === 'pipetteOffset' ? 'pipette_offset' : 'tip_length'
-  return request<EmptyResponse>(
-    DELETE,
-    `/calibration/${endpoint}`,
-    null,
-    config,
-    apiParams && createAxiosConfig({ params: apiParams })
-  )
+  return request<EmptyResponse>(DELETE, `/calibration/${endpoint}`, config, {
+    queryParams: apiParams,
+  })
 }

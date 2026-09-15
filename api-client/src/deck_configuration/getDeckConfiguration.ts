@@ -7,10 +7,5 @@ import type { DeckConfigurationResponse } from './types'
 export function getDeckConfiguration(
   config: HostConfig
 ): ResponsePromise<DeckConfigurationResponse> {
-  return request<DeckConfigurationResponse>(
-    GET,
-    `/deck_configuration`,
-    null,
-    config
-  )
+  return request<DeckConfigurationResponse>(GET, `/deck_configuration`, config)
 }

@@ -2,9 +2,7 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
 
 export type FileUploadErrorType =
-  | 'INVALID_FILE_TYPE'
-  | 'INVALID_JSON_FILE'
-  | 'INVALID_PYTHON_FILE'
+  'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE' | 'INVALID_PYTHON_FILE'
 export type FileUploadMessageKey = 'DID_MIGRATE'
 export type FileUploadMessage =
   | {

@@ -1184,6 +1184,33 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
+  it('changeTip="once" with return tip should not return tip between volume chunks', () => {
+    transferArgs = {
+      ...transferArgs,
+      sourceWells: ['A1'],
+      destWells: ['A3'],
+      changeTip: 'once',
+      dropTipLocation: getLabwareDefURI(
+        fixtureTiprack300ul as LabwareDefinition2
+      ),
+    }
+
+    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+
+    const returnTipCommands = res.commands.filter(
+      command => command.commandType === 'dropTip'
+    )
+    expect(returnTipCommands).toHaveLength(1)
+    expect(returnTipCommands[0]).toMatchObject({
+      params: {
+        pipetteId: 'p300SingleId',
+        labwareId: 'tiprack1Id',
+        wellName: 'A1',
+      },
+    })
+  })
+
   it('changeTip="always"', () => {
     transferArgs = {
       ...transferArgs,

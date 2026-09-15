@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 from typing import Generator
 
 import pytest
@@ -7,7 +8,15 @@ import requests
 from server_utils.auth.scopes import serialize_scopes
 from tests.dev_server import DevServer
 
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
+from auth_server.persistence.file_and_directory_names import (
+    DB_FILE,
+    LATEST_VERSION_DIRECTORY,
+)
+from auth_server.settings.models import SettingsResponseData
+from auth_server.users.models import (
+    AccountType,
+)
+from auth_server.users.scopes import get_scope_set_of_account_type
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
@@ -15,30 +24,57 @@ _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 @pytest.fixture
 def admin_scopes_str() -> str:
     """All the OAuth 2 scopes that an admin should have, as a space-separated string."""
-    return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]))
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.ADMIN, SettingsResponseData(), must_reset_password=False
+        )
+    )
+
+
+@pytest.fixture
+def service_scopes_str() -> str:
+    """All the OAuth 2 scopes that a service account should have, as a space-separated string."""
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.SERVICE, SettingsResponseData(), must_reset_password=False
+        )
+    )
 
 
 @pytest.fixture
 def user_scopes_str() -> str:
     """All the OAuth 2 scopes that a regular user should have, as a space-separated string."""
-    return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]))
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.USER, SettingsResponseData(), must_reset_password=False
+        )
+    )
 
 
 @pytest.fixture
-def admin_scopes_list() -> list[str]:
-    """All the OAuth 2 scopes that an admin should have, as a list."""
-    return sorted(scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN])
+def auth_persistence_directory(tmp_path: Path) -> Path:
+    """Persistence directory shared by the server process and test helpers."""
+    persistence_directory = tmp_path / "auth-persist"
+    persistence_directory.mkdir()
+    return persistence_directory
 
 
 @pytest.fixture
-def user_scopes_list() -> list[str]:
-    """All the OAuth 2 scopes that a regular user should have, as a list."""
-    return sorted(scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER])
+def auth_db_path(auth_persistence_directory: Path) -> str:
+    """Path to the server SQLite database under the test persistence directory."""
+    return str(auth_persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE)
 
 
 @pytest.fixture
-def run_server(unused_tcp_port: int) -> Generator[DevServer, None, None]:
+def run_server(
+    unused_tcp_port: int,
+    auth_persistence_directory: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test."""
+    monkeypatch.setenv(
+        "OT_AUTH_SERVER_persistence_directory", str(auth_persistence_directory)
+    )
     with DevServer(port=unused_tcp_port) as dev_server:
         dev_server.start()
         base_url = f"http://localhost:{dev_server.port}"

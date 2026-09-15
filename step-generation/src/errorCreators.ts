@@ -527,3 +527,11 @@ export const liveTaskError = (): CommandCreatorError => {
       'This module is currently running a live task. Please wait for it to complete before performing this action.',
   }
 }
+
+export const vacuumUnderPressure = (): CommandCreatorError => {
+  return {
+    type: 'VACUUM_UNDER_PRESSURE',
+    message:
+      'The vacuum module is under pressure. Deactivate the pump to move labware to or from it.',
+  }
+}

@@ -15,7 +15,9 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableStatusLight,
+  EnterRobotEncryptionKey,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -33,7 +35,6 @@ import type { ShellUpdateState } from '/app/redux/shell/types'
 import type * as ShellUpdate from '/app/redux/shell/update'
 
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/shell/update', async importOriginal => {
   const actual = await importOriginal<typeof ShellUpdate>()
@@ -44,7 +45,9 @@ vi.mock('/app/redux/shell/update', async importOriginal => {
 })
 vi.mock('../AdvancedTab/DeviceReset')
 vi.mock('../AdvancedTab/DisplayRobotName')
+vi.mock('../AdvancedTab/EnableComplianceReadySoftware')
 vi.mock('../AdvancedTab/EnableStatusLight')
+vi.mock('../AdvancedTab/EnterRobotEncryptionKey')
 vi.mock('../AdvancedTab/GantryHoming')
 vi.mock('../AdvancedTab/LegacySettings')
 vi.mock('../AdvancedTab/OpenJupyterControl')
@@ -118,6 +121,12 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(DisableStackerSensors).mockReturnValue(
       <div>Mock DisableStackerSensors Section</div>
     )
+    vi.mocked(EnterRobotEncryptionKey).mockReturnValue(
+      <div>Mock EnterRobotEncryptionKey Section</div>
+    )
+    vi.mocked(EnableComplianceReadySoftware).mockReturnValue(
+      <div>Mock EnableComplianceReadySoftware Section</div>
+    )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useCurrentRun).mockReturnValue(null)
   })
@@ -129,6 +138,16 @@ describe('RobotSettings Advanced tab', () => {
   it('should render AboutRobotName section', () => {
     render()
     screen.getByText('Mock AboutRobotName Section')
+  })
+
+  it('should render EnableComplianceReadySoftware section', () => {
+    render()
+    screen.getByText('Mock EnableComplianceReadySoftware Section')
+  })
+
+  it('should render EnterRobotEncryptionKey section', () => {
+    render()
+    screen.getByText('Mock EnterRobotEncryptionKey Section')
   })
 
   it('should render GantryHoming section', () => {

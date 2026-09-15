@@ -128,8 +128,8 @@ LAYOUT_TO_START: Dict[str, Optional[str]] = {
     "Full": None,
 }
 LAYOUT_TO_END: Dict[str, Optional[str]] = {
-    "SingleA1": "A1",
-    "SingleH1": "H1",
+    "SingleA1": None,
+    "SingleH1": None,
     "H1toG1": "G1",
     "H1toF1": "F1",
     "H1toE1": "E1",

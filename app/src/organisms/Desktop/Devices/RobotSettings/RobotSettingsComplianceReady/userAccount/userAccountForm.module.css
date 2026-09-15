@@ -1,0 +1,66 @@
+.success_intro {
+  display: flex;
+  width: 100%;
+  height: 4.5rem;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.form_intro {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.one_time_password_value {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  padding: var(--spacing-6) var(--spacing-24) var(--spacing-6) var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-30);
+  gap: var(--spacing-10);
+}
+
+.form_fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.field_group {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.modal_content {
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+}
+
+.form_fields > .field_group {
+  flex: unset;
+}
+
+.fields_row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-24);
+}
+
+.field_group_value {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-8);
+}

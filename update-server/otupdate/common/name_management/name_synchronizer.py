@@ -2,15 +2,22 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from logging import getLogger
-from typing import AsyncGenerator, Optional
+from typing import Annotated, AsyncGenerator, Optional
 
-from aiohttp import web
+import fastapi
+
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 
 from .avahi import AvahiClient, alternative_service_name
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
-from otupdate.common.constants import APP_VARIABLE_PREFIX
 
-_NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
+_name_synchronizer_accessor = AppStateAccessor["NameSynchronizer"](
+    "otupdate_name_synchronizer"
+)
 _log = getLogger(__name__)
 
 
@@ -136,23 +143,25 @@ class NameSynchronizer:
 
 
 def install_name_synchronizer(
-    name_synchronizer: NameSynchronizer, app: web.Application
+    name_synchronizer: NameSynchronizer, app_state: AppState
 ) -> None:
-    """Install a NameSynchronizer on `app` for later retrieval
+    """Install a NameSynchronizer on `app_state` for later retrieval
     via get_name_synchronizer().
 
     This should be done as part of server startup.
     """
-    app[_NAME_SYNCHRONIZER_VARNAME] = name_synchronizer
+    _name_synchronizer_accessor.set_on(app_state, name_synchronizer)
 
 
-def get_name_synchronizer(request: web.Request) -> NameSynchronizer:
-    """Return the server's singleton NameSynchronizer from a request.
+def get_name_synchronizer(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> NameSynchronizer:
+    """A FastAPI dependency to retrieve the server's singleton NameSynchronizer.
 
-    The singleton NameSynchronizer is expected to have been installed on the
-    aiohttp.Application already via install_name_synchronizer().
+    The singleton NameSynchronizer is expected to have been installed on global
+    app state already via install_name_synchronizer().
     """
-    name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
+    name_synchronizer = _name_synchronizer_accessor.get_from(app_state)
     assert isinstance(name_synchronizer, NameSynchronizer), (
         f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
     )

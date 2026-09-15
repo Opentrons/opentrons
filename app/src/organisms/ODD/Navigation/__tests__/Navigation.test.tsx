@@ -7,10 +7,10 @@ import { i18n } from '/app/i18n'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 
 import { Navigation } from '..'
-import { useAccountIconInitial } from '../hooks/useAccountIconInitial'
 import { NavigationMenu } from '../NavigationMenu'
 
 import type { ComponentProps } from 'react'
@@ -18,7 +18,7 @@ import type { ComponentProps } from 'react'
 vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')
-vi.mock('../hooks/useAccountIconInitial')
+vi.mock('/app/resources/access-control/useAccountIconInitial')
 vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'

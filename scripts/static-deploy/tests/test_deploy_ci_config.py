@@ -359,6 +359,42 @@ def test_resolve_ci_config_uppercase_tag():
     assert config.relative_artifact_dir == "/build/docs"
 
 
+def test_resolve_ci_config_workflow_dispatch_branch():
+    """Branch-based workflow_dispatch resolves to sandbox with ref_name as prefix."""
+    env = {
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/heads/wip-my-feature",
+        "GITHUB_REF_NAME": "wip-my-feature",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.application == "mkdocs"
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "wip-my-feature"
+    assert config.relative_artifact_dir == "../../dist"
+
+
+def test_resolve_ci_config_workflow_dispatch_tag_raises():
+    """Tag-based workflow_dispatch raises ValueError; use push tag trigger instead."""
+    env = {
+        "GITHUB_EVENT_NAME": "workflow_dispatch",
+        "GITHUB_REF": "refs/tags/staging-mkdocs-v1.0.0",
+        "GITHUB_REF_NAME": "staging-mkdocs-v1.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        with pytest.raises(ValueError, match="workflow_dispatch is only supported for branch refs"):
+            resolve_ci_config()
+
+
 def test_resolve_ci_config_lowercase_tag():
     """Test CI config resolution handles fully lowercase tags."""
     env = {

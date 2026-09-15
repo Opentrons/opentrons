@@ -37,7 +37,7 @@ git_describe_base := git describe --dirty --tags --long --match
 # get the appropriate git describe command for a given project
 # parameter 1: project
 define git_describe_cmd_for_project
-$(if $(findstring robot-stack,$(1)),$(git_describe_base)=v*,$(if $(findstring ot3,$(1)),$(git_describe_base)=ot3@*,$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
+$(if $(findstring robot-stack,$(1)),$(git_describe_base)=v[0-9]*.[0-9]*,$(if $(findstring ot3,$(1)),$(git_describe_base)=ot3@*,$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
 endef
 
 # get the appropriate tag regex for a given project

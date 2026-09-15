@@ -107,23 +107,28 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
   }
 
   const MEDIUM_BUTTON_STYLE = css`
-    background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
-    border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadius40
-      : BORDERS.borderRadius16};
+    background-color: ${
+      MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+    };
+    border-radius: ${
+      buttonCategory === 'rounded'
+        ? BORDERS.borderRadius40
+        : BORDERS.borderRadius16
+    };
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: ${CURSOR_DEFAULT};
 
     &:focus {
-      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+      background-color: ${
+        MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      };
       box-shadow: none;
     }
     &:hover {
-      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-        .defaultBackgroundColor};
+      background-color: ${
+        MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultBackgroundColor
+      };
       border: none;
       box-shadow: none;
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
@@ -133,13 +138,15 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
 
     &:active {
-      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-        .activeBackgroundColor};
+      background-color: ${
+        MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].activeBackgroundColor
+      };
     }
 
     &:disabled {
-      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
-        .disabledBackgroundColor};
+      background-color: ${
+        MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor
+      };
       color: ${COLORS.grey50};
     }
   `

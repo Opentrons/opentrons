@@ -19,6 +19,10 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { useCurrentRobotName } from '/app/redux/robot-auth'
+
 import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
@@ -27,6 +31,7 @@ interface FirmwareUpdateModalProps {
   proceed: () => void
   subsystem: Subsystem
   isOnDevice: boolean
+  onUnauthorized?: () => void
 }
 
 const DESCRIPTION_STYLE = css`
@@ -68,13 +73,22 @@ const SPINNER_STYLE = css`
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
 ): JSX.Element => {
-  const { proceed, proceedDescription, subsystem, description, isOnDevice } =
-    props
+  const {
+    proceed,
+    proceedDescription,
+    subsystem,
+    description,
+    isOnDevice,
+    onUnauthorized,
+  } = props
   const [updateId, setUpdateId] = useState<string | null>(null)
   const [firmwareText, setFirmwareText] = useState<string | null>(null)
   const { data: attachedInstruments, refetch: refetchInstruments } =
     useInstrumentsQuery({ refetchInterval: 5000 })
-  const { updateSubsystem } = useUpdateSubsystemMutation({
+  const documentationState = useDocumentationState()
+  const robotName = useCurrentRobotName()
+  const { ensureCanUpdate, isLoading } = useRequireAdminForUpdates(robotName)
+  const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
     },
@@ -89,20 +103,29 @@ export const FirmwareUpdateModal = (
 
   useEffect(
     () => {
-      setTimeout(() => {
+      if (isLoading || robotName == null) {
+        return
+      }
+      const startTimeout = setTimeout(() => {
         if (!updateNeeded) {
           setFirmwareText(proceedDescription)
           setTimeout(() => {
             proceed()
           }, 2000)
+        } else if (!ensureCanUpdate()) {
+          onUnauthorized?.()
         } else {
           updateSubsystem(subsystem)
         }
       }, 2000)
+      return () => {
+        clearTimeout(startTimeout)
+      }
     },
+    // Wait for admin-credential queries and robot identity before auto-starting.
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [isLoading, robotName]
   )
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus

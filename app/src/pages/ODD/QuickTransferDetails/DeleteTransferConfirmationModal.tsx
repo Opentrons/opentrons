@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,9 +12,16 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
+  useHost,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -40,7 +46,12 @@ export function DeleteTransferConfirmationModal({
     iconColor: COLORS.yellow50,
   }
   const host = useHost()
-  const queryClient = useQueryClient()
+  const { documentationState } = useLinkedDocumentationState(
+    ['delete_protocol', 'delete_runs'],
+    transferId
+  )
+  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
+  const { deleteRun } = useDeleteRunMutation(documentationState)
   const { data: protocolRecord } = useProtocolQuery(transferId)
   const transferName =
     protocolRecord?.data.metadata.protocolName ??
@@ -59,17 +70,12 @@ export function DeleteTransferConfirmationModal({
         )
         .then(referencingRunIds => {
           return Promise.all(
-            referencingRunIds?.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun({ runId }))
           )
         })
-        .then(() => deleteProtocol(host, transferId))
-        .then(() =>
-          queryClient
-            .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) => {
-              console.error(`error invalidating runs query: ${e.message}`)
-            })
-        )
+        .then(() => {
+          return deleteProtocol(transferId)
+        })
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
@@ -77,6 +83,10 @@ export function DeleteTransferConfirmationModal({
           makeSnackbar(t('deleted_transfer') as string)
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            setShowIcon(false)
+            return
+          }
           navigate('/protocols')
           console.error(`error deleting resources: ${e.message}`)
         })

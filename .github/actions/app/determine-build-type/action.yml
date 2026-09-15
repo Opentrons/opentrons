@@ -1,0 +1,73 @@
+name: 'Determine App Build Type'
+description: >-
+  Determine which Opentrons app build variants and build type to run based on
+  branch, tag, and workflow event.
+
+inputs:
+  edge-build-policy:
+    description: >-
+      Edge branch policy. Use once-per-day to skip builds when another push
+      workflow already ran today (UTC). Use always for manual/on-demand builds.
+    required: false
+    default: 'once-per-day'
+  skip-pull-requests:
+    description: 'When true, pull_request events produce no build variants.'
+    required: false
+    default: 'true'
+  workflow-file:
+    description: >-
+      Workflow filename used for the edge once-per-day GitHub Actions API query.
+    required: false
+    default: 'app-test-build-deploy.yaml'
+  github-token:
+    description: 'GitHub token for edge once-per-day workflow run lookup.'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  variants:
+    description: 'JSON array of build variants (release and/or internal-release).'
+    value: ${{ steps.determine.outputs.variants }}
+  type:
+    description: 'Build type (develop, release, or as-release).'
+    value: ${{ steps.determine.outputs.type }}
+  message:
+    description: 'Human-readable explanation of the selected build configuration.'
+    value: ${{ steps.determine.outputs.message }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Determine build variant and type'
+      id: determine
+      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+      env:
+        EDGE_BUILD_POLICY: ${{ inputs.edge-build-policy }}
+        SKIP_PULL_REQUESTS: ${{ inputs.skip-pull-requests }}
+        WORKFLOW_FILE: ${{ inputs.workflow-file }}
+        GITHUB_TOKEN_INPUT: ${{ inputs.github-token }}
+      with:
+        script: |
+          const path = require('node:path')
+          const { determineBuildType } = require(path.join('${{ github.action_path }}', 'determine-build-type.js'))
+
+          const result = await determineBuildType({
+            eventName: context.eventName,
+            ref: context.ref,
+            runId: context.runId,
+            skipPullRequests: process.env.SKIP_PULL_REQUESTS === 'true',
+            edgeBuildPolicy: process.env.EDGE_BUILD_POLICY,
+            repository: context.repo.owner + '/' + context.repo.repo,
+            githubToken: process.env.GITHUB_TOKEN_INPUT,
+            workflowFile: process.env.WORKFLOW_FILE,
+          })
+
+          console.log(result.message)
+
+          core.setOutput('variants', JSON.stringify(result.variants))
+          core.setOutput('type', result.type)
+          core.setOutput('message', result.message)
+
+          await core.summary.addHeading('App build configuration')
+          await core.summary.addRaw(`Type: ${result.type}\n\nVariants: ${JSON.stringify(result.variants)}\n\n${result.message}`)
+          await core.summary.write()

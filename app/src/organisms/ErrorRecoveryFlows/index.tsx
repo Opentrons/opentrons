@@ -41,8 +41,7 @@ export interface UseErrorRecoveryInactiveResult extends UseErrorRecoveryResultBa
   isERActive: false
 }
 export type UseErrorRecoveryResult =
-  | UseErrorRecoveryInactiveResult
-  | UseErrorRecoveryActiveResult
+  UseErrorRecoveryInactiveResult | UseErrorRecoveryActiveResult
 
 export function useErrorRecoveryFlows(
   runId: string,

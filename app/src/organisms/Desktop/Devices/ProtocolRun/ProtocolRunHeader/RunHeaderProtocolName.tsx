@@ -7,7 +7,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useProtocolDetailsForRun } from '/app/resources/runs'
+import { useQuickProtocolDetailsForRun } from '/app/resources/runs'
 
 interface RunHeaderProtocolNameProps {
   runId: string
@@ -17,7 +17,7 @@ interface RunHeaderProtocolNameProps {
 export function RunHeaderProtocolName({
   runId,
 }: RunHeaderProtocolNameProps): JSX.Element {
-  const { protocolKey, displayName } = useProtocolDetailsForRun(runId)
+  const { protocolKey, displayName } = useQuickProtocolDetailsForRun(runId)
 
   return (
     <Flex>

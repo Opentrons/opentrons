@@ -3,27 +3,26 @@ import { useTranslation } from 'react-i18next'
 import { AlertModal, SpinnerModal } from '@opentrons/components'
 
 import { ErrorModal } from '/app/molecules/modals'
-import { FAILURE, PENDING } from '/app/redux/robot-api'
 
 import { DISCONNECT } from './constants'
 
-import type { RequestStatus } from '/app/redux/robot-api/types'
 import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {
   type: NetworkChangeType
   ssid: string | null
-  requestStatus: RequestStatus
+  isPending: boolean
+  isError: boolean
   error: { message?: string; [key: string]: unknown } | null
   onClose: () => unknown
 }
 
 export const ResultModal = (props: ResultModalProps): JSX.Element => {
-  const { type, ssid, requestStatus, error, onClose } = props
+  const { type, ssid, isPending, isError, error, onClose } = props
   const { t } = useTranslation(['device_settings', 'shared'])
   const isDisconnect = type === DISCONNECT
 
-  if (requestStatus === PENDING) {
+  if (isPending) {
     const message = isDisconnect
       ? t('disconnecting_from_wifi_network', { ssid: ssid })
       : t('connecting_to_wifi_network', { ssid: ssid })
@@ -31,7 +30,7 @@ export const ResultModal = (props: ResultModalProps): JSX.Element => {
     return <SpinnerModal alertOverlay message={message} />
   }
 
-  if (error || requestStatus === FAILURE) {
+  if (isError || error != null) {
     const heading = isDisconnect
       ? t('unable_to_disconnect')
       : t('unable_to_connect')

@@ -8,10 +8,10 @@ from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-from server_utils.auth.resource_server.authorization_checker import (
+from server_utils.auth.resource_server.fastapi import AuthorizationError
+from server_utils.auth.resource_server.types import (
     NotAnActiveTokenResult,
 )
-from server_utils.auth.resource_server.fastapi import AuthorizationError
 from server_utils.auth.scopes import Scope
 
 from robot_server.constants import V1_TAG

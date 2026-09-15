@@ -103,8 +103,8 @@ class ReadAbsorbanceImpl(
             start_time = datetime.now()
             results = await abs_reader.start_measure()
             finish_time = datetime.now()
-            if abs_reader._measurement_config is not None:
-                sample_wavelengths = abs_reader._measurement_config.sample_wavelengths
+            if abs_reader.measurement_config is not None:
+                sample_wavelengths = abs_reader.measurement_config.sample_wavelengths
                 for wavelength, result in zip(sample_wavelengths, results):
                     converted_values = (
                         self._state_view.modules.convert_absorbance_reader_data_points(

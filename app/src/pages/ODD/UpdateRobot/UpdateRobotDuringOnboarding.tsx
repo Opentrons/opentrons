@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import {
   CheckUpdates,
   ErrorUpdateSoftware,
@@ -22,8 +23,8 @@ import {
   clearRobotUpdateSession,
   downloadRobotUpdate,
   getRobotUpdateAvailable,
+  getRobotUpdateSession,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -34,7 +35,6 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     useState<boolean>(true)
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -42,7 +42,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotName =
+    typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
+  const session = useSelector(getRobotUpdateSession)
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
@@ -96,17 +99,19 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
               flex="1"
               onClick={() => {
                 dispatch(downloadRobotUpdate())
-                dispatchStartRobotUpdate(robotName)
+                startUpdate()
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>
         </ErrorUpdateSoftware>
-      ) : isShowCheckingUpdates && robotUpdateType !== 'upgrade' ? (
+      ) : isShowCheckingUpdates &&
+        robotUpdateType !== 'upgrade' &&
+        session == null ? (
         <CheckUpdates />
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
+        (robotUpdateType !== 'upgrade' && session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate('/emergency-stop')
@@ -116,6 +121,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate('/emergency-stop')
+          }}
           beforeCommittingSuccessfulUpdate={handleSuccessfulUpdate}
         />
       )}

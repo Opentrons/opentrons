@@ -26,10 +26,10 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '/app/redux/networking'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { SendProtocolToFlexSlideout } from '..'
@@ -51,7 +51,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/custom-labware')
 vi.mock('/app/redux/protocol-storage/selectors')
 vi.mock('/app/resources/runs')
@@ -118,7 +118,7 @@ describe('SendProtocolToFlexSlideout', () => {
       mutateAsync: mockMutateAsync,
     } as any)
     vi.mocked(mockMutateAsync).mockImplementation(() => Promise.resolve())
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: null,
     })

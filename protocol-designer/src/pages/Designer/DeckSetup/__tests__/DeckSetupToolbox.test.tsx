@@ -23,6 +23,7 @@ import {
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   getAdditionalEquipment,
+  getDeckConfiguration,
   getLabwareEntities,
   getSavedStepForms,
 } from '/protocol-designer/step-forms/selectors'
@@ -100,6 +101,9 @@ describe('DeckSetupToolbox', () => {
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
+    vi.mocked(getDeckConfiguration).mockReturnValue({
+      deckConfig: [],
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()

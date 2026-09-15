@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockLeftProtoPipette } from '/app/redux/pipettes/__fixtures__'
 import { useAttachedPipettes } from '/app/resources/instruments'
+import { mockLeftProtoPipette } from '/app/resources/instruments/__fixtures__'
 import { useRunHasStarted } from '/app/resources/runs'
 
 import { CalibrationTaskList } from '..'

@@ -19,4 +19,4 @@ class MigrationUpTo1(Migration):
         dest_db_file = dest_dir / DB_FILE
         alembic_cfg = Config(str(_ALEMBIC_INI_FILE))
         alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{dest_db_file}")
-        command.upgrade(alembic_cfg, "f37b867e27cf")
+        command.upgrade(alembic_cfg, "b8c4e2f1a903")

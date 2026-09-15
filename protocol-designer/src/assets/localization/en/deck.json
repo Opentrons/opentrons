@@ -1,16 +1,12 @@
 {
-  "warning": {
-    "gen1multichannel": "No GEN1 8-Channel access",
-    "cancelForSure": "Are you sure you want to remove this {{adapterName}}?"
-  },
   "blocked_slot": {
-    "MODULE_INCOMPATIBLE_SINGLE_LABWARE": "Labware incompatible with this module",
+    "LABWARE_INCOMPATIBLE_WITH_ADAPTER": "Labware incompatible with this adapter",
     "MODULE_INCOMPATIBLE_LABWARE_SWAP": "Swapping labware not possible due to module incompatibility",
-    "LABWARE_INCOMPATIBLE_WITH_ADAPTER": "Labware incompatible with this adapter"
+    "MODULE_INCOMPATIBLE_SINGLE_LABWARE": "Labware incompatible with this module"
   },
   "off_deck": {
-    "slideout_title": "Off-deck labware",
-    "slideout_empty_state": "There is currently no off-deck labware in this step of the protocol"
+    "slideout_empty_state": "There is currently no off-deck labware in this step of the protocol",
+    "slideout_title": "Off-deck labware"
   },
   "overlay": {
     "slot": {
@@ -18,5 +14,9 @@
       "place_here": "Place here",
       "swap_labware": "Swap labware"
     }
+  },
+  "warning": {
+    "cancelForSure": "Are you sure you want to remove this {{adapterName}}?",
+    "gen1multichannel": "No GEN1 8-Channel access"
   }
 }

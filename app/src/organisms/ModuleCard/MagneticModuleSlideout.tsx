@@ -27,12 +27,13 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
+import type { MagneticModule } from '@opentrons/api-client'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
-import type { MagneticModule } from '/app/redux/modules/types'
 
 interface ModelContents {
   version: string
@@ -72,7 +73,8 @@ export const MagneticModuleSlideout = (
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const [engageHeightValue, setEngageHeightValue] = useState<string | null>(
     null
   )

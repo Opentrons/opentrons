@@ -24,9 +24,8 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
-import type { Mount } from '/app/redux/pipettes/types'
 
 interface SetupInstrumentCalibrationItemProps {
   mount: Mount
@@ -78,7 +77,6 @@ export function SetupFlexPipetteCalibrationItem({
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <TertiaryButton
-          id="PipetteCalibration_attachPipetteButton"
           onClick={() => {
             setShowFlexPipetteFlow(true)
           }}
@@ -99,7 +97,6 @@ export function SetupFlexPipetteCalibrationItem({
           gridGap={SPACING.spacing8}
         >
           <TertiaryButton
-            id="PipetteCalibration_calibratePipetteButton"
             onClick={() => {
               setShowFlexPipetteFlow(true)
             }}
@@ -139,7 +136,6 @@ export function SetupFlexPipetteCalibrationItem({
             : t(`devices_landing:${mount}_mount`)
         }
         title={requestedPipetteSpecs?.displayName}
-        id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}
       />
     </>

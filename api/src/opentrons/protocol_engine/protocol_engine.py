@@ -45,6 +45,9 @@ from .execution import (
     QueueWorker,
     create_queue_worker,
 )
+from .execution.associated_command_error_recovery import (
+    AssociatedCommandErrorRecoveryOrchestrator,
+)
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
@@ -64,7 +67,6 @@ from .types import (
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.system import camera
 
 _log = getLogger(__name__)
 
@@ -101,6 +103,9 @@ class ProtocolEngine:
         file_provider: FileProvider,
         camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
+        associated_command_error_recovery: Optional[
+            AssociatedCommandErrorRecoveryOrchestrator
+        ] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -119,6 +124,7 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper
         self._door_watcher = door_watcher
         self._module_data_provider = module_data_provider
+        self._associated_command_error_recovery = associated_command_error_recovery
         self._queue_worker = queue_worker
         if self._queue_worker:
             self._queue_worker.start()
@@ -327,7 +333,7 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def _stop_from_asynchronous_error(self) -> None:
+    def _stop_from_asynchronous_error(self, msg: str = "") -> None:
         try:
             action = self._state_store.commands.validate_action_allowed(
                 StopAction(from_asynchronous_error=True)
@@ -348,7 +354,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self._get_queue_worker.cancel()
+        self._get_queue_worker.cancel(msg)
 
     def estop(self) -> None:
         """Signal to the engine that an E-stop event occurred.
@@ -368,10 +374,13 @@ class ProtocolEngine:
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error("E-stop Pressed")
 
     async def async_module_error(
-        self, module_model: ModuleModel, serial: str | None
+        self,
+        module_model: ModuleModel,
+        serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Signal to the engine that an asynchronous module error occured.
 
@@ -404,7 +413,20 @@ class ProtocolEngine:
             # the stop behavior over and over
             return False
 
-        self._stop_from_asynchronous_error()
+        if (
+            error is not None
+            and self._associated_command_error_recovery is not None
+            and self._associated_command_error_recovery.try_recover_from_module_error(
+                module_model=module_model,
+                module_serial=serial,
+                error=error,
+            )
+        ):
+            return False
+
+        self._stop_from_asynchronous_error(
+            f"asynchronous module error from {module_model}"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -437,7 +459,9 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error(
+            f"Module {module_model} {serial} has disconnected"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -599,11 +623,10 @@ class ProtocolEngine:
             finish_error_details = None
 
         try:
-            await camera.update_live_stream_status(
-                self.state_view.config.robot_type,
-                False,
-                self._camera_provider,
-                self.state_view.camera.get_enablement_settings(),
+            await self._camera_provider.update_live_stream_status(
+                robot_type=self.state_view.config.robot_type,
+                stream_status=False,
+                enablement_settings=self.state_view.camera.get_enablement_settings(),
             )
         except Exception as e:
             _log.exception(f"Exception during live stream post-run cleanup: {e}")

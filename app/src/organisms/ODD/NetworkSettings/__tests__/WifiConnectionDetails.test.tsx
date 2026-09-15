@@ -2,11 +2,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { INTERFACE_WIFI, mockWifiNetwork } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useWifiList } from '/app/resources/networking/hooks'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
@@ -15,7 +18,6 @@ import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('/app/resources/networking/hooks')
-vi.mock('/app/redux/networking')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
@@ -47,8 +49,8 @@ const initialMockWifi = {
 }
 
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar', active: false },
 ]
 
 describe('WifiConnectionDetails', () => {
@@ -58,7 +60,7 @@ describe('WifiConnectionDetails', () => {
       ssid: 'mockWifi',
       authType: 'wpa-psk',
     }
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })

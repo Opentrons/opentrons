@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     LegacyLabwareOffsetCreate,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -52,7 +53,10 @@ labware_router = LightRouter()
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("add labware offset to maintenance run")),
+    ],
 )
 async def add_labware_offset(
     request_body: RequestModel[
@@ -80,7 +84,7 @@ async def add_labware_offset(
 
     added_offsets: list[LabwareOffset] = []
     for offset_to_add in offsets_to_add:
-        added_offset = run_orchestrator_store.add_labware_offset(offset_to_add)
+        added_offset = await run_orchestrator_store.add_labware_offset(offset_to_add)
         added_offsets.append(added_offset)
         log.info(f'Added labware offset "{added_offset.id}" to run "{run.id}".')
 
@@ -111,7 +115,10 @@ async def add_labware_offset(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("add labware to maintenance run")),
+    ],
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
@@ -127,7 +134,7 @@ async def add_labware_definition(
         run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    uri = run_orchestrator_store.add_labware_definition(request_body.data)
+    uri = await run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(
