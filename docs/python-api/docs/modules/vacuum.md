@@ -150,7 +150,7 @@ Unlike closed-loop pressure control, which maintains a precise vacuum for reprod
 You can set the Vacuum Module to run the pump motor continuously at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
 
 !!! warning "Carboy overflow risk"
-    Because `start_set_vacuum_power()` does not read sensor data, the module cannot detect when the waste carboy is full. If the carboy float valve closes, the pump will continue running without raising an error. Use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
+    Because open-loop power control ignores sensor feedback, the module will continue to run even after the carboy reaches capacity and the float valve closes. Always empty the carboy before running a protocol and use `start_set_vacuum_pressure()` whenever possible to prevent overflow or deadheaded pump operation.
 
 Like the closed-loop pressure control method, `start_set_vacuum_power()` runs asynchronously and returns a `Task` object. Pass the task to `wait_for_tasks()` to pause protocol execution until the duration ends and system pressure equalizes to atmospheric levels.
 
