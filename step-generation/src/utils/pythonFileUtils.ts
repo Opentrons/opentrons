@@ -130,6 +130,11 @@ export function getLoadAdapters(
     lw.def.allowedRoles?.includes('adapter')
   )
   const pythonAdapters = Object.values(adapterEntities)
+    .sort(
+      (a, b) =>
+        labwareRobotState[a.id].stack.length -
+        labwareRobotState[b.id].stack.length
+    )
     .map(adapter => {
       const { id, def, pythonName } = adapter
       const { parameters, namespace, version } = def
@@ -141,10 +146,15 @@ export function getLoadAdapters(
       const isOnVacuumDock = labwareRobotState[id].stack.some(
         element => element === VACUUM_DOCK_ADDRESSABLE_AREA
       )
+      const parentAdapter =
+        adapterSlot in labwareEntities ? labwareEntities[adapterSlot] : null
 
       let parentName: string
       let locationArg: string | null = null
-      if (adapterModuleId != null) {
+      if (parentAdapter != null) {
+        parentName = parentAdapter.pythonName
+        locationArg = null
+      } else if (adapterModuleId != null) {
         const adapterModule = moduleEntities[adapterModuleId]
         ;[parentName, locationArg] = isOnVacuumDock
           ? [

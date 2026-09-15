@@ -43,8 +43,10 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
+  getCanPlaceStackableVacuumSpacer,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
+  getIsStackableVacuumSpacer,
 } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
@@ -226,6 +228,21 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
     return getIsVacuumSpacer(topmost.def)
   }, [vacuumModuleId, deckSetup.labware])
 
+  const mainModuleStack = useMemo(() => {
+    if (vacuumModuleId == null) {
+      return []
+    }
+    const onMainModule = Object.values(deckSetup.labware).filter(
+      lw =>
+        lw.stack.includes(vacuumModuleId) && !lw.stack.includes('vacuumDock')
+    )
+    if (onMainModule.length === 0) {
+      return []
+    }
+    return onMainModule.sort((a, b) => b.stack.length - a.stack.length)[0]
+      .stack
+  }, [vacuumModuleId, deckSetup.labware])
+
   // collar placed on the dock slot
   const dockHasCollar =
     vacuumModuleId != null &&
@@ -243,6 +260,12 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
       } else {
         setUserCategoryExpandState(prev => ({ ...prev, wellPlate: true }))
       }
+    } else if (moduleType === VACUUM_MODULE_TYPE && mainModuleTopIsSpacer) {
+      setUserCategoryExpandState(prev => ({
+        ...prev,
+        adapter: true,
+        wellPlate: true,
+      }))
     } else if (
       moduleType === VACUUM_MODULE_TYPE &&
       moduleHasLabware &&
@@ -342,6 +365,20 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
         return false
       }
 
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        getIsStackableVacuumSpacer(labwareDef)
+      ) {
+        if (!moduleHasLabware) {
+          return false
+        }
+        return !getCanPlaceStackableVacuumSpacer(
+          labwareDef,
+          mainModuleStack,
+          deckSetup.labware
+        ).isCompatible
+      }
+
       // for main vacuum module area with existing labware, filter explicitly
       // (skip when only a bare spacer is present — treat like an empty module)
       if (
@@ -403,6 +440,8 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
       mainModuleHasCollar,
       mainModuleTopIsFilterPlate,
       mainModuleTopIsSpacer,
+      mainModuleStack,
+      deckSetup.labware,
     ]
   )
 
