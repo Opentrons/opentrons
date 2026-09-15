@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, TypeVar, Union
+from typing import Awaitable, Callable, Dict, List, Optional, Sequence, TypeVar, Union
 
 from typing_extensions import ParamSpec
 
@@ -275,9 +276,9 @@ class StateStore(StateView, ActionHandler):
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
-        notify_publishers: Optional[Callable[[], None]] = None,
+        notify_publishers: Optional[Callable[[], Awaitable[None]]] = None,
         updates_callback: Optional[
-            Callable[[list[EngineEventNotification]], None]
+            Callable[[list[EngineEventNotification]], Awaitable[None]]
         ] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
@@ -368,6 +369,7 @@ class StateStore(StateView, ActionHandler):
             substore.handle_action(action)
 
         self._update_state_views()
+        asyncio.create_task(self._notify_and_update_callbacks())
 
     async def wait_for(
         self,
@@ -544,9 +546,11 @@ class StateStore(StateView, ActionHandler):
         self._tasks._state = next_state.tasks
         self._camera._state = next_state.camera
         self._change_notifier.notify()
+
+    async def _notify_and_update_callbacks(self) -> None:
         if self._notify_robot_server is not None:
-            self._notify_robot_server()
+            await self._notify_robot_server()
 
         if self._updates_callback is not None:
-            self._updates_callback(self._update_events)
+            await self._updates_callback(self._update_events)
             self._update_events = []

@@ -43,9 +43,11 @@ async def create_protocol_engine(
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
-    notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    notify_publishers: typing.Optional[
+        typing.Callable[[], typing.Awaitable[None]]
+    ] = None,
     updates_callback: typing.Optional[
-        typing.Callable[[list[EngineEventNotification]], None]
+        typing.Callable[[list[EngineEventNotification]], typing.Awaitable[None]]
     ] = None,
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler
