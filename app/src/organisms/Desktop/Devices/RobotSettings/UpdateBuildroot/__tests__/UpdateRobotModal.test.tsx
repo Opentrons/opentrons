@@ -144,9 +144,10 @@ describe('UpdateRobotModal', () => {
 
     expect(downloadRobotUpdate).toHaveBeenCalled()
     expect(mockStartUpdate).toHaveBeenCalled()
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
   })
 
-  it('disables update while admin permission queries are loading', () => {
+  it('keeps update enabled without a spinner while admin queries are loading', () => {
     mockGatedStart.isLoading = true
     vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
@@ -155,6 +156,53 @@ describe('UpdateRobotModal', () => {
     })
 
     render(props)
-    expect(screen.getByText('Update robot now')).toBeDisabled()
+    expect(screen.getByText('Update robot now')).toBeEnabled()
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
+  })
+
+  it('shows a spinner after click until admin queries settle then starts the update', () => {
+    mockGatedStart.isLoading = true
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ rerender }] = render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+
+    expect(downloadRobotUpdate).toHaveBeenCalledTimes(1)
+    expect(mockStartUpdate).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('ot-spinner')).toBeInTheDocument()
+    expect(screen.getByText('Update robot now')).toBeEnabled()
+
+    fireEvent.click(screen.getByText('Update robot now'))
+    expect(downloadRobotUpdate).toHaveBeenCalledTimes(1)
+    expect(mockStartUpdate).not.toHaveBeenCalled()
+
+    mockGatedStart.isLoading = false
+    rerender(<UpdateRobotModal {...props} />)
+
+    expect(mockStartUpdate).toHaveBeenCalledTimes(1)
+  })
+
+  it('clears the spinner if starting the update is blocked', () => {
+    mockGatedStart.isLoading = true
+    mockStartUpdate.mockReturnValue(false)
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ rerender }] = render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+    expect(screen.getByLabelText('ot-spinner')).toBeInTheDocument()
+
+    mockGatedStart.isLoading = false
+    rerender(<UpdateRobotModal {...props} />)
+
+    expect(mockStartUpdate).toHaveBeenCalledTimes(1)
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
   })
 })
