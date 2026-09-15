@@ -5,11 +5,12 @@ import json
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Union
 
 import pytest
 from decoy import Decoy
 from fastapi import Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from opentrons.protocol_engine import CommandSlice
 from opentrons.protocol_engine import commands as pe_commands
@@ -63,10 +64,19 @@ def _stub_empty_output_files(decoy: Decoy, data_files_store: DataFilesStore) -> 
     )
 
 
-async def _read_and_cleanup_zip(result: FileResponse) -> zipfile.ZipFile:
+async def _read_and_cleanup_zip(
+    result: Union[FileResponse, StreamingResponse],
+) -> zipfile.ZipFile:
     """Copy zip bytes, run background cleanup, then open an in-memory ZipFile."""
-    assert isinstance(result, FileResponse)
-    zip_bytes = Path(result.path).read_bytes()
+    if isinstance(result, StreamingResponse):
+        zip_bytes = bytes()
+        async for chunk in result.body_iterator:
+            assert isinstance(chunk, bytes)
+            zip_bytes += chunk
+    elif isinstance(result, FileResponse):
+        zip_bytes = Path(result.path).read_bytes()
+    else:
+        raise ValueError(f"Invalid result type {type(result)}")
     if result.background is not None:
         await result.background()
     return zipfile.ZipFile(io.BytesIO(zip_bytes))
@@ -252,7 +262,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         **_ALL_DOWNLOAD_TYPES,
     )
 
-    assert isinstance(result, FileResponse)
+    assert isinstance(result, StreamingResponse)
     assert result.media_type == "application/zip"
     assert "attachment" in result.headers["Content-Disposition"]
     assert ".zip" in result.headers["Content-Disposition"]
@@ -341,7 +351,7 @@ async def test_download_run_files_protocol_json_keeps_extension(
         protocol=True,
     )
 
-    assert isinstance(result, FileResponse)
+    assert isinstance(result, StreamingResponse)
     with await _read_and_cleanup_zip(result) as zf:
         assert "JSON_Proto.json" in zf.namelist()
         assert zf.read("JSON_Proto.json") == protocol_path.read_bytes()
@@ -406,7 +416,7 @@ async def test_download_run_files_skips_missing_protocol_silently(
         images=True,
     )
 
-    assert isinstance(result, FileResponse)
+    assert isinstance(result, StreamingResponse)
     with await _read_and_cleanup_zip(result) as zf:
         names = zf.namelist()
         assert "protocol-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in names
@@ -475,7 +485,7 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         labwareOffsets=True,
     )
 
-    assert isinstance(result, FileResponse)
+    assert isinstance(result, StreamingResponse)
     with await _read_and_cleanup_zip(result) as zf:
         assert "run-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in zf.namelist()
         assert not any(name.endswith(".json") for name in zf.namelist())
