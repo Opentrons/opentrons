@@ -61,7 +61,7 @@ export interface RequestConfig<
 
   /**
    * If true, this request will always use HTTPS, never HTTP.
-   * (Unless it's to localhost, in which case it may still use HTTP.)
+   * (Unless the host is a local transport, loopback or USB, which always uses HTTP.)
    *
    * This must be set to true whenever a request carries secrets. For example, if
    * the request is to change a user's password, this needs to be true to avoid
@@ -111,8 +111,11 @@ export function request<
     'Authorization' in headers ||
     (requestConfig?.requiresSecureTransport ?? false)
 
-  const protocol =
-    (secure ?? false) || (requiresSecureTransport && !isLocalhost(hostConfig))
+  // USB is an HTTP-only serial tunnel and loopback is on-robot. Neither can
+  // (or should) speak TLS, even when a token or requiresSecureTransport is set.
+  const protocol = isLocalTransport(hostConfig)
+    ? 'http'
+    : (secure ?? false) || requiresSecureTransport
       ? 'https'
       : 'http'
   const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
@@ -136,10 +139,12 @@ export function request<
   })
 }
 
-function isLocalhost(hostConfig: HostConfig): boolean {
+function isLocalTransport(hostConfig: HostConfig): boolean {
   return (
     hostConfig.hostname === 'localhost' ||
     hostConfig.hostname === '127.0.0.1' ||
-    hostConfig.hostname === '::1'
+    hostConfig.hostname === '::1' ||
+    // Must match OPENTRONS_USB in app/src/redux/discovery/constants.ts.
+    hostConfig.hostname === 'opentrons-usb'
   )
 }
