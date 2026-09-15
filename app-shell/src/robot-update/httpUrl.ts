@@ -1,3 +1,5 @@
+import { OPENTRONS_USB } from '../constants'
+
 export const DEFAULT_HTTP_PORT = 31950
 export const DEFAULT_HTTPS_PORT = 32313
 
@@ -19,14 +21,19 @@ export function buildRobotHttpUrl(
   } = {}
 ): string {
   const { token, secure, forceHttp } = options
-  const isLocalhost =
-    robot.ip === 'localhost' || robot.ip === '127.0.0.1' || robot.ip === '::1'
+  const isLocalTransport =
+    robot.ip === 'localhost' ||
+    robot.ip === '127.0.0.1' ||
+    robot.ip === '::1' ||
+    robot.ip === OPENTRONS_USB
 
   const requiresSecureTransport = Boolean(token) || Boolean(secure)
+  // USB is an HTTP-only serial tunnel and loopback is ODD. Neither can
+  // speak TLS, even when a token or secure flag is set. Matches api-client request().
   const protocol =
-    forceHttp === true
+    forceHttp === true || isLocalTransport
       ? 'http'
-      : (secure ?? false) || (requiresSecureTransport && !isLocalhost)
+      : (secure ?? false) || requiresSecureTransport
         ? 'https'
         : 'http'
 
