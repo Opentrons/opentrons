@@ -24,7 +24,7 @@ describe('request', () => {
 
   function lastBaseURL(): string {
     const config = requestor.mock.calls[0][0] as AxiosRequestConfig
-    return config.baseURL as string
+    return config.baseURL!
   }
 
   it('percent-encodes userNotes with newlines and Unicode for the header', async () => {
