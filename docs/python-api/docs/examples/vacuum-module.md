@@ -3,40 +3,35 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-## Vacuum module miniprep use case
+This use case examines an automated miniprep protocol for the Flex liquid handling robot and the Vacuum Module. It is excerpted from a real, multi-stage python protocol. While the underlying protocol performs a nucleic acid miniprep, our focus here is on how the API code and how it's used with the Vacuum Module, the Gripper, pipettes, and related labware. In this example, you'll see how API commands are used to programmatically reconfigure the manifold stack mid-protocol, apply different vacuum pressures for different filter types, and execute pipetting actions concurrently while the Vacuum Module operates independently, in the background.
 
-This example demonstrates how a plasmid miniprep protocol uses Vacuum Module API methods. A miniprep a common, but often tedious, laboratory procedure used in molecular biology to isolate DNA. The Opentrons Flex pared with the Vacuum Module and other Opentrons deck modules and labware, helps speed up this procedure through full automation of all the steps in a miniprep workflow.
+### Stage 1: protocol metadata
 
-## Some descriptive header here
+Every protocol file starts with metadata and requirements. In this sample:
 
+- The `metadata` dictionary contains protocol information such as its name and an optional, brief description, which is displayed in the Opentrons App and on the Flex touchscreen.
 
-
-### Protocol metadata
-
-Every protocol file starts with metadata. This is a dictonary that defines specific requirements for a protocol At a minimum, a Flex protocol needs a requirements block to define the robot as a Flex and the API version (the minimum API version for the Vacuum Module is v2.30). Our miniprep use case is no different. The protocol code starts as shown:
+- The `requirements` dictionary tells us what robot model to use (Flex) and the API version (v2.31). Note that the Vacuum Module works with the Flex only and requires API version 2.30, or higher, to run.
 
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import VacuumModuleContext
 
 metadata = {
-    "protocolName": "Multi-Stage Purification Use Case",
-    "description": "Demonstrates internal collection, direct-to-waste washing, and concurrent pipetting",
+    "protocolName": "Miniprep Vacuum Module Use Case",
+    "description": "Demonstrates waste collection, direct-to-waste washing, and concurrent execution."
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.30"}
+requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 ```
 
-Created automatically by the Opentrons App, AI, or Protocol Designer.
+### Stage 2: Loading modules and labware
 
-"Step" or "Stage"
-
-### Part 1: load modules and labware
-
-Some description or summary here.
+The protocol begins by loading hardware and staging labware. Staging the collar on the dock allows the Flex Gripper to assemble the internal stack (like spacers and collection plates) directly inside the vacuum manifold base.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
+    # Load modules and waste routing
     vacuum: VacuumModuleContext = protocol.load_module("vacuumModuleV1", "A3")
     heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
     waste_chute = protocol.load_waste_chute()
@@ -44,18 +39,16 @@ def run(protocol: protocol_api.ProtocolContext):
     # Stage the tall collar on the vacuum module dock (slot A4)
     collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_tall")
 
-    # Load a spacer in deck slot A1 and well plates
-    short_spacer = protocol.load_adapter(
-        "opentrons_vacuum_manifold_spacer_short", "A1"
-    )
+    # Load an internal spacer and collection plate into the manifold base (slot A3)
+    short_spacer = protocol.load_adapter("opentrons_vacuum_manifold_spacer_short", "A1")
     collection_plate = vacuum.load_labware(
         "nunc_96_wellplate_450ul", label="Lysate Collection Plate"
     )
+
+    # Stage the filter plates and pipetting tools
     filter_plate = short_spacer.load_labware(
         "cytiva_96_wellplate_1000ul_shorttip_filter", label="Clarification Plate"
     )
-
-    # Load a silica binding plate, a reservoir of reagent, a pipette and tiprack
     silica_plate = protocol.load_labware(
         "cytiva_96_wellplate_1000ul_longtip_filter", "C1", label="Silica Plate"
     )
@@ -184,9 +177,3 @@ Pressure sensors in the Control Box allows the module to apply multiple vacuum p
 ### Depressurization and Gripper safety
 
 Attempting to move labware while the manifold remains under vacuum raises an API error. Setting vent_after=True with an equalize_timeout_s delay ensures the module vents to atmospheric pressure (0 mbar) at the end of a cycle. Synchronizing the background task with wait_for_tasks() ensures the system is depressurized before the Gripper attempts to move the collar or labware.
-
-## Full protocol
-
-If you're interested in the complete Python protocol, you can review and copy this file here.
-
-<font color="red">¿Expand/drop-down section with complete .py file? 600 lines.</font>
