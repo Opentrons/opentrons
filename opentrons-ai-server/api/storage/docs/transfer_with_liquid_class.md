@@ -89,7 +89,7 @@ metadata = {
     "source": "Liquid Classes example",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
