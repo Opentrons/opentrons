@@ -62,19 +62,22 @@ export function useRequireAdminForUpdates(
   const host = useHostConfigForRobot(robotName)
 
   const { data: accessControl, isLoading: isAccessControlLoading } =
-    useAccessControlEnabledQuery(undefined, host)
+    useAccessControlEnabledQuery({ retry: false }, host)
   const { data: authSettings, isLoading: isAuthSettingsLoading } =
-    useAuthSettingsQuery(undefined, host)
-  const { data: self, isLoading: isSelfLoading } = useSelfQuery(undefined, host)
+    useAuthSettingsQuery({ retry: false }, host)
+  const { data: self, isLoading: isSelfLoading } = useSelfQuery(
+    { retry: false },
+    host
+  )
 
+  const accessControlEnabled = accessControl?.data.accessControlEnabled === true
   const isLoading =
     robotName != null &&
     (host == null ||
       isAccessControlLoading === true ||
-      isAuthSettingsLoading === true ||
-      isSelfLoading === true)
+      (accessControlEnabled &&
+        (isAuthSettingsLoading === true || isSelfLoading === true)))
 
-  const accessControlEnabled = accessControl?.data.accessControlEnabled === true
   const requireAdmin =
     authSettings?.data.requireAdminCredsWhenUpdatingRobotSoftware === true
   const isLoggedIn = self?.data.username != null
