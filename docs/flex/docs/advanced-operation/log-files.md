@@ -22,6 +22,9 @@ In an idle state or during a protocol run, your Flex constantly writes data to s
 
 The records in these log files can be difficult to interpret and understand but they're valuable for troubleshooting purposes. If you ever need to download the log files, the following instructions will step you through that process.
 
+!!! note
+    Flex robots with Opentrons Flex Compliance Ready Software generate additional files called audit logs. Read more about these logs and they information they contain in the [Compliance Ready Software manual](../../compliance-ready-software/using/files.md#file-types).
+
 ## Downloading Flex log files
 
 Follow these instructions to download the Flex log files:
@@ -42,3 +45,5 @@ Follow these instructions to download the Flex log files:
 5. _(Optional)_ To read the logs, double-click the downloaded file to decompress it. The individual logs will expand into a new folder in the same location as the downloaded file. Any text editor should be able to open these files.
 
 </div>
+
+## Managing Flex log files

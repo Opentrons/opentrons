@@ -34,6 +34,10 @@ Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), 
 
 Enable additional tools and features designed for developers. Not recommended for use unless instructed by Opentrons Support.
 
+### Devices
+
+View attached devices, like an external keyboard or USB device. 
+
 ### Device Reset
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
@@ -46,6 +50,14 @@ You should disable this setting only when using labware that causes detection er
 
 !!! note
     When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
+
+### Encryption key 
+
+Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
+
+### File manager
+
+Download or delete files stored on your Flex. 
 
 ### Home Gantry on Restart
 
