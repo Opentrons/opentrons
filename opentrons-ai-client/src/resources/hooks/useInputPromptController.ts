@@ -192,7 +192,7 @@ export function useInputPromptController(
       setAuthError(null)
       token = await getAccessToken()
     } catch {
-      setAuthError(t('error_auth_token'))
+      setAuthError(t('error_auth_token') as string)
       return
     }
 
