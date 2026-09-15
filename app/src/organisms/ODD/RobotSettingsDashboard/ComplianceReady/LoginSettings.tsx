@@ -5,6 +5,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './compliance_ready_settings.module.css'
 import { NumericSettingPage } from './NumericSettingPage'
+import { PasswordChange } from './PasswordChange'
 import { PasswordComplexity } from './PasswordComplexity'
 import { SettingsListButton } from './SettingsListButton'
 
@@ -17,9 +18,11 @@ type CRSLoginSettingsPages =
 export function LoginSettings({
   authSettings,
   onClickBack,
+  patchAuthSettings,
 }: {
   authSettings?: AuthSettingsData
   onClickBack: () => void
+  patchAuthSettings: (authSettings: Partial<AuthSettingsData>) => void
 }): ReactNode {
   const { t } = useTranslation('device_settings')
 
@@ -38,7 +41,7 @@ export function LoginSettings({
     },
     password_reset_time: {
       title: t('require_password_change_after_time'),
-      value: authSettings?.passwordResetTime,
+      value: Math.round((authSettings?.passwordResetTime ?? 0) / 86400),
       units: t('days'),
     },
     password_complexity: {
@@ -48,7 +51,7 @@ export function LoginSettings({
     },
     idle_logout: {
       title: t('auto_logout_inactivity_length'),
-      value: authSettings?.idleLogout,
+      value: Math.round((authSettings?.idleLogout ?? 0) / 60),
       units: t('mins'),
     },
   }
@@ -68,9 +71,21 @@ export function LoginSettings({
           value={authSettings?.maxNumberOfLoginAttempts}
           label={t('number_of_logins')}
           onBack={value => {
-            console.log(value)
+            patchAuthSettings({ maxNumberOfLoginAttempts: value })
             setCurrentPage(null)
           }}
+          min={1}
+          max={5}
+        />
+      )
+    case 'password_reset_time':
+      return (
+        <PasswordChange
+          onClickBack={() => {
+            setCurrentPage(null)
+          }}
+          authSettings={authSettings}
+          patchAuthSettings={patchAuthSettings}
         />
       )
     case 'idle_logout':
@@ -78,12 +93,13 @@ export function LoginSettings({
         <NumericSettingPage
           title={t('auto_logout')}
           description={t('auto_logout_inactivity_length')}
-          value={authSettings?.idleLogout}
+          value={Math.round((authSettings?.idleLogout ?? 0) / 60)}
           label={t('number_of_minutes')}
           onBack={value => {
-            console.log(value)
+            patchAuthSettings({ idleLogout: value ? value * 60 : undefined })
             setCurrentPage(null)
           }}
+          min={1}
         />
       )
     case 'password_complexity':
@@ -93,6 +109,7 @@ export function LoginSettings({
             setCurrentPage(null)
           }}
           authSettings={authSettings}
+          patchAuthSettings={patchAuthSettings}
         />
       )
     default:

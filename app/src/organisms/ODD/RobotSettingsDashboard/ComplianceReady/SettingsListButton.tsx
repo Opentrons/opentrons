@@ -1,3 +1,5 @@
+import clsx from 'clsx'
+
 import { Icon, ListButton, StyledText } from '@opentrons/components'
 
 import styles from './compliance_ready_settings.module.css'
@@ -7,15 +9,19 @@ import type { ReactNode } from 'react'
 export function SettingsListButton({
   key,
   title,
+  detail,
   value,
   onClick,
   chevron,
+  toggleValue,
 }: {
   key: string
   title: string
+  detail?: string
   value?: string
   chevron?: boolean
   onClick: () => void
+  toggleValue?: boolean
 }): ReactNode {
   return (
     <ListButton
@@ -25,8 +31,18 @@ export function SettingsListButton({
       className={styles.list_button}
     >
       <div className={styles.button_content}>
-        <StyledText oddStyle="level4HeaderSemiBold">{title}</StyledText>
-        <div className={styles.value_container}>
+        <div className={styles.title_container}>
+          <StyledText oddStyle="level4HeaderSemiBold">{title}</StyledText>
+          {detail && (
+            <StyledText oddStyle="level4HeaderRegular">{detail}</StyledText>
+          )}
+        </div>
+        <div
+          className={clsx(
+            styles.value_container,
+            toggleValue && styles.toggle_value_container
+          )}
+        >
           <StyledText oddStyle="level4HeaderRegular" width="100%">
             {value}
           </StyledText>

@@ -18,9 +18,11 @@ import type { AuthSettingsData } from '@opentrons/api-client'
 export function PasswordComplexity({
   onClickBack,
   authSettings,
+  patchAuthSettings,
 }: {
   onClickBack: () => void
   authSettings?: AuthSettingsData
+  patchAuthSettings: (settings: Partial<AuthSettingsData>) => void
 }): ReactNode {
   const { t } = useTranslation('device_settings')
   const [showMinLength, setShowMinLength] = useState(false)
@@ -28,7 +30,7 @@ export function PasswordComplexity({
 
   const passwordComplexityEnabled =
     authSettings?.passwordComplexityMinimumLength != null ||
-    authSettings?.passwordComplexitySpecialCharacters != null
+    !!authSettings?.passwordComplexitySpecialCharacters
 
   if (showMinLength) {
     return (
@@ -37,7 +39,8 @@ export function PasswordComplexity({
         value={authSettings?.passwordComplexityMinimumLength ?? 1}
         label={t('number_of_characters')}
         caption={t('input_range')}
-        onBack={() => {
+        onBack={value => {
+          patchAuthSettings({ passwordComplexityMinimumLength: value })
           setShowMinLength(false)
         }}
         min={1}
@@ -50,29 +53,36 @@ export function PasswordComplexity({
     <OddModal
       header={{
         title: t('require_password_complexity_modal_title'),
-        iconName: 'alert',
+        iconName: 'information',
         iconColor: COLORS.yellow50,
       }}
-      modalSize="small"
+      modalSize="medium"
     >
-      <StyledText oddStyle="level4HeaderRegular">
-        {t('require_password_complexity_modal_description')}
-      </StyledText>
-      <div className={styles.warning_modal_buttons}>
-        <SmallButton
-          buttonText={t('cancel')}
-          onClick={() => {
-            setShowWarningModal(false)
-          }}
-          width="50%"
-        />
-        <SmallButton
-          buttonText={t('confirm')}
-          onClick={() => {
-            setShowWarningModal(false)
-          }}
-          width="50%"
-        />
+      <div className={styles.warning_modal_content}>
+        <StyledText oddStyle="level4HeaderRegular">
+          {t('require_password_complexity_modal_description')}
+        </StyledText>
+        <div className={styles.warning_modal_buttons}>
+          <SmallButton
+            buttonText={t('cancel')}
+            onClick={() => {
+              setShowWarningModal(false)
+            }}
+            width="50%"
+            buttonType="secondary"
+          />
+          <SmallButton
+            buttonText={t('confirm')}
+            onClick={() => {
+              patchAuthSettings({
+                passwordComplexitySpecialCharacters: true,
+                passwordComplexityMinimumLength: 8,
+              })
+              setShowWarningModal(false)
+            }}
+            width="50%"
+          />
+        </div>
       </div>
     </OddModal>
   )
@@ -90,7 +100,14 @@ export function PasswordComplexity({
             title={t('password_complexity_requirements')}
             value={passwordComplexityEnabled}
             onClick={() => {
-              setShowWarningModal(true)
+              if (!passwordComplexityEnabled) {
+                setShowWarningModal(true)
+              } else {
+                patchAuthSettings({
+                  passwordComplexitySpecialCharacters: false,
+                  passwordComplexityMinimumLength: null,
+                })
+              }
             }}
           />
           {passwordComplexityEnabled && (
@@ -102,7 +119,12 @@ export function PasswordComplexity({
                 <ToggleSetting
                   title={t('require_special_characters')}
                   value={true}
-                  onClick={() => {}}
+                  onClick={() => {
+                    patchAuthSettings({
+                      passwordComplexitySpecialCharacters:
+                        !authSettings?.passwordComplexitySpecialCharacters,
+                    })
+                  }}
                 />
                 <SettingsListButton
                   key={t('minimum_password_length')}
