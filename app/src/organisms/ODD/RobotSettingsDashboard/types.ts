@@ -2,6 +2,7 @@
  * a set of screen options for the robot settings dashboard page
  */
 export type SettingOption =
+  | 'ComplianceReady'
   | 'NetworkSettings'
   | 'RobotName'
   | 'RobotSystemVersion'
