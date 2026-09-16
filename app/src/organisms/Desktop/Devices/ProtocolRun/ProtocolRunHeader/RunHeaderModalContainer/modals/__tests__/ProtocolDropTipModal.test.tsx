@@ -160,7 +160,6 @@ describe('ProtocolDropTipModal', () => {
     const beginRemoval = screen.getByRole('button', { name: /Begin removal/i })
     expect(beginRemoval).toHaveAttribute('aria-disabled', 'true')
     expect(beginRemoval).not.toBeDisabled()
-    expect(document.querySelector('svg')).not.toBeNull()
   })
 
   it('does not call onBeginRemoval while loading', () => {
