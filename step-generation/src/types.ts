@@ -302,6 +302,8 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
+export type Choices = number[] | string[]
+
 export interface RuntimeParameter {
   variableName: string
   displayName: string
@@ -309,7 +311,7 @@ export interface RuntimeParameter {
   default: string | number | boolean
   minimum?: number
   maximum?: number
-  choices?: string | number
+  choices?: Choices
   unit?: string
   description?: string
 }
