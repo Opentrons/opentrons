@@ -42,6 +42,7 @@
   "seconds_per_step": "{{seconds}} s per step",
   "slot": "Slot",
   "slot_empty": "Slot empty",
+  "slot_spotlight": "Slot Spotlight",
   "source_tips": "Source tips",
   "source_well_view": "Source well view",
   "speed": "{{speed}} RPM",
