@@ -1,0 +1,17 @@
+---
+description: App codebase targets Flex robots only; OT2 support is deprecated
+alwaysApply: true
+---
+
+# Flex Only — OT2 Deprecated
+
+This codebase's app UI and client logic **only runs on Flex robots**. OT2 support is **deprecated**.
+
+When writing or reviewing code:
+
+- **Assume Flex** — design for Flex hardware, APIs, and UX.
+- **Do not add OT2-specific logic** — no new branches, fallbacks, or compatibility paths for OT2.
+- **Do not preserve OT2 behavior** unless the user explicitly asks to maintain legacy OT2 code.
+- **Ignore OT2-only paths** when refactoring — existing OT2-named files or conditionals (e.g. `OT2SetupLPC`, `robotType === 'OT-2'`) are legacy; do not extend them.
+
+If a change would require OT2 vs Flex branching, implement the Flex path only.
