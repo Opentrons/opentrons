@@ -267,6 +267,7 @@ export function constructInvariantContextFromAnalysis(
       wasteChuteEntities: {},
       trashBinEntities: {},
       stagingAreaEntities: {},
+      runTimeParameters: {},
       //  the timeline scrubber doesn't visualize gripper right now
       gripperEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },

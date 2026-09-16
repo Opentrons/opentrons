@@ -205,6 +205,7 @@ export function makeContext(): InvariantContext {
     stagingAreaEntities: {},
     gripperEntities: {},
     liquidEntities: {},
+    runTimeParameters: {},
     config: DEFAULT_CONFIG,
   }
 }

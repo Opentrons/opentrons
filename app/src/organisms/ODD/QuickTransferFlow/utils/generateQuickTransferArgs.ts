@@ -298,6 +298,7 @@ export function getInvariantContextAndRobotState(
     stagingAreaEntities: {},
     gripperEntities: {},
     liquidEntities: {},
+    runTimeParameters: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
   const moduleLocations = {}

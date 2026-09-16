@@ -199,6 +199,7 @@ beforeEach(() => {
     stagingAreaEntities: {},
     gripperEntities: {},
     liquidEntities: {},
+    runTimeParameters: {},
     config: DEFAULT_CONFIG,
   }
 })
