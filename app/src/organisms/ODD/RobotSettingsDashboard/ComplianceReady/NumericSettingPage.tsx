@@ -6,6 +6,7 @@ import { StyledText, TouchInputField } from '@opentrons/components'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard/NumericalKeyboard'
 
 import { ChildNavigation } from '../../ChildNavigation'
+import { parseNumericalInput } from '../../utils/parseNumericalInput'
 import styles from './compliance_ready_settings.module.css'
 
 import type { ChangeEvent, ReactNode } from 'react'
@@ -72,7 +73,17 @@ export function NumericSettingPage({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setError(undefined)
-    setCurrentValue(Number(event.target.value))
+    const parseResult = parseNumericalInput(event.target.value, {
+      allowDecimal: false,
+      allowNegative: false,
+      // don't pass min/max, validate on submission
+    })
+    if (parseResult.result === 'success') {
+      setCurrentValue(parseResult.data)
+    } else if (parseResult.result === 'empty') {
+      setCurrentValue(undefined)
+    }
+    console.log('parseResult', parseResult)
   }
 
   return (
@@ -82,7 +93,7 @@ export function NumericSettingPage({
         <div className={styles.numeric_settings_left}>
           <StyledText oddStyle="level4HeaderRegular">{description}</StyledText>
           <TouchInputField
-            type="number"
+            type="text"
             value={currentValue}
             onChange={handleChange}
             ref={inputElementRef}

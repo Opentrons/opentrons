@@ -15,11 +15,6 @@ export interface SoftwareKeyboardControlOptions {
    * The software keyboard.
    */
   keyboardRef: RefObject<KeyboardReactInterface>
-
-  /**
-   *
-   */
-  numericKeyboard?: boolean
 }
 
 /** Props that should be passed to react-simple-keyboard. */
@@ -41,7 +36,7 @@ export interface SoftwareKeyboardControlResult {
 export function useSoftwareKeyboardControl(
   options: SoftwareKeyboardControlOptions
 ): SoftwareKeyboardControlResult {
-  const { inputElementRef, keyboardRef, numericKeyboard = false } = options
+  const { inputElementRef, keyboardRef } = options
 
   const result = useMemo<SoftwareKeyboardControlResult>(
     () => ({
@@ -101,10 +96,7 @@ export function useSoftwareKeyboardControl(
         //    to the end. I don't fully understand this, but it seems like setSelectionRange()
         //    requires it.
         inputElement.focus()
-
-        const value = numericKeyboard ? +newValue : newValue
-        setValue(inputElement, '' + value)
-
+        setValue(inputElement, newValue)
         try {
           inputElement.setSelectionRange(
             keyboardRef.current?.getCaretPosition() ?? null,
@@ -120,7 +112,7 @@ export function useSoftwareKeyboardControl(
         inputElement.dispatchEvent(new Event('input', { bubbles: true }))
       },
     }),
-    [inputElementRef, keyboardRef, numericKeyboard]
+    [inputElementRef, keyboardRef]
   )
 
   return result
