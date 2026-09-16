@@ -15,7 +15,7 @@ export function ToggleSetting({
 }): ReactNode {
   return (
     <SettingsListButton
-      key={title}
+      key={title + value}
       title={title}
       detail={detail}
       value={value ? 'On' : 'Off'}

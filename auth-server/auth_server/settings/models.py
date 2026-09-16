@@ -63,6 +63,17 @@ class SettingsResponseData(_StrictBaseModel):
         description="Require admin credentials for signoff protocol.",
     )
 
+class PatchSettingsResponseMeta(_StrictBaseModel):
+    requiresLogout: Annotated[
+        bool,
+        pydantic.Field(
+            description="Whether the user needs to logout to apply the new settings."
+        ),
+    ]
+
+class PatchSettingsResponseBody(_StrictBaseModel):
+    data: SettingsResponseData
+    meta: PatchSettingsResponseMeta
 
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.
