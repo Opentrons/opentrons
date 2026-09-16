@@ -12,6 +12,7 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useLogout } from '/app/redux/robot-auth'
 
 import { AdminActions } from './AdminActions'
 import { AuditLogRequirements } from './AuditLogRequirements'
@@ -42,9 +43,19 @@ export function ComplianceReadySettings({
   const { data: authSettings } = useAuthSettingsQuery()
   const { data: auditSettings } = useAuditSettingsQuery()
 
+  const logout = useLogout()
+
   const documentationState = useDocumentationState()
-  const { mutate: patchAuthSettings } =
-    useAuthSettingsMutation(documentationState)
+  const { mutate: patchAuthSettings } = useAuthSettingsMutation(
+    documentationState,
+    {
+      onSuccess: data => {
+        if (data.meta.requiresLogout) {
+          logout()
+        }
+      },
+    }
+  )
   const { mutate: patchRobotServerSettings } =
     usePatchRobotServerAccessControlSettingsMutation(documentationState)
   const { mutate: patchAuditSettings } =
