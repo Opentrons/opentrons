@@ -56,6 +56,7 @@ export function NumericSettingPage({
       setError('' + t('maximum_value_is', { max }))
       return
     }
+    // max int in C lol
     if (currentValue > 2147483647) {
       setError(
         '' +
