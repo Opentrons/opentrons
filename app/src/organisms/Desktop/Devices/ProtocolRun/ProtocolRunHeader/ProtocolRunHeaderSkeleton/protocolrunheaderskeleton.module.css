@@ -1,0 +1,30 @@
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  width: 100%;
+  min-height: 14rem;
+  margin-bottom: var(--spacing-16);
+  padding: var(--spacing-16);
+  gap: var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--black-90) 30%, transparent) 0%,
+    color-mix(in srgb, var(--black-90) 15%, transparent) 51.04%,
+    color-mix(in srgb, var(--black-90) 30%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
