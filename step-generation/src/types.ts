@@ -305,7 +305,7 @@ export interface Ingredients {
 export interface RunTimeParameter {
   variableName: string
   displayName: string
-  type: 'boolean'| 'string' | 'float' | 'int' | 'csv'
+  type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
   default: string | number | boolean
   minimum?: number
   maximum?: number
