@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import { Icon, ListButton, StyledText } from '@opentrons/components'
+import { COLORS, Icon, ListButton, StyledText } from '@opentrons/components'
 
 import styles from './compliance_ready_settings.module.css'
 
@@ -34,7 +34,9 @@ export function SettingsListButton({
         <div className={styles.title_container}>
           <StyledText oddStyle="level4HeaderSemiBold">{title}</StyledText>
           {detail && (
-            <StyledText oddStyle="level4HeaderRegular">{detail}</StyledText>
+            <StyledText oddStyle="level4HeaderRegular" color={COLORS.grey60}>
+              {detail}
+            </StyledText>
           )}
         </div>
         <div
