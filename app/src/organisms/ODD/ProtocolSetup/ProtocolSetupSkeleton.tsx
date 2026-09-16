@@ -29,23 +29,23 @@ export function ProtocolSetupTitleSkeleton(): JSX.Element {
   )
 }
 
+export function ProtocolSetupHeaderButtonSkeleton(): JSX.Element {
+  return (
+    <Skeleton
+      height="6.25rem"
+      width="6.25rem"
+      backgroundSize="99rem"
+      borderRadius={BORDERS.borderRadiusFull}
+      fixedBackground
+    />
+  )
+}
+
 export function ProtocolSetupButtonsSkeleton(): JSX.Element {
   return (
     <>
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
+      <ProtocolSetupHeaderButtonSkeleton />
+      <ProtocolSetupHeaderButtonSkeleton />
     </>
   )
 }

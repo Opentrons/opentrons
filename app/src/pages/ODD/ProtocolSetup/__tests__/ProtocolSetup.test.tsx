@@ -1,5 +1,5 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -13,6 +13,7 @@ import {
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
+  useRestartMutation,
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -38,7 +39,6 @@ import {
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   getUnmatchedModulesForProtocol,
-  ProtocolSetupButtonsSkeleton,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
@@ -76,6 +76,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
 import {
+  useCloseCurrentRun,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useNotifyRunQuery,
@@ -156,7 +157,6 @@ const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
 const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
 const MockProtocolSetupCamera = vi.mocked(ProtocolSetupCamera)
 const MockProtocolSetupTitleSkeleton = vi.mocked(ProtocolSetupTitleSkeleton)
-const MockProtocolSetupButtonsSkeleton = vi.mocked(ProtocolSetupButtonsSkeleton)
 const MockProtocolSetupStepSkeleton = vi.mocked(ProtocolSetupStepSkeleton)
 const MockConfirmSetupStepsCompleteModal = vi.mocked(
   ConfirmSetupStepsCompleteModal
@@ -193,6 +193,7 @@ const mockEmptyAnalysis = {
 } as unknown as SharedData.CompletedProtocolAnalysis
 
 const mockPlay = vi.fn()
+const mockCloseCurrentRun = vi.fn()
 const mockOffset = {
   id: 'fake_labware_offset',
   createdAt: 'timestamp',
@@ -385,6 +386,19 @@ describe('ProtocolSetup', () => {
       addCameraSettingsToRun: vi.fn(),
     } as any)
     vi.mocked(getCameraUsageState).mockReturnValue({ enabled: true } as any)
+    mockCloseCurrentRun.mockImplementation(
+      (options?: { onSuccess?: () => void }) => {
+        options?.onSuccess?.()
+      }
+    )
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: false,
+    })
+    vi.mocked(useRestartMutation).mockReturnValue({
+      restart: vi.fn(),
+      isLoading: false,
+    } as any)
   })
 
   it('should render text, image, and buttons', () => {
@@ -559,10 +573,38 @@ describe('ProtocolSetup', () => {
       data: null,
     } as any)
     MockProtocolSetupTitleSkeleton.mockReturnValue(<div>SKELETON</div>)
-    MockProtocolSetupButtonsSkeleton.mockReturnValue(<div>SKELETON</div>)
     MockProtocolSetupStepSkeleton.mockReturnValue(<div>SKELETON</div>)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(3)
+    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(2)
+    screen.getByRole('button', { name: 'close' })
+    expect(
+      screen.queryByRole('button', { name: 'play' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows a timeout modal after 5 minutes of loading and dismisses the run when returning to the dashboard', () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+        data: null,
+      } as any)
+      render(`/runs/${RUN_ID}/setup/`)
+      expect(
+        screen.queryByText('Run is taking longer than usual to load')
+      ).not.toBeInTheDocument()
+      act(() => {
+        vi.advanceTimersByTime(300000)
+      })
+      screen.getByText('Run is taking longer than usual to load')
+      fireEvent.click(screen.getByText('Return to dashboard'))
+      expect(mockCloseCurrentRun).toHaveBeenCalledWith(
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+        })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('should render toast and make a button disabled when a robot door is open', async () => {
