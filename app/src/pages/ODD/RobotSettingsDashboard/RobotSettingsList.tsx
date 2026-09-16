@@ -109,7 +109,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     })
   )
 
-  const { data: accessControlEnabled } = useAccessControlEnabledQuery()
+  const { data: accessControlData } = useAccessControlEnabledQuery()
+  const isCRSEnabled = accessControlData?.data.accessControlEnabled ?? false
 
   return (
     <div className={styles.main_content}>
@@ -254,7 +255,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="verified"
         />
-        {!!accessControlEnabled && (
+        {isCRSEnabled ? (
           <RobotSettingButton
             settingName={t('compliance_ready_software')}
             dataTestId="RobotSettingButton_compliance_ready"
@@ -263,7 +264,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
             }}
             iconName="compliance"
           />
-        )}
+        ) : null}
         <RobotSettingButton
           settingName={t(
             'app_settings:include_protocol_source_in_run_download'
