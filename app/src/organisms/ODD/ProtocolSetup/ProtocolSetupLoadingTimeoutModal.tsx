@@ -12,7 +12,7 @@ import styles from './protocolsetuploadingtimeoutmodal.module.css'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
-export const RUN_ERROR_TIMEOUT_DURATION_MS = 300000
+export const RUN_ERROR_TIMEOUT_DURATION_MS = 3 * 60 * 1000
 
 interface ProtocolSetupLoadingTimeoutModalProps {
   onReturnToDashboard: () => void

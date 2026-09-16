@@ -49,6 +49,7 @@ import {
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
+import { RUN_ERROR_TIMEOUT_DURATION_MS } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLoadingTimeoutModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import {
   useProtocolHasRunTimeParameters,
@@ -582,7 +583,7 @@ describe('ProtocolSetup', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows a timeout modal after 5 minutes of loading and dismisses the run when returning to the dashboard', () => {
+  it('shows a timeout modal after 3 minutes of loading and dismisses the run when returning to the dashboard', () => {
     vi.useFakeTimers()
     try {
       vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
@@ -593,7 +594,7 @@ describe('ProtocolSetup', () => {
         screen.queryByText('Run is taking longer than usual to load')
       ).not.toBeInTheDocument()
       act(() => {
-        vi.advanceTimersByTime(300000)
+        vi.advanceTimersByTime(RUN_ERROR_TIMEOUT_DURATION_MS)
       })
       screen.getByText('Run is taking longer than usual to load')
       fireEvent.click(screen.getByText('Return to dashboard'))
