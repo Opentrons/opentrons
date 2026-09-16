@@ -285,6 +285,25 @@ def test_get_gripper_labware_movement_waypoints() -> None:
     ]
 
 
+def test_get_gripper_labware_movement_waypoints_pickup_speed() -> None:
+    """Only the post-grip Z retract should carry pickup_speed."""
+    result = get_gripper_labware_movement_waypoints(
+        from_labware_center=Point(101, 102, 119.5),
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
+        post_drop_slide_offset=None,
+        pickup_speed=20.0,
+    )
+    assert [waypoint.speed for waypoint in result] == [
+        None,
+        None,
+        20.0,
+        None,
+        None,
+        None,
+    ]
+
+
 def test_get_gripper_labware_movement_waypoint_with_slide() -> None:
     """It should get the correct waypoints for gripper movement."""
     result = get_gripper_labware_movement_waypoints(
