@@ -33,15 +33,11 @@ export function UserAccountUsernameField<T extends FieldValues>({
           maxLength: usernameMaxLength,
         }) as string)
       : null
-  const invalidCharactersError = t(
-    'username_invalid_characters'
-  ) as string
+  const invalidCharactersError = t('username_invalid_characters') as string
 
   return (
     <div className={styles.field_group}>
-      <StyledText desktopStyle="bodyDefaultRegular">
-        {t('username')}
-      </StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">{t('username')}</StyledText>
       <div className={styles.field_group_value}>
         <Controller
           control={control}

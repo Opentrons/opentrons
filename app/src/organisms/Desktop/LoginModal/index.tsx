@@ -536,9 +536,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           ref={newPasswordInputRef}
           autoFocus
           name="newPassword"
-          title={t(
-            'access_control:password_expired_new_password_field'
-          )}
+          title={t('access_control:password_expired_new_password_field')}
           type={showNewPassword ? 'text' : 'password'}
           value={formData.newPassword}
           error={formData.error ?? undefined}
@@ -559,9 +557,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
         <InputField
           ref={confirmPasswordInputRef}
           name="confirmPassword"
-          title={t(
-            'access_control:password_expired_confirm_password_field'
-          )}
+          title={t('access_control:password_expired_confirm_password_field')}
           type={showConfirmPassword ? 'text' : 'password'}
           value={formData.confirmPassword}
           error={formData.confirmPasswordError ?? undefined}

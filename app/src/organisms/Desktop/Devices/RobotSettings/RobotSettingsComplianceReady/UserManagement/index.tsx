@@ -64,12 +64,8 @@ function UserManagementTable({
         <StyledText desktopStyle="bodyDefaultRegular">
           {t('legal_name')}
         </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('role')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('status')}
-        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{t('role')}</StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{t('status')}</StyledText>
         <span className={styles.overflow_cell_inner} aria-hidden />
       </div>
       <div className={styles.rows}>
@@ -144,11 +140,9 @@ export function UserManagement({
 
     void deleteUser(deletedUsername)
       .then(() => {
-        makeToast(
-          t('delete_user_success_banner') as string,
-          SUCCESS_TOAST,
-          { closeButton: true }
-        )
+        makeToast(t('delete_user_success_banner') as string, SUCCESS_TOAST, {
+          closeButton: true,
+        })
         setUserToDelete(null)
         if (username === deletedUsername) {
           dispatch(logOut({ robotName }))
@@ -173,11 +167,9 @@ export function UserManagement({
       .then(() => resetPasswordAfterUnlock(username))
       .then(response => {
         setUserToActivate(null)
-        makeToast(
-          t('activate_user_success_banner') as string,
-          SUCCESS_TOAST,
-          { closeButton: true }
-        )
+        makeToast(t('activate_user_success_banner') as string, SUCCESS_TOAST, {
+          closeButton: true,
+        })
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
           setResetPasswordTemporaryPassword(temporaryPassword)
@@ -197,11 +189,9 @@ export function UserManagement({
 
     void resetUserPassword(resetUsername)
       .then(response => {
-        makeToast(
-          t('reset_password_success_banner') as string,
-          SUCCESS_TOAST,
-          { closeButton: true }
-        )
+        makeToast(t('reset_password_success_banner') as string, SUCCESS_TOAST, {
+          closeButton: true,
+        })
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
           setResetPasswordTemporaryPassword(temporaryPassword)
@@ -234,11 +224,9 @@ export function UserManagement({
       request: { data: { locked: true } },
     })
       .then(() => {
-        makeToast(
-          t('lock_user_success_banner') as string,
-          SUCCESS_TOAST,
-          { closeButton: true }
-        )
+        makeToast(t('lock_user_success_banner') as string, SUCCESS_TOAST, {
+          closeButton: true,
+        })
         setUserToDeactivate(null)
         if (username === lockedUsername) {
           dispatch(logOut({ robotName }))
@@ -275,11 +263,9 @@ export function UserManagement({
         <AddUserModal
           robotName={robotName}
           onUserCreated={() => {
-            makeToast(
-              t('add_user_created_banner') as string,
-              SUCCESS_TOAST,
-              { closeButton: true }
-            )
+            makeToast(t('add_user_created_banner') as string, SUCCESS_TOAST, {
+              closeButton: true,
+            })
           }}
           onClose={() => {
             setShowAddUserModal(false)
@@ -291,11 +277,9 @@ export function UserManagement({
           robotName={robotName}
           user={userToEdit}
           onUserUpdated={() => {
-            makeToast(
-              t('edit_user_success_banner') as string,
-              SUCCESS_TOAST,
-              { closeButton: true }
-            )
+            makeToast(t('edit_user_success_banner') as string, SUCCESS_TOAST, {
+              closeButton: true,
+            })
           }}
           onClose={() => {
             setUserToEdit(null)
@@ -354,9 +338,7 @@ export function UserManagement({
       {resetPasswordTemporaryPassword != null ? (
         <OneTimePasswordModal
           password={resetPasswordTemporaryPassword}
-          message={
-            t('reset_password_one_time_password_message') as string
-          }
+          message={t('reset_password_one_time_password_message') as string}
           onConfirm={handleResetPasswordCancel}
           onClose={handleResetPasswordCancel}
         />
