@@ -955,12 +955,12 @@ def _compare_target_figure(plt: Any, runs: list[dict[str, Any]], target: float) 
                 linewidth=1.2,
                 label=run_label(run),
             )
-            trip_t = (hold or {}).get("trip_t_s")
-            if trip_t is not None:
-                trip_y = _y_at_or_before(samples, float(trip_t), y_key)
+            trip_t_s = (hold or {}).get("trip_t_s")
+            if trip_t_s is not None:
+                trip_y = _y_at_or_before(samples, float(trip_t_s), y_key)
                 if trip_y is not None:
                     ax.scatter(
-                        [float(trip_t)],
+                        [float(trip_t_s)],
                         [trip_y],
                         facecolors="#dc2626",
                         edgecolors=color,

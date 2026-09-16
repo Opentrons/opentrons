@@ -20,7 +20,7 @@ from opentrons.drivers.vacuum_module.types import VentState
 try:
     from hardware_testing.modules.common.utils import find_module_port
 except ImportError:
-    from serial.tools.list_ports import comports
+    from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
     def find_module_port(vid: int, pid: int) -> str:
         """Find a USB serial port by VID/PID when hardware_testing isn't installed."""
@@ -168,6 +168,7 @@ async def run_target(
     expect_trip: bool,
     waste_detection: bool,
 ) -> dict[str, Any]:
+    """Hold one target, sample until duration or a waste trip, and persist results."""
     print(f"\n=== Target {target_gauge} mbar for {duration_s}s ===", flush=True)
     await pump.set_vent_state(VentState.CLOSED)
     print("close vent: CLOSED", flush=True)
@@ -289,6 +290,7 @@ async def run_target(
 
 
 async def main(args: argparse.Namespace) -> int:
+    """Connect to the vacuum module and run the hold sweep."""
     targets = args.targets
     duration_s = args.duration_s
     run_name = args.run_name
