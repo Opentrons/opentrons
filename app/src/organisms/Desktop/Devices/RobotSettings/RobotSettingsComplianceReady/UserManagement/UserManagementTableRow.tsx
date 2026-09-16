@@ -70,9 +70,7 @@ export function UserManagementTableRow({
             background={user.locked}
             hasIcon={false}
             text={
-              user.locked
-                ? t('user_status_locked')
-                : t('user_status_active')
+              user.locked ? t('user_status_locked') : t('user_status_active')
             }
           />
         </div>
