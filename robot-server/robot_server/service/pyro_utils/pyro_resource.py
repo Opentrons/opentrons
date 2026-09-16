@@ -238,11 +238,6 @@ class RobotServerPyroResource:
                 "Cannot return a FileProvider from the RobotServerPyroResource without initializing."
             )
 
-    async def notify_publishers_callback(self) -> None:
-        """A callback for notify publishers to be provided to the run process."""
-        assert self._notify_publishers is not None
-        await self._notify_publishers()
-
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_hardware_state_update_callback(self) -> HardwareEventHandler:
         """Create a callback for hardware events to report to the HardwareStateStore.
@@ -269,7 +264,12 @@ class RobotServerPyroResource:
                 "Cannot provide a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
             )
 
-    async def get_engine_updates_callback(
+    async def notify_publishers_callback(self) -> None:
+        """A callback for notify publishers to be provided to the run process."""
+        assert self._notify_publishers is not None
+        await self._notify_publishers()
+
+    async def engine_updates_callback(
         self, events: list[EngineEventNotification]
     ) -> None:
         """Update the RunOrchestratorStore local store of Engine state status."""
