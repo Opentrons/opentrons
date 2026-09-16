@@ -17,12 +17,31 @@ make -C api setup
 
 This creates `api/.venv/` with all entry points installed. You only need to do this once.
 
+### OT-2 protocols (outside this repository's `api/.venv`)
+
+OT-2 robot software and the Python API live in a **separate fork** ([opentrons-ot2](https://github.com/Opentrons/opentrons-ot2)). This monorepo's `api/` package (and `api/.venv`) is **Flex-only**: `opentrons analyze` and `opentrons_simulate` **reject OT-2 protocols**.
+
+The same split applies on PyPI: **`opentrons==9.0.0` is the last release where one package could analyze or simulate both OT-2 and Flex.** That wheel supports **Python API through 2.28** (the last apiLevel shared across both robots before the fork). **`opentrons` 9.1+ analyzes Flex only**; use the OT-2 fork / OT-2 app stack for OT-2 protocols at 2.28 or below.
+
+For mixed OT-2/Flex reference checks at apiLevel 2.28, create a **separate** Python 3.12 venv (do not commit it):
+
+```bash
+uv venv /path/to/opentrons-9.0-venv --python 3.12
+uv pip install --python /path/to/opentrons-9.0-venv/bin/python 'opentrons==9.0.0'
+
+/path/to/opentrons-9.0-venv/bin/python -m opentrons.cli analyze tmp-protocols/my_protocol.py --check --json-output=-
+/path/to/opentrons-9.0-venv/bin/opentrons_simulate tmp-protocols/my_protocol.py
+```
+
+Flex-only checks use `api/.venv/bin/...` from this monorepo (or current PyPI `opentrons` for Flex).
+
 ## Entry Points
 
-| Tool     | Binary                                          | Notes                                 |
-| -------- | ----------------------------------------------- | ------------------------------------- |
-| Simulate | `api/.venv/bin/opentrons_simulate`              | Registered script entry point         |
-| Analyze  | `api/.venv/bin/python -m opentrons.cli analyze` | Module command — no standalone binary |
+| Tool                                       | Binary                                            | Notes                                               |
+| ------------------------------------------ | ------------------------------------------------- | --------------------------------------------------- |
+| Simulate                                   | `api/.venv/bin/opentrons_simulate`                | Flex dev tree; OT-2 rejected                        |
+| Analyze                                    | `api/.venv/bin/python -m opentrons.cli analyze`   | Flex dev tree; OT-2 rejected                        |
+| Simulate / analyze (OT-2 or mixed @ ≤2.28) | Separate venv with `opentrons==9.0.0` (see above) | Last unified PyPI release; not monorepo `api/.venv` |
 
 > **Do not use `uv run`** for one-off simulate/analyze calls. It checks and potentially rebuilds the venv on every invocation, adding significant latency. Call the venv binaries directly.
 

@@ -24,7 +24,7 @@ Remember to work column by column since we're using a multichannel pipette, and 
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext): # Module loading
 temp_mod_sample = protocol.load_module('temperature module gen2', 1)
@@ -118,7 +118,7 @@ from opentrons import protocol_api
 
 requirements = {
 'robotType': 'Flex',
-'apiLevel': '2.15'
+'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -222,7 +222,7 @@ metadata = {
 "protocolName": "Reagent Transfer ",
 "author": "OGA",
 "description": "Transfer reagents from multile source labware to multiple destination labware",
-"apiLevel": "2.16",
+"apiLevel": "2.28",
 }
 
 def run(protocol: protocol_api.ProtocolContext): # labware
@@ -284,7 +284,7 @@ from opentrons import protocol_api
 metadata = {
 'protocolName': 'Sample Aliquoting & Plate Prep',
 'author': 'ChatGPT',
-'apiLevel': '2.16'
+'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -339,7 +339,7 @@ metadata = {
 "description": "Transfer reagents from multile source labware to multiple destination labware",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext): # labware
 source_1 = protocol.load_labware("nest_1_reservoir_195ml", location='B1')
@@ -408,7 +408,7 @@ metadata = {
 'author': 'Opentrons Generative AI',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 # protocol run function
 
@@ -489,7 +489,7 @@ metadata = {
 'description': 'PCR Amplification protocol with 25 cycles',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext): # Sample parameters
 sample_volume_ul = 20
@@ -658,7 +658,7 @@ metadata = {
 
 requirements = {
 "robotType": "Flex",
-"apiLevel": "2.19"
+"apiLevel": "2.28"
 }
 
 def run(protocol):
@@ -796,7 +796,7 @@ metadata = {
     'protocolName': 'Serial Dilution for Eskil',
     'author': 'John C. Lynch',
     'source': 'Custom Protocol Request',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def run(protocol):
@@ -897,7 +897,7 @@ metadata = {
 
 requirements = {
 "robotType": "Flex",
-"apiLevel": "2.16"
+"apiLevel": "2.28"
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -962,7 +962,7 @@ metadata = {{
     'author': 'User',
     'description': "Transfer liquids between reservoir, PCR plate, and heater shaker module's plate."
 }}
-requirements = {{"robotType": "Flex", "apiLevel": "2.19"}}
+requirements = {{"robotType": "Flex", "apiLevel": "2.28"}}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load trash before commands
@@ -1128,7 +1128,7 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.27'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
