@@ -19,6 +19,7 @@ import {
   downloadRobotUpdate,
   getRobotUpdateAvailable,
   getRobotUpdateSession,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
 
 import type { Dispatch, State } from '/app/redux/types'
@@ -67,7 +68,8 @@ export function UpdateRobot(): JSX.Element {
         </ErrorUpdateSoftware>
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        (robotUpdateType !== 'upgrade' && session == null) ? (
+        (!isRobotSoftwareUpdateAvailable(robotUpdateType) &&
+          session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate(-1)
