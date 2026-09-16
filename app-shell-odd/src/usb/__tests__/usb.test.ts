@@ -111,19 +111,19 @@ describe('usb/usb isSingleFunctionMassStorageMount', () => {
     )
   })
 
-  it('fails open (returns true) when the backing device cannot be resolved', async () => {
+  it('fails closed (returns false) when the backing device cannot be resolved', async () => {
     mockSysfs({ realpaths: {}, interfaces: {} })
 
     await expect(
       isSingleFunctionMassStorageMount('/media/MYSTERY-sdz9')
-    ).resolves.toBe(true)
+    ).resolves.toBe(false)
   })
 
-  it('returns true when the path has no recognizable block node', async () => {
+  it('returns false when the path has no recognizable block node', async () => {
     mockSysfs({ realpaths: {}, interfaces: {} })
 
     await expect(
       isSingleFunctionMassStorageMount('/media/not-a-block-device')
-    ).resolves.toBe(true)
+    ).resolves.toBe(false)
   })
 })
