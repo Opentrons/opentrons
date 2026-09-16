@@ -1,6 +1,6 @@
 ---
 name: robot-python-projects
-description: Guidelines for robot Python projects — api/, robot-server/, hardware/, auth-server/, shared-data/, server-utils/, system-server/, update-server/, usb-bridge/, g-code-testing/. Use when working with Python files in these directories or their pyproject.toml files.
+description: Guidelines for robot Python projects — api/, robot-server/, hardware/, auth-server/, shared-data/, server-utils/, system-server/, update-server/, usb-bridge/. Use when working with Python files in these directories or their pyproject.toml files.
 ---
 
 # Robot Python Projects
@@ -18,7 +18,6 @@ The following directories contain the robot Python projects — packages that ru
 | `system-server`         | `system-server/`  | System-level server for robot management             |
 | `otupdate`              | `update-server/`  | Server for software and firmware updates             |
 | `ot3usb`                | `usb-bridge/`     | USB bridge daemon for Flex                           |
-| `g-code-testing`        | `g-code-testing/` | G-code testing and emulation tools                   |
 
 ## Common Patterns
 
