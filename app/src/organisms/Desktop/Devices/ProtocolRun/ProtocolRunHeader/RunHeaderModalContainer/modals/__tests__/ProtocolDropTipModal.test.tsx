@@ -46,7 +46,7 @@ describe('useProtocolDropTipModal', () => {
       modalProps: {
         onSkip: expect.any(Function),
         onBeginRemoval: expect.any(Function),
-        isDisabled: false,
+        isPressed: false,
       },
     })
   })
@@ -113,7 +113,7 @@ describe('useProtocolDropTipModal', () => {
     expect(props.enableDTWiz).toHaveBeenCalled()
   })
 
-  it('should set isDisabled to true when isHomingPipettes is true', () => {
+  it('should set isPressed to true when isHomingPipettes is true', () => {
     vi.mocked(useHomePipettes).mockReturnValue({
       homePipettes: mockHomePipettes,
       isHoming: true,
@@ -121,7 +121,7 @@ describe('useProtocolDropTipModal', () => {
 
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
-    expect(result.current.modalProps?.isDisabled).toBe(true)
+    expect(result.current.modalProps?.isPressed).toBe(true)
   })
 })
 
@@ -139,7 +139,7 @@ describe('ProtocolDropTipModal', () => {
       onSkip: vi.fn(),
       onBeginRemoval: vi.fn(),
       mount: 'left',
-      isDisabled: false,
+      isPressed: false,
     }
   })
 
@@ -155,7 +155,7 @@ describe('ProtocolDropTipModal', () => {
   })
 
   it('renders a spinner and pressed loading state on Begin removal while homing', () => {
-    render({ ...props, isDisabled: true })
+    render({ ...props, isPressed: true })
 
     const beginRemoval = screen.getByRole('button', { name: /Begin removal/i })
     expect(beginRemoval).toHaveAttribute('aria-disabled', 'true')
@@ -164,7 +164,7 @@ describe('ProtocolDropTipModal', () => {
   })
 
   it('does not call onBeginRemoval while loading', () => {
-    render({ ...props, isDisabled: true })
+    render({ ...props, isPressed: true })
 
     fireEvent.click(screen.getByRole('button', { name: /Begin removal/i }))
 

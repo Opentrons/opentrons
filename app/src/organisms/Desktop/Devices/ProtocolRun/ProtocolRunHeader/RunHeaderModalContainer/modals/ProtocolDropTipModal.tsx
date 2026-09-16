@@ -24,7 +24,7 @@ import type { IconProps } from '@opentrons/components'
 export interface ProtocolDropTipModalProps {
   onSkip: () => void
   onBeginRemoval: () => void
-  isDisabled: boolean
+  isPressed: boolean
   mount?: PipetteData['mount']
 }
 
@@ -32,7 +32,7 @@ export function ProtocolDropTipModal({
   onSkip,
   onBeginRemoval,
   mount,
-  isDisabled,
+  isPressed,
 }: ProtocolDropTipModalProps): JSX.Element {
   const { t } = useTranslation('drop_tip_wizard')
 
@@ -82,15 +82,15 @@ export function ProtocolDropTipModal({
           <TextOnlyButton
             onClick={onSkip}
             buttonText={t('skip_and_home_pipette')}
-            disabled={isDisabled}
+            disabled={isPressed}
           />
           <PrimaryButton
-            onClick={isDisabled ? undefined : onBeginRemoval}
-            aria-disabled={isDisabled}
-            css={isDisabled ? PRESSED_LOADING_STATE : undefined}
+            onClick={isPressed ? undefined : onBeginRemoval}
+            aria-disabled={isPressed}
+            css={isPressed ? PRESSED_LOADING_STATE : undefined}
           >
             <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              {isDisabled ? (
+              {isPressed ? (
                 <Icon name="ot-spinner" spin size={SPACING.spacing16} />
               ) : null}
               {t('begin_removal')}

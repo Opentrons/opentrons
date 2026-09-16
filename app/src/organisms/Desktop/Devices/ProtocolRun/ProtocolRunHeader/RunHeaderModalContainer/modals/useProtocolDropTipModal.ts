@@ -80,7 +80,7 @@ export function useProtocolDropTipModal({
         modalProps: {
           onSkip,
           onBeginRemoval,
-          isDisabled: isHoming,
+          isPressed: isHoming,
         },
       }
     : { showModal: false, modalProps: null }

@@ -21,15 +21,15 @@ const defaultHandlers = {
 export const Default: Story = {
   args: {
     mount: 'left',
-    isDisabled: false,
+    isPressed: false,
     ...defaultHandlers,
   },
 }
 
-export const Loading: Story = {
+export const Pressed: Story = {
   args: {
     mount: 'left',
-    isDisabled: true,
+    isPressed: true,
     ...defaultHandlers,
   },
 }
