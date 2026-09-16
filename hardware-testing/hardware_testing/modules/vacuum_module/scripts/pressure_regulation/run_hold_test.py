@@ -234,8 +234,7 @@ async def run_target(
                 f"D={sample['duration_remaining_s']:3d}  "
                 f"A={sample['abs_a']:.1f} B={sample['abs_b']:.1f} "
                 f"H={sample['atm']:.1f}  "
-                f"rpm={rpm_s} pwm={pwm_s}"
-                + ("  ERR401" if tripped else ""),
+                f"rpm={rpm_s} pwm={pwm_s}" + ("  ERR401" if tripped else ""),
                 flush=True,
             )
 

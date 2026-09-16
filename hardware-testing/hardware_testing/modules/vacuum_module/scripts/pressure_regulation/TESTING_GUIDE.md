@@ -4,7 +4,7 @@
 
 Compares **pressure regulation at hold** (mean |error|, stdev, peak-to-peak) across firmware variants.
 
-Default sweep: **0 → −800 mbar** in 50 mbar steps, **120 s** each.  
+Default sweep: **0 → −800 mbar** in 50 mbar steps, **120 s** each.
 Uses `VacuumModuleDriver` (asyncio). Waste detection is **off by default**.
 
 ---
@@ -171,7 +171,7 @@ ssh -i $KEY root@$FLEX \
   | tee $ART/run_${RUN_NAME}.log
 ```
 
-Live samples: `t=… C=… T=… err=… E=… D=…` · `STEADY` per target · final `DONE`.  
+Live samples: `t=… C=… T=… err=… E=… D=…` · `STEADY` per target · final `DONE`.
 Files on Flex: `/tmp/vacuum_pressure_hold_results.json` (and `.csv` / `_summary.csv` with `--output both`).
 
 ---
@@ -241,8 +241,8 @@ Waste rows also show trip / Trip t / expect / pass.
 
 ## 5) A/B firmware workflow
 
-1. Flash A → sweep → save under `runs/00_…`  
-2. Flash B → sweep → save under `runs/01_…`  
+1. Flash A → sweep → save under `runs/00_…`
+2. Flash B → sweep → save under `runs/01_…`
 3. Open **compare.html**; prefer lower mean |error| and p2p/stdev on hold (last ~30 s of enabled samples, or until trip).
 4. Keep Flex, module, dry filter/collar, and room conditions the same.
 
