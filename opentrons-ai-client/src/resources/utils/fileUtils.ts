@@ -1,5 +1,5 @@
-// MIME types provide better security than file extensions
-// as they check the actual file content headers
+// `File.type` is reported by the OS, not sniffed from file content, and can be
+// empty (commonly for .py on Windows). Filename extension is the fallback.
 export const ALLOWED_MIME_TYPES = {
   pdf: ['application/pdf', 'pdf'],
   csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'csv'],
@@ -13,6 +13,15 @@ export const ALLOWED_MIME_TYPES = {
 }
 
 export type FileType = 'pdf' | 'csv' | 'python'
+
+const EXTENSION_FILE_TYPES: Array<{
+  extension: string
+  fileType: FileType
+}> = [
+  { extension: '.pdf', fileType: 'pdf' },
+  { extension: '.csv', fileType: 'csv' },
+  { extension: '.py', fileType: 'python' },
+]
 
 export interface FileValidationResult {
   isValid: boolean
@@ -66,7 +75,12 @@ export const getFileType = (file: File): FileType | null => {
     return 'python'
   }
 
-  return null
+  const fileName = file.name.toLowerCase()
+  const extensionMatch = EXTENSION_FILE_TYPES.find(({ extension }) =>
+    fileName.endsWith(extension)
+  )
+
+  return extensionMatch?.fileType ?? null
 }
 
 /**
