@@ -13,7 +13,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import {
+  getRobotUpdateDisplayInfo,
+  isRobotSoftwareUpdateAvailable,
+} from '/app/redux/robot-update'
 
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
@@ -36,7 +39,7 @@ export function UpdateRobotBanner(
     return getRobotUpdateDisplayInfo(state, robot?.name)
   })
 
-  return (autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
+  return isRobotSoftwareUpdateAvailable(autoUpdateAction) &&
     robot !== null &&
     robot.healthStatus === 'ok' ? (
     <Flex
