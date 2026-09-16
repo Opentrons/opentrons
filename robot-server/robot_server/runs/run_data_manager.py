@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import (
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -218,7 +219,7 @@ class RunDataManager:
         camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         protocol: Optional[ProtocolResource],
         access_control_status: bool,
         log_period_id: Optional[str],
