@@ -39,7 +39,6 @@ export function getShellUsbMountPaths(state: State): string[] {
 
 // Only mounts whose backing device is a single-function USB mass-storage device
 export function getShellUsbMassStorageMountPaths(state: State): string[] {
-  console.log('getShellUsbMassStorageMountPaths', state.shell.usbMountPaths)
   return state.shell.usbMountPaths.reduce<string[]>((acc, entry) => {
     return entry.isMassStorage ? [...acc, entry.path] : acc
   }, [])
