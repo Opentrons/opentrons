@@ -37,4 +37,22 @@ describe('getFileType', () => {
         'Unsupported file type. Please upload PDF, CSV, or Python (.py) files.',
     })
   })
+
+  it('rejects a .py filename when MIME type is present but not Python', () => {
+    const file = new File(['not python'], 'evil.py', { type: 'image/png' })
+
+    expect(getFileType(file)).toBeNull()
+    expect(validateFile(file)).toEqual({
+      isValid: false,
+      error:
+        'Unsupported file type. Please upload PDF, CSV, or Python (.py) files.',
+    })
+  })
+
+  it('accepts uppercase .PY when MIME type is empty', () => {
+    const file = new File(['print(1)\n'], 'protocol.PY', { type: '' })
+
+    expect(getFileType(file)).toBe('python')
+    expect(validateFile(file)).toEqual({ isValid: true })
+  })
 })
