@@ -156,6 +156,15 @@ describe('ProtocolDropTipModal', () => {
     screen.getByText('Skip and home pipette')
   })
 
+  it('renders a sized spinner when disabled during homing', () => {
+    render({ ...props, isDisabled: true })
+
+    screen.getByText('Remove any attached tips')
+    screen.getByText('Begin removal')
+    screen.getByText('Skip and home pipette')
+    expect(document.querySelector('svg')).not.toBeNull()
+  })
+
   it('calls onSkip when skip button is clicked', () => {
     render(props)
 

@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -149,20 +150,29 @@ export function ProtocolDropTipModal({
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          <Trans
-            t={t}
-            i18nKey="liquid_damages_this_pipette"
-            values={{
-              mount,
-            }}
-            components={{
-              mount: <strong />,
-            }}
-          />
-        </StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+          {isDisabled ? (
+            <Icon
+              name="ot-spinner"
+              spin
+              size="82px"
+              alignSelf={ALIGN_CENTER}
+            />
+          ) : null}
+          <StyledText desktopStyle="bodyDefaultRegular">
+            <Trans
+              t={t}
+              i18nKey="liquid_damages_this_pipette"
+              values={{
+                mount,
+              }}
+              components={{
+                mount: <strong />,
+              }}
+            />
+          </StyledText>
+        </Flex>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>
-          {isDisabled ? <Icon name="ot-spinner" spin /> : null}
           <TextOnlyButton
             onClick={onSkip}
             buttonText={t('skip_and_home_pipette')}
