@@ -67,7 +67,7 @@ export const getFileType = (file: File): FileType | null => {
   }
 
   // Match server: only .py has an extension fallback when MIME is missing.
-  if (file.name.toLowerCase().endsWith('.py')) {
+  if (mimeType === '' && file.name.toLowerCase().endsWith('.py')) {
     return 'python'
   }
 
