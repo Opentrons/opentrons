@@ -16,7 +16,16 @@ import type { State } from '/app/redux/types'
 const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async () => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateAvailable: vi.fn(),
+    getRobotUpdateSession: vi.fn(),
+    clearRobotUpdateSession: vi.fn(),
+    downloadRobotUpdate: vi.fn(),
+  }
+})
 vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
   useGatedStartRobotUpdate: () => ({
     startUpdate: mockStartUpdate,
@@ -114,12 +123,12 @@ describe('UpdateRobot', () => {
     screen.getByText('Your software is already up to date!')
   })
 
-  it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
+  it('should render Update Software when the channel version is a downgrade', () => {
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.DOWNGRADE
     )
     render()
-    screen.getByText('Your software is already up to date!')
+    screen.getByText('Downloading software...')
   })
 
   it('should keep showing the update when a session exists even if type is not upgrade', () => {

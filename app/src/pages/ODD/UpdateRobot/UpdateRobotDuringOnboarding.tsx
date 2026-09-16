@@ -24,6 +24,7 @@ import {
   downloadRobotUpdate,
   getRobotUpdateAvailable,
   getRobotUpdateSession,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
 
 import type { Dispatch, State } from '/app/redux/types'
@@ -51,9 +52,11 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     getOnDeviceDisplaySettings
   )
 
+  const hasAvailableUpdate = isRobotSoftwareUpdateAvailable(robotUpdateType)
+
   useEffect(
     () => {
-      if (robotUpdateType !== 'upgrade') {
+      if (!hasAvailableUpdate) {
         const checkUpdateTimer = setTimeout(() => {
           setIsShowCheckingUpdates(false)
         }, CHECK_UPDATES_DURATION)
@@ -105,13 +108,11 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             />
           </Flex>
         </ErrorUpdateSoftware>
-      ) : isShowCheckingUpdates &&
-        robotUpdateType !== 'upgrade' &&
-        session == null ? (
+      ) : isShowCheckingUpdates && !hasAvailableUpdate && session == null ? (
         <CheckUpdates />
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        (robotUpdateType !== 'upgrade' && session == null) ? (
+        (!hasAvailableUpdate && session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate('/emergency-stop')

@@ -15,7 +15,16 @@ import type { State } from '/app/redux/types'
 const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async () => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateAvailable: vi.fn(),
+    getRobotUpdateSession: vi.fn(),
+    clearRobotUpdateSession: vi.fn(),
+    downloadRobotUpdate: vi.fn(),
+  }
+})
 vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
   useGatedStartRobotUpdate: () => ({
     startUpdate: mockStartUpdate,
@@ -124,6 +133,15 @@ describe('UpdateRobotDuringOnboarding', () => {
     expect(checkUpdates).not.toBeInTheDocument()
   })
 
+  it('should never render CheckUpdates if it already has a downgrade', () => {
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.DOWNGRADE
+    )
+    render()
+    expect(screen.queryByText('Checking for updates')).not.toBeInTheDocument()
+    screen.getByText('Downloading software...')
+  })
+
   it('should render mock Update Software for downloading', () => {
     const mockDownloadSession = {
       ...mockSession,
@@ -140,18 +158,6 @@ describe('UpdateRobotDuringOnboarding', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.REINSTALL
-    )
-    render()
-    act(() => {
-      vi.advanceTimersByTime(11000)
-    })
-    screen.getByText('Your software is already up to date!')
-  })
-
-  it('should render NoUpdate found when there is no upgrade - downgrade', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
-      RobotUpdate.DOWNGRADE
     )
     render()
     act(() => {

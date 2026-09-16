@@ -586,3 +586,19 @@ describe('robot update selectors', () => {
     })
   })
 })
+
+describe('isRobotSoftwareUpdateAvailable', () => {
+  it.each([
+    [true, 'upgrade'],
+    [true, 'downgrade'],
+    [false, 'reinstall'],
+    [false, null],
+  ] as const)(
+    'should return %s when the update type is %s',
+    (expected, updateType) => {
+      expect(selectors.isRobotSoftwareUpdateAvailable(updateType)).toBe(
+        expected
+      )
+    }
+  )
+})
