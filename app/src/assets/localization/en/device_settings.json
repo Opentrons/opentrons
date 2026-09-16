@@ -34,7 +34,7 @@
   "auto_logout": "Length of time for auto-logout",
   "auto_logout_inactivity_length": "Length of time for auto-logout due to inactivity",
   "automatically_capture_image": "Automatically capture an image of the deck in the event of an error.",
-  "automatically_delete_protocol_run_logs": "Automatically delete protocol run logs on the robot when there are 20 protocol run records",
+  "automatically_delete_protocol_run_logs": "Automatically delete the oldest protocol run record when the robot reaches the maximum of 20 saved records",
   "boot_scripts": "Boot scripts",
   "both": "Both",
   "brightness": "Brightness",
