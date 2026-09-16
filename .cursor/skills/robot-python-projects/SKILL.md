@@ -7,17 +7,17 @@ description: Guidelines for robot Python projects — api/, robot-server/, hardw
 
 The following directories contain the robot Python projects — packages that run on or support Opentrons robots:
 
-| Project                 | Directory         | Description                                          |
-| ----------------------- | ----------------- | ---------------------------------------------------- |
-| `opentrons`             | `api/`            | Core Opentrons Python API for protocol execution     |
-| `robot-server`          | `robot-server/`   | HTTP API server that runs on the robot               |
-| `opentrons-hardware`    | `hardware/`       | Low-level hardware control and CAN bus communication |
-| `auth-server`           | `auth-server/`    | Authentication server for Flex                       |
-| `opentrons-shared-data` | `shared-data/`    | Shared data definitions (labware, pipettes, modules) |
-| `server-utils`          | `server-utils/`   | Common utilities for Python servers                  |
-| `system-server`         | `system-server/`  | System-level server for robot management             |
-| `otupdate`              | `update-server/`  | Server for software and firmware updates             |
-| `ot3usb`                | `usb-bridge/`     | USB bridge daemon for Flex                           |
+| Project                 | Directory        | Description                                          |
+| ----------------------- | ---------------- | ---------------------------------------------------- |
+| `opentrons`             | `api/`           | Core Opentrons Python API for protocol execution     |
+| `robot-server`          | `robot-server/`  | HTTP API server that runs on the robot               |
+| `opentrons-hardware`    | `hardware/`      | Low-level hardware control and CAN bus communication |
+| `auth-server`           | `auth-server/`   | Authentication server for Flex                       |
+| `opentrons-shared-data` | `shared-data/`   | Shared data definitions (labware, pipettes, modules) |
+| `server-utils`          | `server-utils/`  | Common utilities for Python servers                  |
+| `system-server`         | `system-server/` | System-level server for robot management             |
+| `otupdate`              | `update-server/` | Server for software and firmware updates             |
+| `ot3usb`                | `usb-bridge/`    | USB bridge daemon for Flex                           |
 
 ## Common Patterns
 
