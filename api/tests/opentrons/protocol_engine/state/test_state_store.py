@@ -86,7 +86,7 @@ def test_has_state(subject: StateStore) -> None:
     assert isinstance(result, State)
 
 
-def test_state_is_immutable(subject: StateStore) -> None:
+async def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.state
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
@@ -95,7 +95,7 @@ def test_state_is_immutable(subject: StateStore) -> None:
     assert result_1 is not result_2
 
 
-def test_notify_on_state_change(
+async def test_notify_on_state_change(
     decoy: Decoy,
     change_notifier: ChangeNotifier,
     subject: StateStore,

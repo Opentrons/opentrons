@@ -202,7 +202,7 @@ class TestSimulatePythonLabware:
             simulate.simulate(protocol_file=protocol_filelike, file_name=file_name)
 
 
-def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None:
+async def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None:
     """You should be able to move the simulated hardware without having to home explicitly.
 
     https://opentrons.atlassian.net/browse/RQA-1801
@@ -259,7 +259,7 @@ class TestGetProtocolAPILabware:
     LW_LOAD_NAME = "fixture_12_trough"
     LW_NAMESPACE = "fixture"
 
-    def test_default_no_extra_labware(
+    async def test_default_no_extra_labware(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """By default, no extra labware should be available."""
@@ -269,7 +269,7 @@ class TestGetProtocolAPILabware:
                 load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
             )
 
-    def test_extra_labware(self, api_version: APIVersion) -> None:
+    async def test_extra_labware(self, api_version: APIVersion) -> None:
         """Providing extra_labware should make that labware available."""
         explicit_extra_lw = {
             self.LW_LOAD_NAME: json.loads(
@@ -283,7 +283,7 @@ class TestGetProtocolAPILabware:
             load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
         )
 
-    def test_jupyter(
+    async def test_jupyter(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Putting labware in the Jupyter directory should make it available."""
@@ -300,7 +300,7 @@ class TestGetProtocolAPILabware:
             load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
         )
 
-    def test_jupyter_override(
+    async def test_jupyter_override(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Passing any extra_labware should prevent searching the Jupyter directory."""
@@ -318,7 +318,7 @@ class TestGetProtocolAPILabware:
                 load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
             )
 
-    def test_jupyter_not_on_filesystem(
+    async def test_jupyter_not_on_filesystem(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
