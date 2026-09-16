@@ -1,4 +1,4 @@
-import { MenuItem, MenuList, useOnClickOutside } from '@opentrons/components'
+import { MenuItem, useOnClickOutside } from '@opentrons/components'
 
 import styles from './perstepoverflowmenu.module.css'
 
@@ -34,7 +34,7 @@ export function PerStepOverflowMenu(
 
   return (
     <div ref={perStepOverflowWrapperRef} className={styles.container}>
-      <MenuList opensUpward={true}>
+      <div className={styles.menu_list}>
         {PLAYBACK_SPEED_OPTIONS.map(option => (
           <MenuItem
             key={option.seconds}
@@ -45,7 +45,7 @@ export function PerStepOverflowMenu(
             {option.label}
           </MenuItem>
         ))}
-      </MenuList>
+      </div>
     </div>
   )
 }

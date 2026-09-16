@@ -126,6 +126,7 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
             type="button"
             className={styles.speed_button}
             onClick={handlePerStepOverflowClick}
+            aria-label={`${t('playback_speed')}, ${getSpeedMultiplierText(milliSecondsPerFrame)}`}
           >
             <StyledText desktopStyle="captionSemiBold">
               {getSpeedMultiplierText(milliSecondsPerFrame)}
