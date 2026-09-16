@@ -19,12 +19,12 @@ describe('getFileType', () => {
     expect(validateFile(file)).toEqual({ isValid: true })
   })
 
-  it('accepts .csv and .pdf files when MIME type is empty', () => {
+  it('rejects .csv and .pdf when MIME type is empty (server has no fallback)', () => {
     const csv = new File(['a,b\n'], 'data.csv', { type: '' })
     const pdf = new File(['%PDF-1.4'], 'doc.pdf', { type: '' })
 
-    expect(getFileType(csv)).toBe('csv')
-    expect(getFileType(pdf)).toBe('pdf')
+    expect(getFileType(csv)).toBeNull()
+    expect(getFileType(pdf)).toBeNull()
   })
 
   it('rejects an unknown extension when MIME type is empty', () => {

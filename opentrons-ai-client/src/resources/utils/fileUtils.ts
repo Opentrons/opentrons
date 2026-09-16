@@ -14,15 +14,6 @@ export const ALLOWED_MIME_TYPES = {
 
 export type FileType = 'pdf' | 'csv' | 'python'
 
-const EXTENSION_FILE_TYPES: Array<{
-  extension: string
-  fileType: FileType
-}> = [
-  { extension: '.pdf', fileType: 'pdf' },
-  { extension: '.csv', fileType: 'csv' },
-  { extension: '.py', fileType: 'python' },
-]
-
 export interface FileValidationResult {
   isValid: boolean
   error?: string
@@ -75,12 +66,12 @@ export const getFileType = (file: File): FileType | null => {
     return 'python'
   }
 
-  const fileName = file.name.toLowerCase()
-  const extensionMatch = EXTENSION_FILE_TYPES.find(({ extension }) =>
-    fileName.endsWith(extension)
-  )
+  // Match server: only .py has an extension fallback when MIME is missing.
+  if (file.name.toLowerCase().endsWith('.py')) {
+    return 'python'
+  }
 
-  return extensionMatch?.fileType ?? null
+  return null
 }
 
 /**
