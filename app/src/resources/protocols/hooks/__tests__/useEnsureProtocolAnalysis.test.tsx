@@ -22,19 +22,19 @@ const PENDING_ANALYSIS_ID = 'pending-analysis-id'
 
 const EMPTY_SUMMARIES_PROTOCOL = {
   data: { analysisSummaries: [] },
-} as Protocol
+} as unknown as Protocol
 
 const PENDING_SUMMARIES_PROTOCOL = {
   data: {
     analysisSummaries: [{ id: PENDING_ANALYSIS_ID, status: 'pending' }],
   },
-} as Protocol
+} as unknown as Protocol
 
 const COMPLETED_SUMMARIES_PROTOCOL = {
   data: {
     analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id, status: 'completed' }],
   },
-} as Protocol
+} as unknown as Protocol
 
 describe('useEnsureProtocolAnalysis', () => {
   let createProtocolAnalysis: ReturnType<typeof vi.fn>

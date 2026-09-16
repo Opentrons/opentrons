@@ -96,7 +96,7 @@ export function useEnsureProtocolAnalysis(
     analysis,
     analysisId,
     isAnalyzing: analysis?.status !== 'completed',
-    protocolRecord,
+    protocolRecord: protocolRecord ?? undefined,
   }
 }
 
