@@ -27,6 +27,11 @@
   background-color: var(--variant-hover);
 }
 
+
+.icon_button:focus-visible {
+  background-color: var(--variant-hover);
+}
+
 .icon_button:focus-visible::after {
   position: absolute;
   border: 2px solid var(--variant-default);
