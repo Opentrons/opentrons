@@ -32,6 +32,6 @@
   border: 2px solid var(--variant-default);
   border-radius: 50%;
   content: '';
-  inset: -8px;
+  inset: -4px;
   pointer-events: none;
 }
