@@ -12,7 +12,7 @@ This article describes the types of diagnostic files your Flex generates and exp
 
 In an idle state or during a protocol run, your Flex constantly writes data to several different *diagnostic files*. Each of these files tracks the activities specific to different parts of the robot and its attachments. 
 
-You can access these files from the [file mananger](#managing-flex-log-files), where you'll be able to download two types of files: troubleshooting logs or calibration logs. 
+You can access these files from the [file mananger](#managing-flex-files), where you'll be able to download two types of files: troubleshooting logs or calibration logs. 
 
 The following table summarizes the data captured in each file.
 

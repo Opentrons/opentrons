@@ -78,13 +78,13 @@ View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple conn
 
 Choose what data you want Flex to share with Opentrons. This information is always anonymized and we only use it to improve our products.
 
-Flex records what it's doing in several log files that are stored on the robot. These logs are grouped into two categories for privacy opt-in purposes:
+Flex records what it's doing in several diagnostic files that are stored on the robot. These files are grouped into two categories for privacy opt-in purposes:
 
 - **Robot Logs:** Data about robot server activities, executed API commands, and interactions with attached modules.
 
 - **Display Usage:** Data about how the touchscreen draws its graphics.
 
-If you opt out of automatic data sharing, you can still download Flex log files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Log Files](../advanced-operation/log-files.md#downloading-flex-log-files) for instructions.
+If you opt out of automatic data sharing, you can still download Flex files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Diagnostic Files](../advanced-operation/diagnostic-files.md#downloading-flex-files) for instructions.
 
 !!! note
     There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
