@@ -46,7 +46,7 @@ describe('NumericSettingPage', () => {
     screen.getByText('Maximum login attempts')
     screen.getByText('Maximum login attempts before account deactivation')
     screen.getByText('Input range 1-5')
-    expect(screen.getByLabelText('Number of logins')).toHaveValue(5)
+    expect(screen.getByLabelText('Number of logins')).toHaveValue('5')
     screen.getByText('mock numerical keyboard')
   })
 
