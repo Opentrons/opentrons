@@ -5,10 +5,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useHomePipettes } from '/app/local-resources/instruments'
 
-import {
-  ProtocolDropTipModal,
-  useProtocolDropTipModal,
-} from '../ProtocolDropTipModal'
+import { ProtocolDropTipModal } from '../ProtocolDropTipModal'
+import { useProtocolDropTipModal } from '../useProtocolDropTipModal'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
@@ -156,13 +154,21 @@ describe('ProtocolDropTipModal', () => {
     screen.getByText('Skip and home pipette')
   })
 
-  it('renders a sized spinner when disabled during homing', () => {
+  it('renders a spinner and pressed loading state on Begin removal while homing', () => {
     render({ ...props, isDisabled: true })
 
-    screen.getByText('Remove any attached tips')
-    screen.getByText('Begin removal')
-    screen.getByText('Skip and home pipette')
+    const beginRemoval = screen.getByRole('button', { name: /Begin removal/i })
+    expect(beginRemoval).toHaveAttribute('aria-disabled', 'true')
+    expect(beginRemoval).not.toBeDisabled()
     expect(document.querySelector('svg')).not.toBeNull()
+  })
+
+  it('does not call onBeginRemoval while loading', () => {
+    render({ ...props, isDisabled: true })
+
+    fireEvent.click(screen.getByRole('button', { name: /Begin removal/i }))
+
+    expect(props.onBeginRemoval).not.toHaveBeenCalled()
   })
 
   it('calls onSkip when skip button is clicked', () => {
