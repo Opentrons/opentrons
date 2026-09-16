@@ -82,7 +82,7 @@ describe('createFile selector', () => {
     trashBinEntities: {},
     gripperEntities: {},
     stagingAreaEntities: {},
-    runTimeParameters: {},
+    runtimeParameters: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
 

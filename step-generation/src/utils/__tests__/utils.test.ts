@@ -333,7 +333,7 @@ describe('makeInitialRobotState', () => {
           stagingAreaEntities: {},
           gripperEntities: {},
           liquidEntities: {},
-          runTimeParameters: {},
+          runtimeParameters: {},
         },
         labwareLocations: {
           somePlateId: { stack: ['somePlateId', '1'] },

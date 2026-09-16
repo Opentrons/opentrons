@@ -76,7 +76,7 @@ describe('getPipetteMovementSafetyStatus', () => {
       stagingAreaEntities: {},
       gripperEntities: {},
       liquidEntities: {},
-      runTimeParameters: {},
+      runtimeParameters: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
       },

@@ -302,7 +302,7 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
-export interface RunTimeParameter {
+export interface RuntimeParameter {
   variableName: string
   displayName: string
   type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
@@ -310,11 +310,11 @@ export interface RunTimeParameter {
   minimum?: number
   maximum?: number
   choices?: string | number
-  unit?: number
+  unit?: string
   description?: string
 }
-export interface RunTimeParameters {
-  [variableName: string]: RunTimeParameter
+export interface RuntimeParameters {
+  [variableName: string]: RuntimeParameter
 }
 
 export type AdditionalEquipmentName =
@@ -977,7 +977,7 @@ export interface InvariantContext {
   stagingAreaEntities: StagingAreaEntities
   gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
-  runTimeParameters: RunTimeParameters
+  runtimeParameters: RuntimeParameters
   config: Config
 }
 
