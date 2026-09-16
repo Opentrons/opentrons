@@ -99,6 +99,7 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
+import { useEnsureProtocolAnalysis } from '/app/resources/protocols'
 import {
   useLPCDisabledReason,
   useModuleCalibrationStatus,
@@ -788,36 +789,14 @@ export function ProtocolSetup(): JSX.Element {
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const analysisId = mostRecentAnalysisSummary?.id ?? null
-  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
-    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const { analysis: mostRecentAnalysis, protocolRecord } =
+    useEnsureProtocolAnalysis(protocolId)
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
   const [showConfirmCancelModal, setShowConfirmCancelModal] =
     useState<boolean>(false)
-
-  const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(protocolId, analysisId, {
-      enabled:
-        protocolRecord != null &&
-        isPollingForCompletedAnalysis &&
-        analysisId != null,
-      refetchInterval: ANALYSIS_POLL_MS,
-    })
-
-  useEffect(() => {
-    if (mostRecentAnalysis?.status === 'completed') {
-      setIsPollingForCompletedAnalysis(false)
-    } else {
-      setIsPollingForCompletedAnalysis(true)
-    }
-  }, [mostRecentAnalysis?.status])
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = useMemo(

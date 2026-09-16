@@ -8,6 +8,7 @@ import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useCamera,
+  useCreateProtocolAnalysisMutation,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -301,11 +302,24 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
+    vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
+      createProtocolAnalysis: vi.fn(),
+    } as any)
+    const protocolRecord = {
+      data: {
+        metadata: { protocolName: PROTOCOL_NAME },
+        analysisSummaries: [{ id: 'fake-analysis-id', status: 'completed' }],
+      },
+    }
     when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .thenReturn({
-        data: { data: { metadata: { protocolName: PROTOCOL_NAME } } },
-      } as any)
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, undefined)
+      .thenReturn({ data: protocolRecord } as any)
     when(vi.mocked(useInstrumentsQuery))
       .calledWith()
       .thenReturn({
@@ -610,5 +624,32 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: false })
     render(`/runs/${RUN_ID}/setup/`)
     expect(screen.getByText('Action needed')).toBeInTheDocument()
+  })
+
+  it('starts protocol analysis when the protocol has no analysis summaries', () => {
+    const createProtocolAnalysis = vi.fn()
+    vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
+      createProtocolAnalysis,
+    } as any)
+    const protocolRecord = {
+      data: {
+        metadata: { protocolName: PROTOCOL_NAME },
+        analysisSummaries: [],
+      },
+    }
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
+      .thenReturn({ data: protocolRecord } as any)
+
+    render(`/runs/${RUN_ID}/setup/`)
+
+    expect(createProtocolAnalysis).toHaveBeenCalledTimes(1)
+    expect(createProtocolAnalysis).toHaveBeenCalledWith(
+      { protocolKey: PROTOCOL_ID, forceReAnalyze: false },
+      expect.objectContaining({ onError: expect.any(Function) })
+    )
   })
 })
