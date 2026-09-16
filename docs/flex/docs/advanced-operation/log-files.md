@@ -35,9 +35,9 @@ Follow these instructions to download the Flex log files:
 
 2. For your selected robot, click the three-dot menu ( ⋮ ) and then click **Robot settings**.
 
-3. Click the **Advanced** tab to open the advanced settings page.
+3. Click the **File manager** tab to download and manage files.
 
-4. Click **Download logs**. You’ll be prompted to choose a save location when the log files are ready to download.
+4. Choose the type of file you need to download. You’ll be prompted to choose a save location when the log files are ready to download.
 
     !!!note
         Flex produces a single `.zip` file that contains the logs. The file name includes the robot’s name followed by `_logs.zip`. For example, if your robot is called “Flex1," the log file will be named `Flex1_logs.zip`.
@@ -47,3 +47,12 @@ Follow these instructions to download the Flex log files:
 </div>
 
 ## Managing Flex log files
+
+You can access your Flex's file manager in the Opentrons App or on the Flex touchscreen. 
+
+On your robot's details page in the Opentrons App, click the three-dot menu ( ⋮ ) and choose **Robot settings**. Click the **File manager** tab to download and manage files. 
+
+<figure class="screenshot" markdown>
+![Example of File manager in the Opentrons App](../images/app-file-manager.png)
+<figcaption>View file capacity and download or delete diagnostic files and protocol run records.</figcaption>
+</figure>

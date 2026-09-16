@@ -35,13 +35,13 @@ Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons F
 
 The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
 
-Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
+Each entry in the **Run History** tab includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
 
 - **View protocol run record:** Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
 
 - **Rerun protocol now:** The same as choosing **Start setup** on the corresponding protocol.
 
-- **Download files:** Download a `.zip` file containing protocol .JSON files, including information about all steps performed, and any still images taken during a protocol run, if the camera was enabled.
+- **Download protocol files:** Download a `.zip` file containing protocol .JSON files, including information about all steps performed, and any still images taken during a protocol run, if the camera was enabled.
 
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
