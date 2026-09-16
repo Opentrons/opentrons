@@ -238,27 +238,8 @@ class RobotServerPyroResource:
                 "Cannot return a FileProvider from the RobotServerPyroResource without initializing."
             )
 
-    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    async def get_notify_publishers(self) -> Callable[[], Awaitable[None]] | None:
-        """Provide a Pyro Proxy for the Notification Publishers callback.
-
-        The returned instance is meant to execute in the Robot Server's process. Of note
-        Notification publishers are only registered with the Pyro Resource for runs created by
-        the Robot Server.
-        """
-
-        if self._notify_publishers:
-
-            async def call_soon_notify_publishers() -> None:
-                # Call soon on the thread notification publisher locally executes
-                assert self._notify_publishers is not None
-                # await self._notify_publishers()
-
-            return call_soon_notify_publishers
-        else:
-            return None
-
-    async def pyro_notify_publishers(self) -> None:
+    async def notify_publishers_callback(self) -> None:
+        """A callback for notify publishers to be provided to the run process."""
         assert self._notify_publishers is not None
         await self._notify_publishers()
 
