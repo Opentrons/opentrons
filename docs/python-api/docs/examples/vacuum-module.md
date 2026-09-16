@@ -3,23 +3,27 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-This use case examines an automated miniprep protocol for the Flex liquid handling robot and the Vacuum Module. It is excerpted from a real, multi-stage python protocol. While the underlying protocol performs a nucleic acid miniprep, our focus here is on how the API code and how it's used with the Vacuum Module, the Gripper, pipettes, and related labware. In this example, you'll see how API commands are used to programmatically reconfigure the manifold stack mid-protocol, apply different vacuum pressures for different filter types, and execute pipetting actions concurrently while the Vacuum Module operates independently, in the background.
+This use case examines an automated miniprep protocol for the Flex liquid handling robot and the Vacuum Module. It is excerpted from a real, multi-stage python protocol. While the underlying protocol performs a nucleic acid miniprep, our focus here is on how the API code and how it's used with the Vacuum Module, the Gripper, pipettes, and related labware.
+
+In sample code, you'll see how API commands are used to programmatically reconfigure the manifold stack mid-protocol, apply different vacuum pressures for different filter types, and execute pipetting actions concurrently while the Vacuum Module operates independently, in the background.
+
+TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.
 
 ### Stage 1: protocol metadata
 
-Every protocol file starts with metadata and requirements. In this sample:
+Every protocol file starts with the `metadata` and `requirements` dictionaries. 
 
-- The `metadata` dictionary contains protocol information such as its name and an optional, brief description, which is displayed in the Opentrons App and on the Flex touchscreen.
+- `metadata`: This includes key-value pairs for the protocol name (`protocolName`) and aa concise description (`description`), which are displayed in the Opentrons App and on the Flex touchscreen.
 
-- The `requirements` dictionary tells us what robot model to use (Flex) and the API version (v2.31). Note that the Vacuum Module works with the Flex only and requires API version 2.30, or higher, to run.
+- `requirements`: This includes key-value pairs that tell the protocol engine  `robotType` and `apiLevel`. These are used to tell the protocol engine what robot is being used and the API level. The Vacuum Module can only be used with the Flex robot and requires API level 2.30, or higher.
 
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import VacuumModuleContext
 
 metadata = {
-    "protocolName": "Miniprep Vacuum Module Use Case",
-    "description": "Demonstrates waste collection, direct-to-waste washing, and concurrent execution."
+    "protocolName": "Nucleic acid miniprep",
+    "description": "A Vacuum Module use case using the Python API."
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.31"}
@@ -27,11 +31,18 @@ requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 
 ### Stage 2: Loading modules and labware
 
-The protocol begins by loading hardware and staging labware. Staging the collar on the dock allows the Flex Gripper to assemble the internal stack (like spacers and collection plates) directly inside the vacuum manifold base.
+The `run` function defines the physical layout of objects on the deck, initializing modules, adapters, labware and instruments before pipetting. In this part of the protocol, we're staging :
+
+* **Modules and waste:** 
+* **Manifold collar:**
+* **Manifold stack:**
+* **Labware, chemicals, instruments:**
+
+Any other modules, instruments, and labware used in a protocol are also identified and loaded in this stage.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
-    # Load modules and waste routing
+    # Load modules and external waste chute
     vacuum: VacuumModuleContext = protocol.load_module("vacuumModuleV1", "A3")
     heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
     waste_chute = protocol.load_waste_chute()
@@ -45,7 +56,7 @@ def run(protocol: protocol_api.ProtocolContext):
         "nunc_96_wellplate_450ul", label="Lysate Collection Plate"
     )
 
-    # Stage the filter plates and pipetting tools
+    # Stage the filter plates, reservoir, pipette, and tips
     filter_plate = short_spacer.load_labware(
         "cytiva_96_wellplate_1000ul_shorttip_filter", label="Clarification Plate"
     )
@@ -57,7 +68,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
 
-### Part 2: clarify and filter
+### Stage 3: clarify and filter
 
 Some description or summary here. Mention concurrent or simultaneous actions. Split code into 2 blocks here:
 
@@ -80,7 +91,7 @@ block 1
     )
 ```
 
-block 2, the concurrent stuff, do some hand waving
+Brief discussion of concurrent actions about other modules performing tasks while the vacuum module runs.
 
 ```python
     # The Flex can pipette liquids or manipulate labware in other deck slots while 
@@ -98,7 +109,7 @@ block 2, the concurrent stuff, do some hand waving
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
-### Part 3: waste binding, wash, and dry
+### Stage 4: waste binding, wash, and dry
 
 More description here, focus is on vacuum module
 
@@ -129,7 +140,7 @@ More description here, focus is on vacuum module
     protocol.wait_for_tasks([dry_task])
 ```
 
-### Step 4: recover elution
+### Stage 5: recover elution
 
 Collect the liquid.
 
