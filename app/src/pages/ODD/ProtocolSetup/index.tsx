@@ -219,18 +219,18 @@ function PrepareToRun({
     [storageInfo.isImageStorageLow != null]
   )
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const analysisId = mostRecentAnalysisSummary?.id ?? null
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
   const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
+    useProtocolAnalysisAsDocumentQuery(protocolId, analysisId, {
+      enabled:
+        protocolRecord != null &&
+        isPollingForCompletedAnalysis &&
+        analysisId != null,
+      refetchInterval: ANALYSIS_POLL_MS,
+    })
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -792,6 +792,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
   })
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const analysisId = mostRecentAnalysisSummary?.id ?? null
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
   const isMaintenanceRunActive =
@@ -802,14 +803,13 @@ export function ProtocolSetup(): JSX.Element {
     useState<boolean>(false)
 
   const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
+    useProtocolAnalysisAsDocumentQuery(protocolId, analysisId, {
+      enabled:
+        protocolRecord != null &&
+        isPollingForCompletedAnalysis &&
+        analysisId != null,
+      refetchInterval: ANALYSIS_POLL_MS,
+    })
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {

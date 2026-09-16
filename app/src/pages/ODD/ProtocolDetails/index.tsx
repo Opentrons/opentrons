@@ -341,10 +341,11 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
+  const analysisId = last(protocolRecord?.data.analysisSummaries)?.id ?? null
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
+    analysisId,
+    { enabled: protocolRecord != null && analysisId != null }
   )
   const { documentationState: deleteDocumentationState } =
     useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)

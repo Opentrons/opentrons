@@ -8,10 +8,11 @@ import {
 
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolData } = useProtocolQuery(props.protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     props.protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
   return (
