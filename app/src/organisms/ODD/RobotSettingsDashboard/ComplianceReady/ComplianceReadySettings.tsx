@@ -28,7 +28,7 @@ import type {
 } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
-export type CRSSettingsPages = 'users' | 'login' | 'admin' | 'storage' | 'audit'
+export type CRSSettingsPages = 'login' | 'admin' | 'storage' | 'audit' // | 'users'
 
 export function ComplianceReadySettings({
   setCurrentOption,
@@ -52,7 +52,7 @@ export function ComplianceReadySettings({
   const [currentPage, setCurrentPage] = useState<CRSSettingsPages | null>(null)
 
   const settingsPageNames: { [key in CRSSettingsPages]: string } = {
-    users: t('users_title'),
+    // users: t('users_title'),
     login: t('login_title'),
     admin: t('admin_title'),
     audit: t('audit_title'),
