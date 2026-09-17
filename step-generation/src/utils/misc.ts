@@ -51,10 +51,10 @@ import {
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
+  MAX_STACKABLE_VACUUM_SPACERS,
   STAGING_AREA_SLOTS,
   VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
-  MAX_STACKABLE_VACUUM_SPACERS,
   VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
 } from '../constants'
@@ -160,8 +160,7 @@ export const getCanPlaceStackableVacuumSpacer = (
 
   const movingLoadName = movingDef.parameters.loadName
   const alreadyPresent = spacerLoadNames.includes(movingLoadName)
-  const wouldExceedMax =
-    spacerLoadNames.length >= MAX_STACKABLE_VACUUM_SPACERS
+  const wouldExceedMax = spacerLoadNames.length >= MAX_STACKABLE_VACUUM_SPACERS
   const listedOnParent =
     movingDef.compatibleParentLabware?.includes(topDef.parameters.loadName) ===
       true ||

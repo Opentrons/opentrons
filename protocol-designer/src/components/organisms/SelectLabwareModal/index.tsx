@@ -239,8 +239,7 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
     if (onMainModule.length === 0) {
       return []
     }
-    return onMainModule.sort((a, b) => b.stack.length - a.stack.length)[0]
-      .stack
+    return onMainModule.sort((a, b) => b.stack.length - a.stack.length)[0].stack
   }, [vacuumModuleId, deckSetup.labware])
 
   // collar placed on the dock slot
