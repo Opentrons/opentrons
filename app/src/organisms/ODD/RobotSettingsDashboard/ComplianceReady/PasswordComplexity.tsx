@@ -35,10 +35,10 @@ export function PasswordComplexity({
   if (showMinLength) {
     return (
       <NumericSettingPage
-        title={t('minimum_password_length')}
+        title={t('odd_minimum_password_length')}
         value={authSettings?.passwordComplexityMinimumLength ?? 1}
-        label={t('number_of_characters')}
-        caption={t('input_range')}
+        label={t('odd_number_of_characters')}
+        caption={t('odd_input_range')}
         onBack={value => {
           patchAuthSettings({ passwordComplexityMinimumLength: value })
           setShowMinLength(false)
@@ -52,7 +52,7 @@ export function PasswordComplexity({
   const warningModal = (
     <OddModal
       header={{
-        title: t('require_password_complexity_modal_title'),
+        title: t('odd_require_password_complexity_modal_title'),
         iconName: 'information',
         iconColor: COLORS.yellow50,
       }}
@@ -60,7 +60,7 @@ export function PasswordComplexity({
     >
       <div className={styles.warning_modal_content}>
         <StyledText oddStyle="level4HeaderRegular">
-          {t('require_password_complexity_modal_description')}
+          {t('odd_require_password_complexity_modal_description')}
         </StyledText>
         <div className={styles.warning_modal_buttons}>
           <SmallButton
@@ -92,12 +92,12 @@ export function PasswordComplexity({
       {showWarningModal && warningModal}
       <div className={styles.container}>
         <ChildNavigation
-          header={t('password_complexity_requirements')}
+          header={t('odd_password_complexity_requirements')}
           onClickBack={onClickBack}
         />
         <div className={styles.password_complexity_content}>
           <ToggleSetting
-            title={t('password_complexity_requirements')}
+            title={t('odd_password_complexity_requirements')}
             value={passwordComplexityEnabled}
             onClick={() => {
               if (!passwordComplexityEnabled) {
@@ -113,12 +113,14 @@ export function PasswordComplexity({
           {passwordComplexityEnabled && (
             <div className={styles.settings_preferences}>
               <StyledText oddStyle="level4HeaderSemiBold">
-                {t('preferences')}
+                {t('odd_preferences')}
               </StyledText>
               <div className={styles.settings_preferences_list}>
                 <ToggleSetting
-                  title={t('require_special_characters')}
-                  value={true}
+                  title={t('odd_require_special_characters')}
+                  value={
+                    authSettings?.passwordComplexitySpecialCharacters ?? false
+                  }
                   onClick={() => {
                     patchAuthSettings({
                       passwordComplexitySpecialCharacters:
@@ -127,9 +129,9 @@ export function PasswordComplexity({
                   }}
                 />
                 <SettingsListButton
-                  key={t('minimum_password_length')}
-                  title={t('minimum_password_length')}
-                  value={`${authSettings?.passwordComplexityMinimumLength ?? 1} ${t('characters')}`}
+                  key={t('odd_minimum_password_length')}
+                  title={t('odd_minimum_password_length')}
+                  value={`${authSettings?.passwordComplexityMinimumLength ?? 1} ${t('odd_characters')}`}
                   onClick={() => {
                     setShowMinLength(true)
                   }}

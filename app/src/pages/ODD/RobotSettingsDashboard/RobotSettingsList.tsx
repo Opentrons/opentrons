@@ -257,7 +257,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         />
         {isCRSEnabled ? (
           <RobotSettingButton
-            settingName={t('compliance_ready_software')}
+            settingName={t('odd_compliance_ready_software')}
             dataTestId="RobotSettingButton_compliance_ready"
             onClick={() => {
               setCurrentOption('ComplianceReady')

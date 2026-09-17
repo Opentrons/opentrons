@@ -12,7 +12,7 @@ import { PasswordInputField } from '..'
 import type { ComponentProps } from 'react'
 
 const TOGGLE_PASSWORD_VISIBILITY = 'Toggle password visibility'
-const PASSWORD_PLACEHOLDER = i18n.t('password_placeholder', {
+const PASSWORD_PLACEHOLDER = i18n.t('desktop_password_placeholder', {
   ns: 'device_settings',
 })
 

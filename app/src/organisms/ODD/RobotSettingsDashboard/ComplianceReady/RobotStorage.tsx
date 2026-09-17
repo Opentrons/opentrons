@@ -21,11 +21,14 @@ export function RobotStorage({
   const { t } = useTranslation('device_settings')
   return (
     <div className={styles.container}>
-      <ChildNavigation header={t('storage_title')} onClickBack={onClickBack} />
+      <ChildNavigation
+        header={t('odd_storage_title')}
+        onClickBack={onClickBack}
+      />
       <div className={styles.content}>
         <div className={styles.settings_list}>
           <ToggleSetting
-            title={t('automatically_delete_protocol_run_logs')}
+            title={t('odd_automatically_delete_protocol_run_logs')}
             value={robotServerSettings?.deleteOverMaxOnDiskProtocols ?? false}
             onClick={() => {
               patchRobotServerSettings({

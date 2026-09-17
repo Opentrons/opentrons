@@ -75,7 +75,7 @@ export function AddUserModal({
   const { accountType } = watch()
   const accountTypeOptions: DropdownOption[] =
     MANAGEABLE_USER_ACCOUNT_TYPES.map(accountType => ({
-      name: t(`user_role_${accountType}`),
+      name: t(`desktop_user_role_${accountType}`),
       value: accountType,
     }))
   const selectedAccountTypeOption =
@@ -124,7 +124,7 @@ export function AddUserModal({
     return (
       <OneTimePasswordModal
         password={generatedPassword}
-        message={t('add_user_success_message') as string}
+        message={t('desktop_add_user_success_message') as string}
         onConfirm={handleConfirm}
         onClose={handleClose}
       />
@@ -137,7 +137,7 @@ export function AddUserModal({
       overflow="visible"
       header={
         <WizardHeader
-          title={t('add_user')}
+          title={t('desktop_add_user')}
           onExit={handleClose}
           currentStep={ADD_USER_WIZARD_CREATE_ACCOUNT_STEP}
           totalSteps={ADD_USER_WIZARD_TOTAL_STEPS}
@@ -151,10 +151,10 @@ export function AddUserModal({
           <div className={styles.form_fields}>
             <div className={styles.form_intro}>
               <StyledText desktopStyle="headingSmallBold">
-                {t('create_account') as string}
+                {t('desktop_create_account') as string}
               </StyledText>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('add_user_create_account_description') as string}
+                {t('desktop_add_user_create_account_description') as string}
               </StyledText>
             </div>
             <UserAccountIdentityFormFields
@@ -174,7 +174,7 @@ export function AddUserModal({
                       shouldValidate: true,
                     })
                   }}
-                  title={t('role')}
+                  title={t('desktop_role')}
                   width="100%"
                 />
               </div>
@@ -184,7 +184,7 @@ export function AddUserModal({
                 {t('shared:cancel') as string}
               </SecondaryButton>
               <PrimaryButton type="submit" disabled={isSaving}>
-                {t('create_account') as string}
+                {t('desktop_create_account') as string}
               </PrimaryButton>
             </div>
           </div>

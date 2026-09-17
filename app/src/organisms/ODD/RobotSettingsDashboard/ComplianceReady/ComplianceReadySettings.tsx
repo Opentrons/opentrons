@@ -52,11 +52,11 @@ export function ComplianceReadySettings({
   const [currentPage, setCurrentPage] = useState<CRSSettingsPages | null>(null)
 
   const settingsPageNames: { [key in CRSSettingsPages]: string } = {
-    // users: t('users_title'),
-    login: t('login_title'),
-    admin: t('admin_title'),
-    audit: t('audit_title'),
-    storage: t('storage_title'),
+    // users: t('odd_users_title'),
+    login: t('odd_login_title'),
+    admin: t('odd_admin_title'),
+    audit: t('odd_audit_title'),
+    storage: t('odd_storage_title'),
   }
 
   const handlePatchAuthSettings =
@@ -124,7 +124,7 @@ export function ComplianceReadySettings({
       return (
         <div className={styles.container}>
           <ChildNavigation
-            header={t('compliance_ready_software')}
+            header={t('odd_compliance_ready_software')}
             onClickBack={() => {
               setCurrentOption(null)
             }}

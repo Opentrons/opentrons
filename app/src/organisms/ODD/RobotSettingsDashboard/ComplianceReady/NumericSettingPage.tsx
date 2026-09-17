@@ -43,25 +43,25 @@ export function NumericSettingPage({
     if (currentValue == null) {
       setError(
         '' +
-          t('value_is_required', {
+          t('odd_value_is_required', {
             label: label.toLowerCase(),
           })
       )
       return
     }
     if (min != null && currentValue < min) {
-      setError('' + t('minimum_value_is', { min }))
+      setError('' + t('odd_minimum_value_is', { min }))
       return
     }
     if (max != null && currentValue > max) {
-      setError('' + t('maximum_value_is', { max }))
+      setError('' + t('odd_maximum_value_is', { max }))
       return
     }
     // max int in C lol
     if (currentValue > 2147483647) {
       setError(
         '' +
-          t('maximum_value_is', {
+          t('odd_maximum_value_is', {
             max: Math.min(2147483647, max ?? 2147483647),
           })
       )
