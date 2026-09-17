@@ -102,6 +102,7 @@ export function LoginSettings({
             setCurrentPage(null)
           }}
           min={1}
+          max={30000000}
         />
       )
     case 'password_complexity':
