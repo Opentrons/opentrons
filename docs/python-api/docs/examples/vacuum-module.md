@@ -3,11 +3,9 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-This use case examines an automated miniprep protocol for the Flex liquid handling robot and the Vacuum Module. It is excerpted from a real, multi-stage python protocol. While the underlying protocol performs a nucleic acid miniprep, our focus here is on how the API code and how it's used with the Vacuum Module, the Gripper, pipettes, and related labware.
+This use case is excerpted from a 600-line automated nucleic acid miniprep protocol. These code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
 
-In sample code, you'll see how API commands are used to programmatically reconfigure the manifold stack mid-protocol, apply different vacuum pressures for different filter types, and execute pipetting actions concurrently while the Vacuum Module operates independently, in the background.
-
-TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.
+<font color="red">TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.</font>
 
 ## Stage 1: protocol metadata
 
@@ -176,7 +174,7 @@ Because `start_set_vacuum_pressure()` runs asynchronously in the background, the
 
 ## Stage 4: Direct-to-waste wash and dry
 
-In this stage, the protocol transitions to direct-to-waste mode by, again, moving the internal collection plate off the vacuum base. This new stack pulls waste material through the manifold directly to the carboy. It then runs two vacuum profiles: an intermediate vacuum at `-500` mbar for sample binding and washing, ending with a deep vacuum at `-800` mbar to thoroughly dry the silica plate.
+In this stage, the protocol transitions to direct-to-waste mode by moving and restacking labware on the vacuum base. This new stack pulls waste material through the manifold directly to the carboy. It then runs two vacuum profiles: an intermediate vacuum at `-500` mbar for sample binding and washing, ending with a deep vacuum at `-800` mbar to thoroughly dry the silica plate.
 
 <table>
   <thead>
@@ -190,7 +188,7 @@ In this stage, the protocol transitions to direct-to-waste mode by, again, movin
       <td><strong>Stack reconfiguration</strong></td>
       <td>
         <ul>
-          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a> moves the lysate collection plate off the module to slot D2, opening the manifold cavity for direct-to-waste evacuation.</li>
+          <li><code>move_labware()</code></a> moves the lysate collection plate off the module to slot D2, opening the manifold cavity for direct-to-waste evacuation.</li>
           <li><code>move_labware()</code> seats the tall collar directly onto the vacuum base and places the long-tip silica plate on the collar.</li>
         </ul>
       </td>
@@ -199,7 +197,7 @@ In this stage, the protocol transitions to direct-to-waste mode by, again, movin
       <td><strong>Sample binding</strong></td>
       <td>
         <ul>
-          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure"><code>start_set_vacuum_pressure()</code></a> draws sample through the silica membrane directly to the waste carboy at <code>-500</code> mbar.</li>
+          <li><code>start_set_vacuum_pressure()</code></a> draws sample through the silica membrane directly to the waste carboy at <code>-500</code> mbar.</li>
           <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.wait_for_tasks"><code>wait_for_tasks()</code></a> halts execution until the binding cycle finishes and pressure equalizes (<code>equalize_timeout_s=10</code>).</li>
         </ul>
       </td>
@@ -244,7 +242,7 @@ In this stage, the protocol transitions to direct-to-waste mode by, again, movin
 
 ### Parallel vs serial operation
 
-Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling [`wait_for_tasks([dry_task])`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] immediately after starting the vacuum cycle transitions the protocol back to serial execution. Placing `wait_for_tasks()` directly after a non-blocking method pauses script progress, ensuring each drying and washing cycle completes before the robot proceeds to the next command.
+Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling `wait_for_tasks([dry_task])` immediately after starting the vacuum cycle transitions the protocol back to serial execution. Placing `wait_for_tasks()` directly after a non-blocking method pauses script progress, ensuring each drying and washing cycle completes before the robot proceeds to the next command.
 
 ## Protocol takeaways
 
