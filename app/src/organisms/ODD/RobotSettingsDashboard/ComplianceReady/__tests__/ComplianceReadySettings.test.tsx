@@ -16,6 +16,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLogout } from '/app/redux/robot-auth'
 
 import { ComplianceReadySettings } from '../ComplianceReadySettings'
 
@@ -26,6 +27,7 @@ import type {
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
+import type * as RobotAuth from '/app/redux/robot-auth'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -40,6 +42,13 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('/app/local-resources/access-control/useDocumentationState')
+vi.mock('/app/redux/robot-auth', async importOriginal => {
+  const actual = await importOriginal<typeof RobotAuth>()
+  return {
+    ...actual,
+    useLogout: vi.fn(),
+  }
+})
 vi.mock('/app/atoms/SoftwareKeyboard/NumericalKeyboard', () => ({
   NumericalKeyboard: () => <div>mock numerical keyboard</div>,
 }))
@@ -75,6 +84,7 @@ const MOCK_ROBOT_SERVER_SETTINGS: RobotServerAccessControlSettingsResponse = {
 const mockPatchAuthSettings = vi.fn()
 const mockPatchAuditSettings = vi.fn()
 const mockPatchRobotServerSettings = vi.fn()
+const mockLogout = vi.fn()
 
 const render = (
   props: ComponentProps<typeof ComplianceReadySettings>
@@ -94,6 +104,7 @@ describe('ComplianceReadySettings', () => {
     vi.mocked(useDocumentationState).mockReturnValue(
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
     )
+    vi.mocked(useLogout).mockReturnValue(mockLogout)
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: MOCK_AUTH_SETTINGS,
     } as ReturnType<typeof useAuthSettingsQuery>)
