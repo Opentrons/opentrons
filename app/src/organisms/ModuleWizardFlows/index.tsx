@@ -39,6 +39,7 @@ import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
+import { VerifyVacuumInstall } from './VerifyVacuumInstall'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -64,7 +65,7 @@ export function ModuleWizardFlows(
     onComplete,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const {
     currentStep,
@@ -194,12 +195,12 @@ export function ModuleWizardFlows(
           >
             {wizardFlowBaseProps.isOnDevice ? (
               <SmallButton
-                buttonText={t('try_again')}
+                buttonText={i18n.format(t('try_again'), 'capitalize')}
                 onClick={wizardFlowBaseProps.dismissDoorOpenError}
               />
             ) : (
               <PrimaryButton onClick={wizardFlowBaseProps.dismissDoorOpenError}>
-                {t('try_again')}
+                {i18n.format(t('try_again'), 'capitalize')}
               </PrimaryButton>
             )}
           </Flex>
@@ -438,6 +439,25 @@ export function ModuleWizardFlows(
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.VERIFY_VACUUM:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <VerifyVacuumInstall
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )

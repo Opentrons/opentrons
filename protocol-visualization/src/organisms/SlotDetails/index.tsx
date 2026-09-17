@@ -5,11 +5,11 @@ import {
 } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '../../molecules/SlotDetailsEmptyState'
-import { getLabwareStackForSlot } from '../utils/getLabwareStackForSlot'
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SlotSpotlight/LabwareSlot'
 import { TipDisposalSlot } from '../SlotSpotlight/TipDisposalSlot'
 import { TipPickupSlot } from '../SlotSpotlight/TipPickupSlot'
+import { getLabwareStackForSlot } from '../utils/getLabwareStackForSlot'
 import styles from './slotdetails.module.css'
 
 import type { ReactNode } from 'react'
@@ -32,7 +32,6 @@ interface SlotDetailsProps {
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
-  headerPortalEl?: HTMLElement | null
 }
 export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const {
@@ -42,7 +41,6 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
     invariantContext,
     analysis,
     liquids,
-    headerPortalEl,
   } = props
   const { labware, modules } = robotState
   const {
@@ -128,7 +126,6 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
           <TipPickupSlot
             tiprackEntity={labwareEntitiesExtended[topMostLabwareOnSlot]}
             robotState={robotState}
-            headerPortalEl={headerPortalEl}
           />
         )
       case 'labware':
@@ -139,8 +136,6 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
             commands={commands}
             liquids={liquids}
             robotState={robotState}
-            moduleEntities={moduleEntities}
-            headerPortalEl={headerPortalEl}
           />
         )
       default:
@@ -152,35 +147,18 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
     <>
       {isSlotEmpty ? (
         <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState
-            slotId={slotId}
-            headerPortalEl={headerPortalEl}
-          />
+          <SlotDetailsEmptyState />
         </div>
       ) : null}
       <div className={styles.slot_container}>
         <div className={styles.slot_details}>
           {renderLabwareContent()}
-          {disposalType != null ? (
-            <TipDisposalSlot
-              robotState={robotState}
-              disposalType={disposalType}
-              headerPortalEl={
-                topMostLabwareOnSlot == null ? headerPortalEl : undefined
-              }
-            />
-          ) : null}
+          {disposalType != null ? <TipDisposalSlot /> : null}
           {moduleOnSlot != null ? (
             <ModuleContainer
               moduleId={moduleOnSlot[0]}
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
-              slotId={mappedSlot}
-              headerPortalEl={
-                topMostLabwareOnSlot == null && disposalType == null
-                  ? headerPortalEl
-                  : undefined
-              }
             />
           ) : null}
         </div>

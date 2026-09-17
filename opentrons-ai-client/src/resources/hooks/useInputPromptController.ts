@@ -69,6 +69,7 @@ export function useInputPromptController(
   const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
     useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
+  const [authError, setAuthError] = useState<string | null>(null)
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
   const { data, isLoading, callApi, error, clearError } = useApiCall()
@@ -188,8 +189,10 @@ export function useInputPromptController(
 
     let token: string
     try {
+      setAuthError(null)
       token = await getAccessToken()
     } catch {
+      setAuthError(t('error_auth_token') as string)
       return
     }
 
@@ -290,7 +293,7 @@ export function useInputPromptController(
   ])
 
   const errorMessage: string | null =
-    fileError ?? resolveErrorMessage(error, t as TFunction)
+    authError ?? fileError ?? resolveErrorMessage(error, t as TFunction)
 
   return {
     submitChat: () => {
@@ -298,7 +301,10 @@ export function useInputPromptController(
     },
     isLoading,
     errorMessage,
-    dismissError: clearError,
+    dismissError: () => {
+      setAuthError(null)
+      clearError()
+    },
     attachedFiles,
     handleFileSelect: (files: FileList | null) => {
       if (files == null) return

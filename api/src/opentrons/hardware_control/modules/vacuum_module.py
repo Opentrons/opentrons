@@ -124,15 +124,12 @@ DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
 # See waste_detector.hpp in opentrons-modules repo for details
 DEFAULT_WASTE_CONFIG = WasteConfigParameters(
     waste_detection_enabled=True,
-    p_window_start=0.10,
-    p_window_end=0.95,
-    baseline_fast_factor=0.75,
-    max_delta_per_tick=250.0,
-    max_rise_per_tick=3.5,
-    max_cummulative_rise=11.5,
     p_filter_alpha=0.5,
-    min_window_time=700.0,  # ms
-    max_window_time=20000.0,  # ms
+    g_sealed_max=0.50,
+    flowing_dp_mbar=8.0,
+    stable_hold_ms=6000.0,
+    stable_hold_deep_ms=10000.0,
+    min_waste_depth_mbar=20.0,
 )
 
 
@@ -328,15 +325,12 @@ class VacuumModule(mod_abc.AbstractModule):
         waste = DEFAULT_WASTE_CONFIG
         await self._driver.set_waste_configs(
             desired_waste_detection_enabled(),
-            waste.p_window_start,
-            waste.p_window_end,
-            waste.baseline_fast_factor,
-            waste.max_delta_per_tick,
-            waste.max_rise_per_tick,
-            waste.max_cummulative_rise,
             waste.p_filter_alpha,
-            waste.min_window_time,
-            waste.max_window_time,
+            waste.g_sealed_max,
+            waste.flowing_dp_mbar,
+            waste.stable_hold_ms,
+            waste.stable_hold_deep_ms,
+            waste.min_waste_depth_mbar,
         )
 
         # Pressure control parameters
