@@ -12,6 +12,7 @@ from opentrons.motion_planning import (
     get_waypoints,
 )
 from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus
+from opentrons.motion_planning.waypoints import GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
 from opentrons.types import Point
 
 
@@ -308,4 +309,34 @@ def test_get_gripper_labware_movement_waypoint_with_slide() -> None:
         GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), True, True),
         # slide after ungripping
         GripperMovementWaypointsWithJawStatus(Point(211, 212, 1000), True, False),
+    ]
+
+
+def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
+    """Near a vacuum module, open jaws only close to the labware."""
+    height_above_grip = 40.0
+    result = get_gripper_labware_movement_waypoints(
+        from_labware_center=Point(101, 102, 119.5),
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
+        post_drop_slide_offset=None,
+        restrict_pickup_approach=True,
+        restrict_drop_retract=True,
+        labware_height_above_grip=height_above_grip,
+    )
+    pickup_hover_z = 119.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
+    drop_hover_z = 219.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
+    assert result == [
+        GripperMovementWaypointsWithJawStatus(Point(101, 102, 999), False, False),
+        GripperMovementWaypointsWithJawStatus(
+            Point(101, 102, pickup_hover_z), False, False
+        ),
+        GripperMovementWaypointsWithJawStatus(Point(101, 102, 119.5), True, False),
+        GripperMovementWaypointsWithJawStatus(Point(101, 102, 999), False, False),
+        GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), False, False),
+        GripperMovementWaypointsWithJawStatus(Point(201, 202, 219.5), False, False),
+        GripperMovementWaypointsWithJawStatus(
+            Point(201, 202, drop_hover_z), True, True
+        ),
+        GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), False, True),
     ]

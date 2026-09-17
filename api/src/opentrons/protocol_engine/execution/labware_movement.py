@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Optional, overload
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Quirks
@@ -41,6 +42,18 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 _GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
+# Extra opening beyond labware Y, mm total. Fully homed open (92 mm) hits a
+# vacuum-module collar on an adjacent slot.
+_LABWARE_JAW_OPEN_CLEARANCE_MM = -1.5
+
+
+def _jaw_open_width_mm(
+    target_grip_width: float, min_jaw_width: float, max_jaw_width: float
+) -> int:
+    desired = target_grip_width + _LABWARE_JAW_OPEN_CLEARANCE_MM
+    lo = math.ceil(min_jaw_width)
+    hi = math.floor(max_jaw_width)
+    return int(min(hi, max(lo, round(desired))))
 
 
 class LabwareMovementHandler:
@@ -111,6 +124,8 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
+        restrict_pickup_approach: bool = False,
+        restrict_drop_retract: bool = False,
     ) -> None: ...
 
     @overload
@@ -124,6 +139,8 @@ class LabwareMovementHandler:
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
         gripper_z_offset: Optional[float],
+        restrict_pickup_approach: bool = False,
+        restrict_drop_retract: bool = False,
     ) -> None: ...
 
     async def move_labware_with_gripper(  # noqa: C901
@@ -137,6 +154,8 @@ class LabwareMovementHandler:
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
         gripper_z_offset: Optional[float] = None,
+        restrict_pickup_approach: bool = False,
+        restrict_drop_retract: bool = False,
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
 
@@ -210,41 +229,55 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
+            labware_height_above_grip = 0.0
+            if restrict_pickup_approach or restrict_drop_retract:
+                grip_z = self._state_store.labware.get_grip_z(labware_definition)
+                extents = self._state_store.labware.get_extents_around_lw_origin(
+                    labware_definition
+                )
+                labware_height_above_grip = max(0.0, extents.max_z - grip_z)
             movement_waypoints = get_gripper_labware_movement_waypoints(
                 from_labware_center=from_labware_center,
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
                 post_drop_slide_offset=post_drop_slide_offset,
                 gripper_home_z_offset=gripper_z_offset,
+                labware_height_above_grip=labware_height_above_grip,
+                restrict_pickup_approach=restrict_pickup_approach,
+                restrict_drop_retract=restrict_drop_retract,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(
                 labware_definition
             )
+            grip_specs = self._state_store.labware.get_gripper_width_specs(
+                labware_definition=labware_definition
+            )
+            gripper = ot3api.hardware_gripper
+            assert gripper is not None
+            jaw_limits = gripper.geometry.jaw_width
+            open_width_mm = _jaw_open_width_mm(
+                grip_specs.targetY, jaw_limits["min"], jaw_limits["max"]
+            )
             holding_labware = False
+            gripper_home_z = gripper_homed_position.z
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
-                    if waypoint_data.dropping:
-                        # This `disengage_axes` step is important in order to engage
-                        # the electronic brake on the Z axis of the gripper. The brake
-                        # has a stronger holding force on the axis than the hold current,
-                        # and prevents the axis from spuriously dropping when  e.g. the notch
-                        # on the side of a falling tiprack catches the jaw.
+                    await ot3api.hold_jaw_width(open_width_mm)
+                    # Pickup opens then grips; drop opens then is empty.
+                    holding_labware = not waypoint_data.dropping
+                    if (
+                        waypoint_data.dropping
+                        and waypoint_data.position.z >= gripper_home_z
+                    ):
+                        # Default drop: ungrip and home Z in one step (jaws already
+                        # at travel height). Restricted drop homes after closing.
                         await ot3api.disengage_axes([Axis.Z_G])
-                    await ot3api.ungrip()
-                    holding_labware = True
-                    if waypoint_data.dropping:
-                        # We lost the position estimation after disengaging the axis, so
-                        # it is necessary to home it next
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
                     # we only want to check position after the gripper has opened and
                     # should be holding labware
                     if holding_labware:
-                        grip_specs = self._state_store.labware.get_gripper_width_specs(
-                            labware_definition=labware_definition
-                        )
-
                         disable_geometry_grip_check = False
                         if labware_definition.parameters.quirks is not None:
                             disable_geometry_grip_check = (
@@ -261,12 +294,15 @@ class LabwareMovementHandler:
                             grip_width_uncertainty_narrower=grip_specs.uncertaintyNarrower,
                             disable_geometry_grip_check=disable_geometry_grip_check,
                         )
+                    if waypoint_data.dropping:
+                        # Restricted drop: close above the labware, then brake and home.
+                        await ot3api.disengage_axes([Axis.Z_G])
+                        await ot3api.home_z(OT3Mount.GRIPPER)
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )
 
-            # this makes sure gripper jaw is closed between two move labware calls
-            await ot3api.idle_gripper()
+            await ot3api.hold_jaw_width(open_width_mm)
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

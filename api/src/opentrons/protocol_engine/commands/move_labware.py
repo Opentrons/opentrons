@@ -41,6 +41,7 @@ from ..types import (
     AddressableAreaLocation,
     CurrentWell,
     DeckSlotLocation,
+    LabwareLocation,
     LabwareLocationSequence,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -74,6 +75,17 @@ def _remove_default(s: dict[str, Any]) -> None:
 
 # Extra buffer on top of minimum distance to move to the right
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
+
+
+def _has_vacuum_collar_neighbor(
+    location: LabwareLocation, state_view: StateView
+) -> bool:
+    """Return True if a north/south neighbor is a vacuum module collar."""
+    for labware in state_view.geometry.get_north_south_neighbors(location):
+        lw_def = state_view.labware.get_definition(labware_id=labware.id)
+        if labware_validation.validate_definition_is_vacuum_module_dock(lw_def):
+            return True
+    return False
 
 
 class MoveLabwareParams(BaseModel):
@@ -443,6 +455,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
+
             user_pick_up_offset = (
                 Point.from_xyz_attrs(params.pickUpOffset)
                 if params.pickUpOffset is not None
@@ -467,6 +480,15 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     immediate_destination_location_sequence
                 )
 
+            # Restrict gripper pick-up / drop-off if placing labware on slots
+            # with wide neighbor labware like the vacuum module collar.
+            restrict_pick = _has_vacuum_collar_neighbor(
+                validated_current_loc, self._state_view
+            )
+            restrict_drop = _has_vacuum_collar_neighbor(
+                validated_new_loc, self._state_view
+            )
+
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
@@ -476,6 +498,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     user_pick_up_offset=user_pick_up_offset,
                     user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
+                    restrict_pickup_approach=restrict_pick,
+                    restrict_drop_retract=restrict_drop,
                 )
             except (
                 FailedGripperPickupError,
