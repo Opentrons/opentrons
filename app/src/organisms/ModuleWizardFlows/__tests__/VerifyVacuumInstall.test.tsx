@@ -185,7 +185,7 @@ describe('VerifyVacuumInstall', () => {
 
     await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     screen.getByText(
-      'Ensure tube connections are secure and the collar and non-filter plate are fully seated. Try again or continue setup.'
+      'Ensure tube connections are secure and the collar and non-filter plate are fully seated.'
     )
     screen.getByRole('button', { name: /try again/i })
     screen.getByRole('button', { name: 'Continue anyway' })

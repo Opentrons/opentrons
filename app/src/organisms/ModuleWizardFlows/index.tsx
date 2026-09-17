@@ -64,7 +64,7 @@ export function ModuleWizardFlows(
     onComplete,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const {
     currentStep,
@@ -194,12 +194,12 @@ export function ModuleWizardFlows(
           >
             {wizardFlowBaseProps.isOnDevice ? (
               <SmallButton
-                buttonText={t('try_again')}
+                buttonText={i18n.format(t('try_again'), 'capitalize')}
                 onClick={wizardFlowBaseProps.dismissDoorOpenError}
               />
             ) : (
               <PrimaryButton onClick={wizardFlowBaseProps.dismissDoorOpenError}>
-                {t('try_again')}
+                {i18n.format(t('try_again'), 'capitalize')}
               </PrimaryButton>
             )}
           </Flex>

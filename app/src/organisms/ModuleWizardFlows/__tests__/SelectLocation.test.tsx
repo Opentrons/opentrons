@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockVacuumModule } from '@opentrons/api-client'
 import {
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
@@ -9,6 +10,7 @@ import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -155,6 +157,27 @@ describe('SelectLocation', () => {
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
+  })
+
+  it('does not mention calibration when selecting a vacuum module location', () => {
+    props.attachedModule = mockVacuumModule
+    props.deckConfig = mockSimpleDeckConfig.map(dc => {
+      const updatedDc = { ...dc }
+      if (updatedDc.cutoutId === 'cutoutA3') {
+        updatedDc.cutoutFixtureId = VACUUM_MODULE_V1_FIXTURE
+        updatedDc.opentronsModuleSerialNumber = mockVacuumModule.serialNumber
+      }
+      return updatedDc
+    })
+
+    render(props)
+
+    screen.getByText(
+      /Select the slot where you installed the .* connected to USB/
+    )
+    expect(
+      screen.queryByText(/location must be correct for successful calibration/i)
+    ).not.toBeInTheDocument()
   })
 })
 

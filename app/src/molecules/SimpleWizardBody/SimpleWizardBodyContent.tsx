@@ -47,6 +47,8 @@ const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  padding: 0 ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
@@ -54,13 +56,19 @@ const HEADER_STYLE = css`
     line-height: ${SPACING.spacing40};
   }
 `
+
+const ERROR_HEADER_STYLE = css`
+  ${HEADER_STYLE};
+  margin-top: ${SPACING.spacing40};
+`
+
 const SUBHEADER_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   margin-left: 6.25rem;
   margin-right: 6.25rem;
   margin-bottom: ${SPACING.spacing32};
   text-align: ${TYPOGRAPHY.textAlignCenter};
-  height: 1.75rem;
+  min-height: 1.75rem;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
@@ -157,7 +165,11 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
                 aria-label="ot-alert"
               />
             )}
-            <LegacyStyledText css={HEADER_STYLE}>{header}</LegacyStyledText>
+            <LegacyStyledText
+              css={isSuccess ? HEADER_STYLE : ERROR_HEADER_STYLE}
+            >
+              {header}
+            </LegacyStyledText>
             {subHeader != null ? (
               <LegacyStyledText css={SUBHEADER_STYLE}>
                 {subHeader}

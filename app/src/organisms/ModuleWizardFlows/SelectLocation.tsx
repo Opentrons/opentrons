@@ -289,7 +289,9 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               module: moduleName,
               port: parseModuleUSBPort(attachedModule),
             })}
-            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
+            {isFlexStacker || isVacuumModule
+              ? null
+              : ` ${t('location_must_be_correct')}`}
           </StyledText>
           {isFlexStacker || isVacuumModule ? (
             <InlineNotification
