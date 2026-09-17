@@ -69,11 +69,16 @@ async def _enable_pyro_subprocess_flags(robot_client: RobotClient) -> None:
 def _patch_increases_password_complexity(patch: PatchSettingsRequestData, old_settings: SettingsResponseData | None = None) -> bool:
     """Return whether a settings patch tightens password requirements."""
     patch_data = patch.model_dump(exclude_unset=True)
-    old_settings_data = old_settings.model_dump()
     if "passwordComplexitySpecialCharacters" in patch_data and patch_data["passwordComplexitySpecialCharacters"] is True:
+        if old_settings is None:
+            return True
+        old_settings_data = old_settings.model_dump()
         if old_settings_data["passwordComplexitySpecialCharacters"] is None or old_settings_data["passwordComplexitySpecialCharacters"] is False:
             return True
     if "passwordComplexityMinimumLength" in patch_data and patch_data["passwordComplexityMinimumLength"] is not None:
+        if old_settings is None:
+            return True
+        old_settings_data = old_settings.model_dump()
         if old_settings_data["passwordComplexityMinimumLength"] is None or old_settings_data["passwordComplexityMinimumLength"] < patch_data["passwordComplexityMinimumLength"]:
             return True
     return False
