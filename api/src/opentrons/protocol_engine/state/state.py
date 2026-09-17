@@ -544,6 +544,7 @@ class StateStore(StateView, ActionHandler):
         self._change_notifier.notify()
 
     async def notify_and_update_callbacks(self) -> None:
+        """Async loop that waits for update events to be available before updating and notifying the robot server."""
         while True:
             events = [await self._update_events_queue.get()]
             try:
@@ -561,4 +562,5 @@ class StateStore(StateView, ActionHandler):
                 self._update_events_queue.task_done()
 
     async def wait_for_update_events(self) -> None:
+        """Block until all items in the update events queue have been processed."""
         await self._update_events_queue.join()
