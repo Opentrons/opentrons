@@ -302,6 +302,23 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
+export type Choices = number[] | string[]
+
+export interface RuntimeParameter {
+  variableName: string
+  displayName: string
+  type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
+  default: string | number | boolean
+  minimum?: number
+  maximum?: number
+  choices?: Choices
+  unit?: string
+  description?: string
+}
+export interface RuntimeParameters {
+  [variableName: string]: RuntimeParameter
+}
+
 export type AdditionalEquipmentName =
   'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
 
@@ -962,6 +979,7 @@ export interface InvariantContext {
   stagingAreaEntities: StagingAreaEntities
   gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
+  runtimeParameters: RuntimeParameters
   config: Config
 }
 
