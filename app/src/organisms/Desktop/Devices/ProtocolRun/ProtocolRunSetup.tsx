@@ -11,6 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -511,9 +512,11 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_is_loading')}
+          height="28.5rem"
+        />
       )}
     </Flex>
   )

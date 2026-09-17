@@ -35,6 +35,7 @@ import {
   useRunHeaderModalContainer,
 } from './RunHeaderModalContainer'
 import { RunHeaderProtocolName } from './RunHeaderProtocolName'
+import { ProtocolRunHeaderSkeleton } from './ProtocolRunHeaderSkeleton'
 
 import type { RefObject } from 'react'
 
@@ -52,10 +53,13 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    }
+  )
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
@@ -139,36 +143,42 @@ export function ProtocolRunHeader(
         runErrors={runErrors}
         {...props}
       />
-      <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
-        <RunHeaderProtocolName runId={runId} />
-        <RunHeaderBannerContainer
-          runStatus={runStatus}
-          enteredER={enteredER}
-          isResetRunLoading={isResetRunLoadingRef.current}
-          runErrors={runErrors}
-          runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          hasImages={outputFileIds.jpeg.length > 0}
-          hasCsvFiles={outputFileIds.csv.length > 0}
-          closeCurrentRun={closeCurrentRun}
-          isClosingCurrentRun={isClosingCurrentRun}
-          {...props}
-        />
-        <RunHeaderContent
-          runRecord={runRecord ?? null}
-          runStatus={runStatus}
-          isResetRunLoadingRef={isResetRunLoadingRef}
-          attachedModules={attachedModules}
-          runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          isClosingCurrentRun={isClosingCurrentRun}
-          numberOfAtomicCommands={
-            protocolData?.status === 'completed'
-              ? protocolData.commands.length
-              : 0
-          }
-          {...props}
-        />
-        <RunProgressMeter {...props} />
-      </Flex>
+      {isRunLoading ? (
+        <div ref={protocolRunHeaderRef}>
+          <ProtocolRunHeaderSkeleton />
+        </div>
+      ) : (
+        <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
+          <RunHeaderProtocolName runId={runId} />
+          <RunHeaderBannerContainer
+            runStatus={runStatus}
+            enteredER={enteredER}
+            isResetRunLoading={isResetRunLoadingRef.current}
+            runErrors={runErrors}
+            runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+            hasImages={outputFileIds.jpeg.length > 0}
+            hasCsvFiles={outputFileIds.csv.length > 0}
+            closeCurrentRun={closeCurrentRun}
+            isClosingCurrentRun={isClosingCurrentRun}
+            {...props}
+          />
+          <RunHeaderContent
+            runRecord={runRecord ?? null}
+            runStatus={runStatus}
+            isResetRunLoadingRef={isResetRunLoadingRef}
+            attachedModules={attachedModules}
+            runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+            isClosingCurrentRun={isClosingCurrentRun}
+            numberOfAtomicCommands={
+              protocolData?.status === 'completed'
+                ? protocolData.commands.length
+                : 0
+            }
+            {...props}
+          />
+          <RunProgressMeter {...props} />
+        </Flex>
+      )}
     </>
   )
 }
