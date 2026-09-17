@@ -146,7 +146,7 @@ eval "$(pyenv init -)"
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
@@ -193,7 +193,7 @@ On Windows, we rely on:
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
@@ -223,7 +223,7 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
