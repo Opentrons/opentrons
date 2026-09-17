@@ -131,6 +131,8 @@ def get_gripper_labware_movement_waypoints(
     gripper_home_z: float,
     post_drop_slide_offset: Optional[Point],
     gripper_home_z_offset: Optional[float] = None,
+    pickup_speed: Optional[float] = None,
+    dropoff_speed: Optional[float] = None,
     labware_height_above_grip: float = 0.0,
     restrict_pickup_approach: bool = False,
     restrict_drop_retract: bool = False,
@@ -175,13 +177,14 @@ def get_gripper_labware_movement_waypoints(
             GripperMovementWaypointsWithJawStatus(
                 position=from_labware_center, jaw_open=True, dropping=False
             ),
-            # Gripper grips the labware here
+            # Gripper grips the labware here, then retracts
             GripperMovementWaypointsWithJawStatus(
                 position=Point(
                     from_labware_center.x, from_labware_center.y, gripper_max_z_home
                 ),
                 jaw_open=False,
                 dropping=False,
+                speed=pickup_speed,
             ),
             GripperMovementWaypointsWithJawStatus(
                 position=Point(
@@ -191,7 +194,10 @@ def get_gripper_labware_movement_waypoints(
                 dropping=False,
             ),
             GripperMovementWaypointsWithJawStatus(
-                position=to_labware_center, jaw_open=False, dropping=False
+                position=to_labware_center,
+                jaw_open=False,
+                dropping=False,
+                speed=dropoff_speed,
             ),
         ]
     )

@@ -13,11 +13,13 @@ from ..errors import (
     HeaterShakerLabwareLatchNotOpenError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
+    WrongModuleTypeError,
 )
 from ..types import (
     AccessibleByGripperLocation,
     GripperMoveType,
     LabwareLocation,
+    ModuleLocation,
     OnDeckLabwareLocation,
     OnLabwareLocation,
 )
@@ -54,6 +56,11 @@ def _jaw_open_width_mm(
     lo = math.ceil(min_jaw_width)
     hi = math.floor(max_jaw_width)
     return int(min(hi, max(lo, round(desired))))
+
+
+# Collar Z speeds when moving a vacuum-module collar off the module (A3).
+# Default gripper Z max is 50 mm/s. Pickup retract is slower for the gasket seal.
+_VACUUM_MODULE_COLLAR_PICKUP_SPEED = 10.0  # mm/s
 
 
 class LabwareMovementHandler:
@@ -229,6 +236,12 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
+            is_collar = self._is_vacuum_module_collar(labware_definition)
+            pickup_speed = (
+                _VACUUM_MODULE_COLLAR_PICKUP_SPEED
+                if is_collar and self._is_vacuum_module_location(current_location)
+                else None
+            )
             labware_height_above_grip = 0.0
             if restrict_pickup_approach or restrict_drop_retract:
                 grip_z = self._state_store.labware.get_grip_z(labware_definition)
@@ -242,6 +255,7 @@ class LabwareMovementHandler:
                 gripper_home_z=gripper_homed_position.z,
                 post_drop_slide_offset=post_drop_slide_offset,
                 gripper_home_z_offset=gripper_z_offset,
+                pickup_speed=pickup_speed,
                 labware_height_above_grip=labware_height_above_grip,
                 restrict_pickup_approach=restrict_pickup_approach,
                 restrict_drop_retract=restrict_drop_retract,
@@ -299,7 +313,9 @@ class LabwareMovementHandler:
                         await ot3api.disengage_axes([Axis.Z_G])
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 await ot3api.move_to(
-                    mount=gripper_mount, abs_position=waypoint_data.position
+                    mount=gripper_mount,
+                    abs_position=waypoint_data.position,
+                    speed=waypoint_data.speed,
                 )
 
             await ot3api.hold_jaw_width(open_width_mm)
@@ -350,3 +366,19 @@ class LabwareMovementHandler:
                 )
             except VacuumModuleStillUnderVacuumError:
                 raise
+
+    @staticmethod
+    def _is_vacuum_module_collar(labware_definition: LabwareDefinition) -> bool:
+        """True for labware that docks on the vacuum module (collars/adapters)."""
+        quirks = labware_definition.parameters.quirks
+        return quirks is not None and "vacuumModuleDock" in quirks
+
+    def _is_vacuum_module_location(self, location: LabwareLocation) -> bool:
+        """True when the location is the vacuum module."""
+        if not isinstance(location, ModuleLocation):
+            return False
+        try:
+            self._state_store.modules.get_vacuum_module_substate(location.moduleId)
+        except WrongModuleTypeError:
+            return False
+        return True
