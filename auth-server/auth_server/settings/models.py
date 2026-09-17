@@ -63,8 +63,10 @@ class SettingsResponseData(_StrictBaseModel):
         description="Require admin credentials for signoff protocol.",
     )
 
+
 class PatchSettingsResponseMeta(_StrictBaseModel):
     """Contains metadata about the patch settings response.
+
     This is used to determine if the user's password has been reset.
     """
 
@@ -75,13 +77,16 @@ class PatchSettingsResponseMeta(_StrictBaseModel):
         ),
     ]
 
+
 class PatchSettingsResponseBody(_StrictBaseModel):
     """A response to a patch settings request.
+
     This includes the new settings and metadata about the response.
     """
-    
+
     data: SettingsResponseData
     meta: PatchSettingsResponseMeta
+
 
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.

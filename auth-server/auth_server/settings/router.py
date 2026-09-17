@@ -66,23 +66,37 @@ async def _enable_pyro_subprocess_flags(robot_client: RobotClient) -> None:
         ) from e
 
 
-def _patch_increases_password_complexity(patch: PatchSettingsRequestData, old_settings: SettingsResponseData | None = None) -> bool:
+def _patch_increases_password_complexity(
+    patch: PatchSettingsRequestData, old_settings: SettingsResponseData | None = None
+) -> bool:
     """Return whether a settings patch tightens password requirements."""
     patch_data = patch.model_dump(exclude_unset=True)
-    if "passwordComplexitySpecialCharacters" in patch_data and patch_data["passwordComplexitySpecialCharacters"] is True:
+    if (
+        "passwordComplexitySpecialCharacters" in patch_data
+        and patch_data["passwordComplexitySpecialCharacters"] is True
+    ):
         if old_settings is None:
             return True
         old_settings_data = old_settings.model_dump()
-        if old_settings_data["passwordComplexitySpecialCharacters"] is None or old_settings_data["passwordComplexitySpecialCharacters"] is False:
+        if (
+            old_settings_data["passwordComplexitySpecialCharacters"] is None
+            or old_settings_data["passwordComplexitySpecialCharacters"] is False
+        ):
             return True
-    if "passwordComplexityMinimumLength" in patch_data and patch_data["passwordComplexityMinimumLength"] is not None:
+    if (
+        "passwordComplexityMinimumLength" in patch_data
+        and patch_data["passwordComplexityMinimumLength"] is not None
+    ):
         if old_settings is None:
             return True
         old_settings_data = old_settings.model_dump()
-        if old_settings_data["passwordComplexityMinimumLength"] is None or old_settings_data["passwordComplexityMinimumLength"] < patch_data["passwordComplexityMinimumLength"]:
+        if (
+            old_settings_data["passwordComplexityMinimumLength"] is None
+            or old_settings_data["passwordComplexityMinimumLength"]
+            < patch_data["passwordComplexityMinimumLength"]
+        ):
             return True
     return False
-
 
 
 @router.get(
@@ -186,11 +200,16 @@ async def patch_settings(  # noqa: D103
 ) -> PatchSettingsResponseBody:
     old_settings = settings_store.get_settings()
     new_settings = settings_store.patch_settings(request_body.data)
-    requires_logout = _patch_increases_password_complexity(request_body.data, old_settings)
+    requires_logout = _patch_increases_password_complexity(
+        request_body.data, old_settings
+    )
     if requires_logout:
         user_store.mark_all_reset_password()
         oauth2_backend.revoke_all_tokens()
-    return PatchSettingsResponseBody.model_construct(data=new_settings, meta=PatchSettingsResponseMeta(requiresLogout=requires_logout))
+    return PatchSettingsResponseBody.model_construct(
+        data=new_settings,
+        meta=PatchSettingsResponseMeta(requiresLogout=requires_logout),
+    )
 
 
 @router.delete(
