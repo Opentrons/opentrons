@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { RobotCoordsForeignObject, RobotWorkSpace } from '@opentrons/components'
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { LabwareSlot } from '..'
@@ -10,17 +11,15 @@ import { i18n } from '../../../../i18n'
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
-import type {
-  LabwareEntities,
-  ModuleEntities,
-  RobotState,
-} from '@opentrons/step-generation'
+import type { LabwareEntities, RobotState } from '@opentrons/step-generation'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actual,
     LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
+    RobotWorkSpace: vi.fn(actual.RobotWorkSpace),
+    RobotCoordsForeignObject: vi.fn(actual.RobotCoordsForeignObject),
   }
 })
 
@@ -107,13 +106,13 @@ describe('LabwareSlot', () => {
   let props: ComponentProps<typeof LabwareSlot>
 
   beforeEach(() => {
+    vi.clearAllMocks()
     props = {
       topLabwareOnSlotId: MOCK_LABWARE_ID,
       labwareEntities: createMockLabwareEntities(),
       commands: [createMockLoadLabwareCommand()],
       liquids: [],
       robotState: createMockRobotState(),
-      moduleEntities: {} as ModuleEntities,
     }
   })
 
@@ -125,6 +124,13 @@ describe('LabwareSlot', () => {
   it('should render labware nickname when provided', () => {
     render(props)
     expect(screen.getByText('Test Plate')).toBeInTheDocument()
+  })
+
+  it('should render display name without nickname when displayName is absent', () => {
+    props.commands = []
+    render(props)
+    expect(screen.getByText('Mock 96 Well Plate')).toBeInTheDocument()
+    expect(screen.queryByText('Test Plate')).not.toBeInTheDocument()
   })
 
   it('should render LabwareRender component', () => {
@@ -150,5 +156,76 @@ describe('LabwareSlot', () => {
     }
     render(props)
     expect(screen.getByText('mock LabwareRender')).toBeInTheDocument()
+  })
+
+  it('should keep the stacked badge inside the viewBox for short labware', () => {
+    const shortLidId = 'shortLidId'
+    const shortLidDef = {
+      ...fixture96Plate,
+      metadata: {
+        ...fixture96Plate.metadata,
+        displayName: 'Opentrons Flex Tip Rack Lid',
+      },
+      dimensions: {
+        xDimension: 121,
+        yDimension: 78.75,
+        zDimension: 17,
+      },
+      wells: {},
+      ordering: [],
+    } as LabwareDefinition2
+
+    props.topLabwareOnSlotId = shortLidId
+    props.labwareEntities = {
+      [shortLidId]: {
+        id: shortLidId,
+        labwareDefURI: 'opentrons/opentrons_flex_tiprack_lid/1',
+        def: shortLidDef,
+        pythonName: 'mock_lid',
+      },
+      lidUnderId: {
+        id: 'lidUnderId',
+        labwareDefURI: 'opentrons/opentrons_flex_tiprack_lid/1',
+        def: shortLidDef,
+        pythonName: 'mock_lid_under',
+      },
+    }
+    props.commands = []
+    props.robotState = {
+      ...createMockRobotState(),
+      labware: {
+        [shortLidId]: {
+          stack: [shortLidId, 'lidUnderId', MOCK_SLOT],
+        },
+        lidUnderId: {
+          stack: ['lidUnderId', MOCK_SLOT],
+        },
+      },
+    }
+
+    render(props)
+    expect(screen.getByLabelText('stacked')).toBeInTheDocument()
+    expect(screen.getByText('Top labware in stack')).toBeInTheDocument()
+
+    expect(RobotWorkSpace).toHaveBeenCalledWith(
+      expect.objectContaining({ viewBox: '0 0 133 90.75' }),
+      expect.anything()
+    )
+
+    expect(RobotCoordsForeignObject).toHaveBeenCalledWith(
+      expect.objectContaining({ x: 222, y: 141.5 }),
+      expect.anything()
+    )
+
+    const badgeScale = 0.5
+    const viewBoxWidth = 133
+    const viewBoxHeight = 90.75
+    const badgeX = 222 * badgeScale
+    const badgeY = 141.5 * badgeScale
+    // Same relative corner inset as the legacy 235/155 placement on ANSI plates.
+    expect(badgeX).toBeCloseTo(111)
+    expect(badgeY).toBeCloseTo(70.75)
+    expect(badgeX).toBeLessThan(viewBoxWidth)
+    expect(badgeY).toBeLessThan(viewBoxHeight)
   })
 })

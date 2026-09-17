@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     service_version: str = "hardcoded_default_from_settings"
     # Comma-separated origins for CORS. With allow_credentials=True, "*" is invalid; use explicit origins.
     # Default allows local Vite dev server so the UI at http://localhost:5173 can call the API.
-    allowed_origins: str = "http://localhost:5173,http://localhost:3000"
+    allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
