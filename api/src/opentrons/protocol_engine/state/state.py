@@ -299,7 +299,9 @@ class StateStore(StateView, ActionHandler):
             updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
         self._updates_callback = updates_callback
-        self._update_events: list[EngineEventNotification] = []
+        self._update_events_queue: asyncio.Queue[EngineEventNotification] = (
+            asyncio.Queue()
+        )
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
@@ -369,7 +371,6 @@ class StateStore(StateView, ActionHandler):
             substore.handle_action(action)
 
         self._update_state_views()
-        asyncio.create_task(self._notify_and_update_callbacks())
 
     async def wait_for(
         self,
@@ -464,12 +465,7 @@ class StateStore(StateView, ActionHandler):
         return current_value
 
     def _append_update_events(self, event: EngineEventNotification) -> None:
-        latest_events = []
-        for old_event in self._update_events:
-            if not isinstance(old_event, event.__class__):
-                latest_events.append(old_event)
-        latest_events.append(event)
-        self._update_events = latest_events
+        self._update_events_queue.put_nowait(event)
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
@@ -547,10 +543,22 @@ class StateStore(StateView, ActionHandler):
         self._camera._state = next_state.camera
         self._change_notifier.notify()
 
-    async def _notify_and_update_callbacks(self) -> None:
-        if self._notify_robot_server is not None:
-            await self._notify_robot_server()
+    async def notify_and_update_callbacks(self) -> None:
+        while True:
+            events = [await self._update_events_queue.get()]
+            try:
+                while True:
+                    events.append(self._update_events_queue.get_nowait())
+            except asyncio.QueueEmpty:
+                pass
+            if self._notify_robot_server is not None:
+                await self._notify_robot_server()
 
-        if self._updates_callback is not None:
-            await self._updates_callback(self._update_events)
-            self._update_events = []
+            if self._updates_callback is not None:
+                await self._updates_callback(events)
+
+            for _ in events:
+                self._update_events_queue.task_done()
+
+    async def wait_for_update_events(self) -> None:
+        await self._update_events_queue.join()

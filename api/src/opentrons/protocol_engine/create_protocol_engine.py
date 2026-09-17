@@ -114,6 +114,9 @@ async def create_protocol_engine(
     file_provider = file_provider or FileProvider()
     camera_provider = camera_provider or CameraProvider()
 
+    notify_and_update_task = asyncio.create_task(
+        state_store.notify_and_update_callbacks()
+    )
     pe = ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -126,6 +129,7 @@ async def create_protocol_engine(
         file_provider=file_provider,
         camera_provider=camera_provider,
         associated_command_error_recovery=associated_command_error_recovery,
+        notify_and_update_task=notify_and_update_task,
     )
 
     # todo(mm, 2024-11-08): This is a quick hack to support the absorbance reader, which
