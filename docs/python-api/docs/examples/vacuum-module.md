@@ -9,7 +9,7 @@ In sample code, you'll see how API commands are used to programmatically reconfi
 
 TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.
 
-### Stage 1: protocol metadata
+## Stage 1: protocol metadata
 
 Every protocol file starts with the `metadata` and `requirements` dictionaries. 
 
@@ -29,7 +29,7 @@ metadata = {
 requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 ```
 
-### Stage 2: Loading modules and labware
+## Stage 2: Loading modules and labware
 
 During this stage, `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, the API code establishes what's going to be used and where it can be found.
 
@@ -110,16 +110,17 @@ def run(protocol: protocol_api.ProtocolContext):
     tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B2")
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
+## Stage 3: Concurrent actions
 
-### Stage 3: Clarify and filter
+### Lysate collection
 
-During this stage, the protocol collects clarified lysate into an internal 96-well collection plate. The script first uses the Flex Gripper to assemble the clarification stack inside the manifold base. Once filtration begins, the non-blocking vacuum command allows the robot to perform liquid handling steps in parallel across other deck slots while extraction proceeds in the background.
+During this stage, the protocol collects clarified lysate in a 96-well collection plate. To collect this material, the Flex Gripper stacks a collection and filter plate on top of each other on the manifold base. After stacking well plates and adding a collar, the robot extracts liquid using a gentle pressure to avoid clogging the filter plate membrane.
 
 <table>
   <thead>
     <tr>
-      <th>Action</th>
-      <th>API method and role</th>
+      <th style="text-align: left;">Action</th>
+      <th style="text-align: left;">API method and role</th>
     </tr>
   </thead>
   <tbody>
@@ -127,38 +128,17 @@ During this stage, the protocol collects clarified lysate into an internal 96-we
       <td><strong>Stack assembly</strong></td>
       <td>
         <ul>
-          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a> uses the Flex Gripper to place the short-tip filter plate directly over the collection plate inside the manifold base.</li>
-          <li><code>move_labware()</code> seats the tall collar over the base to seal the chamber.</li>
+          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a> uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
+          <li><code>move_labware()</code> seats the tall collar over the base to seal the labware stack.</li>
         </ul>
       </td>
     </tr>
     <tr>
       <td><strong>Asynchronous vacuum</strong></td>
-      <td><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure"><code>start_set_vacuum_pressure()</code></a> initiates a gentle pull (<code>-330</code> mbar) to clear the lysate without membrane fouling, returning a <a href="../../reference/types/#opentrons.protocol_api.Task"><code>Task</code></a> object.</td>
-    </tr>
-    <tr>
-      <td><strong>Parallel liquid handling</strong></td>
-      <td><code>pick_up_tip()</code>, <code>aspirate()</code>, and <code>drop_tip()</code> prepare binding buffers on external deck slots while the vacuum cycle runs.</td>
-    </tr>
-    <tr>
-      <td><strong>Safety synchronization</strong></td>
-      <td><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.wait_for_tasks"><code>wait_for_tasks()</code></a> halts execution until the vacuum cycle finishes and pressure equalizes before unstacking labware.</td>
-    </tr>
-    <tr>
-      <td><strong>Teardown and disposal</strong></td>
-      <td>
-        <ul>
-          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.move_to_dock"><code>move_to_dock()</code></a> returns the collar to slot A4 to expose the clarified filtrate.</li>
-          <li><code>move_labware()</code> transports the exhausted clarification plate to the waste chute.</li>
-        </ul>
-      </td>
+      <td><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure"><code>start_set_vacuum_pressure()</code></a> pulls a gentle vacuum (<code>-330</code> mbar) to clear lysate without fouling the filter and returns a <a href="../../reference/types/#opentrons.protocol_api.Task"><code>Task</code></a> object.</td>
     </tr>
   </tbody>
 </table>
-
-**Assembling the manifold and initiating vacuum**
-
-The Flex Gripper builds the clarification stack directly inside the manifold base. Calling `start_set_vacuum_pressure()` launches the extraction cycle in the background and returns a `Task` object, leaving the protocol thread free to continue.
 
 ```python
     # Stack the filter plate over the collection plate inside the manifold base
@@ -174,7 +154,9 @@ The Flex Gripper builds the clarification stack directly inside the manifold bas
     )
 ```
 
-While the vacuum pump is running, the Flex 96-channel pipette prepares binding buffer in an adjacent plate. Calling wait_for_tasks() acts as a synchronization barrier, ensuring the chamber equalizes to atmospheric pressure (0 mbar) before the gripper removes the collar and discards the filter plate.
+### Liquid handling
+
+Because `start_set_vacuum_pressure()` runs asynchronously in the background, the robot can carry out other operations simultaneously, while extracting lysate. Also, `clarify_task = vacuum.start_set_vacuum_pressure()` prevents the Gripper from moving labware off the Vacuum Module until the system depressurizes.
 
 ```python
 # The Flex can pipette liquids or manipulate labware in other deck slots while 
@@ -192,12 +174,49 @@ While the vacuum pump is running, the Flex 96-channel pipette prepares binding b
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
-### Stage 4: waste binding, wash, and dry
+## Stage 4: Direct-to-waste wash and dry
 
-More description here, focus is on vacuum module
+In this stage, the protocol transitions to direct-to-waste mode by, again, moving the internal collection plate off the vacuum base. This new stack pulls waste material through the manifold directly to the carboy. It then runs two vacuum profiles: an intermediate vacuum at `-500` mbar for sample binding and washing, ending with a deep vacuum at `-800` mbar to thoroughly dry the silica plate.
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left;">Action</th>
+      <th style="text-align: left;">API method and role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Stack reconfiguration</strong></td>
+      <td>
+        <ul>
+          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a> moves the lysate collection plate off the module to slot D2, opening the manifold cavity for direct-to-waste evacuation.</li>
+          <li><code>move_labware()</code> seats the tall collar directly onto the vacuum base and places the long-tip silica plate on the collar.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Sample binding</strong></td>
+      <td>
+        <ul>
+          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure"><code>start_set_vacuum_pressure()</code></a> draws sample through the silica membrane directly to the waste carboy at <code>-500</code> mbar.</li>
+          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.wait_for_tasks"><code>wait_for_tasks()</code></a> halts execution until the binding cycle finishes and pressure equalizes (<code>equalize_timeout_s=10</code>).</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Membrane drying</strong></td>
+      <td>
+        <ul>
+          <li><code>start_set_vacuum_pressure()</code> pulls a deep vacuum at maximum capacity (<code>-800</code> mbar) for 60 seconds to purge residual wash ethanol from the silica membrane.</li>
+          <li><code>wait_for_tasks()</code> forces the robot to pause until venting and pressure equalization complete (<code>equalize_timeout_s=30</code>) before subsequent gripper operations</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ```python
-# Move collection plate off the module to open the base for direct draining
     protocol.move_labware(collection_plate, "D2", use_gripper=True)
 
     # Seat the collar on the base and load the silica plate directly onto it
@@ -223,34 +242,9 @@ More description here, focus is on vacuum module
     protocol.wait_for_tasks([dry_task])
 ```
 
-### Stage 5: recover elution
+### Parallel vs serial operation
 
-Collect the liquid.
-
-```python
-# Return collar to dock to access the empty base cavity
-    vacuum.move_to_dock(collar, use_gripper=True)
-
-    # Place a clean PCR plate inside the base, then stack the silica plate and collar
-    elution_plate = protocol.load_labware(
-        "opentrons_96_wellplate_200ul_pcr_full_skirt", "C2", label="Elution Plate"
-    )
-    protocol.move_labware(elution_plate, vacuum, use_gripper=True)
-    protocol.move_labware(silica_plate, elution_plate, use_gripper=True)
-    protocol.move_labware(collar, vacuum, use_gripper=True)
-
-    # Pull purified eluate into the recovery plate
-    elute_task = vacuum.start_set_vacuum_pressure(
-        gauge_pressure_mbar=-500,
-        duration_s=60,
-        vent_after=True,
-        equalize_timeout_s=20,
-    )
-    protocol.wait_for_tasks([elute_task])
-
-    # Return collar to the dock to expose the purified samples for downstream use
-    vacuum.move_to_dock(collar, use_gripper=True)
-```
+Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling [`wait_for_tasks([dry_task])`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] immediately after starting the vacuum cycle transitions the protocol back to serial execution. Placing `wait_for_tasks()` directly after a non-blocking method pauses script progress, ensuring each drying and washing cycle completes before the robot proceeds to the next command.
 
 ## Protocol takeaways
 
@@ -258,11 +252,11 @@ The miniprep protocol demonstrates several key operational principles of the Vac
 
 ### Dynamic stack configuration
 
-The Flex, Vacuum Module, and related hardware can adapt to changing filtration requirements mid-protocol. For example, the code commands the Gripper alternate between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
+Using the Gripper, the Vacuum Module can adapt to changing filtration requirements mid-protocol. For example, this protocol alternates between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
 
 ### Non-blocking operations and concurrency
 
-Operational commands like start_set_vacuum_pressure() run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or running other deck modules and pipetting while the Vacuum Module operates on its own.
+Operational commands like `start_set_vacuum_pressure()` run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or running other deck modules and pipetting while the Vacuum Module operates on its own.
 
 ### Pressure profiles
 
@@ -270,4 +264,4 @@ Pressure sensors in the Control Box allows the module to apply multiple vacuum p
 
 ### Depressurization and Gripper safety
 
-Attempting to move labware while the manifold remains under vacuum raises an API error. Setting vent_after=True with an equalize_timeout_s delay ensures the module vents to atmospheric pressure (0 mbar) at the end of a cycle. Synchronizing the background task with wait_for_tasks() ensures the system is depressurized before the Gripper attempts to move the collar or labware.
+Attempting to move labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with an `equalize_timeout_s` delay ensures the manifold system vents to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing background tasks with `wait_for_tasks()` guarantees the system is fully depressurized before the Flex Gripper attempts to unstack collars or labware.
