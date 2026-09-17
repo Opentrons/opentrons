@@ -147,7 +147,9 @@ export function UserManagement({
         makeToast(
           t('desktop_delete_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         setUserToDelete(null)
         if (username === deletedUsername) {
@@ -176,7 +178,9 @@ export function UserManagement({
         makeToast(
           t('desktop_activate_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
@@ -200,7 +204,9 @@ export function UserManagement({
         makeToast(
           t('desktop_reset_password_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
@@ -237,7 +243,9 @@ export function UserManagement({
         makeToast(
           t('desktop_lock_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         setUserToDeactivate(null)
         if (username === lockedUsername) {
@@ -278,7 +286,9 @@ export function UserManagement({
             makeToast(
               t('desktop_add_user_created_banner') as string,
               SUCCESS_TOAST,
-              { closeButton: true }
+              {
+                closeButton: true,
+              }
             )
           }}
           onClose={() => {
@@ -294,7 +304,9 @@ export function UserManagement({
             makeToast(
               t('desktop_edit_user_success_banner') as string,
               SUCCESS_TOAST,
-              { closeButton: true }
+              {
+                closeButton: true,
+              }
             )
           }}
           onClose={() => {
