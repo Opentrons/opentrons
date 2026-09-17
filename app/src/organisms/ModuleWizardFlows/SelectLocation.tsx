@@ -290,7 +290,9 @@ export function SelectLocation(props: SelectLocationProps): ReactNode {
               module: moduleName,
               port: parseModuleUSBPort(attachedModule),
             })}
-            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
+            {isFlexStacker || isVacuumModule
+              ? null
+              : ` ${t('location_must_be_correct')}`}
           </StyledText>
           {isFlexStacker || isVacuumModule ? (
             <InlineNotification
