@@ -44,6 +44,9 @@ vi.mock('../RunHeaderBannerContainer')
 vi.mock('../RunHeaderContent')
 vi.mock('../../../../RunProgressMeter')
 vi.mock('../RunHeaderProtocolName')
+vi.mock('../ProtocolRunHeaderSkeleton', () => ({
+  ProtocolRunHeaderSkeleton: () => <div>MOCK_PROTOCOL_RUN_HEADER_SKELETON</div>,
+}))
 vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
 vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
@@ -85,6 +88,7 @@ describe('ProtocolRunHeader', () => {
           status: RUN_STATUS_RUNNING,
         },
       },
+      isLoading: false,
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
@@ -135,6 +139,19 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('MOCK_RUN_HEADER_BANNER_CONTAINER')
     screen.getByText('MOCK_RUN_HEADER_CONTENT')
     screen.getByText('MOCK_RUN_PROGRESS_METER')
+  })
+
+  it('renders a skeleton while the run query is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+
+    render(props)
+
+    screen.getByText('MOCK_PROTOCOL_RUN_HEADER_SKELETON')
+    expect(screen.queryByText('MOCK_RUN_HEADER_PROTOCOL_NAME')).toBeNull()
+    expect(screen.queryByText('MOCK_RUN_HEADER_CONTENT')).toBeNull()
   })
 
   it('navigates to /devices if robot is not viewable and protocolData is not null', () => {

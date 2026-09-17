@@ -217,7 +217,7 @@ describe('ProtocolRunSetup', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
+  it('renders run loading info screen if robot-analyzed and app-analyzed protocol data is null', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
@@ -239,7 +239,7 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Loading data...')
+    screen.getByText('Run is loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {

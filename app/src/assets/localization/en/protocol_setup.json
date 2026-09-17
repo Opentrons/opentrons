@@ -178,6 +178,7 @@
   "liquids_ready": "Liquids ready",
   "list_view": "List View",
   "loading_data": "Loading data...",
+  "run_is_loading": "Run is loading",
   "loading_labware_offsets": "Loading labware offsets",
   "loading_protocol_details": "Loading details...",
   "location": "Location",
