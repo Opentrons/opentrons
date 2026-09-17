@@ -95,21 +95,29 @@ const MOCK_USERS_RESPONSE: AuthUsersResponse = {
 
 vi.mock('@opentrons/react-api-client')
 
+const mockOnShowOneTimePassword = vi.fn()
+
 const render = (
   initialState: Partial<State> = {}
 ): [RenderResult, Store<State>] => {
-  return renderWithProviders(<UserManagement robotName={ROBOT_NAME} />, {
-    i18nInstance: i18n,
-    initialState: {
-      robotAuth: {
-        perRobotAuthStates: {
-          [ROBOT_NAME]: MOCK_AUTH_STATE,
+  return renderWithProviders(
+    <UserManagement
+      robotName={ROBOT_NAME}
+      onShowOneTimePassword={mockOnShowOneTimePassword}
+    />,
+    {
+      i18nInstance: i18n,
+      initialState: {
+        robotAuth: {
+          perRobotAuthStates: {
+            [ROBOT_NAME]: MOCK_AUTH_STATE,
+          },
+          mostRecentRobotName: ROBOT_NAME,
         },
-        mostRecentRobotName: ROBOT_NAME,
-      },
-      ...initialState,
-    } as State,
-  })
+        ...initialState,
+      } as State,
+    }
+  )
 }
 
 function expandAccordion(): void {
@@ -122,6 +130,7 @@ const mockUpdateUser = vi.fn()
 
 describe('UserManagement', () => {
   beforeEach(() => {
+    mockOnShowOneTimePassword.mockReset()
     mockDeleteUser.mockReset()
     mockDeleteUser.mockResolvedValue(undefined)
     mockResetUserPassword.mockReset()
@@ -277,7 +286,7 @@ describe('UserManagement', () => {
     screen.getByText("Reset this user's password?")
   })
 
-  it('logs out and shows the one-time password when the logged-in user resets their own password', async () => {
+  it('shows the one-time password via callback and does not log out yet when the logged-in user resets their own password', async () => {
     mockResetUserPassword.mockResolvedValue({
       data: { temporaryPassword: 'temp-password-123' },
     })
@@ -291,11 +300,13 @@ describe('UserManagement', () => {
 
     await vi.waitFor(() => {
       expect(mockResetUserPassword).toHaveBeenCalledWith('alice')
-      expect(store.dispatch).toHaveBeenCalledWith(
-        logOut({ robotName: ROBOT_NAME })
+      expect(mockOnShowOneTimePassword).toHaveBeenCalledWith(
+        'temp-password-123'
       )
-      screen.getByText('temp-password-123')
     })
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      logOut({ robotName: ROBOT_NAME })
+    )
   })
 
   it('does not log out when resetting another user password', async () => {
@@ -324,7 +335,9 @@ describe('UserManagement', () => {
 
     await vi.waitFor(() => {
       expect(mockResetUserPassword).toHaveBeenCalledWith('carol')
-      screen.getByText('temp-password-456')
+      expect(mockOnShowOneTimePassword).toHaveBeenCalledWith(
+        'temp-password-456'
+      )
     })
     expect(store.dispatch).not.toHaveBeenCalledWith(
       logOut({ robotName: ROBOT_NAME })
@@ -472,7 +485,9 @@ describe('UserManagement', () => {
         request: { data: { locked: false } },
       })
       expect(mockResetUserPassword).toHaveBeenCalledWith('bob')
-      screen.getByText('temp-password-123')
+      expect(mockOnShowOneTimePassword).toHaveBeenCalledWith(
+        'temp-password-123'
+      )
     })
     expect(mockUpdateUser).toHaveBeenCalledTimes(1)
     expect(mockResetUserPassword).toHaveBeenCalledTimes(1)
