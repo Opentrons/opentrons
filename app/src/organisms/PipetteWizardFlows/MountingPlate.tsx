@@ -1,8 +1,19 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -25,8 +36,21 @@ export const MountingPlate = (
     chainRunCommands,
     errorMessage,
     setShowErrorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
+    isOnDevice,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setIsDoorOpenError(true)
+      setShowErrorMessage(t('door_is_open') as string)
+    } else {
+      setShowErrorMessage(error.message)
+    }
+  }
 
   const handleAttachMountingPlate = (): void => {
     chainRunCommands?.(
@@ -48,21 +72,46 @@ export const MountingPlate = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
   return errorMessage != null ? (
-    <SimpleWizardBody
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      isSuccess={false}
-      subHeader={errorMessage}
-    />
+    isDoorOpenError ? (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    ) : (
+      <SimpleWizardBody
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        isSuccess={false}
+        subHeader={errorMessage}
+      />
+    )
   ) : (
     <GenericWizardTile
       header={t(

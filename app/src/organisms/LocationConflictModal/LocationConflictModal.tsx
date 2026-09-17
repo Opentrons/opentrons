@@ -46,6 +46,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons/SmallButton'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
@@ -53,6 +54,7 @@ import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 import { patchDeckConfigForRequiredFixture } from './patchDeckConfigForRequiredFixture'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -74,7 +76,7 @@ interface LocationConflictModalProps {
 
 export const LocationConflictModal = (
   props: LocationConflictModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     onCloseClick,
     cutoutId,
@@ -93,7 +95,9 @@ export const LocationConflictModal = (
 
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const documentationState = useDocumentationState()
+  const { updateDeckConfiguration } =
+    useUpdateDeckConfigurationMutation(documentationState)
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId

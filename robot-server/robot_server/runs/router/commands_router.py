@@ -244,7 +244,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    response_data = run_orchestrator_store.get_command(command.id)
+    response_data = await run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -310,7 +310,7 @@ async def get_run_commands(
             " If `false`, only return safe commands.
     """
     try:
-        command_slice = run_data_manager.get_commands_slice(
+        command_slice = await run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -320,7 +320,9 @@ async def get_run_commands(
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
-    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
+    recovery_target_command = await run_data_manager.get_recovery_target_command(
+        run_id=runId
+    )
 
     data = [
         RunCommandSummary.model_construct(
@@ -402,7 +404,7 @@ async def get_run_commands_as_pre_serialized_list(
             " If `false`, only return safe commands.
     """
     try:
-        commands = run_data_manager.get_all_commands_as_preserialized_list(
+        commands = await run_data_manager.get_all_commands_as_preserialized_list(
             run_id=runId, include_fixit_commands=includeFixitCommands
         )
     except RunNotFoundError as e:
@@ -446,7 +448,7 @@ async def get_run_command(
         run_data_manager: Run data retrieval.
     """
     try:
-        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+        command = await run_data_manager.get_command(run_id=runId, command_id=commandId)
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandNotFoundError as e:

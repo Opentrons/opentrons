@@ -167,7 +167,9 @@ class RunOrchestrator(AbstractRunCoordinator):
             camera_provider=camera_provider,
         )
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
         # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
         # historical reasons. It's unsafe to change the deck configuration mid-run
@@ -195,13 +197,13 @@ class RunOrchestrator(AbstractRunCoordinator):
         else:
             return await self._setup_runner.run(deck_configuration=deck_configuration)
 
-    def pause(self) -> None:
+    async def pause(self) -> None:
         """Pause the run."""
         self._protocol_engine.request_pause()
 
     async def stop(self) -> None:
         """Stop the run."""
-        if self.run_has_started():
+        if await self.run_has_started():
             await self._protocol_engine.request_stop()
         else:
             await self.finish(
@@ -210,7 +212,7 @@ class RunOrchestrator(AbstractRunCoordinator):
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
 
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
         self._protocol_engine.resume_from_recovery(reconcile_false_positive)
 
@@ -229,19 +231,19 @@ class RunOrchestrator(AbstractRunCoordinator):
             post_run_hardware_state=post_run_hardware_state,
         )
 
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
 
-    def get_preconditions(self) -> CommandPreconditions:
+    async def get_preconditions(self) -> CommandPreconditions:
         """Get the preconditions of a protocol run."""
         return self._protocol_engine.state_view.preconditions.get_precondition()
 
-    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+    async def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
 
-    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the list of run time parameters defined in the protocol, if any.
 
         This returns a list of all run time parameters with their validated definitions
@@ -262,27 +264,27 @@ class RunOrchestrator(AbstractRunCoordinator):
             else self._protocol_runner.run_time_parameters
         )
 
-    def get_all_command_annotations(self) -> List[CommandAnnotation]:
+    async def get_all_command_annotations(self) -> List[CommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
         return self._protocol_engine.state_view.commands.get_all_command_annotations()
 
-    def get_total_command_annotations_count(self) -> int:
+    async def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations defined in the protocol, if any."""
         return len(
             self._protocol_engine.state_view.commands.get_all_command_annotations()
         )
 
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+    async def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the command annotation by ID."""
         return self._protocol_engine.state_view.commands.get_command_annotation(
             annotation_id
         )
 
-    def get_current_command(self) -> Optional[CommandPointer]:
+    async def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
         return self._protocol_engine.state_view.commands.get_current()
 
-    def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
+    async def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
         most_recently_finalized_command = self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
         return (
@@ -296,7 +298,7 @@ class RunOrchestrator(AbstractRunCoordinator):
             else None
         )
 
-    def get_command_slice(
+    async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
@@ -310,7 +312,7 @@ class RunOrchestrator(AbstractRunCoordinator):
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
         """Get a slice of command annotations in the run."""
@@ -318,7 +320,7 @@ class RunOrchestrator(AbstractRunCoordinator):
             cursor=cursor, length=length
         )
 
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self,
         cursor: int,
         length: int,
@@ -335,31 +337,31 @@ class RunOrchestrator(AbstractRunCoordinator):
             cursor=cursor, length=length
         )
 
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
         return self._protocol_engine.state_view.commands.get_recovery_target()
 
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
         return self._protocol_engine.state_view.commands.get(command_id=command_id)
 
-    def get_all_commands(self) -> List[Command]:
+    async def get_all_commands(self) -> List[Command]:
         """Get all run commands."""
         return self._protocol_engine.state_view.commands.get_all()
 
-    def get_command_errors(self) -> List[ErrorOccurrence]:
+    async def get_command_errors(self) -> List[ErrorOccurrence]:
         """Get all run command errors."""
         return self._protocol_engine.state_view.commands.get_all_errors()
 
-    def get_run_status(self) -> EngineStatus:
+    async def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         return self._protocol_engine.state_view.commands.get_status()
 
-    def get_is_run_terminal(self) -> bool:
+    async def get_is_run_terminal(self) -> bool:
         """Get whether engine is in a terminal state."""
         return self._protocol_engine.state_view.commands.get_is_terminal()
 
-    def get_camera_capture_image_settings(
+    async def get_camera_capture_image_settings(
         self,
     ) -> Dict[str, Any]:
         """Get camera capture image settings."""
@@ -373,32 +375,32 @@ class RunOrchestrator(AbstractRunCoordinator):
             "saturation": self._protocol_engine.state_view.camera.get_saturation(),
         }
 
-    def run_has_started(self) -> bool:
+    async def run_has_started(self) -> bool:
         """Get whether the run has started."""
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def run_has_stopped(self) -> bool:
+    async def run_has_stopped(self) -> bool:
         """Get whether the run has stopped."""
         return self._protocol_engine.state_view.commands.get_is_stopped()
 
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
         return self._protocol_engine.add_labware_offset(request)
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self._protocol_engine.add_labware_definition(definition)
 
-    def add_camera_enablement_settings(
+    async def add_camera_enablement_settings(
         self,
         enablement_settings: CameraSettings,
     ) -> CameraSettings:
         """Add new camera enablement settings."""
         return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
 
-    def add_camera_capture_image_settings(
+    async def add_camera_capture_image_settings(
         self,
         camera_id: Optional[str] = None,
         resolution: Optional[Tuple[int, int]] = None,
@@ -430,7 +432,7 @@ class RunOrchestrator(AbstractRunCoordinator):
                 await self._protocol_engine.wait_for_command(added_command.id)
         return added_command
 
-    def estop(self) -> None:
+    async def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
 
@@ -496,7 +498,7 @@ class RunOrchestrator(AbstractRunCoordinator):
                 run_time_param_paths=run_time_param_paths,
             )
 
-    def get_is_okay_to_clear(self) -> bool:
+    async def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly, so it could be removed."""
         return self._protocol_engine.state_view.commands.get_is_okay_to_clear()
 
@@ -512,11 +514,11 @@ class RunOrchestrator(AbstractRunCoordinator):
         """Get engine deck type."""
         return self._protocol_engine.state_view.config.deck_type
 
-    def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
+    async def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
         return self._protocol_engine.state_view.pipettes.get_nozzle_configurations()
 
-    def get_tip_attached(self) -> Dict[str, bool]:
+    async def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
 
         def has_tip_attached(pipette_id: str) -> bool:
@@ -531,11 +533,11 @@ class RunOrchestrator(AbstractRunCoordinator):
         )
         return {pipette_id: has_tip_attached(pipette_id) for pipette_id in pipette_ids}
 
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    async def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Create error recovery policy for the run."""
         self._protocol_engine.set_error_recovery_policy(policy)
 
-    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+    async def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         modules = self._protocol_engine.state_view.modules.get_all()
         stackers: Dict[str, FlexStackerSubState] = {}
@@ -574,6 +576,6 @@ class RunOrchestrator(AbstractRunCoordinator):
         else:
             raise UnknownProtocolParseMode()
 
-    def clear_command_history(self) -> None:
+    async def clear_command_history(self) -> None:
         """Force cleanup of command history."""
         self._protocol_engine.clear_command_history()

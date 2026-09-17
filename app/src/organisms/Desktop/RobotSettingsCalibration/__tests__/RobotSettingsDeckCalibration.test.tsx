@@ -10,14 +10,14 @@ import {
   mockWarningDeckCalData,
 } from '/app/redux/calibration/__fixtures__'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
 import { useAttachedPipettes } from '/app/resources/instruments'
+import { mockAttachedPipette } from '/app/resources/instruments/__fixtures__'
 
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 
 import type { ComponentProps } from 'react'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 
 vi.mock('../..//CalibrationStatusCard')
 vi.mock('/app/redux/robot-api/selectors')

@@ -52,6 +52,18 @@ export interface MoveToWellArgs extends OpentronsAIBaseArgs<'moveToWell'> {}
 export interface PrepareToAspirateArgs extends OpentronsAIBaseArgs<'prepareToAspirate'> {}
 export interface TryLiquidProbeArgs extends OpentronsAIBaseArgs<'tryLiquidProbe'> {}
 export interface VerifyTipPresenceArgs extends OpentronsAIBaseArgs<'verifyTipPresence'> {}
+export interface HeaterShakerCloseLabwareLatchArgs extends OpentronsAIBaseArgs<'heaterShaker/closeLabwareLatch'> {}
+export interface HeaterShakerSetAndWaitForShakeSpeedArgs extends OpentronsAIBaseArgs<'heaterShaker/setAndWaitForShakeSpeed'> {}
+export interface HeaterShakerDeactiveHeaterArgs extends OpentronsAIBaseArgs<'heaterShaker/deactivateHeater'> {}
+export interface HeaterShakerOpenLabwareLatchArgs extends OpentronsAIBaseArgs<'heaterShaker/openLabwareLatch'> {}
+export interface HeaterShakerDeactivateShakerArgs extends OpentronsAIBaseArgs<'heaterShaker/deactivateShaker'> {}
+export interface TCSetTargetBlockTemperatureArgs extends OpentronsAIBaseArgs<'thermocycler/setTargetBlockTemperature'> {}
+export interface TCSetTargetLidTemperatureArgs extends OpentronsAIBaseArgs<'thermocycler/setTargetLidTemperature'> {}
+export interface TCOpenLidArgs extends OpentronsAIBaseArgs<'thermocycler/openLid'> {}
+export interface TCCloseLidArgs extends OpentronsAIBaseArgs<'thermocycler/closeLid'> {}
+export interface TCDeactivateBlockArgs extends OpentronsAIBaseArgs<'thermocycler/deactivateBlock'> {}
+export interface TCDeactivateLidArgs extends OpentronsAIBaseArgs<'thermocycler/deactivateLid'> {}
+export interface TCStartRunExtendedProfileArgs extends OpentronsAIBaseArgs<'thermocycler/startRunExtendedProfile'> {}
 
 // the following args have additional args in the commandCreators
 // which are needed for the timeline errors
@@ -130,3 +142,15 @@ export type OpentronsAIArgs =
   | PrepareToAspirateArgs
   | TouchTipArgs
   | TryLiquidProbeArgs
+  | HeaterShakerCloseLabwareLatchArgs
+  | HeaterShakerSetAndWaitForShakeSpeedArgs
+  | HeaterShakerOpenLabwareLatchArgs
+  | HeaterShakerDeactiveHeaterArgs
+  | HeaterShakerDeactivateShakerArgs
+  | TCSetTargetBlockTemperatureArgs
+  | TCSetTargetLidTemperatureArgs
+  | TCCloseLidArgs
+  | TCDeactivateBlockArgs
+  | TCDeactivateLidArgs
+  | TCOpenLidArgs
+  | TCStartRunExtendedProfileArgs

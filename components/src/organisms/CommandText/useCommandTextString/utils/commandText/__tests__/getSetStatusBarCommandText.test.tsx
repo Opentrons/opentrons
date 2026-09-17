@@ -6,6 +6,7 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getSetStatusBarCommandText } from '../getSetStatusBarCommandText'
 
+import type { ReactNode } from 'react'
 import type { SetStatusBarRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../../types'
 
@@ -13,7 +14,7 @@ function TestWrapper({
   command,
 }: {
   command: SetStatusBarRunTimeCommand
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getSetStatusBarCommandText({
     command,

@@ -11,14 +11,14 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from './constants'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 interface IconButtonProps extends ComponentProps<typeof Btn> {
   iconName: ComponentProps<typeof Icon>['name']
   hasBackground?: boolean
 }
 
-export function IconButton(props: IconButtonProps): JSX.Element {
+export function IconButton(props: IconButtonProps): ReactNode {
   const { iconName, hasBackground = false, ...buttonProps } = props
   return (
     <Btn
@@ -32,14 +32,14 @@ export function IconButton(props: IconButtonProps): JSX.Element {
         }
         &:focus-visible {
           box-shadow: ${ODD_FOCUS_VISIBLE};
-          background-color: ${hasBackground
-            ? COLORS.grey35
-            : COLORS.transparent};
+          background-color: ${
+            hasBackground ? COLORS.grey35 : COLORS.transparent
+          };
         }
         &:disabled {
-          background-color: ${hasBackground
-            ? COLORS.grey35
-            : COLORS.transparent};
+          background-color: ${
+            hasBackground ? COLORS.grey35 : COLORS.transparent
+          };
           color: ${COLORS.grey50};
         }
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

@@ -45,7 +45,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.30",
+    "apiLevel": "2.31",
 }
 
 _PRESET_GCODE: dict[str, str] = {

@@ -186,3 +186,6 @@ export const VACUUM_MODULE_SLOT = 'A3'
 
 export const VACUUM_MODULE_TYPE_WITH_LABWARE: 'vacuumModuleTypeWithLabware' =
   'vacuumModuleTypeWithLabware'
+
+export const VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X: number = -11.5
+export const VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y: number = -12

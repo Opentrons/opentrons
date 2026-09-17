@@ -4,8 +4,12 @@ import { getWifiList } from '@opentrons/api-client'
 
 import { getQueryKey, useHost } from '../api'
 
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { QueryKey, UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, WifiListResponse } from '@opentrons/api-client'
+
+export function wifiQueryKey(host: HostConfig | null): QueryKey {
+  return getQueryKey(host, 'networking', 'wifi')
+}
 
 export function useWifiQuery(
   options: UseQueryOptions<WifiListResponse, Error> = {},
@@ -15,7 +19,7 @@ export function useWifiQuery(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
-    getQueryKey(host, 'networking', 'wifi'),
+    wifiQueryKey(host),
     () => getWifiList(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )

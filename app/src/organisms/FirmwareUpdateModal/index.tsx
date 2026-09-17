@@ -19,6 +19,9 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
+import type { ReactNode } from 'react'
 import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
@@ -67,14 +70,15 @@ const SPINNER_STYLE = css`
 
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
-): JSX.Element => {
+): ReactNode => {
   const { proceed, proceedDescription, subsystem, description, isOnDevice } =
     props
   const [updateId, setUpdateId] = useState<string | null>(null)
   const [firmwareText, setFirmwareText] = useState<string | null>(null)
   const { data: attachedInstruments, refetch: refetchInstruments } =
     useInstrumentsQuery({ refetchInterval: 5000 })
-  const { updateSubsystem } = useUpdateSubsystemMutation({
+  const documentationState = useDocumentationState()
+  const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
     },

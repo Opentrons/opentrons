@@ -20,10 +20,11 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
+import type { TemperatureModule } from '@opentrons/api-client'
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '/app/redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
@@ -36,7 +37,8 @@ export const TemperatureModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
   const { reportModuleCommand } = useModuleCommandAnalytics()

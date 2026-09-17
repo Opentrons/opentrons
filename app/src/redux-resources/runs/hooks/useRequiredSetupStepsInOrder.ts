@@ -16,10 +16,7 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type {
-  StepKey,
-  UpdateRunSetupStepsRequiredAction,
-} from '/app/redux/protocol-runs'
+import type { StepKey } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
 
 export interface UseRequiredSetupStepsInOrderProps {
@@ -114,7 +111,9 @@ export function useRequiredSetupStepsInOrder({
       dispatch(
         updateRunSetupStepsRequired(runId, {
           ...ALL_STEPS_IN_ORDER.reduce<
-            UpdateRunSetupStepsRequiredAction['payload']['required']
+            ReturnType<
+              typeof updateRunSetupStepsRequired
+            >['payload']['required']
           >(
             (acc, thiskey) => ({
               ...acc,

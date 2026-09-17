@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   COLORS,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -11,6 +11,8 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
+
 interface UnskippableModalProps {
   goBack: () => void
   proceed: () => void
@@ -18,7 +20,7 @@ interface UnskippableModalProps {
   isOnDevice: boolean | null
 }
 
-export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
+export function UnskippableModal(props: UnskippableModalProps): ReactNode {
   const { goBack, proceed, isOnDevice, isRobotMoving } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   return (
@@ -53,13 +55,14 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             disabled={isRobotMoving}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >
             {t('shared:exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

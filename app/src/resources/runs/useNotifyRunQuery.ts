@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -12,17 +14,22 @@ export function useNotifyRunQuery<TError = Error>(
   options: QueryOptionsWithPolling<Run, TError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     options,
     hostOverride,
   })
 
   const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch && runId != null) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    // Route params can turn a missing id into the literal string "null" (e.g. `/runs/${null}` → `/runs/null`). Treat that like no id.
+    const isValidRunId = runId != null && runId !== 'null'
+    if (refetch > 0 && isValidRunId) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery, runId])
 
   return httpQueryResult
 }

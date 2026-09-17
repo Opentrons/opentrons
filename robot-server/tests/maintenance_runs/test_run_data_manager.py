@@ -5,6 +5,7 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
+from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
     CommandSlice,
     EngineStatus,
@@ -129,8 +130,11 @@ async def test_create(
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should create an engine and a persisted run resource."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -179,8 +183,11 @@ async def test_create_with_options(
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should handle creation with labware offsets."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -235,8 +242,11 @@ async def test_create_engine_error(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should not create a resource if engine creation fails."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -270,21 +280,24 @@ async def test_get_current_run(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_feature_flags: None,
 ) -> None:
     """It should get the current run from the engine."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
 
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         run_id
     )
-    decoy.when(mock_maintenance_run_orchestrator_store.get_state_summary()).then_return(
-        engine_state_summary
-    )
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.get_state_summary()
+    ).then_return(engine_state_summary)
     decoy.when(
         mock_maintenance_run_orchestrator_store.current_run_created_at
     ).then_return(datetime(2023, 1, 1))
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == MaintenanceRun(
         current=True,
@@ -309,15 +322,18 @@ async def test_get_run_not_current(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_feature_flags: None,
 ) -> None:
     """It should raise a MaintenanceRunNotFoundError."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
 
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "not-current-id"
     )
     with pytest.raises(MaintenanceRunNotFoundError):
-        subject.get(run_id=run_id)
+        await subject.get(run_id=run_id)
 
 
 async def test_delete_current_run(
@@ -325,8 +341,11 @@ async def test_delete_current_run(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_camera_provider: CameraProvider,
     subject: MaintenanceRunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should delete the current run from the engine."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         run_id
@@ -341,13 +360,16 @@ async def test_delete_current_run(
     )
 
 
-def test_get_commands_slice_current_run(
+async def test_get_commands_slice_current_run(
     decoy: Decoy,
     subject: MaintenanceRunDataManager,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     run_command: commands.Command,
+    mock_feature_flags: None,
 ) -> None:
     """Should get a sliced command list from engine store."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     expected_commands_result = [
         commands.WaitForResume(
             id="command-id-2",
@@ -366,9 +388,9 @@ def test_get_commands_slice_current_run(
         "run-id"
     )
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
+        await mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
     ).then_return(expected_command_slice)
 
-    result = subject.get_commands_slice("run-id", 1, 2)
+    result = await subject.get_commands_slice("run-id", 1, 2)
 
     assert expected_command_slice == result

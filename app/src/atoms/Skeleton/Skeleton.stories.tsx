@@ -13,6 +13,7 @@ import {
 import { Skeleton as SkeletonComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 
 const meta: Meta<typeof SkeletonComponent> = {
   title: 'App/Atoms/Skeleton',
@@ -21,7 +22,7 @@ const meta: Meta<typeof SkeletonComponent> = {
 
 export default meta
 
-const DemoSkeleton = (args): JSX.Element => {
+const DemoSkeleton = (args): ReactNode => {
   return (
     <Modal width="47rem">
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">

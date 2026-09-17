@@ -1,9 +1,9 @@
-import type { PipetteOffsetCalibration } from '@opentrons/api-client'
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
-} from '/app/redux/pipettes/types'
+  PipetteOffsetCalibration,
+} from '@opentrons/api-client'
 
 export function downloadFile(
   data: Blob | string | object,
@@ -42,8 +42,7 @@ export function getIs96ChannelPipetteAttached(
 export function getOffsetCalibrationForMount(
   pipetteOffsetCalibrations: PipetteOffsetCalibration[] | null,
   attachedPipettes:
-    | FetchPipettesResponseBody
-    | { left: undefined; right: undefined },
+    FetchPipettesResponseBody | { left: undefined; right: undefined },
   mount: Mount
 ): PipetteOffsetCalibration | null {
   if (pipetteOffsetCalibrations == null) {

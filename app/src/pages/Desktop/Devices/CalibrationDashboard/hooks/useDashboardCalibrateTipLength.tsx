@@ -183,13 +183,11 @@ export function useDashboardCalibrateTipLength(
     getTopPortalEl()
   )
 
-  if (
-    !(
-      startingSession ||
-      tipLengthCalibrationSession != null ||
-      showCalBlockModal != null
-    )
-  ) {
+  if (!(
+    startingSession ||
+    tipLengthCalibrationSession != null ||
+    showCalBlockModal != null
+  )) {
     Wizard = null
   }
 

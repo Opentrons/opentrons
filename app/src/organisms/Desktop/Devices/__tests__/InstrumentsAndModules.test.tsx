@@ -4,6 +4,7 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { mockMagneticModule } from '@opentrons/api-client'
 import {
   useInstrumentsQuery,
   useModulesQuery,
@@ -14,7 +15,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'

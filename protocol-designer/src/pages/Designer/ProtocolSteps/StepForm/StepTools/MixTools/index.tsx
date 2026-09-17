@@ -9,6 +9,7 @@ import { TipSettings } from '../MoveLiquidTools/TipSettings'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
 export function MixTools(
@@ -16,7 +17,7 @@ export function MixTools(
     StepFormProps,
     'focusHandlers' | 'showFormErrors' | 'focusedField'
   >
-): JSX.Element {
+): ReactNode {
   const {
     propsForFields,
     formData,

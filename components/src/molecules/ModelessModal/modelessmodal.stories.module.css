@@ -1,0 +1,22 @@
+button {
+  padding: var(--spacing-16);
+}
+
+.content_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: var(--spacing-24);
+  background-color: var(white);
+  gap: var(--spacing-16);
+}
+
+.simple_content_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16);
+  background-color: var(--white);
+}

@@ -12,7 +12,6 @@ import type { CsvFileParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/networking')
 vi.mock('/app/resources/useNotifyDataReady')
 vi.mock('/app/redux/config')
 

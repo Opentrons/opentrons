@@ -27,8 +27,10 @@
   "none_attached": "无附加内容",
   "number_of_labware_in_stacker": "堆栈中的耗材数量",
   "open": "打开",
+  "pause": "暂停",
   "percent_complete": "{{percent}}% 完成",
   "pipette": "移液器",
+  "play": "播放",
   "protocol_steps": "协议步骤",
   "quantity": "数量：{{quantity}}",
   "reference_wavelength": "参考波长",
@@ -63,5 +65,5 @@
   "well_dimension": "{{number}} mm",
   "well_name": "孔位 {{wellName}}",
   "well_view": "孔位视图",
-  "well_volume": "{{volume}} µl"
+  "well_volume": "{{volume}} µL"
 }

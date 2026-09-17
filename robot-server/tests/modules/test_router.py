@@ -17,6 +17,7 @@ from opentrons.hardware_control.modules import (
     ModuleType,
     module_calibration,
 )
+from opentrons.hardware_control.modules.types import ModuleStateSummary
 from opentrons.protocol_engine import ModuleModel
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point
@@ -66,7 +67,7 @@ async def test_get_modules_empty(
     hardware_api: HardwareControlAPI,
 ) -> None:
     """It should get an empty modules list from the hardware API."""
-    decoy.when(hardware_api.attached_modules).then_return([])
+    decoy.when(await hardware_api.get_attached_modules()).then_return([])
     decoy.when(module_calibration.load_all_module_calibrations()).then_return([])
 
     result = await get_attached_modules(
@@ -122,36 +123,34 @@ async def test_get_modules_maps_data_and_id(
         source=SourceType.default,
         status=CalibrationStatus(),
     )
-    decoy.when(hardware_api.attached_modules).then_return([magnetic_module])
+    decoy.when(await hardware_api.get_attached_modules()).then_return([magnetic_module])
     decoy.when(module_calibration.load_all_module_calibrations()).then_return(
         [
             calibration_offset,
         ]
     )
-    decoy.when(magnetic_module.has_available_update()).then_return(True)
-    decoy.when(magnetic_module.model()).then_return("magneticModuleV1")
-    decoy.when(magnetic_module.device_info).then_return(
-        {
-            "serial": "serial-number",
-            "version": "1.2.3",
-        }
-    )
-    decoy.when(magnetic_module.live_data).then_return(
-        {
-            "status": "engaged",
-            "data": {"engaged": True, "height": 42},
-        }
-    )
-    decoy.when(magnetic_module.usb_port).then_return(
-        HardwareUSBPort(
-            name="abc",
-            port_number=101,
-            hub=False,
-            port_group=PortGroup.UNKNOWN,
-            hub_port=None,
+    decoy.when(await magnetic_module.get_state_summary()).then_return(
+        ModuleStateSummary(
+            model="magneticModuleV1",
+            usb_port=HardwareUSBPort(
+                name="abc",
+                port_number=101,
+                hub=False,
+                port_group=PortGroup.UNKNOWN,
+                hub_port=None,
+            ),
+            has_available_update=True,
+            live_data={
+                "status": "engaged",
+                "data": {"engaged": True, "height": 42},
+            },
+            device_info={
+                "serial": "serial-number",
+                "version": "1.2.3",
+            },
+            serial_number="serial-number",
         )
     )
-
     module_identity = ModuleIdentity(
         module_id="module-id",
         serial_number="serial-number",

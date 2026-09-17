@@ -76,6 +76,12 @@
   background-color: var(--grey-40);
 }
 
+.presaved_fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
 .presaved_vacuum_step_content {
   display: flex;
   width: 100%;
@@ -85,11 +91,16 @@
 
 .presaved_vacuum_step_form_row {
   display: flex;
-  overflow: hidden;
   min-width: 0;
   flex-direction: row;
   align-items: flex-start;
   gap: var(--spacing-12);
+}
+
+.presaved_vacuum_step_hold {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
 }
 
 .cycle_steps_list {
@@ -125,7 +136,7 @@
 }
 
 .flex_fill {
-  overflow: hidden;
+  display: flex;
   min-width: 0;
   flex: 1;
 }

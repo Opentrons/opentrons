@@ -4,10 +4,12 @@ import { Btn, Icon, StyledText } from '@opentrons/components'
 
 import { GREY_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 
+import type { ReactNode } from 'react'
+
 interface ExportButtonProps {
   onClick: () => void
 }
-export function ExportButton({ onClick }: ExportButtonProps): JSX.Element {
+export function ExportButton({ onClick }: ExportButtonProps): ReactNode {
   const { t } = useTranslation('shared')
 
   return (

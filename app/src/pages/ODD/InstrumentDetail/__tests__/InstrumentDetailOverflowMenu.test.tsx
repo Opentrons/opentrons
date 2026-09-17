@@ -12,11 +12,7 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 
-import type {
-  GripperData,
-  HostConfig,
-  PipetteData,
-} from '@opentrons/api-client'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
@@ -30,6 +26,13 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/GripperWizardFlows')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
 
 const MOCK_PIPETTE = {
   mount: 'left',
@@ -100,7 +103,7 @@ const MOCK_GRIPPER = {
   instrumentName: 'p1000_single_flex',
 } as GripperData
 
-const MOCK_HOST: HostConfig = { hostname: 'TEST_HOST' }
+const MOCK_ROBOT_NAME = 'TEST_ROBOT'
 const mockToggleDTWiz = vi.fn()
 
 const render = (pipetteOrGripper: PipetteData | GripperData) => {
@@ -110,7 +113,7 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
         onClick={() =>
           handleInstrumentDetailOverflowMenu(
             pipetteOrGripper,
-            MOCK_HOST,
+            MOCK_ROBOT_NAME,
             mockToggleDTWiz
           )
         }

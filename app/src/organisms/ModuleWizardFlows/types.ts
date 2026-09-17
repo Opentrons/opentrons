@@ -1,6 +1,6 @@
 import type { AttachedModule } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { CreateCommand, IdentifyColor } from '@opentrons/shared-data'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 import type { ACTIONS, FLOWS, SECTIONS } from './constants'
 
 export type ModuleSetupWizardStep =
@@ -14,6 +14,7 @@ export type ModuleSetupWizardStep =
   | CheckInstallationPinsStep
   | InstallShuttleStep
   | UpdateFirmwareStep
+  | VerifyVacuumStep
 
 export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
@@ -62,7 +63,12 @@ export interface ModuleSetupWizardBaseStepProps {
   attachedModule: AttachedModule
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  isDoorOpenError: boolean
+  setIsDoorOpenError: (isDoorOpenError: boolean) => void
+  dismissDoorOpenError: () => void
   isOnDevice: boolean
+  sendIdentifyModule: SendIdentifyModule
+  setExitCleanupCommands: (commands: CreateCommand[]) => void
 }
 
 export interface ModuleSetupWizardRequiresPipetteStepProps extends ModuleSetupWizardBaseStepProps {
@@ -79,6 +85,12 @@ export type ModuleSetupWizardStepProps =
 
 export type ModuleWizardFlow = typeof FLOWS.SETUP
 
+export type SendIdentifyModule = (
+  module: AttachedModule,
+  start: boolean,
+  color?: IdentifyColor
+) => void
+
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
 }
@@ -93,6 +105,9 @@ export interface InstallShuttleStep {
 }
 export interface UpdateFirmwareStep {
   section: typeof SECTIONS.UPDATE_FIRMWARE
+}
+export interface VerifyVacuumStep {
+  section: typeof SECTIONS.VERIFY_VACUUM
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

@@ -10,6 +10,7 @@ import {
 } from '@opentrons/components'
 import { labwareImages } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { SelectOption } from '@opentrons/components'
 
 export interface ChosenTipRackRenderProps {
@@ -18,7 +19,7 @@ export interface ChosenTipRackRenderProps {
 
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
-): JSX.Element {
+): ReactNode {
   const { selectedValue } = props
   const loadName: keyof typeof labwareImages = selectedValue.value.split(
     '/'

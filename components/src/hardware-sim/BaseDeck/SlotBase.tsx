@@ -1,5 +1,5 @@
-import type { SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 
-export function SlotBase(props: SVGProps<SVGPathElement>): JSX.Element {
+export function SlotBase(props: SVGProps<SVGPathElement>): ReactNode {
   return <path data-testid={'slot-base'} {...props} />
 }

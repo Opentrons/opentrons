@@ -12,6 +12,7 @@ import {
 } from '../../PipetteFields'
 import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
+import type { ReactNode } from 'react'
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
@@ -26,7 +27,7 @@ export function FirstStepMixTools({
   propsForFields,
   formData,
   pipettes,
-}: FirstStepMixToolsProps): JSX.Element {
+}: FirstStepMixToolsProps): ReactNode {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const completedSteps =
     formData.labware != null &&

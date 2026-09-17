@@ -4,12 +4,12 @@ import Semver from 'semver'
 
 import { getConfig } from '../config'
 import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../constants'
-import { postFile } from '../http'
 import { createLogger } from '../log'
-import { FLEX_MANIFEST_URL, SYSTEM_FILENAME } from './constants'
+import { FLEX_MANIFEST_URL } from './constants'
 import { getSystemUpdateDir } from './directories'
 import { getProvider as getUsbUpdateProvider } from './from-usb'
 import { getProvider as getWebUpdateProvider } from './from-web'
+import { registerRobotUpdateUpload } from './upload'
 
 import type { Action, Dispatch } from '../types'
 import type { USBUpdateSource } from './from-usb'
@@ -284,33 +284,6 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           return new Promise(resolve => {
             resolve()
           })
-        case 'robotUpdate:UPLOAD_FILE': {
-          const { host, path, systemFile } = action.payload
-          return postFile(
-            `http://${host.ip}:${host.port}${path}`,
-            SYSTEM_FILENAME,
-            systemFile
-          )
-            .then(() => ({
-              type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
-              payload: host.name,
-            }))
-            .catch((error: Error) => {
-              log.warn('Error uploading update to robot', {
-                path,
-                systemFile,
-                error,
-              })
-
-              return {
-                type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-                payload: {
-                  message: `Error uploading update to robot: ${error.message}`,
-                },
-              }
-            })
-            .then(dispatch)
-        }
         case 'robotUpdate:READ_SYSTEM_FILE': {
           const getDetails = ():
             | {
@@ -472,6 +445,8 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
 }
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
+  registerRobotUpdateUpload()
+
   return manageDriver(dispatch).handleAction
 }
 

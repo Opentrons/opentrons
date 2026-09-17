@@ -1,9 +1,13 @@
 import { useState } from 'react'
 
-import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useCreateMaintenanceCommandMutation,
+} from '@opentrons/react-api-client'
 
 import { chainMaintenanceCommandsRecursive } from '../../runs'
 
+import type { CommandData } from '@opentrons/api-client'
 import type {
   DocumentationState,
   DocumentedAction,
@@ -40,7 +44,12 @@ export function useChainMaintenanceCommands(
         createMaintenanceCommand,
         continuePastCommandFailure,
         setIsLoading
-      ),
+      ).catch(error => {
+        if (isDocumentedMutationError(error)) {
+          return new Promise<CommandData[]>(() => {})
+        }
+        return Promise.reject(error)
+      }),
     isCommandMutationLoading: isLoading,
   }
 }

@@ -12,8 +12,7 @@ interface Props {
   onClick: () => void
   onUpload: (
     event:
-      | React.DragEvent<HTMLLabelElement>
-      | React.ChangeEvent<HTMLInputElement>
+      React.DragEvent<HTMLLabelElement> | React.ChangeEvent<HTMLInputElement>
   ) => void
 }
 

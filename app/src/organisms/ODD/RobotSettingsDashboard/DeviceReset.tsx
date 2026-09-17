@@ -13,15 +13,17 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { resetConfig } from '/app/redux/robot-admin'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
+import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
+import type { ReactNode } from 'react'
+import type { ResetConfigRequest } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type { SetSettingOption } from './types'
 
 interface LabelProps {
@@ -116,7 +118,7 @@ interface DeviceResetProps {
 export function DeviceReset({
   robotName,
   setCurrentOption,
-}: DeviceResetProps): JSX.Element {
+}: DeviceResetProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [resetOptions, setResetOptions] = useState<DisplayedResetOptionState>({
     pipetteOffsetCalibrations: false,
@@ -125,10 +127,21 @@ export function DeviceReset({
     labwareOffsets: false,
     runsHistory: false,
   })
-  const [dispatchRequest] = useDispatchApiRequest()
+  const documentationState = useDocumentationState()
+  const { postResetConfig, reset } = useResetRobotConfigMutation(
+    documentationState,
+    robotName,
+    {
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          reset()
+        }
+      },
+    }
+  )
 
   const handleClick = (): void => {
-    dispatchRequest(resetConfig(robotName, buildResetRequest(resetOptions)))
+    postResetConfig(buildResetRequest(resetOptions))
   }
 
   const {
@@ -307,7 +320,7 @@ interface ConfirmClearDataModalProps {
 export const ConfirmClearDataModal = ({
   cancelClearData,
   confirmClearData,
-}: ConfirmClearDataModalProps): JSX.Element => {
+}: ConfirmClearDataModalProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('confirm_device_reset_heading'),

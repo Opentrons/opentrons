@@ -11,6 +11,7 @@ import {
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -22,7 +23,7 @@ interface EqipmentItem {
 
 interface BeforeBeginningProps extends ModuleSetupWizardMaybePipetteStepProps {}
 
-export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
+export function BeforeBeginning(props: BeforeBeginningProps): ReactNode {
   const { proceed, attachedModule, setErrorMessage } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
 

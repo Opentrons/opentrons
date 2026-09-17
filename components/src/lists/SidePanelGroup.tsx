@@ -25,7 +25,7 @@ export interface SidePanelGroupProps {
 /**
  * A component for grouping and titling multiple lists
  */
-export function SidePanelGroup(props: SidePanelGroupProps): JSX.Element {
+export function SidePanelGroup(props: SidePanelGroupProps): ReactNode {
   const { iconName, disabled } = props
 
   const className = cx(styles.panel_group, props.className, {

@@ -77,6 +77,11 @@ ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 _cors_origins: List[str] = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
 if not _cors_origins:
     raise ValueError("allowed_origins setting is empty")
+if ALLOWED_CREDENTIALS and any(origin == "*" for origin in _cors_origins):
+    raise ValueError(
+        "allowed_origins cannot include '*' when CORS credentials are enabled. "
+        "Use explicit dev origins, e.g. http://localhost:5173,http://127.0.0.1:5173"
+    )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,

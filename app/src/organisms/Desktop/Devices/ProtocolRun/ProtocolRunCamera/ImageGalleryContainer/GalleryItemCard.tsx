@@ -18,6 +18,7 @@ import { useImage } from '/app/resources/dataFiles/useImage'
 import styles from './gallery.module.css'
 import { GalleryItemErrorModal } from './GalleryItemErrorModal'
 
+import type { ReactNode } from 'react'
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 export interface GalleryItemCardProps extends UseImageGalleryDataProps {
@@ -26,7 +27,7 @@ export interface GalleryItemCardProps extends UseImageGalleryDataProps {
   robotName: string
 }
 
-export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
+export function GalleryItemCard(props: GalleryItemCardProps): ReactNode {
   const { item, protocolAnalysis, robotName, runId } = props
   const {
     currentCommand,

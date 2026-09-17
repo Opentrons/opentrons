@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { TextAreaField } from '@opentrons/components'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { FieldProps } from '../../types'
 
-export function MessageField(props: { fieldProps: FieldProps }): JSX.Element {
+export function MessageField(props: { fieldProps: FieldProps }): ReactNode {
   const { fieldProps } = props
   const { t } = useTranslation('form')
   return (

@@ -10,6 +10,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import styles from './peripherals.module.css'
 
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface PeripheralsInfoProps {
@@ -18,7 +19,7 @@ interface PeripheralsInfoProps {
 
 export function PeripheralsInfo({
   robotType,
-}: PeripheralsInfoProps): JSX.Element {
+}: PeripheralsInfoProps): ReactNode {
   const { t } = useTranslation('protocol_overview')
   const isFlex = robotType === FLEX_ROBOT_TYPE
 

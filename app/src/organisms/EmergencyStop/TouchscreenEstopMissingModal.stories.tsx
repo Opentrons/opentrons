@@ -14,7 +14,7 @@ import type * as React from 'react'
 export default {
   title: 'ODD/Organisms/EstopMissingModal',
   component: EstopMissingModal,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const dummyConfig = {

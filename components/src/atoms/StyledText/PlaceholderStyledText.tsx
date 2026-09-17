@@ -25,7 +25,7 @@ interface PlaceholderStyledTextProps {
  */
 export const PlaceholderStyledText = (
   props: PlaceholderStyledTextProps
-): JSX.Element => {
+): ReactNode => {
   const { children, color, desktopStyle, oddStyle } = props
 
   const styleMap: Record<StyleKey, string> = {

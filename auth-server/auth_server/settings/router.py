@@ -3,7 +3,23 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    PatchLoggingEnabledRequestData,
+)
+from server_utils.audit.fastapi import (
+    get_audit_client,
+    get_audit_logger,
+    get_supplied_user_notes,
+)
+from server_utils.auth.resource_server.fastapi import (
+    RequireAuthenticationResult,
+    require_authentication,
+    require_scopes,
+)
+from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     RequestModel,
@@ -11,14 +27,29 @@ from server_utils.fastapi_utils.models.json_api import (
 )
 
 from .models import (
+    AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+    AUTH_SERVER_AUDIT_SYSTEM_NAME,
     AccessControlResponseData,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
 from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
+from auth_server.oauth2.backend import Backend
+from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.settings.models import PatchAccessControlRequestData
+from auth_server.users.dependencies import get_user_store
+from auth_server.users.store import UserStore
 
 router = fastapi.APIRouter()
+
+
+def _patch_changes_password_complexity(patch: PatchSettingsRequestData) -> bool:
+    """Return whether a settings patch includes password complexity fields."""
+    patch_data = patch.model_dump(exclude_unset=True)
+    return (
+        "passwordComplexitySpecialCharacters" in patch_data
+        or "passwordComplexityMinimumLength" in patch_data
+    )
 
 
 @router.get(
@@ -50,11 +81,19 @@ async def get_access_control_enabled_settings(  # noqa: D103
     "/auth/settings/accessControlEnabled",
     summary="Change access control enabled settings",
     description="Change the access control enabled settings.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("update CRS enabled")),
+    ],
 )
 async def patch_access_control_settings(  # noqa: D103
     request_body: RequestModel[PatchAccessControlRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    audit_client: Annotated[AuditClient, fastapi.Depends(get_audit_client)],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+    user_notes: Annotated[str | None, fastapi.Depends(get_supplied_user_notes)],
 ) -> SimpleBody[AccessControlResponseData]:
     """Change the access control enabled settings."""
     try:
@@ -66,40 +105,63 @@ async def patch_access_control_settings(  # noqa: D103
             status_code=422,
             detail="Access control enabled cannot be modified once enabled.",
         )
+    if request_body.data.accessControlEnabled is not None:
+        if isinstance(authentication, AuthenticatedResult):
+            request = PatchLoggingEnabledRequestData(
+                loggingEnabled=request_body.data.accessControlEnabled,
+                accountName=authentication.username,
+                legalName=authentication.fullname,
+                reason=user_notes,
+            )
+        else:
+            request = PatchLoggingEnabledRequestData(
+                loggingEnabled=request_body.data.accessControlEnabled,
+                accountName=AUTH_SERVER_AUDIT_SYSTEM_NAME,
+                legalName=AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+                reason=None,
+            )
+        await audit_client.set_logging_enabled(request)
     return SimpleBody.model_construct(data=accessControlResponseData)
 
 
 @router.patch(
     "/auth/settings",
     summary="Change auth settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Change authorization and authentication settings.
 
         The new settings are returned.
-        """
-    ),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+        """),
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("edit CRS settings")),
+    ],
 )
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    user_store: Annotated[UserStore, fastapi.Depends(get_user_store)],
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
     new_settings = settings_store.patch_settings(request_body.data)
+    if _patch_changes_password_complexity(request_body.data):
+        user_store.mark_all_reset_password()
+        oauth2_backend.revoke_all_tokens()
     return SimpleBody.model_construct(data=new_settings)
 
 
 @router.delete(
     "/auth/settings",
     summary="Reset auth settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Reset authorization and authentication settings to their defaults.
 
         The new settings are returned.
-        """
-    ),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+        """),
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("reset CRS settings")),
+    ],
 )
 async def delete_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],

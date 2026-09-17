@@ -22,10 +22,11 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { ERUtilsResults } from '../hooks'
 import type { RecoveryContentProps } from '../types'
 
-export function CancelRun(props: RecoveryContentProps): JSX.Element {
+export function CancelRun(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { CANCEL_RUN } = RECOVERY_MAP

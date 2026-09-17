@@ -20,6 +20,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -44,7 +45,7 @@ interface TemperatureModuleFixtureProps {
 
 export function TemperatureModuleItem(
   props: TemperatureModuleFixtureProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

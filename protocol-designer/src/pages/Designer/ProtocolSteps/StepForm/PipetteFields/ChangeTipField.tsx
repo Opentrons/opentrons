@@ -4,6 +4,7 @@ import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 
 import { getDisabledChangeTipOptions } from './utils'
 
+import type { ReactNode } from 'react'
 import type { ChangeTipOptions } from '@opentrons/step-generation'
 import type { FieldProps } from '../types'
 import type { DisabledChangeTipArgs } from './utils'
@@ -18,7 +19,7 @@ const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
 
 export function ChangeTipField(
   props: FieldProps & DisabledChangeTipArgs
-): JSX.Element {
+): ReactNode {
   const {
     aspirateWells,
     dispenseWells,

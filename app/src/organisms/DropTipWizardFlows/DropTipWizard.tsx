@@ -50,6 +50,7 @@ import {
   useConfirmPosition,
 } from './steps'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardFlowsProps } from '.'
 import type {
   DropTipBlowoutLocationDetails,
@@ -65,7 +66,7 @@ export type DropTipWizardProps = DropTipWizardFlowsProps &
     dropTipCommandLocations: DropTipBlowoutLocationDetails[]
   }
 
-export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
+export function DropTipWizard(props: DropTipWizardProps): ReactNode {
   const {
     issuedCommandsType,
     activeMaintenanceRunId,
@@ -90,6 +91,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
     isOnDevice,
     errorDetails,
     handleMustHome: dropTipCommands.handleMustHome,
+    handleClearError: props.clearErrorDetails,
   })
 
   const goBackRunValid = (): Promise<void> => {
@@ -127,7 +129,7 @@ export function DropTipWizard(props: DropTipWizardProps): JSX.Element {
 
 export function DropTipWizardContainer(
   props: DropTipWizardContainerProps
-): JSX.Element {
+): ReactNode {
   const { issuedCommandsType } = props
 
   const buildDTWizType = (): JSX.Element => {
@@ -143,7 +145,7 @@ export function DropTipWizardContainer(
 
 export function DropTipWizardFixitType(
   props: DropTipWizardContainerProps
-): JSX.Element {
+): ReactNode {
   return (
     <Flex css={INTERVENTION_CONTAINER_STYLE}>
       <DropTipWizardContent {...props} />
@@ -153,7 +155,7 @@ export function DropTipWizardFixitType(
 
 export function DropTipWizardSetupType(
   props: DropTipWizardContainerProps
-): JSX.Element {
+): ReactNode {
   return createPortal(
     props.isOnDevice ? (
       <Flex css={SIMPLE_CONTAINER_STYLE}>
@@ -178,7 +180,7 @@ export function DropTipWizardSetupType(
 
 export const DropTipWizardContent = (
   props: DropTipWizardContainerProps
-): JSX.Element => {
+): ReactNode => {
   const {
     activeMaintenanceRunId,
     currentStep,
@@ -191,7 +193,7 @@ export const DropTipWizardContent = (
   } = props
 
   const { t } = useTranslation('drop_tip_wizard')
-  const confirmPositionUtils = useConfirmPosition(currentStep)
+  const confirmPositionUtils = useConfirmPosition(currentStep, errorDetails)
 
   function buildGettingReady(): JSX.Element {
     return <InProgressModal description={t('getting_ready')} />

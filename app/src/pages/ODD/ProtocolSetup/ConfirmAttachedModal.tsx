@@ -10,6 +10,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmAttachedModalProps {
@@ -22,7 +23,7 @@ export function ConfirmAttachedModal({
   onCloseClick,
   isProceedToRunModal,
   onConfirmClick,
-}: ConfirmAttachedModalProps): JSX.Element {
+}: ConfirmAttachedModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('confirm_heater_shaker_module_modal_title'),

@@ -2,16 +2,13 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { ApiHostProvider } from '@opentrons/react-api-client'
-
-import { OPENTRONS_USB, UNREACHABLE } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { UNREACHABLE } from '/app/redux/discovery'
 import {
   getRobotUpdateSession,
   robotUpdateIgnored,
   setRobotUpdateSeen,
 } from '/app/redux/robot-update'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
 import { ViewUpdateModal } from './ViewUpdateModal'
@@ -37,10 +34,16 @@ const UpdateBuildroot = NiceModal.create(
     const robotName = useRef<string>(robot?.name ?? '')
     const dispatch = useDispatch<Dispatch>()
     const session = useSelector(getRobotUpdateSession)
-    const token = useAccessTokenForRobot(robot?.name ?? null)
     if (!hasSeenSessionOnce.current && session) {
       hasSeenSessionOnce.current = true
     }
+
+    // Dismiss so the progress modal cannot stay up with no close control.
+    useEffect(() => {
+      if (hasSeenSessionOnce.current && session == null) {
+        modal.remove()
+      }
+    }, [session, modal])
 
     useEffect(
       () => {
@@ -65,23 +68,18 @@ const UpdateBuildroot = NiceModal.create(
       [robotName, close]
     )
 
-    if (hasSeenSessionOnce.current) {
+    if (hasSeenSessionOnce.current && session != null) {
       return (
-        <ApiHostProvider
-          hostname={robot?.ip ?? null}
-          port={robot?.port ?? null}
-          requestor={
-            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-          }
-          token={token}
-        >
+        <ApiHostProvider robotName={robotName.current}>
           <RobotUpdateProgressModal
             robotName={robotName.current}
             session={session}
-            closeUpdateBuildroot={modal.remove}
+            closeRobotUpdate={modal.remove}
           />
         </ApiHostProvider>
       )
+    } else if (hasSeenSessionOnce.current) {
+      return null
     } else if (robot != null && robot.status !== UNREACHABLE) {
       return (
         <ViewUpdateModal

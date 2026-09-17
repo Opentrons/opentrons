@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Awaitable, Callable
 
 from typing_extensions import Protocol
 
@@ -16,4 +16,10 @@ class EventSourcer(Protocol):
 
         The returned callable removes the callback.
         """
+        ...
+
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
         ...

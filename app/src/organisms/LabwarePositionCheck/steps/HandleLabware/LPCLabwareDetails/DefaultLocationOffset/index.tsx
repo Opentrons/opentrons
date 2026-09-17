@@ -26,12 +26,11 @@ import {
 
 import { ManageDefaultOffsetBtn } from './ManageDefaultOffsetBtn'
 
+import type { ReactNode } from 'react'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function DefaultLocationOffset(
-  props: LPCWizardContentProps
-): JSX.Element {
+export function DefaultLocationOffset(props: LPCWizardContentProps): ReactNode {
   const { runId } = props
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()

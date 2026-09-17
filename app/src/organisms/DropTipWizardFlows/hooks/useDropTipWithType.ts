@@ -20,6 +20,7 @@ export type UseDTWithTypeParams = DropTipWizardFlowsProps & {
 export interface UseDropTipWithTypeResult {
   activeMaintenanceRunId: string | null
   errorDetails: ErrorDetails | null
+  clearErrorDetails: () => void
   isExiting: boolean
   isCommandInProgress: boolean
   dropTipCommands: UseDropTipCommandsResult
@@ -34,16 +35,21 @@ export interface UseDropTipWithTypeResult {
 export function useDropTipWithType(
   params: UseDTWithTypeParams
 ): UseDropTipWithTypeResult {
-  const { issuedCommandsType, fixitCommandTypeUtils } = params
+  const { issuedCommandsType, fixitCommandTypeUtils, closeFlow } = params
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
-  const { errorDetails, setErrorDetails } = useErrorDetails()
+  const { errorDetails, setErrorDetails, clearErrorDetails } = useErrorDetails()
   const {
     commandDocState,
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation('drop_tips')
+  } = useMaintenanceRunDocumentation(
+    'drop_tips',
+    // Prefer the fixit cancel handler so ER does not re-enter drop tip (and
+    // re-prompt) when the user backs out of documentation.
+    fixitCommandTypeUtils?.onDocumentationCancel ?? closeFlow
+  )
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
@@ -76,6 +82,7 @@ export function useDropTipWithType(
   return {
     activeMaintenanceRunId,
     errorDetails,
+    clearErrorDetails,
     isExiting,
     dropTipCommands,
     isCommandInProgress: dtCreateCommandUtils.isCommandInProgress,
@@ -86,11 +93,20 @@ export function useDropTipWithType(
 function useErrorDetails(): {
   errorDetails: ErrorDetails | null
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
+  clearErrorDetails: () => void
 } {
   const [errorDetails, setErrorDetails] = useState<null | ErrorDetails>(null)
   const setRobustErrorDetails = useDropTipCommandErrors(setErrorDetails)
 
-  return { errorDetails, setErrorDetails: setRobustErrorDetails }
+  const clearErrorDetails = (): void => {
+    setErrorDetails(null)
+  }
+
+  return {
+    errorDetails,
+    setErrorDetails: setRobustErrorDetails,
+    clearErrorDetails,
+  }
 }
 
 /**

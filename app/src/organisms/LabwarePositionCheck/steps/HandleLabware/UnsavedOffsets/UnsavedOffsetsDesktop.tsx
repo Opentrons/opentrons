@@ -20,6 +20,7 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 interface UnsavedOffsetsDesktopProps extends LPCWizardContentProps {
@@ -28,7 +29,7 @@ interface UnsavedOffsetsDesktopProps extends LPCWizardContentProps {
 
 export function UnsavedOffsetsDesktop(
   props: UnsavedOffsetsDesktopProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const { toggleShowUnsavedOffsetsDesktop, runId } = props
   const dispatch = useDispatch()

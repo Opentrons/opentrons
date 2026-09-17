@@ -6,6 +6,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   AdditionalCustomLabwareSourceFolder,
+  AuditLogFolder,
   ClearUnavailableRobots,
   EnableDevTools,
   OverridePathToPython,
@@ -60,6 +61,7 @@ describe('AdvancedSettings', () => {
     vi.mocked(AdditionalCustomLabwareSourceFolder).mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
+    vi.mocked(AuditLogFolder).mockReturnValue(<div>mock AuditLogFolder</div>)
   })
 
   afterEach(() => {
@@ -74,6 +76,11 @@ describe('AdvancedSettings', () => {
   it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
     render()
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
+  })
+
+  it('should render mock AuditLogFolder section', () => {
+    render()
+    screen.getByText('mock AuditLogFolder')
   })
 
   it('should render mock robot caching section', () => {

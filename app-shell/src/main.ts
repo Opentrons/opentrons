@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerAudit } from './audit'
 import { registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
@@ -127,6 +128,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerUpdate(dispatch),
           registerRobotUpdate(dispatch),
           registerLabware(dispatch, window),
+          registerAudit(dispatch, window),
           registerSystemInfo(dispatch),
           registerProtocolStorage(dispatch),
           registerUsb(dispatch),

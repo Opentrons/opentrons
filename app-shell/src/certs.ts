@@ -1,5 +1,6 @@
 import { pbkdf2, subtle, X509Certificate } from 'crypto'
 import { mkdir, open, readdir, rm, stat } from 'fs/promises'
+import { Agent as HttpsAgent } from 'https'
 import { join } from 'path'
 import { promisify } from 'util'
 import { app, ipcMain } from 'electron'
@@ -23,6 +24,19 @@ const CERT_DECRYPTION_FORWARD_CLOCK_SKEW_FAR_S = 10 * 365 * 24 * 60 * 60
 const CERT_SUBDIR = 'robot-certificates'
 
 const log = createLogger('certs')
+
+/**
+ * Convert a Node.js certificate fingerprint into a safe filename.
+ *
+ * `X509Certificate.fingerprint256` is colon-separated hex, e.g. `AB:CD:...`.
+ * Colons are illegal in Windows filenames and display oddly in macOS Finder,
+ * so strip them and keep only the hex digits.
+ *
+ * Exported for tests.
+ */
+export function getCertificateFilename(certificate: X509Certificate): string {
+  return `${certificate.fingerprint256.replaceAll(':', '')}.cer`
+}
 
 async function wrappedStat(
   path: string
@@ -66,7 +80,7 @@ async function saveCertificateToDisk(
   certificate: X509Certificate
 ): Promise<void> {
   const certDir = await getCertDir()
-  const certPath = join(certDir, `${certificate.fingerprint256}.cer`)
+  const certPath = join(certDir, getCertificateFilename(certificate))
   await writeFile(certPath, certificate.raw)
   log.info(`Saved certificate to ${certPath}`)
   addCertificateToMap(certificate)
@@ -139,6 +153,24 @@ function addCertificateToMap(certificate: X509Certificate): void {
   const sha256Fingerprint = certificate.fingerprint256
   knownCertificates.set(sha256Fingerprint, certificate)
   log.info(`added certificate at ${sha256Fingerprint}`)
+}
+
+/**
+ * HTTPS agent for main-process requests to robots.
+ *
+ * Renderer/Chromium traffic is covered by `certificate-error`.
+ * Node `fetch` in the shell does not use that path, so HTTPS uploads must
+ * trust the same installed robot CAs explicitly. Hostname verification is
+ * skipped because robots are often addressed by IP while certs use a name.
+ */
+export function createRobotHttpsAgent(): HttpsAgent {
+  const ca = Array.from(knownCertificates.values()).map(cert => cert.toString())
+
+  return new HttpsAgent({
+    ca,
+    rejectUnauthorized: true,
+    checkServerIdentity: () => undefined,
+  })
 }
 
 /**

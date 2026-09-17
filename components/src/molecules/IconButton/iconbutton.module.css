@@ -5,8 +5,18 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-12);
+  border: none;
   border-radius: 50%;
   background-color: var(--variant-default);
+  outline: none;
+}
+
+.size_sm {
+  padding: var(--spacing-8);
+}
+
+.size_md {
+  padding: var(--spacing-12);
 }
 
 .icon_button:active {
@@ -17,11 +27,16 @@
   background-color: var(--variant-hover);
 }
 
+
+.icon_button:focus-visible {
+  background-color: var(--variant-hover);
+}
+
 .icon_button:focus-visible::after {
   position: absolute;
   border: 2px solid var(--variant-default);
   border-radius: 50%;
   content: '';
-  inset: -8px;
+  inset: -4px;
   pointer-events: none;
 }

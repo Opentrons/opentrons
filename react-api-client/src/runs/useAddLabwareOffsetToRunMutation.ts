@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { addLabwareOffsetToRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
@@ -10,6 +11,7 @@ import type {
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 interface AddLabwareOffsetToRunParams {
   runId: string
@@ -28,28 +30,33 @@ export type UseAddLabwareOffsetToRun = UseMutationResult<
   >
 }
 
-export function useAddLabwareOffsetToRunMutation(): UseAddLabwareOffsetToRun {
+export function useAddLabwareOffsetToRunMutation(
+  documentationState: DocumentationState
+): UseAddLabwareOffsetToRun {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     LabwareOffset,
     unknown,
     AddLabwareOffsetToRunParams
-  >(({ runId, data }) =>
-    addLabwareOffsetToRun(host!, runId, data)
-      .then(response => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
-        return response.data
-      })
-      .catch((e: Error) => {
-        console.error(`error creating labware offsets: ${e.message}`)
-        throw e
-      })
+  >(
+    documentationState,
+    ['apply_offsets'],
+    ({ variables: { runId, data }, userNotes }) =>
+      addLabwareOffsetToRun(host!, runId, data, userNotes)
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'runs'))
+            .catch((e: Error) => {
+              console.error(`error invalidating runs query: ${e.message}`)
+            })
+          return response.data
+        })
+        .catch((e: Error) => {
+          console.error(`error creating labware offsets: ${e.message}`)
+          throw e
+        })
   )
 
   return {

@@ -21,6 +21,8 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 
+import type { ReactNode } from 'react'
+
 export interface CalibrationStatusCardProps {
   robotName: string
   setShowHowCalibrationWorksModal: (
@@ -31,7 +33,7 @@ export interface CalibrationStatusCardProps {
 export function CalibrationStatusCard({
   robotName,
   setShowHowCalibrationWorksModal,
-}: CalibrationStatusCardProps): JSX.Element {
+}: CalibrationStatusCardProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { taskListStatus } = useCalibrationTaskList()
 

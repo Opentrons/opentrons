@@ -5,6 +5,7 @@ import { Icon, ListButton, StyledText } from '@opentrons/components'
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { MediumButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
@@ -12,6 +13,7 @@ import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
+import type { ReactNode } from 'react'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
@@ -27,12 +29,13 @@ export function CameraControlsHome({
   toggleShowControls,
   settings,
   runId,
-}: CameraControlsHomeProps): JSX.Element {
+}: CameraControlsHomeProps): ReactNode {
   const { t } = useTranslation('device_settings')
+  const documentationState = useDocumentationState()
   const {
     createCameraImageSettings,
     isLoading: isCreateCameraImageSettingsLoading,
-  } = useCreateCameraImageSettings()
+  } = useCreateCameraImageSettings(documentationState)
   const { isLoading, imgPath, takePhoto } = usePreviewImage(
     {
       zoom: settings.zoom,
@@ -40,7 +43,8 @@ export function CameraControlsHome({
       contrast: settings.contrast,
       saturation: settings.saturation,
     },
-    runId
+    runId,
+    documentationState
   )
 
   const [showModal, setShowModal] = useState(false)
@@ -156,7 +160,7 @@ function SettingButton({
   onClick,
   title,
   value,
-}: SettingButtonProps): JSX.Element {
+}: SettingButtonProps): ReactNode {
   return (
     <ListButton
       type="noActive"

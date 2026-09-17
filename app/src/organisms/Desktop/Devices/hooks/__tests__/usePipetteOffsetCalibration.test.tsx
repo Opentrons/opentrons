@@ -17,8 +17,8 @@ import { usePipetteOffsetCalibration } from '..'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { AttachedPipette, Mount } from '@opentrons/api-client'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { AttachedPipette, Mount } from '/app/redux/pipettes/types'
 import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('/app/redux/calibration')

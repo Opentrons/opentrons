@@ -21,8 +21,10 @@ import type {
 // TODO(jh, 03-14-25): Remove this adapter logic and Mixpanel event once analytics
 //  indicate that users no longer run old analyses.
 
-// If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
-// otherwise, use the current analysis.
+/**
+ * If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
+ * otherwise, use the current analysis.
+ */
 export function useCompatibleAnalysis(
   runId: string | null,
   runRecord: Run | undefined,

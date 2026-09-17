@@ -21,6 +21,7 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
@@ -34,7 +35,7 @@ export interface TerseOffsetTableProps {
 export function TerseOffsetTable({
   offsets,
   labwareDefinitions,
-}: TerseOffsetTableProps): JSX.Element {
+}: TerseOffsetTableProps): ReactNode {
   const { i18n, t } = useTranslation('labware_position_check')
   return (
     <TerseTable>

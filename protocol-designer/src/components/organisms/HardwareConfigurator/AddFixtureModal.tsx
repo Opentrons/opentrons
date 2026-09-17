@@ -58,6 +58,7 @@ import {
 } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -98,15 +99,12 @@ interface AddFixtureModalProps {
   existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
-  | 'modulesOrFixtures'
-  | 'fixtureOptions'
-  | 'moduleOptions'
-  | 'wasteChuteOptions'
+  'modulesOrFixtures' | 'fixtureOptions' | 'moduleOptions' | 'wasteChuteOptions'
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
 //  so cleanly.
-export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
+export function AddFixtureModal(props: AddFixtureModalProps): ReactNode {
   const {
     cutoutId,
     closeModal,
@@ -345,6 +343,24 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       .map(cf => cf.id)
       .includes(newModule.cutoutFixtureId as CutoutFixtureId)
 
+    const isVacuumModule = getCutoutFixturesForModuleModel(
+      VACUUM_MODULE_V1,
+      deckDef
+    )
+      .map(cf => cf.id)
+      .includes(newModule.cutoutFixtureId as CutoutFixtureId)
+
+    let slot: string = getSlotDisplayNameFromAAWithFakes(
+      newModule.addressableAreaId as AddressableAreaName
+    )
+    if (isThermocyclerModule) {
+      slot = 'B1'
+    }
+    if (isVacuumModule) {
+      slot = 'A3'
+    }
+    console.log({ isVacuumModule, slot })
+
     const updatedModules: FormModules = {
       ...filteredModules,
       ...(matchedModule != null &&
@@ -355,11 +371,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel as ModuleModel),
-        slot: isThermocyclerModule
-          ? 'B1'
-          : getSlotDisplayNameFromAAWithFakes(
-              newModule.addressableAreaId as AddressableAreaName
-            ),
+        slot,
         cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
         cutoutId: isThermocyclerModule ? 'cutoutB1' : newModule.cutoutId,
       },

@@ -18,9 +18,9 @@ import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipet
 import { useDeckCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { OverflowMenu } from '..'

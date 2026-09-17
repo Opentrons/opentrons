@@ -27,6 +27,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     AddLinearMoveRequest,
+    AddSensorLinearMoveRequest,
     BindSensorOutputRequest,
     ExecuteMoveGroupRequest,
     MoveCompleted,
@@ -57,6 +58,46 @@ from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
+
+
+def _with_echoed_move_indices(
+    responder: CanLoopback.LoopbackResponder,
+) -> CanLoopback.LoopbackResponder:
+    """Make a responder echo the message index of the request each completion answers.
+
+    Firmware copies the message index of the request that set a move up into the
+    completion it sends for that move, and MoveScheduler relies on that to tell the
+    completions of its own moves from the rest of the traffic on the bus. A responder
+    that invents an index instead would have its completions ignored.
+    """
+    sent: Dict[Tuple[int, int, int], int] = {}
+
+    def _wrapped(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        if isinstance(message, (AddLinearMoveRequest, AddSensorLinearMoveRequest)):
+            sent[
+                (
+                    node_id.value,
+                    message.payload.group_id.value,
+                    message.payload.seq_id.value,
+                )
+            ] = message.payload.message_index.value
+        responses = responder(node_id, message)
+        for _, response, source in responses:
+            if isinstance(response, MoveCompleted):
+                index = sent.get(
+                    (
+                        source.value,
+                        response.payload.group_id.value,
+                        response.payload.seq_id.value,
+                    )
+                )
+                if index is not None:
+                    response.payload.message_index = UInt32Field(index)
+        return responses
+
+    return _wrapped
 
 
 @pytest.fixture
@@ -239,7 +280,7 @@ async def test_liquid_probe(
                     assert message.payload.velocity_mm.value == velocity
             return []
 
-    message_send_loopback.add_responder(move_responder)
+    message_send_loopback.add_responder(_with_echoed_move_indices(move_responder))
 
     position = await liquid_probe(
         messenger=mock_messenger,
@@ -338,7 +379,7 @@ async def test_capacitive_probe(
         else:
             return []
 
-    message_send_loopback.add_responder(move_responder)
+    message_send_loopback.add_responder(_with_echoed_move_indices(move_responder))
 
     status = await capacitive_probe(
         mock_messenger, target_node, motor_node, distance, speed
@@ -425,7 +466,7 @@ async def test_capacitive_sweep(
         else:
             return []
 
-    message_send_loopback.add_responder(move_responder)
+    message_send_loopback.add_responder(_with_echoed_move_indices(move_responder))
 
     result = await capacitive_pass(
         mock_messenger, target_node, motor_node, distance, speed

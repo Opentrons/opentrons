@@ -12,9 +12,9 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 interface PipetteStatus {
@@ -76,15 +76,13 @@ interface ProtocolRunModuleControlsProps {
 export const ProtocolRunModuleControls = ({
   robotName,
   runId,
-}: ProtocolRunModuleControlsProps): JSX.Element => {
+}: ProtocolRunModuleControlsProps): ReactNode => {
   const { t } = useTranslation('protocol_setup')
   const {
     attachPipetteRequired,
     calibratePipetteRequired,
     updatePipetteFWRequired,
   } = usePipetteIsReady()
-  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
-
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId,
     true
@@ -129,10 +127,6 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
-              latestRequestId={getLatestRequestId(
-                module.attachedModuleMatch.serialNumber
-              )}
-              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}
@@ -157,10 +151,6 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
-              latestRequestId={getLatestRequestId(
-                module.attachedModuleMatch.serialNumber
-              )}
-              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}

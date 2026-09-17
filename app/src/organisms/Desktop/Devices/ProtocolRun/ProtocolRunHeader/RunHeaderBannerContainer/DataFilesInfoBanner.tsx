@@ -14,6 +14,8 @@ import {
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface DataFilesInfoBannerProps {
   hasImages: boolean
   hasCsvFiles: boolean
@@ -24,7 +26,7 @@ export function DataFilesInfoBanner({
   hasCsvFiles,
   hasImages,
   robotName,
-}: DataFilesInfoBannerProps): JSX.Element {
+}: DataFilesInfoBannerProps): ReactNode {
   const navigate = useNavigate()
   const { t } = useTranslation('run_details')
 

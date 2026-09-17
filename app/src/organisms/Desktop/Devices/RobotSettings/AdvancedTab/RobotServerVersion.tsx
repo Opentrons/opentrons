@@ -22,6 +22,7 @@ import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface RobotServerVersionProps {
@@ -33,7 +34,7 @@ const GITHUB_LINK =
 
 export function RobotServerVersion({
   robotName,
-}: RobotServerVersionProps): JSX.Element {
+}: RobotServerVersionProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
@@ -56,7 +57,6 @@ export function RobotServerVersion({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             paddingBottom={SPACING.spacing4}
-            id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_version')}
           </LegacyStyledText>
@@ -75,7 +75,6 @@ export function RobotServerVersion({
             <Link
               external
               href={GITHUB_LINK}
-              id="AdvancedSettings_GitHubLink"
               css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
           </LegacyStyledText>

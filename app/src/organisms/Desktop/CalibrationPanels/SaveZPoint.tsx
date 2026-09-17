@@ -31,7 +31,7 @@ import * as Sessions from '/app/redux/sessions'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
@@ -46,7 +46,7 @@ const assetMap = {
   },
 }
 
-export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
+export function SaveZPoint(props: CalibrationPanelProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { isMulti, mount, sendCommands, sessionType } = props
   const demoAsset = useMemo(

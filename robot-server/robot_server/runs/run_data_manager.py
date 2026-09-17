@@ -1,7 +1,15 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from opentrons import config
 from opentrons.protocol_engine import (
@@ -36,11 +44,11 @@ from .error_recovery_models import ErrorRecoveryRule
 from .run_models import BadRun, Run, RunDataError
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -58,6 +66,7 @@ def _build_run(
         return Run.model_construct(
             id=run_resource.run_id,
             protocolId=run_resource.protocol_id,
+            logPeriodId=run_resource.log_period_id,
             createdAt=run_resource.created_at,
             actions=run_resource.actions,
             status=state_summary.status,
@@ -68,6 +77,7 @@ def _build_run(
             pipettes=state_summary.pipettes,
             modules=state_summary.modules,
             current=current,
+            signedBy=run_resource.signed_by,
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
@@ -121,6 +131,7 @@ def _build_run(
         dataError=run_loading_error,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=state.status,
@@ -130,6 +141,7 @@ def _build_run(
         pipettes=state.pipettes,
         modules=state.modules,
         current=current,
+        signedBy=run_resource.signed_by,
         completedAt=state.completedAt,
         startedAt=state.startedAt,
         liquids=state.liquids,
@@ -142,6 +154,14 @@ def _build_run(
 
 class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
+
+
+class RunNotCompleteError(ValueError):
+    """Error raised when trying to sign a run that has not completed."""
+
+
+class RunSignoffRequiredError(ValueError):
+    """Error raised when an action requires the run to be signed off first."""
 
 
 class PreSerializedCommandsNotAvailableError(LookupError):
@@ -165,7 +185,7 @@ class RunDataManager:
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
         camera_setting_store: CameraSettingStore,
-        task_runner: TaskRunner,
+        access_control_setting_store: AccessControlSettingStore,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
     ) -> None:
@@ -174,13 +194,13 @@ class RunDataManager:
 
         self._error_recovery_setting_store = error_recovery_setting_store
         self._camera_setting_store = camera_setting_store
+        self._access_control_setting_store = access_control_setting_store
         # todo(mm, 2024-11-22): Storing the list of error recovery rules is outside the
         # responsibilities of this class. It's also clunky for us to store it like this
         # because we need to remember to clear it whenever the current run changes.
         # This error recovery mapping stuff probably belongs in RunOrchestratorStore.
         self._current_run_error_recovery_rules: List[ErrorRecoveryRule] = []
 
-        self._task_runner = task_runner
         self._runs_publisher = runs_publisher
         self._file_provider = file_provider
 
@@ -200,6 +220,8 @@ class RunDataManager:
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        access_control_status: bool,
+        log_period_id: Optional[str],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
@@ -213,6 +235,8 @@ class RunDataManager:
             run_time_param_values: Any runtime parameter values to set.
             run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
+            access_control_status: Status of the Auth-Server access control enablement.
+            log_period_id: The log period this run exists in, if audit logging is enabled
 
         Returns:
             The run resource.
@@ -220,9 +244,15 @@ class RunDataManager:
         Raise:
             RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
+            RunSignoffRequiredError: The previous current run must be signed
+                off before it can be replaced.
         """
+        self._run_orchestrator_store.set_access_control_status(
+            access_control_mode=access_control_status
+        )
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
+            self._raise_if_run_requires_signoff(prev_run_id, access_control_status)
             # Allow clear() to propagate RunConflictError.
             prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
@@ -275,13 +305,16 @@ class RunDataManager:
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
+            log_period_id=log_period_id,
         )
-        run_time_parameters = self._run_orchestrator_store.get_run_time_parameters()
+        run_time_parameters = (
+            await self._run_orchestrator_store.get_run_time_parameters()
+        )
         self._run_store.insert_csv_rtp(
             run_id=run_id, run_time_parameters=run_time_parameters
         )
 
-        self._runs_publisher.start_publishing_for_run(
+        await self._runs_publisher.start_publishing_for_run(
             get_current_command=self.get_current_command,
             get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
@@ -291,10 +324,10 @@ class RunDataManager:
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
-        self._run_orchestrator_store.add_camera_capture_image_settings(
+        await self._run_orchestrator_store.add_camera_capture_image_settings(
             capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
         )
 
@@ -305,7 +338,7 @@ class RunDataManager:
             run_time_parameters=run_time_parameters,
         )
 
-    def get(self, run_id: str) -> Union[Run, BadRun]:
+    async def get(self, run_id: str) -> Union[Run, BadRun]:
         """Get a run resource.
 
         This method will pull from the current run or the historical runs,
@@ -321,13 +354,13 @@ class RunDataManager:
             RunNotFoundError: The given run identifier does not exist.
         """
         run_resource = self._run_store.get(run_id=run_id)
-        state_summary = self._get_state_summary(run_id=run_id)
-        parameters = self._get_run_time_parameters(run_id=run_id)
+        state_summary = await self._get_state_summary(run_id=run_id)
+        parameters = await self._get_run_time_parameters(run_id=run_id)
         current = run_id == self._run_orchestrator_store.current_run_id
 
         return _build_run(run_resource, state_summary, current, parameters)
 
-    def get_run_loaded_labware_definitions(
+    async def get_run_loaded_labware_definitions(
         self, run_id: str
     ) -> List[LabwareDefinition]:
         """Get a run's load labware definitions.
@@ -351,9 +384,9 @@ class RunDataManager:
                 f"Cannot get load labware definitions of {run_id} because it is not the current run."
             )
 
-        return self._run_orchestrator_store.get_loaded_labware_definitions()
+        return await self._run_orchestrator_store.get_loaded_labware_definitions()
 
-    def get_all(self, length: Optional[int]) -> List[Union[Run, BadRun]]:
+    async def get_all(self, length: Optional[int]) -> List[Union[Run, BadRun]]:
         """Get current and stored run resources.
 
         Results are ordered from oldest to newest.
@@ -364,89 +397,121 @@ class RunDataManager:
         return [
             _build_run(
                 run_resource=run_resource,
-                state_summary=self._get_state_summary(run_resource.run_id),
+                state_summary=await self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id
                 == self._run_orchestrator_store.current_run_id,
-                run_time_parameters=self._get_run_time_parameters(run_resource.run_id),
+                run_time_parameters=await self._get_run_time_parameters(
+                    run_resource.run_id
+                ),
             )
             for run_resource in self._run_store.get_all(length)
         ]
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(self, run_id: str, access_control_status: bool) -> None:
         """Delete a current or historical run.
 
         Args:
             run_id: The identifier of the run to remove.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
+            # We will only raise for a signoff if the run is current. Uncurrent unsigned
+            # runs are allowed to be deleted, as they can come from runs interrupted by
+            # a power cycle or runs created before signoff was required.
+            self._raise_if_run_requires_signoff(run_id, access_control_status)
             await self._run_orchestrator_store.clear()
 
         self._runs_publisher.clean_up_run(run_id=run_id)
 
         self._run_store.remove(run_id=run_id)
 
-    async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
-        """Get and potentially archive the current run.
+    async def uncurrent(
+        self, run_id: str, access_control_status: bool
+    ) -> Union[Run, BadRun]:
+        """Archive the current run.
 
         Args:
-            run_id: The run to get and maybe archive.
-            current: Whether to mark the run as current or not.
-                     If `current` set to False, then the run is 'un-current'ed by
-                     stopping the run, saving the final run data to the run store,
-                     and clearing the engine and runner.
-                     If 'current' is True or not specified, we simply fetch the run's
-                     data from memory and database.
+            run_id: The run to un-current.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Returns:
-            The updated run.
+            The run after it has been un-currented.
 
         Raises:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
-            RunConflictError: The run cannot be updated because it is not idle.
+            RunConflictError: The run cannot be un-currented because it is not idle.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be un-currented.
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
-                f"Cannot update {run_id} because it is not the current run."
+                f"Cannot un-current {run_id} because it is not the current run."
             )
 
-        next_current = current if current is False else True
+        self._raise_if_run_requires_signoff(run_id, access_control_status)
 
-        if next_current is False:
-            run_result = await self._run_orchestrator_store.clear()
-            state_summary = run_result.state_summary
-            parameters = run_result.parameters
-            run_resource: Union[RunResource, BadRunResource] = (
-                self._run_store.update_run_state(
-                    run_id=run_id,
-                    summary=run_result.state_summary,
-                    commands=run_result.commands,
-                    command_annotations=run_result.command_annotations,
-                    run_time_parameters=run_result.parameters,
-                )
+        run_result = await self._run_orchestrator_store.clear()
+        self._file_provider.clear_run_metadata()
+
+        run_resource: Union[RunResource, BadRunResource] = (
+            self._run_store.update_run_state(
+                run_id=run_id,
+                summary=run_result.state_summary,
+                commands=run_result.commands,
+                command_annotations=run_result.command_annotations,
+                run_time_parameters=run_result.parameters,
             )
-            self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
-            self._file_provider.clear_run_metadata()
-        else:
-            state_summary = self._run_orchestrator_store.get_state_summary()
-            parameters = self._run_orchestrator_store.get_run_time_parameters()
-            run_resource = self._run_store.get(run_id=run_id)
+        )
+        self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
 
         self._runs_publisher.publish_runs_advise_refetch(run_id)
 
         return _build_run(
             run_resource=run_resource,
-            state_summary=state_summary,
-            current=next_current,
-            run_time_parameters=parameters,
+            state_summary=run_result.state_summary,
+            current=False,
+            run_time_parameters=run_result.parameters,
         )
 
-    def get_commands_slice(
+    async def set_signed_by(self, run_id: str, signed_by: str) -> Union[Run, BadRun]:
+        """Record that a human has reviewed the current completed run.
+
+        Args:
+            run_id: The run to sign.
+            signed_by: Signature of the user who reviewed the run.
+
+        Returns:
+            The run after the signature has been stored.
+
+        Raises:
+            RunNotCurrentError: The run is not the current run.
+            RunNotCompleteError: The run has not reached a terminal status.
+        """
+        if run_id != self._run_orchestrator_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot sign {run_id} because it is not the current run."
+            )
+
+        if not await self._run_orchestrator_store.get_is_run_terminal():
+            raise RunNotCompleteError(
+                f"Cannot sign {run_id} because it has not completed."
+            )
+
+        self._run_store.set_signed_by(run_id=run_id, signed_by=signed_by)
+        self._runs_publisher.publish_runs_advise_refetch(run_id)
+        return await self.get(run_id=run_id)
+
+    async def get_commands_slice(
         self,
         run_id: str,
         cursor: Optional[int],
@@ -465,7 +530,7 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_slice(
+            return await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
                 include_fixit_commands=include_fixit_commands,
@@ -476,7 +541,7 @@ class RunDataManager:
             run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
         )
 
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self, run_id: str, cursor: int, length: int
     ) -> CommandErrorSlice:
         """Get a slice of run commands errors.
@@ -490,7 +555,7 @@ class RunDataManager:
             RunNotCurrentError: The given run identifier is not the current run.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_error_slice(
+            return await self._run_orchestrator_store.get_command_error_slice(
                 cursor=cursor, length=length
             )
         return self._run_store.get_commands_errors_slice(
@@ -524,7 +589,9 @@ class RunDataManager:
         else:
             return self._get_historical_run_last_command(run_id=run_id)
 
-    def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
+    async def get_recovery_target_command(
+        self, run_id: str
+    ) -> Optional[CommandPointer]:
         """Get the current error recovery target.
 
         See `ProtocolEngine.state_view.commands.get_recovery_target()`.
@@ -533,12 +600,12 @@ class RunDataManager:
             run_id: ID of the run.
         """
         if self._run_orchestrator_store.current_run_id == run_id:
-            return self._run_orchestrator_store.get_command_recovery_target()
+            return await self._run_orchestrator_store.get_command_recovery_target()
         else:
             # Historical runs can't have any ongoing error recovery.
             return None
 
-    def get_command(self, run_id: str, command_id: str) -> Command:
+    async def get_command(self, run_id: str, command_id: str) -> Command:
         """Get a run's command by ID.
 
         Args:
@@ -550,23 +617,25 @@ class RunDataManager:
             CommandNotFoundError: The given command identifier was not found.
         """
         if self._run_orchestrator_store.current_run_id == run_id:
-            return self._run_orchestrator_store.get_command(command_id=command_id)
+            return await self._run_orchestrator_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
-    def get_command_errors_count(self, run_id: str) -> int:
+    async def get_command_errors_count(self, run_id: str) -> int:
         """Get all command errors."""
         if run_id == self._run_orchestrator_store.current_run_id:
-            return len(self._run_orchestrator_store.get_command_errors())
+            return len(await self._run_orchestrator_store.get_command_errors())
         return self._run_store.get_command_errors_count(run_id)
 
-    def get_total_command_annotations_count(self, run_id: str) -> int:
+    async def get_total_command_annotations_count(self, run_id: str) -> int:
         """Get the total number of command annotations in the specified run."""
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_total_command_annotations_count()
+            return (
+                await self._run_orchestrator_store.get_total_command_annotations_count()
+            )
         return self._run_store.get_total_command_annotations_count(run_id)
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self, run_id: str, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
         """Get a slice of the run's commands annotations.
@@ -577,19 +646,21 @@ class RunDataManager:
             length: Length of slice to return.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_annotations_slice(
+            return await self._run_orchestrator_store.get_command_annotations_slice(
                 cursor=cursor, length=length
             )
         return self._run_store.get_command_annotations_slice(
             run_id=run_id, cursor=cursor, length=length
         )
 
-    def get_command_annotation(
+    async def get_command_annotation(
         self, run_id: str, annotation_id: str
     ) -> CommandAnnotation:
         """Get a run's command annotation by ID."""
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_command_annotation(annotation_id)
+            return await self._run_orchestrator_store.get_command_annotation(
+                annotation_id
+            )
         return self._run_store.get_command_annotation(run_id, annotation_id)
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
@@ -615,13 +686,13 @@ class RunDataManager:
 
         raise RunNotCurrentError()
 
-    def get_all_commands_as_preserialized_list(
+    async def get_all_commands_as_preserialized_list(
         self, run_id: str, include_fixit_commands: bool
     ) -> List[str]:
         """Get all commands of a run in a serialized json list."""
         if (
             run_id == self._run_orchestrator_store.current_run_id
-            and not self._run_orchestrator_store.get_is_run_terminal()
+            and not await self._run_orchestrator_store.get_is_run_terminal()
         ):
             raise PreSerializedCommandsNotAvailableError(
                 "Pre-serialized commands are only available after a run has ended."
@@ -630,7 +701,7 @@ class RunDataManager:
             run_id, include_fixit_commands
         )
 
-    def set_error_recovery_rules(
+    async def set_error_recovery_rules(
         self, run_id: str, rules: List[ErrorRecoveryRule]
     ) -> None:
         """Set the run's error recovery policy, in robot-server terms.
@@ -647,7 +718,7 @@ class RunDataManager:
         mapped_policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
             self._current_run_error_recovery_rules, is_enabled
         )
-        self._run_orchestrator_store.set_error_recovery_policy(
+        await self._run_orchestrator_store.set_error_recovery_policy(
             policy=mapped_policy,
             error_recovery_rules=self._current_run_error_recovery_rules,
             error_recovery_is_enabled=is_enabled,
@@ -661,19 +732,36 @@ class RunDataManager:
             )
         return self._current_run_error_recovery_rules
 
-    def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
+    def _raise_if_run_requires_signoff(
+        self, run_id: str, access_control_enabled: bool
+    ) -> None:
+        """Raise if the run must be signed off before leaving or deleting it."""
+        signoff_required = (
+            access_control_enabled
+            and self._access_control_setting_store.get_all().requireSignoffForProtocolLog
+        )
+        if signoff_required:
+            is_signed_off = self._run_store.get(run_id=run_id).signed_by is not None
+            if not is_signed_off:
+                raise RunSignoffRequiredError(
+                    f"Run {run_id} must be signed off before this action."
+                )
+
+    async def _get_state_summary(
+        self, run_id: str
+    ) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_state_summary()
+            return await self._run_orchestrator_store.get_state_summary()
         else:
             return self._run_store.get_state_summary(run_id=run_id)
 
-    def _get_good_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        summary = self._get_state_summary(run_id)
+    async def _get_good_state_summary(self, run_id: str) -> Optional[StateSummary]:
+        summary = await self._get_state_summary(run_id)
         return summary if isinstance(summary, StateSummary) else None
 
-    def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
+    async def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
         if run_id == self._run_orchestrator_store.current_run_id:
-            return self._run_orchestrator_store.get_run_time_parameters()
+            return await self._run_orchestrator_store.get_run_time_parameters()
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
 

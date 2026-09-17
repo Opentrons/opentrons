@@ -170,7 +170,7 @@ export const getIsPipettableLabware = (
   labwareDef: LabwareDefinition
 ): boolean => {
   // assume the labware can be a pipetting target if labware definition's `allowedRoles` is undefined
-  if (labwareDef.allowedRoles == null) {
+  if (labwareDef.allowedRoles == null || labwareDef.allowedRoles.length === 0) {
     return true
   }
   return (

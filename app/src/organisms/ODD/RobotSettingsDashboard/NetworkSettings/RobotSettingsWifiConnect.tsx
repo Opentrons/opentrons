@@ -1,18 +1,23 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { FAILURE, PENDING, SUCCESS } from '/app/redux/robot-api'
 
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 
-import type { RequestState } from '/app/redux/robot-api/types'
+import type { AxiosError } from 'axios'
 import type { SetSettingOption } from '../types'
 
 interface RobotSettingsWifiConnectProps {
   handleConnect: () => void
-  requestState: RequestState | null
+  isPending: boolean
+  isSuccess: boolean
+  isError: boolean
+  error: AxiosError | null
+  resetConfigure: () => void
   selectedSsid: string
   setCurrentOption: SetSettingOption
 }
@@ -22,16 +27,34 @@ interface RobotSettingsWifiConnectProps {
  */
 export function RobotSettingsWifiConnect({
   handleConnect,
-  requestState,
+  isPending,
+  isSuccess,
+  isError,
+  error,
+  resetConfigure,
   setCurrentOption,
   selectedSsid,
 }: RobotSettingsWifiConnectProps): JSX.Element | null {
   const { t } = useTranslation('device_settings')
+  const isDocumentedCancel =
+    isError && error != null && isDocumentedMutationError(error)
 
-  if (requestState == null) {
-    // should only get here briefly if at all
+  useEffect(() => {
+    if (isDocumentedCancel) {
+      resetConfigure()
+      setCurrentOption('RobotSettingsSetWifiCred')
+    }
+  }, [isDocumentedCancel, resetConfigure, setCurrentOption])
+
+  useEffect(() => {
+    if (isSuccess) {
+      setCurrentOption('RobotSettingsWifi')
+    }
+  }, [isSuccess, setCurrentOption])
+
+  if (isDocumentedCancel) {
     return null
-  } else if (requestState.status === PENDING) {
+  } else if (isPending) {
     return (
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -41,8 +64,10 @@ export function RobotSettingsWifiConnect({
         <ConnectingNetwork ssid={selectedSsid} />
       </Flex>
     )
-  } else if (requestState.status === FAILURE) {
-    const isInvalidPassword = requestState.response.status === 401
+  } else if (isError && error != null) {
+    const isInvalidPassword = error.response?.status === 401
+    const errorMessage =
+      error.message != null && error.message.length > 0 ? error.message : null
     return (
       <Flex flexDirection={DIRECTION_COLUMN} height="100%">
         <ChildNavigation
@@ -58,7 +83,7 @@ export function RobotSettingsWifiConnect({
           paddingTop={SPACING.spacing32}
         >
           <FailedToConnect
-            requestState={requestState}
+            errorMessage={errorMessage}
             selectedSsid={selectedSsid}
             isInvalidPassword={isInvalidPassword}
             handleTryAgain={() => {
@@ -73,9 +98,6 @@ export function RobotSettingsWifiConnect({
         </Flex>
       </Flex>
     )
-  } else if (requestState.status === SUCCESS) {
-    setCurrentOption('RobotSettingsWifi')
-    return null
   } else {
     return null
   }

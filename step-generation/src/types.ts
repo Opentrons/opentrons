@@ -114,9 +114,7 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    | ProfileBlockActivity
-    | TargetTempBlockActivity
-    | DeactivatedBlockActivity
+    ProfileBlockActivity | TargetTempBlockActivity | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -304,11 +302,25 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
+export type Choices = number[] | string[]
+
+export interface RuntimeParameter {
+  variableName: string
+  displayName: string
+  type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
+  default: string | number | boolean
+  minimum?: number
+  maximum?: number
+  choices?: Choices
+  unit?: string
+  description?: string
+}
+export interface RuntimeParameters {
+  [variableName: string]: RuntimeParameter
+}
+
 export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
+  'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
@@ -387,11 +399,7 @@ export interface PipetteEntities {
 
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
-  | 'always'
-  | 'once'
-  | 'never'
-  | 'perDest'
-  | 'perSource'
+  'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -971,6 +979,7 @@ export interface InvariantContext {
   stagingAreaEntities: StagingAreaEntities
   gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
+  runtimeParameters: RuntimeParameters
   config: Config
 }
 
@@ -1135,8 +1144,7 @@ export interface CommandsAndWarnings extends StepInfo {
   python?: string
 }
 export type CommandCreatorResult =
-  | CommandsAndWarnings
-  | CommandCreatorErrorResponse
+  CommandsAndWarnings | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
@@ -1185,5 +1193,4 @@ export type UnsafePipetteMovementReason =
     }
 
 export type PipetteMovementSafetyStatus =
-  | { isSafe: true }
-  | { isSafe: false; reason: UnsafePipetteMovementReason }
+  { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }

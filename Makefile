@@ -16,7 +16,6 @@ AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 DOCS_DIR := docs
-G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_DIR := hardware
 KEY_SERVER_DIR := key-server
 LABWARE_LIBRARY_DIR := labware-library
@@ -31,7 +30,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUDIT_SERVER_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUDIT_SERVER_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -44,7 +43,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
+format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
+FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
 
 ifeq ($(watch), true)
 	cover := false
@@ -254,7 +254,17 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-eslint lint-js-prettier
+
+# Regenerate the denylist used by opentrons/no-direct-mutating.
+.PHONY: generate-mutating-api-client-exports
+generate-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js
+
+# Fail if the committed denylist is stale vs api-client POST/PUT/PATCH/DELETE exports.
+.PHONY: check-mutating-api-client-exports
+check-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js --check
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
@@ -340,10 +350,10 @@ dev-backend:
 .PHONY: dev-backend-flex
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
-		$(MAKE) -C auth-server dev ';' \
-		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 ';' \
-		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
-		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C auth-server dev OT_AUTH_SERVER_audit_server_url=http://localhost:33970 ';' \
+		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 OT_AUDIT_SERVER_auth_server_url=http://localhost:31950 OT_AUDIT_SERVER_robot_server_url=http://localhost:31951 ';' \
+		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 OT_ROBOT_SERVER_audit_server_url=http://localhost:33970 BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 OT_SYSTEM_SERVER_audit_server_url=http://localhost:33970 ';' \
 		$(MAKE) -C key-server dev-mitmproxy ';' \
 		$(MAKE) dev-proxy ';' \
 		$(MAKE) dev-proxy-tls

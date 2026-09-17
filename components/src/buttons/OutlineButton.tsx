@@ -3,6 +3,7 @@ import cx from 'classnames'
 import { Button } from './Button'
 import styles from './buttons.module.css'
 
+import type { ReactNode } from 'react'
 import type { ButtonProps } from './Button'
 
 /**
@@ -11,7 +12,7 @@ import type { ButtonProps } from './Button'
  *
  * @deprecated Use {@link SecondaryBtn}
  */
-export function OutlineButton(props: ButtonProps): JSX.Element {
+export function OutlineButton(props: ButtonProps): ReactNode {
   const className = cx(styles.button_outline, props.className, {
     [styles.inverted]: props.inverted,
   })

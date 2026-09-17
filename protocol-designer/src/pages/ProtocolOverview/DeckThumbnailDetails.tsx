@@ -33,7 +33,7 @@ import {
 } from '../../utils'
 import { SlotHover } from './SlotHover'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckConfiguration,
@@ -54,7 +54,7 @@ interface DeckSetupDetailsProps {
 
 export const DeckThumbnailDetails = (
   props: DeckSetupDetailsProps
-): JSX.Element => {
+): ReactNode => {
   const {
     initialDeckSetup,
     deckDef,

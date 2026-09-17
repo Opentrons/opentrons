@@ -9,6 +9,8 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { useCloneRun } from '../useCloneRun'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 
@@ -17,6 +19,9 @@ import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs/useNotifyRunQuery')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID_NO_RTP: string = 'run_id_no_rtp'
@@ -128,7 +133,7 @@ describe('useCloneRun hook', () => {
       } as any)
 
     when(vi.mocked(useCreateRunMutation))
-      .calledWith(expect.anything())
+      .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
       createProtocolAnalysis: vi.fn(),
@@ -154,18 +159,21 @@ describe('useCloneRun hook', () => {
 
     const { result } = renderHook(() => useCloneRun(RUN_ID_NO_RTP), { wrapper })
     result.current && result.current.cloneRun()
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: [
-        {
-          definitionUri: 'uri1',
-          locationSequence: [1, 2],
-          offset: { x: 1, y: 1, z: 1 },
-        },
-      ],
-      runTimeParameterValues: {},
-      runTimeParameterFiles: {},
-    })
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: [
+          {
+            definitionUri: 'uri1',
+            locationSequence: [1, 2],
+            offset: { x: 1, y: 1, z: 1 },
+          },
+        ],
+        runTimeParameterValues: {},
+        runTimeParameterFiles: {},
+      },
+      { onError: expect.any(Function) }
+    )
   })
 
   it('should return a function that when called, calls createRun run with runTimeParameterValues overrides', async () => {
@@ -176,23 +184,26 @@ describe('useCloneRun hook', () => {
 
     const { result } = renderHook(() => useCloneRun(RUN_ID_RTP), { wrapper })
     result.current && result.current.cloneRun()
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: [
-        {
-          definitionUri: 'uri1',
-          locationSequence: [1, 2],
-          offset: { x: 1, y: 1, z: 1 },
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: [
+          {
+            definitionUri: 'uri1',
+            locationSequence: [1, 2],
+            offset: { x: 1, y: 1, z: 1 },
+          },
+        ],
+        runTimeParameterValues: {
+          number_param: 2,
+          boolean_param: false,
         },
-      ],
-      runTimeParameterValues: {
-        number_param: 2,
-        boolean_param: false,
+        runTimeParameterFiles: {
+          file_param: 'fileId_123',
+        },
       },
-      runTimeParameterFiles: {
-        file_param: 'fileId_123',
-      },
-    })
+      { onError: expect.any(Function) }
+    )
   })
 
   it('should filter duplicate labware offsets and keep only the most recent ones', async () => {
@@ -219,12 +230,32 @@ describe('useCloneRun hook', () => {
       },
     ]
 
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: expectedOffsets,
-      runTimeParameterValues: {},
-      runTimeParameterFiles: {},
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: expectedOffsets,
+        runTimeParameterValues: {},
+        runTimeParameterFiles: {},
+      },
+      { onError: expect.any(Function) }
+    )
+  })
+
+  it('should invoke onError when createRun fails', () => {
+    const mockCreateRun = vi.fn((_vars, options) => {
+      options?.onError?.(new Error('documentation cancelled'))
     })
+    const mockOnError = vi.fn()
+    vi.mocked(useCreateRunMutation).mockReturnValue({
+      createRun: mockCreateRun,
+    } as any)
+
+    const { result } = renderHook(() => useCloneRun(RUN_ID_NO_RTP), { wrapper })
+    result.current.cloneRun({ onError: mockOnError })
+
+    expect(mockOnError).toHaveBeenCalledWith(
+      new Error('documentation cancelled')
+    )
   })
 
   it('should handle analysis trigger when specified', async () => {

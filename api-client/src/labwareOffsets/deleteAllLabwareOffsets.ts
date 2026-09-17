@@ -7,7 +7,10 @@ import type { HostConfig } from '../types'
  * Delete all labware offsets stored on the robot.
  */
 export function deleteAllLabwareOffsets(
-  config: HostConfig
+  config: HostConfig,
+  userNotes?: string
 ): ResponsePromise<{ data: null }> {
-  return request<{ data: null }>(DELETE, '/labwareOffsets', config)
+  return request<{ data: null }>(DELETE, '/labwareOffsets', config, {
+    userNotes,
+  })
 }

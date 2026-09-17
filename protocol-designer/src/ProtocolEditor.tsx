@@ -12,7 +12,9 @@ import {
 import { PortalRoot } from './components/organisms'
 import { ProtocolRoutes } from './ProtocolRoutes'
 
-export function ProtocolEditor(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ProtocolEditor(): ReactNode {
   return (
     <DndProvider backend={HTML5Backend}>
       <Box

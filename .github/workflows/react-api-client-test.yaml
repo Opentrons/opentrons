@@ -4,19 +4,14 @@ name: 'JS API Clients test'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'react-api-client/**'
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
       - 'vitest.config.*'
   push:
-    paths:
-      - 'react-api-client/**'
-      - 'api-client/**'
-      - 'package.json'
-      - '.github/workflows/react-api-client-test.yaml'
-      - 'vitest.config.*'
+    paths: *paths
     branches:
       - '*'
   workflow_dispatch:
@@ -38,7 +33,7 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'

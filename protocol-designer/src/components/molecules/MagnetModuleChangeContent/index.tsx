@@ -9,7 +9,9 @@ import {
 
 import { KnowledgeLink } from '/protocol-designer/components/organisms'
 
-export function MagnetModuleChangeContent(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function MagnetModuleChangeContent(): ReactNode {
   const { t } = useTranslation('starting_deck_state')
 
   return (

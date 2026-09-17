@@ -18,8 +18,8 @@ const meta: Meta<typeof LoggedOutOverlay> = {
   component: LoggedOutOverlay,
   parameters: {
     layout: 'fullscreen',
-    ...VIEWPORT.touchScreenViewport,
   },
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

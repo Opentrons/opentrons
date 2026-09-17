@@ -1,42 +1,24 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import {
-  COLORS,
-  getLabwareDefinitionsFromCommands,
-} from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
 import { OddModal } from '/app/molecules/OddModal'
-import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
-import { ActionItem } from './ActionItems/ActionItem'
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
-import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const ActionsViewImpl = ({
   actionsToDocument,
 }: {
   actionsToDocument: DocumentedAction[]
-}): JSX.Element => {
+}): ReactNode => {
   const { t } = useTranslation(['access_control', 'shared'])
   const modal = useModal()
-  const allRunTimeCommands = actionsToDocument.filter(isRunTimeCommand)
-  const allRunDefs = getLabwareDefinitionsFromCommands(allRunTimeCommands)
-  const { data } = useNotifyCurrentMaintenanceRun()
-  const commandTextData =
-    data != null
-      ? {
-          pipettes: data?.data.pipettes ?? [],
-          labware: data?.data.labware ?? [],
-          modules: data?.data.modules ?? [],
-          liquids: data?.data.liquids ?? [],
-          commands: allRunTimeCommands,
-        }
-      : null
-
   const actionViewHeader = {
     title: t('actions_requiring_documentation'),
     hasExitIcon: true,
@@ -49,24 +31,14 @@ const ActionsViewImpl = ({
       header={actionViewHeader}
       modalZIndex={1002}
       onOutsideClick={modal.remove}
+      overflow="hidden"
     >
-      <div className={styles.actions_list}>
-        {actionsToDocument.map((action, i) => (
-          <ActionItem
-            key={`action-${i}`}
-            action={action}
-            allRunDefs={allRunDefs}
-            commandTextData={commandTextData}
-            className={styles.action}
-          />
-        ))}
-      </div>
+      <ActionList
+        actionsToDocument={actionsToDocument}
+        className={styles.actions_view_list}
+      />
     </OddModal>
   )
-}
-
-function isRunTimeCommand(action: DocumentedAction): action is RunTimeCommand {
-  return typeof action === 'object' && 'commandType' in action
 }
 
 export const ActionsView = NiceModal.create(ActionsViewImpl)

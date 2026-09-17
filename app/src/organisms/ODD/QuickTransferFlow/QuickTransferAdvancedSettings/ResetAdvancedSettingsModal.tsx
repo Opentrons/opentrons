@@ -17,7 +17,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { ACTIONS } from '../constants'
 import { retrieveLiquidClassValues } from '../utils'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type {
   FlowRateKind,
@@ -37,7 +37,7 @@ export function ResetAdvancedSettingsModal({
   kind,
   dispatch,
   onClose,
-}: ResetAdvancedSettingsModalProps): JSX.Element {
+}: ResetAdvancedSettingsModalProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { liquidClassName: stateLiquidClassName } = state
   const liquidClass =

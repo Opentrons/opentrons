@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -9,9 +8,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 export interface ConfirmCrashRecoveryProps {
   back: () => unknown
@@ -20,7 +22,7 @@ export interface ConfirmCrashRecoveryProps {
 
 export function ConfirmCrashRecovery(
   props: ConfirmCrashRecoveryProps
-): JSX.Element {
+): ReactNode {
   const { back, confirm } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 
@@ -57,9 +59,9 @@ export function ConfirmCrashRecovery(
         >
           {t('shared:resume')}
         </Link>
-        <AlertPrimaryButton onClick={confirm}>
+        <PrimaryButton variant="warning" onClick={confirm}>
           {t('start_over')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

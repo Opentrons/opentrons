@@ -42,7 +42,8 @@ async def require_estop_in_good_state(
         # This is an OT-2 and there's no estop, so don't block out the endpoint
         return True
     else:
-        state = estop_handler.get_state()
+        estop_status = await estop_handler.get_status()
+        state = estop_status.status
         if state is EstopState.NOT_PRESENT:
             raise EstopNotAttached(
                 detail="An estop must be attached to access this endpoint"

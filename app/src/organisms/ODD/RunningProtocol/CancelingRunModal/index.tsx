@@ -6,7 +6,9 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './cancelingmodal.module.css'
 
-export function CancelingRunModal(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function CancelingRunModal(): ReactNode {
   const { t, i18n } = useTranslation('run_details')
 
   return (

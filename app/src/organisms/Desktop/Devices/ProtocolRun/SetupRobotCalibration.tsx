@@ -36,6 +36,7 @@ import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
 
+import type { ReactNode } from 'react'
 import type { AnalyticsProtocolProceedButtonText } from '/app/redux/analytics/constants'
 import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -54,7 +55,7 @@ export function SetupRobotCalibration({
   nextStep,
   expandStep,
   calibrationStatus,
-}: SetupRobotCalibrationProps): JSX.Element {
+}: SetupRobotCalibrationProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const nextStepButtonKey: AnalyticsProtocolProceedButtonText = (() => {
     switch (nextStep) {
@@ -117,7 +118,6 @@ export function SetupRobotCalibration({
           })
         }}
         {...targetProps}
-        id="RobotCalStep_proceedButton"
       >
         {t(nextStepButtonKey)}
       </PrimaryButton>

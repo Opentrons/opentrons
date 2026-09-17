@@ -5,6 +5,7 @@ import { StyledText } from '@opentrons/components'
 import { CameraCard } from './CameraCard'
 import styles from './inputdevices.module.css'
 
+import type { ReactNode } from 'react'
 import type { CameraCardProps } from './CameraCard'
 
 export type PeripheralsProps = CameraCardProps
@@ -13,7 +14,7 @@ export function Peripherals({
   isFlex,
   robotName,
   isRobotBusy,
-}: PeripheralsProps): JSX.Element {
+}: PeripheralsProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

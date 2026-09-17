@@ -18,6 +18,7 @@ from opentrons.system import camera
 from opentrons.system.camera import PREVIEW_IMAGE, StreamConfigurationKeys
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import RequestModel
@@ -58,7 +59,10 @@ DEFAULT_CAMERA_PATH = f"/dev/{DEFAULT_CAMERA_ID}"
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change camera enable")),
+    ],
 )
 async def post_camera(
     request_body: RequestModel[CameraEnable],
@@ -96,6 +100,11 @@ async def post_camera(
         camera_settings_store.get_error_recovery_camera_enabled()
     )
 
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if camera.robot_supports_livestream(robot_type):
         stream_settings = _get_stream_settings()
         if (
@@ -105,7 +114,8 @@ async def post_camera(
                 run_data_manager.current_run_id is not None
                 and (
                     True
-                    if run_data_manager.get(run_data_manager.current_run_id).status
+                    if run_data is not None
+                    and run_data.status
                     not in [
                         EngineStatus.IDLE,
                         EngineStatus.STOPPED,
@@ -203,7 +213,10 @@ async def get_camera_capture_image_settings(
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change camera settings")),
+    ],
 )
 async def add_camera_capture_image_settings(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -238,7 +251,10 @@ async def add_camera_capture_image_settings(
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("capture preview image")),
+    ],
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],
@@ -252,8 +268,14 @@ async def post_camera_preview_image(
     """
     Return a preview image based on the provided capture image settings.
     """
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if run_data_manager.current_run_id is not None and (
-        run_data_manager.get(run_data_manager.current_run_id).status
+        run_data is not None
+        and run_data.status
         not in [EngineStatus.STOPPED, EngineStatus.FAILED, EngineStatus.SUCCEEDED]
     ):
         raise HTTPException(
@@ -325,7 +347,10 @@ async def post_camera_preview_image(
     "/camera/picture",
     description="Capture an image from the OT-2's on-board camera and return it",
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("capture image")),
+    ],
 )
 async def post_picture_capture(
     camera_settings_store: Annotated[
@@ -406,7 +431,10 @@ async def get_live_stream(
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change camera stream settings")),
+    ],
 )
 async def post_live_stream_settings(
     request_body: RequestModel[LiveStreamSettings],
@@ -453,6 +481,11 @@ async def post_live_stream_settings(
     camera_enabled = camera_settings_store.get_camera_enabled()
     live_stream_enabled = camera_settings_store.get_live_stream_enabled()
 
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if (
         camera_enabled
         and live_stream_enabled
@@ -460,7 +493,8 @@ async def post_live_stream_settings(
             run_data_manager.current_run_id is not None
             and (
                 True
-                if run_data_manager.get(run_data_manager.current_run_id).status
+                if run_data is not None
+                and run_data.status
                 not in [
                     EngineStatus.IDLE,
                     EngineStatus.STOPPED,

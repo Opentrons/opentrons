@@ -58,6 +58,14 @@ def validate_definition_is_filter_plate(definition: LabwareDefinition) -> bool:
     )
 
 
+def validate_definition_is_vacuum_module_dock(definition: LabwareDefinition) -> bool:
+    """Validate that the definitions is a compatible with the vacuum module dock."""
+    return (
+        definition.parameters.quirks is not None
+        and "vacuumModuleDock" in definition.parameters.quirks
+    )
+
+
 def validate_definition_is_deck_slot_compatible(
     definition: LabwareDefinition,
 ) -> bool:

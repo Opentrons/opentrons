@@ -6,6 +6,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ModalHeader,
@@ -18,6 +19,7 @@ import {
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { useHomePipettes } from '/app/local-resources/instruments'
 
+import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
@@ -51,10 +53,15 @@ export function useProtocolDropTipModal({
   pipetteInfo,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showModal, setShowModal] = useState(areTipsAttached)
+  // After skip-and-home, keep the modal closed even if tip state / run
+  // currentness briefly lag after close is requested.
+  const [hasSkipped, setHasSkipped] = useState(false)
 
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
-    onSettled: () => {
+    onSuccess: () => {
+      setHasSkipped(true)
+      setShowModal(false)
       onSkipAndHome()
     },
   })
@@ -62,6 +69,10 @@ export function useProtocolDropTipModal({
   // Close the modal if a different app closes the run context.
   useEffect(
     () => {
+      if (hasSkipped) {
+        setShowModal(false)
+        return
+      }
       if (isRunCurrent && !isHoming) {
         setShowModal(areTipsAttached)
       } else if (!isRunCurrent) {
@@ -70,7 +81,7 @@ export function useProtocolDropTipModal({
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isRunCurrent, areTipsAttached, showModal]
+    [isRunCurrent, areTipsAttached, showModal, hasSkipped]
   ) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
   const onSkip = (): void => {
@@ -106,7 +117,7 @@ export function ProtocolDropTipModal({
   onBeginRemoval,
   mount,
   isDisabled,
-}: ProtocolDropTipModalProps): JSX.Element {
+}: ProtocolDropTipModalProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
 
   const buildIcon = (): IconProps => {
@@ -152,6 +163,7 @@ export function ProtocolDropTipModal({
           />
         </StyledText>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>
+          {isDisabled ? <Icon name="ot-spinner" spin /> : null}
           <TextOnlyButton
             onClick={onSkip}
             buttonText={t('skip_and_home_pipette')}

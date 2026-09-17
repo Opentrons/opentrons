@@ -1,0 +1,2 @@
+export const REDISCOVERY_TIME_MS = 1200000
+export const STATUS_POLL_MS = 2000

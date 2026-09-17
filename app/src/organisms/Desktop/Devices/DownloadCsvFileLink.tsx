@@ -13,13 +13,15 @@ import { useDataFileRawQuery } from '@opentrons/react-api-client'
 
 import { downloadFile } from './utils'
 
+import type { ReactNode } from 'react'
+
 interface DownloadCsvFileLinkProps {
   fileId: string
   fileName: string
 }
 export function DownloadCsvFileLink(
   props: DownloadCsvFileLinkProps
-): JSX.Element {
+): ReactNode {
   const { fileId, fileName } = props
   const { t } = useTranslation('run_details')
   const { data: csvFileRaw } = useDataFileRawQuery(fileId)

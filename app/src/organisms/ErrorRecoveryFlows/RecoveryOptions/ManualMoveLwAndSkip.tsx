@@ -8,9 +8,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function ManualMoveLwAndSkip(props: RecoveryContentProps): JSX.Element {
+export function ManualMoveLwAndSkip(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { MANUAL_MOVE_AND_SKIP } = RECOVERY_MAP

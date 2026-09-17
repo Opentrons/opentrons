@@ -19,9 +19,14 @@ describe('requireDocumentation', () => {
       'starting calibration' as DocumentationReport
     )
 
-    const result = await requireDocumentation('alice', [])
+    const result = await requireDocumentation('alice', [], 0)
 
     expect(result).toEqual('starting calibration' as DocumentationReport)
-    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice', [])
+    expect(showDocumentationRequiredModal).toHaveBeenCalledWith(
+      'alice',
+      [],
+      0,
+      undefined
+    )
   })
 })

@@ -37,7 +37,7 @@
   "confirm_camera_preferences": "确认摄像头设置",
   "confirm_camera_preferences_desc": "确认您摄像头设置，以便在运行设置期间查看实时监控。",
   "csv_available_download": "与此运行相关的所有文件都可以在设备的最近运行界面上找到。",
-  "current_step": "当前步骤",
+  "current_step": "步骤",
   "current_step_pause": "当前步骤 - 用户暂停",
   "current_step_pause_timer": "计时器",
   "current_temperature": "当前：{{temperature}}°C",

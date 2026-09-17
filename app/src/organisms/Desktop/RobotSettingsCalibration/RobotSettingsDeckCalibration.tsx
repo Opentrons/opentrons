@@ -17,6 +17,7 @@ import * as RobotApi from '/app/redux/robot-api'
 
 import { formatLastModified } from '../CalibrationPanels/utils'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface RobotSettingsDeckCalibrationProps {
@@ -25,7 +26,7 @@ interface RobotSettingsDeckCalibrationProps {
 
 export function RobotSettingsDeckCalibration({
   robotName,
-}: RobotSettingsDeckCalibrationProps): JSX.Element {
+}: RobotSettingsDeckCalibrationProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const createRequestId = useRef<string | null>(null)
 

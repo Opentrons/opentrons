@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   Box,
   COLORS,
@@ -77,7 +76,7 @@ export type LPCContentContainerProps = LPCWizardContentProps &
 
 export function LPCContentContainer(
   props: LPCContentContainerProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const {
     runId,
@@ -171,7 +170,7 @@ function DesktopFooterContent({
   primaryBtnAlert,
   commandUtils,
   desktopFooterBtnCopy,
-}: Omit<LPCContentContainerProps, 'children' | 'buttonText'>): JSX.Element {
+}: Omit<LPCContentContainerProps, 'children' | 'buttonText'>): ReactNode {
   const step = useSelector(selectCurrentStep(runId))
   const { currentSubstep } = useSelector(selectStepInfo(runId))
   const showHelpLink =
@@ -189,12 +188,13 @@ function DesktopFooterContent({
           </SecondaryButton>
         )}
         {primaryBtnAlert ? (
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             disabled={buttonIsDisabled}
             onClick={onClickButton}
           >
             {desktopFooterBtnCopy}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         ) : (
           <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
             {desktopFooterBtnCopy}
@@ -205,7 +205,7 @@ function DesktopFooterContent({
   )
 }
 
-function NeedHelpLink(): JSX.Element {
+function NeedHelpLink(): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   return (

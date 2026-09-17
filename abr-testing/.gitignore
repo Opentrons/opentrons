@@ -4,3 +4,8 @@ build
 htmlcov
 
 abr_testing/_version.py
+
+# Secrets / keys — never commit these. Keep templates/*.example.json tracked.
+*ssh*
+*robot_key*
+jiraCredentials.json

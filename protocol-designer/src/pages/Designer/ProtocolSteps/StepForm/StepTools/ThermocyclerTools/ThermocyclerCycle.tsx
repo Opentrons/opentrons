@@ -35,7 +35,7 @@ import { uuid } from '/protocol-designer/utils'
 
 import { getStepIndex, getTimeFromString } from './utils'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
 
@@ -68,7 +68,7 @@ interface ThermocyclerCycleProps {
   setIsInEdit: Dispatch<SetStateAction<boolean>>
 }
 
-export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
+export function ThermocyclerCycle(props: ThermocyclerCycleProps): ReactNode {
   const {
     setShowCreateNewCycle,
     step,

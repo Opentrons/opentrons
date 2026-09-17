@@ -22,10 +22,8 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
-  DEST_WELL_BLOWOUT_DESTINATION,
   getPipetteWithTipMaxVol,
   getTrashOrLabware,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
 import {
@@ -54,6 +52,7 @@ import {
   WellsOrderField,
 } from '../../PipetteFields'
 import {
+  getBlowoutLabwareDetails,
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../../utils'
@@ -62,7 +61,7 @@ import { FLOW_RATE } from '../ByVolumeBuilderModal/types'
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
@@ -87,7 +86,7 @@ export const SecondStepsMoveLiquidTools = ({
   tab,
   setTab,
   setShowFormErrors,
-}: SecondStepsMoveLiquidToolsProps): JSX.Element => {
+}: SecondStepsMoveLiquidToolsProps): ReactNode => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const pipetteEntities = useSelector(getPipetteEntities)
@@ -167,16 +166,8 @@ export const SecondStepsMoveLiquidTools = ({
       isDestinationTrash ? 'dispense_mix_checkbox' : 'dispense_mix_checkbox_2'
     }`
   )
-  const blowoutLocation = propsForFields.blowout_location.value ?? null
-  const isBlowoutLocationSource =
-    blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
-  const isBlowoutLocationDestination =
-    blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
-  const isBlowoutLocationLabware =
-    isBlowoutLocationSource || isBlowoutLocationDestination
-  const blowOutLabwareId = isBlowoutLocationSource
-    ? (propsForFields.aspirate_labware.value as string)
-    : ((propsForFields.dispense_labware.value as string) ?? null)
+  const { isBlowoutLocationLabware, blowOutLabwareId } =
+    getBlowoutLabwareDetails(propsForFields)
   const aspirateTab = {
     text: t('aspirate'),
     isActive: tab === 'aspirate',

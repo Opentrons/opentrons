@@ -39,7 +39,7 @@ export interface UseRouteUpdateActionsResult {
     step?: RouteStep
   ) => Promise<void>
   /* Stashes the current map then sets the current map to robot in motion after validating the door is closed.
-  Restores the map after motion completes. */
+  Restores the stashed map when motion ends (including when the user cancels documentation for the mutation). */
   handleMotionRouting: (
     inMotion: boolean,
     movingRoute?: RobotMovingRoute
@@ -60,6 +60,20 @@ export function useRouteUpdateActions(
   const { OPTION_SELECTION, ROBOT_IN_MOTION, ROBOT_DOOR_OPEN } = RECOVERY_MAP
   const { isDoorOpen } = doorStatusUtils
   const stashedMapRef = useRef<IRecoveryMap | null>(null)
+
+  const isRobotMovingRoute = (route: RecoveryRoute): boolean => {
+    const movingRoutes: RecoveryRoute[] = [
+      RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+      RECOVERY_MAP.ROBOT_RESUMING.ROUTE,
+      RECOVERY_MAP.ROBOT_RETRYING_STEP.ROUTE,
+      RECOVERY_MAP.ROBOT_CANCELING.ROUTE,
+      RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE,
+      RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE,
+      RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE,
+      RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE,
+    ]
+    return movingRoutes.includes(route)
+  }
 
   const goBackPrevStep = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -154,17 +168,20 @@ export function useRouteUpdateActions(
               ? head(STEP_ORDER[robotMovingRoute])!
               : ROBOT_IN_MOTION.STEPS.IN_MOTION
           setRecoveryMap({ route, step })
-        } else {
-          if (stashedMapRef.current != null) {
-            setRecoveryMap(stashedMapRef.current)
-            stashedMapRef.current = null
-          } else {
-            setRecoveryMap({
-              route: OPTION_SELECTION.ROUTE,
-              step: OPTION_SELECTION.STEPS.SELECT,
-            })
-          }
+        } else if (stashedMapRef.current != null) {
+          // Return to the screen from before motion/mutation started.
+          setRecoveryMap(stashedMapRef.current)
+          stashedMapRef.current = null
+        } else if (isRobotMovingRoute(currentRoute)) {
+          // Stash was already cleared but we are still on a motion route — escape
+          // to option selection rather than remaining stuck on the motion screen.
+          setRecoveryMap({
+            route: OPTION_SELECTION.ROUTE,
+            step: OPTION_SELECTION.STEPS.SELECT,
+          })
         }
+        // else: motion already cleared and previous screen restored (e.g. a
+        // caller's .finally after documentation cancel). Leave the map alone.
 
         resolve()
       })

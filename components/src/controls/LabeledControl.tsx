@@ -9,7 +9,7 @@ export interface LabeledControlProps {
   children?: ReactNode
 }
 
-export function LabeledControl(props: LabeledControlProps): JSX.Element {
+export function LabeledControl(props: LabeledControlProps): ReactNode {
   const { label, control, children } = props
 
   return (

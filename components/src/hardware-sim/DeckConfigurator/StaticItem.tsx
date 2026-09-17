@@ -10,6 +10,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface StaticFixtureProps {
@@ -23,7 +24,7 @@ interface StaticFixtureProps {
  * config map
  */
 
-export function StaticItem(props: StaticFixtureProps): JSX.Element {
+export function StaticItem(props: StaticFixtureProps): ReactNode {
   const { deckDefinition, fixtureLocation, label } = props
 
   const staticCutout = deckDefinition.locations.cutouts.find(

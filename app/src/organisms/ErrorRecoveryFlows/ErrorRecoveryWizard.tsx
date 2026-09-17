@@ -49,6 +49,7 @@ import {
 } from './shared'
 import { getErrorKind } from './utils'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
@@ -93,7 +94,7 @@ export type ErrorRecoveryWizardProps = ErrorRecoveryFlowsProps &
 
 export function ErrorRecoveryWizard(
   props: ErrorRecoveryWizardProps
-): JSX.Element {
+): ReactNode {
   return (
     <ErrorRecoveryComponent
       errorKind={getErrorKind(props.failedCommand)}
@@ -102,9 +103,7 @@ export function ErrorRecoveryWizard(
   )
 }
 
-export function ErrorRecoveryComponent(
-  props: RecoveryContentProps
-): JSX.Element {
+export function ErrorRecoveryComponent(props: RecoveryContentProps): ReactNode {
   const {
     recoveryMap,
     hasLaunchedRecovery,
@@ -179,7 +178,7 @@ export function ErrorRecoveryComponent(
   )
 }
 
-export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
+export function ErrorRecoveryContent(props: RecoveryContentProps): ReactNode {
   const buildSelectRecoveryOption = (): JSX.Element => {
     return <SelectRecoveryOption {...props} />
   }

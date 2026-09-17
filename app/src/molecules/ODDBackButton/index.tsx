@@ -9,11 +9,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { HTMLProps } from 'react'
+import type { HTMLProps, ReactNode } from 'react'
 
-export function ODDBackButton(
-  props: HTMLProps<HTMLButtonElement>
-): JSX.Element {
+export function ODDBackButton(props: HTMLProps<HTMLButtonElement>): ReactNode {
   const { onClick, label } = props
 
   return (
