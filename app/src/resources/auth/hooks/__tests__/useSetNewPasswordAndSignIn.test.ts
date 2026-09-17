@@ -148,7 +148,7 @@ describe('useSetNewPasswordAndSignIn', () => {
     })
 
     await waitFor(() => {
-      expect(onError).toHaveBeenCalledWith('password_previously_used')
+      expect(onError).toHaveBeenCalledWith('desktop_password_previously_used')
     })
     expect(onSuccess).not.toHaveBeenCalled()
   })

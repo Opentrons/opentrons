@@ -29,10 +29,10 @@ export function PasswordChange({
   if (showLengthOfTime) {
     return (
       <NumericSettingPage
-        title={t('length_of_time_before_password_change')}
-        description={t('length_of_time_before_password_change_description')}
+        title={t('odd_length_of_time_before_password_change')}
+        description={t('odd_length_of_time_before_password_change_description')}
         value={Math.round((authSettings?.passwordResetTime ?? 0) / 86400)}
-        label={t('number_of_days')}
+        label={t('odd_number_of_days')}
         onBack={value => {
           patchAuthSettings({
             passwordResetTime: value ? value * 86400 : undefined,
@@ -48,12 +48,12 @@ export function PasswordChange({
   return (
     <div className={styles.container}>
       <ChildNavigation
-        header={t('password_change_requirement')}
+        header={t('odd_password_change_requirement')}
         onClickBack={onClickBack}
       />
       <div className={styles.password_complexity_content}>
         <ToggleSetting
-          title={t('require_password_changed')}
+          title={t('odd_require_password_changed')}
           value={passwordChangeEnabled}
           onClick={() => {
             if (!passwordChangeEnabled) {
@@ -68,13 +68,13 @@ export function PasswordChange({
         {passwordChangeEnabled && (
           <div className={styles.settings_preferences}>
             <StyledText oddStyle="level4HeaderSemiBold">
-              {t('preferences')}
+              {t('odd_preferences')}
             </StyledText>
             <div className={styles.settings_preferences_list}>
               <SettingsListButton
-                key={t('just_length_of_time')}
-                title={t('just_length_of_time')}
-                value={`${Math.round((authSettings?.passwordResetTime ?? 0) / 86400)} ${t('days')}`}
+                key={t('odd_just_length_of_time')}
+                title={t('odd_just_length_of_time')}
+                value={`${Math.round((authSettings?.passwordResetTime ?? 0) / 86400)} ${t('odd_days')}`}
                 onClick={() => {
                   setShowLengthOfTime(true)
                 }}

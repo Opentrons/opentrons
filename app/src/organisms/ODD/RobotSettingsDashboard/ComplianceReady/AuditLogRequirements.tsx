@@ -32,7 +32,7 @@ export function AuditLogRequirements({
   const [showDocumentation, setShowDocumentation] = useState(false)
 
   const documentationValue = auditSettings?.requireReasonForInteraction
-    ? `${auditSettings.minLengthOfReasonForInteraction ?? 0} ${t('characters')}`
+    ? `${auditSettings.minLengthOfReasonForInteraction ?? 0} ${t('odd_characters')}`
     : t('off')
 
   if (showDocumentation) {
@@ -50,14 +50,14 @@ export function AuditLogRequirements({
   return (
     <div className={styles.container}>
       <ChildNavigation
-        header={t('audit_log_requirements')}
+        header={t('odd_audit_log_requirements')}
         onClickBack={onClickBack}
       />
       <div className={styles.content}>
         <div className={styles.settings_list}>
           <SettingsListButton
-            key={t('require_documentation_for_robot_actions')}
-            title={t('require_documentation_for_robot_actions')}
+            key={t('odd_require_documentation_for_robot_actions')}
+            title={t('odd_require_documentation_for_robot_actions')}
             value={documentationValue}
             onClick={() => {
               setShowDocumentation(true)
@@ -65,8 +65,8 @@ export function AuditLogRequirements({
             chevron
           />
           <ToggleSetting
-            key={t('require_signoff_for_protocol_log')}
-            title={t('require_signoff_for_protocol_log')}
+            key={t('odd_require_signoff_for_protocol_log')}
+            title={t('odd_require_signoff_for_protocol_log')}
             value={robotServerSettings?.requireSignoffForProtocolLog ?? false}
             onClick={() => {
               patchRobotServerSettings({
@@ -85,7 +85,7 @@ export function AuditLogRequirements({
                   !robotServerSettings?.requireLogsToBeSavedInApp,
               })
             }}
-            detail={t('require_logs_to_be_saved_in_app_description')}
+            detail={t('odd_require_logs_to_be_saved_in_app_description')}
           />
         </div>
       </div>

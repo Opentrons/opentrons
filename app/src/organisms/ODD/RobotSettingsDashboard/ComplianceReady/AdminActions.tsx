@@ -19,11 +19,14 @@ export function AdminActions({
   const { t } = useTranslation('device_settings')
   return (
     <div className={styles.container}>
-      <ChildNavigation header={t('admin_title')} onClickBack={onClickBack} />
+      <ChildNavigation
+        header={t('odd_admin_title')}
+        onClickBack={onClickBack}
+      />
       <div className={styles.content}>
         <div className={styles.settings_list}>
           <ToggleSetting
-            title={t('require_admin_credentials_to_update_robots')}
+            title={t('odd_require_admin_credentials_to_update_robots')}
             value={
               authSettings?.requireAdminCredsWhenUpdatingRobotSoftware ?? false
             }
@@ -35,7 +38,7 @@ export function AdminActions({
             }}
           />
           <ToggleSetting
-            title={t('require_admin_credentials_to_send_protocols')}
+            title={t('odd_require_admin_credentials_to_send_protocols')}
             value={
               authSettings?.requireAdminCredsWhenSendingProtocolToRobot ?? false
             }
@@ -47,7 +50,9 @@ export function AdminActions({
             }}
           />
           <ToggleSetting
-            title={t('require_admin_credentials_to_sign_protocol_run_records')}
+            title={t(
+              'odd_require_admin_credentials_to_sign_protocol_run_records'
+            )}
             value={authSettings?.requireAdminCredsForSignoffProtocol ?? false}
             onClick={() => {
               patchAuthSettings({

@@ -38,7 +38,7 @@ export function OneTimePasswordModal({
       width="31.25rem"
       header={
         <WizardHeader
-          title={t('add_user')}
+          title={t('desktop_add_user')}
           onExit={onClose}
           currentStep={ADD_USER_WIZARD_ONE_TIME_PASSWORD_STEP}
           totalSteps={ADD_USER_WIZARD_TOTAL_STEPS}
@@ -51,13 +51,13 @@ export function OneTimePasswordModal({
         <div className={styles.form_fields}>
           <div className={styles.success_intro}>
             <StyledText desktopStyle="headingSmallBold">
-              {t('one_time_password') as string}
+              {t('desktop_one_time_password') as string}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">{message}</StyledText>
           </div>
           <div className={styles.field_group}>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('one_time_password') as string}
+              {t('desktop_one_time_password') as string}
             </StyledText>
             <div className={styles.one_time_password_value}>
               <StyledText desktopStyle="bodyDefaultRegular">

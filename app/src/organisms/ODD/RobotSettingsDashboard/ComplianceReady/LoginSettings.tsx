@@ -35,24 +35,24 @@ export function LoginSettings({
     }
   > = {
     max_logins: {
-      title: t('maximum_login_attempts_before_account_deactivation'),
+      title: t('odd_maximum_login_attempts_before_account_deactivation'),
       value: authSettings?.maxNumberOfLoginAttempts,
-      units: t('logins'),
+      units: t('odd_logins'),
     },
     password_reset_time: {
-      title: t('require_password_change_after_time'),
+      title: t('odd_require_password_change_after_time'),
       value: Math.round((authSettings?.passwordResetTime ?? 0) / 86400),
-      units: t('days'),
+      units: t('odd_days'),
     },
     password_complexity: {
-      title: t('password_complexity_requirements'),
+      title: t('odd_password_complexity_requirements'),
       value: authSettings?.passwordComplexityMinimumLength,
       units: 'bool',
     },
     idle_logout: {
-      title: t('auto_logout_inactivity_length'),
+      title: t('odd_auto_logout_inactivity_length'),
       value: Math.round((authSettings?.idleLogout ?? 0) / 60),
-      units: t('mins'),
+      units: t('odd_minutes'),
     },
   }
 
@@ -66,10 +66,12 @@ export function LoginSettings({
     case 'max_logins':
       return (
         <NumericSettingPage
-          title={t('maximum_login_attempts')}
-          description={t('maximum_login_attempts_before_account_deactivation')}
+          title={t('odd_maximum_login_attempts')}
+          description={t(
+            'odd_maximum_login_attempts_before_account_deactivation'
+          )}
           value={authSettings?.maxNumberOfLoginAttempts}
-          label={t('number_of_logins')}
+          label={t('odd_number_of_logins')}
           onBack={value => {
             patchAuthSettings({ maxNumberOfLoginAttempts: value })
             setCurrentPage(null)
@@ -91,10 +93,10 @@ export function LoginSettings({
     case 'idle_logout':
       return (
         <NumericSettingPage
-          title={t('auto_logout')}
-          description={t('auto_logout_inactivity_length')}
+          title={t('odd_auto_logout')}
+          description={t('odd_auto_logout_inactivity_length')}
           value={Math.round((authSettings?.idleLogout ?? 0) / 60)}
-          label={t('number_of_minutes')}
+          label={t('odd_number_of_minutes')}
           onBack={value => {
             patchAuthSettings({ idleLogout: value ? value * 60 : undefined })
             setCurrentPage(null)
@@ -116,7 +118,7 @@ export function LoginSettings({
       return (
         <div className={styles.container}>
           <ChildNavigation
-            header={t('login_title')}
+            header={t('odd_login_title')}
             onClickBack={onClickBack}
           />
           <div className={styles.content}>

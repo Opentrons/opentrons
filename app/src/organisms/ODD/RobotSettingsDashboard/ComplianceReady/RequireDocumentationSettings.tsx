@@ -29,10 +29,10 @@ export function RequireDocumentationSettings({
   if (showMinLength) {
     return (
       <NumericSettingPage
-        title={t('minimum_length_for_documentation')}
-        description={t('minimum_length_for_documentation_description')}
+        title={t('odd_minimum_length_for_documentation')}
+        description={t('odd_minimum_length_for_documentation_description')}
         value={auditSettings?.minLengthOfReasonForInteraction ?? 0}
-        label={t('number_of_characters')}
+        label={t('odd_number_of_characters')}
         onBack={value => {
           patchAuditSettings({
             minLengthOfReasonForInteraction: value,
@@ -47,12 +47,12 @@ export function RequireDocumentationSettings({
   return (
     <div className={styles.container}>
       <ChildNavigation
-        header={t('require_documentation_for_robot_actions')}
+        header={t('odd_require_documentation_for_robot_actions')}
         onClickBack={onClickBack}
       />
       <div className={styles.password_complexity_content}>
         <ToggleSetting
-          title={t('require_documentation_for_robot_actions')}
+          title={t('odd_require_documentation_for_robot_actions')}
           value={documentationEnabled}
           onClick={() => {
             if (!documentationEnabled) {
@@ -67,13 +67,13 @@ export function RequireDocumentationSettings({
         {documentationEnabled && (
           <div className={styles.settings_preferences}>
             <StyledText oddStyle="level4HeaderSemiBold">
-              {t('preferences')}
+              {t('odd_preferences')}
             </StyledText>
             <div className={styles.settings_preferences_list}>
               <SettingsListButton
-                key={t('minimum_length_for_documentation')}
-                title={t('minimum_length_for_documentation_description')}
-                value={`${auditSettings?.minLengthOfReasonForInteraction ?? 0} ${t('characters')}`}
+                key={t('odd_minimum_length_for_documentation')}
+                title={t('odd_minimum_length_for_documentation_description')}
+                value={`${auditSettings?.minLengthOfReasonForInteraction ?? 0} ${t('odd_characters')}`}
                 onClick={() => {
                   setShowMinLength(true)
                 }}
