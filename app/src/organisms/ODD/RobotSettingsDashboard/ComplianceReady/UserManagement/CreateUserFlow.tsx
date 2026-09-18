@@ -26,8 +26,10 @@ interface CreateUserFlowState {
 
 export function CreateUserFlow({
   onCancel,
+  usernames,
 }: {
   onCancel: () => void
+  usernames: string[]
 }): ReactNode {
   const { t } = useTranslation('device_settings')
 
@@ -99,6 +101,7 @@ export function CreateUserFlow({
           currentStep={1}
           totalSteps={4}
           savedUsername={flowState.username}
+          takenUsernames={usernames}
         />
       ),
     },

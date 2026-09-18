@@ -20,6 +20,7 @@ export function AddUsername({
   onContinue,
   totalSteps,
   currentStep,
+  takenUsernames,
 }: {
   savedUsername?: string
   onClickBack: () => void
@@ -27,6 +28,7 @@ export function AddUsername({
   onContinue: (username: string) => void
   totalSteps: number
   currentStep: number
+  takenUsernames: string[]
 }): ReactNode {
   const [username, setUsername] = useState<string | undefined>(savedUsername)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -39,6 +41,8 @@ export function AddUsername({
     setUsername(e.target.value)
     if (e.target.value.length > MAX_USERNAME_LENGTH) {
       setError('' + t('odd_add_username_caption'))
+    } else if (takenUsernames.includes(e.target.value)) {
+      setError('' + t('odd_add_username_taken_caption'))
     } else {
       setError(undefined)
     }
