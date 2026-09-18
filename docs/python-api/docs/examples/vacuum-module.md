@@ -3,17 +3,19 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-This use case is excerpted from a 600-line automated nucleic acid miniprep protocol. These code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
+This use case is taken from a 600-line nucleic acid miniprep protocol. These excerpted miniprep code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
 
 <font color="red">TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.</font>
 
 ## Stage 1: protocol metadata
 
-Every protocol file starts with the `metadata` and `requirements` dictionaries. 
+Every protocol file starts with the `metadata` and `requirements` dictionaries.
 
-- `metadata`: This includes key-value pairs for the protocol name (`protocolName`) and aa concise description (`description`), which are displayed in the Opentrons App and on the Flex touchscreen.
+<!--- maybe use a table to match sections below, but too much for just 2 bullets? --->
 
-- `requirements`: This includes the key-value pairs `robotType` and `apiLevel` which tell the protocol engine what robot is being used and the API version. The Vacuum Module can only be used with the Flex robot and requires API version 2.30, or higher.
+- `metadata`: Contains key-value pairs for the protocol name (`protocolName`) and aa concise description (`description`), which are displayed in Opentrons software and on the Flex touchscreen.
+
+- `requirements`: Contains the key-value pairs `robotType` and `apiLevel` which tell the Flex what robot model (Flex or OT-2) is being used and the API version. You can only use the Vacuum Module with the Flex and API version 2.30, or higher.
 
 ```python
 from opentrons import protocol_api
@@ -29,7 +31,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 
 ## Stage 2: Loading modules and labware
 
-During this stage, `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, the API code establishes what's going to be used and where it can be found.
+During this stage, `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, you use the API code to establish what's going to be used and where it can be found on the robot.
 
 <!--- replacing with a test table
 * **Modules and waste:** Calls [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to initialize the Vacuum Module in slot A3 and an adjacent Heater-Shaker in slot D1. Because the vacuum manifold adapter requires the location used by the trash bin, calling [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute] configures the external waste chute for hands-free, external waste disposal.
@@ -112,7 +114,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ### Lysate collection
 
-During this stage, the protocol collects clarified lysate in a 96-well collection plate. To collect this material, the Flex Gripper stacks a collection and filter plate on top of each other on the manifold base. After stacking well plates and adding a collar, the robot extracts liquid using a gentle pressure to avoid clogging the filter plate membrane.
+During this stage, the protocol collects clarified lysate in a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. After adding a collar to create a sealed chamber, the robot extracts liquid by applying a gentle vacuum to avoid clogging the filter plate membrane.
 
 <table>
   <thead>
@@ -139,11 +141,11 @@ During this stage, the protocol collects clarified lysate in a 96-well collectio
 </table>
 
 ```python
-    # Stack the filter plate over the collection plate inside the manifold base
+    # Stack the filter plate over the collection plate on the manifold base
     protocol.move_labware(filter_plate, collection_plate, use_gripper=True)
     protocol.move_labware(collar, vacuum, use_gripper=True)
 
-    # Start gentle vacuum to draw clarified lysate without fouling the filter
+    # Start vacuum to extract clarified liquid
     clarify_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-330,
         duration_s=60,
@@ -154,27 +156,26 @@ During this stage, the protocol collects clarified lysate in a 96-well collectio
 
 ### Liquid handling
 
-Because `start_set_vacuum_pressure()` runs asynchronously in the background, the robot can carry out other operations simultaneously, while extracting lysate. Also, `clarify_task = vacuum.start_set_vacuum_pressure()` prevents the Gripper from moving labware off the Vacuum Module until the system depressurizes.
+Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations simultaneously while extracting. Also, `clarify_task = vacuum.start_set_vacuum_pressure()` prevents the Gripper from moving labware off the Vacuum Module until the system depressurizes.
 
 ```python
-# The Flex can pipette liquids or manipulate labware in other deck slots while 
-    # the vacuum pump runs in the background
+# Flex can pipette liquids and run other modules while the Vacuum Module executes tasks
     pipette.pick_up_tip()
     pipette.aspirate(400, reservoir["A5"])
-    # Dispense binding agent into downstream processing plate...
+    # Dispense binding agent into downstream processing plate
     pipette.drop_tip()
 
     # Wait for filtration, venting, and pressure equalization to finish
     protocol.wait_for_tasks([clarify_task])
 
-    # Return the collar to the dock and discard the exhausted clarification filter
+    # Return the collar to the dock and discard the used clarification filter
     vacuum.move_to_dock(collar, use_gripper=True)
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
 ## Stage 4: Direct-to-waste wash and dry
 
-In this stage, the protocol transitions to direct-to-waste mode by moving and restacking labware on the vacuum base. This new stack pulls waste material through the manifold directly to the carboy. It then runs two vacuum profiles: an intermediate vacuum at `-500` mbar for sample binding and washing, ending with a deep vacuum at `-800` mbar to thoroughly dry the silica plate.
+In this stage, additional Gripper movements and reconfigure the stack to prepare the sample for washing and plate drying.
 
 <table>
   <thead>
@@ -217,11 +218,11 @@ In this stage, the protocol transitions to direct-to-waste mode by moving and re
 ```python
     protocol.move_labware(collection_plate, "D2", use_gripper=True)
 
-    # Seat the collar on the base and load the silica plate directly onto it
+    # Seat the collar on the base and set the silica plate on top of it
     protocol.move_labware(collar, vacuum, use_gripper=True)
     protocol.move_labware(silica_plate, collar, use_gripper=True)
 
-    # Sample Binding: evacuate waste liquid directly to the 2 L carboy
+    # Binding: extract waste liquid to the carboy
     bind_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-500,
         duration_s=60,
@@ -230,7 +231,7 @@ In this stage, the protocol transitions to direct-to-waste mode by moving and re
     )
     protocol.wait_for_tasks([bind_task])
 
-    # Membrane Drying: deep vacuum profile to clear residual wash ethanol
+    # Drying: run a deep vacuum profile to extract residual ethanol
     dry_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-800,
         duration_s=60,
@@ -240,9 +241,10 @@ In this stage, the protocol transitions to direct-to-waste mode by moving and re
     protocol.wait_for_tasks([dry_task])
 ```
 
+<!--- should this be a note, not used? Seems an important concept to surface --->
 ### Parallel vs serial operation
 
-Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling `wait_for_tasks([dry_task])` immediately after starting the vacuum cycle transitions the protocol back to serial execution. Placing `wait_for_tasks()` directly after a non-blocking method pauses script progress, ensuring each drying and washing cycle completes before the robot proceeds to the next command.
+Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, you call `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operation back to serial execution. When you put `wait_for_tasks()` directly after a non-blocking method you're pausing the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
 
 ## Protocol takeaways
 
@@ -254,12 +256,12 @@ Using the Gripper, the Vacuum Module can adapt to changing filtration requiremen
 
 ### Non-blocking operations and concurrency
 
-Operational commands like `start_set_vacuum_pressure()` run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or running other deck modules and pipetting while the Vacuum Module operates on its own.
+Operational commands like `start_set_vacuum_pressure()` run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or control other deck modules and pipetting while the Vacuum Module operates on its own.
 
 ### Pressure profiles
 
-Pressure sensors in the Control Box allows the module to apply multiple vacuum pressures based on liquid volumes and membrane porosities at different protocol stages. As shown in the examples, the protocol starts with a gentle vacuum (-330 mbar) during clarification, then uses an intermediate vacuum (-500 mbar) to quickly clear washes, and ends by running the module to its maximum capacity (-800 mbar) to dry the silica membrane for elution.
+Pressure sensors in the Control Box allows the module to apply multiple vacuum pressures based on liquid volumes and membrane porosities at different protocol stages. As shown in the examples, the protocol starts with a gentle vacuum (-330 mbar) during clarification, then uses an intermediate vacuum (-500 mbar) to quickly clear washes, and ends by running the module at its maximum capacity (-800 mbar) to dry the silica membrane for elution.
 
 ### Depressurization and Gripper safety
 
-Attempting to move labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with an `equalize_timeout_s` delay ensures the manifold system vents to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing background tasks with `wait_for_tasks()` guarantees the system is fully depressurized before the Flex Gripper attempts to unstack collars or labware.
+Attempting to move labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with an `equalize_timeout_s` delay lets the manifold system return to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing background tasks with `wait_for_tasks()` guarantees the system is fully depressurized before the Flex Gripper attempts to unstack collars or labware.
