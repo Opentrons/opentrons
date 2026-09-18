@@ -8,6 +8,7 @@ import {
   useAuthSettingsQuery,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
+  useUsersQuery,
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
@@ -20,6 +21,7 @@ import styles from './compliance_ready_settings.module.css'
 import { LoginSettings } from './LoginSettings'
 import { RobotStorage } from './RobotStorage'
 import { SettingsListButton } from './SettingsListButton'
+import { UserManagement } from './UserManagement/UserManagement'
 
 import type { ReactNode } from 'react'
 import type {
@@ -29,7 +31,7 @@ import type {
 } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
-export type CRSSettingsPages = 'login' | 'admin' | 'storage' | 'audit' // | 'users'
+export type CRSSettingsPages = 'users' | 'login' | 'admin' | 'storage' | 'audit'
 
 export function ComplianceReadySettings({
   setCurrentOption,
@@ -63,7 +65,7 @@ export function ComplianceReadySettings({
   const [currentPage, setCurrentPage] = useState<CRSSettingsPages | null>(null)
 
   const settingsPageNames: { [key in CRSSettingsPages]: string } = {
-    // users: t('odd_users_title'),
+    users: t('odd_users_title'),
     login: t('odd_login_title'),
     admin: t('odd_admin_title'),
     audit: t('odd_audit_title'),
@@ -86,9 +88,21 @@ export function ComplianceReadySettings({
       patchAuditSettings
     )
 
+  const { data: users } = useUsersQuery()
+  const usersData = users?.data ?? []
+
   const pages = Object.keys(settingsPageNames) as CRSSettingsPages[]
 
   switch (currentPage) {
+    case 'users':
+      return (
+        <UserManagement
+          users={usersData}
+          onClickBack={() => {
+            setCurrentPage(null)
+          }}
+        />
+      )
     case 'login':
       return (
         <LoginSettings
