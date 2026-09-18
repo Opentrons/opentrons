@@ -20,7 +20,7 @@ export function UserRow({
   return (
     <ListButton
       key={key}
-      type="noActive"
+      type={user.locked ? 'notConnected' : 'noActive'}
       onClick={onClick}
       className={styles.user_row_button}
     >
@@ -51,7 +51,7 @@ export function UserRow({
             {user.locked ? t('locked') : t('active')}
           </StyledText>
         </div>
-        <Icon name="chevron-right" className={styles.user_row_chevron} />
+        {<Icon name="chevron-right" className={styles.user_row_chevron} />}
       </div>
     </ListButton>
   )

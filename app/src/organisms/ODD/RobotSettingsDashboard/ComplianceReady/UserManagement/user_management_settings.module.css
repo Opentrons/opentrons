@@ -117,7 +117,13 @@
 }
 
 .share_one_time_password_password {
+  min-height: 3.5rem;
   padding: var(--spacing-16) var(--spacing-20);
   border-radius: var(--spacing-8);
   background-color: #cbcccc; /* grey35 */
+}
+
+.share_one_time_password_password_text {
+  font-family: 'Reddit Mono Variable', 'Reddit Mono', monospace;
+  font-size: var(--font-size-22);
 }
