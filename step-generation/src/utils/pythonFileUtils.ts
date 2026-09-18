@@ -130,11 +130,19 @@ export function getLoadAdapters(
     lw.def.allowedRoles?.includes('adapter')
   )
   const pythonAdapters = Object.values(adapterEntities)
-    .sort(
-      (a, b) =>
-        labwareRobotState[a.id].stack.length -
-        labwareRobotState[b.id].stack.length
-    )
+    // Parent adapters must load before children stacked on them.
+    // Independent adapters keep insertion order.
+    .sort((a, b) => {
+      const aStack = labwareRobotState[a.id].stack
+      const bStack = labwareRobotState[b.id].stack
+      if (aStack.includes(b.id)) {
+        return 1
+      }
+      if (bStack.includes(a.id)) {
+        return -1
+      }
+      return 0
+    })
     .map(adapter => {
       const { id, def, pythonName } = adapter
       const { parameters, namespace, version } = def

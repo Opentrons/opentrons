@@ -245,14 +245,14 @@ describe('getLoadAdapters', () => {
     ).toBe(
       `
 # Load Adapters:
-adapter_2 = protocol.load_adapter_from_definition(
-    CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
-    location="B2",
-)
 adapter_1 = magnetic_block_1.load_adapter(
     "fixture_flex_96_tiprack_adapter",
     namespace="opentrons",
     version=1,
+)
+adapter_2 = protocol.load_adapter_from_definition(
+    CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
+    location="B2",
 )`.trimStart()
     )
   })
