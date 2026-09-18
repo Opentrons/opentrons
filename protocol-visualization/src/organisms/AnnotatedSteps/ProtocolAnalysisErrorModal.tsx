@@ -36,11 +36,7 @@ export function ProtocolAnalysisErrorModal({
           <CodeBlock key={error.id}>{error.detail}</CodeBlock>
         ))}
         <div className={styles.button_container}>
-          <PrimaryButton
-            role="button"
-            aria-label="close_analysis_error_modal"
-            onClick={onClose}
-          >
+          <PrimaryButton role="button" onClick={onClose}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {t('close')}
             </StyledText>
