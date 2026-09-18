@@ -44,7 +44,10 @@ export function ShareOneTimePassword({
             {t('odd_share_one_time_password_caption')}
           </StyledText>
           <div className={styles.share_one_time_password_password}>
-            <StyledText oddStyle="smallBodyTextRegular">
+            <StyledText
+              oddStyle="smallBodyTextRegular"
+              className={styles.share_one_time_password_password_text}
+            >
               {oneTimePassword}
             </StyledText>
           </div>

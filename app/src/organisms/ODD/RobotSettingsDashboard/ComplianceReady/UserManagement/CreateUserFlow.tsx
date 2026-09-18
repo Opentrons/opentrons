@@ -41,6 +41,11 @@ export function CreateUserFlow({
     role: 'admin' | 'user' | 'service'
   ): Promise<void> => {
     if (flowState.step === 2 && !!flowState.legalName && !!flowState.username) {
+      setFlowState(prevState => ({
+        ...prevState,
+        step: 3,
+        role,
+      }))
       createUser({
         data: {
           username: flowState.username,
