@@ -725,6 +725,45 @@ class RunStore:
             commands_errors=sliced_commands,
         )
 
+    async def insert_command(self, run_id: str, command_index: int, command: Command) -> None:
+        """Insert a command into the run command table"""
+        insert_command = sqlalchemy.insert(run_command_table)
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            transaction.execute(
+                insert_command,
+                {
+                    "run_id": run_id,
+                    "index_in_run": command_index,
+                    "command_id": command.id,
+                    "command": pydantic_to_json(command),
+                    "command_intent": str(command.intent.value)
+                    if command.intent
+                    else CommandIntent.PROTOCOL,
+                    "command_error": pydantic_to_json(command.error)
+                    if command.error
+                    else None,
+                    "command_status": _convert_commands_status_to_sql_command_status(
+                        command.status
+                    ),
+                },
+            )
+
+    async def insert_command_annotation(self, run_id: str, command_annotation: CommandAnnotation) -> None:
+        """Insert a command annotation into the command annotation table"""
+        insert_command_annotation = sqlalchemy.insert(command_annotation_table)
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            
+            transaction.execute(
+                insert_command_annotation,
+                _convert_command_annotation_to_sql_values(
+                    run_id, command_annotation
+                ),
+            )
+
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
