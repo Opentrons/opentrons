@@ -1,7 +1,7 @@
 """Manage current maintenance run data."""
 
 from datetime import datetime
-from typing import Callable, Optional, Sequence
+from typing import Awaitable, Callable, Optional, Sequence
 
 from opentrons.config import (
     feature_flags as ff,
@@ -99,7 +99,7 @@ class MaintenanceRunDataManager:
         created_at: datetime,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         camera_provider: CameraProvider,
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.

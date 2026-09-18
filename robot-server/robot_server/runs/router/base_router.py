@@ -9,6 +9,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import (
     Annotated,
+    Awaitable,
     Callable,
     Dict,
     Final,
@@ -284,7 +285,9 @@ async def create_run(  # noqa: C901
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
-    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    notify_publishers: Annotated[
+        Callable[[], Awaitable[None]], Depends(get_pe_notify_publishers)
+    ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],

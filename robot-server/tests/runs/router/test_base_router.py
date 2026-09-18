@@ -108,7 +108,7 @@ from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_store import RunStore
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
