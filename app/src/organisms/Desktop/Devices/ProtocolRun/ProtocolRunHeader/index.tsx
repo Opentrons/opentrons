@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
+import { Skeleton } from '/app/atoms/Skeleton'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -28,7 +29,7 @@ import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import { useRunAnalytics, useRunErrors } from './hooks'
-import { ProtocolRunHeaderSkeleton } from './ProtocolRunHeaderSkeleton'
+import styles from './protocolrunheader.module.css'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
 import {
@@ -144,8 +145,12 @@ export function ProtocolRunHeader(
         {...props}
       />
       {isRunLoading ? (
-        <div ref={protocolRunHeaderRef}>
-          <ProtocolRunHeaderSkeleton />
+        <div
+          ref={protocolRunHeaderRef}
+          className={styles.skeleton}
+          data-testid="ProtocolRunHeader_skeleton"
+        >
+          <Skeleton width="100%" height="14rem" backgroundSize="200%" />
         </div>
       ) : (
         <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
