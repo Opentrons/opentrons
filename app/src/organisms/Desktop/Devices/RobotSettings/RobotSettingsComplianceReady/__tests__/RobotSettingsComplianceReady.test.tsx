@@ -62,7 +62,7 @@ const render = (): [RenderResult, Store<State>] => {
           },
           mostRecentRobotName: ROBOT_NAME,
         },
-      } as State,
+      } as unknown as State,
     }
   )
 }
