@@ -126,6 +126,11 @@ metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+# Radwag may only return a reading after the mass is stable.
+# Keep CSV scale_delay as the minimum wait, then poll until samples exist.
+MIN_MEASUREMENT_SAMPLES = 2
+MAX_MEASUREMENT_WAIT_S = 120
+MEASUREMENT_POLL_S = 2
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -1070,6 +1075,82 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
+def _notify_operator(
+    ctx: ProtocolContext,
+    title: str,
+    details: str,
+    *,
+    pause: bool = True,
+) -> None:
+    """Show a clear message to the operator (log + comment + optional pause)."""
+    message = f"{title}\n{details}".strip()
+    print_error(message)
+    if ctx.is_simulating():
+        return
+    try:
+        ctx.comment(message)
+    except Exception:
+        pass
+    if pause:
+        ctx.pause(
+            f"{message}\n\n"
+            "Resume to continue, or Cancel the run from the app to abort."
+        )
+
+
+def _tagged_sample_count(recorder: GravimetricRecorder, tag: str) -> int:
+    """Count in-memory samples currently tagged for this measurement."""
+    return len(
+        [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
+    )
+
+
+def _wait_for_scale_samples(
+    ctx: ProtocolContext,
+    recorder: GravimetricRecorder,
+    tag: str,
+    min_wait_s: int,
+    max_wait_s: int,
+) -> None:
+    """Keep the sample tag applied until the scale has tagged enough samples.
+
+    Some Radwag read paths only return after the mass is stable, so a fixed
+    scale_delay window can end with zero tagged samples. Hold the tag open
+    for at least min_wait_s, then poll until samples exist or max_wait_s.
+    """
+    if ctx.is_simulating():
+        return
+    max_wait_s = max(min_wait_s, max_wait_s)
+    with recorder.samples_of_tag(tag):
+        print_info(
+            f"waiting {min_wait_s}s (max {max_wait_s}s) for measurement {tag}, "
+            "please wait..."
+        )
+        ctx.delay(min_wait_s)
+        waited = float(min_wait_s)
+        while _tagged_sample_count(recorder, tag) < MIN_MEASUREMENT_SAMPLES:
+            remaining = max_wait_s - waited
+            if remaining <= 0:
+                break
+            extra = min(MEASUREMENT_POLL_S, remaining)
+            n = _tagged_sample_count(recorder, tag)
+            print_info(
+                f"scale not settled ({n}/{MIN_MEASUREMENT_SAMPLES} samples "
+                f"for {tag}); waiting extra {extra}s "
+                f"({waited:.0f}/{max_wait_s}s)..."
+            )
+            ctx.delay(extra)
+            waited += extra
+    sample_count = _tagged_sample_count(recorder, tag)
+    if sample_count < 1:
+        raise RuntimeError(
+            f"SCALE READ FAILED: No scale samples recorded for {tag} "
+            f"after {max_wait_s}s. The Radwag may still be unstable, "
+            "disconnected, or blocked on a stable-only read. "
+            "Check USB/power/draft shield and retry."
+        )
+
+
 def retract_and_wait(
     fixture_settings: FixtureSettings,
     mode: MeasurementType,
@@ -1102,16 +1183,30 @@ def retract_and_wait(
             fixture_settings.recorder.add_simulation_mass(volume * -0.001)
         elif mode == MeasurementType.DISPENSE:
             fixture_settings.recorder.add_simulation_mass(volume * 0.001)
-    m_data = record_measurement_data(
+    # Wait until samples exist while the tag is still applied, then build
+    # MeasurementData without another long fixed delay (already waited above).
+    _wait_for_scale_samples(
         fixture_settings.ctx,
-        m_tag,
         fixture_settings.recorder,
-        fixture_settings.mount,
-        True,  # Stable is always true
-        fixture_settings.env_sensor,
-        False,  # Shorten is always false
+        m_tag,
         fixture_settings.scale_delay,
+        MAX_MEASUREMENT_WAIT_S,
     )
+    try:
+        m_data = record_measurement_data(
+            fixture_settings.ctx,
+            m_tag,
+            fixture_settings.recorder,
+            fixture_settings.mount,
+            True,  # Stable is always true
+            fixture_settings.env_sensor,
+            False,  # Shorten is always false
+            0,  # already waited in _wait_for_scale_samples
+        )
+    except Exception as e:
+        raise RuntimeError(
+            f"SCALE MEASUREMENT ERROR for {m_tag}: {type(e).__name__}: {e}"
+        ) from e
     report.store_measurement(fixture_settings.test_report, m_tag, m_data)
     _MEASUREMENTS.append(
         (
@@ -1790,16 +1885,40 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     fixture_settings, tip, volume
                 )
                 if requirements:
-                    if (
-                        abs(dispense_d) > requirements[0]
-                        or abs(dispense_cv) > requirements[1]
-                    ):
-                        print_error(
-                            f"Pipette failed QC on channel {channel} tip {tip} volume {volume}"
+                    d_limit, cv_limit = requirements
+                    failed_checks = []
+                    if abs(dispense_d) > d_limit:
+                        failed_checks.append(
+                            f"dispense D%={dispense_d:.3f} exceeds limit {d_limit}"
                         )
-                        raise RuntimeError(
-                            f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
+                    if abs(dispense_cv) > cv_limit:
+                        failed_checks.append(
+                            f"dispense CV={dispense_cv:.3f} exceeds limit {cv_limit}"
                         )
+                    if abs(aspirate_d) > d_limit:
+                        failed_checks.append(
+                            f"aspirate D%={aspirate_d:.3f} exceeds limit {d_limit}"
+                        )
+                    if abs(aspirate_cv) > cv_limit:
+                        failed_checks.append(
+                            f"aspirate CV={aspirate_cv:.3f} exceeds limit {cv_limit}"
+                        )
+                    if failed_checks:
+                        _notify_operator(
+                            ctx,
+                            "QC FAILED (fail_early)",
+                            (
+                                f"channel={channel} tip={tip} volume={volume}\n"
+                                f"aspirate: avg={aspirate_average:.4f} "
+                                f"D%={aspirate_d:.3f} CV={aspirate_cv:.3f}\n"
+                                f"dispense: avg={dispense_average:.4f} "
+                                f"D%={dispense_d:.3f} CV={dispense_cv:.3f}\n"
+                                f"limits: |D%|<={d_limit}, CV<={cv_limit}\n"
+                                + "\n".join(f"- {item}" for item in failed_checks)
+                                + "\nResume to continue remaining channels/volumes."
+                            ),
+                        )
+                        # Do not raise: let the operator decide via Cancel/Resume.
             for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
                     trial_asp_dict[trial], volume
@@ -1896,8 +2015,18 @@ def run(ctx: ProtocolContext) -> None:
             if not result:
                 print_error("Failed to upload CSV to Google Drive.")
     except Exception as e:
-        print_error(f"Captured traceback:\n{traceback.format_exc()}")
-        raise e
+        tb = traceback.format_exc()
+        print_error(f"Captured traceback:\n{tb}")
+        _notify_operator(
+            ctx,
+            "PROTOCOL ERROR",
+            (
+                f"{type(e).__name__}: {e}\n"
+                "See robot console / run log for full traceback.\n"
+                "Resume to finish cleanup; the run will still be marked failed."
+            ),
+        )
+        raise
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")
