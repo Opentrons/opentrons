@@ -1,0 +1,123 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-40) var(--spacing-40);
+  margin-top: 7.75rem;
+}
+
+.users_list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.user_row_button.user_row_button {
+  padding: var(--spacing-20) var(--spacing-24);
+  border-radius: var(--spacing-16);
+}
+
+.user_row_content {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-24);
+}
+
+.user_row_details {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: var(--spacing-24);
+}
+
+.user_row_text {
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user_row_locked_status {
+  width: var(--spacing-120);
+  flex-shrink: 0;
+}
+
+.user_row_chevron {
+  width: var(--spacing-48);
+  height: var(--spacing-48);
+  flex-shrink: 0;
+}
+
+.users_list_header {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0 0 var(--spacing-24);
+  gap: var(--spacing-24);
+}
+
+.users_list_header_text {
+  width: 100%;
+}
+
+.odd_create_user_content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8rem;
+}
+
+.odd_create_user_input_container {
+  display: flex;
+  width: 51.5rem;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.odd_choose_role_buttons {
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--spacing-40);
+}
+
+.share_one_time_password_content {
+  display: flex;
+  flex-direction: row;
+  padding: var(--spacing-32) var(--spacing-60) var(--spacing-40);
+  margin-top: 8rem;
+  gap: var(--spacing-40);
+}
+
+.share_one_time_password_left {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.share_one_time_password_right {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.share_one_time_password_password {
+  padding: var(--spacing-16) var(--spacing-20);
+  border-radius: var(--spacing-8);
+  background-color: #cbcccc; /* grey35 */
+}
