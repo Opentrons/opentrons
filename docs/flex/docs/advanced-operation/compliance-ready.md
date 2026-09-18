@@ -10,7 +10,7 @@ Opentrons Flex Compliance Ready Software enables features on your Flex for 21 CF
 
 The software is permanently installed during on your Flex on-site by a trained Opentrons representative. Because Compliance Ready Software is designed to secure your Flex in your lab, some features like [Jupyter notebook access](jupyter-notebook.md), [command line operation](command-line.md), and [Quick Transfer protocols](../touchscreen/quick-transfer.md) are permanently disabled once the software is activated.
 
-This section takes a look at using Compliance Ready Software in your lab. For more, see the [Compliance Ready Software manual](../../compliance-ready-software/index.md). 
+This section takes a look at using Compliance Ready Software in your lab. You can read more in the [Compliance Ready Software manual](../../compliance-ready-software/index.md), or contact [Opentrons](opentrons.com/contact) to get started installing Compliance Ready Software on your Flex. 
  
 ## Logging in
 
@@ -72,6 +72,3 @@ Signing for a run is the final checkpoint to completing the protocol run, and ad
 </figure>
 
 After signing, your compliance ready Flex will prompt you to download audit logs, files containing data like responsible users, timestamps, and required documentation for every robot action. 
-
-Ready to hear more? Get in touch with [Opentrons](opentrons.com/contact).
-
