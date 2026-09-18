@@ -5,5 +5,5 @@ import type { HostConfig } from '../../types'
 import type { AuthUserResponse } from './types'
 
 export function getSelf(config: HostConfig): ResponsePromise<AuthUserResponse> {
-  return request<AuthUserResponse>(GET, `/auth/users/self`, null, config)
+  return request<AuthUserResponse>(GET, `/auth/users/self`, config)
 }

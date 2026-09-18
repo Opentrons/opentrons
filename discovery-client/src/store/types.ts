@@ -16,6 +16,7 @@ import type {
   HEALTH_POLLED,
   INITIALIZE_STATE,
   REMOVE_ROBOT,
+  RENAME_ROBOT,
   SERVICE_FOUND,
 } from './actions'
 
@@ -23,7 +24,7 @@ import type {
  * Health state of a given robot
  */
 export interface RobotState {
-  /** unique name of the robot */
+  /** The human-readable display name of the robot. */
   name: string
   /** latest /health response data from the robot */
   health: HealthResponse | null
@@ -121,10 +122,19 @@ export interface RemoveRobotAction {
   payload: { name: string }
 }
 
+/**
+ * Renames a robot in the state
+ */
+export interface RenameRobotAction {
+  type: typeof RENAME_ROBOT
+  payload: { prevName: string; newName: string }
+}
+
 export type Action =
   | InitializeStateAction
   | ServiceFoundAction
   | HealthPolledAction
   | RemoveRobotAction
+  | RenameRobotAction
 
 export type Dispatch = (action: Action) => Action

@@ -255,6 +255,7 @@ from .move_labware import (
     MoveLabwareCreate,
     MoveLabwareParams,
     MoveLabwareResult,
+    VacuumModuleUnderVacuumMovementError,
 )
 from .move_relative import (
     MoveRelative,
@@ -1008,6 +1009,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[OverpressureError],
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
+    DefinedErrorData[VacuumModuleUnderVacuumMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
@@ -1015,6 +1017,9 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerLabwareRetrieveError],
     DefinedErrorData[FlexStackerShuttleOccupiedError],
     DefinedErrorData[FlexStackerLabwareStoreError],
+    DefinedErrorData[vacuum_module.VacuumPressureNotReachedError],
+    DefinedErrorData[vacuum_module.VacuumModuleCarboyFullError],
+    DefinedErrorData[vacuum_module.VacuumModuleError],
 ]
 
 

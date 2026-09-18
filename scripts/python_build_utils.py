@@ -34,6 +34,7 @@ package_entries = {
     'performance-metrics': PackageEntry('performance_metrics'),
     'auth-server': PackageEntry('auth_server'),
     'key-server': PackageEntry('key_server'),
+    'audit-server': PackageEntry('audit_server'),
 }
 
 project_entries = {
@@ -74,11 +75,19 @@ def normalize_version(package, project, extra_tag='', git_dir=None):
     vers_obj = packaging.version.Version(get_version(package, project, extra_tag, git_dir))
     return str(vers_obj)
 
-def _latest_tag_for_prefix(prefix, git_dir):
+def _tag_glob_for_prefix(prefix, project):
+    if project == 'robot-stack':
+        # Require major.minor shape; excludes mistagged names like vacuum-module-qc-*.
+        return prefix + '[0-9]*.[0-9]*'
+    return prefix + '*'
+
+
+def _latest_tag_for_prefix(prefix, git_dir, project='robot-stack'):
     check_dir = git_dir or CWD
+    tag_glob = _tag_glob_for_prefix(prefix, project)
     try:
         tags_result = subprocess.check_output(
-            ['git', 'describe', '--tags', '--abbrev=0', '--match=' + prefix + '*'],
+            ['git', 'describe', '--tags', '--abbrev=0', '--match=' + tag_glob],
             cwd=check_dir)
     except subprocess.CalledProcessError:
         # This happens if a tag for the project didn't exist. This might be because
@@ -96,7 +105,7 @@ def _latest_tag_for_prefix(prefix, git_dir):
 
 def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
-    tag = _latest_tag_for_prefix(prefix, git_dir)
+    tag = _latest_tag_for_prefix(prefix, git_dir, project)
     return prefix.join(tag.split(prefix)[1:])
 
 def _ref_from_sha(sha):

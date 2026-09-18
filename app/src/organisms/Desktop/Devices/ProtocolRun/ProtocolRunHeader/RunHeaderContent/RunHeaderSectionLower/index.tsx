@@ -13,7 +13,7 @@ import {
 import { useStoredProtocolAnalysis } from '/app/resources/analysis/hooks/useStoredProtocolAnalysis'
 import {
   EMPTY_TIMESTAMP,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunCreatedAtTimestamp,
   useRunTimestamps,
 } from '/app/resources/runs'
@@ -45,7 +45,7 @@ export function RunHeaderSectionLower({
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { protocolKey, robotType } = useProtocolDetailsForRun(runId)
+  const { protocolKey, robotType } = useQuickProtocolDetailsForRun(runId)
   const { makeSnackbar } = useToaster()
 
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

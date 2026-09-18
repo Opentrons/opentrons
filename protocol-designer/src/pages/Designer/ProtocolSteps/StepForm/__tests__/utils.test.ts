@@ -18,6 +18,7 @@ import {
 import { getMaxUiFlowRate, getNumPickups } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
+  getBlowoutLabwareDetails,
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
 } from '../utils'
@@ -90,6 +91,46 @@ describe('getBlowoutLocationOptionsForForm', () => {
   it('should return an empty array for unknown stepType', () => {
     const result = getBlowoutLocationOptionsForForm({ stepType: 'comment' })
     expect(result).toEqual([])
+  })
+})
+
+describe('getBlowoutLabwareDetails', () => {
+  const makePropsForFields = (blowoutLocation: string | null): any => ({
+    blowout_location: { value: blowoutLocation },
+    aspirate_labware: { value: 'mockAspirateLabwareId' },
+    dispense_labware: { value: 'mockDispenseLabwareId' },
+  })
+
+  it('should return the aspirate labware id when blowout location is the source well', () => {
+    expect(
+      getBlowoutLabwareDetails(
+        makePropsForFields(SOURCE_WELL_BLOWOUT_DESTINATION)
+      )
+    ).toEqual({
+      isBlowoutLocationLabware: true,
+      blowOutLabwareId: 'mockAspirateLabwareId',
+    })
+  })
+
+  it('should return the dispense labware id when blowout location is the destination well', () => {
+    expect(
+      getBlowoutLabwareDetails(
+        makePropsForFields(DEST_WELL_BLOWOUT_DESTINATION)
+      )
+    ).toEqual({
+      isBlowoutLocationLabware: true,
+      blowOutLabwareId: 'mockDispenseLabwareId',
+    })
+  })
+
+  it('should report a non-labware location for a trash bin', () => {
+    const result = getBlowoutLabwareDetails(makePropsForFields('trashBinId'))
+    expect(result.isBlowoutLocationLabware).toBe(false)
+  })
+
+  it('should report a non-labware location when blowout location is unset', () => {
+    const result = getBlowoutLabwareDetails(makePropsForFields(null))
+    expect(result.isBlowoutLocationLabware).toBe(false)
   })
 })
 

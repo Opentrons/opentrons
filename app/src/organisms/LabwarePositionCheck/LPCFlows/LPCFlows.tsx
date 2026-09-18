@@ -2,6 +2,10 @@ import { LPCWizardContainer } from '/app/organisms/LabwarePositionCheck/LPCWizar
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
+import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
   LabwareDefinition,
@@ -27,6 +31,9 @@ export interface LPCFlowsProps {
   protocolName: string
   maintenanceRunId: string
   analytics: ReturnType<typeof useLPCAnalytics>
+  commandDocState: DocumentationState
+  actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
 }
 
 export function LPCFlows(props: LegacySupportLPCFlowsProps): JSX.Element {

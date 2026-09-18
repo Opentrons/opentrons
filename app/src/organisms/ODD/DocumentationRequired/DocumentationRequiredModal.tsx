@@ -3,30 +3,36 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
-export interface DocumentationRequiredModalArgs {
-  username: string
-}
-
-export interface DocumentationRequiredModalResult {
-  note: string
-  confirmedAt: string
-}
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 const DocumentationRequiredModalImpl = NiceModal.create(
-  ({ username }: { username: string }): JSX.Element => {
+  ({
+    username,
+    actionsToDocument,
+    minReportLength,
+    onCancel,
+    initialDocreport,
+  }: {
+    username: string
+    actionsToDocument: DocumentedAction[]
+    minReportLength: number
+    onCancel?: () => void
+    initialDocreport?: DocumentationReport
+  }): JSX.Element => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
-      const result: DocumentationRequiredModalResult = {
-        note,
-        confirmedAt: new Date().toISOString(),
-      }
+      const result: DocumentationReport = note as DocumentationReport
       modal.resolve(result)
       modal.remove()
     }
 
     const handleBack = (): void => {
-      modal.resolve(null)
+      onCancel?.()
+      modal.resolve('' as DocumentationReport)
       modal.remove()
     }
 
@@ -34,8 +40,11 @@ const DocumentationRequiredModalImpl = NiceModal.create(
       <div className={styles.overlay}>
         <DocumentationRequired
           username={username}
+          actionsToDocument={actionsToDocument}
           onConfirm={handleConfirm}
           onBack={handleBack}
+          initialDocreport={initialDocreport}
+          minReportLength={minReportLength}
         />
       </div>
     )
@@ -43,6 +52,16 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 )
 
 export const showDocumentationRequiredModal = (
-  username: string
-): Promise<DocumentationRequiredModalResult | null> =>
-  NiceModal.show(DocumentationRequiredModalImpl, { username })
+  username: string,
+  actionsToDocument: DocumentedAction[],
+  minReportLength: number,
+  onCancel?: () => void,
+  initialDocreport?: DocumentationReport
+): Promise<DocumentationReport> =>
+  NiceModal.show(DocumentationRequiredModalImpl, {
+    username,
+    actionsToDocument,
+    minReportLength,
+    onCancel,
+    initialDocreport,
+  })

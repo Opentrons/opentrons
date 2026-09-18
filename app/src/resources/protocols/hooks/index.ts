@@ -1,3 +1,4 @@
+export * from './useEnsureProtocolAnalysis'
 export * from './useLastRunProtocolCommand'
 export * from './useRunningStepCounts'
 export * from './useCurrentProtocol'

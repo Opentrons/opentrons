@@ -95,11 +95,13 @@ describe('LabwareMapView', () => {
       mostRecentAnalysis: {} as unknown as CompletedProtocolAnalysis,
       startingDeck: {
         A1: [
-          {
-            displayName: 'nickName',
-            definitionUri: 'mock def uri',
-            labwareId: '1234',
-          },
+          [
+            {
+              displayName: 'nickName',
+              definitionUri: 'mock def uri',
+              labwareId: '1234',
+            },
+          ],
         ],
       },
       labwareByLiquidId: {},

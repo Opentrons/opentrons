@@ -5,13 +5,7 @@ import { remote } from './redux/shell/remote'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'http'
-  | 'verbose'
-  | 'debug'
-  | 'silly'
+  'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly'
 
 export type Log = (message: string, meta?: {}) => void
 

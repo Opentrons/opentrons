@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -20,16 +18,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { FloatingActionButton } from '/app/atoms/buttons'
+import { TouchFloatingActionButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
-import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
-  useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
-} from '/app/resources/runs'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
@@ -60,16 +54,6 @@ export function ProtocolSetupModulesAndDeck({
   setSetupScreen,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
-  const runStatus = runRecord?.data.status ?? null
-  useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED) {
-      navigate('/protocols')
-    }
-  }, [runStatus, navigate])
   const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
     useState<boolean>(false)
   const [showMapView, setShowMapView] = useState<boolean>(false)
@@ -84,20 +68,30 @@ export function ProtocolSetupModulesAndDeck({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
+  const attachedModulesData = useAttachedModules({
+    refetchInterval: ATTACHED_MODULE_POLL_MS,
+  })
+  const attachedModules = useMemo(
+    () => attachedModulesData ?? [],
+    [attachedModulesData]
+  )
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   const hasModules = attachedProtocolModuleMatches.length > 0
@@ -196,11 +190,14 @@ export function ProtocolSetupModulesAndDeck({
           </>
         )}
       </Flex>
-      <FloatingActionButton
+      <TouchFloatingActionButton
         buttonText={showMapView ? t('list_view') : t('map_view')}
         onClick={() => {
           setShowMapView(mapView => !mapView)
         }}
+        aria-label={
+          showMapView ? t('display_list_view') : t('display_map_view')
+        }
       />
     </>
   )

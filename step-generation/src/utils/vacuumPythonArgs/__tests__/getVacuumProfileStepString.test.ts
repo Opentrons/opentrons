@@ -15,9 +15,10 @@ describe('getVacuumProfileStepString', () => {
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "gauge_pressure": 55,
+        "gauge_pressure_mbar": 55,
+        "enable_pump": True,
         "hold_time_seconds": 12,
         "vent_after": False,
     }
@@ -31,9 +32,10 @@ describe('getVacuumProfileStepString', () => {
       { enablePump: true, holdSeconds: 5, percentPower: 30, ventAfter: false },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "power_percent": 30,
+        "percent_power": 30,
+        "enable_pump": True,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -57,9 +59,10 @@ describe('getVacuumProfileStepString', () => {
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "gauge_pressure": 30,
+        "gauge_pressure_mbar": 30,
+        "enable_pump": True,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -84,14 +87,16 @@ describe('getVacuumProfileStepString', () => {
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "gauge_pressure": 10,
+        "gauge_pressure_mbar": 10,
+        "enable_pump": True,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "gauge_pressure": 20,
+        "gauge_pressure_mbar": 20,
+        "enable_pump": True,
         "hold_time_seconds": 2,
         "vent_after": False,
     }
@@ -121,19 +126,22 @@ describe('getVacuumProfileStepString', () => {
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "gauge_pressure": 100,
+        "gauge_pressure_mbar": 100,
+        "enable_pump": True,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "power_percent": 30,
+        "percent_power": 30,
+        "enable_pump": True,
         "hold_time_seconds": 5,
         "vent_after": False,
     },
     {
-        "power_percent": 30,
+        "percent_power": 30,
+        "enable_pump": True,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -163,14 +171,16 @@ describe('getVacuumProfileStepString', () => {
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[
+      `steps=[
     {
-        "gauge_pressure": 1,
+        "gauge_pressure_mbar": 1,
+        "enable_pump": True,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "power_percent": 50,
+        "percent_power": 50,
+        "enable_pump": True,
         "hold_time_seconds": 2,
         "vent_after": True,
     }

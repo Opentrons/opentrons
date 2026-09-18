@@ -13,6 +13,7 @@ import {
 
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleRenderInfoForProtocolById,
@@ -58,6 +59,18 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const runHasStarted = useRunHasStarted(runId)
   const tooltipText = runHasStarted ? t('protocol_run_started') : null
 
+  const handleProceed = useHandleAndLog(
+    () => {
+      setLabwareConfirmed(true)
+    },
+    'confirm_placements',
+    {
+      action: 'confirm liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
+    }
+  )
+
   return (
     <>
       <Flex
@@ -79,9 +92,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing16}>
         <PrimaryButton
-          onClick={() => {
-            setLabwareConfirmed(true)
-          }}
+          onClick={handleProceed}
           disabled={labwareConfirmed || runHasStarted}
           {...targetProps}
         >

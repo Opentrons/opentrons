@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import lru_cache
 from logging import getLogger
@@ -124,7 +124,9 @@ def _verify_height(
     Evaluate the height found by capacitive probe against search settings.
     """
     if found_pos > expected_pos + settings.early_sense_tolerance_mm:
-        raise EarlyCapacitiveSenseTrigger(found_pos, expected_pos)
+        raise EarlyCapacitiveSenseTrigger(
+            f"Calibration triggered early at z={found_pos}mm, expected {expected_pos}"
+        )
 
 
 async def _verify_edge_pos(
@@ -166,7 +168,9 @@ async def _verify_edge_pos(
             return
         else:
             last_result = hit_deck
-    raise EdgeNotFoundError(edge_name_str, check_stride)
+    raise EdgeNotFoundError(
+        f"Edge {edge_name_str} could not be verified at {check_stride} mm resolution."
+    )
 
 
 def critical_edge_offset(
@@ -377,7 +381,9 @@ async def find_calibration_structure_height(
         hcapi, mount, z_prep_point, z_pass_settings, probe=probe
     )
     if not hit_deck:
-        raise CalibrationStructureNotFoundError(structure_z, z_limit)
+        raise CalibrationStructureNotFoundError(
+            f"Structure height at z={structure_z}mm beyond lower limit: {z_limit}."
+        )
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
 
@@ -455,7 +461,10 @@ async def find_axis_center(
     left_edge_absolute = axis.of_point(start) + left_edge
     right_edge_absolute = axis.of_point(start) + right_edge
     if abs(detected_width - nominal_width) > WIDTH_TOLERANCE_MM:
-        raise InaccurateNonContactSweepError(nominal_width, detected_width)
+        raise InaccurateNonContactSweepError(
+            f"Calibration detected a slot width of {detected_width:.3f}mm, "
+            f"which is too far from the design width of {nominal_width:.3f}mm"
+        )
     return (left_edge_absolute + right_edge_absolute) / 2
 
 
@@ -1106,6 +1115,87 @@ class OT3Transforms(RobotCalibration):
     left_mount_offset: Point
     right_mount_offset: Point
     gripper_mount_offset: Point
+
+    @staticmethod
+    def to_pyro_dict(obj: "OT3Transforms") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        transform_dict = asdict(obj)
+        transform_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        transform_dict["deck_calibration"]["source"] = obj.deck_calibration.source.value
+        transform_dict["deck_calibration"]["status"] = {
+            "markedBad": obj.deck_calibration.status.markedBad,
+            "source": obj.deck_calibration.status.source.value
+            if obj.deck_calibration.status.source is not None
+            else None,
+            "markedAt": obj.deck_calibration.status.markedAt.isoformat()
+            if obj.deck_calibration.status.markedAt is not None
+            else None,
+        }
+        transform_dict["deck_calibration"]["last_modified"] = (
+            obj.deck_calibration.last_modified.isoformat()
+            if obj.deck_calibration.last_modified is not None
+            else None
+        )
+
+        def _point_to_dict(point: Point) -> Dict[str, float]:
+            return {
+                "x": float(point.x),
+                "y": float(point.y),
+                "z": float(point.z),
+            }
+
+        transform_dict["carriage_offset"] = _point_to_dict(obj.carriage_offset)
+        transform_dict["left_mount_offset"] = _point_to_dict(obj.left_mount_offset)
+        transform_dict["right_mount_offset"] = _point_to_dict(obj.right_mount_offset)
+        transform_dict["gripper_mount_offset"] = _point_to_dict(
+            obj.gripper_mount_offset
+        )
+
+        return transform_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "OT3Transforms":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        status_source = data["deck_calibration"]["status"]["source"]
+        status_marked_at = data["deck_calibration"]["status"]["markedAt"]
+        last_modified = data["deck_calibration"]["last_modified"]
+
+        def _dict_to_point(point_dict: Dict[str, float]) -> Point:
+            return Point(
+                x=float(point_dict["x"]),
+                y=float(point_dict["y"]),
+                z=float(point_dict["z"]),
+            )
+
+        return OT3Transforms(
+            deck_calibration=DeckCalibration(
+                attitude=data["deck_calibration"]["attitude"],
+                source=types.SourceType(data["deck_calibration"]["source"]),
+                status=types.CalibrationStatus(
+                    markedBad=data["deck_calibration"]["status"]["markedBad"],
+                    source=None
+                    if status_source is None
+                    else types.SourceType(status_source)
+                    if status_source is not None
+                    else None,
+                    markedAt=datetime.datetime.fromisoformat(status_marked_at)
+                    if status_marked_at is not None
+                    else None,
+                ),
+                belt_attitude=data["deck_calibration"]["belt_attitude"],
+                last_modified=datetime.datetime.fromisoformat(last_modified)
+                if last_modified is not None
+                else None,
+                pipette_calibrated_with=data["deck_calibration"][
+                    "pipette_calibrated_with"
+                ],
+                tiprack=data["deck_calibration"]["tiprack"],
+            ),
+            carriage_offset=_dict_to_point(data["carriage_offset"]),
+            left_mount_offset=_dict_to_point(data["left_mount_offset"]),
+            right_mount_offset=_dict_to_point(data["right_mount_offset"]),
+            gripper_mount_offset=_dict_to_point(data["gripper_mount_offset"]),
+        )
 
 
 def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:

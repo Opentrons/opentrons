@@ -16,16 +16,14 @@ connected_router = APIRouter()
     "/system/connected",
     deprecated=True,
     summary="Obtain a list of all active authorizations",
-    description=dedent(
-        """\
+    description=dedent("""\
         This was part of an experimental set of endpoints for authorization.
         It's kept for compatibility reasons. Do not use it in new code.
         Use the `/auth` endpoints instead.
 
         This returns all the active (unexpired) authorizations that were created
         through `/system/authorize`.
-        """
-    ),
+        """),
     status_code=status.HTTP_200_OK,
     response_model=GetConnectedResponse,
 )

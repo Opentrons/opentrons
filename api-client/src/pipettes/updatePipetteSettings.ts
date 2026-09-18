@@ -15,7 +15,7 @@ export function updatePipetteSettings(
   return request<IndividualPipetteSettings, UpdatePipetteSettingsData>(
     PATCH,
     `/settings/pipettes/${pipetteId}`,
-    data,
-    config
+    config,
+    { body: data }
   )
 }

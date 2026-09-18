@@ -7,12 +7,13 @@ import type { HostConfig } from '../types'
 export function addCameraSettingsToRun(
   config: HostConfig,
   runId: string,
-  data: CameraData
+  data: CameraData,
+  userNotes: string
 ): ResponsePromise<CameraResponse> {
   return request<CameraResponse, { data: CameraData }>(
     POST,
     `/runs/${runId}/camera/settings`,
-    { data },
-    config
+    config,
+    { body: { data }, userNotes }
   )
 }

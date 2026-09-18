@@ -40,13 +40,23 @@ export function prefixForProject(project) {
   }
 }
 
+/** Git tag glob for listing/describing versions of a project. */
+export function tagGlobForProject(project) {
+  const prefix = prefixForProject(project)
+  if (project === 'robot-stack') {
+    // Require major.minor shape; excludes mistagged names like vacuum-module-qc-*.
+    return `${prefix}[0-9]*.[0-9]*`
+  }
+  return `${prefix}*`
+}
+
 export async function latestTagForProject(project) {
   return (
     await monorepoGit().raw([
       'describe',
       '--tags',
       '--abbrev=0',
-      `--match=${prefixForProject(project)}*`,
+      `--match=${tagGlobForProject(project)}`,
     ])
   ).trim()
 }

@@ -5,7 +5,7 @@ import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 
 export type AttachedPipettesFromInstrumentsQuery = {
   [mount in Mount]: null | PipetteInformation

@@ -51,8 +51,9 @@ class StopVacuumImpl(
 
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         if vm_hardware is not None:
-            await vm_hardware.set_vacuum_state(enable_vacuum=False)
+            await vm_hardware.stop_vacuum()
 
+        state_update.update_vacuum_module_pump_engaged(params.moduleId, False)
         return SuccessData(public=StopVacuumResult(), state_update=state_update)
 
 

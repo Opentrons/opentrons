@@ -3,17 +3,17 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useSentryReport } from '/app/App/hooks'
+import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { reloadUi } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'
@@ -32,7 +32,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   useSentryReport(error)
 
   return (
-    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
+    <Modal type="warning" title={t('error_boundary_title')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <LegacyStyledText forwardedAs="p">
@@ -45,12 +45,13 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
             {error.message}
           </LegacyStyledText>
         </Flex>
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           alignSelf={ALIGN_FLEX_END}
           onClick={handleReloadClick}
         >
           {t('reload_app')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Modal>
   )

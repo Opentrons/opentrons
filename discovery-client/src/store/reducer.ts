@@ -81,6 +81,14 @@ export const robotsByNameReducer = (
       return name in state ? omit(state, name) : state
     }
 
+    case Actions.RENAME_ROBOT: {
+      const { prevName, newName } = action.payload
+      const robot = state[prevName]
+      if (robot == null || prevName === newName) return state
+      const nextState = { ...state, [newName]: { ...robot, name: newName } }
+      return omit(nextState, prevName)
+    }
+
     case Actions.SERVICE_FOUND: {
       const { name } = action.payload
       const robot: RobotState | undefined = state[name]
@@ -140,6 +148,23 @@ export const hostsByIpReducer = (
       })
 
       return removals.length > 0 ? omit(state, removals) : state
+    }
+
+    case Actions.RENAME_ROBOT: {
+      const { prevName, newName } = action.payload
+      if (prevName === newName) return state
+      let changed = false
+      const nextState: HostsByIpMap = {}
+      Object.keys(state).forEach((ip: string) => {
+        const host = state[ip]
+        if (host.robotName === prevName) {
+          changed = true
+          nextState[ip] = { ...host, robotName: newName }
+        } else {
+          nextState[ip] = host
+        }
+      })
+      return changed ? nextState : state
     }
 
     case Actions.SERVICE_FOUND: {

@@ -9,33 +9,45 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDataFileRawQuery } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
-import { downloadFile } from './utils'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 
 interface DownloadCsvFileLinkProps {
   fileId: string
   fileName: string
 }
+
 export function DownloadCsvFileLink(
   props: DownloadCsvFileLinkProps
 ): JSX.Element {
   const { fileId, fileName } = props
   const { t } = useTranslation('run_details')
-  const { data: csvFileRaw } = useDataFileRawQuery(fileId)
+  const host = useHost()
 
   return (
     <Link
       role="button"
       css={
-        csvFileRaw == null
+        host == null
           ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
           : TYPOGRAPHY.linkPSemiBold
       }
       onClick={() => {
-        if (csvFileRaw != null) {
-          downloadFile(csvFileRaw, fileName)
+        if (host == null) {
+          return
         }
+        void saveFileFromUrl({
+          name: fileName,
+          source: `/dataFiles/${fileId}/download`,
+          hostname: host.hostname,
+          port: host.port ?? null,
+        }).catch((error: unknown) => {
+          if (!isFileSaveCanceledError(error)) {
+            throw error
+          }
+        })
       }}
     >
       <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>

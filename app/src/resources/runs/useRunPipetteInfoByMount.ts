@@ -7,25 +7,26 @@ import {
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
-import { INCOMPATIBLE, INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
+import {
+  INCOMPATIBLE,
+  INEXACT_MATCH,
+  MATCH,
+} from '/app/resources/runs/constants'
 
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
+import type { AttachedPipette, Mount } from '@opentrons/api-client'
 import type {
   LabwareDefinition,
   LoadPipetteRunTimeCommand,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type {
-  AttachedPipette,
-  Mount,
-  PipetteInfo,
-} from '/app/redux/pipettes/types'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 

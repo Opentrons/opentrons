@@ -18,6 +18,7 @@ class InvalidCriticalPoint(MotionPlanningFailureError):
             message=(message or f"Critical point {cp_name} is invalid for a {instr}."),
             detail={"instrument": instr, "critical point": cp_name},
         )
+        self.args = (cp_name, instr, message)
 
 
 class InvalidPipetteName(InvalidInstrumentData):
@@ -28,6 +29,7 @@ class InvalidPipetteName(InvalidInstrumentData):
             message=f"Invalid pipette name key {name} on mount {mount}",
             detail={"mount": mount, "name": str(name)},
         )
+        self.args = (name, mount)
 
 
 class InvalidPipetteModel(InvalidInstrumentData):
@@ -35,6 +37,7 @@ class InvalidPipetteModel(InvalidInstrumentData):
 
     def __init__(self, name: str, model: str, mount: str) -> None:
         super().__init__(detail={"mount": mount, "name": name, "model": model})
+        self.args = (name, mount, mount)
 
 
 class UpdateOngoingError(RobotInUseError):

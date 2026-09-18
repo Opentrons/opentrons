@@ -74,7 +74,7 @@ async def test_absorbance_reader_implementation(
     )
 
     decoy.when(await absorbance_module_hw.start_measure()).then_return([[1.2, 1.3]])
-    decoy.when(absorbance_module_hw._measurement_config).then_return(
+    decoy.when(absorbance_module_hw.measurement_config).then_return(
         ABSMeasurementConfig(
             measure_mode=ABSMeasurementMode.SINGLE,
             sample_wavelengths=[1, 2],

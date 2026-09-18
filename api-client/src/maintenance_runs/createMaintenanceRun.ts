@@ -6,12 +6,13 @@ import type { CreateMaintenanceRunData, MaintenanceRun } from './types'
 
 export function createMaintenanceRun(
   config: HostConfig,
-  data: CreateMaintenanceRunData = {}
+  data: CreateMaintenanceRunData = {},
+  userNotes?: string
 ): ResponsePromise<MaintenanceRun> {
   return request<MaintenanceRun, { data: CreateMaintenanceRunData }>(
     POST,
     '/maintenance_runs',
-    { data },
-    config
+    config,
+    { body: { data }, userNotes }
   )
 }

@@ -84,9 +84,9 @@ const containerStyle = (
     padding: ${SPACING.spacing12};
     border-radius: ${SPACING.spacing8};
     gap: ${SPACING.spacing8};
-    background-color: ${alertKind === 'warning'
-      ? COLORS.yellow30
-      : COLORS.grey20};
+    background-color: ${
+      alertKind === 'warning' ? COLORS.yellow30 : COLORS.grey20
+    };
     transition: ${TRANSITION_STYLE};
 
     &:focus-visible {
@@ -98,22 +98,22 @@ const containerStyle = (
       padding: ${SPACING.spacing24};
       gap: ${SPACING.spacing24};
       border-radius: ${SPACING.spacing16};
-      background-color: ${alertKind === 'warning'
-        ? COLORS.yellow35
-        : COLORS.grey35};
+      background-color: ${
+        alertKind === 'warning' ? COLORS.yellow35 : COLORS.grey35
+      };
 
       &:active {
-        background-color: ${alertKind === 'warning'
-          ? COLORS.yellow40
-          : COLORS.grey40};
+        background-color: ${
+          alertKind === 'warning' ? COLORS.yellow40 : COLORS.grey40
+        };
       }
     }
 
     @media not all and ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       &:hover {
-        background-color: ${alertKind === 'warning'
-          ? COLORS.yellow30
-          : COLORS.grey30};
+        background-color: ${
+          alertKind === 'warning' ? COLORS.yellow30 : COLORS.grey30
+        };
       }
     }
   `

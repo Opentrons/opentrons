@@ -6,6 +6,7 @@ import { deleteMaintenanceRun } from '@opentrons/api-client'
 
 import { useDeleteMaintenanceRunMutation } from '..'
 import { MAINTENANCE_RUN_ID } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -34,9 +35,16 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(deleteMaintenanceRun).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useDeleteMaintenanceRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          []
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID)
@@ -51,9 +59,16 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       data: { data: null },
     } as Response<EmptyResponse>)
 
-    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useDeleteMaintenanceRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          []
+        ),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID))
 
     await waitFor(() => {

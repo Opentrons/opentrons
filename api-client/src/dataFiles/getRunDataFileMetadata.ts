@@ -11,7 +11,6 @@ export function getRunDataFileMetadata(
   return request<RunDataFileMetadataResponse>(
     GET,
     `/dataFiles/${runId}/all`,
-    null,
     config
   )
 }

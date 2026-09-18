@@ -39,7 +39,7 @@ describe('ModuleSetupModal', () => {
   it('should render the correct body', () => {
     render(props)
     screen.getByText(
-      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.'
+      'Follow the step-by-step setup instructions in the module’s manual. Scan the QR code or click the link below to view it on the Opentrons documentation website.'
     )
   })
   it('should render a link to the learn more page', () => {
@@ -50,7 +50,7 @@ describe('ModuleSetupModal', () => {
           name: 'mockModuleDisplayName setup instructions',
         })
         .getAttribute('href')
-    ).toBe('https://support.opentrons.com/s/modules')
+    ).toBe('https://docs.opentrons.com/temperature-module/')
   })
   it('should call close when the close button is pressed', () => {
     render(props)
@@ -66,7 +66,7 @@ describe('ModuleSetupModal', () => {
     }
     render(props)
     screen.getByText(
-      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to read the module Instruction Manual.'
+      'Follow the step-by-step setup instructions in the module’s manual. Scan the QR code or click the link below to view it on the Opentrons documentation website.'
     )
     expect(
       screen
@@ -74,9 +74,7 @@ describe('ModuleSetupModal', () => {
           name: 'mockModuleDisplayName setup instructions',
         })
         .getAttribute('href')
-    ).toBe(
-      'https://insights.opentrons.com/hubfs/Absorbance%20Plate%20Reader%20Instruction%20Manual.pdf'
-    )
+    ).toBe('https://docs.opentrons.com/absorbance-plate-reader/')
   })
   it('should render variable copy and link if flex stacker', () => {
     props = {
@@ -85,7 +83,7 @@ describe('ModuleSetupModal', () => {
     }
     render(props)
     screen.getByText(
-      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to see the Stacker Quickstart guide.'
+      'Follow the step-by-step setup instructions in the module’s manual. Scan the QR code or click the link below to view it on the Opentrons documentation website.'
     )
     expect(
       screen
@@ -93,6 +91,6 @@ describe('ModuleSetupModal', () => {
           name: 'mockModuleDisplayName setup instructions',
         })
         .getAttribute('href')
-    ).toBe('https://docs.opentrons.com/stacker/installation/')
+    ).toBe('https://docs.opentrons.com/stacker/')
   })
 })

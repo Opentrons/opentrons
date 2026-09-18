@@ -35,7 +35,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
-import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
+import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -96,15 +96,15 @@ export const ChooseModuleToConfigureModal = (
       [[], []]
     ) ?? []
 
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
   const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
 
   const stackerIdentifyHandler = (module: AttachedModule): void => {
-    sendIdentifyStacker(module, true, 'blue')
+    sendIdentifyModule(module, true, 'blue')
     setIdentifyInUse(module.serialNumber)
     const timeoutID = setTimeout(() => {
-      sendIdentifyStacker(module, false)
+      sendIdentifyModule(module, false)
       setIdentifyInUse(null)
     }, MODULE_IDENTIFY_TIME_MS)
     setTimeoutID(timeoutID)
@@ -127,7 +127,7 @@ export const ChooseModuleToConfigureModal = (
         unconfiguredModuleMatches.find(m => m.serialNumber === identifyInUse) ??
         null
       if (previousModule !== null && module !== null) {
-        sendIdentifyStacker(previousModule, false)
+        sendIdentifyModule(previousModule, false)
         if (identifyTimeout !== null) {
           clearTimeout(identifyTimeout)
         }
@@ -138,7 +138,7 @@ export const ChooseModuleToConfigureModal = (
   const handleStackerClearAndConfigureModule = (
     module: AttachedModule
   ): void => {
-    sendIdentifyStacker(module, false)
+    sendIdentifyModule(module, false)
     if (identifyTimeout !== null) {
       clearTimeout(identifyTimeout)
     }

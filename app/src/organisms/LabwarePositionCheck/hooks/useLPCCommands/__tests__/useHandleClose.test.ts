@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 
@@ -13,10 +13,12 @@ describe('useHandleClose', () => {
   const mockMaintenanceRunId = 'mock_maintenance_run'
   const mockOnCloseClick = vi.fn()
   const mockChainRunCommands = vi.fn(() => Promise.resolve())
+  const mockFlushJogAudit = vi.fn()
 
   const mockProps = {
     maintenanceRunId: mockMaintenanceRunId,
     onCloseClick: mockOnCloseClick,
+    flushJogAudit: mockFlushJogAudit,
   } as any
 
   beforeEach(() => {
@@ -32,6 +34,10 @@ describe('useHandleClose', () => {
     vi.mocked(useChainMaintenanceCommands).mockReturnValue({
       chainRunCommands: mockChainRunCommands,
     } as any)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should initialize with isExiting as false', () => {
@@ -56,6 +62,7 @@ describe('useHandleClose', () => {
       true
     )
     expect(mockOnCloseClick).toHaveBeenCalled()
+    expect(mockFlushJogAudit).toHaveBeenCalled()
   })
 
   it('should call onCloseClick even if chainRunCommands fails', async () => {
@@ -70,6 +77,7 @@ describe('useHandleClose', () => {
     expect(result.current.isExiting).toBe(true)
     expect(mockChainRunCommands).toHaveBeenCalled()
     expect(mockOnCloseClick).toHaveBeenCalled()
+    expect(mockFlushJogAudit).toHaveBeenCalled()
   })
 
   it('should set isExiting to true and call onCloseClick when handleCloseNoHome is called', async () => {
@@ -82,5 +90,6 @@ describe('useHandleClose', () => {
     expect(result.current.isExiting).toBe(true)
     expect(mockChainRunCommands).not.toHaveBeenCalled()
     expect(mockOnCloseClick).toHaveBeenCalled()
+    expect(mockFlushJogAudit).toHaveBeenCalled()
   })
 })

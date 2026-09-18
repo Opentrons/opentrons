@@ -42,10 +42,7 @@ import type {
 
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
-  | ConsolidateArgs
-  | DistributeArgs
-  | TransferArgs
-  | MixArgs
+  ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs
 
 function getCommandCreatorForTransferlikeSubsteps(
   stepArgs: TransferLikeArgs
@@ -319,7 +316,7 @@ export function generateSubstepItem(
   labwareNamesByModuleId: LabwareNamesByModuleId
 ): SubstepItemData | null | undefined {
   if (!robotState) {
-    console.info(
+    console.warn(
       `No robot state, could not generate substeps for step ${stepId}.` +
         `There was probably an upstream error.`
     )

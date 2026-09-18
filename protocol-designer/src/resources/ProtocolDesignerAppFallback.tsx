@@ -5,11 +5,11 @@ import { captureException } from '@sentry/react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -44,7 +44,7 @@ export function ProtocolDesignerAppFallback({
   }, [error, errorId])
 
   return (
-    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
+    <Modal type="warning" title={t('error_boundary_title')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="bodyDefaultRegular">
@@ -59,9 +59,9 @@ export function ProtocolDesignerAppFallback({
           <SecondaryButton onClick={handleDownloadProtocol}>
             {t('download_protocol')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleReloadClick}>
+          <PrimaryButton variant="warning" onClick={handleReloadClick}>
             {t('reload_app')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

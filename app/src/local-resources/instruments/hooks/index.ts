@@ -1,4 +1,5 @@
 export * from './useGripperDisplayName'
+export * from './useHomeGantry'
 export * from './useHomePipettes'
 export * from './usePipetteModelSpecs'
 export * from './usePipetteNameSpecs'

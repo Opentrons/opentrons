@@ -12,20 +12,13 @@ export interface TipLengthDeletionParams {
   pipette_id: string
 }
 export type DeleteCalRequestParams =
-  | PipOffsetDeletionParams
-  | TipLengthDeletionParams
+  PipOffsetDeletionParams | TipLengthDeletionParams
 
 export type FetchCalibrationStatusParams =
-  | PipOffsetDeletionParams
-  | TipLengthDeletionParams
+  PipOffsetDeletionParams | TipLengthDeletionParams
 
 type CalibrationSourceType =
-  | 'default'
-  | 'factory'
-  | 'user'
-  | 'calibration_check'
-  | 'legacy'
-  | 'unknown'
+  'default' | 'factory' | 'user' | 'calibration_check' | 'legacy' | 'unknown'
 interface IndividualCalibrationHealthStatus {
   markedBad: boolean // will be marked bad by a faile cal health check
   source: CalibrationSourceType | null // what actor marked it bad

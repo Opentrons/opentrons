@@ -22,7 +22,6 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  VACUUM_MODULE_V1,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -66,7 +65,6 @@ export function useDeckConfigurationEditing(
   modules: FormModules | InitialDeckStateModules,
   fixtures: Fixtures,
   hasGripper: boolean,
-  enableVacuumModule: boolean,
   setValue?: UseFormSetValue<WizardFormState>,
   updateInitialDeckState?: (
     value: CutoutConfigMap[],
@@ -304,16 +302,13 @@ export const getModuleFixtures = (
   moduleModel: ModuleModel,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  const filteredModuleModels = getFilteredModules(moduleModel).filter(
-    model => model !== VACUUM_MODULE_V1 || enableVacuumModule
-  )
+  const filteredModuleModels = getFilteredModules(moduleModel)
   const isStagingAreaInSlot4 =
     fixtures != null &&
     Object.values(fixtures).some(
@@ -346,8 +341,7 @@ export const getModules = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   const availableOptions: CutoutConfigMap[][] = []
 
@@ -368,8 +362,7 @@ export const getModules = (
       MAGNETIC_BLOCK_V1,
       addressableAreaId,
       deckDef,
-      fixtures,
-      enableVacuumModule
+      fixtures
     )
   }
 
@@ -382,8 +375,7 @@ export const getModules = (
       model as ModuleModel,
       addressableAreaId,
       deckDef,
-      fixtures,
-      enableVacuumModule
+      fixtures
     )
     availableOptions.push(...moduleOptions)
   })
@@ -395,16 +387,9 @@ export const getModuleOptions = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
-  return getModules(
-    cutoutId,
-    addressableAreaId,
-    deckDef,
-    fixtures,
-    enableVacuumModule
-  )
+  return getModules(cutoutId, addressableAreaId, deckDef, fixtures)
 }
 
 interface AvailableOptionsProps {
@@ -414,7 +399,6 @@ interface AvailableOptionsProps {
   addressableAreaId: AddressableAreaNamesWithFakes
   fixtures: Fixtures
   existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
-  enableVacuumModule: boolean
 }
 export const getAvailableOptions = (
   props: AvailableOptionsProps
@@ -426,7 +410,6 @@ export const getAvailableOptions = (
     addressableAreaId,
     deckDefinition,
     fixtures,
-    enableVacuumModule,
   } = props
 
   let availableOptions: CutoutConfigMap[][] = []
@@ -443,8 +426,7 @@ export const getAvailableOptions = (
       cutoutId,
       addressableAreaId,
       deckDefinition,
-      fixtures,
-      enableVacuumModule
+      fixtures
     )
   }
   if (optionStage === 'wasteChuteOptions') {

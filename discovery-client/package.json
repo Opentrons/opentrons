@@ -20,18 +20,15 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
-    "@types/lodash": "4.17.24",
+    "@types/lodash": "catalog:",
     "@types/node-fetch": "2.6.11",
     "@types/yargs": "17.0.32",
-    "escape-string-regexp": "1.0.5",
     "is-ip": "5.0.1",
-    "lodash": "4.18.1",
+    "lodash": "catalog:",
     "mdns-js": "1.0.1",
     "node-fetch": "2.6.7",
     "redux": "5.0.1",
     "reselect": "5.1.1",
-    "stable": "0.1.8",
-    "to-regex": "3.0.2",
     "yargs": "15.4.0"
   }
 }

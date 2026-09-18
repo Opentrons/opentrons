@@ -1,4 +1,4 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -15,7 +15,14 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import { DeviceDetails } from '..'
 
+import type * as ReactRouterDom from 'react-router-dom'
 import type { State } from '/app/redux/types'
+
+vi.mock('react-router-dom', async () => {
+  const actual =
+    await vi.importActual<typeof ReactRouterDom>('react-router-dom')
+  return { ...actual, useLocation: vi.fn(), useParams: vi.fn() }
+})
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
@@ -44,6 +51,7 @@ describe('DeviceDetails', () => {
     when(getScanning)
       .calledWith({} as State)
       .thenReturn(false)
+    vi.mocked(useParams).mockReturnValue({ robotName: 'otie' })
   })
 
   it('redirects to devices page when a robot is not found and not scanning', () => {
@@ -79,6 +87,10 @@ describe('DeviceDetails', () => {
 
   it('renders RecentProtocolRuns when a robot is found', () => {
     when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    vi.mocked(useParams).mockReturnValue({
+      robotName: 'otie',
+      deviceDetailsTab: 'run-history',
+    })
     render('/devices/otie')
     expect(vi.mocked(RecentProtocolRuns)).toHaveBeenCalled()
   })

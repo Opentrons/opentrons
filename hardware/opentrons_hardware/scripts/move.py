@@ -7,8 +7,9 @@ from logging.config import dictConfig
 
 from numpy import float64
 
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger, SerialUsbDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger, build
-from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_hardware.drivers.gpio import RemoteOT3GPIO
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     EnableMotorRequest,
@@ -98,8 +99,10 @@ async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     async with build.can_messenger(build_settings(args)) as messenger:
         # build a GPIO handler, which will automatically release estop
-        gpio = OT3GPIO(__name__)
-        gpio.deactivate_estop()
+        usb_driver = SerialUsbDriver(asyncio.get_running_loop())
+        usb_messenger = BinaryMessenger(usb_driver)
+        gpio = RemoteOT3GPIO(usb_messenger, __name__)
+        await gpio.deactivate_estop()
         await run_move(messenger)
 
 

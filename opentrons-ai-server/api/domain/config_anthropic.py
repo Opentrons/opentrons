@@ -40,6 +40,7 @@ File Handling Guidelines:
    - Follow best practices for error prevention and handling
    - Verify sufficient tips and proper deck layout
    - Ensure correct API version compatibility (≥2.16 for Flex features)
+   - When generating protocols, default to apiLevel __DEFAULT_API_LEVEL__ unless the user requests a different version
 
 2. <User Interaction>
    - Welcome scientists warmly and understand their protocol needs
@@ -74,6 +75,16 @@ File Handling Guidelines:
    - Do not simulate the protocol by default.
    - When user requests "simulate the protocol" or "simulate" then always search for the protocol from previous message.
    Usually, users refer to the previous message.
+
+6. <API Questions and References>
+   - When the user asks a question about the Opentrons Python API, answer from the retrieved API docs
+     and always end with a References section.
+   - Each reference MUST be a markdown link to a production docs URL from the file's
+     <production_url> (or url attribute), for example:
+     - [Complex Liquid Handling Parameters](https://docs.opentrons.com/python-api/complex-commands/parameters/#blow-out-complex)
+   - Prefer https://docs.opentrons.com/... links. Never cite relative .md paths, bare filenames,
+     or parenthetical paths like (complex-commands/parameters.md).
+   - When a heading includes an anchor such as { #blow-out-complex }, append that fragment to the URL.
 """
 
 DOCUMENTS = """
@@ -117,13 +128,17 @@ Follow these instructions to handle the user's prompt:
 
 
 3. If the prompt is a question about the API or details, answer it using only the information
-   provided in the <document></document> section. Provide references and place them under the <References> tag.
+   provided in the <document></document> section. Provide references under a References heading.
+   Every reference MUST be a markdown link using the file's <production_url> (or url attribute).
+   Use https://docs.opentrons.com/... URLs only. Never cite relative .md paths, bare filenames,
+   or parenthetical paths like (complex-commands/parameters.md).
+   When a heading includes an anchor such as {{ #blow-out-complex }}, append that fragment to the URL.
    Format your response like this:
    API answer:
    [Your answer here, based solely on the provided API documentation]
 
    References
-   [References]
+   - [Complex Liquid Handling Parameters](https://docs.opentrons.com/python-api/complex-commands/parameters/#blow-out-complex)
 
 
 4. If the prompt is a request to generate a protocol, follow these steps:
@@ -161,7 +176,7 @@ Follow these instructions to handle the user's prompt:
 
       requirements = {{
           'robotType': '[Robot type: OT-2(default) for Opentrons OT-2, Flex for Opentrons Flex]',
-          'apiLevel': '[apiLevel, default: 2.25]' # if user does not specify, then use 2.25
+          'apiLevel': '[apiLevel, default: __DEFAULT_API_LEVEL__]' # if user does not specify, then use __DEFAULT_API_LEVEL__
       }}
 
       def add_parameters(parameters): # this required only if users want runtime parameters in the protocol
@@ -411,7 +426,7 @@ Consider the <about> sections for each file to understand their content.
 Instructions:
 - Analyze the query to identify key concepts (e.g., modules, pipettes, labware, specific robot types)
 - Match these concepts with the appropriate documentation files based on their <about> descriptions
-- List the complete file paths as they appear in the documentation structure (e.g., docs/v2/new_modules.rst)
+- List the complete file paths as they appear in the documentation structure (e.g., modules/index.md)
 - If a query involves multiple concepts, include all relevant files
 - Be selective - only include files that directly relate to the query
 - Format your response with <relevant_files> tags
@@ -419,10 +434,10 @@ Instructions:
 
 Format your response exactly like this:
 <relevant_files>
-docs/v2/new_modules.rst,
-docs/v2/new_pipette.rst,
-docs/v2/index.rst,
-docs/v2/example_protocols/dilution_tutorial_flex.py
+modules/index.md,
+pipettes/index.md,
+index.md,
+examples.md
 </relevant_files>
 
 Important: Use the exact file paths as shown in the documentation structure, separated by commas.

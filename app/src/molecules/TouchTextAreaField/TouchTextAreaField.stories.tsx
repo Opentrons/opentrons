@@ -10,7 +10,7 @@ import type { ComponentProps } from 'react'
 const meta: Meta<typeof TouchTextAreaFieldComponent> = {
   title: 'ODD/Molecules/TouchTextAreaField',
   component: TouchTextAreaFieldComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {},
 }
 

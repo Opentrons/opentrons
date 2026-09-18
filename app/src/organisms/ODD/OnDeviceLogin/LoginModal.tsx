@@ -1,66 +1,237 @@
-import { useState } from 'react'
+import { useCallback, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import clsx from 'clsx'
 
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
+import { getUserLoginStatus } from '@opentrons/api-client'
+import {
+  POSITION_FIXED,
+  SPACING,
+  SUCCESS_TOAST,
+  Toast,
+} from '@opentrons/components'
+import { useAuthSettingsQuery, useHost } from '@opentrons/react-api-client'
 
-import { useStoreLoginState } from './hooks'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { getLocalRobot } from '/app/redux/discovery'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
+import {
+  DEFAULT_MIN_PASSWORD_LENGTH,
+  useOAuth2PasswordLogin,
+  useSetNewPasswordAndSignIn,
+} from '/app/resources/auth'
+
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
-export interface LoginModalResult {
-  username: string
-}
+type LoginModalPhase = 'login' | 'chooseNewPassword'
 
-const LoginModalImpl = NiceModal.create((): JSX.Element => {
-  const modal = useModal()
-  const { t } = useTranslation('device_settings')
-  const [step, setStep] = useState<LoginStep>('username')
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const storeLoginState = useStoreLoginState()
+const LoginModalImpl = NiceModal.create(
+  (props: { key?: string }): JSX.Element => {
+    const { key } = props
+    const modal = useModal()
+    const { t } = useTranslation(['access_control'])
+    const passwordUpdatedToastId = useId()
+    const host = useHost()
+    const shouldShowPasswordUpdatedToastRef = useRef(false)
+    const [phase, setPhase] = useState<LoginModalPhase>('login')
+    const [step, setStep] = useState<LoginStep>('username')
+    const [loginError, setLoginError] = useState<string | null>(null)
+    const [loginUsername, setLoginUsername] = useState<string | undefined>(
+      undefined
+    )
+    const [loginResetPassword, setLoginResetPassword] = useState(false)
+    const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
+    const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
+      string | null
+    >(null)
+    const storeLoginState = useStoreLoginState()
+    const localRobotName = useSelector(
+      (state: State) => getLocalRobot(state)?.name ?? null
+    )
+    const loggedInUsername = useUsernameForRobot(localRobotName)
 
-  const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: (username, response) => {
-      setLoginError(null)
-      storeLoginState(username, response)
-      const result: LoginModalResult = { username }
-      modal.resolve(result)
+    const isChoosingNewPassword = phase === 'chooseNewPassword'
+
+    const finishModal = useCallback(
+      (
+        username: string,
+        options?: { showPasswordUpdatedToast?: boolean }
+      ): void => {
+        if (options?.showPasswordUpdatedToast === true) {
+          setPasswordUpdatedUsername(username)
+          return
+        }
+
+        modal.resolve({ username })
+        modal.remove()
+      },
+      [modal]
+    )
+
+    const handleLoginSuccess = useCallback(
+      (
+        username: string,
+        user: AuthUser,
+        response: OAuth2TokenResponse
+      ): void => {
+        setLoginError(null)
+        storeLoginState(localRobotName, user, response)
+
+        if (user.resetPassword) {
+          setLoginUsername(username)
+          setPhase('chooseNewPassword')
+          setStep('password')
+        } else {
+          finishModal(username, {
+            showPasswordUpdatedToast: shouldShowPasswordUpdatedToastRef.current,
+          })
+          shouldShowPasswordUpdatedToastRef.current = false
+        }
+      },
+      [finishModal, storeLoginState, localRobotName]
+    )
+
+    const dismissModal = useCallback((): void => {
+      modal.resolve(null)
       modal.remove()
-    },
-    onError: () => {
-      setLoginError(t('on_device_login_error_incorrect') as string)
-    },
-  })
+    }, [modal])
 
-  const handleCancel = (): void => {
-    modal.resolve(null)
-    modal.remove()
+    const handleUsernameSubmit = async (username: string): Promise<void> => {
+      setLoginUsername(username)
+      if (host == null) return
+
+      setIsFetchingLoginStatus(true)
+      try {
+        const response = await getUserLoginStatus(host, username)
+        setLoginResetPassword(response.data.data.resetPassword as boolean)
+      } catch {
+        setLoginResetPassword(false)
+      } finally {
+        setIsFetchingLoginStatus(false)
+      }
+    }
+
+    const { submitPassword, isAuthLoading: isLoginAuthLoading } =
+      useOAuth2PasswordLogin({
+        onSuccess: handleLoginSuccess,
+        onError: message => {
+          setLoginError(message)
+        },
+      })
+
+    const handleNewPasswordSuccess = useCallback(
+      (username: string, newPassword: string) => {
+        setLoginError(null)
+        shouldShowPasswordUpdatedToastRef.current = true
+        setLoginResetPassword(false)
+        setLoginUsername(username)
+        setPhase('login')
+        setStep('password')
+        submitPassword(username, newPassword)
+      },
+      [submitPassword]
+    )
+
+    const documentationState = useDocumentationState()
+    const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
+      useSetNewPasswordAndSignIn(documentationState, {
+        onSuccess: handleNewPasswordSuccess,
+        onError: message => {
+          setLoginError(message)
+          setStep('password')
+        },
+      })
+
+    const { data: authSettings } = useAuthSettingsQuery({
+      enabled: isChoosingNewPassword,
+    })
+    const passwordComplexity =
+      isChoosingNewPassword && authSettings?.data != null
+        ? {
+            minLength:
+              authSettings.data.passwordComplexityMinimumLength ??
+              DEFAULT_MIN_PASSWORD_LENGTH,
+            requireSpecialCharacters:
+              authSettings.data.passwordComplexitySpecialCharacters === true,
+          }
+        : null
+
+    const handleCancel = (): void => {
+      dismissModal()
+    }
+
+    const initialUsername =
+      phase === 'chooseNewPassword'
+        ? (loggedInUsername ?? loginUsername)
+        : loginUsername
+
+    return (
+      <div
+        className={clsx(
+          styles.overlay,
+          isChoosingNewPassword && styles.overlay_below_documentation
+        )}
+        key={key}
+      >
+        <OnDeviceLogin
+          key={phase}
+          step={step}
+          onStepChange={setStep}
+          onUsernameSubmit={
+            phase === 'login' ? handleUsernameSubmit : undefined
+          }
+          submitPassword={
+            isChoosingNewPassword ? submitNewPassword : submitPassword
+          }
+          isAuthLoading={
+            isChoosingNewPassword
+              ? isSetNewPasswordLoading
+              : isLoginAuthLoading || isFetchingLoginStatus
+          }
+          isPasswordResetRequired={isChoosingNewPassword}
+          loginResetPassword={loginResetPassword}
+          initialUsername={initialUsername}
+          loginError={loginError}
+          onClearLoginError={() => {
+            setLoginError(null)
+          }}
+          passwordComplexity={passwordComplexity}
+          onCancel={handleCancel}
+        />
+        {passwordUpdatedUsername != null ? (
+          <Toast
+            id={passwordUpdatedToastId}
+            message={t('on_device_login_password_updated') as string}
+            type={SUCCESS_TOAST}
+            displayType="odd"
+            position={POSITION_FIXED}
+            right={SPACING.spacing32}
+            bottom={SPACING.spacing32}
+            onClose={() => {
+              finishModal(passwordUpdatedUsername)
+            }}
+          />
+        ) : null}
+      </div>
+    )
   }
-
-  return (
-    <div className={styles.overlay}>
-      <OnDeviceLogin
-        step={step}
-        onStepChange={setStep}
-        submitPassword={submitPassword}
-        isAuthLoading={isAuthLoading}
-        loginError={loginError}
-        onClearLoginError={() => {
-          setLoginError(null)
-        }}
-        onCancel={handleCancel}
-      />
-    </div>
-  )
-})
+)
 
 /**
  * Open the login modal and await the result.
  */
-export const showLoginModal = (): Promise<LoginModalResult | null> =>
-  NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
+export function showLoginModal(props?: {
+  key?: string
+}): Promise<{ username: string } | null> {
+  return NiceModal.show(LoginModalImpl, props ?? {})
+}
 
 /**
  * Returns whether the login modal is currently visible.

@@ -1,8 +1,7 @@
-import { useMutation } from 'react-query'
-
 import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -11,6 +10,8 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { RunAction } from '@opentrons/api-client'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,
@@ -27,15 +28,25 @@ export type UsePlayRunMutationOptions = UseMutationOptions<
 >
 
 export const usePlayRunMutation = (
+  documentationState: DocumentationState,
+  actionsToDocument?: DocumentedAction[],
   options: UsePlayRunMutationOptions = {}
 ): UsePlayRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction, AxiosError, string>(
-    [host, 'runs', RUN_ACTION_TYPE_PLAY],
-    (runId: string) =>
-      createRunAction(host!, runId, {
-        actionType: RUN_ACTION_TYPE_PLAY,
-      })
+  const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'play_run']
+  const mutation = useDocumentedMutation<RunAction, AxiosError, string>(
+    documentationState,
+    actions,
+    getQueryKey(host, 'runs', RUN_ACTION_TYPE_PLAY),
+    ({ variables: runId, userNotes }: DocumentedMutationParameters<string>) =>
+      createRunAction(
+        host!,
+        runId,
+        {
+          actionType: RUN_ACTION_TYPE_PLAY,
+        },
+        userNotes
+      )
         .then(response => response.data)
         .catch(e => {
           throw e

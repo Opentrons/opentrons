@@ -423,7 +423,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     def convert_plunger_positions(
         cls, v: Dict[str, PlungerPositions]
     ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
-        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
+        return {
+            pip_types.LiquidClasses(int(key))
+            if isinstance(key, str) and key.isdigit()
+            else pip_types.LiquidClasses[key]: value
+            for key, value in v.items()
+        }
 
 
 class PipetteRowDefinition(BaseModel):
@@ -514,7 +519,12 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     def convert_aspirate_key_to_channel_type(
         cls, v: Dict[str, SupportedTipsDefinition]
     ) -> Dict[pip_types.PipetteTipType, SupportedTipsDefinition]:
-        return {pip_types.PipetteTipType[key]: value for key, value in v.items()}
+        return {
+            pip_types.PipetteTipType(int(key))
+            if isinstance(key, str) and key.isdigit()
+            else pip_types.PipetteTipType[key]: value
+            for key, value in v.items()
+        }
 
 
 class PipetteConfigurations(
@@ -540,7 +550,12 @@ class PipetteConfigurations(
     def convert_liquid_properties_key(
         cls, v: Dict[str, PipetteLiquidPropertiesDefinition]
     ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:
-        return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
+        return {
+            pip_types.LiquidClasses(int(key))
+            if isinstance(key, str) and key.isdigit()
+            else pip_types.LiquidClasses[key]: value
+            for key, value in v.items()
+        }
 
 
 def liquid_class_for_volume_between_default_and_defaultlowvolume(

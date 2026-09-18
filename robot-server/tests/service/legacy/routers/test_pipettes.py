@@ -5,7 +5,7 @@ from mock import MagicMock
 from starlette.testclient import TestClient
 
 from opentrons import types
-from opentrons.protocol_engine.resources import ot3_validation
+from opentrons.config import feature_flags
 from opentrons.types import Mount
 
 
@@ -31,8 +31,11 @@ def attached_pipettes():
     }
 
 
-def test_get_pipettes(api_client, hardware, attached_pipettes):
+def test_get_pipettes(
+    api_client, hardware, attached_pipettes, mock_feature_flags, decoy
+):
     hardware.attached_instruments = attached_pipettes
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     expected = {
         "left": {
             "model": attached_pipettes[types.Mount.LEFT]["model"],
@@ -85,11 +88,11 @@ def test_get_ot3_pipettes(
     api_client: TestClient,
     hardware: MagicMock,
     attached_pipettes: Dict[Mount, Any],
-    monkeypatch: pytest.MonkeyPatch,
+    mock_feature_flags: None,
+    decoy,
 ) -> None:
     """It should return the correct pipette data for OT3 pipettes"""
-    mock = MagicMock(return_value=None)
-    monkeypatch.setattr(ot3_validation, "ensure_ot3_hardware", mock)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     hardware.attached_instruments = attached_pipettes
 
     expected = {

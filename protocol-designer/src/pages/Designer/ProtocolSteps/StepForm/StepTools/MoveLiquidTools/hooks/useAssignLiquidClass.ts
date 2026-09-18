@@ -2,20 +2,25 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, COLUMN, getAllLiquidClassDefs } from '@opentrons/shared-data'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import {
   getCurrentFormIsPresaved,
   getCurrentFormUnsavedChangedFields,
   getLabwareEntities,
   getLiquidEntities,
+  getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
-import { getAllWellsFromPrimaryWells } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selectors/well-contents'
 
 import { selectors as labwareIngredSelectors } from '../../../../../../../labware-ingred/selectors'
+import { getEntireWellSelection } from '../../../PipetteFields/NozzleAndWellSelectionModal/utils'
 import { getShouldUpdateForLiquidClass } from '../../../utils'
 
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { FormData } from '/protocol-designer/form-types'
 
 export interface LiquidClassOption {
@@ -44,20 +49,27 @@ export function useAssignLiquidClass(
   const liquidsInLabware = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )[formData[labwareField]]
-  const nozzlesConfigured = formData.nozzles
-  let channels = 1
-  if (nozzlesConfigured === COLUMN) {
-    channels = 8
-  } else if (nozzlesConfigured === ALL) {
-    channels = 96
-  }
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const pipetteChannels = pipetteEntities[formData.pipette]?.spec.channels ?? 1
+  const nozzlesConfigured = formData.nozzles as NozzleConfigurationStyle
+  const primaryNozzle =
+    formData.primaryNozzle as PrimaryNozzleConfigurationStyle
+  const labwareDef = labwareEntities[formData[labwareField]]?.def
   const allWellsAdjustedForPipette =
-    channels !== 1
-      ? getAllWellsFromPrimaryWells(
-          formData[wellsField] as string[],
-          labwareEntities[formData[labwareField]]?.def,
-          channels as 8 | 96
-        )
+    labwareDef != null
+      ? [
+          ...new Set(
+            (formData[wellsField] as string[]).flatMap(well =>
+              getEntireWellSelection(
+                well,
+                labwareDef.ordering,
+                nozzlesConfigured,
+                primaryNozzle,
+                pipetteChannels
+              )
+            )
+          ),
+        ]
       : (formData[wellsField] as string[])
 
   const liquidClassesInSourceWellsSet = allWellsAdjustedForPipette.reduce<

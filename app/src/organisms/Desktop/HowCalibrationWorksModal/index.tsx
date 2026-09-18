@@ -43,7 +43,6 @@ export function HowCalibrationWorksModal({
         </LegacyStyledText>
         <ExternalLink
           href={ROBOT_CAL_HELP_ARTICLE}
-          id="RobotCalModal_helpArticleLink"
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
           {t('learn_more_about_robot_cal_link')}

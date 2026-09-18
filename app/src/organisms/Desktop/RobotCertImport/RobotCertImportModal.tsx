@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
   InputField,
@@ -42,25 +42,37 @@ export function RobotCertImportModal(
   const footer = (
     <div className={styles.modal_footer_container}>
       <PrimaryButton onClick={handleImport.tryImport}>
-        <StyledText>{t('verify')}</StyledText>
+        <StyledText>{t('submit')}</StyledText>
       </PrimaryButton>
     </div>
   )
+  // TODO(jj): fix z-index
   return (
     <Modal
-      title={t('robot_encryption_key_verification')}
+      title={t('robot_encryption_key')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
+      zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
-        <div>
+        <div className={styles.text_block}>
           <StyledText desktopStyle="headingSmallBold">
             {t('verify_robot_encryption_key')}
           </StyledText>
-
           <StyledText desktopStyle="bodyDefaultRegular">
-            {t('verify_the_robot_encryption_key_to_use_the_robot')}
+            <Trans
+              t={t}
+              i18nKey="enter_the_encryption_key"
+              components={{
+                b: (
+                  <StyledText
+                    desktopStyle="bodyDefaultSemiBold"
+                    display="inline"
+                  />
+                ),
+              }}
+            />
           </StyledText>
         </div>
         <div>

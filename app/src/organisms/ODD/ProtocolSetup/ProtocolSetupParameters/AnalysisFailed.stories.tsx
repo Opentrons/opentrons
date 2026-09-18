@@ -11,7 +11,7 @@ const queryClient = new QueryClient()
 export default {
   title: 'ODD/Organisms/AnalysisFailedModal',
   component: AnalysisFailedModal,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <QueryClientProvider client={queryClient}>

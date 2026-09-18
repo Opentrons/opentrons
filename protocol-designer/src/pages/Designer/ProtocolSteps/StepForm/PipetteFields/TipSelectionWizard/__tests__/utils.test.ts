@@ -76,6 +76,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -88,6 +89,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -101,6 +103,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -114,6 +117,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -131,6 +135,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -148,6 +153,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -169,6 +175,7 @@ describe('getIsTiprackSelectable', () => {
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            labwareRobotState: mockRobotState.labware,
           })
         ).toBe(false)
       })
@@ -186,6 +193,7 @@ describe('getIsTiprackSelectable', () => {
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            labwareRobotState: mockRobotState.labware,
           })
         ).toBe(true)
       })
@@ -211,6 +219,7 @@ describe('getAreAnyMatchingTipracksSelectable', () => {
         nozzles: ALL,
         labwareEntities: {},
         validTiprackIds: [mockTiprackId],
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -223,6 +232,7 @@ describe('getAreAnyMatchingTipracksSelectable', () => {
         nozzles: ALL,
         labwareEntities: {},
         validTiprackIds: [],
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })

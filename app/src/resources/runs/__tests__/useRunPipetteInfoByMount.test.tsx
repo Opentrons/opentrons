@@ -17,22 +17,22 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
 } from '/app/redux/calibration/tip-length/__fixtures__'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
+import {
+  mockLeftProtoPipette,
+  mockRightProtoPipette,
+} from '/app/resources/instruments/__fixtures__'
 
 import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
 
 import type * as SharedData from '@opentrons/shared-data'
-import type { PipetteInfo } from '/app/redux/pipettes'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

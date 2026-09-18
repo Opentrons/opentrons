@@ -47,7 +47,7 @@ describe('RobotSystemVersion', () => {
 
   it('should render text when there is no available update', () => {
     render(props)
-    screen.getByText('Robot System Version')
+    screen.getByText('Robot system version')
     screen.getByText(
       'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )

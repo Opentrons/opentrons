@@ -2,6 +2,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  mockHeaterShaker,
+  mockMagneticModule,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+  mockThermocyclerGen2,
+} from '@opentrons/api-client'
+import {
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   VACUUM_MODULE_TYPE,
@@ -10,14 +17,8 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
-import {
-  mockHeaterShaker,
-  mockMagneticModule,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-  mockThermocyclerGen2,
-} from '/app/redux/modules/__fixtures__'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
@@ -29,6 +30,9 @@ import type { TemperatureStatus } from '@opentrons/api-client'
 vi.mock('/app/resources/legacy_sessions')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (props: ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {

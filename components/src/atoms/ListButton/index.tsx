@@ -12,11 +12,7 @@ import type { StyleProps } from '../../primitives'
 export * from './ListButtonChildren/index'
 
 type ListButtonType =
-  | 'noActive'
-  | 'connected'
-  | 'notConnected'
-  | 'onColor'
-  | 'error'
+  'noActive' | 'connected' | 'notConnected' | 'onColor' | 'error'
 
 interface ListButtonProps extends StyleProps {
   /** ListButton type */
@@ -129,16 +125,16 @@ const LIST_BUTTON_STYLE = (
   oddListButtonProps: Record<string, string>
 ): FlattenSimpleInterpolation => css`
   cursor: ${disabled ? CURSOR_DEFAULT : CURSOR_POINTER};
-  background-color: ${disabled
-    ? COLORS.grey20
-    : desktopListButtonProps.backgroundColor};
+  background-color: ${
+    disabled ? COLORS.grey20 : desktopListButtonProps.backgroundColor
+  };
   padding: ${styleProps.padding ?? `${SPACING.spacing20} ${SPACING.spacing24}`};
   border-radius: ${BORDERS.borderRadius8};
 
   &:hover {
-    background-color: ${disabled
-      ? COLORS.grey20
-      : desktopListButtonProps.hoverBackgroundColor};
+    background-color: ${
+      disabled ? COLORS.grey20 : desktopListButtonProps.hoverBackgroundColor
+    };
   }
 
   &:focus-visible {
@@ -147,14 +143,14 @@ const LIST_BUTTON_STYLE = (
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${disabled
-      ? COLORS.grey35
-      : oddListButtonProps.backgroundColor};
+    background-color: ${
+      disabled ? COLORS.grey35 : oddListButtonProps.backgroundColor
+    };
 
     &:hover {
-      background-color: ${disabled
-        ? COLORS.grey35
-        : oddListButtonProps.hoverBackgroundColor};
+      background-color: ${
+        disabled ? COLORS.grey35 : oddListButtonProps.hoverBackgroundColor
+      };
     }
   }
 `

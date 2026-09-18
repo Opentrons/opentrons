@@ -1,3 +1,4 @@
+import asyncio
 import typing
 
 from fastapi import APIRouter, Depends, Query
@@ -6,11 +7,10 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount
 
-from robot_server.hardware import get_hardware
+from robot_server.errors.error_responses import ApiError
+from robot_server.hardware import get_hardware, get_ot3_hardware
 from robot_server.service.legacy.models import pipettes
 
 router = APIRouter()
@@ -58,7 +58,7 @@ async def get_pipettes(
     if refresh is True:
         await hardware.cache_instruments()
 
-    attached = hardware.attached_instruments
+    attached = await asyncio.to_thread(lambda: hardware.attached_instruments)
 
     def make_pipette(
         mount: Mount, pipette_dict: PipetteDict, is_ot2: bool
@@ -75,15 +75,15 @@ async def get_pipettes(
             id=pipette_dict.get("pipette_id"),
             mount_axis=mount_axis.lower(),
             plunger_axis=plunger_axis.lower(),
-            tip_length=pipette_dict.get("tip_length", 0)
-            if pipette_dict.get("model")
-            else None,
+            tip_length=(
+                pipette_dict.get("tip_length", 0) if pipette_dict.get("model") else None
+            ),
         )
 
     try:
-        ot3_validation.ensure_ot3_hardware(hardware)
+        get_ot3_hardware(hardware)
         is_ot2 = False
-    except HardwareNotSupportedError:
+    except ApiError:
         is_ot2 = True
     e = {
         mount.name.lower(): make_pipette(mount=mount, pipette_dict=data, is_ot2=is_ot2)
