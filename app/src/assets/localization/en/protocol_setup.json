@@ -332,7 +332,6 @@
   "run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
   "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run",
   "run_disabled_modules_not_connected": "Make sure all modules are connected before proceeding to run",
-  "run_is_loading": "Run is loading",
   "run_labware_position_check": "Run Labware Position Check",
   "run_labware_position_check_to_get_offsets": "Run Labware Position Check to get your labware offset data.",
   "run_never_started": "Run was never started",
