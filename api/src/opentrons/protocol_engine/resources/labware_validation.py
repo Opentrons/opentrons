@@ -58,6 +58,22 @@ def validate_definition_is_filter_plate(definition: LabwareDefinition) -> bool:
     )
 
 
+def validate_definition_is_vacuum_spacer(definition: LabwareDefinition) -> bool:
+    """Validate that the definition is a stackable vacuum module spacer."""
+    return (
+        definition.parameters.quirks is not None
+        and "vacuumSpacer" in definition.parameters.quirks
+    )
+
+
+def validate_definition_is_vacuum_spacer_seat(definition: LabwareDefinition) -> bool:
+    """Validate that the definition is the vacuum spacer with locating clips (12.8 mm)."""
+    return (
+        definition.parameters.quirks is not None
+        and "vacuumSpacerSeat" in definition.parameters.quirks
+    )
+
+
 def validate_definition_is_deck_slot_compatible(
     definition: LabwareDefinition,
 ) -> bool:

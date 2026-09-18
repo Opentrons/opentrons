@@ -250,6 +250,45 @@ def test_validate_definition_is_filter_plate(
 
 
 @pytest.mark.parametrize(
+    ("quirks", "expected_result"),
+    [
+        (None, False),
+        (["foo"], False),
+        (["vacuumSpacer"], True),
+        (["vacuumSpacer", "vacuumSpacerSeat"], True),
+    ],
+)
+def test_validate_definition_is_vacuum_spacer(
+    quirks: list[str] | None, expected_result: bool
+) -> None:
+    """It should detect the vacuumSpacer quirk."""
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(quirks=quirks)  # type: ignore[call-arg]
+    )
+    assert subject.validate_definition_is_vacuum_spacer(definition) == expected_result
+
+
+@pytest.mark.parametrize(
+    ("quirks", "expected_result"),
+    [
+        (None, False),
+        (["vacuumSpacer"], False),
+        (["vacuumSpacerSeat"], True),
+    ],
+)
+def test_validate_definition_is_vacuum_spacer_seat(
+    quirks: list[str] | None, expected_result: bool
+) -> None:
+    """It should detect the vacuumSpacerSeat quirk."""
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(quirks=quirks)  # type: ignore[call-arg]
+    )
+    assert (
+        subject.validate_definition_is_vacuum_spacer_seat(definition) == expected_result
+    )
+
+
+@pytest.mark.parametrize(
     ("definition", "expected_result"),
     [
         (
