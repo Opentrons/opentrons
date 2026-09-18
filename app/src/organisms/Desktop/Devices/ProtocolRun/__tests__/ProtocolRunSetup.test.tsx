@@ -185,7 +185,10 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
@@ -217,7 +220,7 @@ describe('ProtocolRunSetup', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
+  it('renders run loading info screen if robot-analyzed and app-analyzed protocol data is null', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
@@ -239,7 +242,16 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Loading data...')
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while the run query is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {

@@ -335,6 +335,7 @@
   "run_labware_position_check": "Run Labware Position Check",
   "run_labware_position_check_to_get_offsets": "Run Labware Position Check to get your labware offset data.",
   "run_never_started": "Run was never started",
+  "run_setup_loading": "Run setup loading",
   "secure": "Secure",
   "secure_labware_instructions": "Secure labware instructions",
   "secure_labware_modal": "Securing labware to the {{name}}",

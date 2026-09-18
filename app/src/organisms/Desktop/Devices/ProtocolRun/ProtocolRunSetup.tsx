@@ -11,6 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -116,10 +117,15 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
+  // Show setup loading until the run record and an analysis are available.
+  const showRunLoadingState = isRunLoading || protocolAnalysis == null
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -451,7 +457,13 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolAnalysis != null ? (
+      {showRunLoadingState ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_setup_loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
@@ -510,10 +522,6 @@ export function ProtocolRunSetup({
             })
           )}
         </>
-      ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
       )}
     </Flex>
   )

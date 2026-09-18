@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
+import { Skeleton } from '/app/atoms/Skeleton'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -28,6 +29,7 @@ import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import { useRunAnalytics, useRunErrors } from './hooks'
+import styles from './protocolrunheader.module.css'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
 import {
@@ -52,10 +54,13 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    }
+  )
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
@@ -139,36 +144,46 @@ export function ProtocolRunHeader(
         runErrors={runErrors}
         {...props}
       />
-      <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
-        <RunHeaderProtocolName runId={runId} />
-        <RunHeaderBannerContainer
-          runStatus={runStatus}
-          enteredER={enteredER}
-          isResetRunLoading={isResetRunLoadingRef.current}
-          runErrors={runErrors}
-          runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          hasImages={outputFileIds.jpeg.length > 0}
-          hasCsvFiles={outputFileIds.csv.length > 0}
-          closeCurrentRun={closeCurrentRun}
-          isClosingCurrentRun={isClosingCurrentRun}
-          {...props}
-        />
-        <RunHeaderContent
-          runRecord={runRecord ?? null}
-          runStatus={runStatus}
-          isResetRunLoadingRef={isResetRunLoadingRef}
-          attachedModules={attachedModules}
-          runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          isClosingCurrentRun={isClosingCurrentRun}
-          numberOfAtomicCommands={
-            protocolData?.status === 'completed'
-              ? protocolData.commands.length
-              : 0
-          }
-          {...props}
-        />
-        <RunProgressMeter {...props} />
-      </Flex>
+      {isRunLoading ? (
+        <div
+          ref={protocolRunHeaderRef}
+          className={styles.skeleton}
+          data-testid="ProtocolRunHeader_skeleton"
+        >
+          <Skeleton width="100%" height="14rem" backgroundSize="200%" />
+        </div>
+      ) : (
+        <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
+          <RunHeaderProtocolName runId={runId} />
+          <RunHeaderBannerContainer
+            runStatus={runStatus}
+            enteredER={enteredER}
+            isResetRunLoading={isResetRunLoadingRef.current}
+            runErrors={runErrors}
+            runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+            hasImages={outputFileIds.jpeg.length > 0}
+            hasCsvFiles={outputFileIds.csv.length > 0}
+            closeCurrentRun={closeCurrentRun}
+            isClosingCurrentRun={isClosingCurrentRun}
+            {...props}
+          />
+          <RunHeaderContent
+            runRecord={runRecord ?? null}
+            runStatus={runStatus}
+            isResetRunLoadingRef={isResetRunLoadingRef}
+            attachedModules={attachedModules}
+            runHeaderModalContainerUtils={runHeaderModalContainerUtils}
+            isClosingCurrentRun={isClosingCurrentRun}
+            numberOfAtomicCommands={
+              protocolData?.status === 'completed'
+                ? protocolData.commands.length
+                : 0
+            }
+            {...props}
+          />
+          <RunProgressMeter {...props} />
+        </Flex>
+      )}
     </>
   )
 }
