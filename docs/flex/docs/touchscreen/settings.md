@@ -51,13 +51,9 @@ You should disable this setting only when using labware that causes detection er
 !!! note
     When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
 
-### Encryption key 
-
-Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
-
 ### File manager
 
-Download or delete files stored on your Flex. 
+Download [files](../advanced-operation/diagnostic-files.md) stored on your Flex, including protocol run records, troubleshooting logs, and calibration logs.
 
 ### Home Gantry on Restart
 
@@ -92,6 +88,10 @@ If you opt out of automatic data sharing, you can still download Flex files for 
 ### Recovery Mode
 
 Turns [error recovery][error-recovery] on and off. Error recovery mode pauses the active protocol and gives you a chance to fix a problem if something unexpected happens during the run.
+
+### Robot encryption key 
+
+Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
 
 ### Robot Name
 
