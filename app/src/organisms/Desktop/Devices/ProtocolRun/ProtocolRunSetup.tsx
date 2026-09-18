@@ -117,10 +117,16 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: _isRunLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
+  // TODO(dev): force loading info screen visible for visual QA — remove before merge
+  const isRunLoading = true
+  const showRunLoadingState = isRunLoading || protocolAnalysis == null
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -452,7 +458,13 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolAnalysis != null ? (
+      {showRunLoadingState ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('Run setup loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
@@ -511,12 +523,6 @@ export function ProtocolRunSetup({
             })
           )}
         </>
-      ) : (
-        <InfoScreen
-          iconName="ot-spinner"
-          content={t('run_is_loading')}
-          height="28.5rem"
-        />
       )}
     </Flex>
   )
