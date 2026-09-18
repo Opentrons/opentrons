@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
@@ -25,12 +25,17 @@ export function UserManagement({
     setCreateUser(true)
   }
 
+  const usernames = useMemo(() => {
+    return users.map(user => user.username)
+  }, [users])
+
   if (createUser) {
     return (
       <CreateUserFlow
         onCancel={() => {
           setCreateUser(false)
         }}
+        usernames={usernames}
       />
     )
   }
