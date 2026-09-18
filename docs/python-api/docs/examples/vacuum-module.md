@@ -3,7 +3,7 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-This use case is taken from a 600-line nucleic acid miniprep protocol. These excerpted miniprep code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
+This use case is taken from a 600-line nucleic acid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
 
 <font color="red">TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.</font>
 
@@ -15,7 +15,7 @@ Every protocol file starts with the `metadata` and `requirements` dictionaries.
 
 - `metadata`: Contains key-value pairs for the protocol name (`protocolName`) and aa concise description (`description`), which are displayed in Opentrons software and on the Flex touchscreen.
 
-- `requirements`: Contains the key-value pairs `robotType` and `apiLevel` which tell the Flex what robot model (Flex or OT-2) is being used and the API version. You can only use the Vacuum Module with the Flex and API version 2.30, or higher.
+- `requirements`: Contains the key-value pairs `robotType` and `apiLevel` which tell the Flex what robot model (Flex or OT-2) is being used and the API version. Hint: you can only use the Vacuum Module with Flex and API version 2.30, or higher.
 
 ```python
 from opentrons import protocol_api
@@ -112,7 +112,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 ## Stage 3: Concurrent actions
 
-### Lysate collection
+### Liquid collection
 
 During this stage, the protocol collects clarified lysate in a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. After adding a collar to create a sealed chamber, the robot extracts liquid by applying a gentle vacuum to avoid clogging the filter plate membrane.
 
@@ -159,10 +159,9 @@ During this stage, the protocol collects clarified lysate in a 96-well collectio
 Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations simultaneously while extracting. Also, `clarify_task = vacuum.start_set_vacuum_pressure()` prevents the Gripper from moving labware off the Vacuum Module until the system depressurizes.
 
 ```python
-# Flex can pipette liquids and run other modules while the Vacuum Module executes tasks
+# Pipetting liquids while the Vacuum Module runs
     pipette.pick_up_tip()
     pipette.aspirate(400, reservoir["A5"])
-    # Dispense binding agent into downstream processing plate
     pipette.drop_tip()
 
     # Wait for filtration, venting, and pressure equalization to finish
