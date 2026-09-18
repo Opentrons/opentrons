@@ -179,6 +179,7 @@
   "list_view": "List View",
   "loading_data": "Loading data...",
   "run_is_loading": "Run is loading",
+  "run_setup_loading": "Run setup loading",
   "loading_labware_offsets": "Loading labware offsets",
   "loading_protocol_details": "Loading details...",
   "location": "Location",

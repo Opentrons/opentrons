@@ -461,7 +461,7 @@ export function ProtocolRunSetup({
       {showRunLoadingState ? (
         <InfoScreen
           iconName="ot-spinner"
-          content={t('Run setup loading')}
+          content={t('run_setup_loading')}
           height="auto"
         />
       ) : (

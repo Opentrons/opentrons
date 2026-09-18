@@ -239,7 +239,7 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Run is loading')
+    screen.getByText('Run setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
