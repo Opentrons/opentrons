@@ -19,7 +19,6 @@ from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
     require_authentication,
 )
-from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -32,7 +31,6 @@ _audit_client_accessor = AppStateAccessor[Client]("audit_client")
 
 MUTATING_HTTP_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 USER_NOTES_HEADER: Final[str] = "Opentrons-User-Notes"
-PERMISSION_DENIED_MESSAGE: Final = "Permission denied: insufficient scope"
 
 
 async def get_supplied_user_notes(
@@ -127,54 +125,6 @@ def get_audit_client(
         "Forgot to initialize audit client as part of server startup?"
     )
     return client
-
-
-def attach_permission_denied_audit_logger(
-    request: Request,
-    authentication: RequireAuthenticationResult,
-) -> None:
-    """Attach a fallback AuditLogger for an authenticated mutating request that will be denied.
-
-    No-op for non-mutating methods, unauthenticated results, a missing audit client,
-    or when an AuditLogger is already present on the request.
-    """
-    if request.method not in MUTATING_HTTP_METHODS:
-        return
-    if not isinstance(authentication, AuthenticatedResult):
-        return
-    existing = getattr(request.state, "audit_logger", None)
-    if isinstance(existing, AuditLogger):
-        return
-    audit_client = _audit_client_accessor.get_from(request.app.state)
-    if audit_client is None:
-        return
-
-    audit_logger = AuditLogger(
-        audit_client=audit_client,
-        auto_log_request_head=True,
-        auto_log_response_head=True,
-        auto_log_request_body=True,
-        auto_log_response_body=True,
-        auto_log_request_full_headers=False,
-        request=request,
-    )
-    audit_logger.set_action_from_request(request)
-    audit_logger.set_auth_details(authentication)
-    audit_logger.set_user_note(_peek_user_notes_header(request))
-    audit_logger.append_message_chunk(PERMISSION_DENIED_MESSAGE)
-    request.state.audit_logger = audit_logger
-
-
-def _peek_user_notes_header(request: Request) -> str | None:
-    """Read `Opentrons-User-Notes` without enforcing presence or length."""
-    raw = request.headers.get(USER_NOTES_HEADER)
-    if raw is None:
-        return None
-    try:
-        decoded = urllib.parse.unquote(raw).strip()
-    except Exception:
-        return None
-    return decoded or None
 
 
 @asynccontextmanager

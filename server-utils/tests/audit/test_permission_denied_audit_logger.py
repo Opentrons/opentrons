@@ -9,11 +9,10 @@ from starlette.requests import Request
 
 from server_utils.audit.audit_logger import AuditLogger
 from server_utils.audit.audit_server import Client, SubmitAuditLogMessageData
-from server_utils.audit.fastapi import (
+from server_utils.audit.fastapi import USER_NOTES_HEADER, install_audit_client
+from server_utils.audit.permission_denied import (
     PERMISSION_DENIED_MESSAGE,
-    USER_NOTES_HEADER,
     attach_permission_denied_audit_logger,
-    install_audit_client,
 )
 from server_utils.auth.resource_server.types import (
     AuthenticatedResult,
