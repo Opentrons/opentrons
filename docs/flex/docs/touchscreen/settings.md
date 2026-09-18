@@ -34,6 +34,10 @@ Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), 
 
 Enable additional tools and features designed for developers. Not recommended for use unless instructed by Opentrons Support.
 
+### Devices
+
+View attached devices, like an external keyboard or USB device. 
+
 ### Device Reset
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
@@ -46,6 +50,10 @@ You should disable this setting only when using labware that causes detection er
 
 !!! note
     When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
+
+### File manager
+
+Download [files](../advanced-operation/diagnostic-files.md) stored on your Flex, including protocol run records, troubleshooting logs, and calibration logs.
 
 ### Home Gantry on Restart
 
@@ -66,13 +74,13 @@ View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple conn
 
 Choose what data you want Flex to share with Opentrons. This information is always anonymized and we only use it to improve our products.
 
-Flex records what it's doing in several log files that are stored on the robot. These logs are grouped into two categories for privacy opt-in purposes:
+Flex records what it's doing in several diagnostic files that are stored on the robot. These files are grouped into two categories for privacy opt-in purposes:
 
 - **Robot Logs:** Data about robot server activities, executed API commands, and interactions with attached modules.
 
 - **Display Usage:** Data about how the touchscreen draws its graphics.
 
-If you opt out of automatic data sharing, you can still download Flex log files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Log Files](../advanced-operation/log-files.md#downloading-flex-log-files) for instructions.
+If you opt out of automatic data sharing, you can still download Flex files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Diagnostic Files](../advanced-operation/diagnostic-files.md#downloading-flex-files) for instructions.
 
 !!! note
     There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
@@ -80,6 +88,10 @@ If you opt out of automatic data sharing, you can still download Flex log files 
 ### Recovery Mode
 
 Turns [error recovery][error-recovery] on and off. Error recovery mode pauses the active protocol and gives you a chance to fix a problem if something unexpected happens during the run.
+
+### Robot encryption key 
+
+Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
 
 ### Robot Name
 

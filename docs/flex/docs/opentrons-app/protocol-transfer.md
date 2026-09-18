@@ -35,19 +35,17 @@ Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons F
 
 The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
 
-Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
+Each entry in the **Run History** tab includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
 
 - **View protocol run record:** Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
 
 - **Rerun protocol now:** The same as choosing **Start setup** on the corresponding protocol.
 
-- **Download run log:** Save to your computer a JSON file containing information about the protocol run, including all performed steps.
+- **Download protocol files:** Download a `.zip` file containing protocol .JSON files, including information about all steps performed, and any still images taken during a protocol run, if the camera was enabled.
 
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
-
-- **Download image files:** Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
