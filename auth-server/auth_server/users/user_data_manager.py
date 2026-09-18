@@ -39,9 +39,13 @@ def _generate_temporary_password(
     if not require_special_characters:
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
-    return "".join(
-        secrets.choice(temp_password_characters()) for _ in range(min_length)
-    )
+    # Force at least one special so generated temps meet the same rule as user-chosen
+    # passwords.
+    chars = [secrets.choice(CREDENTIAL_SPECIAL_CHARACTERS)]
+    alphabet = temp_password_characters()
+    chars.extend(secrets.choice(alphabet) for _ in range(max(min_length - 1, 0)))
+    secrets.SystemRandom().shuffle(chars)
+    return "".join(chars)
 
 
 def _password_complexity_requirements(
