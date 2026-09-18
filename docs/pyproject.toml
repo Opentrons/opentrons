@@ -20,6 +20,8 @@ dependencies = [
 ]
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"
 
