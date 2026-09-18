@@ -44,8 +44,8 @@ vi.mock('../RunHeaderBannerContainer')
 vi.mock('../RunHeaderContent')
 vi.mock('../../../../RunProgressMeter')
 vi.mock('../RunHeaderProtocolName')
-vi.mock('../ProtocolRunHeaderSkeleton', () => ({
-  ProtocolRunHeaderSkeleton: () => <div>MOCK_PROTOCOL_RUN_HEADER_SKELETON</div>,
+vi.mock('/app/atoms/Skeleton', () => ({
+  Skeleton: () => <div>MOCK_PROTOCOL_RUN_HEADER_SKELETON</div>,
 }))
 vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
