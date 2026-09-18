@@ -51,6 +51,7 @@ import {
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
+  MAX_STACKABLE_VACUUM_SPACERS,
   STAGING_AREA_SLOTS,
   VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
@@ -106,6 +107,71 @@ export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
   return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
+}
+
+export function getIsStackableVacuumSpacer(def: LabwareDefinition2): boolean {
+  return (def.parameters.quirks ?? []).includes('vacuumSpacer')
+}
+
+export function getIsVacuumSpacerSeat(def: LabwareDefinition2): boolean {
+  return (def.parameters.quirks ?? []).includes('vacuumSpacerSeat')
+}
+
+export const getStackableVacuumSpacerLoadNamesInStack = (
+  stack: string[],
+  labwareById: Record<string, { def: LabwareDefinition2 }>
+): string[] => {
+  return stack
+    .filter(
+      id => id in labwareById && getIsStackableVacuumSpacer(labwareById[id].def)
+    )
+    .map(id => labwareById[id].def.parameters.loadName)
+}
+
+export const getCanPlaceStackableVacuumSpacer = (
+  movingDef: LabwareDefinition2,
+  stack: string[],
+  labwareById: Record<string, { def: LabwareDefinition2 }>
+): { isCompatible: boolean; isAboveStackLimit: boolean } => {
+  if (!getIsStackableVacuumSpacer(movingDef)) {
+    return { isCompatible: false, isAboveStackLimit: false }
+  }
+
+  const spacerLoadNames = getStackableVacuumSpacerLoadNamesInStack(
+    stack,
+    labwareById
+  )
+  if (stack.length === 0) {
+    return { isCompatible: true, isAboveStackLimit: false }
+  }
+
+  const topId = getTopLocationInStack(stack)
+  if (!(topId in labwareById)) {
+    return { isCompatible: true, isAboveStackLimit: false }
+  }
+
+  const topDef = labwareById[topId].def
+  if (!getIsStackableVacuumSpacer(topDef)) {
+    return { isCompatible: false, isAboveStackLimit: false }
+  }
+  if (getIsVacuumSpacerSeat(topDef)) {
+    return { isCompatible: false, isAboveStackLimit: false }
+  }
+
+  const movingLoadName = movingDef.parameters.loadName
+  const alreadyPresent = spacerLoadNames.includes(movingLoadName)
+  const wouldExceedMax = spacerLoadNames.length >= MAX_STACKABLE_VACUUM_SPACERS
+  const listedOnParent =
+    movingDef.compatibleParentLabware?.includes(topDef.parameters.loadName) ===
+      true ||
+    Object.keys(movingDef.stackingOffsetWithLabware ?? {}).includes(
+      topDef.parameters.loadName
+    )
+
+  return {
+    isCompatible: listedOnParent && !alreadyPresent && !wouldExceedMax,
+    isAboveStackLimit: alreadyPresent || wouldExceedMax,
+  }
 }
 
 const getIsVacuumCollar = (def: LabwareDefinition2): boolean => {
@@ -1126,40 +1192,54 @@ export const getIsLabwareCompatibleWithStack = (
     const movingLabwareIsCollar =
       movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
       false
-
-    isCompatible =
-      // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
-      ((movingLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
-        false) &&
-        !isLidRole &&
-        !isLabwareOnSlotTiprack &&
-        !(
-          topLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
-          false
-        )) ||
-      // vacuum spacer: same rules as the main module area — only collars and filter plates
-      (!isOccupiedByCollar && movingLabwareIsCollar) ||
-      // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
-      ((topLabwareEntity.def.parameters.quirks?.includes(
-        'providesStackingDefault'
-      ) ??
-        false) &&
-        !isVacuumSpacer) ||
-      // check compatible labware key
-      movingLabwareEntity.def.compatibleParentLabware?.some(
-        loadName => loadName === loadNameToCheck
-      ) ||
-      // check stacking offset map for legacy compatibility
-      Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
-        lw => lw === loadNameToCheck
-      ) ||
-      (isUniversalLid &&
-        !isLabwareOnSlotTuberack &&
-        !isLabwareOnSlotAluminumBlock &&
-        !isLabwareOnSlotTiprack &&
-        (topLabwareEntity.def.parameters.loadName ===
-          'opentrons_tough_universal_lid' ||
-          !isLidRole))
+    const movingIsStackableVacuumSpacer = getIsStackableVacuumSpacer(
+      movingLabwareEntity.def
+    )
+    const vacuumSpacerPlacement = movingIsStackableVacuumSpacer
+      ? getCanPlaceStackableVacuumSpacer(
+          movingLabwareEntity.def,
+          stack,
+          labwareEntities
+        )
+      : null
+    if (vacuumSpacerPlacement != null) {
+      isAboveStackLimit = vacuumSpacerPlacement.isAboveStackLimit
+      isCompatible = vacuumSpacerPlacement.isCompatible
+    } else {
+      isCompatible =
+        // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
+        ((movingLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
+          false) &&
+          !isLidRole &&
+          !isLabwareOnSlotTiprack &&
+          !(
+            topLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
+            false
+          )) ||
+        // vacuum spacer: same rules as the main module area — only collars and filter plates
+        (!isOccupiedByCollar && movingLabwareIsCollar) ||
+        // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
+        ((topLabwareEntity.def.parameters.quirks?.includes(
+          'providesStackingDefault'
+        ) ??
+          false) &&
+          !isVacuumSpacer) ||
+        // check compatible labware key
+        movingLabwareEntity.def.compatibleParentLabware?.some(
+          loadName => loadName === loadNameToCheck
+        ) ||
+        // check stacking offset map for legacy compatibility
+        Object.keys(
+          movingLabwareEntity.def.stackingOffsetWithLabware ?? {}
+        ).some(lw => lw === loadNameToCheck) ||
+        (isUniversalLid &&
+          !isLabwareOnSlotTuberack &&
+          !isLabwareOnSlotAluminumBlock &&
+          !isLabwareOnSlotTiprack &&
+          (topLabwareEntity.def.parameters.loadName ===
+            'opentrons_tough_universal_lid' ||
+            !isLidRole))
+    }
 
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {

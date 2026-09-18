@@ -316,6 +316,50 @@ adapter_1 = protocol.load_adapter(
 )`
     )
   })
+  it('should generate loadAdapters for stacked vacuum spacers', () => {
+    const mockVacuumEntity = {
+      [moduleId5]: {
+        id: moduleId5,
+        model: VACUUM_MODULE_V1,
+        type: VACUUM_MODULE_TYPE,
+        pythonName: 'vacuum_module_1',
+      },
+    }
+
+    expect(
+      getLoadAdapters(
+        mockVacuumEntity,
+        {
+          [labwareId1]: mockLabwareEntities[labwareId1],
+          [labwareId2]: {
+            ...mockLabwareEntities[labwareId1],
+            id: labwareId2,
+            pythonName: 'adapter_2',
+          },
+        },
+        {
+          [labwareId1]: {
+            stack: [labwareId1, moduleId5],
+          },
+          [labwareId2]: {
+            stack: [labwareId2, labwareId1, moduleId5],
+          },
+        }
+      )
+    ).toBe(
+      `# Load Adapters:
+adapter_1 = vacuum_module_1.load_adapter(
+    "fixture_flex_96_tiprack_adapter",
+    namespace="opentrons",
+    version=1,
+)
+adapter_2 = adapter_1.load_adapter(
+    "fixture_flex_96_tiprack_adapter",
+    namespace="opentrons",
+    version=1,
+)`
+    )
+  })
 })
 
 describe('getLoadLidStacks', () => {
