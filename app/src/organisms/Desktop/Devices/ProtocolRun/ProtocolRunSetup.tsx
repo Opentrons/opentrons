@@ -117,15 +117,14 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord, isLoading: _isRunLoading } = useNotifyRunQuery(
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
     runId,
     {
       staleTime: Infinity,
       refetchInterval: RUN_RECORD_REFETCH_MS,
     }
   )
-  // TODO(dev): force loading info screen visible for visual QA — remove before merge
-  const isRunLoading = true
+  // Show setup loading until the run record and an analysis are available.
   const showRunLoadingState = isRunLoading || protocolAnalysis == null
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,

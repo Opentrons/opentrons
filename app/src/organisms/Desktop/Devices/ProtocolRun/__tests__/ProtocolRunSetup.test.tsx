@@ -185,7 +185,10 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
@@ -238,6 +241,15 @@ describe('ProtocolRunSetup', () => {
           ReduxRuns.LABWARE_SETUP_STEP_KEY,
         ],
       })
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while the run query is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
     render()
     screen.getByText('Run setup loading')
   })

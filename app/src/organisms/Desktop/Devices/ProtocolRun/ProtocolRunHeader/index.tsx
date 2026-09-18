@@ -28,6 +28,7 @@ import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import { useRunAnalytics, useRunErrors } from './hooks'
+import { ProtocolRunHeaderSkeleton } from './ProtocolRunHeaderSkeleton'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
 import {
@@ -35,7 +36,6 @@ import {
   useRunHeaderModalContainer,
 } from './RunHeaderModalContainer'
 import { RunHeaderProtocolName } from './RunHeaderProtocolName'
-import { ProtocolRunHeaderSkeleton } from './ProtocolRunHeaderSkeleton'
 
 import type { RefObject } from 'react'
 
@@ -53,15 +53,13 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord, isLoading: _isRunLoading } = useNotifyRunQuery(
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
     runId,
     {
       staleTime: Infinity,
       refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     }
   )
-  // TODO(dev): force skeleton visible for visual QA — remove before merge
-  const isRunLoading = true
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
