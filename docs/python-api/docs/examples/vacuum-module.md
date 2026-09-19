@@ -3,9 +3,25 @@ title: "Python API: Vacuum Module Examples"
 description: Code samples that demonstrate using the Opentrons Python API to run protocols and control hardware.
 ---
 
-This use case is taken from a 600-line nucleic acid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
+This use case is taken from a plasmid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules and labware.
 
-<font color="red">TBD placeholder: Something something write your own code, use Protocol Designer, or Opentrons AI. Can export as `.py` (Python) file.</font>
+## Workflow overview
+
+A plasmid miniprep is a technique used to isolate DNA. It consists of these phases: lysate clarification, DNA binding, wash clearance, membrane drying, and product elution. Our use case examines, in part, how you can use automated Vacuum Module API methods to execute these procedures: <!--- TIL lysate is broken open cells and the goo inside --->
+
+* **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. Vacuum the then draws clarified lysate into the collection plate without fouling the filter.
+
+* **Waste collection:** The Gripper automatically moves well plates and Vacuum Module components to create different stacked configurations for each stage of the process. The module applies different vacuum profiles to collect and dispose of material.
+
+* **Elution:** This process stacks a filter plate directly on a collection plate and runs the module to recover purified DNA .
+
+API methods highlighted in this use case include:
+
+* [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to initiate non-blocking vacuum tasks.
+* [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to synchronize background filtration and ensure system depressurization before moving labware.
+* [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock] and [`move_to_dock()`][opentrons.protocol_api.VacuumModuleContext.move_to_dock] to stage and manipulate manifold collars.
+
+Let's get started and dive in to the code.
 
 ## Stage 1: protocol metadata
 
@@ -111,6 +127,8 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
 ## Stage 3: Concurrent actions
+
+<font color="red">Needs some intro here. During this stage, the robot does all the things.</font>
 
 ### Liquid collection
 
@@ -240,10 +258,9 @@ In this stage, additional Gripper movements and reconfigure the stack to prepare
     protocol.wait_for_tasks([dry_task])
 ```
 
-<!--- should this be a note, not used? Seems an important concept to surface --->
-### Parallel vs serial operation
-
-Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, you call `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operation back to serial execution. When you put `wait_for_tasks()` directly after a non-blocking method you're pausing the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
+<!--- maybe this should be the Phase 3, H2 section intro, as a compare/contrast --->
+!!! note
+    Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, you call `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operation back to serial execution. When you put `wait_for_tasks()` directly after a non-blocking method you're pausing the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
 
 ## Protocol takeaways
 
