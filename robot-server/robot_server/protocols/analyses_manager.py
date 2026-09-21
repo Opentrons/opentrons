@@ -191,16 +191,109 @@ class AnalysesManager:
             try:
                 await analyzer.analyze(analysis_id=analysis_id)
             except Exception as error:
-                if self._pending_analysis_exists(
+                await self._promote_pending_on_failure(
+                    analyzer=analyzer,
+                    analysis_id=analysis_id,
+                    protocol_resource=protocol_resource,
+                    error=error,
+                )
+
+    async def start_analysis_if_rtps_differ(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+        last_analysis_summary: AnalysisSummary,
+    ) -> Optional[AnalysisSummary]:
+        """Initialize under the global lock and start analysis only if RTPs changed.
+
+        Waits until the job has either skipped (RTPs match) or recorded pending. 
+        Analyze continues in the background while holding the lock.
+        """
+        decision: asyncio.Future[Optional[AnalysisSummary]] = (
+            asyncio.get_running_loop().create_future()
+        )
+        self._task_runner.run(
+            self._run_rtp_compare_job,
+            analysis_id=analysis_id,
+            protocol_resource=protocol_resource,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+            last_analysis_summary=last_analysis_summary,
+            decision=decision,
+        )
+        return await decision
+
+    async def _run_rtp_compare_job(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+        last_analysis_summary: AnalysisSummary,
+        decision: "asyncio.Future[Optional[AnalysisSummary]]",
+    ) -> None:
+        try:
+            async with self._lock:
+                analyzer = await self.initialize_analyzer(
+                    analysis_id=analysis_id,
+                    protocol_resource=protocol_resource,
+                    run_time_param_values=run_time_param_values,
+                    run_time_param_paths=run_time_param_paths,
+                )
+                run_time_parameters = await analyzer.get_verified_run_time_parameters()
+                if await self._analysis_store.matching_rtp_values_in_analysis(
+                    last_analysis_summary=last_analysis_summary,
+                    new_parameters=run_time_parameters,
+                ):
+                    await analyzer.clean_up()
+                    if not decision.done():
+                        decision.set_result(None)
+                    return
+                self._analysis_store.add_pending(
                     protocol_id=protocol_resource.protocol_id,
                     analysis_id=analysis_id,
-                ):
-                    await analyzer.update_to_failed_analysis(
-                        analysis_id=analysis_id,
-                        protocol_robot_type=protocol_resource.source.robot_type,
-                        error=error,
-                        run_time_parameters=[],
+                    run_time_parameters=run_time_parameters,
+                )
+                if not decision.done():
+                    decision.set_result(
+                        AnalysisSummary(
+                            id=analysis_id,
+                            status=AnalysisStatus.PENDING,
+                            runTimeParameters=run_time_parameters,
+                        )
                     )
+                try:
+                    await analyzer.analyze(analysis_id=analysis_id)
+                except Exception as error:
+                    await self._promote_pending_on_failure(
+                        analyzer=analyzer,
+                        analysis_id=analysis_id,
+                        protocol_resource=protocol_resource,
+                        error=error,
+                    )
+        except Exception as error:
+            if not decision.done():
+                decision.set_exception(error)
+
+    async def _promote_pending_on_failure(
+        self,
+        analyzer: protocol_analyzer.ProtocolAnalyzer,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        error: Exception,
+    ) -> None:
+        if self._pending_analysis_exists(
+            protocol_id=protocol_resource.protocol_id,
+            analysis_id=analysis_id,
+        ):
+            await analyzer.update_to_failed_analysis(
+                analysis_id=analysis_id,
+                protocol_robot_type=protocol_resource.source.robot_type,
+                error=error,
+                run_time_parameters=[],
+            )
 
     def _pending_analysis_exists(self, protocol_id: str, analysis_id: str) -> bool:
         return any(

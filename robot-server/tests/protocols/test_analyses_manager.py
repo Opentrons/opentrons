@@ -81,6 +81,24 @@ def subject(
     )
 
 
+def _protocol_resource(protocol_id: str = "protocol-id") -> ProtocolResource:
+    return ProtocolResource(
+        protocol_id=protocol_id,
+        created_at=datetime(year=2021, month=1, day=1),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-3 Standard",
+            content_hash="abc123",
+        ),
+        protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+
+
 class _QueuedAnalyzer:
     """Analyzer stub that records load/analyze order and can hold the queue lock."""
 
@@ -545,4 +563,105 @@ async def test_initialize_analyzer_promotes_pending_on_failure(
             errors=matchers.Anything(),
         ),
         times=0,
+    )
+
+
+async def test_start_analysis_if_rtps_differ_skips_when_rtps_match(
+    decoy: Decoy,
+    analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
+) -> None:
+    """Matching RTPs should clean up the analyzer and not record a new pending analysis."""
+    protocol_resource = _protocol_resource()
+    last_summary = AnalysisSummary(id="old-analysis", status=AnalysisStatus.COMPLETED)
+    analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
+    decoy.when(
+        protocol_analyzer.create_protocol_analyzer(
+            analysis_store=analysis_store,
+            protocol_resource=protocol_resource,
+            run_process_pyro_provider=run_process_pyro_provider,
+        )
+    ).then_return(analyzer)
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_analysis(
+            last_analysis_summary=last_summary,
+            new_parameters=[],
+        )
+    ).then_return(True)
+
+    subject = AnalysesManager(
+        analysis_store=analysis_store,
+        task_runner=TaskRunner(),
+        run_process_pyro_provider=run_process_pyro_provider,
+    )
+    result = await subject.start_analysis_if_rtps_differ(
+        analysis_id="analysis-id",
+        protocol_resource=protocol_resource,
+        run_time_param_values={},
+        run_time_param_paths={},
+        last_analysis_summary=last_summary,
+    )
+
+    assert result is None
+    decoy.verify(await analyzer.clean_up())
+    decoy.verify(
+        analysis_store.add_pending(
+            protocol_id=matchers.Anything(),
+            analysis_id=matchers.Anything(),
+            run_time_parameters=matchers.Anything(),
+        ),
+        times=0,
+    )
+
+
+async def test_start_analysis_if_rtps_differ_starts_when_rtps_differ(
+    decoy: Decoy,
+    analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
+) -> None:
+    """Mismatched RTPs should record pending under the lock and analyze."""
+    protocol_resource = _protocol_resource()
+    last_summary = AnalysisSummary(id="old-analysis", status=AnalysisStatus.COMPLETED)
+    analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
+    decoy.when(
+        protocol_analyzer.create_protocol_analyzer(
+            analysis_store=analysis_store,
+            protocol_resource=protocol_resource,
+            run_process_pyro_provider=run_process_pyro_provider,
+        )
+    ).then_return(analyzer)
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_analysis(
+            last_analysis_summary=last_summary,
+            new_parameters=[],
+        )
+    ).then_return(False)
+
+    subject = AnalysesManager(
+        analysis_store=analysis_store,
+        task_runner=TaskRunner(),
+        run_process_pyro_provider=run_process_pyro_provider,
+    )
+    result = await subject.start_analysis_if_rtps_differ(
+        analysis_id="analysis-id",
+        protocol_resource=protocol_resource,
+        run_time_param_values={},
+        run_time_param_paths={},
+        last_analysis_summary=last_summary,
+    )
+
+    assert result == AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+        runTimeParameters=[],
+    )
+    decoy.verify(
+        analysis_store.add_pending(
+            protocol_id="protocol-id",
+            analysis_id="analysis-id",
+            run_time_parameters=[],
+        ),
+        await analyzer.analyze(analysis_id="analysis-id"),
     )
