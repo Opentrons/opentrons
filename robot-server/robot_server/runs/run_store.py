@@ -50,6 +50,7 @@ from robot_server.persistence.tables import (
     run_table,
 )
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 log = logging.getLogger(__name__)
 
@@ -139,6 +140,19 @@ class RunStore:
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._run_store_provider = RunStoreProvider(
+            run_id=None,
+            store_insert_command=self.insert_command,
+            store_insert_command_annotation=self.insert_command_annotation,
+            store_get_command=self.get_command,
+            store_get_commands_slice=self.get_commands_slice,
+            store_get_command_annotation=self.get_command_annotation,
+            store_get_command_annotation_slice=self.get_command_annotations_slice
+        )
+
+    def get_run_store_provider(self) -> RunStoreProvider:
+        """Get the RunStoreProvider created by the RunStore."""
+        return self._run_store_provider
 
     def update_run_state(
         self,
@@ -517,7 +531,7 @@ class RunStore:
             )
             return []
 
-    def get_commands_slice(
+    async def get_commands_slice(
         self,
         run_id: str,
         length: int,
@@ -765,7 +779,7 @@ class RunStore:
             )
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get_command(self, run_id: str, command_id: str) -> Command:
+    async def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
 
         Args:
@@ -805,7 +819,7 @@ class RunStore:
             count_result: int = transaction.execute(select_count).scalar_one()
             return count_result
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self,
         run_id: str,
         cursor: int,
@@ -867,7 +881,7 @@ class RunStore:
                 total_length=total_count,
             )
 
-    def get_command_annotation(
+    async def get_command_annotation(
         self, run_id: str, command_annotation_id: str
     ) -> CommandAnnotation:
         """Get run command annotation by id."""

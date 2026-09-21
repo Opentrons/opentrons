@@ -93,6 +93,7 @@ from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 log = logging.getLogger(__name__)
 
@@ -230,6 +231,11 @@ class DirectedRunProcess(AbstractRunCoordinator):
             assert self._robot_server_resource is not None
 
         self._run_id = run_id
+
+        # Create the RunStoreProvider
+        run_store_provider = self._robot_server_resource.get_run_store_provider()
+        run_store_provider.set_run_id(self._run_id)
+
 
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)

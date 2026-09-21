@@ -529,18 +529,19 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if (
-            run_id == self._run_orchestrator_store.current_run_id
-            and not await self._run_orchestrator_store.get_commands_deleted()
-        ):
-            return await self._run_orchestrator_store.get_command_slice(
-                cursor=cursor,
-                length=length,
-                include_fixit_commands=include_fixit_commands,
-            )
+        # if (
+        #     run_id == self._run_orchestrator_store.current_run_id
+        #     and not await self._run_orchestrator_store.get_commands_deleted()
+        # ):
+        #     return await self._run_orchestrator_store.get_command_slice(
+        #         cursor=cursor,
+        #         length=length,
+        #         include_fixit_commands=include_fixit_commands,
+        #     )
+        #CASEY NOTE get rid of ROS version
 
         # Let exception propagate
-        return self._run_store.get_commands_slice(
+        return await self._run_store.get_commands_slice(
             run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
         )
 
@@ -565,7 +566,7 @@ class RunDataManager:
             run_id=run_id, cursor=cursor, length=length
         )
 
-    def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
+    async def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
 
         See `ProtocolEngine.state_view.commands.get_current()` for the definition
@@ -577,9 +578,9 @@ class RunDataManager:
         if self._run_orchestrator_store.current_run_id == run_id:
             return self._run_orchestrator_store.get_current_command()
         else:
-            return self._get_historical_run_last_command(run_id=run_id)
+            return await self._get_historical_run_last_command(run_id=run_id)
 
-    def get_last_completed_command(self, run_id: str) -> Optional[CommandPointer]:
+    async def get_last_completed_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "last" command, if any.
 
         See `ProtocolEngine.state_view.commands.get_most_recently_finalized_command()` for the definition of "last."
@@ -590,7 +591,7 @@ class RunDataManager:
         if self._run_orchestrator_store.current_run_id == run_id:
             return self._run_orchestrator_store.get_most_recently_finalized_command()
         else:
-            return self._get_historical_run_last_command(run_id=run_id)
+            return await self._get_historical_run_last_command(run_id=run_id)
 
     async def get_recovery_target_command(
         self, run_id: str
@@ -619,13 +620,14 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found.
             CommandNotFoundError: The given command identifier was not found.
         """
-        if (
-            self._run_orchestrator_store.current_run_id == run_id
-            and not await self._run_orchestrator_store.get_commands_deleted()
-        ):
-            return await self._run_orchestrator_store.get_command(command_id=command_id)
+        # if (
+        #     self._run_orchestrator_store.current_run_id == run_id
+        #     and not await self._run_orchestrator_store.get_commands_deleted()
+        # ):
+        #     return await self._run_orchestrator_store.get_command(command_id=command_id)
+        # CASEY NOTE clear out the run orchestrator version
 
-        return self._run_store.get_command(run_id=run_id, command_id=command_id)
+        return await self._run_store.get_command(run_id=run_id, command_id=command_id)
 
     async def get_command_errors_count(self, run_id: str) -> int:
         """Get all command errors."""
@@ -651,11 +653,12 @@ class RunDataManager:
             cursor: Requested index of the first command annotation in the returned slice.
             length: Length of slice to return.
         """
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return await self._run_orchestrator_store.get_command_annotations_slice(
-                cursor=cursor, length=length
-            )
-        return self._run_store.get_command_annotations_slice(
+        # if run_id == self._run_orchestrator_store.current_run_id:
+        #     return await self._run_orchestrator_store.get_command_annotations_slice(
+        #         cursor=cursor, length=length
+        #     )
+        # CASEY NOTE get rid of the ROS version
+        return await self._run_store.get_command_annotations_slice(
             run_id=run_id, cursor=cursor, length=length
         )
 
@@ -663,11 +666,12 @@ class RunDataManager:
         self, run_id: str, annotation_id: str
     ) -> CommandAnnotation:
         """Get a run's command annotation by ID."""
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return await self._run_orchestrator_store.get_command_annotation(
-                annotation_id
-            )
-        return self._run_store.get_command_annotation(run_id, annotation_id)
+        # if run_id == self._run_orchestrator_store.current_run_id:
+        #     return await self._run_orchestrator_store.get_command_annotation(
+        #         annotation_id
+        #     )
+        # CASEY NOTE get rid of the ROS version
+        return await self._run_store.get_command_annotation(run_id, annotation_id)
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
@@ -771,8 +775,8 @@ class RunDataManager:
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
 
-    def _get_historical_run_last_command(self, run_id: str) -> Optional[CommandPointer]:
-        command_slice = self._run_store.get_commands_slice(
+    async def _get_historical_run_last_command(self, run_id: str) -> Optional[CommandPointer]:
+        command_slice = await self._run_store.get_commands_slice(
             run_id=run_id, cursor=None, length=1, include_fixit_commands=True
         )
         if not command_slice.commands:

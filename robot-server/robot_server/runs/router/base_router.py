@@ -892,7 +892,7 @@ async def get_current_state(  # noqa: C901
     else:
         flex_stacker_states = None
 
-    last_completed_command = run_data_manager.get_last_completed_command(run_id=runId)
+    last_completed_command = await run_data_manager.get_last_completed_command(run_id=runId)
     links = CurrentStateLinks.model_construct(
         lastCompleted=(
             CommandLinkNoMeta.model_construct(

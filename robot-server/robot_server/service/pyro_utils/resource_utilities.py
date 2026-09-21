@@ -18,6 +18,7 @@ from robot_server.service.pyro_utils.pyro_resource import (
     RobotServerPyroResource,
     robot_server_pyro_resource_accessor,
 )
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -143,4 +144,17 @@ def register_hardware_state_store_to_pyro_resource(
     else:
         raise RuntimeError(
             "Cannot set HardwareStateStore, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_run_store_provider_to_pyro_resource(
+    app_state: AppState, run_store_provider: RunStoreProvider
+) -> None:
+    """Set the Run Store Provider as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_run_store_provider(run_store_provider)
+    else:
+        raise RuntimeError(
+            "Cannot set RunStore, RobotServerPyroResource is not initialized."
         )

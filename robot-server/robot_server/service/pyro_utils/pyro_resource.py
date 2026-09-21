@@ -32,6 +32,7 @@ from server_utils.fastapi_utils.app_state import (
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -77,6 +78,7 @@ class RobotServerPyroResource:
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], None]] = None
         self._hardware_state_store: Optional["HardwareStateStore"] = None
+        self._run_store_provider: Optional[RunStoreProvider] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -122,6 +124,11 @@ class RobotServerPyroResource:
     def set_hardware_state_store(self, hardware_store: "HardwareStateStore") -> None:
         """Set the HardwareStateStore of the RobotServerPyroResource, not serialized for remote processes."""
         self._hardware_state_store = hardware_store
+
+    def set_run_store_provider(self, run_store_provider: RunStoreProvider) -> None:
+            """Set the RunStoreProvider of the RobotServerPyroResource, not serialized for remote processes."""
+            if self._run_store_provider is None:
+                self._run_store_provider = run_store_provider
 
     ### Interface methods for remote access ###
 
@@ -293,6 +300,20 @@ class RobotServerPyroResource:
         else:
             raise RuntimeError(
                 "Cannot provide a protocol engine listener from the RobotServerPyroResource without a RunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_run_store_provider(self) -> RunStoreProvider:
+        """Provide a Pyro Proxy for the RunStoreProvider.
+
+        The returned instance is meant to execute in the Robot Server's process.
+        """
+
+        if self._run_store_provider is not None:
+            return self._run_store_provider
+        else:
+            raise RuntimeError(
+                "Cannot return a RunStoreProvider from the RobotServerPyroResource without initializing."
             )
 
 

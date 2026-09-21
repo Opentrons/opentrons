@@ -60,6 +60,7 @@ from robot_server.service.pyro_utils.resource_utilities import (
 )
 from robot_server.service.task_runner import get_task_runner
 from robot_server.settings import get_settings
+from robot_server.service.pyro_utils.resource_utilities import register_run_store_provider_to_pyro_resource
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
@@ -81,6 +82,7 @@ async def get_run_store(
 
     if run_store is None:
         run_store = RunStore(sql_engine=sql_engine)
+        register_run_store_provider_to_pyro_resource(app_state=app_state, run_store_provider=run_store.get_run_store_provider())
         _run_store_accessor.set_on(app_state, run_store)
 
     return run_store
