@@ -115,9 +115,13 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 **Yellow:** `--yellow-20` through `--yellow-60` (20, 30, 35, 40, 50, 60)
 
-**Flex brand:** `--flex-40`, `--flex-50`, `--flex-55`
+**Flex brand:** `--flex-20` through `--flex-60` (20, 30, 35, 40, 50, 55, 60)
 
-**Semi-transparent:** `--transparent-white-80`, `--transparent-white-50`, `--transparent-black-10`, `--transparent-black-60`, `--transparent-black-80`, `--transparent`
+**Semi-transparent white:** `--transparent-white-20` through `--transparent-white-80` (20, 30, 50, 80)
+
+**Semi-transparent black:** `--transparent-black-10` through `--transparent-black-80` (10, 20, 30, 40, 50, 60, 80)
+
+**transparent:** `--transparent`
 
 > Some colors (green, purple) have touchscreen variants that activate when `components/src/styles/global.css` applies the `.enable_touchscreen_colors` class. The default values are non-touchscreen.
 
@@ -127,7 +131,7 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 ### Typography
 
-**Font size:** `--font-size-10` (10px), `--font-size-11` (11px), `--font-size-13` (13px), `--font-size-13` (13px), `--font-size-14` (14px), `--font-size-15` (15px), `--font-size-19` (19px), `--font-size-20`, `--font-size-22`, `--font-size-28`, `--font-size-32`, `--font-size-38`, `--font-size-80`
+**Font size:** `--font-size-9`, `--font-size-10`, `--font-size-11`, `--font-size-12`, `--font-size-13`, `--font-size-14`, `--font-size-15`, `--font-size-16`, `--font-size-19`, `--font-size-20`, `--font-size-22`, `--font-size-23`, `--font-size-24`, `--font-size-26`, `--font-size-28`, `--font-size-32`, `--font-size-38`, `--font-size-39`, `--font-size-80`
 
 **Font weight:** `--font-weight-light` (300), `--font-weight-regular` (400), `--font-weight-semi-bold` (600), `--font-weight-bold` (700)
 
@@ -214,6 +218,28 @@ The repo uses `stylelint-config-standard` + `stylelint-config-idiomatic-order` (
 - Max 4 decimal places for numbers (except dimension properties like `width`, `height`, `flex`)
 - Standard CSS property ordering (idiomatic order)
 - `@value` at-rule is still allowed but deprecated — avoid in new code
+
+### Tips: Common Stylelint Fixes
+
+**Zero lengths must have no unit** (`length-zero-no-unit`):
+
+```css
+/* ✖ Unexpected unit */
+box-shadow: 0px 3px 6px rgb(0 0 0 / 23%);
+
+/* ✔ Use bare 0 — no px/rem/etc. */
+box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+```
+
+**Use modern `rgb` notation** (`color-function-alias-notation`, `color-function-notation`):
+
+```css
+/* ✖ rgba + comma-separated args are legacy */
+box-shadow: 0 3px 6px rgba(0, 0, 0, 23%);
+
+/* ✔ Prefer rgb with space-separated channels and / alpha */
+box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+```
 
 ## Linting and Formatting
 
