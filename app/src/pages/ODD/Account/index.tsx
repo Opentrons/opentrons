@@ -26,12 +26,18 @@ export function Account({
   passwordComplexity,
   username,
   fullName,
+  onSaveNewPassword,
+  onSaveNewLegalName,
+  onSaveNewUsername,
 }: {
   onBack?: () => void
   usernames: string[]
   passwordComplexity: PasswordComplexityRequirements | null
   username: string
   fullName: string
+  onSaveNewPassword: (password: string) => Promise<void>
+  onSaveNewLegalName: (legalName: string) => Promise<void>
+  onSaveNewUsername: (username: string) => Promise<void>
 }): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
@@ -51,8 +57,10 @@ export function Account({
         onCancel={() => {
           setEditInfo(null)
         }}
-        onSave={() => {
-          setEditInfo(null)
+        onSave={(password: string) => {
+          void onSaveNewPassword(password).then(() => {
+            setEditInfo(null)
+          })
         }}
         passwordComplexity={passwordComplexity}
       />
@@ -64,8 +72,10 @@ export function Account({
         onCancel={() => {
           setEditInfo(null)
         }}
-        onSave={() => {
-          setEditInfo(null)
+        onSave={(legalName: string) => {
+          void onSaveNewLegalName(legalName).then(() => {
+            setEditInfo(null)
+          })
         }}
       />
     )
@@ -76,8 +86,10 @@ export function Account({
         onCancel={() => {
           setEditInfo(null)
         }}
-        onSave={() => {
-          setEditInfo(null)
+        onSave={(newUsername: string) => {
+          void onSaveNewUsername(newUsername).then(() => {
+            setEditInfo(null)
+          })
         }}
         takenUsernames={usernames}
       />

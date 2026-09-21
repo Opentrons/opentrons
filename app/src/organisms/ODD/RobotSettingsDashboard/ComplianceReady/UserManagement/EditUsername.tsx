@@ -41,10 +41,14 @@ export function EditUsername({
   }
 
   const handleConfirm = useCallback((): void => {
-    if (!!username?.trim() && username.trim().length <= MAX_USERNAME_LENGTH) {
+    if (
+      !!username?.trim() &&
+      username.trim().length <= MAX_USERNAME_LENGTH &&
+      !takenUsernames.includes(username.trim())
+    ) {
       onSave(username.trim())
     }
-  }, [username, onSave])
+  }, [username, onSave, takenUsernames])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
@@ -73,6 +77,7 @@ export function EditUsername({
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
+        onClickBack={onCancel}
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>

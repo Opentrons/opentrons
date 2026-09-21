@@ -25,11 +25,29 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
+const onSaveNewPassword = vi.fn().mockResolvedValue(undefined)
+const onSaveNewUsername = vi.fn().mockResolvedValue(undefined)
+const onSaveNewLegalName = vi.fn().mockResolvedValue(undefined)
+
 const renderAccount = (initialPath = '/account', onBack?: () => void) => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialPath]}>
       <Routes>
-        <Route path="/account" element={<Account onBack={onBack} />} />
+        <Route
+          path="/account"
+          element={
+            <Account
+              onBack={onBack}
+              usernames={['george_clooney']}
+              passwordComplexity={null}
+              username="george_clooney"
+              fullName="George Clooney"
+              onSaveNewPassword={onSaveNewPassword}
+              onSaveNewUsername={onSaveNewUsername}
+              onSaveNewLegalName={onSaveNewLegalName}
+            />
+          }
+        />
       </Routes>
     </MemoryRouter>,
     {

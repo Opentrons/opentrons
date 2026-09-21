@@ -5,6 +5,8 @@ import { TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { getPasswordComplexityError } from '/app/resources/auth'
 
 import { ChildNavigation } from '../../../ChildNavigation'
@@ -33,8 +35,12 @@ export function EditPassword({
   const [phase, setPhase] = useState<'password' | 'confirmPassword'>('password')
   const { t } = useTranslation(['device_settings', 'access_control'])
   const keyboardRef = useRef(null)
-  const inputElementRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
+  const inputType: 'text' | 'password' = showPassword ? 'text' : 'password'
+
+  usePlaceCaretAtEndOnToggle(inputElementRef, showPassword, true)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (phase === 'password') {
@@ -90,6 +96,7 @@ export function EditPassword({
 
         setConfirmPasswordError(undefined)
         setError(undefined)
+        setShowPassword(false)
         setPhase('confirmPassword')
       }
     } else {
@@ -140,6 +147,14 @@ export function EditPassword({
             ? t('odd_password_continue_button')
             : t('odd_password_save_button')
         }
+        onClickBack={
+          phase === 'password'
+            ? onCancel
+            : () => {
+                setShowPassword(false)
+                setPhase('password')
+              }
+        }
         buttonType="primary"
         secondaryButtonProps={{
           buttonText: t('odd_password_cancel_button'),
@@ -150,7 +165,7 @@ export function EditPassword({
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>
           <TouchInputField
-            type="text"
+            type={inputType}
             label={
               phase === 'password'
                 ? t('odd_new_password_label')
@@ -162,6 +177,14 @@ export function EditPassword({
             borderRadius="8px"
             error={phase === 'password' ? error : confirmPasswordError}
             autoFocus
+            accessory={
+              <PasswordVisibilityToggle
+                isVisible={showPassword}
+                onToggle={() => {
+                  setShowPassword(prev => !prev)
+                }}
+              />
+            }
           />
         </div>
         <AccordionKeyboard

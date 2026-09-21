@@ -7,6 +7,7 @@
   "account_legal_name": "Legal name",
   "account_password": "Password",
   "account_password_placeholder": "************************",
+  "account_save_error": "Unable to save account settings. Try again.",
   "account_title": "Personal account settings",
   "account_username": "Username",
   "active": "Active",
