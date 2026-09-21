@@ -16,7 +16,7 @@ export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
 export function ProtocolDetailsHeaderTitleSkeleton(): JSX.Element {
   return (
     <Skeleton
-      width="42rem"
+      width="100%"
       height="3rem"
       backgroundSize="99rem"
       borderRadius={BORDERS.borderRadius12}
