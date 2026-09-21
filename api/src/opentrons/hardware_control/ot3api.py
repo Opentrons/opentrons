@@ -3485,7 +3485,7 @@ class OT3API(
                 message=f"No stored firmware for {module.name} {module.serial_number}"
             )
         return await modules.update_firmware(module, bundled_fw.path)
-    
+
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def get_motor_usage_data(
         self,
