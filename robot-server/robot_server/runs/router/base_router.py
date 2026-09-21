@@ -103,6 +103,10 @@ from ..run_models import (
 )
 from ..run_orchestrator_store import RunConflictError
 from ..run_store import RunStore
+from robot_server.access_control.settings.store import (
+    AccessControlSettingStore,
+    get_access_control_setting_store,
+)
 from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
@@ -289,6 +293,9 @@ async def create_run(  # noqa: C901
         Callable[[], Awaitable[None]], Depends(get_pe_notify_publishers)
     ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    access_control_setting_store: Annotated[
+        AccessControlSettingStore, Depends(get_access_control_setting_store)
+    ],
     audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
     request_body: Optional[RequestModel[RunCreate]] = None,
@@ -312,6 +319,8 @@ async def create_run(  # noqa: C901
         notify_publishers: Utilized by the engine to notify publishers of state changes.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
+        access_control_setting_store: Persistent CRS settings, including whether
+            to auto-delete old runs at the maximum.
         audit_client: Client to get log period info from
         disk_monitor: Disk monitor for checking if we have enough space.
     """
@@ -364,7 +373,11 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_auto_deleter.make_room_for_new_run()
+    if (
+        not access_control_status
+        or access_control_setting_store.get_all().deleteOverMaxOnDiskProtocols
+    ):
+        run_auto_deleter.make_room_for_new_run()
 
     if disk_monitor.is_disk_space_below_run_start_limit() and access_control_status:
         log_line = f"Disk free space is {disk_monitor.get_available_disk_space_mb()}MB which is below the limit for starting a run."
