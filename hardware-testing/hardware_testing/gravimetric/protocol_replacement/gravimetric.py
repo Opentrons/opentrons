@@ -1,8 +1,9 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional
+from contextlib import contextmanager
+from typing import List, Dict, Tuple, Optional, Iterator
 from dataclasses import dataclass, asdict
-from time import time
+from time import time, sleep
 import copy
 import json
 import traceback
@@ -131,6 +132,80 @@ SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 MIN_MEASUREMENT_SAMPLES = 2
 MAX_MEASUREMENT_WAIT_S = 120
 MEASUREMENT_POLL_S = 2
+# One SI waits for the stable reply. Do not stack retries on a 1s timeout;
+# that leaves the Radwag holding a response the reader never consumes.
+SCALE_READ_TIMEOUT_S = 30.0
+
+
+def _scale_serial_port(scale: Scale) -> str:
+    """Return the Radwag device path, if this scale has a real serial port."""
+    radwag = getattr(scale, "_scale", None)
+    connection = getattr(radwag, "_connection", None)
+    return str(getattr(connection, "port", "") or "")
+
+
+@contextmanager
+def _hide_serial_port_from_other_devices(port: str) -> Iterator[None]:
+    """Keep Asair/impact port scans from opening the scale tty.
+
+    Those scanners treat any 8-character reply as a sensor. A Radwag line is
+    long enough to match, so the env sensor would keep the scale port and
+    write Modbus into it while the recorder is also sending SI.
+    """
+    if not port:
+        yield
+        return
+    import hardware_testing.drivers.asair_sensor as asair_mod
+    import hardware_testing.drivers.ImpactProtectionV2 as impact_mod
+    from serial.tools.list_ports import comports as real_comports
+
+    def _filtered() -> list:
+        return [item for item in real_comports() if getattr(item, "device", None) != port]
+
+    previous = (asair_mod.comports, impact_mod.comports)
+    asair_mod.comports = _filtered  # type: ignore[assignment]
+    impact_mod.comports = _filtered  # type: ignore[assignment]
+    print_info(f"excluding scale port {port} from other serial scans")
+    try:
+        yield
+    finally:
+        asair_mod.comports, impact_mod.comports = previous
+
+
+def _harden_scale_reader(scale: Scale, recorder: GravimetricRecorder) -> None:
+    """Wait for one stable Radwag reply, and keep the recorder thread alive."""
+    radwag = getattr(scale, "_scale", None)
+    connection = getattr(radwag, "_connection", None)
+    if connection is None or not hasattr(radwag, "_write_command_and_read_response"):
+        return
+    from hardware_testing.drivers.radwag.commands import RadwagCommand
+
+    connection.timeout = SCALE_READ_TIMEOUT_S
+
+    def _read_mass_once() -> Tuple[float, bool]:
+        cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
+        response = radwag._write_command_and_read_response(cmd, retries=0)
+        assert response.measurement is not None
+        return response.measurement, response.stable
+
+    radwag.read_mass = _read_mass_once  # type: ignore[method-assign]
+    original_read = scale.read
+
+    def _read_without_killing_recorder() -> object:
+        while recorder.is_recording or not recorder.is_in_thread:
+            try:
+                return original_read()
+            except Exception as exc:
+                print_warning(f"scale read failed, retrying one SI: {exc}")
+                try:
+                    connection.reset_input_buffer()
+                except Exception:
+                    pass
+                sleep(0.2)
+        raise RuntimeError("scale recording stopped")
+
+    scale.read = _read_without_killing_recorder  # type: ignore[method-assign]
+
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -518,20 +593,23 @@ class FixtureSettings(CSVSettings):
         scale_serial = scale.read_serial_number()
         if simulating:
             recorder.set_simulation_mass(10)
-        recorder.record(in_thread=True)
-        env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
-        env_serial = env_sensor.get_serial()
+        # Scan the other fixtures before the scale thread starts sending SI,
+        # and never let them open the scale tty.
+        scale_port = _scale_serial_port(scale)
         use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
-        # 链接防撞工装
         ImpactSerial = None
-        if use_impact_protection:
-            # 确保skip_port是字符串，即使link_port为None
-            skip_port = link_port if link_port is not None else ""
-            ImpactSerial = ImpactProtectionV2.BuildImpactProtection(
-                simulate=simulating, skip_port=skip_port
-            )
-            assert ImpactSerial is not None
-            ctx.delay(seconds=1, msg=f"p {ImpactSerial.port}")
+        with _hide_serial_port_from_other_devices(scale_port):
+            env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
+            env_serial = env_sensor.get_serial()
+            if use_impact_protection:
+                skip_port = link_port if link_port is not None else ""
+                ImpactSerial = ImpactProtectionV2.BuildImpactProtection(
+                    simulate=simulating, skip_port=skip_port
+                )
+                assert ImpactSerial is not None
+                ctx.delay(seconds=1, msg=f"p {ImpactSerial.port}")
+        _harden_scale_reader(scale, recorder)
+        recorder.record(in_thread=True)
 
         ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
 
