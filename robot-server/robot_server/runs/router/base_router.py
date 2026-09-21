@@ -373,7 +373,11 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_auto_deleter.make_room_for_new_run()
+    if (
+        not access_control_status
+        or access_control_setting_store.get_all().deleteOverMaxOnDiskProtocols
+    ):
+        run_auto_deleter.make_room_for_new_run()
 
     if disk_monitor.is_disk_space_below_run_start_limit() and access_control_status:
         log_line = f"Disk free space is {disk_monitor.get_available_disk_space_mb()}MB which is below the limit for starting a run."
