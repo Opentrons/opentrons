@@ -1,6 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -25,11 +25,14 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const renderAccount = (initialPath = '/account') => {
+const renderAccount = (
+  initialPath = '/account',
+  onBack?: () => void
+) => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialPath]}>
       <Routes>
-        <Route path="/account" element={<Account />} />
+        <Route path="/account" element={<Account onBack={onBack} />} />
       </Routes>
     </MemoryRouter>,
     {
@@ -40,24 +43,28 @@ const renderAccount = (initialPath = '/account') => {
 
 describe('Account', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('renders account details when logged in', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'george_clooney',
       fullName: 'George Clooney',
     })
+  })
 
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders account details when logged in', () => {
     renderAccount()
 
-    screen.getByRole('heading', { name: 'Account' })
+    screen.getByRole('heading', { name: 'Personal account settings' })
     screen.getByText('Username')
     screen.getByText('george_clooney')
     screen.getByText('Legal name')
     screen.getByText('George Clooney')
-    screen.getByText('Manage user account details in the Opentrons App')
+    screen.getByText('Password')
+    screen.getByText('************************')
+    expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(3)
   })
 
   it('renders a blank page, then navigates to the previous page, when the user is not logged in', async () => {
@@ -69,9 +76,10 @@ describe('Account', () => {
 
     renderAccount()
 
-    screen.getByRole('heading', { name: 'Account' })
+    screen.getByRole('heading', { name: 'Personal account settings' })
     screen.getByText('Username')
     screen.getByText('Legal name')
+    screen.getByText('Password')
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(-1)
@@ -79,12 +87,6 @@ describe('Account', () => {
   })
 
   it('dispatches logOut when the "log out" button is tapped', () => {
-    vi.mocked(useAccountInfo).mockReturnValue({
-      isLoggedIn: true,
-      username: 'username',
-      fullName: 'Full Name',
-    })
-
     const [, store] = renderAccount()
 
     fireEvent.click(screen.getByRole('button', { name: 'Log out' }))
@@ -94,15 +96,18 @@ describe('Account', () => {
   })
 
   it('navigates to the previous page when the back button is tapped', () => {
-    vi.mocked(useAccountInfo).mockReturnValue({
-      isLoggedIn: true,
-      username: 'george_clooney',
-      fullName: 'George Clooney',
-    })
-
     renderAccount()
 
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(mockNavigate).toHaveBeenCalledWith(-1)
+  })
+
+  it('calls onBack when provided instead of navigating', () => {
+    const mockOnBack = vi.fn()
+    renderAccount('/account', mockOnBack)
+
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    expect(mockOnBack).toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

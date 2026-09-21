@@ -30,7 +30,6 @@ import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
-import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -68,6 +67,7 @@ import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/req
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { AdminHub } from '../pages/ODD/AdminHub'
 import { RunLoading } from '../pages/ODD/RunLoading/RunLoading'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -124,7 +124,7 @@ function getPathComponent(
 ): JSX.Element {
   switch (path) {
     case '/account':
-      return <Account />
+      return <AdminHub />
     case '/choose-language':
       return <ChooseLanguage />
     case '/dashboard':

@@ -8,7 +8,6 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import {
-  useAccessControlEnabledQuery,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
@@ -108,9 +107,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
       message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
     })
   )
-
-  const { data: accessControlData } = useAccessControlEnabledQuery()
-  const isCRSEnabled = accessControlData?.data.accessControlEnabled ?? false
 
   return (
     <div className={styles.main_content}>
@@ -255,16 +251,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="verified"
         />
-        {isCRSEnabled ? (
-          <RobotSettingButton
-            settingName={t('odd_compliance_ready_software')}
-            dataTestId="RobotSettingButton_compliance_ready"
-            onClick={() => {
-              setCurrentOption('ComplianceReady')
-            }}
-            iconName="compliance"
-          />
-        ) : null}
         <RobotSettingButton
           settingName={t(
             'app_settings:include_protocol_source_in_run_download'

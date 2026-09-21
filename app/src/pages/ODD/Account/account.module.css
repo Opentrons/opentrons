@@ -16,3 +16,25 @@
   margin-top: auto;
   text-align: center;
 }
+
+.button_content {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-20) var(--spacing-24);
+}
+
+.right_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-24);
+}
+
+.list_button.list_button {
+  padding: 0;
+  border-radius: var(--spacing-16);
+}
