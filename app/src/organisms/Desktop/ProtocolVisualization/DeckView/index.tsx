@@ -162,7 +162,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   }))
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
-  ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
+  ).filter(
+    stagingArea =>
+      stagingArea.location === WASTE_CHUTE_CUTOUT &&
+      Object.keys(wasteChuteEntities).length > 0
+  )
   const filteredStagingAreas = {
     ...flexStackerAsStagingAreas,
     ...stagingAreaEntities,

@@ -132,7 +132,11 @@ export function DeckView(props: DeckViewProps): ReactNode {
   }))
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
-  ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
+  ).filter(
+    stagingArea =>
+      stagingArea.location === WASTE_CHUTE_CUTOUT &&
+      Object.keys(wasteChuteEntities).length > 0
+  )
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
