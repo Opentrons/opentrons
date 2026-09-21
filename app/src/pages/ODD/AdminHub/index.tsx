@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,8 +10,10 @@ import { SettingsListButton } from '/app/organisms/ODD/RobotSettingsDashboard/Co
 import { UserManagement } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/UserManagement'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { useIsAdminForRobot, useLogout } from '/app/redux/robot-auth'
+import { usePasswordComplexity } from '/app/resources/auth/hooks/usePasswordComplexity'
 
 import { Account } from '../Account'
+import { useAccountInfo } from '../Account/hooks'
 import styles from './adminhub.module.css'
 
 import type { ReactNode } from 'react'
@@ -31,6 +33,17 @@ export function AdminHub(): ReactNode {
 
   const { data: users } = useUsersQuery()
   const usersData = users?.data ?? []
+  const usernames = useMemo(() => {
+    return users?.data.map(user => user.username) ?? []
+  }, [users])
+  const { passwordComplexity } = usePasswordComplexity()
+  const { isLoggedIn, username, fullName } = useAccountInfo()
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(-1)
+    }
+  }, [isLoggedIn, navigate])
 
   if (!isAdmin || selectedPage === 'personal_account_settings') {
     return (
@@ -44,6 +57,10 @@ export function AdminHub(): ReactNode {
                 navigate(-1)
               }
         }
+        usernames={usernames}
+        passwordComplexity={passwordComplexity}
+        username={username ?? ''}
+        fullName={fullName ?? ''}
       />
     )
   }

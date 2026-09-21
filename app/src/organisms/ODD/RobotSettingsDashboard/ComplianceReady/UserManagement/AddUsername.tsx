@@ -49,8 +49,8 @@ export function AddUsername({
   }
 
   const handleConfirm = useCallback((): void => {
-    if (username && username.length <= MAX_USERNAME_LENGTH) {
-      onContinue(username)
+    if (!!username?.trim() && username.trim().length <= MAX_USERNAME_LENGTH) {
+      onContinue(username.trim())
     }
   }, [username, onContinue])
 

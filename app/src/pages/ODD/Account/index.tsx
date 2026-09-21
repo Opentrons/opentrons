@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -7,30 +7,82 @@ import { COLORS, ListButton, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { EditLegalName } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/EditLegalName'
+import { EditPassword } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/EditPassword'
+import { EditUsername } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/EditUsername'
 import { getLocalRobot } from '/app/redux/discovery'
 import { logOut } from '/app/redux/robot-auth'
 
 import styles from './account.module.css'
-import { useAccountInfo } from './hooks'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
+import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
-export function Account({ onBack }: { onBack?: () => void }): JSX.Element {
+export function Account({
+  onBack,
+  usernames,
+  passwordComplexity,
+  username,
+  fullName,
+}: {
+  onBack?: () => void
+  usernames: string[]
+  passwordComplexity: PasswordComplexityRequirements | null
+  username: string
+  fullName: string
+}): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { isLoggedIn, username, fullName } = useAccountInfo()
+
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
   )
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate(-1)
-    }
-  }, [isLoggedIn, navigate])
+  const [editInfo, setEditInfo] = useState<
+    'password' | 'legalName' | 'username' | null
+  >(null)
+
+  if (editInfo === 'password') {
+    return (
+      <EditPassword
+        onCancel={() => {
+          setEditInfo(null)
+        }}
+        onSave={() => {
+          setEditInfo(null)
+        }}
+        passwordComplexity={passwordComplexity}
+      />
+    )
+  }
+  if (editInfo === 'legalName') {
+    return (
+      <EditLegalName
+        onCancel={() => {
+          setEditInfo(null)
+        }}
+        onSave={() => {
+          setEditInfo(null)
+        }}
+      />
+    )
+  }
+  if (editInfo === 'username') {
+    return (
+      <EditUsername
+        onCancel={() => {
+          setEditInfo(null)
+        }}
+        onSave={() => {
+          setEditInfo(null)
+        }}
+        takenUsernames={usernames}
+      />
+    )
+  }
 
   return (
     <div className={styles.page}>
@@ -56,19 +108,25 @@ export function Account({ onBack }: { onBack?: () => void }): JSX.Element {
         <AccountRow
           label={t('account_username')}
           value={username ?? ''}
-          onClickEdit={() => {}}
+          onClickEdit={() => {
+            setEditInfo('username')
+          }}
           t={t}
         />
         <AccountRow
           label={t('account_legal_name')}
           value={fullName ?? ''}
-          onClickEdit={() => {}}
+          onClickEdit={() => {
+            setEditInfo('legalName')
+          }}
           t={t}
         />
         <AccountRow
           label={t('account_password')}
           value={t('account_password_placeholder')}
-          onClickEdit={() => {}}
+          onClickEdit={() => {
+            setEditInfo('password')
+          }}
           t={t}
         />
       </div>

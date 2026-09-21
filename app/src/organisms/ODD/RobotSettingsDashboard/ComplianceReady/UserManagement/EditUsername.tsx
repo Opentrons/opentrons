@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StepMeter, TouchInputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -11,36 +11,40 @@ import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'
 
-export function AddLegalName({
-  onClickBack,
+const MAX_USERNAME_LENGTH = 20
+
+export function EditUsername({
   onCancel,
-  onContinue,
-  totalSteps,
-  currentStep,
-  savedLegalName,
+  onSave,
+  takenUsernames,
 }: {
-  onClickBack: (legalName?: string) => void
   onCancel: () => void
-  onContinue: (username: string) => void
-  totalSteps: number
-  currentStep: number
-  savedLegalName?: string
+  onSave: (username: string) => void
+  takenUsernames: string[]
 }): ReactNode {
-  const [legalName, setLegalName] = useState<string | undefined>(savedLegalName)
+  const [username, setUsername] = useState<string | undefined>(undefined)
+  const [error, setError] = useState<string | undefined>(undefined)
   const { t } = useTranslation('device_settings')
   const keyboardRef = useRef(null)
   const inputElementRef = useRef(null)
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setLegalName(e.target.value)
+    setUsername(e.target.value)
+    if (e.target.value.length > MAX_USERNAME_LENGTH) {
+      setError('' + t('odd_add_username_caption'))
+    } else if (takenUsernames.includes(e.target.value)) {
+      setError('' + t('odd_add_username_taken_caption'))
+    } else {
+      setError(undefined)
+    }
   }
 
   const handleConfirm = useCallback((): void => {
-    if (!!legalName?.trim()) {
-      onContinue(legalName.trim())
+    if (!!username?.trim() && username.trim().length <= MAX_USERNAME_LENGTH) {
+      onSave(username.trim())
     }
-  }, [legalName, onContinue])
+  }, [username, onSave])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
@@ -59,12 +63,8 @@ export function AddLegalName({
 
   return (
     <div className={styles.container}>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
       <ChildNavigation
-        header={t('odd_add_legal_name_title')}
-        onClickBack={() => {
-          onClickBack(legalName)
-        }}
+        header={t('odd_add_username_title')}
         onClickButton={handleConfirm}
         buttonText={t('odd_create_user_continue_button')}
         buttonType="primary"
@@ -73,16 +73,17 @@ export function AddLegalName({
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
-        marginTop="12px"
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>
           <TouchInputField
             type="text"
-            label={t('odd_add_legal_name_label')}
-            value={legalName}
+            label={t('odd_add_username_label')}
+            value={username}
             onChange={handleChange}
+            caption={!!error ? undefined : t('odd_add_username_caption')}
             ref={inputElementRef}
+            error={error}
             borderRadius="8px"
             autoFocus
           />
