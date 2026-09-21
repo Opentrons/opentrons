@@ -25,10 +25,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const renderAccount = (
-  initialPath = '/account',
-  onBack?: () => void
-) => {
+const renderAccount = (initialPath = '/account', onBack?: () => void) => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialPath]}>
       <Routes>
