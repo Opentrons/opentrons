@@ -9,9 +9,9 @@ Adminstrator accounts have the option to change these settings again later. For 
 
 ## Download files after a run
 
-All Flex robots have a limited storage capacity for the files they generate. To save space, compliance ready Flex robots will not save audit logs to the robot by default. Instead, they're saved in the Opentrons App.
+All Flex robots have a limited storage capacity for the files they generate. To save space, your compliance ready Flex won't store audit logs on the robot by default. Instead, you'll need to download them from the Opentrons App.
 
-When this setting is on, all users will be prompted to download audit logs in the Opentrons App after each protocol run.
+When this setting is on, all users will be prompted to download audit logs in the Opentrons App immediately after a protocol run.
 
 <figure class="screenshot" markdown>
 ![Prompt on the Flex touchscreen to download audit logs from the Opentrons App.](images/download-logs-odd.png)
