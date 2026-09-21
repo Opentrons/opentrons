@@ -3,10 +3,11 @@
 from contextlib import contextmanager
 from typing import List, Dict, Tuple, Optional, Iterator
 from dataclasses import dataclass, asdict
-from time import time, sleep
+from time import time, sleep, monotonic
 import copy
 import json
 import traceback
+from types import MethodType
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -192,7 +193,7 @@ def _harden_scale_reader(scale: Scale, recorder: GravimetricRecorder) -> None:
     original_read = scale.read
 
     def _read_without_killing_recorder() -> object:
-        while recorder.is_recording or not recorder.is_in_thread:
+        while recorder.is_recording:
             try:
                 return original_read()
             except Exception as exc:
@@ -205,6 +206,74 @@ def _harden_scale_reader(scale: Scale, recorder: GravimetricRecorder) -> None:
         raise RuntimeError("scale recording stopped")
 
     scale.read = _read_without_killing_recorder  # type: ignore[method-assign]
+
+
+def _harden_recorder_against_clock_skew(recorder: GravimetricRecorder) -> None:
+    """Schedule scale reads with monotonic time so wall-clock jumps cannot stall.
+
+    The stock recorder uses time.time() against sample timestamps. If the robot
+    clock jumps backward (seen ~8h in the field), end_time stays in the "future"
+    and the loop never decides another SI is due.
+    """
+    import hardware_testing.gravimetric.measurement.record as record_mod
+
+    sample_cls = record_mod.GravimetricSample
+    sleep_real = record_mod.SLEEP_TIME_IN_RECORD_LOOP
+    sleep_sim = record_mod.SLEEP_TIME_IN_RECORD_LOOP_SIMULATING
+
+    def _record_samples(
+        self: GravimetricRecorder,
+        timeout: Optional[float] = None,
+        on_new_sample: Optional[object] = None,
+    ) -> object:
+        assert self._cfg.duration or self.is_in_thread
+        assert self._cfg.frequency
+        length = (
+            int(self._cfg.duration * self._cfg.frequency) + 1 if self._cfg.duration else 0
+        )
+        interval = 1.0 / self._cfg.frequency
+        self._recording = record_mod.GravimetricRecording()
+        start_mono = monotonic()
+        last_sample_mono: Optional[float] = None
+        # Keep CSV timestamps increasing even if wall clock jumps backward.
+        wall_anchor = time()
+        mono_anchor = start_mono
+        while self.is_recording:
+            if length and len(self._recording) >= length:
+                break
+            now_mono = monotonic()
+            if timeout is not None and (now_mono - start_mono) >= timeout:
+                break
+            due = last_sample_mono is None or (now_mono - last_sample_mono) >= interval
+            if due:
+                mass = self._scale.read()
+                if self._cfg.stable and not mass.stable:
+                    self._recording.clear()
+                    last_sample_mono = None
+                    continue
+                sample_time = wall_anchor + (monotonic() - mono_anchor)
+                sample = sample_cls(
+                    grams=mass.grams,
+                    stable=mass.stable,
+                    time=sample_time,
+                    tag=self._sample_tag,
+                )
+                self._recording.append(sample)
+                last_sample_mono = monotonic()
+                self._reading_samples.set()
+                if callable(on_new_sample):
+                    on_new_sample(self._recording)
+            if self.is_in_thread:
+                sleep(sleep_sim if self.is_simulator else sleep_real)
+        self._reading_samples.clear()
+        assert len(self._recording) == length or not self.is_recording, (
+            f"Scale recording timed out before accumulating "
+            f"{length} samples (recorded {len(self._recording)} samples)"
+        )
+        return self._recording
+
+    recorder._record_samples = MethodType(_record_samples, recorder)  # type: ignore[method-assign]
+    print_info("scale recorder scheduling switched to monotonic time")
 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
@@ -609,6 +678,7 @@ class FixtureSettings(CSVSettings):
                 assert ImpactSerial is not None
                 ctx.delay(seconds=1, msg=f"p {ImpactSerial.port}")
         _harden_scale_reader(scale, recorder)
+        _harden_recorder_against_clock_skew(recorder)
         recorder.record(in_thread=True)
 
         ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
