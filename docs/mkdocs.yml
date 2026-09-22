@@ -23,6 +23,9 @@ nav:
 exclude_docs: |
   python-api/liquid-class-tables/*.md
 
+hooks:
+  - hooks.py
+
 plugins:
   - monorepo
   - search
