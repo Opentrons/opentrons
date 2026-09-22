@@ -1,13 +1,13 @@
 .skeleton {
   display: flex;
-  padding: var(--spacing-16);
+  width: 100%;
+  box-sizing: border-box;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--spacing-16);
   align-self: stretch;
-  width: 100%;
-  margin-bottom: var(--spacing-16);
+  padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
+  margin-bottom: var(--spacing-16);
   background-color: var(--white);
-  box-sizing: border-box;
+  gap: var(--spacing-16);
 }
