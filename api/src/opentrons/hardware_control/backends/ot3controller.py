@@ -75,6 +75,7 @@ from opentrons_hardware.drivers.gpio import RemoteOT3GPIO
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
+    MotorUsageValueType,
     NodeId,
     SensorId,
 )
@@ -498,6 +499,28 @@ class OT3Controller(FlexBackend):
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
         return motor_nodes(self._subsystem_manager.targets)
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[List[Axis]] = None
+    ) -> Dict[Axis, Dict[str, int]]:
+        """Request and return motor usage data."""
+        parsed_responses: Dict[Axis, Dict[str, int]] = {}
+        expected = None
+        if expected_axes:
+            expected = set([axis_to_node(axis) for axis in expected_axes])
+        usage_data = await self._subsystem_manager.get_motor_usage_data(expected)
+
+        motor_usage_payload = {
+            node_to_axis(node): usage_data[node] for node in usage_data
+        }
+        for ax in motor_usage_payload.keys():
+            usage_elements = motor_usage_payload[ax].payload.usage_elements
+            parsed_responses[ax] = {
+                MotorUsageValueType(el.key).name: el.usage_value
+                for el in usage_elements
+            }
+
+        return parsed_responses
 
     async def update_firmware(
         self,
