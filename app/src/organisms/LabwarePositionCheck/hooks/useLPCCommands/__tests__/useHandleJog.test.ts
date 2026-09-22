@@ -23,6 +23,7 @@ describe('useHandleJog', () => {
   const mockRunId = 'mock_run'
   const mockMaintenanceRunId = 'mock_maintenance_run'
   const mockSetErrorMessage = vi.fn()
+  const mockSetIsDoorOpenError = vi.fn()
   const mockChainLPCCommands = vi.fn(() => Promise.resolve())
   const mockCreateSilentCommand = vi.fn()
   const mockRecordJog = vi.fn()
@@ -40,6 +41,7 @@ describe('useHandleJog', () => {
     runId: mockRunId,
     maintenanceRunId: mockMaintenanceRunId,
     setErrorMessage: mockSetErrorMessage,
+    setIsDoorOpenError: mockSetIsDoorOpenError,
     chainLPCCommands: mockChainLPCCommands,
   } as any
   const mockPipette = {
@@ -203,6 +205,33 @@ describe('useHandleJog', () => {
     expect(mockSetErrorMessage).toHaveBeenCalledWith(
       'Error issuing jog command: Command failed'
     )
+    expect(mockSetIsDoorOpenError).not.toHaveBeenCalled()
+    expect(mockRecordJog).not.toHaveBeenCalled()
+  })
+
+  it('should set door-open error instead of a generic message when the door is open', async () => {
+    const mockDoorOpenError = {
+      isAxiosError: true,
+      message: 'Request failed with status code 409',
+      response: {
+        status: 409,
+        data: {
+          errors: [{ id: 'MaintenanceCommandDoorOpen' }],
+        },
+      },
+    }
+    mockCreateSilentCommand.mockRejectedValueOnce(mockDoorOpenError)
+
+    const { result } = renderHook(() => useHandleJog(mockProps))
+
+    act(() => {
+      result.current.handleJog('x', 1, 1)
+    })
+
+    await vi.runAllTimersAsync()
+
+    expect(mockSetIsDoorOpenError).toHaveBeenCalledWith(true)
+    expect(mockSetErrorMessage).not.toHaveBeenCalled()
     expect(mockRecordJog).not.toHaveBeenCalled()
   })
 

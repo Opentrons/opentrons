@@ -19,6 +19,7 @@ import {
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
 
+import { LPCDoorOpen } from './LPCDoorOpen'
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
@@ -74,9 +75,13 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
 function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('shared')
   const currentStep = useSelector(selectCurrentStep(props.runId))
-  const { isRobotMoving, errorMessage, unableToDetect } = props.commandUtils
+  const { isRobotMoving, isDoorOpenError, errorMessage, unableToDetect } =
+    props.commandUtils
 
   // Handle special cases that are shared by multiple steps first.
+  if (isDoorOpenError) {
+    return <LPCDoorOpen {...props} />
+  }
   if (isRobotMoving) {
     return (
       <LPCRobotInMotion

@@ -5,6 +5,7 @@ import debounce from 'lodash/debounce'
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
 import { useCoalescedJogAudit } from '/app/local-resources/access-control/useCoalescedJogAudit'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
 import { moveRelativeCommand, moveToWellCommands } from './commands'
@@ -26,6 +27,7 @@ const DEBOUNCE_TIME_MS = 50
 
 interface UseHandleJogProps extends UseLPCCommandWithChainRunChildProps {
   setErrorMessage: (msg: string | null) => void
+  setIsDoorOpenError: (isDoorOpenError: boolean) => void
 }
 
 export interface UseHandleJogResult {
@@ -44,6 +46,7 @@ export function useHandleJog({
   runId,
   maintenanceRunId,
   setErrorMessage,
+  setIsDoorOpenError,
   chainLPCCommands,
   commandDocState,
   actionsToDocument,
@@ -100,7 +103,11 @@ export function useHandleJog({
           onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
-          setErrorMessage(`Error issuing jog command: ${e.message}`)
+          if (isMaintenanceDoorOpenError(e)) {
+            setIsDoorOpenError(true)
+          } else {
+            setErrorMessage(`Error issuing jog command: ${e.message}`)
+          }
         })
         .finally(() => {
           processingRef.current = false
@@ -125,6 +132,7 @@ export function useHandleJog({
     maintenanceRunId,
     createSilentCommand,
     setErrorMessage,
+    setIsDoorOpenError,
     recordJog,
   ])
 
