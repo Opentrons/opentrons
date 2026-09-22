@@ -566,6 +566,97 @@ async def test_initialize_analyzer_promotes_pending_on_failure(
     )
 
 
+async def test_initialize_analyzer_promotes_pending_when_rtp_lookup_fails(
+    decoy: Decoy,
+    analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
+    subject: AnalysesManager,
+) -> None:
+    """Init failure before a coordinator exists must still promote pending."""
+    robot_type: RobotType = "OT-3 Standard"
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type=robot_type,
+            content_hash="abc123",
+        ),
+        protocol_key="dummy-data-111",
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+    raised_exception = RuntimeError("Can't resolve pyro proxy")
+    enumerated_error = EnumeratedError(
+        code=ErrorCodes.GENERAL_ERROR,
+        message="Can't resolve pyro proxy",
+    )
+    analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
+    decoy.when(
+        protocol_analyzer.create_protocol_analyzer(
+            analysis_store=analysis_store,
+            protocol_resource=protocol_resource,
+            run_process_pyro_provider=run_process_pyro_provider,
+        )
+    ).then_return(analyzer)
+    decoy.when(
+        await analyzer.load_orchestrator(  # type: ignore[func-returns-value]
+            run_time_param_values={"sample_count": 123},
+            run_time_param_paths={},
+        )
+    ).then_raise(raised_exception)
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_raise(
+        AssertionError
+    )
+    decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
+        enumerated_error
+    )
+    decoy.when(analysis_store.get_summaries_by_protocol("protocol-id")).then_return(
+        [
+            AnalysisSummary(
+                id="analysis-id",
+                status=AnalysisStatus.PENDING,
+                runTimeParameters=[],
+            )
+        ]
+    )
+
+    with pytest.raises(FailedToInitializeAnalyzer):
+        await subject.initialize_analyzer(
+            analysis_id="analysis-id",
+            protocol_resource=protocol_resource,
+            run_time_param_values={"sample_count": 123},
+            run_time_param_paths={},
+        )
+
+    decoy.verify(
+        await analysis_store.update(
+            analysis_id="analysis-id",
+            robot_type=robot_type,
+            run_time_parameters=[],
+            commands=[],
+            labware=[],
+            modules=[],
+            pipettes=[],
+            errors=[
+                ErrorOccurrence.from_failed(
+                    id="internal-error",
+                    createdAt=matchers.IsA(datetime),
+                    error=enumerated_error,
+                )
+            ],
+            liquids=[],
+            liquidClasses=[],
+            command_annotations=[],
+            labware_offsets=[],
+        ),
+        await analyzer.clean_up(),
+    )
+
+
 async def test_start_analysis_if_rtps_differ_skips_when_rtps_match(
     decoy: Decoy,
     analysis_store: AnalysisStore,

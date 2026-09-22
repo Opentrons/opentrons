@@ -83,7 +83,10 @@ class AnalysesManager:
                     error=internal_error,
                 )
             ]
-            run_time_parameters = await analyzer.get_verified_run_time_parameters()
+            try:
+                run_time_parameters = await analyzer.get_verified_run_time_parameters()
+            except Exception:
+                run_time_parameters = []
             try:
                 if self._pending_analysis_exists(
                     protocol_id=protocol_resource.protocol_id,
@@ -208,7 +211,7 @@ class AnalysesManager:
     ) -> Optional[AnalysisSummary]:
         """Initialize under the global lock and start analysis only if RTPs changed.
 
-        Waits until the job has either skipped (RTPs match) or recorded pending. 
+        Waits until the job has either skipped (RTPs match) or recorded pending.
         Analyze continues in the background while holding the lock.
         """
         decision: asyncio.Future[Optional[AnalysisSummary]] = (
