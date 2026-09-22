@@ -132,6 +132,14 @@ describe('useEnsureProtocolAnalysis', () => {
     when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
         enabled: true,
+        refetchInterval: ANALYSIS_POLL_MS,
+      })
+      .thenReturn({
+        data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis>)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
+        enabled: true,
         refetchInterval: false,
       })
       .thenReturn({
@@ -144,6 +152,37 @@ describe('useEnsureProtocolAnalysis', () => {
     expect(result.current.analysis).toEqual(PROTOCOL_ANALYSIS)
     expect(result.current.analysisId).toBe(PROTOCOL_ANALYSIS.id)
     expect(result.current.isAnalyzing).toBe(false)
+    expect(useProtocolAnalysisAsDocumentQuery).toHaveBeenCalledWith(
+      PROTOCOL_ID,
+      PROTOCOL_ANALYSIS.id,
+      { enabled: true, refetchInterval: false }
+    )
+  })
+
+  it('keeps polling asDocument after the summary is completed until the document loads', () => {
+    stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, true)
+    stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, undefined)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
+        enabled: true,
+        refetchInterval: ANALYSIS_POLL_MS,
+      })
+      .thenReturn({
+        data: null,
+      } as UseQueryResult<CompletedProtocolAnalysis | null>)
+
+    const { result, rerender } = renderHook(() =>
+      useEnsureProtocolAnalysis(PROTOCOL_ID)
+    )
+
+    expect(result.current.isAnalyzing).toBe(true)
+    rerender()
+    expect(useProtocolAnalysisAsDocumentQuery).toHaveBeenCalledWith(
+      PROTOCOL_ID,
+      PROTOCOL_ANALYSIS.id,
+      { enabled: true, refetchInterval: ANALYSIS_POLL_MS }
+    )
+    expect(result.current.isAnalyzing).toBe(true)
   })
 
   it('treats LastAnalysisPending 503 as in-progress and does not retry', () => {
