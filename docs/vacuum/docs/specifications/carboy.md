@@ -69,15 +69,15 @@ See [Chemical Compatibility](compatibility.md) for the ratings of individual car
 The carboy cap includes two important liquid control features:
 
 * **Waste diverter:** channels liquid waste down the interior wall of the carboy, away from the exhaust port and float valve.
-* **Float valve:** is a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and Control Box.
+* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and control box.
 
 !!! note
     The float valve is a passive backflow preventer. It does not electronically communicate with the vacuum pump. When the carboy is full and the overflow valve closes, the pump:
 
-    - Shuts off automatically when operating at a set vacuum pressure (e.g., -400 mbar). Detection takes about 30 seconds.
+    - Shuts off automatically when operating at a set vacuum pressure (e.g., –400 mbar). Detection takes about 30 seconds.
     - Does not shut off automatically when operating at a set power rating (e.g., 60% power).
 
-    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../../python-api/modules/vacuum/#controlling-vacuum-operations) in the Vacuum Module API guide.
+    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../../python-api/modules/vacuum/#controlling-vacuum-operations) in the Python Protocol API documentation.
 
 ## Accessories
 
