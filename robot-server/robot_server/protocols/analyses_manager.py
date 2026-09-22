@@ -151,9 +151,8 @@ class AnalysesManager:
     ) -> AnalysisSummary:
         """Record a pending analysis immediately and run it when the global lock is free.
 
-        Overlapping analyses share one simulating subprocess. Recording pending first
-        lets the client poll skeletons while this job waits its turn, instead of
-        initializing on the HTTP request and racing the simulator slot.
+        Recording pending first lets the client poll while this job waits its turn,
+        instead of initializing on the HTTP request.
         """
         pending_parameters = run_time_parameters or []
         self._analysis_store.add_pending(
