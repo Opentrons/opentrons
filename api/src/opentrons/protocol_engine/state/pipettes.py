@@ -777,6 +777,8 @@ class PipetteView:
                 return nozzle_map.instrument_xy_center_offset
             case CriticalPoint.XY_CENTER:
                 return nozzle_map.xy_center_offset
+            case CriticalPoint.X_CENTER:
+                return nozzle_map.x_center_offset
             case CriticalPoint.Y_CENTER:
                 return nozzle_map.y_center_offset
             case CriticalPoint.FRONT_NOZZLE:

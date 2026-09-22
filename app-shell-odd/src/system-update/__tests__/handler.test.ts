@@ -95,7 +95,10 @@ describe('update driver manager', () => {
   it('creates a driver once config is loaded', () => {
     when(getConfig)
       .calledWith('update')
-      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
+      .thenReturn({
+        channel: 'alpha',
+        automaticallyDownloadUpdates: true,
+      } as any as Cfg.Config['update'])
     const webDriverPayload = {
       manifestUrl: FLEX_MANIFEST_URL,
       channel: 'alpha',
@@ -137,16 +140,21 @@ describe('update driver manager', () => {
   it('reloads the web driver when appropriate', () => {
     when(getConfig)
       .calledWith('update')
-      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
+      .thenReturn({
+        channel: 'alpha',
+        automaticallyDownloadUpdates: true,
+      } as any as Cfg.Config['update'])
     const fakeProvider = {
       teardown: vi.fn(),
-      refreshUpdateCache: vi.fn(),
+      scanUpdate: vi.fn(),
+      downloadUpdate: vi.fn(),
       getUpdateDetails: vi.fn(),
       lockUpdateCache: vi.fn(),
       unlockUpdateCache: vi.fn(),
       name: vi.fn(),
       source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     const fakeProvider2 = {
       ...fakeProvider,
@@ -192,6 +200,7 @@ describe('update driver manager', () => {
           .calledWith('update')
           .thenReturn({
             channel: 'beta',
+            automaticallyDownloadUpdates: true,
           } as any as Cfg.Config['update'])
         return driverManager.handleAction({
           type: VALUE_UPDATED,
@@ -214,18 +223,21 @@ describe('update driver', () => {
   let subject: UpdateDriver | null = null
   const fakeProvider: UpdateProvider<WebUpdateSource> = {
     teardown: vi.fn(),
-    refreshUpdateCache: vi.fn(),
+    scanUpdate: vi.fn(),
+    downloadUpdate: vi.fn(),
     getUpdateDetails: vi.fn(),
     lockUpdateCache: vi.fn(),
     unlockUpdateCache: vi.fn(),
     name: vi.fn(),
     source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
     cleanup: () => Promise.resolve(),
+    ongoingCheck: () => null,
   }
   const fakeUsbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {
     first: {
       teardown: vi.fn(),
-      refreshUpdateCache: vi.fn(),
+      scanUpdate: vi.fn(),
+      downloadUpdate: vi.fn(),
       getUpdateDetails: vi.fn(),
       lockUpdateCache: vi.fn(),
       unlockUpdateCache: vi.fn(),
@@ -235,6 +247,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     },
   }
 
@@ -245,7 +258,10 @@ describe('update driver', () => {
     when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
     when(getConfig)
       .calledWith('update')
-      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
+      .thenReturn({
+        channel: 'alpha',
+        automaticallyDownloadUpdates: true,
+      } as any as Cfg.Config['update'])
     when(getWebProvider)
       .calledWith({
         manifestUrl: FLEX_MANIFEST_URL,
@@ -256,7 +272,8 @@ describe('update driver', () => {
       .thenReturn(fakeProvider)
     fakeUsbProviders.first = {
       teardown: vi.fn(),
-      refreshUpdateCache: vi.fn(),
+      scanUpdate: vi.fn(),
+      downloadUpdate: vi.fn(),
       getUpdateDetails: vi.fn(),
       lockUpdateCache: vi.fn(),
       unlockUpdateCache: vi.fn(),
@@ -266,10 +283,12 @@ describe('update driver', () => {
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     fakeUsbProviders.second = {
       teardown: vi.fn(),
-      refreshUpdateCache: vi.fn(),
+      scanUpdate: vi.fn(),
+      downloadUpdate: vi.fn(),
       getUpdateDetails: vi.fn(),
       lockUpdateCache: vi.fn(),
       unlockUpdateCache: vi.fn(),
@@ -279,6 +298,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/other/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     subject = createUpdateDriver(dispatch)
   })
@@ -296,22 +316,25 @@ describe('update driver', () => {
     )
   })
 
-  it('checks updates when told to check updates', () => {
+  it('checks updates when told to check updates and autodownloads if the setting is set', () => {
     const thisSubject = subject!
-    when(fakeProvider.refreshUpdateCache)
+    when(getConfig)
+      .calledWith('update')
+      .thenReturn({ automaticallyDownloadUpdates: true })
+    when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
           new Promise(resolve => {
             progress({
-              version: null,
-              files: null,
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
               downloadProgress: 0,
               releaseNotes: null,
             })
             resolve({
-              version: null,
-              files: null,
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
               downloadProgress: 0,
               releaseNotes: null,
             })
@@ -323,7 +346,7 @@ describe('update driver', () => {
         expect(dispatch).toHaveBeenCalledWith({
           type: 'robotUpdate:UPDATE_INFO',
           payload: {
-            version: null,
+            version: '1.2.3',
             releaseNotes: null,
             force: false,
             target: 'flex',
@@ -331,33 +354,166 @@ describe('update driver', () => {
         })
         expect(dispatch).toHaveBeenCalledWith({
           type: 'robotUpdate:UPDATE_VERSION',
-          payload: { version: null, force: false, target: 'flex' },
+          payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).toHaveBeenCalledWith({
+          type: 'robotUpdate:DOWNLOAD_UPDATE',
+          meta: { shell: true },
         })
       })
   })
-  it('forwards in-progress downloads when no USB updates are present', () => {
+  it('checks updates when told to check updates and does not autodownload if the setting is set', () => {
     const thisSubject = subject!
-    when(fakeProvider.refreshUpdateCache)
+    when(getConfig).calledWith('update').thenReturn(false)
+    when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
           new Promise(resolve => {
             progress({
-              version: null,
-              files: null,
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
+              downloadProgress: 0,
+              releaseNotes: null,
+            })
+            resolve({
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
+              downloadProgress: 0,
+              releaseNotes: null,
+            })
+          })
+      )
+    return thisSubject
+      .handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+      .then(() => {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: 'robotUpdate:UPDATE_INFO',
+          payload: {
+            version: '1.2.3',
+            releaseNotes: null,
+            force: false,
+            target: 'flex',
+          },
+        })
+        expect(dispatch).toHaveBeenCalledWith({
+          type: 'robotUpdate:UPDATE_VERSION',
+          payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).not.toHaveBeenCalledWith({
+          type: 'robotUpdate:DOWNLOAD_UPDATE',
+          meta: { shell: true },
+        })
+      })
+  })
+  it('does not clear update data if a scan fails because a check is ongoing', async () => {
+    const thisSubject = subject!
+    when(getConfig)
+      .calledWith('update')
+      .thenReturn({ automaticallyDownloadUpdates: false })
+    when(fakeProvider.scanUpdate)
+      .calledWith(expect.any(Function))
+      .thenDo(
+        progress =>
+          new Promise(resolve => {
+            progress({
+              version: '1.2.3',
+              files: {
+                system: null,
+                releaseNotes: '/some/path/to/releasenotes.md',
+              },
+              downloadProgress: 0,
+              releaseNotes: 'hello',
+            })
+            resolve({
+              version: '1.2.3',
+              files: {
+                system: null,
+                releaseNotes: '/some/path/to/releasenotes.md',
+              },
+              downloadProgress: 0,
+              releaseNotes: 'hello',
+            })
+          })
+      )
+    await thisSubject.handleAction({
+      type: 'shell:CHECK_UPDATE',
+      meta: { shell: true },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(1, {
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: { version: '1.2.3', force: false, target: 'flex' },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(2, {
+      type: 'robotUpdate:UPDATE_INFO',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+        releaseNotes: 'hello',
+      },
+    })
+    when(fakeProvider.scanUpdate)
+      .calledWith(expect.any(Function))
+      .thenReject(new Error('ongoing'))
+    await thisSubject.handleAction({
+      type: 'shell:CHECK_UPDATE',
+      meta: { shell: true },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(3, {
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+      },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(4, {
+      type: 'robotUpdate:UPDATE_INFO',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+        releaseNotes: 'hello',
+      },
+    })
+    expect(dispatch).not.toHaveBeenCalledWith({
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: { version: null, force: false, target: 'flex' },
+    })
+  })
+  it('downloads updates when told and no USB updates are present and updates are on', () => {
+    when(getConfig)
+      .calledWith('update')
+      .thenReturn({ automaticallyDownloadUpdates: true })
+    const thisSubject = subject!
+    when(fakeProvider.downloadUpdate)
+      .calledWith(expect.any(Function))
+      .thenDo(
+        progress =>
+          new Promise(resolve => {
+            progress({
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
               downloadProgress: 0,
               releaseNotes: null,
             })
             progress({
               version: '1.2.3',
-              files: null,
-              downloadProgress: 0,
+              files: { system: null, releaseNotes: null },
+              downloadProgress: 1,
               releaseNotes: null,
             })
             progress({
               version: '1.2.3',
-              files: null,
+              files: { system: null, releaseNotes: null },
               downloadProgress: 50,
+              releaseNotes: null,
+            })
+            progress({
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
+              downloadProgress: 50.1,
               releaseNotes: null,
             })
             progress({
@@ -381,7 +537,10 @@ describe('update driver', () => {
           })
       )
     return thisSubject
-      .handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+      .handleAction({
+        type: 'robotUpdate:DOWNLOAD_UPDATE',
+        meta: { shell: true },
+      })
       .then(() => {
         expect(dispatch).toHaveBeenNthCalledWith(1, {
           type: 'robotUpdate:UPDATE_VERSION',
@@ -389,22 +548,17 @@ describe('update driver', () => {
         })
         expect(dispatch).toHaveBeenNthCalledWith(2, {
           type: 'robotUpdate:DOWNLOAD_PROGRESS',
-          payload: { progress: 50, target: 'flex' },
+          payload: { progress: 1, target: 'flex' },
         })
         expect(dispatch).toHaveBeenNthCalledWith(3, {
-          type: 'robotUpdate:UPDATE_INFO',
-          payload: {
-            version: '1.2.3',
-            releaseNotes: 'some release notes',
-            force: false,
-            target: 'flex',
-          },
+          type: 'robotUpdate:DOWNLOAD_PROGRESS',
+          payload: { progress: 50, target: 'flex' },
+        })
+        expect(dispatch).not.toHaveBeenCalledWith({
+          type: 'robotUpdate:DOWNLOAD_PROGRESS',
+          payload: { progress: 50.1, target: 'flex' },
         })
         expect(dispatch).toHaveBeenNthCalledWith(4, {
-          type: 'robotUpdate:UPDATE_VERSION',
-          payload: { version: '1.2.3', force: false, target: 'flex' },
-        })
-        expect(dispatch).toHaveBeenNthCalledWith(5, {
           type: 'robotUpdate:UPDATE_INFO',
           payload: {
             version: '1.2.3',
@@ -413,9 +567,26 @@ describe('update driver', () => {
             target: 'flex',
           },
         })
-        expect(dispatch).toHaveBeenNthCalledWith(6, {
+        expect(dispatch).toHaveBeenNthCalledWith(5, {
           type: 'robotUpdate:UPDATE_VERSION',
           payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(6, {
+          type: 'robotUpdate:UPDATE_INFO',
+          payload: {
+            version: '1.2.3',
+            releaseNotes: 'some release notes',
+            force: false,
+            target: 'flex',
+          },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(7, {
+          type: 'robotUpdate:UPDATE_VERSION',
+          payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(8, {
+          type: 'robotUpdate:DOWNLOAD_DONE',
+          payload: 'flex',
         })
       })
   })
@@ -428,7 +599,7 @@ describe('update driver', () => {
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -462,7 +633,7 @@ describe('update driver', () => {
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',
@@ -550,7 +721,7 @@ describe('update driver', () => {
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -593,7 +764,7 @@ describe('update driver', () => {
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -655,7 +826,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',
@@ -663,7 +834,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeProvider.refreshUpdateCache)
+    when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -730,7 +901,7 @@ describe('update driver', () => {
         massStorageDeviceFiles: ['/some/third/file', '/some/fourth/file'],
       })
       .thenReturn(fakeUsbProviders.second)
-    when(fakeUsbProviders.first.refreshUpdateCache)
+    when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -738,7 +909,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.second.refreshUpdateCache)
+    when(fakeUsbProviders.second.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',

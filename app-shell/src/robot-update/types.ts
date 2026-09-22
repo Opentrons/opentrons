@@ -8,7 +8,7 @@ export interface ReleaseSetUrls {
 }
 
 export interface ReleaseManifest {
-  production: {
+  productionV2: {
     [version: string]: ReleaseSetUrls | undefined
   }
 }

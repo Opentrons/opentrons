@@ -416,7 +416,7 @@ const fromEmptyGantryAttachNinetySix = (
   ...(wasteChute
     ? [
         {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
+          section: SECTIONS.ATTACH_WASTE_CHUTE,
           mount: LEFT,
           flowType: FLOWS.DETACH,
         },

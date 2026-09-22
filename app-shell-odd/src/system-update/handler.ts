@@ -19,6 +19,14 @@ export const CURRENT_SYSTEM_VERSION = _PKG_VERSION_
 
 const log = createLogger('system-update/handler')
 
+const getUpdateConfig = (): { automaticDownload: boolean; channel: string } => {
+  const updateConfig = getConfig('update')
+  return {
+    channel: updateConfig.channel,
+    automaticDownload: updateConfig.automaticallyDownloadUpdates === true,
+  }
+}
+
 export interface UpdateDriver {
   handleAction: (action: Action) => Promise<void>
   reload: () => Promise<void>
@@ -32,13 +40,13 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
 
   let webUpdate: UnresolvedUpdate = {
     version: null,
-    files: null,
+    files: { system: null, releaseNotes: null },
     releaseNotes: null,
     downloadProgress: 0,
   }
   let webProvider = getWebUpdateProvider({
     manifestUrl: FLEX_MANIFEST_URL,
-    channel: getConfig('update').channel,
+    channel: getUpdateConfig().channel,
     updateCacheDirectory: getSystemUpdateDir(),
     currentVersion: CURRENT_SYSTEM_VERSION,
   })
@@ -50,7 +58,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
     currentBestUsbUpdate = null
     Object.values(usbProviders).forEach(provider => {
       const providerUpdate = provider.getUpdateDetails()
-      if (providerUpdate.files == null) {
+      if (providerUpdate.version == null) {
         // nothing to do, keep null
       } else if (currentBestUsbUpdate == null) {
         currentBestUsbUpdate = {
@@ -95,12 +103,12 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
       switch (action.type) {
         case 'shell:CHECK_UPDATE':
           return webProvider
-            .refreshUpdateCache(updateStatus => {
+            .scanUpdate(updateStatus => {
               webUpdate = updateStatus
               if (currentBestUsbUpdate == null) {
                 if (
                   updateStatus.version != null &&
-                  updateStatus.files == null &&
+                  updateStatus.files.system == null &&
                   updateStatus.downloadProgress === 0
                 ) {
                   dispatch({
@@ -113,7 +121,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
                   })
                 } else if (
                   updateStatus.version != null &&
-                  updateStatus.files == null &&
+                  updateStatus.files.system == null &&
                   updateStatus.downloadProgress !== 0
                 ) {
                   dispatch({
@@ -130,22 +138,101 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               }
             })
             .catch(err => {
-              log.warn(
-                `Error finding updates with ${webProvider.name()}: ${
-                  err.name
-                }: ${err.message}`
-              )
-              return {
-                version: null,
-                files: null,
-                downloadProgress: 0,
-                releaseNotes: null,
-              } as const
+              if (err?.message === 'ongoing') {
+                return webUpdate
+              } else {
+                log.warn(
+                  `Error finding updates with ${webProvider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+                return {
+                  version: null,
+                  files: { system: null, releaseNotes: null },
+                  downloadProgress: 0,
+                  releaseNotes: null,
+                } as const
+              }
             })
             .then(result => {
               webUpdate = result
               dispatchStaticUpdateData()
             })
+            .then(() => {
+              if (
+                getConfig('update').automaticallyDownloadUpdates &&
+                webUpdate.version != null &&
+                webUpdate.files.system == null
+              ) {
+                dispatch({
+                  type: 'robotUpdate:DOWNLOAD_UPDATE',
+                  meta: { shell: true },
+                })
+              }
+            })
+        case 'robotUpdate:DOWNLOAD_UPDATE': {
+          const check = webProvider.ongoingCheck() ?? Promise.resolve()
+          log.info('enqueueing download now')
+          return check.then(() => {
+            log.info('beginning download of robot update now')
+            let lastProgress = 0
+            return webProvider
+              .downloadUpdate(updateStatus => {
+                webUpdate = updateStatus
+                if (
+                  updateStatus.version != null &&
+                  updateStatus.files.system == null &&
+                  updateStatus.downloadProgress === 0
+                ) {
+                  dispatch({
+                    type: 'robotUpdate:UPDATE_VERSION',
+                    payload: {
+                      version: updateStatus.version,
+                      force: false,
+                      target: 'flex',
+                    },
+                  })
+                } else if (
+                  updateStatus.version != null &&
+                  updateStatus.files.system == null &&
+                  updateStatus.downloadProgress !== 0
+                ) {
+                  if (updateStatus.downloadProgress - lastProgress >= 1) {
+                    dispatch({
+                      // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
+                      type: 'robotUpdate:DOWNLOAD_PROGRESS',
+                      payload: {
+                        progress: updateStatus.downloadProgress,
+                        target: 'flex',
+                      },
+                    })
+                    lastProgress = updateStatus.downloadProgress
+                  }
+                } else if (updateStatus.files.system != null) {
+                  dispatchStaticUpdateData()
+                }
+              })
+              .catch(err => {
+                log.warn(
+                  `Error finding updates with ${webProvider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+                return {
+                  version: null,
+                  files: { system: null, releaseNotes: null },
+                  downloadProgress: 0,
+                  releaseNotes: null,
+                } as const
+              })
+              .then(result => {
+                log.info('Update download complete')
+                webUpdate = result
+                dispatchStaticUpdateData()
+                dispatch({ type: 'robotUpdate:DOWNLOAD_DONE', payload: 'flex' })
+              })
+          })
+        }
         case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
           log.info(
             `mass storage device enumerated at ${action.payload.rootPath}`
@@ -161,7 +248,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             massStorageDeviceFiles: action.payload.filePaths,
           })
           return usbProviders[action.payload.rootPath]
-            .refreshUpdateCache(() => {})
+            .scanUpdate(() => {})
             .then(() => {
               updateBestUsbUpdate()
               dispatchStaticUpdateData()
@@ -225,17 +312,22 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             .then(dispatch)
         }
         case 'robotUpdate:READ_SYSTEM_FILE': {
-          const getDetails = (): {
-            systemFile: string
-            version: string
-            isManualFile: false
-          } | null => {
+          const getDetails = ():
+            | {
+                systemFile: string
+                version: string
+                isManualFile: false
+              }
+            | null
+            | 'ongoing' => {
             if (currentBestUsbUpdate) {
               return {
                 systemFile: currentBestUsbUpdate.files.system,
                 version: currentBestUsbUpdate.version,
                 isManualFile: false,
               }
+            } else if (webProvider.ongoingCheck() != null) {
+              return 'ongoing'
             } else if (webUpdate.files?.system != null) {
               return {
                 systemFile: webUpdate.files.system,
@@ -248,6 +340,14 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           }
           return new Promise(resolve => {
             const details = getDetails()
+            if (details === 'ongoing') {
+              dispatch({
+                type: 'robotUpdate:CHECKING_FOR_UPDATE',
+                payload: 'flex',
+              })
+              resolve()
+              return
+            }
             if (details == null) {
               dispatch({
                 type: 'robotUpdate:UNEXPECTED_ERROR',
@@ -294,7 +394,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
         .then(() => {
           webProvider = getWebUpdateProvider({
             manifestUrl: FLEX_MANIFEST_URL,
-            channel: getConfig('update').channel,
+            channel: getUpdateConfig().channel,
             updateCacheDirectory: getSystemUpdateDir(),
             currentVersion: CURRENT_SYSTEM_VERSION,
           })
@@ -309,7 +409,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
         })
     },
     shouldReload: () =>
-      getConfig('update').channel !== webProvider.source().channel,
+      getUpdateConfig().channel !== webProvider.source().channel,
     teardown: () => {
       return Promise.allSettled([
         webProvider.teardown(),

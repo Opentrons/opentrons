@@ -1,7 +1,7 @@
 // functions and utilities for retrieving the releases manifest
 import fse from 'fs-extra'
 
-import { fetchJson } from '../http'
+import { fetchJson, fetchToFile } from '../http'
 
 import type { ReleaseManifest, ReleaseSetUrls } from './types'
 
@@ -16,11 +16,19 @@ export function downloadManifest(
     .catch(() => fse.readJson(cacheFilePath))
 }
 
-// TODO(mc, 2019-07-02): retrieve something other than "production"
 export function getReleaseSet(
   manifest: ReleaseManifest,
   version: string
 ): ReleaseSetUrls | null {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
-  return manifest.production[version] || null
+  return manifest.productionV2[version] || null
+}
+
+export function downloadNotes(
+  notesUrl: string,
+  cacheFilePath: string
+): Promise<string> {
+  return fetchToFile(notesUrl, cacheFilePath)
+    .catch(() => cacheFilePath)
+    .then(filePath => fse.readFile(filePath, 'utf-8'))
 }

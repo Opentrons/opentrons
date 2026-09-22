@@ -31,7 +31,7 @@ export function UpdateSoftware({
       case 'installing':
         return t('installing_software')
       default:
-        console.warn('Update software has an issue')
+        console.warn(`update software: unknown updateType: ${updateType}`)
         return null
     }
   }
