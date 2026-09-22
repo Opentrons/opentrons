@@ -5,9 +5,9 @@ description: An analysis of the Opentrons Python API code used by the Vacuum Mod
 
 This use case is taken from a plasmid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules, and labware.
 
-## Workflow overview
+## Overview
 
-A plasmid miniprep is a technique used to isolate DNA. It comprises multiple phases, but our use case does not. Instead, this is a code analysis only of the procedures that require Vacuum Module and its related API methods, such as:<!--- TIL lysate is broken open cells and the goo inside --->
+A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This use case focuses exclusively on the procedures that interact with API methods used by the Vacuum Module such as:
 
 * **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. Vacuum the then draws clarified lysate into a collection plate.
 
@@ -27,7 +27,7 @@ The code analysis starts below.
 
 Every protocol file begins with the `metadata` and `requirements` dictionaries.
 
-<!--- maybe use a table to match sections below, but too much for just 2 bullets? --->
+<!--- perhpas a table to match sections below, but too much for just 2 bullets --->
 
 - `metadata`: Contains key-value pairs for the protocol name (`protocolName`) and a concise description (`description`), which are displayed in Opentrons software and on the Flex touchscreen.
 
@@ -118,7 +118,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
 ## Stage 3: Concurrent actions
-
+<!--- figure out something after new spacer info is available --->
 <font color="red">Needs some intro here. During this stage, the robot does all the things.</font>
 
 ### Liquid collection
@@ -249,9 +249,9 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
     protocol.wait_for_tasks([dry_task])
 ```
 
-<!--- maybe this should be the Phase 3, H2 section intro, as a compare/contrast --->
+<!--- maybe this should be the Phase 3, H2 section intro --->
 !!! note
-    Unlike the clarification step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, you call `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operation back to serial execution. When you put `wait_for_tasks()` directly after a non-blocking method you're pausing the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
+    Unlike the liquid collection step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operations back to serial execution. Putting `wait_for_tasks()` after a non-blocking method pauses the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
 
 ## Protocol takeaways
 
