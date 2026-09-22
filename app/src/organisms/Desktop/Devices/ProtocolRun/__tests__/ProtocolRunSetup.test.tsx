@@ -49,6 +49,7 @@ import { SetupLabware } from '../SetupLabware'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
@@ -65,8 +66,7 @@ vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
 vi.mock('/app/resources/runs/useModuleCalibrationStatus')
 vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
+  const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
     useProtocolQuery: vi.fn(),
