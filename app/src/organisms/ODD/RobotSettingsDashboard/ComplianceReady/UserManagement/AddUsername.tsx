@@ -6,12 +6,12 @@ import { StepMeter, TouchInputField } from '@opentrons/components'
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { USERNAME_MAX_LENGTH } from '../../../../../resources/auth/helpers'
 import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'
-
-const MAX_USERNAME_LENGTH = 20
 
 export function AddUsername({
   savedUsername,
@@ -39,7 +39,7 @@ export function AddUsername({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value)
-    if (e.target.value.length > MAX_USERNAME_LENGTH) {
+    if (e.target.value.length > USERNAME_MAX_LENGTH) {
       setError('' + t('odd_add_username_caption'))
     } else if (takenUsernames.includes(e.target.value)) {
       setError('' + t('odd_add_username_taken_caption'))
@@ -49,7 +49,7 @@ export function AddUsername({
   }
 
   const handleConfirm = useCallback((): void => {
-    if (!!username?.trim() && username.trim().length <= MAX_USERNAME_LENGTH) {
+    if (!!username?.trim() && username.trim().length <= USERNAME_MAX_LENGTH) {
       onContinue(username.trim())
     }
   }, [username, onContinue])

@@ -7,11 +7,15 @@ import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
-import { getPasswordComplexityError } from '/app/resources/auth'
+import {
+  getPasswordComplexityError,
+  mapSetNewPasswordError,
+} from '/app/resources/auth'
 
 import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
+import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
@@ -35,7 +39,9 @@ export function EditPassword({
     string | undefined
   >(undefined)
   const [phase, setPhase] = useState<'password' | 'confirmPassword'>('password')
-  const { t } = useTranslation(['device_settings', 'access_control'])
+  const { t } = useTranslation(['device_settings', 'access_control']) as {
+    t: TFunction
+  }
   const keyboardRef = useRef(null)
   const inputElementRef = useRef<HTMLInputElement>(null)
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
@@ -70,29 +76,8 @@ export function EditPassword({
           password,
           passwordComplexity
         )
-        if (complexityError === 'tooShort') {
-          setError(
-            t('must_be_at_least_characters', {
-              ns: 'access_control',
-              minLength: passwordComplexity.minLength,
-            }) as string
-          )
-          return
-        }
-        if (complexityError === 'invalidCharacters') {
-          setError(
-            t('password_invalid_characters', {
-              ns: 'access_control',
-            }) as string
-          )
-          return
-        }
-        if (complexityError === 'missingSpecialCharacters') {
-          setError(
-            t('must_include_at_least_one_special_character', {
-              ns: 'access_control',
-            }) as string
-          )
+        if (complexityError) {
+          setError(mapSetNewPasswordError(complexityError, t))
           return
         }
 
@@ -146,8 +131,8 @@ export function EditPassword({
         onClickButton={handleConfirm}
         buttonText={
           phase === 'password'
-            ? t('odd_password_continue_button')
-            : t('odd_password_save_button')
+            ? '' + t('odd_password_continue_button')
+            : '' + t('odd_password_save_button')
         }
         onClickBack={
           phase === 'password'
@@ -159,7 +144,7 @@ export function EditPassword({
         }
         buttonType="primary"
         secondaryButtonProps={{
-          buttonText: t('odd_password_cancel_button'),
+          buttonText: '' + t('odd_password_cancel_button'),
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
