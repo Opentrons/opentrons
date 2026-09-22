@@ -17,9 +17,11 @@ export interface DocumentationRequiredModalContextType {
   showLoginModal: ({
     robotName,
     key,
+    uncloseable,
   }: {
     robotName: string
     key?: string
+    uncloseable?: boolean
   }) => Promise<{ username: string } | null>
   showSignRunModal: (documentationState: DocumentationState) => Promise<boolean>
   showDownloadLogsModal: (logPeriodId: string) => Promise<boolean>

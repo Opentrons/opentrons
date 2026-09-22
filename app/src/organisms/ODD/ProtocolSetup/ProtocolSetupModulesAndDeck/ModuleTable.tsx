@@ -10,10 +10,7 @@ import {
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  useChainLiveCommands,
-  useRunCalibrationStatus,
-} from '/app/resources/runs'
+import { useRunCalibrationStatus } from '/app/resources/runs'
 
 import { ModuleTableItem } from './ModuleTableItem'
 
@@ -52,7 +49,6 @@ export function ModuleTable(props: ModuleTableProps): ReactNode {
   const localRobot = useSelector(getLocalRobot)
   const robotName: string = localRobot?.name ?? ''
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { chainLiveCommands } = useChainLiveCommands()
 
   return (
     <>
@@ -85,7 +81,6 @@ export function ModuleTable(props: ModuleTableProps): ReactNode {
                   key={module.moduleId}
                   module={module}
                   calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
                   comboFixtureId={comboFixtureId}
                   conflictedFixture={
                     comboFixtureConflict
@@ -96,6 +91,7 @@ export function ModuleTable(props: ModuleTableProps): ReactNode {
                   }
                   deckDef={deckDef}
                   robotName={robotName}
+                  runId={runId}
                 />
               )
             }
@@ -112,10 +108,10 @@ export function ModuleTable(props: ModuleTableProps): ReactNode {
               key={module.moduleId}
               module={module}
               calibrationStatus={calibrationStatus}
-              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}
+              runId={runId}
             />
           )
         })}

@@ -30,10 +30,17 @@ def get_scope_set_of_account_type(
             return set(Scope)  # All scopes.
 
         elif account_type == AccountType.AUDITOR:
-            # Auditors should have read-only access to everything. Our read-only endpoints are
-            # mostly accessible without authentication, but there are some exceptions. This
-            # just needs to have the scopes to cover those exceptions.
-            return {Scope.USERS_READ_OTHERS}
+            # Auditors should have read-only access to the robot. Most read endpoints
+            # do not require authentication; these scopes cover the exceptions.
+            #
+            # USERS_READ_OTHERS: list and read other users.
+            # USERS_READ_SELF: GET /auth/users/self after login.
+            # USERS_WRITE_SELF: change own password and profile.
+            return {
+                Scope.USERS_READ_OTHERS,
+                Scope.USERS_READ_SELF,
+                Scope.USERS_WRITE_SELF,
+            }
 
         elif account_type == AccountType.USER:
             result = {

@@ -9,7 +9,6 @@ import {
   restartStatusChanged,
 } from '/app/redux/robot-admin'
 import {
-  clearRobotUpdateSession,
   createSession,
   createSessionSuccess,
   setRobotUpdateSessionStep,
@@ -37,6 +36,7 @@ import { REDISCOVERY_TIME_MS } from './constants'
 import { ensureUpdateFileReady } from './ensureUpdateFileReady'
 import { getUserNotesFromDocumentationState } from './getUserNotesFromDocumentationState'
 import { pollRobotUpdateStatus } from './pollRobotUpdateStatus'
+import { reportRobotUpdateFlowError } from './reportRobotUpdateFlowError'
 
 import type { AxiosError } from 'axios'
 import type { Store } from 'redux'
@@ -251,12 +251,8 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
         })
     })
     .catch((error: unknown) => {
-      reportFlowError(dispatch, error)
+      reportRobotUpdateFlowError(dispatch, error)
     })
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError'
 }
 
 function waitForDocumentationReady(
@@ -296,30 +292,6 @@ function waitForDocumentationReady(
 
     tick()
   })
-}
-
-function reportFlowError(dispatch: Dispatch, error: unknown): void {
-  if (isAbortError(error)) return
-  if (isDocumentedMutationError(error)) {
-    // access_control_loading is retried in createUpdateSession; if it still
-    // surfaces here, keep the session so the UI does not silently disappear.
-    if (error.type === 'access_control_loading') {
-      dispatch(
-        unexpectedRobotUpdateError(
-          i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
-        )
-      )
-      return
-    }
-    // base case, the user backed out.
-    dispatch(clearRobotUpdateSession())
-    return
-  }
-  const message =
-    error instanceof Error
-      ? error.message
-      : i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
-  dispatch(unexpectedRobotUpdateError(message))
 }
 
 function createUpdateSession(

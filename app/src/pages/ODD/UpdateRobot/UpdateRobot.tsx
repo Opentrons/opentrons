@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import {
   ErrorUpdateSoftware,
   NoUpdateFound,
@@ -17,8 +18,9 @@ import {
   clearRobotUpdateSession,
   downloadRobotUpdate,
   getRobotUpdateAvailable,
+  getRobotUpdateSession,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -32,8 +34,10 @@ export function UpdateRobot(): ReactNode {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const { startUpdate } = useRobotUpdateContext()
+  const robotName =
+    typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
+  const session = useSelector(getRobotUpdateSession)
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   const [errorString, setErrorString] = useState<string | null>(null)
@@ -57,7 +61,7 @@ export function UpdateRobot(): ReactNode {
               onClick={() => {
                 setErrorString(null)
                 dispatch(downloadRobotUpdate())
-                startUpdate(robotName)
+                startUpdate()
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
@@ -65,7 +69,8 @@ export function UpdateRobot(): ReactNode {
         </ErrorUpdateSoftware>
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
+        (!isRobotSoftwareUpdateAvailable(robotUpdateType) &&
+          session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate(-1)

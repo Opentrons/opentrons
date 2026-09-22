@@ -129,7 +129,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     render()
     screen.getByText('Clear all data')
     screen.getByText(
-      'Clears calibrations, protocols, and all settings except robot name and network settings.'
+      'Clears calibrations, protocols, and all settings. You’ll have to redo initial setup before using the robot again.'
     )
     expect(screen.queryByText('Clear deck calibration')).toBeNull()
     screen.getByText('Clear pipette calibration')

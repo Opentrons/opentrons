@@ -42,7 +42,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import RunResult
+from opentrons.protocol_runner.protocol_runner import EngineRunResult
 from opentrons.types import NozzleMapInterface
 
 
@@ -87,7 +87,7 @@ class AbstractRunCoordinator(ABC):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         ...
 
@@ -186,6 +186,21 @@ class AbstractRunCoordinator(ABC):
             length: Length of slice to return.
             include_fixit_commands: Get all command intents.
         """
+        ...
+
+    @abstractmethod
+    async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        ...
+
+    @abstractmethod
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        ...
+
+    @abstractmethod
+    async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
         ...
 
     @abstractmethod

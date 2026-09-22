@@ -135,6 +135,7 @@ export type AuditLogAction =
   | 'detach_gripper'
   | 'recalibrate_gripper'
   | 'lpc_flow'
+  | 'jog_pipette'
   | 'drop_tips'
   | 'end_calibration'
   | 'add_module'

@@ -31,10 +31,14 @@ export interface OnDeviceLoginProps {
   onCancel: () => void
   /** New-password + confirm step after temporary-password login. */
   isPasswordResetRequired?: boolean
+  /** Drives the login password field label after username lookup. */
+  loginResetPassword?: boolean
   initialUsername?: string
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
+  /** When set, called before advancing from the username step to the password step. */
+  onUsernameSubmit?: (username: string) => Promise<void>
   /** Robot password policy for client-side validation on the new-password step. */
   passwordComplexity: PasswordComplexityRequirements | null
 }
@@ -46,9 +50,11 @@ export function OnDeviceLogin({
   isAuthLoading,
   onCancel,
   isPasswordResetRequired = false,
+  loginResetPassword = false,
   initialUsername,
   loginError = null,
   onClearLoginError,
+  onUsernameSubmit,
   passwordComplexity,
 }: OnDeviceLoginProps): ReactNode {
   const { t } = useTranslation(['shared', 'access_control'])
@@ -91,7 +97,12 @@ export function OnDeviceLogin({
         )
         return
       }
-      onStepChange('password')
+      void (async (): Promise<void> => {
+        if (onUsernameSubmit != null) {
+          await onUsernameSubmit(username.trim())
+        }
+        onStepChange('password')
+      })()
       return
     }
     if (step === 'password') {
@@ -171,6 +182,7 @@ export function OnDeviceLogin({
     submitPassword,
     passwordComplexity,
     t,
+    onUsernameSubmit,
   ])
 
   const primaryDisabled = isAuthLoading
@@ -240,6 +252,7 @@ export function OnDeviceLogin({
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
+              loginResetPassword={loginResetPassword}
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               usernameError={usernameError}

@@ -53,8 +53,13 @@ interface CheckLabwareProps extends EditOffsetContentProps {
 
 export function CheckLabware(props: CheckLabwareProps): ReactNode {
   const { runId, commandUtils, contentHeader } = props
-  const { toggleRobotMoving, handleJog, resetJog, handleResetLwModulesOnDeck } =
-    commandUtils
+  const {
+    toggleRobotMoving,
+    handleJog,
+    resetJog,
+    handleResetLwModulesOnDeck,
+    flushJogAudit,
+  } = commandUtils
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const dispatch = useDispatch()
@@ -115,6 +120,7 @@ export function CheckLabware(props: CheckLabwareProps): ReactNode {
     })
 
   const handleGoBack = (): void => {
+    flushJogAudit()
     void toggleRobotMoving(true)
       .then(() => handleResetLwModulesOnDeck(offsetLocationDetails))
       .then(() => {
@@ -178,10 +184,12 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
     isLwTiprack,
     liveOffset,
     setJoggedPosition,
+    commandUtils,
   } = props
   const [showOddJogControls, setShowOddJogControls] = useState(false)
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     handleAddConfirmedWorkingVector()
   }
 
@@ -272,6 +280,7 @@ function CheckLabwareContentDesktop(
   const dispatch = useDispatch()
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     dispatch(proceedEditOffsetSubstep(runId, true))
   }
 

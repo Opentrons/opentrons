@@ -33,6 +33,7 @@ dependencies = [
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
     "packaging>=25.0",
     "Pyro5>=5.16,<6",
+    "zipstream-ng==1.9.3",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -50,6 +51,7 @@ robot = [
     "zipp==3.21.0",
     "opentrons-hardware[FLEX]==0.0.0",
     "Pyro5==5.16",
+    "zipstream-ng==1.9.3",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
 # Robot group is always included in dev to ensure dev environment matches robot
@@ -227,4 +229,8 @@ module = [
     "Pyro5.*",
     "serpent"
 ]
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
 follow_untyped_imports = true

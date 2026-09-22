@@ -106,14 +106,15 @@ export function EditUserModal({
     const didChangeRole = data.accountType !== user.accountType
     const submittedTrimmedUsername = data.username.trim()
     const submittedTrimmedFullName = data.fullName.trim()
+    const didChangeUsername = submittedTrimmedUsername !== user.username
+    const shouldLogOut =
+      loggedInUsername === user.username && (didChangeUsername || didChangeRole)
 
     const updatePromise = updateUser({
       username: user.username,
       request: {
         data: {
-          ...(submittedTrimmedUsername !== user.username
-            ? { username: submittedTrimmedUsername }
-            : {}),
+          ...(didChangeUsername ? { username: submittedTrimmedUsername } : {}),
           ...(submittedTrimmedFullName !== user.fullName
             ? { fullName: submittedTrimmedFullName }
             : {}),
@@ -125,7 +126,7 @@ export function EditUserModal({
       .then(() => {
         onUserUpdated?.()
         handleClose()
-        if (didChangeRole && loggedInUsername === user.username) {
+        if (shouldLogOut) {
           dispatch(logOut({ robotName }))
         }
       })

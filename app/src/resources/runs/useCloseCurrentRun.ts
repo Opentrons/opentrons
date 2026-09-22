@@ -44,8 +44,13 @@ export function useCloseCurrentRun(): {
   } = useIsSigningRequired()
 
   const actionsToDocument: DocumentedAction[] = useMemo(
-    () => (isSigningRequired ? ['sign_run', 'dismiss_run'] : ['dismiss_run']),
-    [isSigningRequired]
+    () =>
+      isSigningRequired
+        ? isDownloadingRequired
+          ? ['sign_run']
+          : ['sign_run', 'dismiss_run']
+        : ['dismiss_run'],
+    [isSigningRequired, isDownloadingRequired]
   )
   const { documentationState } = useLinkedDocumentationState(
     actionsToDocument,

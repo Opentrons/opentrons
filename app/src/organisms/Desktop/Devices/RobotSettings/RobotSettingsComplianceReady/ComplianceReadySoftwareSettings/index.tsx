@@ -119,6 +119,9 @@ export function ComplianceReadySoftwareSettings({
     id: AuthSettingFieldId,
     value: string
   ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
       try {
@@ -134,6 +137,9 @@ export function ComplianceReadySoftwareSettings({
     id: AuditServerSettingFieldId,
     value: string
   ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
     const auditPatch = getAuditInputPatch(id, value, fieldValues)
     if (auditPatch != null) {
       try {

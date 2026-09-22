@@ -44,9 +44,7 @@ export function DownloadProtocolRunRecordsWizard({
       copy={copyProps}
       showChoiceScreen
       initialDeleteAfterDownload
-      onDownload={path =>
-        downloadRuns({ runs: allRuns, callTimeUsbPath: path })
-      }
+      onDownload={path => downloadRuns({ runs: allRuns, destination: path })}
       onDelete={downloadedRuns =>
         deleteSelectedRuns(downloadedRuns).then(() => 'deleted' as const)
       }

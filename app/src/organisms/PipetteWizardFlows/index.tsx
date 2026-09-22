@@ -528,6 +528,7 @@ export const PipetteWizardFlows = (
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
         isOnDevice={isOnDevice}
+        onUnauthorized={handleClose}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
