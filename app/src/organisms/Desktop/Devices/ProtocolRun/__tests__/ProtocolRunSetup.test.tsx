@@ -239,7 +239,7 @@ describe('ProtocolRunSetup', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders run loading info screen if robot-analyzed and app-analyzed protocol data is null', () => {
+  it('does not render run loading info screen when analysis is null but robot data is ready', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
@@ -261,7 +261,7 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Run setup loading')
+    expect(screen.queryByText('Run setup loading')).toBeNull()
   })
 
   it('does not render run loading info screen while protocol is analyzing', () => {
@@ -276,6 +276,30 @@ describe('ProtocolRunSetup', () => {
         data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
       },
     } as any)
+    render()
+    expect(screen.queryByText('Run setup loading')).toBeNull()
+  })
+
+  it('does not render run loading info screen while analyzing even if Flex LPC is initializing', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
+      },
+    } as any)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: true,
+    })
     render()
     expect(screen.queryByText('Run setup loading')).toBeNull()
   })

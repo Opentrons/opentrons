@@ -148,12 +148,10 @@ export function ProtocolRunSetup({
   })
   // Protocol exists but analysis is not ready → header "Analyzing on robot" button.
   const isProtocolAnalyzing = protocolRecord != null && protocolAnalysis == null
-  // Keep analysis-null loading as before, plus run / LPC / camera.
-  // While analyzing, skip Setup loading so only the header button shows progress.
+  // Setup loading only when robot data is missing (run / LPC / camera).
   const showRunLoadingState =
     !isProtocolAnalyzing &&
     (isRunLoading ||
-      protocolAnalysis == null ||
       (isFlex && lpcUtils.isFlexLPCInitializing) ||
       (isFlex && isCameraLoading))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
