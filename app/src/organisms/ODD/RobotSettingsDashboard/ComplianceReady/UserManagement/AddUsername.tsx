@@ -5,9 +5,8 @@ import { StepMeter, TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { USERNAME_MAX_LENGTH } from '/app/resources/auth/helpers'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { USERNAME_MAX_LENGTH } from '../../../../../resources/auth/helpers'
 import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
