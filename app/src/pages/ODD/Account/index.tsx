@@ -85,6 +85,9 @@ export function Account({
   const [oneTimePassword, setOneTimePassword] = useState<string | null>(null)
   const { makeToast } = useToaster()
 
+  const accountEditDisabled =
+    accountType === 'service' || username === 'recovery'
+
   const confirmModal = useMemo(() => {
     switch (editInfo) {
       case 'reset':
@@ -307,7 +310,7 @@ export function Account({
         />
       )
     case 'role':
-      if (!onSaveNewRole || accountType === 'service') {
+      if (!onSaveNewRole || accountEditDisabled) {
         setEditInfo(null)
         return
       }
@@ -362,34 +365,30 @@ export function Account({
                 })
               }
               buttonText={
-                accountType === 'service'
-                  ? undefined
-                  : !adminView
-                    ? t('log_out')
-                    : locked
-                      ? t('odd_unlock_account_button')
-                      : t('odd_reset_password_button')
+                !adminView
+                  ? t('log_out')
+                  : locked
+                    ? t('odd_unlock_account_button')
+                    : t('odd_reset_password_button')
               }
               onClickButton={
-                accountType === 'service'
-                  ? undefined
-                  : !adminView
-                    ? () => {
-                        if (localRobotName == null) {
-                          console.warn(
-                            "Couldn't identify the robot to log out of."
-                          )
-                        } else {
-                          dispatch(logOut({ robotName: localRobotName }))
-                        }
+                !adminView
+                  ? () => {
+                      if (localRobotName == null) {
+                        console.warn(
+                          "Couldn't identify the robot to log out of."
+                        )
+                      } else {
+                        dispatch(logOut({ robotName: localRobotName }))
                       }
-                    : locked
-                      ? () => {
-                          setEditInfo('unlock')
-                        }
-                      : () => {
-                          setEditInfo('reset')
-                        }
+                    }
+                  : locked
+                    ? () => {
+                        setEditInfo('unlock')
+                      }
+                    : () => {
+                        setEditInfo('reset')
+                      }
               }
               buttonType={!adminView ? 'tertiaryHighLight' : 'primary'}
               buttonCategory={adminView ? 'rounded' : undefined}
@@ -399,7 +398,7 @@ export function Account({
                 label={t('account_username')}
                 value={username ?? ''}
                 onClickEdit={
-                  accountType === 'service'
+                  accountEditDisabled
                     ? undefined
                     : () => {
                         setEditInfo('username')
@@ -411,7 +410,7 @@ export function Account({
                 label={t('account_legal_name')}
                 value={fullName ?? ''}
                 onClickEdit={
-                  accountType === 'service'
+                  accountEditDisabled
                     ? undefined
                     : () => {
                         setEditInfo('legalName')
@@ -423,13 +422,9 @@ export function Account({
                 <AccountRow
                   label={t('account_password')}
                   value={t('account_password_placeholder')}
-                  onClickEdit={
-                    accountType === 'service'
-                      ? undefined
-                      : () => {
-                          setEditInfo('password')
-                        }
-                  }
+                  onClickEdit={() => {
+                    setEditInfo('password')
+                  }}
                   t={t}
                 />
               ) : (
@@ -437,7 +432,7 @@ export function Account({
                   label={t('account_role')}
                   value={`${t(`odd_${accountType}_role`)}`}
                   onClickEdit={
-                    accountType === 'service'
+                    accountEditDisabled
                       ? undefined
                       : () => {
                           setEditInfo('role')
@@ -447,7 +442,7 @@ export function Account({
                 />
               )}
             </div>
-            {adminView && accountType !== 'service' && (
+            {adminView && !accountEditDisabled && (
               <div className={styles.admin_view_buttons}>
                 {!locked && (
                   <MediumButton
