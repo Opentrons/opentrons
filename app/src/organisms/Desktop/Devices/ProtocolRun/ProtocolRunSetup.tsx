@@ -50,6 +50,7 @@ import {
   updateRunSetupStepsComplete,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useUpdateClientLPC } from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
@@ -124,8 +125,6 @@ export function ProtocolRunSetup({
       refetchInterval: RUN_RECORD_REFETCH_MS,
     }
   )
-  // Show setup loading until the run record and an analysis are available.
-  const showRunLoadingState = isRunLoading || protocolAnalysis == null
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -142,6 +141,21 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  // Camera setup is Flex-only; wait for robot camera settings before showing accordions.
+  const { isLoading: isCameraLoading } = useNotifyCamera({
+    staleTime: Infinity,
+    enabled: isFlex,
+  })
+  // Protocol exists but analysis is not ready → header "Analyzing on robot" button.
+  const isProtocolAnalyzing = protocolRecord != null && protocolAnalysis == null
+  // Keep analysis-null loading as before, plus run / LPC / camera.
+  // While analyzing, skip Setup loading so only the header button shows progress.
+  const showRunLoadingState =
+    !isProtocolAnalyzing &&
+    (isRunLoading ||
+      protocolAnalysis == null ||
+      (isFlex && lpcUtils.isFlexLPCInitializing) ||
+      (isFlex && isCameraLoading))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
