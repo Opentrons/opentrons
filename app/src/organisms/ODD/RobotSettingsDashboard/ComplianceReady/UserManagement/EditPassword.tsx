@@ -19,10 +19,12 @@ export function EditPassword({
   onCancel,
   onSave,
   passwordComplexity,
+  isLoading,
 }: {
   onCancel: () => void
   onSave: (legalName: string) => void
   passwordComplexity: PasswordComplexityRequirements | null
+  isLoading?: boolean
 }): ReactNode {
   const [password, setPassword] = useState<string | undefined>(undefined)
   const [confirmPassword, setConfirmPassword] = useState<string | undefined>(
@@ -161,6 +163,8 @@ export function EditPassword({
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        buttonIsDisabled={isLoading}
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>

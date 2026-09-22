@@ -17,10 +17,12 @@ export function EditUsername({
   onCancel,
   onSave,
   takenUsernames,
+  isLoading,
 }: {
   onCancel: () => void
   onSave: (username: string) => void
   takenUsernames: string[]
+  isLoading?: boolean
 }): ReactNode {
   const [username, setUsername] = useState<string | undefined>(undefined)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -78,6 +80,8 @@ export function EditUsername({
           onClick: onCancel,
         }}
         onClickBack={onCancel}
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        buttonIsDisabled={isLoading}
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>

@@ -14,9 +14,11 @@ import type { ReactNode } from 'react'
 export function EditLegalName({
   onCancel,
   onSave,
+  isLoading,
 }: {
   onCancel: () => void
   onSave: (legalName: string) => void
+  isLoading?: boolean
 }): ReactNode {
   const [legalName, setLegalName] = useState<string | undefined>(undefined)
   const { t } = useTranslation('device_settings')
@@ -61,6 +63,8 @@ export function EditLegalName({
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        buttonIsDisabled={isLoading}
         onClickBack={onCancel}
       />
       <div className={styles.odd_create_user_content}>
