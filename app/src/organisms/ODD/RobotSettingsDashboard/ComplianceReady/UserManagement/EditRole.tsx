@@ -15,11 +15,11 @@ export function EditRole({
   savedRole,
 }: {
   onCancel: () => void
-  onSubmit: (role: 'admin' | 'user' | 'service') => void
+  onSubmit: (role: 'admin' | 'user' | 'auditor') => void
   isLoading?: boolean
-  savedRole?: 'user' | 'admin' | 'service'
+  savedRole?: 'user' | 'admin' | 'auditor'
 }): ReactNode {
-  const [role, setRole] = useState<('user' | 'admin' | 'service') | undefined>(
+  const [role, setRole] = useState<('user' | 'admin' | 'auditor') | undefined>(
     savedRole
   )
   const { t } = useTranslation('device_settings')
@@ -60,12 +60,12 @@ export function EditRole({
                 value: 'admin',
               },
               {
-                label: t('odd_service_role'),
-                value: 'service',
+                label: t('odd_auditor_role'),
+                value: 'auditor',
               },
             ]}
             onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setRole(e.target.value as 'admin' | 'user' | 'service')
+              setRole(e.target.value as 'admin' | 'user' | 'auditor')
             }}
             initialSelected={role}
           />

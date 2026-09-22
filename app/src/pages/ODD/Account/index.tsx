@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { COLORS, ListButton, StyledText } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -96,17 +97,27 @@ export function Account({
               setEditInfo(null)
             }}
             onConfirm={() => {
-              void onResetPassword?.().then(password => {
-                if (password == null) {
-                  makeToast('' + t('odd_reset_password_error'), 'error')
-                  return
-                }
-                setOneTimePassword(password)
-                makeToast('' + t('odd_reset_password_success'), 'success', {
-                  duration: 5000,
+              void onResetPassword?.()
+                .then(password => {
+                  if (password == null) {
+                    makeToast('' + t('odd_reset_password_error'), 'error', {
+                      duration: 5000,
+                    })
+                    return
+                  }
+                  setOneTimePassword(password)
+                  makeToast('' + t('odd_reset_password_success'), 'success', {
+                    duration: 5000,
+                  })
+                  setEditInfo(null)
                 })
-                setEditInfo(null)
-              })
+                .catch((error: unknown) => {
+                  if (!isDocumentedMutationError(error)) {
+                    makeToast('' + t('odd_reset_password_error'), 'error', {
+                      duration: 5000,
+                    })
+                  }
+                })
             }}
             t={t}
             isLoading={isLoading}
@@ -122,12 +133,20 @@ export function Account({
               setEditInfo(null)
             }}
             onConfirm={() => {
-              void onDeleteAccount?.().then(() => {
-                onBack?.()
-                makeToast('' + t('odd_delete_account_success'), 'success', {
-                  duration: 5000,
+              void onDeleteAccount?.()
+                .then(() => {
+                  onBack?.()
+                  makeToast('' + t('odd_delete_account_success'), 'success', {
+                    duration: 5000,
+                  })
                 })
-              })
+                .catch((error: unknown) => {
+                  if (!isDocumentedMutationError(error)) {
+                    makeToast('' + t('odd_delete_account_error'), 'error', {
+                      duration: 5000,
+                    })
+                  }
+                })
             }}
             t={t}
             isLoading={isLoading}
@@ -143,12 +162,20 @@ export function Account({
               setEditInfo(null)
             }}
             onConfirm={() => {
-              void onLockAccount?.().then(() => {
-                setEditInfo(null)
-                makeToast('' + t('odd_lock_account_success'), 'success', {
-                  duration: 5000,
+              void onLockAccount?.()
+                .then(() => {
+                  setEditInfo(null)
+                  makeToast('' + t('odd_lock_account_success'), 'success', {
+                    duration: 5000,
+                  })
                 })
-              })
+                .catch((error: unknown) => {
+                  if (!isDocumentedMutationError(error)) {
+                    makeToast('' + t('odd_lock_account_error'), 'error', {
+                      duration: 5000,
+                    })
+                  }
+                })
             }}
             t={t}
             isLoading={isLoading}
@@ -164,17 +191,27 @@ export function Account({
               setEditInfo(null)
             }}
             onConfirm={() => {
-              void onUnlockAccount?.().then(password => {
-                if (password == null) {
-                  makeToast('' + t('odd_reset_password_error'), 'error')
-                  return
-                }
-                setOneTimePassword(password)
-                makeToast('' + t('odd_unlock_account_success'), 'success', {
-                  duration: 5000,
+              void onUnlockAccount?.()
+                .then(password => {
+                  if (password == null) {
+                    makeToast('' + t('odd_unlock_account_error'), 'error', {
+                      duration: 5000,
+                    })
+                    return
+                  }
+                  setOneTimePassword(password)
+                  makeToast('' + t('odd_unlock_account_success'), 'success', {
+                    duration: 5000,
+                  })
+                  setEditInfo(null)
                 })
-                setEditInfo(null)
-              })
+                .catch((error: unknown) => {
+                  if (!isDocumentedMutationError(error)) {
+                    makeToast('' + t('odd_unlock_account_error'), 'error', {
+                      duration: 5000,
+                    })
+                  }
+                })
             }}
             t={t}
             isLoading={isLoading}
@@ -206,9 +243,17 @@ export function Account({
             setEditInfo(null)
           }}
           onSave={(password: string) => {
-            void onSaveNewPassword(password).then(() => {
-              setEditInfo(null)
-            })
+            void onSaveNewPassword(password)
+              .then(() => {
+                setEditInfo(null)
+              })
+              .catch((error: unknown) => {
+                if (!isDocumentedMutationError(error)) {
+                  makeToast('' + t('odd_save_password_error'), 'error', {
+                    duration: 5000,
+                  })
+                }
+              })
           }}
           passwordComplexity={passwordComplexity}
           isLoading={isLoading}
@@ -222,9 +267,17 @@ export function Account({
             setEditInfo(null)
           }}
           onSave={(legalName: string) => {
-            void onSaveNewLegalName(legalName).then(() => {
-              setEditInfo(null)
-            })
+            void onSaveNewLegalName(legalName)
+              .then(() => {
+                setEditInfo(null)
+              })
+              .catch((error: unknown) => {
+                if (!isDocumentedMutationError(error)) {
+                  makeToast('' + t('odd_save_legal_name_error'), 'error', {
+                    duration: 5000,
+                  })
+                }
+              })
           }}
           isLoading={isLoading}
         />
@@ -237,17 +290,26 @@ export function Account({
             setEditInfo(null)
           }}
           onSave={(newUsername: string) => {
-            void onSaveNewUsername(newUsername).then(() => {
-              setEditInfo(null)
-            })
+            void onSaveNewUsername(newUsername)
+              .then(() => {
+                setEditInfo(null)
+              })
+              .catch((error: unknown) => {
+                if (!isDocumentedMutationError(error)) {
+                  makeToast('' + t('odd_save_username_error'), 'error', {
+                    duration: 5000,
+                  })
+                }
+              })
           }}
           takenUsernames={usernames}
           isLoading={isLoading}
         />
       )
     case 'role':
-      if (!onSaveNewRole || accountType === 'auditor') {
-        return null
+      if (!onSaveNewRole || accountType === 'service') {
+        setEditInfo(null)
+        return
       }
       return (
         <EditRole
@@ -260,9 +322,17 @@ export function Account({
               setEditInfo(null)
               return
             }
-            void onSaveNewRole(role).then(() => {
-              setEditInfo(null)
-            })
+            void onSaveNewRole(role)
+              .then(() => {
+                setEditInfo(null)
+              })
+              .catch((error: unknown) => {
+                if (!isDocumentedMutationError(error)) {
+                  makeToast('' + t('odd_save_role_error'), 'error', {
+                    duration: 5000,
+                  })
+                }
+              })
           }}
           isLoading={isLoading}
         />
@@ -292,30 +362,34 @@ export function Account({
                 })
               }
               buttonText={
-                !adminView
-                  ? t('log_out')
-                  : locked
-                    ? t('odd_unlock_account_button')
-                    : t('odd_reset_password_button')
+                accountType === 'service'
+                  ? undefined
+                  : !adminView
+                    ? t('log_out')
+                    : locked
+                      ? t('odd_unlock_account_button')
+                      : t('odd_reset_password_button')
               }
               onClickButton={
-                !adminView
-                  ? () => {
-                      if (localRobotName == null) {
-                        console.warn(
-                          "Couldn't identify the robot to log out of."
-                        )
-                      } else {
-                        dispatch(logOut({ robotName: localRobotName }))
-                      }
-                    }
-                  : locked
+                accountType === 'service'
+                  ? undefined
+                  : !adminView
                     ? () => {
-                        setEditInfo('unlock')
+                        if (localRobotName == null) {
+                          console.warn(
+                            "Couldn't identify the robot to log out of."
+                          )
+                        } else {
+                          dispatch(logOut({ robotName: localRobotName }))
+                        }
                       }
-                    : () => {
-                        setEditInfo('reset')
-                      }
+                    : locked
+                      ? () => {
+                          setEditInfo('unlock')
+                        }
+                      : () => {
+                          setEditInfo('reset')
+                        }
               }
               buttonType={!adminView ? 'tertiaryHighLight' : 'primary'}
               buttonCategory={adminView ? 'rounded' : undefined}
@@ -324,40 +398,56 @@ export function Account({
               <AccountRow
                 label={t('account_username')}
                 value={username ?? ''}
-                onClickEdit={() => {
-                  setEditInfo('username')
-                }}
+                onClickEdit={
+                  accountType === 'service'
+                    ? undefined
+                    : () => {
+                        setEditInfo('username')
+                      }
+                }
                 t={t}
               />
               <AccountRow
                 label={t('account_legal_name')}
                 value={fullName ?? ''}
-                onClickEdit={() => {
-                  setEditInfo('legalName')
-                }}
+                onClickEdit={
+                  accountType === 'service'
+                    ? undefined
+                    : () => {
+                        setEditInfo('legalName')
+                      }
+                }
                 t={t}
               />
               {!adminView ? (
                 <AccountRow
                   label={t('account_password')}
                   value={t('account_password_placeholder')}
-                  onClickEdit={() => {
-                    setEditInfo('password')
-                  }}
+                  onClickEdit={
+                    accountType === 'service'
+                      ? undefined
+                      : () => {
+                          setEditInfo('password')
+                        }
+                  }
                   t={t}
                 />
               ) : (
                 <AccountRow
                   label={t('account_role')}
                   value={`${t(`odd_${accountType}_role`)}`}
-                  onClickEdit={() => {
-                    setEditInfo('role')
-                  }}
+                  onClickEdit={
+                    accountType === 'service'
+                      ? undefined
+                      : () => {
+                          setEditInfo('role')
+                        }
+                  }
                   t={t}
                 />
               )}
             </div>
-            {adminView && (
+            {adminView && accountType !== 'service' && (
               <div className={styles.admin_view_buttons}>
                 {!locked && (
                   <MediumButton
@@ -393,7 +483,7 @@ function AccountRow({
 }: {
   label: string
   value: string
-  onClickEdit: () => void
+  onClickEdit?: () => void
   t: TFunction
 }): ReactNode {
   return (
@@ -410,12 +500,14 @@ function AccountRow({
               {value}
             </StyledText>
           </div>
-          <SmallButton
-            onClick={onClickEdit}
-            buttonText={'' + t('account_edit')}
-            buttonType="secondary"
-            buttonCategory="rounded"
-          />
+          {!!onClickEdit ? (
+            <SmallButton
+              onClick={onClickEdit}
+              buttonText={'' + t('account_edit')}
+              buttonType="secondary"
+              buttonCategory="rounded"
+            />
+          ) : null}
         </div>
       </div>
     </ListButton>
@@ -453,7 +545,7 @@ const ConfirmModal = ({
         <div className={styles.modal_buttons}>
           <SmallButton
             onClick={onCancel}
-            buttonText={t('odd_cancel_button')}
+            buttonText={'' + t('odd_cancel_button')}
             buttonType="secondary"
             width="100%"
           />
@@ -490,7 +582,7 @@ function OneTimePasswordModal({
     >
       <div className={styles.modal_content}>
         <StyledText oddStyle="bodyTextRegular">
-          {t('odd_one_time_password_description')}
+          {'' + t('odd_one_time_password_description')}
         </StyledText>
         <div className={styles.one_time_password_container}>
           <StyledText
@@ -502,7 +594,7 @@ function OneTimePasswordModal({
         </div>
         <SmallButton
           onClick={onConfirm}
-          buttonText={t('confirm')}
+          buttonText={'' + t('confirm')}
           buttonType="primary"
           width="100%"
         />

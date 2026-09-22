@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  isDocumentedMutationError,
   useUpdateSelfMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
@@ -14,7 +13,6 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ComplianceReadySettings } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/ComplianceReadySettings'
 import { SettingsListButton } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/SettingsListButton'
 import { UserManagement } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/UserManagement'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import {
   updateLoggedInUserProfile,
@@ -41,7 +39,6 @@ export function AdminHub(): ReactNode {
 
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch()
-  const { makeToast } = useToaster()
   const documentationState = useDocumentationState()
   const { updateSelf } = useUpdateSelfMutation(documentationState)
 
@@ -58,26 +55,17 @@ export function AdminHub(): ReactNode {
   const saveSelfAccountChanges = (
     data: UpdateSelfRequest['data']
   ): Promise<void> => {
-    return updateSelf({ data })
-      .then(updatedSelf => {
-        if (robotName != null) {
-          dispatch(
-            updateLoggedInUserProfile({
-              robotName,
-              username: updatedSelf.data.username,
-              fullName: updatedSelf.data.fullName,
-            })
-          )
-        }
-      })
-      .catch((error: unknown) => {
-        if (!isDocumentedMutationError(error)) {
-          makeToast('' + t('account_save_error'), 'error', {
-            duration: 5000,
+    return updateSelf({ data }).then(updatedSelf => {
+      if (robotName != null) {
+        dispatch(
+          updateLoggedInUserProfile({
+            robotName,
+            username: updatedSelf.data.username,
+            fullName: updatedSelf.data.fullName,
           })
-          throw error
-        }
-      })
+        )
+      }
+    })
   }
 
   const onSaveNewPassword = (password: string): Promise<void> => {

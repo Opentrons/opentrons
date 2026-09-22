@@ -19,15 +19,15 @@ export function ChooseRole({
   savedRole,
   isLoading,
 }: {
-  onClickBack: (role?: 'admin' | 'user' | 'service') => void
+  onClickBack: (role?: 'admin' | 'user' | 'auditor') => void
   onCancel: () => void
-  onSubmit: (role: 'admin' | 'user' | 'service') => Promise<void>
+  onSubmit: (role: 'admin' | 'user' | 'auditor') => Promise<void>
   totalSteps: number
   currentStep: number
-  savedRole?: 'admin' | 'user' | 'service'
+  savedRole?: 'admin' | 'user' | 'auditor'
   isLoading: boolean
 }): ReactNode {
-  const [role, setRole] = useState<('admin' | 'user' | 'service') | undefined>(
+  const [role, setRole] = useState<('admin' | 'user' | 'auditor') | undefined>(
     savedRole
   )
   const { t } = useTranslation('device_settings')
@@ -72,12 +72,12 @@ export function ChooseRole({
                 value: 'admin',
               },
               {
-                label: t('odd_service_role'),
-                value: 'service',
+                label: t('odd_auditor_role'),
+                value: 'auditor',
               },
             ]}
             onSelect={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setRole(e.target.value as 'admin' | 'user' | 'service')
+              setRole(e.target.value as 'admin' | 'user' | 'auditor')
             }}
             initialSelected={role}
           />

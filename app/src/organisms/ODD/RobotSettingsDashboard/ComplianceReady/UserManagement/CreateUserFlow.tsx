@@ -20,7 +20,7 @@ interface CreateUserFlowState {
   step: number
   username?: string
   legalName?: string
-  role?: 'admin' | 'user' | 'service'
+  role?: 'admin' | 'user' | 'auditor'
   oneTimePassword?: string
 }
 
@@ -40,7 +40,7 @@ export function CreateUserFlow({
   const { makeToast } = useToaster()
 
   const handleSubmit = async (
-    role: 'admin' | 'user' | 'service'
+    role: 'admin' | 'user' | 'auditor'
   ): Promise<void> => {
     if (flowState.step === 2 && !!flowState.legalName && !!flowState.username) {
       setFlowState(prevState => ({
@@ -126,7 +126,7 @@ export function CreateUserFlow({
       title: t('odd_choose_role_title'),
       content: (
         <ChooseRole
-          onClickBack={(role?: 'admin' | 'user' | 'service') => {
+          onClickBack={(role?: 'admin' | 'user' | 'auditor') => {
             setFlowState(prevState => ({ ...prevState, step: 1, role }))
           }}
           onCancel={onCancel}
