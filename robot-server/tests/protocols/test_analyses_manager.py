@@ -609,7 +609,7 @@ async def test_initialize_analyzer_promotes_pending_when_rtp_lookup_fails(
         )
     ).then_raise(raised_exception)
     decoy.when(await analyzer.get_verified_run_time_parameters()).then_raise(
-        AssertionError
+        AssertionError()
     )
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error

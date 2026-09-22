@@ -89,7 +89,10 @@ export function ProtocolSetupFullSkeleton(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing40}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing40}
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing2}
