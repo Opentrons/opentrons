@@ -69,7 +69,7 @@ See [Chemical Compatibility](compatibility.md) for the ratings of individual car
 The carboy cap includes two important liquid control features:
 
 * **Waste diverter:** channels liquid waste down the interior wall of the carboy, away from the exhaust port and float valve.
-* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and control box.
+* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and reaching the Control Box.
 
 !!! note
     The float valve is a passive backflow preventer. It does not electronically communicate with the vacuum pump. When the carboy is full and the overflow valve closes, the pump:
