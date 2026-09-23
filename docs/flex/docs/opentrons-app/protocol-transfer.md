@@ -41,7 +41,7 @@ Each entry in the **Run History** tab includes the protocol name, its timestamp,
 
 - **Rerun protocol now:** The same as choosing **Start setup** on the corresponding protocol.
 
-- **Download protocol files:** Download a `.zip` file containing protocol .JSON files, including information about all steps performed, and any still images taken during a protocol run, if the camera was enabled.
+- **Download protocol files:** Download a `.zip` file containing protocol `.json` files, including information about all steps performed, and any still images taken during a protocol run, if the camera was enabled.
 
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 

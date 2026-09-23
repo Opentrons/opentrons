@@ -3,14 +3,17 @@ title: "Opentrons Flex: Compliance Ready Software"
 description: "An overview of the optional Opentrons Flex Compliance Ready Software."
 ---
 
-Opentrons Flex Compliance Ready Software enables features on your Flex for 21 CFR part 11–ready operation. The software: 
+Opentrons Flex Compliance Ready Software is a set of optional, permanent, paid features that enable 21 CFR part 11–ready operation on your Flex. The software: 
 
 * Captures every user action with timestamps, required documentation, and robot-generated records and files. 
 * Verifies user access, including required logins and different permissions for administrators and users. 
 
 The software is permanently installed during on your Flex on-site by a trained Opentrons representative. Because Compliance Ready Software is designed to secure your Flex in your lab, some features like [Jupyter notebook access](jupyter-notebook.md), [command line operation](command-line.md), and [Quick Transfer protocols](../touchscreen/quick-transfer.md) are permanently disabled once the software is activated.
 
-This section takes a look at using Compliance Ready Software in your lab. You can read more in the [Compliance Ready Software manual](../../compliance-ready-software/index.md), or contact [Opentrons](opentrons.com/contact) to get started installing Compliance Ready Software on your Flex. 
+This section takes a look at using Compliance Ready Software in your lab. [Contact Opentrons](https://opentrons.com/contact) to get started installing Compliance Ready Software on your Flex. 
+
+!!! Additional Documentation 
+    For more information, see the [Compliance Ready Software Instruction Manual](../../compliance-ready-software/index.md),
  
 ## Logging in
 
@@ -37,7 +40,7 @@ Users won't be able to bypass this screen, and the Flex won't complete the actio
 
 <figure class="screenshot" markdown>
 ![Example of Documentation required screen on the Flex touchscreen](../images/crs-doc-required.png)
-<figcaption>Add documentation on the Flex touchscreen. Tap the gray arrow on the right to collapse the keyboard</figcaption>
+<figcaption>Add documentation on the Flex touchscreen. Tap the gray arrow on the right to collapse the keyboard.</figcaption>
 </figure>
 
 ## Running a protocol 
@@ -58,7 +61,7 @@ Users can be prompted to enter documentation on the Flex touchscreen or in the O
 * Completing a manual action, like moving labware, during a protocol run.
 * Starting and completing error recovery during a protocol run.
 
-See the full list of actions requiring documentation in the [Compliance Ready Software Manual](../../compliance-ready-software/actions.md). 
+See the full [list of actions requiring documentation](../../compliance-ready-software/actions.md) in the Compliance Ready Software Manual.
 
 ## Completing a protocol 
 

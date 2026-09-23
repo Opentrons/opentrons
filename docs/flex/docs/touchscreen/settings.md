@@ -19,18 +19,18 @@ Refer to the [Settings list section](#settings-list) below for definitions of th
 
 Many of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time. The following list describes all the currently available settings.
 
-### Automatically Download Updates
+### Automatically download updates
 
 Choose whether your Flex will download robot software updates in the background as soon as they become available. This setting is available in robot software version 9.1.1 and later, and is off by default.
 
 !!! note
     When this setting is on, software downloads may occur at any time that Flex is connected to the internet, even while running a protocol.
 
-### Camera
+### Camera preferences
 
 Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.
 
-### Developer Tools
+### Developer tools
 
 Enable additional tools and features designed for developers. Not recommended for use unless instructed by Opentrons Support.
 
@@ -38,11 +38,11 @@ Enable additional tools and features designed for developers. Not recommended fo
 
 View attached devices, like an external keyboard or USB device. 
 
-### Device Reset
+### Device reset
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
 
-### Disable Stacker Sensors for Labware Detection
+### Disable Stacker sensors for labware detection
 
 Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before attempting to dispense or store it.
 
@@ -51,11 +51,15 @@ You should disable this setting only when using labware that causes detection er
 !!! note
     When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
 
+### Download protocol source file
+
+Choose whether to include the protocol source file in the group of files that make up a protocol's run record.
+
 ### File manager
 
 Download [files](../advanced-operation/diagnostic-files.md) stored on your Flex, including protocol run records, troubleshooting logs, and calibration logs.
 
-### Home Gantry on Restart
+### Home gantry on restart
 
 By default, the gantry moves to its home position any time you turn on Flex. Only disable this behavior if you have a reason that the gantry must remain stationary after powering on.
 
@@ -63,7 +67,7 @@ By default, the gantry moves to its home position any time you turn on Flex. Onl
 
 Set the language used by the touchscreen to Chinese or English.
 
-### Network Settings
+### Network settings
 
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
@@ -85,7 +89,7 @@ If you opt out of automatic data sharing, you can still download Flex files for 
 !!! note
     There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
 
-### Recovery Mode
+### Recovery mode
 
 Turns [error recovery][error-recovery] on and off. Error recovery mode pauses the active protocol and gives you a chance to fix a problem if something unexpected happens during the run.
 
@@ -93,23 +97,23 @@ Turns [error recovery][error-recovery] on and off. Error recovery mode pauses th
 
 Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
 
-### Robot Name
+### Robot name
 
 Change the name of your Flex. The robot name appears on the touchscreen dashboard and in the Opentrons App.
 
-### Robot System Version
+### Robot system version
 
 See the current version of the robot software or check for updates. If Flex has already automatically checked for updates and found one, this item will have an "Update available" badge in the settings list.
 
-### Status Light
+### Status LEDs
 
 The [status light][status-light-flex] is a strip of LEDs along the top front of the Flex. It provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states.
 
-### Touchscreen Brightness
+### Touchscreen brightness
 
 Set the screen's brightness to one of six levels by tapping **−** or **+**.
 
-### Touchscreen Sleep
+### Touchscreen sleep
 
 Set how long the touchscreen should remain on when idle. When the screen is asleep, tap it once to wake it. Sleep options are:
 
@@ -121,6 +125,6 @@ Set how long the touchscreen should remain on when idle. When the screen is asle
 - 30 minutes
 - 1 hour
 
-### Update Channel
+### Update channel
 
 Choose whether to receive stable or beta software updates.
