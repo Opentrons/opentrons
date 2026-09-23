@@ -122,6 +122,7 @@ export function RunSummary(): JSX.Element {
       runStatus === RUN_STATUS_SUCCEEDED ||
       runStatus === RUN_STATUS_STOPPED
   )
+  const [splashClicked, setSplashClicked] = useState(false)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotType = useRobotType(robotName)
@@ -260,21 +261,35 @@ export function RunSummary(): JSX.Element {
     [isRunCurrent, runSummaryNoFixit, isEREnabled]
   )
 
-  // After the splash, close the run if no tips need handling so desktop does
-  // not auto-document a second dismiss. Keep the run current while tips may
-  // still be on so Return / Run again can still open drop tip.
+  // After splash tap, dim while network requests are in flight. Close if no
+  // tips need handling so desktop does not auto-document a second dismiss.
+  // If tips may still be on, hide the splash without closing so Return / Run
+  // again can still open drop tip.
   useEffect(
     () => {
-      if (showSplash || !isRunCurrent) {
+      if (!splashClicked) {
+        return
+      }
+      if (!isRunCurrent) {
+        setShowSplash(false)
+        setSplashClicked(false)
         return
       }
       if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
-        closeCurrentRunIfValid()
+        closeCurrentRunIfValid(() => {
+          setShowSplash(false)
+          setSplashClicked(false)
+        })
+        return
+      }
+      if (initialPipettesWithTipsCount != null) {
+        setShowSplash(false)
+        setSplashClicked(false)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      showSplash,
+      splashClicked,
       isRunCurrent,
       initialPipettesWithTipsCount,
       tipCheckSkippedBecauseER,
@@ -363,7 +378,7 @@ export function RunSummary(): JSX.Element {
   const outputFileIds = useRunGeneratedDataFiles(runId)
 
   const handleClickSplash = (): void => {
-    if (!showSplash) {
+    if (!showSplash || splashClicked) {
       return
     }
     trackProtocolRunEvent({
@@ -375,7 +390,7 @@ export function RunSummary(): JSX.Element {
       transactionId: runId,
       amount: numberOfImages,
     })
-    setShowSplash(false)
+    setSplashClicked(true)
   }
 
   const buildReturnToWithSpinnerText = (): JSX.Element => (
@@ -452,6 +467,16 @@ export function RunSummary(): JSX.Element {
               <SplashBody>{protocolName}</SplashBody>
             </Flex>
           </SplashFrame>
+          {splashClicked ? (
+            <Flex
+              position={POSITION_ABSOLUTE}
+              top="0"
+              left="0"
+              width="100%"
+              height="100%"
+              backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
+            />
+          ) : null}
         </Flex>
       ) : (
         <Flex
