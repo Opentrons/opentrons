@@ -29,14 +29,13 @@ import type {
   AuthSettingsData,
   RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
-import type { SetSettingOption } from '../types'
 
 export type CRSSettingsPages = 'users' | 'login' | 'admin' | 'storage' | 'audit'
 
 export function ComplianceReadySettings({
-  setCurrentOption,
+  onBack,
 }: {
-  setCurrentOption: SetSettingOption
+  onBack: () => void
 }): ReactNode {
   const { t } = useTranslation('device_settings')
 
@@ -140,9 +139,7 @@ export function ComplianceReadySettings({
         <RobotStorage
           robotServerSettings={robotServerSettings?.data}
           patchRobotServerSettings={handlePatchRobotServerSettings}
-          onClickBack={() => {
-            setCurrentPage(null)
-          }}
+          onClickBack={onBack}
         />
       )
     default:
@@ -150,9 +147,7 @@ export function ComplianceReadySettings({
         <div className={styles.container}>
           <ChildNavigation
             header={t('odd_compliance_ready_software')}
-            onClickBack={() => {
-              setCurrentOption(null)
-            }}
+            onClickBack={onBack}
           />
           <div className={styles.content}>
             <div className={styles.settings_list}>

@@ -99,7 +99,7 @@ describe('ComplianceReadySettings', () => {
 
   beforeEach(() => {
     props = {
-      setCurrentOption: vi.fn(),
+      onBack: vi.fn(),
     }
     vi.mocked(useDocumentationState).mockReturnValue(
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
@@ -145,7 +145,7 @@ describe('ComplianceReadySettings', () => {
     render(props)
 
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
-    expect(props.setCurrentOption).toHaveBeenCalledWith(null)
+    expect(props.onBack).toHaveBeenCalled()
   })
 
   it('navigates to login settings and back to the list', () => {

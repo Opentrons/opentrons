@@ -3,13 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  COLORS,
-  ListItem,
-  ListItemDescriptor,
-  StyledText,
-} from '@opentrons/components'
+import { COLORS, ListButton, StyledText } from '@opentrons/components'
 
+import { SmallButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getLocalRobot } from '/app/redux/discovery'
 import { logOut } from '/app/redux/robot-auth'
@@ -17,10 +13,12 @@ import { logOut } from '/app/redux/robot-auth'
 import styles from './account.module.css'
 import { useAccountInfo } from './hooks'
 
+import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
-export function Account(): JSX.Element {
-  const { t } = useTranslation()
+export function Account({ onBack }: { onBack?: () => void }): JSX.Element {
+  const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { isLoggedIn, username, fullName } = useAccountInfo()
@@ -37,11 +35,14 @@ export function Account(): JSX.Element {
   return (
     <div className={styles.page}>
       <ChildNavigation
-        header={t('top_navigation:account')}
-        onClickBack={() => {
-          navigate(-1)
-        }}
-        buttonText={t('access_control:log_out')}
+        header={t('account_title')}
+        onClickBack={
+          onBack ??
+          (() => {
+            navigate(-1)
+          })
+        }
+        buttonText={t('log_out')}
         onClickButton={() => {
           if (localRobotName == null) {
             console.warn("Couldn't identify the robot to log out of.")
@@ -52,42 +53,62 @@ export function Account(): JSX.Element {
         buttonType="tertiaryHighLight"
       />
       <div className={styles.rows}>
-        <ListItem type="default">
-          <ListItemDescriptor
-            type="default"
-            description={
-              <StyledText oddStyle="bodyTextSemiBold" color={COLORS.black90}>
-                {t('access_control:username')}
-              </StyledText>
-            }
-            content={
-              <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-                {username}
-              </StyledText>
-            }
-          />
-        </ListItem>
-        <ListItem type="default">
-          <ListItemDescriptor
-            type="default"
-            description={
-              <StyledText oddStyle="bodyTextSemiBold" color={COLORS.black90}>
-                {t('access_control:legal_name')}
-              </StyledText>
-            }
-            content={
-              <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-                {fullName}
-              </StyledText>
-            }
-          />
-        </ListItem>
+        <AccountRow
+          label={t('account_username')}
+          value={username ?? ''}
+          onClickEdit={() => {}}
+          t={t}
+        />
+        <AccountRow
+          label={t('account_legal_name')}
+          value={fullName ?? ''}
+          onClickEdit={() => {}}
+          t={t}
+        />
+        <AccountRow
+          label={t('account_password')}
+          value={t('account_password_placeholder')}
+          onClickEdit={() => {}}
+          t={t}
+        />
       </div>
-      <p className={styles.footer}>
-        <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-          {t('branded:account_page_footer')}
-        </StyledText>
-      </p>
     </div>
+  )
+}
+
+function AccountRow({
+  label,
+  value,
+  onClickEdit,
+  t,
+}: {
+  label: string
+  value: string
+  onClickEdit: () => void
+  t: TFunction
+}): ReactNode {
+  return (
+    <ListButton type="noActive" className={styles.list_button}>
+      <div className={styles.button_content}>
+        <StyledText oddStyle="level4HeaderSemiBold">{label}</StyledText>
+        <div className={styles.right_container}>
+          <div className={styles.value_container}>
+            <StyledText
+              oddStyle="level4HeaderRegular"
+              width="100%"
+              color={COLORS.grey60}
+            >
+              {value}
+            </StyledText>
+          </div>
+          <SmallButton
+            onClick={onClickEdit}
+            buttonText={'' + t('account_edit')}
+            buttonType="secondary"
+            buttonCategory="rounded"
+          />
+        </div>
+      </div>
+    </ListButton>
   )
 }
