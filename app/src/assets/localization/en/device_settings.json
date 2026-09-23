@@ -375,6 +375,7 @@
   "odd_add_legal_name_title": "Add legal name",
   "odd_add_username_caption": "20 characters max",
   "odd_add_username_label": "Username",
+  "odd_add_username_required": "Username is required",
   "odd_add_username_taken_caption": "This username is already taken",
   "odd_add_username_title": "Add username",
   "odd_admin_hub_title": "Admin Hub",
