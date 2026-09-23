@@ -22,6 +22,7 @@ import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
   formatPyStr,
+  formatPyValue,
   getChunkForIndentingLists,
   INDENT,
   indentPyLines,
@@ -46,6 +47,8 @@ import type {
   ModuleEntities,
   ModuleTemporalProperties,
   PipetteEntities,
+  RuntimeParameter,
+  RuntimeParameters,
   Timeline,
   TimelineFrame,
   TrashBinEntities,
@@ -768,6 +771,48 @@ const PYTHON_RTP_METHODS: Record<RuntimeParameter['type'], string> = {
   int: 'add_int',
   float: 'add_float',
   string: 'add_str',
-  csv: 'add_csv',
+  csv: 'add_csv_file',
 }
 
+export function getRunTimeParameters(
+  runtimeParameters: RuntimeParameters
+): string {
+  const pythonParameters = Object.values(runtimeParameters)
+    .map(parameter => {
+      const choices = 'choices' in parameter ? parameter.choices : undefined
+      // undefined args are dropped; key order is the Python arg order
+      const args = {
+        variable_name: parameter.variableName,
+        display_name: parameter.displayName,
+        description: parameter.description || undefined,
+        // Python CSV parameters take no default
+        default: parameter.type === 'csv' ? undefined : parameter.default,
+        choices: choices?.map(value => ({
+          display_name: String(value),
+          value,
+        })),
+        ...('minimum' in parameter
+          ? {
+              minimum: parameter.minimum,
+              maximum: parameter.maximum,
+              // unit is only valid with a min/max range
+              unit: choices == null ? parameter.unit : undefined,
+            }
+          : {}),
+      }
+      const pythonArgs = Object.entries(args)
+        .filter(([, value]) => value != null)
+        .map(([key, value]) => `${key}=${formatPyValue(value)}`)
+        .join(',\n')
+      return `parameters.${
+        PYTHON_RTP_METHODS[parameter.type]
+      }(\n${indentPyLines(pythonArgs)},\n)`
+    })
+    .join('\n')
+
+  return pythonParameters
+    ? `def add_parameters(parameters: protocol_api.ParameterContext) -> None:\n${indentPyLines(
+        pythonParameters
+      )}`
+    : ''
+}
