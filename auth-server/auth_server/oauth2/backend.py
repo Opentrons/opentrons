@@ -333,7 +333,14 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 login_attempts_remaining=None, account_locked=True
             )
 
-        password_is_correct = password_hash.verify(password, user.hashed_password)
+        password_to_verify = (
+            user.temporary_hashed_password
+            if user.temporary_hashed_password is not None
+            else user.hashed_password
+        )
+        password_is_correct = password_to_verify is not None and password_hash.verify(
+            password, password_to_verify
+        )
 
         failed_login_count: int
         if password_is_correct:

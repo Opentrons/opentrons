@@ -69,13 +69,13 @@ def _make_orm_user(
     deactivated: bool = False,
     password_set_at: datetime.datetime = _NOW,
     user_id: int | None = None,
-    temporary_password: str | None = None,
+    temporary_hashed_password: str | None = None,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
     user = User(
         username=username,
         hashed_password=hashed_password,
-        temporary_password=temporary_password,
+        temporary_hashed_password=temporary_hashed_password,
         full_name=full_name,
         account_type=account_type,
         reset_password=reset_password,
@@ -836,7 +836,7 @@ def test_update_user_password_is_hashed(
             None,
             False,
             None,
-            clear_temporary_password=True,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(updated)
@@ -852,7 +852,7 @@ def test_update_user_password_is_hashed(
             None,
             False,
             None,
-            clear_temporary_password=True,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     )
@@ -876,7 +876,7 @@ def test_update_user_password_clears_reset_password_flag(
             None,
             False,
             None,
-            clear_temporary_password=True,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(updated)
@@ -897,7 +897,7 @@ def test_update_user_password_clears_reset_password_flag(
             None,
             False,
             None,
-            clear_temporary_password=True,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     )
@@ -943,7 +943,7 @@ def test_reset_user_password(
     decoy.when(
         mock_store.update(
             "reset_me",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -966,7 +966,7 @@ def test_reset_user_password(
     decoy.verify(
         mock_store.update(
             "reset_me",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -988,7 +988,7 @@ def test_reset_user_password_clears_failed_logins(
     decoy.when(
         mock_store.update(
             "reset_me",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1017,7 +1017,7 @@ def test_reset_user_password_uses_password_complexity_settings(
     decoy.when(
         mock_store.update(
             "reset_me",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1042,7 +1042,7 @@ def test_reset_user_password_not_found_raises(
     decoy.when(
         mock_store.update(
             "ghost",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1156,7 +1156,7 @@ def test_update_user_rejects_password_from_before_temp_reset(
         _make_orm_user(
             username="alice",
             hashed_password=password_hash.hash(prior_password),
-            temporary_password=password_hash.hash(temporary_password),
+            temporary_hashed_password=password_hash.hash(temporary_password),
             reset_password=True,
         )
     )
@@ -1290,7 +1290,7 @@ def test_update_service_user_allows_password_change(
             account_type=None,
             reset_password=False,
             deactivated=None,
-            clear_temporary_password=True,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(existing)
@@ -1311,7 +1311,7 @@ def test_reset_service_user_password(
     decoy.when(
         mock_store.update(
             "service",
-            temporary_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),

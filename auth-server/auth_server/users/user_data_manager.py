@@ -353,7 +353,7 @@ class UserDataManager:
                     account_type=new_account_type,
                     reset_password=reset_password,
                     deactivated=deactivated,
-                    clear_temporary_password=True,
+                    clear_temporary_hashed_password=True,
                     now=now,
                 )
             else:
@@ -390,7 +390,7 @@ class UserDataManager:
             self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
-                temporary_password=password_hash.hash(temporary_password),
+                temporary_hashed_password=password_hash.hash(temporary_password),
                 reset_password=True,
                 deactivated=False,
                 now=now,
