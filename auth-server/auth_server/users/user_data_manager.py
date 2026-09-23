@@ -239,17 +239,22 @@ class UserDataManager:
         _validate_username_characters(username)
         settings = self._settings_store.get_settings()
         reset_password = password is None
+        temporary_password_hash: str | None = None
+        real_hashed_password: str | None = None
         if reset_password:
             min_length, require_special = _password_complexity_requirements(settings)
             password = _generate_temporary_password(min_length, require_special)
+            temporary_password_hash = password_hash.hash(password)
         elif password is not None:
             _validate_password_complexity(password, settings)
+            real_hashed_password = password_hash.hash(password)
         assert password is not None
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
             username=username,
-            hashed_password=password_hash.hash(password),
+            hashed_password=real_hashed_password,
+            temporary_password=temporary_password_hash,
             full_name=full_name,
             account_type=account_type,
             now=now,
@@ -314,9 +319,12 @@ class UserDataManager:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
-            if existing_user is not None and password_hash.verify(
-                new_password, existing_user.hashed_password
-            ):
+            is_reusing_current_password = (
+                existing_user is not None
+                and existing_user.hashed_password is not None
+                and password_hash.verify(new_password, existing_user.hashed_password)
+            )
+            if is_reusing_current_password:
                 raise PasswordPreviouslyUsedError(
                     "New password must be different from the current password."
                 )
@@ -337,20 +345,28 @@ class UserDataManager:
                     deactivated = False
             if new_password is not None:
                 reset_password = False
-            updated_user = self._user_store.update(
-                username_to_update,
-                new_username=new_username,
-                hashed_password=(
-                    password_hash.hash(new_password)
-                    if new_password is not None
-                    else None
-                ),
-                full_name=new_full_name,
-                account_type=new_account_type,
-                reset_password=reset_password,
-                deactivated=deactivated,
-                now=now,
-            )
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=password_hash.hash(new_password),
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    clear_temporary_password=True,
+                    now=now,
+                )
+            else:
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=None,
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    now=now,
+                )
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
@@ -360,7 +376,7 @@ class UserDataManager:
         username: str,
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
-        """Reset a user's password to a random temporary password.
+        """Issue a temporary password without replacing the user's real password hash.
 
         Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
@@ -374,7 +390,7 @@ class UserDataManager:
             self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
-                hashed_password=password_hash.hash(temporary_password),
+                temporary_password=password_hash.hash(temporary_password),
                 reset_password=True,
                 deactivated=False,
                 now=now,

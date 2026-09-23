@@ -51,16 +51,18 @@ class UserStore:
     def add(
         self,
         username: str,
-        hashed_password: str,
+        hashed_password: str | None,
         full_name: str,
         account_type: str,
         now: datetime.datetime,
         reset_password: bool,
+        temporary_password: str | None = None,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
             username=username,
             hashed_password=hashed_password,
+            temporary_password=temporary_password,
             full_name=full_name,
             account_type=AccountType(account_type),
             password_set_at=now,
@@ -84,7 +86,7 @@ class UserStore:
             session.delete(user)
             session.commit()
 
-    def update(
+    def update(  # noqa: C901
         self,
         username: str,
         new_username: str | None = None,
@@ -93,12 +95,17 @@ class UserStore:
         account_type: str | None = None,
         reset_password: bool | None = None,
         deactivated: bool | None = None,
+        temporary_password: str | None = None,
+        clear_temporary_password: bool = False,
         *,
         now: datetime.datetime,
     ) -> User:
         """Update a user's fields and return the updated User.
 
         Raises ``ValueError`` if the user does not exist.
+
+        Pass ``temporary_password`` to set a temp password hash, or
+        ``clear_temporary_password=True`` to clear it. Omit both to leave it unchanged.
         """
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
@@ -118,6 +125,10 @@ class UserStore:
                 user.reset_password = reset_password
             if deactivated is not None:
                 user.deactivated = deactivated
+            if clear_temporary_password:
+                user.temporary_password = None
+            elif temporary_password is not None:
+                user.temporary_password = temporary_password
 
             session.commit()
             session.expunge(user)
