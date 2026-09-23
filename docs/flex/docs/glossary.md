@@ -199,9 +199,9 @@ A set of pipetting parameters—such as flow rate, submerge depth, air gap, blow
 
 The ability of Flex pipette sensors to detect the presence or absence of liquid in a well, or to locate the liquid meniscus. See the [Detect liquids section](../python-api/building-block-commands/liquids.md#detect-liquids) and [Measure liquids section](../python-api/building-block-commands/liquids.md#measure-liquids) in the Python Protocol API documentation.
 
-##### Log files
+##### Diagnostic files
 
-Records that Flex continuously writes during operation, capturing robot movements, system processes, communications among robot components, and software update activity. Opentrons Support may request log files when troubleshooting a malfunction. See the [Flex Log Files section](advanced-operation/log-files.md) in the Advanced Operations chapter.
+Records that Flex continuously writes during operation, capturing robot movements, system processes, communications among robot components, and software update activity. Opentrons Support may request diagnostic files when troubleshooting a malfunction. See the [Flex Diagnostic Files section](advanced-operation/diagnostic-files.md) in the Advanced Operations chapter.
 
 ##### Maintenance position
 
