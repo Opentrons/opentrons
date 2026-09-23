@@ -10,9 +10,8 @@ from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.credential_characters import (
-    CREDENTIAL_ALLOWED_CHARACTERS,
     CREDENTIAL_SPECIAL_CHARACTERS,
-    has_only_allowed_credential_characters,
+    temp_password_characters,
 )
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
@@ -20,6 +19,10 @@ from auth_server.users.models import (
     AccountType,
     TemporaryPasswordResponse,
     UserResponse,
+)
+from auth_server.users.software_keyboard_characters import (
+    has_only_allowed_password_characters,
+    has_only_allowed_username_characters,
 )
 from auth_server.users.store import UserStore
 
@@ -36,9 +39,13 @@ def _generate_temporary_password(
     if not require_special_characters:
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
-    return "".join(
-        secrets.choice(CREDENTIAL_ALLOWED_CHARACTERS) for _ in range(min_length)
-    )
+    # Force at least one special so generated temps meet the same rule as user-chosen
+    # passwords.
+    chars = [secrets.choice(CREDENTIAL_SPECIAL_CHARACTERS)]
+    alphabet = temp_password_characters()
+    chars.extend(secrets.choice(alphabet) for _ in range(max(min_length - 1, 0)))
+    secrets.SystemRandom().shuffle(chars)
+    return "".join(chars)
 
 
 def _password_complexity_requirements(
@@ -62,9 +69,9 @@ def _validate_password_complexity(
         raise PasswordTooShortError(
             actual_length=actual_length, required_length=min_length
         )
-    if not has_only_allowed_credential_characters(password):
+    if not has_only_allowed_password_characters(password):
         raise PasswordContainsInvalidCharactersError(
-            "password must not contain spaces or other disallowed characters"
+            "password contains characters not supported by the ODD software keyboard"
         )
     if require_special and not any(
         c in CREDENTIAL_SPECIAL_CHARACTERS for c in password
@@ -100,7 +107,7 @@ class PasswordMissingSpecialCharactersError(InvalidInputError):
 
 
 class PasswordContainsInvalidCharactersError(InvalidInputError):
-    """Raised when a password contains whitespace or other disallowed characters."""
+    """Raised when a password contains characters not supported by the ODD keyboard."""
 
 
 class PasswordPreviouslyUsedError(InvalidInputError):
@@ -112,10 +119,10 @@ class UsernameContainsInvalidCharactersError(InvalidInputError):
 
 
 def _validate_username_characters(username: str | None) -> None:
-    """Reject usernames that include whitespace or characters outside the allowlist."""
+    """Reject usernames that include space or characters outside the allowlist."""
     if username is None:
         return
-    if not has_only_allowed_credential_characters(username):
+    if not has_only_allowed_username_characters(username):
         raise UsernameContainsInvalidCharactersError(
             "username must not contain spaces or other disallowed characters"
         )

@@ -50,7 +50,10 @@ export function useRunControls(
     cloneRun,
     isLoadingRun: isRunControlLoading,
     isCloning: isResetRunLoading,
-  } = useCloneRun(runId ?? null, onCloneRunSuccess, true)
+  } = useCloneRun(runId ?? null, {
+    onSuccess: onCloneRunSuccess,
+    triggerAnalysis: true,
+  })
 
   return {
     play: playRun,

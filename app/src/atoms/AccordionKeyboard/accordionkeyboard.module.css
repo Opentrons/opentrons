@@ -1,5 +1,6 @@
 .accordion_container {
   display: flex;
+  overflow: visible;
   width: 100%;
   flex-direction: column;
   background-color: var(--transparent);
@@ -30,6 +31,7 @@
 }
 
 .accordion_body {
+  overflow: visible;
   width: 100%;
   background-color: var(--grey-35);
   pointer-events: auto;

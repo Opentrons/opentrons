@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional
 
 from opentrons.config import (
     feature_flags as ff,
@@ -75,7 +75,7 @@ class RobotServerPyroResource:
         self._deck_configuration_store: Optional["DeckConfigurationStore"] = None
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
-        self._notify_publishers: Optional[Callable[[], None]] = None
+        self._notify_publishers: Optional[Callable[[], Awaitable[None]]] = None
         self._hardware_state_store: Optional["HardwareStateStore"] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
@@ -112,7 +112,9 @@ class RobotServerPyroResource:
         if self._file_provider is None:
             self._file_provider = file_provider
 
-    def set_notify_publishers(self, notify_publishers: Callable[[], None]) -> None:
+    def set_notify_publishers(
+        self, notify_publishers: Callable[[], Awaitable[None]]
+    ) -> None:
         """Set the Notificaiton Publishers of the RobotServerPyroResource, not serialized for remote processes."""
         # todo(chb, 2026-04-24): This is allowed to be overwritten since it will only be set once per run, it has yet to be determined if
         # they need refreshing. Will this cause problems with multi-run situations, like maintenance runs on top of existing runs?
@@ -237,26 +239,6 @@ class RobotServerPyroResource:
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def get_notify_publishers(self) -> Callable[[], None] | None:
-        """Provide a Pyro Proxy for the Notification Publishers callback.
-
-        The returned instance is meant to execute in the Robot Server's process. Of note
-        Notification publishers are only registered with the Pyro Resource for runs created by
-        the Robot Server.
-        """
-
-        if self._notify_publishers:
-
-            def call_soon_notify_publishers() -> None:
-                # Call soon on the thread notification publisher locally executes
-                assert self._notify_publishers is not None
-                self._loop.call_soon_threadsafe(self._notify_publishers)
-
-            return call_soon_notify_publishers
-        else:
-            return None
-
-    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_hardware_state_update_callback(self) -> HardwareEventHandler:
         """Create a callback for hardware events to report to the HardwareStateStore.
 
@@ -282,13 +264,18 @@ class RobotServerPyroResource:
                 "Cannot provide a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
             )
 
-    def get_engine_updates_callback(
+    async def notify_publishers_callback(self) -> None:
+        """A callback for notify publishers to be provided to the run process."""
+        assert self._notify_publishers is not None
+        await self._notify_publishers()
+
+    async def engine_updates_callback(
         self, events: list[EngineEventNotification]
     ) -> None:
         """Update the RunOrchestratorStore local store of Engine state status."""
         orchestrator_store = self._run_orchestrator_store
         if orchestrator_store is not None:
-            orchestrator_store.update_engine_status_callback(events)
+            await orchestrator_store.update_engine_status_callback(events)
 
         else:
             raise RuntimeError(

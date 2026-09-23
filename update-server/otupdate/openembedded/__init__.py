@@ -25,6 +25,7 @@ from otupdate.common import (
     constants,
     control,
     name_management,
+    session,
     ssh_key_management,
     update,
     update_actions,
@@ -103,6 +104,7 @@ async def get_app(
     app.middleware("http")(audit_logger_middleware)
 
     config.install_config(app.state, config_obj)
+    session.install_session_lock(app.state)
     control.install_control(
         app.state,
         boot_id=boot_id,

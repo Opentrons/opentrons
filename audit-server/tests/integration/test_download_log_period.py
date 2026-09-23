@@ -3,6 +3,8 @@ import zipfile
 
 import httpx
 
+from server_utils.audit.audit_server import SubmitSupportingFileMessageData
+
 from ..dev_server import DevServer
 
 
@@ -91,7 +93,24 @@ async def test_download_log_period_not_current(run_server: DevServer) -> None:
         # post a "robot log" to force log period rotation
         response = await client.post(
             f"{run_server.base_url}/audit/internal/storeRobotLog",
-            files={"file": ("robotlog.json", io.BytesIO(b"hi"), "application/json")},
+            files={
+                "file": ("robotlog.json", io.BytesIO(b"hi"), "application/json"),
+                "supporting_info": (
+                    "supporting_info.json",
+                    io.BytesIO(
+                        SubmitSupportingFileMessageData(
+                            fileType="runrecord",
+                            serverId="123123123",
+                            accountName="steve",
+                            legalName="Steve",
+                            reason=None,
+                        )
+                        .model_dump_json()
+                        .encode("utf-8")
+                    ),
+                    "application/json",
+                ),
+            },
         )
         response.raise_for_status()
 

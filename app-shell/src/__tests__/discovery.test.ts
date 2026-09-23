@@ -54,6 +54,7 @@ describe('app-shell/discovery', () => {
     stop: vi.fn(),
     getRobots: vi.fn(),
     removeRobot: vi.fn(),
+    renameRobot: vi.fn(),
   }
 
   const emitListChange = (): void => {
@@ -280,6 +281,22 @@ describe('app-shell/discovery', () => {
     })
 
     expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
+  })
+
+  it('calls client.renameRobot on discovery:RENAME from main window', () => {
+    initializeDiscovery()
+    const handleAction = registerDiscoveryMainWindow(dispatch)
+
+    handleAction({
+      type: 'discovery:RENAME',
+      payload: {
+        prevName: 'old-name',
+        newName: 'new-name',
+      },
+      meta: { shell: true },
+    })
+
+    expect(mockClient.renameRobot).toHaveBeenCalledWith('old-name', 'new-name')
   })
 
   it('unregisterDiscovery removes secondary dispatcher from the set', () => {

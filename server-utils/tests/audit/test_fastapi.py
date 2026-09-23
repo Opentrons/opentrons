@@ -20,6 +20,7 @@ from server_utils.audit.audit_server import (
     StoreRobotLogSuccessData,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
+    SubmitSupportingFileMessageData,
     TotalUsageSummaryData,
 )
 from server_utils.audit.fastapi import (
@@ -76,7 +77,9 @@ def test_install_and_get_audit_client_via_dependency() -> None:
             raise NotImplementedError()
 
         async def store_robot_log(
-            self, robot_log_file: typing.TextIO
+            self,
+            robot_log_file: typing.TextIO,
+            supporting_info: SubmitSupportingFileMessageData,
         ) -> StoreRobotLogSuccessData:
             raise NotImplementedError
 

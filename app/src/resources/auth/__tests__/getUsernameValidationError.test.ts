@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  CREDENTIAL_ALLOWED_CHARACTERS,
-  CREDENTIAL_ALLOWED_PATTERN,
-  CREDENTIAL_SPECIAL_CHARACTERS,
-} from '../credentialCharacters'
+import { SOFTWARE_KEYBOARD_SYMBOLS } from '../credentialCharacters'
 import { getUsernameValidationError } from '../getUsernameValidationError'
 
 describe('getUsernameValidationError', () => {
@@ -32,18 +28,19 @@ describe('getUsernameValidationError', () => {
     expect(getUsernameValidationError('test\tuser')).toBe('invalidCharacters')
   })
 
-  it('accepts letters, digits, and every password punctuation character', () => {
+  it('accepts letters, digits, keyboard symbols, and candidate hanzi', () => {
     expect(getUsernameValidationError('Ada_Lovelace-1')).toBeNull()
     expect(
-      getUsernameValidationError(`user${CREDENTIAL_SPECIAL_CHARACTERS[0]}`)
+      getUsernameValidationError(`user${SOFTWARE_KEYBOARD_SYMBOLS[0]}`)
     ).toBeNull()
-    for (const character of CREDENTIAL_SPECIAL_CHARACTERS) {
-      expect(CREDENTIAL_ALLOWED_CHARACTERS.includes(character)).toBe(true)
-      expect(CREDENTIAL_ALLOWED_PATTERN.test(`a${character}`)).toBe(true)
+    expect(getUsernameValidationError('张伟')).toBeNull()
+    for (const character of SOFTWARE_KEYBOARD_SYMBOLS) {
+      expect(getUsernameValidationError(`a${character}`)).toBeNull()
     }
   })
 
-  it('rejects characters outside the password-compatible allowlist', () => {
+  it('rejects characters outside the software keyboard allowlist', () => {
     expect(getUsernameValidationError('José')).toBe('invalidCharacters')
+    expect(getUsernameValidationError('user`')).toBe('invalidCharacters')
   })
 })

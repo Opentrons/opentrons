@@ -15,7 +15,13 @@ import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/robot-update/selectors', async () => {
+  const actual = await vi.importActual('/app/redux/robot-update/selectors')
+  return {
+    ...actual,
+    getRobotUpdateDisplayInfo: vi.fn(),
+  }
+})
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../../UpdateBuildroot')
 

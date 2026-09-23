@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 
@@ -49,6 +50,8 @@ export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleResetLwModulesOnDeckResult &
   UseHandleValidMoveToMaintenancePositionResult & {
     errorMessage: string | null
+    isDoorOpenError: boolean
+    dismissDoorOpenError: () => void
     isRobotMoving: boolean
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
     home: () => Promise<void>
@@ -59,6 +62,7 @@ export function useLPCCommands(
   props: UseLPCCommandsProps
 ): UseLPCCommandsResult {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isDoorOpenError, setIsDoorOpenError] = useState(false)
   const [isRobotMoving, setIsRobotMoving] = useState(false)
 
   const { chainRunCommands } = useChainMaintenanceCommands(
@@ -77,6 +81,10 @@ export function useLPCCommands(
       commands,
       continuePastCommandFailure
     ).catch((e: Error) => {
+      if (isMaintenanceDoorOpenError(e)) {
+        setIsDoorOpenError(true)
+        return Promise.reject(e)
+      }
       if (!shouldPropogateError) {
         console.error(`Error during LPC command: ${e.message}`)
         setErrorMessage(`Error during LPC command: ${e.message}`)
@@ -91,9 +99,13 @@ export function useLPCCommands(
   const handleJogUtils = useHandleJog({
     ...props,
     setErrorMessage,
+    setIsDoorOpenError,
     chainLPCCommands,
   })
-  const handleConditionalCleanupUtils = useHandleClose(props)
+  const handleConditionalCleanupUtils = useHandleClose({
+    ...props,
+    flushJogAudit: handleJogUtils.flushJogAudit,
+  })
   const handleProbeCommands = useHandleProbeCommands({
     ...props,
     chainLPCCommands,
@@ -119,6 +131,10 @@ export function useLPCCommands(
 
   return {
     errorMessage,
+    isDoorOpenError,
+    dismissDoorOpenError: () => {
+      setIsDoorOpenError(false)
+    },
     isRobotMoving,
     toggleRobotMoving: (isMoving: boolean) =>
       new Promise<void>(resolve => {

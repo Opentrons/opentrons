@@ -30,6 +30,12 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/resources/health/useRobotInitializationStatus')
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: vi.fn(() => true),
+    isLoading: false,
+  }),
+}))
 
 const render = (props: ComponentProps<typeof RobotUpdateProgressModal>) => {
   return renderWithProviders(<RobotUpdateProgressModal {...props} />, {

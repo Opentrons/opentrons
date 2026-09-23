@@ -78,15 +78,19 @@ export function useCreateMaintenanceCommandMutation(
         userNotes
       )
         .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating maintenance runs query: ${e.message}`
-              )
-            })
+          // Jogs are high-frequency, so documenting each press fills the
+          // end-of-flow modal and refetches maintenance runs on every tick.
+          if (command.commandType !== 'moveRelative') {
+            queryClient
+              .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+              .catch((e: Error) => {
+                console.error(
+                  `error invalidating maintenance runs query: ${e.message}`
+                )
+              })
 
-          addActionToDocument(response.data.data)
+            addActionToDocument(response.data.data)
+          }
           return response.data
         })
         .catch((e: any) => {

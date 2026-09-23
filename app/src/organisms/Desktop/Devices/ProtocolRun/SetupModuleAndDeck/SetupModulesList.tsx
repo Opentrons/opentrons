@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
@@ -20,6 +20,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -41,6 +42,7 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
+  getFlexStackerPrepActions,
   getFlexStackerPrepCommands,
   getModuleImage,
   useModuleUSBPort,
@@ -63,7 +65,7 @@ import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -71,7 +73,6 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,
@@ -95,7 +96,6 @@ export const SetupModulesList = (props: SetupModulesListProps): ReactNode => {
   const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { chainLiveCommands } = useChainLiveCommands()
 
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
@@ -147,10 +147,10 @@ export const SetupModulesList = (props: SetupModulesListProps): ReactNode => {
                   heaterShakerModuleFromProtocol={null}
                   isFlex={isFlex}
                   calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
                   conflictedFixture={comboFixtureConflict}
                   deckDef={deckDef}
                   robotName={robotName}
+                  runId={runId}
                   comboFixtureId={comboFixtureId}
                 />
               )
@@ -175,10 +175,10 @@ export const SetupModulesList = (props: SetupModulesListProps): ReactNode => {
               }
               isFlex={isFlex}
               calibrationStatus={calibrationStatus}
-              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture != null}
               deckDef={deckDef}
               robotName={robotName}
+              runId={runId}
             />
           )
         }
@@ -196,13 +196,10 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
-    continuePastCommandFailure: boolean
-  ) => Promise<CommandData[]>
   deckDef: DeckDefinition
   conflictedFixture: boolean
   robotName: string
+  runId: string
   comboFixtureId?: CutoutFixtureId
 }
 
@@ -214,10 +211,10 @@ export function ModulesListItem({
   attachedModuleMatch,
   isFlex,
   calibrationStatus,
-  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
+  runId,
   comboFixtureId,
 }: ModulesListItemProps): ReactNode {
   const { t } = useTranslation([
@@ -237,6 +234,14 @@ export function ModulesListItem({
 
   const { parseModuleUSBPort } = useModuleUSBPort()
 
+  // NOTE (jj 9/4/26): chainLiveCommands is only used here to home this row's Flex Stacker.
+  // If it is ever used to send other commands, this will need updating.
+  const actionsToDocument = useMemo(
+    () => getFlexStackerPrepActions([attachedModuleMatch]),
+    [attachedModuleMatch]
+  )
+  const { chainLiveCommands } = useChainLiveCommands(actionsToDocument, runId)
+
   const handleSetupModuleClick = (): void => {
     if (attachedModuleMatch !== null) {
       handleModuleWizardFlows({
@@ -252,7 +257,11 @@ export function ModulesListItem({
         getFlexStackerPrepCommands(attachedModuleMatch),
         // if the close latch command fails, we still want to home the shuttle
         true
-      )
+      ).catch(error => {
+        if (!isDocumentedMutationError(error)) {
+          console.error(`error homing stacker: ${String(error)}`)
+        }
+      })
     }
   }
 

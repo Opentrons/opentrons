@@ -39,6 +39,12 @@
   flex-direction: column;
 }
 
+.text_area_field_fill textarea {
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+}
+
 .keyboard_container {
   position: fixed;
   right: 0;

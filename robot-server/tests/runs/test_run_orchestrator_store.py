@@ -41,7 +41,7 @@ from robot_server.runs.run_orchestrator_store import (
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -281,6 +281,13 @@ async def test_clear_engine(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
+    subject._run_result = RunResult(
+        commands=await subject._run_coordinator.get_all_commands(),
+        state_summary=await subject._run_coordinator.get_state_summary(),
+        parameters=await subject._run_coordinator.get_run_time_parameters(),
+        command_annotations=await subject._run_coordinator.get_all_command_annotations(),
+        command_preconditions=await subject._run_coordinator.get_preconditions(),
+    )
     engine = subject._run_coordinator._protocol_engine  # type: ignore[union-attr]
     engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
@@ -340,6 +347,13 @@ async def test_clear_idle_engine(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
+    subject._run_result = RunResult(
+        commands=await subject._run_coordinator.get_all_commands(),
+        state_summary=await subject._run_coordinator.get_state_summary(),
+        parameters=await subject._run_coordinator.get_run_time_parameters(),
+        command_annotations=await subject._run_coordinator.get_all_command_annotations(),
+        command_preconditions=await subject._run_coordinator.get_preconditions(),
+    )
 
     await subject.clear()
 

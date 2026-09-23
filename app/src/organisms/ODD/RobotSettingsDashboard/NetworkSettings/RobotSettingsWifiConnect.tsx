@@ -65,7 +65,7 @@ export function RobotSettingsWifiConnect({
       </Flex>
     )
   } else if (isError && error != null) {
-    const isInvalidPassword = error.response?.status === 401
+    const isInvalidPassword = error.response?.status === 400
     const errorMessage =
       error.message != null && error.message.length > 0 ? error.message : null
     return (

@@ -31,23 +31,23 @@ export function ProtocolSetupTitleSkeleton(): ReactNode {
   )
 }
 
+export function ProtocolSetupHeaderButtonSkeleton(): ReactNode {
+  return (
+    <Skeleton
+      height="6.25rem"
+      width="6.25rem"
+      backgroundSize="99rem"
+      borderRadius={BORDERS.borderRadiusFull}
+      fixedBackground
+    />
+  )
+}
+
 export function ProtocolSetupButtonsSkeleton(): ReactNode {
   return (
     <>
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
+      <ProtocolSetupHeaderButtonSkeleton />
+      <ProtocolSetupHeaderButtonSkeleton />
     </>
   )
 }

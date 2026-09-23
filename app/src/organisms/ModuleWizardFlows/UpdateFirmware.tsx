@@ -11,6 +11,8 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -26,6 +28,7 @@ const CHECKING_UPDATE_TIMEOUT_MS = 1000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
 interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
   patchModuleAfterUpdate: (module: AttachedModule) => void
+  robotName: string
 }
 
 export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
@@ -37,6 +40,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
     setIsModuleUpdating,
     isOnDevice,
     sendIdentifyModule,
+    robotName,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -49,6 +53,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
   const [pollForUpdatedModule, setPollForUpdatedModule] = useState(false)
 
   const documentationState = useDocumentationState()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName)
   const {
     updateModule,
     isLoading,
@@ -122,7 +127,11 @@ export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
       if (isLoading) {
         setInProgress(true)
       } else if (isError) {
-        if (error != null && isDocumentedMutationError(error)) {
+        if (
+          error != null &&
+          (isDocumentedMutationError(error) ||
+            isUpdatesWritePermissionError(error))
+        ) {
           setIsModuleUpdating(false)
           setInProgress(false)
           resetUpdateModule()
@@ -151,6 +160,9 @@ export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
   )
 
   const handleUpdateFirmware = (): void => {
+    if (!ensureCanUpdate()) {
+      return
+    }
     setIsModuleUpdating(true)
     updateModule(attachedModule.serialNumber)
   }

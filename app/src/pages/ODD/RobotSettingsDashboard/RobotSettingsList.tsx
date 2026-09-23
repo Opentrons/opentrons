@@ -32,7 +32,10 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import {
+  getRobotUpdateAvailable,
+  isRobotSoftwareUpdateAvailable,
+} from '/app/redux/robot-update'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
@@ -83,7 +86,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const isUpdateAvailable = isRobotSoftwareUpdateAvailable(robotUpdateType)
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const { lightsEnabled, toggleLights } = useLEDLights()
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()

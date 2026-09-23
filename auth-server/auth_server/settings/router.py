@@ -1,3 +1,4 @@
+import logging
 from textwrap import dedent
 from typing import Annotated
 
@@ -25,6 +26,8 @@ from server_utils.fastapi_utils.models.json_api import (
     RequestModel,
     SimpleBody,
 )
+from server_utils.robot.fastapi import get_robot_client
+from server_utils.robot.robot_server import Client as RobotClient
 
 from .models import (
     AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
@@ -41,6 +44,24 @@ from auth_server.users.dependencies import get_user_store
 from auth_server.users.store import UserStore
 
 router = fastapi.APIRouter()
+_log = logging.getLogger(__name__)
+
+_PYRO_FLAGS_ENABLE_ERROR = (
+    "Cannot enable Compliance Ready Software because"
+    " Pyro subprocess flags could not be enabled."
+)
+
+
+async def _enable_pyro_subprocess_flags(robot_client: RobotClient) -> None:
+    """Persist both Pyro subprocess flags, or raise so CRS is not enabled."""
+    try:
+        await robot_client.enable_pyro_subprocess_flags()
+    except Exception as e:
+        _log.exception("Failed to enable pyro subprocess flags before enabling CRS")
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=_PYRO_FLAGS_ENABLE_ERROR,
+        ) from e
 
 
 def _patch_changes_password_complexity(patch: PatchSettingsRequestData) -> bool:
@@ -80,7 +101,12 @@ async def get_access_control_enabled_settings(  # noqa: D103
 @router.patch(
     "/auth/settings/accessControlEnabled",
     summary="Change access control enabled settings",
-    description="Change the access control enabled settings.",
+    description=(
+        "Change the access control enabled settings. Enabling Compliance Ready"
+        " Software also enables the Pyro hardware and protocol subprocess flags."
+        " If those flags cannot be enabled, this request fails and access control"
+        " remains disabled."
+    ),
     dependencies=[
         fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
         fastapi.Depends(get_audit_logger("update CRS enabled")),
@@ -94,8 +120,11 @@ async def patch_access_control_settings(  # noqa: D103
         RequireAuthenticationResult, fastapi.Depends(require_authentication)
     ],
     user_notes: Annotated[str | None, fastapi.Depends(get_supplied_user_notes)],
+    robot_client: Annotated[RobotClient, fastapi.Depends(get_robot_client)],
 ) -> SimpleBody[AccessControlResponseData]:
     """Change the access control enabled settings."""
+    if request_body.data.accessControlEnabled:
+        await _enable_pyro_subprocess_flags(robot_client)
     try:
         accessControlResponseData = settings_store.patch_access_control(
             request_body.data

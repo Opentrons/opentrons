@@ -91,7 +91,7 @@ class LogDataManager:
 
     async def store_robot_log(
         self, robot_log: UploadFile, robot_log_path: Path
-    ) -> str | None:
+    ) -> tuple[str, str] | None:
         """Store a robot log to the active period."""
         if not self._settings.get_logging_enabled():
             return None
@@ -193,7 +193,7 @@ class LogDataManager:
 
     async def _do_store_robot_log(
         self, robot_log: UploadFile, robot_log_dir_path: Path
-    ) -> str:
+    ) -> tuple[str, str]:
         contents_bytes = await robot_log.read()
         contents = contents_bytes.decode("utf-8")
         signed_contents, signing_exec = await self._sign_log(contents, None)
@@ -213,7 +213,7 @@ class LogDataManager:
 
         robot_log_hash = self._store.store_robot_log(signed_contents, robot_log_path)
 
-        return robot_log_hash
+        return robot_log_hash, robot_log_path.name
 
     def _build_system_message(self, action: str, message: str) -> str:
         """Build an audit log message originated by the system.

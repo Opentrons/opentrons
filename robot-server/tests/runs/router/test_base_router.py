@@ -59,6 +59,8 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
+from robot_server.access_control.settings.models import ResponseData
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
@@ -108,7 +110,7 @@ from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_store import RunStore
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -172,6 +174,12 @@ def mock_disk_monitor(decoy: Decoy) -> DiskMonitor:
     return decoy.mock(cls=DiskMonitor)
 
 
+@pytest.fixture
+def mock_access_control_setting_store(decoy: Decoy) -> AccessControlSettingStore:
+    """Get a mock AccessControlSettingStore."""
+    return decoy.mock(cls=AccessControlSettingStore)
+
+
 async def test_create_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
@@ -185,6 +193,7 @@ async def test_create_run(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -259,6 +268,7 @@ async def test_create_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -266,6 +276,112 @@ async def test_create_run(
     assert result.status_code == 201
 
     decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
+
+
+@pytest.mark.parametrize(
+    ("delete_over_max", "expected_auto_delete_calls"),
+    [
+        (False, 0),
+        (True, 1),
+    ],
+)
+async def test_create_run_auto_delete_respects_crs_toggle(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
+    labware_offset_create: pe_types.LegacyLabwareOffsetCreate,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    mock_protocol_store: ProtocolStore,
+    mock_data_files_store: DataFilesStore,
+    mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
+    delete_over_max: bool,
+    expected_auto_delete_calls: int,
+) -> None:
+    """It should skip run auto-delete when CRS is on and the 20-run cap setting is off."""
+    run_id = "run-id"
+    run_created_at = datetime(year=2021, month=1, day=1)
+    expected_response = Run(
+        id=run_id,
+        createdAt=run_created_at,
+        protocolId=None,
+        logPeriodId="123",
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        status=pe_types.EngineStatus.IDLE,
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+    )
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=True)
+    )
+    decoy.when(await mock_audit_client.get_current_log_period()).then_return(
+        GetLogPeriodsData(
+            id="123",
+            startedAt=datetime(year=2021, month=1, day=1),
+            endedAt=None,
+        )
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
+    )
+    decoy.when(mock_access_control_setting_store.get_all()).then_return(
+        ResponseData(deleteOverMaxOnDiskProtocols=delete_over_max)
+    )
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id=run_id,
+            created_at=run_created_at,
+            labware_offsets=[labware_offset_create],
+            deck_configuration=[],
+            camera_provider=mock_camera_provider,
+            protocol=None,
+            run_time_param_values=None,
+            run_time_param_paths=None,
+            notify_publishers=mock_notify_publishers,
+            access_control_status=True,
+            log_period_id="123",
+        )
+    ).then_return(expected_response)
+
+    result = await create_run(
+        request_body=RequestModel(
+            data=RunCreate(labwareOffsets=[labware_offset_create])
+        ),
+        run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
+        run_id=run_id,
+        created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
+        deck_configuration_store=mock_deck_configuration_store,
+        camera_provider=mock_camera_provider,
+        notify_publishers=mock_notify_publishers,
+        protocol_store=mock_protocol_store,
+        audit_client=mock_audit_client,
+        check_estop=True,
+        access_control_status=True,
+        access_control_setting_store=mock_access_control_setting_store,
+        disk_monitor=mock_disk_monitor,
+    )
+
+    assert result.content.data == expected_response
+    assert result.status_code == 201
+    decoy.verify(
+        mock_run_auto_deleter.make_room_for_new_run(), times=expected_auto_delete_calls
+    )
 
 
 async def test_create_protocol_run(
@@ -279,6 +395,7 @@ async def test_create_protocol_run(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -388,6 +505,7 @@ async def test_create_protocol_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -409,6 +527,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -438,6 +557,7 @@ async def test_create_protocol_run_bad_protocol_id(
             check_estop=True,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -457,6 +577,7 @@ async def test_create_run_conflict(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -502,6 +623,7 @@ async def test_create_run_conflict(
             audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=False,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -521,6 +643,7 @@ async def create_run_fails_when_out_of_space_under_acm(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should refuse to create a run when out of space and ACM is enabled."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -551,6 +674,7 @@ async def create_run_fails_when_out_of_space_under_acm(
             audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=True,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -569,6 +693,7 @@ async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -678,6 +803,7 @@ async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -972,6 +1098,7 @@ async def test_update_run_to_not_current(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1018,6 +1145,7 @@ async def test_update_current_none_noop(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1078,6 +1206,7 @@ async def test_update_run_signed_by_and_uncurrent(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=uncurrent_response)
@@ -1110,6 +1239,7 @@ async def test_update_run_not_complete(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1142,6 +1272,7 @@ async def test_update_run_signoff_required(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1174,6 +1305,7 @@ async def test_update_to_current_not_current(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1206,6 +1338,7 @@ async def test_update_to_current_conflict(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1238,6 +1371,7 @@ async def test_update_to_current_missing(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 404
@@ -1267,6 +1401,7 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
                 username="testuser",
                 fullname="Test User",
             ),
+            user_notes=None,
         )
 
     assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
@@ -1317,6 +1452,7 @@ async def test_update_run_signed_by(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)

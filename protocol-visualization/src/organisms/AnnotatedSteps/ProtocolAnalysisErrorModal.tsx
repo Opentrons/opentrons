@@ -24,7 +24,7 @@ export function ProtocolAnalysisErrorModal({
   onClose,
   portalRoot,
 }: ProtocolAnalysisErrorModalProps): ReactNode {
-  const { i18n, t } = useTranslation(['protocol_visualization', 'shared'])
+  const { t } = useTranslation(['protocol_visualization'])
   return createPortal(
     <Modal
       type="error"
@@ -36,13 +36,9 @@ export function ProtocolAnalysisErrorModal({
           <CodeBlock key={error.id}>{error.detail}</CodeBlock>
         ))}
         <div className={styles.button_container}>
-          <PrimaryButton
-            role="button"
-            aria-label="close_analysis_error_modal"
-            onClick={onClose}
-          >
+          <PrimaryButton role="button" onClick={onClose}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {i18n.format(t('shared:close'), 'capitalize')}
+              {t('close')}
             </StyledText>
           </PrimaryButton>
         </div>

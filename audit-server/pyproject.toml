@@ -20,6 +20,7 @@ dependencies = [
     "cryptography==42.0.5",
     "sqlalchemy==2.0.48",
     "alembic==1.18.4",
+    "zipstream-ng==1.9.3",
 ]
 
 [tool.uv.dependency-groups]
@@ -40,6 +41,7 @@ robot = [
     "cryptography==42.0.5",
     "sqlalchemy==2.0.48",
     "alembic==1.18.4",
+    "zipstream-ng==1.9.3",
 ]
 dev = [
     "ruff==0.14.10",
@@ -165,3 +167,7 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
+follow_untyped_imports = true
