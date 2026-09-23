@@ -27,6 +27,7 @@ import type {
   StyleProps,
 } from '@opentrons/components'
 import type {
+  ButtonCategory,
   IconPlacement,
   SmallButtonTypes,
 } from '/app/atoms/buttons/SmallButton'
@@ -38,6 +39,7 @@ export interface ChildNavigationProps extends StyleProps {
   inlineNotification?: InlineNotificationProps
   onClickButton?: MouseEventHandler
   buttonType?: SmallButtonTypes
+  buttonCategory?: ButtonCategory
   buttonIsDisabled?: boolean
   iconName?: IconName
   backIconName?: IconName
@@ -53,6 +55,7 @@ export function ChildNavigation({
   onClickBack,
   onClickButton,
   buttonType = 'primary',
+  buttonCategory,
   iconName,
   backIconName,
   iconPlacement,
@@ -108,7 +111,10 @@ export function ChildNavigation({
 
           <SmallButton
             buttonType={buttonType}
-            buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
+            buttonCategory={
+              buttonCategory ??
+              (buttonType === 'primary' ? 'rounded' : 'default')
+            }
             buttonText={buttonText}
             onClick={onClickButton}
             iconName={iconName}

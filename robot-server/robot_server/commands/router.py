@@ -8,6 +8,7 @@ from opentrons.protocol_engine import CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from opentrons.protocol_runner import RunOrchestrator
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -51,7 +52,10 @@ class CommandNotFound(ErrorDetails):
         status.HTTP_201_CREATED: {"model": SimpleBody[StatelessCommand]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunActive]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("run stateless command")),
+    ],
 )
 async def create_command(
     request_body: RequestModel[StatelessCommandCreate],
@@ -107,7 +111,7 @@ async def create_command(
         command=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
     )
 
-    response_data = cast(StatelessCommand, orchestrator.get_command(command.id))
+    response_data = cast(StatelessCommand, await orchestrator.get_command(command.id))
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -156,7 +160,7 @@ async def get_commands_list(
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
-    cmd_slice = orchestrator.get_command_slice(
+    cmd_slice = await orchestrator.get_command_slice(
         cursor=cursor, length=pageLength, include_fixit_commands=True
     )
     commands = cast(List[StatelessCommand], cmd_slice.commands)
@@ -193,7 +197,7 @@ async def get_command(
         orchestrator: Run orchestrator with commands.
     """
     try:
-        command = orchestrator.get_command(commandId)
+        command = await orchestrator.get_command(commandId)
 
     except CommandDoesNotExistError as e:
         raise CommandNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e

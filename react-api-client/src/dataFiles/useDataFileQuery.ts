@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getDataFile } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { DataFileDataResponse } from '@opentrons/api-client'
@@ -18,7 +18,7 @@ export function useDataFileQuery(
   }
 
   const query = useQuery<DataFileDataResponse>(
-    [host, 'dataFiles', fileId],
+    getQueryKey(host, 'dataFiles', fileId),
     () => getDataFile(host!, fileId).then(response => response.data),
     allOptions
   )

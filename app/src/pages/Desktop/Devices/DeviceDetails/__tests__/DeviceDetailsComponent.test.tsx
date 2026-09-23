@@ -1,7 +1,6 @@
-import { useLocation } from 'react-router-dom'
+import { MemoryRouter, useLocation, useParams } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useEstopQuery } from '@opentrons/react-api-client'
 
@@ -13,11 +12,17 @@ import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtoco
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
 
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
-vi.mock('react-router-dom')
+import type * as ReactRouterDom from 'react-router-dom'
+
+vi.mock('react-router-dom', async () => {
+  const actual =
+    await vi.importActual<typeof ReactRouterDom>('react-router-dom')
+  return { ...actual, useLocation: vi.fn(), useParams: vi.fn() }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
@@ -39,7 +44,9 @@ const mockEstopStatus = {
 
 const render = () => {
   return renderWithProviders(
-    <DeviceDetailsComponent robotName={ROBOT_NAME} />,
+    <MemoryRouter>
+      <DeviceDetailsComponent robotName={ROBOT_NAME} />
+    </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -50,7 +57,7 @@ describe('DeviceDetailsComponent', () => {
   beforeEach(() => {
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEstopStatus } as any)
     vi.mocked(Peripherals).mockReturnValue(<div>MOCK INPUT DEVICES</div>)
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.mocked(useParams).mockReturnValue({})
     vi.mocked(useLocation).mockReturnValue({ hash: 'mock-hash' } as any)
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
   })
@@ -65,7 +72,14 @@ describe('DeviceDetailsComponent', () => {
     )
   })
 
-  it('renders InstrumentsAndModules when a robot is found', () => {
+  it('renders correct tabs when a robot is found', () => {
+    render()
+    screen.getByText('Hardware')
+    screen.getByText('Deck Configuration')
+    screen.getByText('Run History')
+  })
+
+  it('renders InstrumentsAndModules', () => {
     render()
     expect(vi.mocked(InstrumentsAndModules)).toHaveBeenCalledWith(
       {
@@ -76,7 +90,8 @@ describe('DeviceDetailsComponent', () => {
     )
   })
 
-  it('renders RecentProtocolRuns when a robot is found', () => {
+  it('renders RecentProtocolRuns', () => {
+    vi.mocked(useParams).mockReturnValue({ deviceDetailsTab: 'run-history' })
     render()
     expect(vi.mocked(RecentProtocolRuns)).toHaveBeenCalledWith(
       {
@@ -86,8 +101,10 @@ describe('DeviceDetailsComponent', () => {
     )
   })
 
-  it('renders Deck Configuration when a robot is flex', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+  it('renders Deck Configuration', () => {
+    vi.mocked(useParams).mockReturnValue({
+      deviceDetailsTab: 'deck-configuration',
+    })
     render()
     expect(vi.mocked(DeviceDetailsDeckConfiguration)).toHaveBeenCalled()
   })

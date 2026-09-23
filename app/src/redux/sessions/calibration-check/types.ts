@@ -1,5 +1,5 @@
+import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
-import type { Mount } from '../../pipettes/types'
 import type { CalibrationLabware } from '../types'
 // calibration check session types
 
@@ -43,12 +43,10 @@ export type RobotCalibrationCheckStep =
   | typeof CHECK_STEP_CHECK_COMPLETE
 
 export type RobotCalibrationCheckPipetteRank =
-  | typeof CHECK_PIPETTE_RANK_FIRST
-  | typeof CHECK_PIPETTE_RANK_SECOND
+  typeof CHECK_PIPETTE_RANK_FIRST | typeof CHECK_PIPETTE_RANK_SECOND
 
 export type RobotCalibrationCheckStatus =
-  | typeof CHECK_STATUS_IN_THRESHOLD
-  | typeof CHECK_STATUS_OUTSIDE_THRESHOLD
+  typeof CHECK_STATUS_IN_THRESHOLD | typeof CHECK_STATUS_OUTSIDE_THRESHOLD
 
 export interface CalibrationCheckInstrument {
   model: PipetteModel

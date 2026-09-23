@@ -7,7 +7,7 @@ description: "On-deck thermocycler for PCR: block and lid temperatures, profiles
 
 ## Thermocycler features
 
-The [Opentrons Thermocycler Module](https://opentrons.com/products/thermocycler-module-1?sku=991-00114) is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
+The [Opentrons Thermocycler Module](https://opentrons.com/products/thermocycler-module-1?sku=991-00114) is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with other deck-mounted hardware, and is fully supported in the Opentrons OT-2 App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
@@ -36,7 +36,7 @@ The Thermocycler can execute *profiles*: automatically cycling through a sequenc
 
 The Thermocycler is fully programmable in [Protocol Designer](../../protocol-designer/index.md) and the [Python Protocol API](../../python-api/index.md).
 
-Outside of protocols, the Opentrons App can display the current status of the Thermocycler and can directly control the block temperature, lid temperature, and lid position.
+Outside of protocols, the Opentrons OT-2 App can display the current status of the Thermocycler and can directly control the block temperature, lid temperature, and lid position.
 
 ## Thermocycler lid seals
 

@@ -1,0 +1,22 @@
+test_name: logPeriods endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+      - enable_logging
+
+stages:
+  - name: GET /audit/external/logPeriods gets newly-rotated period
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/logPeriods'
+    response:
+      status_code: 200
+      json:
+        data:
+          - id: '1'
+            startedAt: !anystr
+            endedAt: null
+        meta:
+          cursor: 0
+          totalLength: 1

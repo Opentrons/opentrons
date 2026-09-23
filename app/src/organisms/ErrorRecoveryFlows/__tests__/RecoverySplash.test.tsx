@@ -10,6 +10,7 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
+import { DocumentedMutationError } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -173,6 +174,27 @@ describe('RecoverySplash', () => {
 
     await waitFor(() => {
       expect(props.recoveryCommands.homePipetteZAxes).toHaveBeenCalled()
+    })
+  })
+
+  it('should return to the splash when documentation is cancelled during launch', async () => {
+    mockHomePipetteZAxes.mockRejectedValueOnce(
+      new DocumentedMutationError('no_documentation_report')
+    )
+
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Launch recovery mode' })
+    )
+
+    await waitFor(() => {
+      expect(mockToggleERWiz).toHaveBeenCalledWith(true, true)
+    })
+    await waitFor(() => {
+      expect(mockToggleERWiz).toHaveBeenCalledWith(false, false)
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
     })
   })
 

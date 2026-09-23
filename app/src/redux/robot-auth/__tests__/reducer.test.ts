@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   INITIAL_ROBOT_AUTH_STATE,
-  logInOrRefresh,
-  logOutOrTimeOut,
+  logIn,
+  logOut,
+  refreshLogin,
   robotAuthReducer,
+  updateLoggedInUserProfile,
 } from '../slice'
 
 import type { RobotAuthState } from '../slice'
@@ -13,7 +15,10 @@ describe('robotAuthReducer', () => {
   it('uses empty object as initial state', () => {
     expect(
       robotAuthReducer(undefined, { type: 'not-handled' } as any)
-    ).toStrictEqual({})
+    ).toStrictEqual({
+      perRobotAuthStates: {},
+      mostRecentRobotName: null,
+    } satisfies RobotAuthState)
   })
 
   it('handles logins and login refreshes', () => {
@@ -22,100 +27,198 @@ describe('robotAuthReducer', () => {
     // Log in to first robot:
     state = robotAuthReducer(
       INITIAL_ROBOT_AUTH_STATE,
-      logInOrRefresh({
+      logIn({
         robotName: 'testRobotNameA',
-        username: 'testUserA',
+        user: {
+          username: 'testUserA',
+          fullName: 'Test User A',
+          accountType: 'user',
+        },
         accessToken: 'testAccessTokenA',
         refreshToken: 'testRefreshTokenA',
         expiresAt: 1234,
       })
     )
     expect(state).toStrictEqual({
-      testRobotNameA: {
-        username: 'testUserA',
-        accessToken: 'testAccessTokenA',
-        refreshToken: 'testRefreshTokenA',
-        expiresAt: 1234,
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserA',
+            fullName: 'Test User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
       },
-    })
+      mostRecentRobotName: 'testRobotNameA',
+    } satisfies typeof state)
 
     // Log in to second robot:
     state = robotAuthReducer(
       state,
-      logInOrRefresh({
+      logIn({
         robotName: 'testRobotNameB',
-        username: 'testUserB',
+        user: {
+          username: 'testUserB',
+          fullName: 'Test User B',
+          accountType: 'user',
+        },
         accessToken: 'testAccessTokenB',
         refreshToken: null,
         expiresAt: 5678,
       })
     )
     expect(state).toStrictEqual({
-      testRobotNameA: {
-        username: 'testUserA',
-        accessToken: 'testAccessTokenA',
-        refreshToken: 'testRefreshTokenA',
-        expiresAt: 1234,
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserA',
+            fullName: 'Test User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
+        testRobotNameB: {
+          user: {
+            username: 'testUserB',
+            fullName: 'Test User B',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenB',
+          refreshToken: null,
+          expiresAt: 5678,
+        },
       },
-      testRobotNameB: {
-        username: 'testUserB',
-        accessToken: 'testAccessTokenB',
-        refreshToken: null,
-        expiresAt: 5678,
-      },
-    })
+      mostRecentRobotName: 'testRobotNameB',
+    } satisfies typeof state)
 
     // Refresh login for first robot:
     state = robotAuthReducer(
       state,
-      logInOrRefresh({
+      refreshLogin({
         robotName: 'testRobotNameA',
-        username: 'testUserARefreshed',
+        user: {
+          username: 'testUserARefreshed',
+          fullName: 'Test User A',
+          accountType: 'user',
+        },
         accessToken: 'testAccessTokenARefreshed',
         refreshToken: 'testRefreshTokenARefreshed',
         expiresAt: 4321,
       })
     )
     expect(state).toStrictEqual({
-      testRobotNameA: {
-        username: 'testUserARefreshed',
-        accessToken: 'testAccessTokenARefreshed',
-        refreshToken: 'testRefreshTokenARefreshed',
-        expiresAt: 4321,
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserARefreshed',
+            fullName: 'Test User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenARefreshed',
+          refreshToken: 'testRefreshTokenARefreshed',
+          expiresAt: 4321,
+        },
+        testRobotNameB: {
+          user: {
+            username: 'testUserB',
+            fullName: 'Test User B',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenB',
+          refreshToken: null,
+          expiresAt: 5678,
+        },
       },
-      testRobotNameB: {
-        username: 'testUserB',
-        accessToken: 'testAccessTokenB',
-        refreshToken: null,
-        expiresAt: 5678,
-      },
-    })
+      mostRecentRobotName: 'testRobotNameA',
+    } satisfies typeof state)
   })
 
-  it('handles logouts', () => {
+  it('updates the logged-in user profile without changing session tokens', () => {
     const initialState: RobotAuthState = {
-      testRobotNameA: {
-        username: 'testUserA',
-        accessToken: 'testAccessTokenA',
-        refreshToken: 'testRefreshTokenA',
-        expiresAt: 1234,
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserA',
+            fullName: 'Test User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
       },
-      testRobotNameB: {
-        username: 'testUserB',
-        accessToken: 'testAccessTokenB',
-        refreshToken: 'testRefreshTokenB',
-        expiresAt: 5678,
-      },
+      mostRecentRobotName: 'testRobotNameA',
     }
 
     const newState = robotAuthReducer(
       initialState,
-      logOutOrTimeOut({
+      updateLoggedInUserProfile({
+        robotName: 'testRobotNameA',
+        username: 'testUserAUpdated',
+        fullName: 'Updated User A',
+      })
+    )
+
+    expect(newState).toStrictEqual({
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserAUpdated',
+            fullName: 'Updated User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
+      },
+      mostRecentRobotName: 'testRobotNameA',
+    } satisfies typeof newState)
+  })
+
+  it('handles logouts', () => {
+    const initialState: RobotAuthState = {
+      perRobotAuthStates: {
+        testRobotNameA: {
+          user: {
+            username: 'testUserA',
+            fullName: 'Test User A',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
+        testRobotNameB: {
+          user: {
+            username: 'testUserB',
+            fullName: 'Test User B',
+            accountType: 'user',
+          },
+          accessToken: 'testAccessTokenB',
+          refreshToken: 'testRefreshTokenB',
+          expiresAt: 5678,
+        },
+      },
+      mostRecentRobotName: 'testRobotNameB',
+    }
+
+    const newState = robotAuthReducer(
+      initialState,
+      logOut({
         robotName: 'testRobotNameB',
       })
     )
     expect(newState).toStrictEqual({
-      testRobotNameA: initialState.testRobotNameA,
-    })
+      perRobotAuthStates: {
+        testRobotNameA: initialState.perRobotAuthStates.testRobotNameA,
+      },
+      mostRecentRobotName: 'testRobotNameB',
+    } satisfies typeof newState)
   })
 })

@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from 'react-query'
 
 import { getCurrentSubsystemUpdate } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
@@ -17,7 +17,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
   const host = useHost()
   const queryClient = useQueryClient()
   const query = useQuery<SubsystemUpdateProgressData, TError>(
-    [host, '/subsystems/updates/current', subsystem],
+    getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
     () =>
       getCurrentSubsystemUpdate(host!, subsystem as Subsystem).then(
         response => response.data
@@ -26,7 +26,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
       enabled: host !== null,
       onError: () => {
         queryClient.setQueryData(
-          [host, '/subsystems/updates/current', subsystem],
+          getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
           undefined
         )
       },

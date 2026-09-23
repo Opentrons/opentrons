@@ -159,9 +159,9 @@ async def test_create_play_action_to_resume(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
+    decoy.when(await mock_run_orchestrator_store.run_was_started()).then_return(True)
 
-    result = subject.create_action(
+    result = await subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.PLAY,
         created_at=datetime(year=2021, month=1, day=1),
@@ -175,7 +175,7 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_run_orchestrator_store.play(), times=1)
+    decoy.verify(await mock_run_orchestrator_store.play(), times=1)
     decoy.verify(await mock_run_orchestrator_store.run(deck_configuration=[]), times=0)
 
 
@@ -195,9 +195,9 @@ async def test_create_play_action_to_start(
     subject: RunController,
 ) -> None:
     """It should start a run."""
-    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(False)
+    decoy.when(await mock_run_orchestrator_store.run_was_started()).then_return(False)
 
-    result = subject.create_action(
+    result = await subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.PLAY,
         created_at=datetime(year=2021, month=1, day=1),
@@ -266,7 +266,7 @@ async def test_create_play_action_to_start(
     )
 
 
-def test_create_pause_action(
+async def test_create_pause_action(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
@@ -274,7 +274,7 @@ def test_create_pause_action(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    result = subject.create_action(
+    result = await subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.PAUSE,
         created_at=datetime(year=2021, month=1, day=1),
@@ -288,10 +288,10 @@ def test_create_pause_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_run_orchestrator_store.pause(), times=1)
+    decoy.verify(await mock_run_orchestrator_store.pause(), times=1)
 
 
-def test_create_stop_action(
+async def test_create_stop_action(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
@@ -300,7 +300,7 @@ def test_create_stop_action(
     subject: RunController,
 ) -> None:
     """It should resume a run."""
-    result = subject.create_action(
+    result = await subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.STOP,
         created_at=datetime(year=2021, month=1, day=1),
@@ -317,7 +317,7 @@ def test_create_stop_action(
     decoy.verify(mock_task_runner.run(mock_run_orchestrator_store.stop), times=1)
 
 
-def test_create_resume_from_recovery_action(
+async def test_create_resume_from_recovery_action(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
@@ -326,7 +326,7 @@ def test_create_resume_from_recovery_action(
     subject: RunController,
 ) -> None:
     """It should call `resume_from_recovery()` on the underlying engine store."""
-    result = subject.create_action(
+    result = await subject.create_action(
         action_id="some-action-id",
         action_type=RunActionType.RESUME_FROM_RECOVERY,
         created_at=datetime(year=2021, month=1, day=1),
@@ -341,7 +341,9 @@ def test_create_resume_from_recovery_action(
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
     decoy.verify(
-        mock_run_orchestrator_store.resume_from_recovery(reconcile_false_positive=False)
+        await mock_run_orchestrator_store.resume_from_recovery(
+            reconcile_false_positive=False
+        )
     )
 
 
@@ -364,12 +366,12 @@ async def test_action_not_allowed(
     exception: Exception,
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
-    decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
-    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
-    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(await mock_run_orchestrator_store.run_was_started()).then_return(True)
+    decoy.when(await mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(await mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
-        subject.create_action(
+        await subject.create_action(
             action_id="whatever",
             action_type=action_type,
             created_at=datetime(year=2021, month=1, day=1),

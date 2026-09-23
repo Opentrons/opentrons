@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -26,12 +25,12 @@ import {
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
-  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
@@ -118,7 +117,8 @@ const QuickTransferHeader = ({
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -127,13 +127,15 @@ const QuickTransferHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isTransferFetching ? (
@@ -159,23 +161,25 @@ const QuickTransferHeader = ({
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunTransfer()
-          trackEventWithRobotSerial({
-            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
-            properties: {
-              name: title,
-            },
-          })
-        }}
-        buttonText={t('start_setup')}
-        disabled={isTransferFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={() => {
+            setStartSetup(true)
+            handleRunTransfer()
+            trackEventWithRobotSerial({
+              name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+              properties: {
+                name: title,
+              },
+            })
+          }}
+          buttonText={t('start_setup')}
+          disabled={isTransferFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -306,9 +310,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   )
 
   const dispatch = useDispatch<Dispatch>()
-  const host = useHost()
   const { makeSnackbar } = useToaster()
-  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
@@ -324,14 +326,9 @@ export function QuickTransferDetails(): JSX.Element | null {
 
   let pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
   const pinned = pinnedTransferIds.includes(transferId)
+  const documentationState = useDocumentationState()
 
-  const { createRun } = useCreateRunMutation({
-    onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
-    },
-  })
+  const { createRun } = useCreateRunMutation(documentationState)
 
   const handlePinClick = (): void => {
     if (!pinned) {

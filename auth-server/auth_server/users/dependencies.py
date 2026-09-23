@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.engine import Engine as SQLEngine
 
 from server_utils.fastapi_utils.app_state import (
@@ -13,8 +13,9 @@ from server_utils.fastapi_utils.app_state import (
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
 from auth_server.settings.store import SettingsStore, get_settings_store
+from auth_server.users.models import UserResponse
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import UserDataManager
+from auth_server.users.user_data_manager import UserDataManager, UserNotFoundError
 
 _user_store_accessor = AppStateAccessor[UserStore]("user_store")
 
@@ -39,3 +40,17 @@ async def get_user_data_manager(
 ) -> UserDataManager:
     """Get a UserDataManager backed by the singleton UserStore."""
     return UserDataManager(user_store=user_store, settings_store=settings_store)
+
+
+async def get_user_by_username(
+    username: str,
+    user_data_manager: Annotated[UserDataManager, Depends(get_user_data_manager)],
+) -> UserResponse:
+    """Load the user named in the URL path, or raise HTTP 404."""
+    try:
+        return user_data_manager.get_user(username)
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )

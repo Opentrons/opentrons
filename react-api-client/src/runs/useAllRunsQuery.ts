@@ -2,18 +2,13 @@ import { useQuery } from 'react-query'
 
 import { getRuns } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { GetRunsParams, HostConfig, Runs } from '@opentrons/api-client'
 
-export type UseAllRunsQueryOptions = UseQueryOptions<
-  Runs,
-  AxiosError,
-  Runs,
-  Array<string | HostConfig>
->
+export type UseAllRunsQueryOptions = UseQueryOptions<Runs, AxiosError>
 
 /**
  * @property {HostConfig | null | undefined} hostOverride:
@@ -27,7 +22,7 @@ export function useAllRunsQuery(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  let queryKey = [host!, 'runs', 'details']
+  let queryKey = getQueryKey(host, 'runs', 'details')
   if (params?.pageLength != null) {
     queryKey = [...queryKey, String(params.pageLength)]
   }

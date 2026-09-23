@@ -26,7 +26,7 @@ export function useActivityListener(
 ): void {
   useEffect(() => {
     events.forEach(event => {
-      document.addEventListener(event, onActivity)
+      document.addEventListener(event, onActivity, { passive: true })
     })
 
     return () => {

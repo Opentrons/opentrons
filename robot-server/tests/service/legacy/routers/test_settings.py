@@ -24,6 +24,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.hardware import get_robot_type_enum
 from robot_server.persistence.fastapi_dependencies import (
     get_images_resetter,
     get_persistence_resetter,
@@ -33,12 +34,17 @@ from robot_server.persistence.images_directory import ImagesResetter
 
 def test_get_robot_settings(api_client, hardware):
     Conf = make_dataclass("Conf", ["a", "b", "c"])
-    hardware.config = Conf(a="test", b="this", c=5)
+
+    async def _dummy_return_config(*args, **kwargs):
+        return Conf(a="test", b="this", c=5)
+
+    hardware.update_config.side_effect = _dummy_return_config
 
     res = api_client.get("/settings/robot")
 
     assert res.status_code == 200
     assert res.json() == {"a": "test", "b": "this", "c": 5}
+    hardware.update_config.assert_called_once_with()
 
 
 @pytest.fixture
@@ -794,3 +800,24 @@ def test_set(api_client, mock_set_adv_setting, mock_is_restart_required):
     assert resp.status_code == 200
     validate_response_body(body, None)
     mock_set_adv_setting.assert_called_once_with(test_id, True)
+
+
+def test_enable_hardware_subprocess_persists_without_live_transition(
+    api_client, mock_set_adv_setting, mock_is_restart_required
+):
+    """Enabling Pyro must persist the flag even if subprocess hardware is not up."""
+    mock_is_restart_required.return_value = True
+
+    async def _flex_robot_type() -> RobotTypeEnum:
+        return RobotTypeEnum.FLEX
+
+    app.dependency_overrides[get_robot_type_enum] = _flex_robot_type
+    try:
+        resp = api_client.post(
+            "/settings", json={"id": "enableHardwareSubprocess", "value": True}
+        )
+    finally:
+        del app.dependency_overrides[get_robot_type_enum]
+
+    assert resp.status_code == 200
+    mock_set_adv_setting.assert_called_once_with("enableHardwareSubprocess", True)

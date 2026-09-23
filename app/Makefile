@@ -100,8 +100,8 @@ dev-shell-odd:
 
 .PHONY: test
 test:
-	make -C .. test-js-app tests="$(tests)" test_opts="$(test_opts)"
+	$(MAKE) -C .. test-js-app tests="$(tests)" test_opts="$(test_opts)"
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-app tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-app tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

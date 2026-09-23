@@ -5,6 +5,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.actions.action_handler import ActionHandler
 from opentrons.protocol_engine.actions.actions import (
     Action,
+    BeginAwaitingRecoveryAction,
     FailCommandAction,
     ResumeFromRecoveryAction,
 )
@@ -86,9 +87,16 @@ def _get_state_update(action: Action) -> update_types.StateUpdate | None:
         case ResumeFromRecoveryAction(state_update=state_update):
             return state_update
 
-        case FailCommandAction(
-            error=DefinedErrorData(
-                state_update_if_false_positive=state_update_if_false_positive
+        case (
+            FailCommandAction(
+                error=DefinedErrorData(
+                    state_update_if_false_positive=state_update_if_false_positive
+                )
+            )
+            | BeginAwaitingRecoveryAction(
+                error=DefinedErrorData(
+                    state_update_if_false_positive=state_update_if_false_positive
+                )
             )
         ):
             return (

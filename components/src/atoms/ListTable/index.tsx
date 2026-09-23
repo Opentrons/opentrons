@@ -60,9 +60,11 @@ const TABLE_STYLE = css`
 //  column spacing to be opinionated. Various component designs conflict with feature designs (ex, LPC).
 const trStyle = (numHeaders: number): FlattenSimpleInterpolation => css`
   display: ${DISPLAY_GRID};
-  grid-template-columns: ${numHeaders === 3
-    ? `${FLEX_MAX_CONTENT} 1fr ${FLEX_MAX_CONTENT}`
-    : `repeat(${numHeaders}, 1fr)`};
+  grid-template-columns: ${
+    numHeaders === 3
+      ? `${FLEX_MAX_CONTENT} 1fr ${FLEX_MAX_CONTENT}`
+      : `repeat(${numHeaders}, 1fr)`
+  };
   gap: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

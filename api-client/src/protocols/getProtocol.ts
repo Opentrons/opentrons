@@ -8,5 +8,5 @@ export function getProtocol(
   config: HostConfig,
   protocolId: string
 ): ResponsePromise<Protocol> {
-  return request<Protocol>(GET, `/protocols/${protocolId}`, null, config)
+  return request<Protocol>(GET, `/protocols/${protocolId}`, config)
 }

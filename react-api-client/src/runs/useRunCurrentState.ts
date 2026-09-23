@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getRunCurrentState } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -18,7 +18,7 @@ export function useRunCurrentState(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
   return useQuery<RunCurrentState, AxiosError>(
-    [host, 'runs', runId, 'currentState'],
+    getQueryKey(host, 'runs', runId, 'currentState'),
     () => getRunCurrentState(host!, runId!).then(response => response.data),
     {
       enabled: host != null && runId != null && options.enabled !== false,

@@ -7,7 +7,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { CommandIcon } from '../../molecules/CommandIcon'
 import styles from './annotatedsteps.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -58,7 +58,7 @@ export function IndividualCommand({
   commandNumber,
   scrollTargetId,
   listElement,
-}: IndividualCommandProps): JSX.Element {
+}: IndividualCommandProps): ReactNode {
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 

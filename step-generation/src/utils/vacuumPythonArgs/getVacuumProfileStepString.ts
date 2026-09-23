@@ -33,22 +33,22 @@ const _getVacuumProfileAtomicStepString = (
 ): string => {
   const { holdSeconds, ventAfter } = step
   const baseDict = {
+    enable_pump: true,
     hold_time_seconds: holdSeconds,
     ...(ventAfter != null ? { vent_after: ventAfter } : {}),
   }
   if ('gaugePressureMbar' in step) {
     const { gaugePressureMbar } = step
     return formatPyDict({
-      gauge_pressure: gaugePressureMbar,
+      gauge_pressure_mbar: gaugePressureMbar,
       ...baseDict,
       vent_after: ventAfter,
     })
   }
   const { percentPower } = step
   return formatPyDict({
-    power_percent: Number(percentPower),
+    percent_power: Number(percentPower),
     ...baseDict,
-    vent_after: ventAfter,
   })
 }
 
@@ -59,7 +59,7 @@ export const getVacuumProfileStepString = (
   let repetitionsArg: string
   if (profile.length === 1 && 'repetitions' in profile[0]) {
     const { steps, repetitions } = profile[0]
-    profileArg = `profile=[\n${indentPyLines(
+    profileArg = `steps=[\n${indentPyLines(
       steps
         .map((step, i) => {
           if (i === steps.length - 1) {
@@ -73,7 +73,7 @@ export const getVacuumProfileStepString = (
     return [profileArg, repetitionsArg]
   }
   const atomicProfileSteps = _getAtomicVacuumProfileSteps(profile)
-  profileArg = `profile=[\n${indentPyLines(
+  profileArg = `steps=[\n${indentPyLines(
     atomicProfileSteps
       .map((step, i) => {
         if (i === atomicProfileSteps.length - 1) {

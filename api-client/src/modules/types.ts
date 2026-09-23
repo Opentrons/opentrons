@@ -84,3 +84,7 @@ export interface Modules {
   data: AttachedModule[]
   meta: ModulesMeta
 }
+
+export interface UpdateModuleResponse {
+  message: string
+}

@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
@@ -20,6 +22,7 @@ import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
+import { RobotOutOfStorageModal } from '../../../../RobotOutOfStorageModal.tsx'
 import { getFallbackRobotSerialNumber } from '../../utils'
 import { useActionButtonProperties } from './hooks'
 
@@ -67,6 +70,9 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
 
   const { buttonText, handleButtonClick, buttonIconName } =
     useActionButtonProperties({
@@ -83,34 +89,46 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       isRobotOnWrongVersionOfSoftware,
       areCameraPreferencesConfirmed,
       isCameraReadyToRun,
+      setShowRobotOutOfStorageModal,
       ...props,
     })
   return (
-    <PrimaryButton
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      boxShadow="none"
-      display={DISPLAY_FLEX}
-      onClick={handleButtonClick}
-      id="ProtocolRunHeader_runControlButton"
-      borderRadius={BORDERS.borderRadiusFull}
-      gap={buttonIconName != null ? SPACING.spacing8 : 0}
-    >
-      {buttonIconName != null ? (
-        <Icon
-          name={buttonIconName}
-          size="1rem"
-          spin={
-            isProtocolNotReady ||
-            runStatus === RUN_STATUS_STOP_REQUESTED ||
-            isResetRunLoadingRef.current ||
-            isClosingCurrentRun
-          }
+    <>
+      {showRobotOutOfStorageModal ? (
+        <RobotOutOfStorageModal
+          onConfirm={() => {
+            navigate(`/devices/${robotName}/robot-settings/file-manager`)
+          }}
+          onClose={() => {
+            setShowRobotOutOfStorageModal(false)
+          }}
         />
       ) : null}
-      <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
-        {buttonText}
-      </StyledText>
-    </PrimaryButton>
+      <PrimaryButton
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        boxShadow="none"
+        display={DISPLAY_FLEX}
+        onClick={handleButtonClick}
+        borderRadius={BORDERS.borderRadiusFull}
+        gap={buttonIconName != null ? SPACING.spacing8 : 0}
+      >
+        {buttonIconName != null ? (
+          <Icon
+            name={buttonIconName}
+            size="1rem"
+            spin={
+              isProtocolNotReady ||
+              runStatus === RUN_STATUS_STOP_REQUESTED ||
+              isResetRunLoadingRef.current ||
+              isClosingCurrentRun
+            }
+          />
+        ) : null}
+        <StyledText desktopStyle="bodyDefaultSemiBold" whiteSpace={NO_WRAP}>
+          {buttonText}
+        </StyledText>
+      </PrimaryButton>
+    </>
   )
 }

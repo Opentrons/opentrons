@@ -10,7 +10,7 @@ Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left–right
 <figcaption>Robot calibration</figcaption>
 </figure>
 
-During robot calibration, the Opentrons App automatically takes you through all these procedures in the sequence listed here:
+During robot calibration, the Opentrons OT-2 App automatically takes you through all these procedures in the sequence listed here:
 
 1. **Deck calibration:** The foundation. This process maps the deck to the gantry.
 2. **Tip length calibration:** Measures the distance from the nozzle of the pipette to the tip.
@@ -29,7 +29,7 @@ Deck calibration helps the OT-2 understand deck location and size. This calibrat
   <tbody>
     <tr>
       <th>How it works</th>
-      <td>During deck calibration, the Opentrons App shows you how to use the <a href="../jog-controls/">jog controls</a> to move the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of these marks on the deck.</td>
+      <td>During deck calibration, the Opentrons OT-2 App shows you how to use the <a href="../jog-controls/">jog controls</a> to move the pipette to specific reference points precision-engraved into the deck surface. The robot measures the motor steps required to reach each point and performs calculations to match its internal coordinate system to the actual location of these marks on the deck.</td>
     </tr>
     <tr>
       <th>When to calibrate</th>
@@ -93,11 +93,11 @@ Pipette offset calibration calculates the precise X, Y, and Z position of the pi
 
 ## Running robot calibrations
 
-The calibration controls are located in the Robot Settings section of the Opentrons App. To calibrate your OT-2:
+The calibration controls are located in the Robot Settings section of the Opentrons OT-2 App. To calibrate your OT-2:
 
 <div class="instruction-list" markdown>
 
-1. Click the **Devices** tab in the Opentrons App.
+1. Click the **Devices** tab in the Opentrons OT-2 App.
 
 2. Find your OT-2 in the devices list and click on it to open the robot details page.
 

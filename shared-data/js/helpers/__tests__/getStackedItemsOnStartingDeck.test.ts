@@ -328,38 +328,6 @@ const MOCK_LOAD_LABWARE_B1_COMMAND: LoadLabwareRunTimeCommand = {
   },
 } as LoadLabwareRunTimeCommand
 
-const MOCK_LOAD_LABWARE_FIRST_COMMAND: LoadLabwareRunTimeCommand = {
-  id: 'cmd-1',
-  commandType: 'loadLabware',
-  params: {
-    location: { slotName: SLOT_NAME },
-    loadName: 'mock_labware',
-    namespace: 'mock',
-    version: 1,
-  },
-  result: {
-    labwareId: 'first-labware',
-    definition: MOCK_LABWARE_DEF,
-    locationSequence: [{ kind: 'onCutoutFixture', cutoutId: CUTOUT_ID as any }],
-  },
-} as LoadLabwareRunTimeCommand
-
-const MOCK_LOAD_LABWARE_SECOND_COMMAND = {
-  id: 'cmd-2',
-  commandType: 'loadLabware',
-  params: {
-    location: { slotName: SLOT_NAME },
-    loadName: 'mock_labware',
-    namespace: 'mock',
-    version: 1,
-  },
-  result: {
-    labwareId: 'second-labware',
-    definition: MOCK_LABWARE_DEF,
-    locationSequence: [{ kind: 'onCutoutFixture', cutoutId: CUTOUT_ID as any }],
-  },
-} as any
-
 describe('getStackedItemsOnStartingDeck', () => {
   beforeEach(() => {
     vi.mocked(getLabwareDefURI).mockImplementation(def => {
@@ -413,11 +381,13 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     expect(result).toEqual({
       A1: [
-        {
-          labwareId: LABWARE_ID,
-          definitionUri: 'mock:labware/1',
-          displayName: 'Mock Definition',
-        },
+        [
+          {
+            labwareId: LABWARE_ID,
+            definitionUri: 'mock:labware/1',
+            displayName: 'Mock Definition',
+          },
+        ],
       ],
     })
   })
@@ -429,7 +399,7 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
-    expect(result[SLOT_NAME][0]).toEqual(
+    expect(result[SLOT_NAME][0][0]).toEqual(
       expect.objectContaining({
         displayName: 'Custom Labware Name',
       })
@@ -443,11 +413,13 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     expect(result).toEqual({
       A1: [
-        {
-          labwareId: LABWARE_ID,
-          definitionUri: 'mock:labware/1',
-          displayName: 'Mock Definition',
-        },
+        [
+          {
+            labwareId: LABWARE_ID,
+            definitionUri: 'mock:labware/1',
+            displayName: 'Mock Definition',
+          },
+        ],
       ],
     })
   })
@@ -460,7 +432,7 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
-    expect(result[SLOT_NAME][0]).toEqual(
+    expect(result[SLOT_NAME][0][0]).toEqual(
       expect.objectContaining({
         lidId: LID_ID,
         lidDisplayName: 'Mock Lid',
@@ -483,16 +455,18 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, loadedLabware, [])
 
     expect(result[SLOT_NAME]).toEqual([
-      {
-        labwareId: LABWARE_ID,
-        definitionUri: 'mock:labware/1',
-        displayName: 'Mock Definition',
-      },
-      {
-        labwareId: ADAPTER_ID,
-        definitionUri: 'mock:adapter/1',
-        displayName: 'Mock Adapter',
-      },
+      [
+        {
+          labwareId: LABWARE_ID,
+          definitionUri: 'mock:labware/1',
+          displayName: 'Mock Definition',
+        },
+        {
+          labwareId: ADAPTER_ID,
+          definitionUri: 'mock:adapter/1',
+          displayName: 'Mock Adapter',
+        },
+      ],
     ])
   })
 
@@ -511,16 +485,18 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], loadedModules)
 
     expect(result[SLOT_NAME]).toEqual([
-      {
-        labwareId: LABWARE_ID,
-        definitionUri: 'mock:labware/1',
-        displayName: 'Mock Definition',
-      },
-      {
-        moduleId: MODULE_ID,
-        moduleModel: 'heaterShakerModuleV1',
-        moduleSlotName: SLOT_NAME,
-      },
+      [
+        {
+          labwareId: LABWARE_ID,
+          definitionUri: 'mock:labware/1',
+          displayName: 'Mock Definition',
+        },
+        {
+          moduleId: MODULE_ID,
+          moduleModel: 'heaterShakerModuleV1',
+          moduleSlotName: SLOT_NAME,
+        },
+      ],
     ])
   })
 
@@ -539,7 +515,7 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], loadedModules)
 
     expect(result[TC_MODULE_LOCATION_OT2]).toBeDefined()
-    expect(result[TC_MODULE_LOCATION_OT2][1]).toEqual({
+    expect(result[TC_MODULE_LOCATION_OT2][0][1]).toEqual({
       moduleId: MODULE_ID,
       moduleModel: THERMOCYCLER_MODULE_V1,
       moduleSlotName: '7',
@@ -569,11 +545,13 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
     expect(result.offDeck).toEqual([
-      {
-        labwareId: LABWARE_ID,
-        definitionUri: 'mock:labware/1',
-        displayName: 'Mock Definition',
-      },
+      [
+        {
+          labwareId: LABWARE_ID,
+          definitionUri: 'mock:labware/1',
+          displayName: 'Mock Definition',
+        },
+      ],
     ])
   })
 
@@ -585,7 +563,7 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
-    expect(result.offDeck[0]).toEqual(
+    expect(result.offDeck[0][0]).toEqual(
       expect.objectContaining({
         lidId: LID_ID,
         lidDisplayName: 'Mock Lid',
@@ -599,21 +577,23 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
     expect(result[SLOT_NAME]).toEqual([
-      {
-        labwareId: 'lid-3',
-        definitionUri: 'mock:lid/1',
-        displayName: 'Mock Lid',
-      },
-      {
-        labwareId: 'lid-2',
-        definitionUri: 'mock:lid/1',
-        displayName: 'Mock Lid',
-      },
-      {
-        labwareId: 'lid-1',
-        definitionUri: 'mock:lid/1',
-        displayName: 'Mock Lid',
-      },
+      [
+        {
+          labwareId: 'lid-3',
+          definitionUri: 'mock:lid/1',
+          displayName: 'Mock Lid',
+        },
+        {
+          labwareId: 'lid-2',
+          definitionUri: 'mock:lid/1',
+          displayName: 'Mock Lid',
+        },
+        {
+          labwareId: 'lid-1',
+          definitionUri: 'mock:lid/1',
+          displayName: 'Mock Lid',
+        },
+      ],
     ])
   })
 
@@ -623,16 +603,18 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
     expect(result.offDeck).toEqual([
-      {
-        labwareId: 'lid-1',
-        definitionUri: 'mock:lid/1',
-        displayName: 'Mock Lid',
-      },
-      {
-        labwareId: 'lid-2',
-        definitionUri: 'mock:lid/1',
-        displayName: 'Mock Lid',
-      },
+      [
+        {
+          labwareId: 'lid-1',
+          definitionUri: 'mock:lid/1',
+          displayName: 'Mock Lid',
+        },
+        {
+          labwareId: 'lid-2',
+          definitionUri: 'mock:lid/1',
+          displayName: 'Mock Lid',
+        },
+      ],
     ])
   })
 
@@ -666,17 +648,5 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     expect(Object.keys(result)).toContain('A1')
     expect(Object.keys(result)).toContain('B1')
-  })
-
-  it('skips duplicate locations', () => {
-    const commands: RunTimeCommand[] = [
-      MOCK_LOAD_LABWARE_FIRST_COMMAND,
-      MOCK_LOAD_LABWARE_SECOND_COMMAND,
-    ]
-
-    const result = getStackedItemsOnStartingDeck(commands, [], [])
-
-    expect(result[SLOT_NAME]).toHaveLength(1)
-    expect((result[SLOT_NAME][0] as any).labwareId).toBe('second-labware')
   })
 })

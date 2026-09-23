@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createProtocol } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -17,6 +18,7 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export interface CreateProtocolVariables {
   files: File[]
@@ -44,6 +46,7 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolMutation(
+  documentationState: DocumentationState,
   options: UseCreateProtocolMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
@@ -52,18 +55,23 @@ export function useCreateProtocolMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     Protocol,
     AxiosError<ErrorResponse>,
     CreateProtocolVariables
   >(
-    [host, 'protocols'],
+    documentationState,
+    ['create_protocol'],
+    getQueryKey(host, 'protocols'),
     ({
-      files: protocolFiles,
-      protocolKey,
-      protocolKind = 'standard',
-      runTimeParameterValues,
-      runTimeParameterFiles,
+      variables: {
+        files: protocolFiles,
+        protocolKey,
+        protocolKind = 'standard',
+        runTimeParameterValues,
+        runTimeParameterFiles,
+      },
+      userNotes,
     }) =>
       createProtocol(
         host!,
@@ -71,15 +79,16 @@ export function useCreateProtocolMutation(
         protocolKey,
         protocolKind,
         runTimeParameterValues,
-        runTimeParameterFiles
+        runTimeParameterFiles,
+        userNotes
       )
         .then(response => {
           const protocolId = response.data.data.id
           queryClient
-            .invalidateQueries([host, 'protocols'])
+            .invalidateQueries(getQueryKey(host, 'protocols'))
             .then(() =>
               queryClient.setQueryData(
-                [host, 'protocols', protocolId],
+                getQueryKey(host, 'protocols', protocolId),
                 response.data
               )
             )

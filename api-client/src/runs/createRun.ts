@@ -19,7 +19,11 @@ export interface CreateRunData {
 
 export function createRun(
   config: HostConfig,
-  data: CreateRunData = {}
+  data: CreateRunData = {},
+  userNotes?: string
 ): ResponsePromise<Run> {
-  return request<Run, { data: CreateRunData }>(POST, '/runs', { data }, config)
+  return request<Run, { data: CreateRunData }>(POST, '/runs', config, {
+    body: { data },
+    userNotes,
+  })
 }

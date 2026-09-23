@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getCommands } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
@@ -29,7 +29,15 @@ export function useAllCommandsQuery<TError = Error>(
     pageLength: params?.pageLength ?? DEFAULT_PAGE_LENGTH,
   }
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
+    getQueryKey(
+      host,
+      'runs',
+      runId,
+      'commands',
+      cursor,
+      pageLength,
+      includeFixitCommands
+    ),
     () => {
       return getCommands(host!, runId!, finalizedParams).then(
         response => response.data

@@ -3,6 +3,8 @@
 import asyncio
 from typing import Any, Dict, Optional, Union, cast
 
+from Pyro5.api import Proxy
+
 from opentrons_shared_data.labware.types import LabwareDefinition
 
 from .core.common import ProtocolCore as AbstractProtocolCore
@@ -32,6 +34,7 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.util.broker import Broker
+from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 
 
 class ProtocolEngineCoreRequiredError(Exception):
@@ -95,6 +98,12 @@ def create_protocol_context(
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
+    elif hasattr(hardware_api, "_proxy"):
+        # If this is an Async Client Pyro version of the hardware API, we reconstruct it to
+        # force all the calls to be synchronous, allowing it to be easily used in the SynchronousAdapter
+        with Proxy(hardware_api._proxy._pyroUri) as new_proxy:  # type: ignore[no-untyped-call]
+            sync_acpo = AsyncClientPyroObject(new_proxy, force_synchronous=True)
+            sync_hardware = SynchronousAdapter(sync_acpo)  # type: ignore[arg-type]
     else:
         sync_hardware = SynchronousAdapter(hardware_api)
 

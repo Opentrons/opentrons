@@ -39,7 +39,6 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
-import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -94,10 +93,7 @@ interface AddFixtureModalProps {
   existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
-  | 'modulesOrFixtures'
-  | 'fixtureOptions'
-  | 'moduleOptions'
-  | 'wasteChuteOptions'
+  'modulesOrFixtures' | 'fixtureOptions' | 'moduleOptions' | 'wasteChuteOptions'
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -134,7 +130,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
     []
   )
-  const enableVacuumModule = useSelector(getEnableVacuumModule)
   useEffect(
     () => {
       const options = [
@@ -148,13 +143,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ]
       setAllFixtureOptions(options)
       const moduleOptions = [
-        ...getModuleOptions(
-          cutoutId,
-          addressableAreaId,
-          deckDef,
-          fixtures,
-          enableVacuumModule
-        ),
+        ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
       ]
       setAllModuleOptions(moduleOptions)
     },
@@ -179,7 +168,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     deckDefinition: deckDef,
     addressableAreaId,
     fixtures,
-    enableVacuumModule,
   })
 
   let nextStageOptions = null

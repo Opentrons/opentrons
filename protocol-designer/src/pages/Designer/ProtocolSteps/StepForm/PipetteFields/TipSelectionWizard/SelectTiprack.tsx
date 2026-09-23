@@ -61,6 +61,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
           pipetteSpecs,
           nozzles,
           labwareEntities,
+          labwareRobotState: activeDeckSetup.labware,
         })
         if (selectedTiprackId === null && isTiprackSelectable) {
           setSelectedTiprackId(id)

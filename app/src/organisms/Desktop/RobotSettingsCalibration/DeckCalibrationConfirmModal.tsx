@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -10,6 +9,7 @@ import {
   LegacyStyledText,
   Link,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -54,14 +54,15 @@ export function DeckCalibrationConfirmModal({
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             onClick={confirm}
           >
             {t('shared:yes')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

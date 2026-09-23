@@ -120,7 +120,6 @@ export function OT2SetupLPC(
           onClick={() => {
             setOffsetsConfirmed(true)
           }}
-          id="LPC_setOffsetsConfirmed"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...confirmOffsetsTargetProps}
           disabled={
@@ -140,7 +139,6 @@ export function OT2SetupLPC(
         <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={launchLPC}
-          id="LabwareSetup_checkLabwarePositionsButton"
           {...runLPCTargetProps}
           disabled={lpcDisabledReason !== null || isLaunchingLPC}
         >

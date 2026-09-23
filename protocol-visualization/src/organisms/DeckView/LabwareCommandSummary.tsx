@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { DeckLabelSet, useCommandTypeSummaries } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type {
   CoordinateTuple,
   LabwareDefinition2,
@@ -24,7 +25,7 @@ interface LabwareCommandSummaryProps {
 }
 export function LabwareCommandSummary(
   props: LabwareCommandSummaryProps
-): JSX.Element {
+): ReactNode {
   const { labwareDef, position, showModuleIcon, commandType } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)

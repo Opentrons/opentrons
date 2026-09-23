@@ -9,11 +9,12 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getActiveLayer } from '../utils/getActiveLayer'
+import { isLabwareInDisposalLocation } from '../utils/isLabwareInDisposalLocation'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckDefinition,
   Liquid,
@@ -35,7 +36,7 @@ interface DeckViewLabwareProps {
   hoveredSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
-export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
+export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -61,6 +62,10 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
           return []
         }
         const slot = getSlotInLocationStack(lw.stack)
+        // skip disposal location slots
+        if (isLabwareInDisposalLocation(slot)) {
+          return []
+        }
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,

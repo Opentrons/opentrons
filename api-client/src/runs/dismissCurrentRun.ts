@@ -1,16 +1,18 @@
 import { PATCH, request } from '../request'
 
 import type { ResponsePromise } from '../request'
-import type { EmptyResponse, HostConfig } from '../types'
+import type { HostConfig } from '../types'
+import type { Run } from './types'
 
 export function dismissCurrentRun(
   config: HostConfig,
-  runId: string
-): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse, { data: { current: false } }>(
+  runId: string,
+  userNotes?: string
+): ResponsePromise<Run> {
+  return request<Run, { data: { current: false } }>(
     PATCH,
     `/runs/${runId}`,
-    { data: { current: false } },
-    config
+    config,
+    { body: { data: { current: false } }, userNotes }
   )
 }

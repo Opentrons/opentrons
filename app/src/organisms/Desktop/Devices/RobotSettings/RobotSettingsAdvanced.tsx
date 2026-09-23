@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -11,17 +10,17 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
-import {
-  fetchSettings,
-  getRobotSettings,
-  updateSetting,
-} from '/app/redux/robot-settings'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRun } from '/app/resources/runs'
 
@@ -29,8 +28,10 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableErrorRecoveryMode,
   EnableStatusLight,
+  EnterRobotEncryptionKey,
   FactoryMode,
   GantryHoming,
   LegacySettings,
@@ -50,12 +51,10 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
 import type { MouseEventHandler } from 'react'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type {
-  RobotSettings,
+  ResetConfigRequest,
   RobotSettingsField,
-} from '/app/redux/robot-settings/types'
-import type { Dispatch, State } from '/app/redux/types'
+} from '@opentrons/api-client'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -81,9 +80,8 @@ export function RobotSettingsAdvanced({
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
-  const settings = useSelector<State, RobotSettings>((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const reachable = robot?.status !== UNREACHABLE
   const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
@@ -115,12 +113,6 @@ export function RobotSettingsAdvanced({
     setShowDeviceResetModal(true)
     setIsRobotReachable(isReachable ?? false)
   }
-
-  const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
 
   return (
     <>
@@ -176,30 +168,38 @@ export function RobotSettingsAdvanced({
         <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
+        <Divider marginY={SPACING.spacing16} />
+        <EnableComplianceReadySoftware
+          isRobotBusy={isRobotBusy}
+          robotName={robotName}
+        />
+        <Divider marginY={SPACING.spacing16} />
+        <EnterRobotEncryptionKey
+        // Note: Unlike other buttons on this page,
+        // this should be available even if the robot is busy.
+        />
         {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />
             <UsageSettings
               settings={findSettings('enableDoorSafetySwitch')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
         )}
-        <Divider marginY={SPACING.spacing16} />
+        <Divider
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing24}
+        />
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
-          robotName={robotName}
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
 
         {isFlex ? (
           <>
             <Divider marginY={SPACING.spacing16} />
-            <EnableStatusLight
-              robotName={robotName}
-              isEstopNotDisengaged={isEstopNotDisengaged}
-            />
+            <EnableStatusLight isEstopNotDisengaged={isEstopNotDisengaged} />
           </>
         ) : null}
         {isFlex ? (
@@ -212,7 +212,6 @@ export function RobotSettingsAdvanced({
           <>
             <Divider marginY={SPACING.spacing16} />
             <DisableStackerSensors
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -252,19 +251,16 @@ export function RobotSettingsAdvanced({
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -276,23 +272,23 @@ export function RobotSettingsAdvanced({
 
 interface FeatureFlagToggleProps {
   settingField: RobotSettingsField
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function FeatureFlagToggle({
   settingField,
-  robotName,
   isRobotBusy,
 }: FeatureFlagToggleProps): JSX.Element | null {
-  const dispatch = useDispatch<Dispatch>()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const { value, id, title, description } = settingField
 
   if (id == null) return null
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 

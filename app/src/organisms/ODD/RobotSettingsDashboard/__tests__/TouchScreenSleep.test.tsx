@@ -31,7 +31,7 @@ describe('TouchScreenSleep', () => {
 
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('Touchscreen Sleep')
+    screen.getByText('Touchscreen sleep')
     screen.getByText('Never')
     screen.getByText('3 minutes')
     screen.getByText('5 minutes')

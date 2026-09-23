@@ -1,14 +1,12 @@
 import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
-import { Flex, STYLE_PROPS } from '../../primitives'
-import { DIRECTION_ROW } from '../../styles'
+import { STYLE_PROPS } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { AlertPrimaryButton as AlertPrimaryButtonComponent } from './AlertPrimaryButton'
-import { AltPrimaryButton as AltPrimaryButtonComponent } from './AltPrimaryButton'
 import { BasicButton as BasicButtonComponent } from './BasicButton'
 import { PrimaryButton as PrimaryButtonComponent } from './PrimaryButton'
 import { SecondaryButton as SecondaryButtonComponent } from './SecondaryButton'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { CSSProperties } from 'react'
 
 const meta: Meta = {
   title: 'Helix/Atoms/Buttons',
@@ -29,58 +27,68 @@ const meta: Meta = {
         type: 'boolean',
       },
     },
-    isDangerous: {
-      control: {
-        type: 'boolean',
-      },
-    },
   },
 }
 
 export default meta
+
+const BUTTON_CONTAINER_STYLE: CSSProperties = {
+  padding: SPACING.spacing16,
+}
 
 export const PrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
   args: {
     children: 'primary button',
   },
   render: args => (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+    <div style={BUTTON_CONTAINER_STYLE}>
       <PrimaryButtonComponent {...args} />
-    </Flex>
+    </div>
   ),
 }
 
 export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
   args: {
     children: 'secondary button',
+    isDangerous: false,
+  },
+  argTypes: {
+    isDangerous: {
+      control: {
+        type: 'boolean',
+      },
+      description:
+        'Styles the button as a dangerous action with non-reversible side effects.',
+    },
   },
   render: args => (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+    <div style={BUTTON_CONTAINER_STYLE}>
       <SecondaryButtonComponent {...args} />
-    </Flex>
+    </div>
   ),
 }
 
-export const AlertPrimaryButton: StoryObj<typeof AlertPrimaryButtonComponent> =
-  {
-    args: {
-      children: 'alert tertiary button',
-    },
-    render: args => (
-      <Flex>
-        <AlertPrimaryButtonComponent {...args} />
-      </Flex>
-    ),
-  }
-
-export const AltPrimaryButton: StoryObj<typeof AltPrimaryButtonComponent> = {
+export const WarningPrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
   args: {
+    variant: 'warning',
+    children: 'warning primary button',
+  },
+  render: args => (
+    <div style={BUTTON_CONTAINER_STYLE}>
+      <PrimaryButtonComponent {...args} />
+    </div>
+  ),
+}
+
+export const AltPrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
+  args: {
+    variant: 'alt',
     children: 'alt primary button',
   },
   render: args => (
-    <Flex>
-      <AltPrimaryButtonComponent {...args} />
-    </Flex>
+    <div style={BUTTON_CONTAINER_STYLE}>
+      <PrimaryButtonComponent {...args} />
+    </div>
   ),
 }
 
@@ -106,8 +114,8 @@ export const BasicButton: StoryObj<typeof BasicButtonComponent> = {
     },
   },
   render: args => (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+    <div style={BUTTON_CONTAINER_STYLE}>
       <BasicButtonComponent {...args} />
-    </Flex>
+    </div>
   ),
 }

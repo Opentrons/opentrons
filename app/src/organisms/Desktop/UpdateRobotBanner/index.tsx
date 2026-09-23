@@ -2,16 +2,21 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  ALIGN_CENTER,
   Banner,
   Btn,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import {
+  getRobotUpdateDisplayInfo,
+  isRobotSoftwareUpdateAvailable,
+} from '/app/redux/robot-update'
 
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
@@ -34,7 +39,7 @@ export function UpdateRobotBanner(
     return getRobotUpdateDisplayInfo(state, robot?.name)
   })
 
-  return (autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
+  return isRobotSoftwareUpdateAvailable(autoUpdateAction) &&
     robot !== null &&
     robot.healthStatus === 'ok' ? (
     <Flex
@@ -44,18 +49,26 @@ export function UpdateRobotBanner(
       flexDirection={DIRECTION_COLUMN}
     >
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
-        <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing4}>
-          {t('branded:robot_software_update_required')}
-        </LegacyStyledText>
-        <Btn
-          onClick={() => {
-            handleUpdateBuildroot(robot)
-          }}
-          css={TYPOGRAPHY.pRegular}
-          textDecoration={TYPOGRAPHY.textDecorationUnderline}
+        <Flex
+          width="100%"
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing8}
         >
-          {t('view_update')}
-        </Btn>
+          <LegacyStyledText forwardedAs="p">
+            {t('branded:robot_software_update_required')}
+          </LegacyStyledText>
+          <Btn
+            onClick={() => {
+              handleUpdateBuildroot(robot)
+            }}
+            css={TYPOGRAPHY.pRegular}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            whiteSpace="nowrap"
+          >
+            {t('view_update')}
+          </Btn>
+        </Flex>
       </Banner>
     </Flex>
   ) : null

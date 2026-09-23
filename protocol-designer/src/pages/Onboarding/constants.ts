@@ -17,6 +17,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { ModuleModel, ModuleType, RobotType } from '@opentrons/shared-data'
+import type { FixtureInfo } from '/protocol-designer/components/organisms'
 import type { Gen, PipetteType, PipetteVolumes } from './types'
 
 export const PIPETTE_GENS: Gen[] = ['GEN1', 'GEN2']
@@ -139,4 +140,10 @@ export const DEFAULT_SLOT_MAP_OT2: { [moduleType in ModuleType]?: string } = {
   [HEATERSHAKER_MODULE_TYPE]: '1',
   [MAGNETIC_MODULE_TYPE]: '1',
   [TEMPERATURE_MODULE_TYPE]: '3',
+}
+
+export const FLEX_TRASH_FIXTURE_INFO: FixtureInfo = {
+  cutoutId: 'cutoutA3',
+  name: 'trashBin',
+  cutoutFixtureId: 'trashBinAdapter',
 }

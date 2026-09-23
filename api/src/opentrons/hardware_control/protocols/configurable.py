@@ -34,7 +34,7 @@ class Configurable(Protocol[ConfigType]):
     @config.setter
     def config(self, config: ConfigType) -> None: ...
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> ConfigType:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For

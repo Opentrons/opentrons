@@ -10,7 +10,6 @@ export function getAccessControlEnabled(
   return request<AccessControlEnabledSettingsResponse>(
     GET,
     '/auth/settings/accessControlEnabled',
-    null,
     config
   )
 }

@@ -1,10 +1,10 @@
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import * as Constants from '/app/redux/pipettes/constants'
+import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { PipetteModel } from '@opentrons/shared-data'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 const PIPETTE_POLL_MS = 5000
 export function useAttachedPipettes(
@@ -14,7 +14,7 @@ export function useAttachedPipettes(
     {},
     poll ? { refetchInterval: PIPETTE_POLL_MS } : {}
   )?.data
-  return Constants.PIPETTE_MOUNTS.reduce<AttachedPipettesByMount>(
+  return PIPETTE_MOUNTS.reduce<AttachedPipettesByMount>(
     (result, mount) => {
       const attached = attachedPipettesResponse?.[mount] || null
       const modelSpecs =

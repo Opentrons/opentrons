@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { createSplash } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 import type {
@@ -40,13 +40,14 @@ export function useCreateSplashMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-
+  // For factory use only, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<
     AxiosResponse<void>,
     AxiosError<ErrorResponse>,
     CreateSplashRequestData
   >(
-    [host, 'splash'],
+    getQueryKey(host, 'splash'),
     ({ file }) =>
       createSplash(host!, file).catch(e => {
         throw e

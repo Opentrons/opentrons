@@ -19,6 +19,7 @@ from starlette.responses import JSONResponse
 
 from opentrons.system import nmcli, wifi
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
@@ -124,9 +125,11 @@ def _massage_nmcli_error(error_string: str) -> str:
     response_model=WifiConfigurationResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
-        status.HTTP_401_UNAUTHORIZED: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("connect to wifi")),
+    ],
 )
 async def post_wifi_configure(
     configuration: WifiConfiguration,
@@ -147,10 +150,11 @@ async def post_wifi_configure(
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
     if not ok:
+        # 400, not 401: 401 is reserved for HTTP authentication (CRS login).
         raise LegacyErrorResponse(
             message=_massage_nmcli_error(message),
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status.HTTP_401_UNAUTHORIZED)
+        ).as_error(status.HTTP_400_BAD_REQUEST)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 
@@ -185,7 +189,10 @@ async def get_wifi_keys() -> WifiKeyFiles:
     response_model=AddWifiKeyFileResponse,
     status_code=status.HTTP_201_CREATED,
     response_model_exclude_unset=True,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("add new wifi key")),
+    ],
 )
 async def post_wifi_key(
     response: Response,
@@ -221,7 +228,10 @@ async def post_wifi_key(
     responses={
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("delete wifi key")),
+    ],
 )
 async def delete_wifi_key(
     key_uuid: Annotated[
@@ -280,7 +290,10 @@ async def get_eap_options() -> EapOptions:
     response_model=V1BasicResponse,
     responses={status.HTTP_200_OK: {"model": V1BasicResponse}},
     status_code=status.HTTP_207_MULTI_STATUS,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("disconnect from wifi")),
+    ],
 )
 async def post_wifi_disconnect(wifi_ssid: WifiNetwork) -> JSONResponse:
     ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)

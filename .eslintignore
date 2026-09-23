@@ -6,14 +6,18 @@
 **/venv/**
 .opentrons_config
 **/tsconfig*.json
-# prettier
 **/package.json
+**/pnpm-lock.yaml
 **/CHANGELOG.md
 !api/release-notes.md
 !app-shell/build/release-notes.md
 
 # components library
 storybook-static
+
+# js-package-testing
+js-package-testing/pack/**
+js-package-testing/test-results/**
 
 # python projects and tools
 **/.mypy_cache/**

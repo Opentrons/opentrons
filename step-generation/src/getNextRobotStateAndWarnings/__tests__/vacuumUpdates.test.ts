@@ -631,7 +631,7 @@ describe('forVacuumStopPump', () => {
   })
 })
 
-const sampleVacuumProfile: VacuumModuleStartRunProfileCreateCommand['params']['profile'] =
+const sampleVacuumProfile: VacuumModuleStartRunProfileCreateCommand['params']['steps'] =
   [
     {
       enablePump: true,
@@ -653,7 +653,7 @@ describe('forVacuumStartRunProfile', () => {
     const result = forVacuumStartRunProfile(
       {
         moduleId: vacuumModuleId,
-        profile: sampleVacuumProfile,
+        steps: sampleVacuumProfile,
         taskId: vacuumTaskId,
       },
       invariantContext,
@@ -683,7 +683,7 @@ describe('forVacuumStartRunProfile', () => {
       forVacuumStartRunProfile(
         {
           moduleId: missingModuleId,
-          profile: sampleVacuumProfile,
+          steps: sampleVacuumProfile,
           taskId: vacuumTaskId,
         },
         invariantContext,

@@ -282,7 +282,6 @@ export function TipPositionModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       type="info"
       width="47rem"
       closeOnOutsideClick

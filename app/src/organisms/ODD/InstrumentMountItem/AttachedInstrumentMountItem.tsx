@@ -14,12 +14,11 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { LabeledMount } from './LabeledMount'
 
 import type { ComponentProps, MouseEventHandler } from 'react'
-import type { InstrumentData } from '@opentrons/api-client'
+import type { InstrumentData, Mount } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 import type { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import type { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
-import type { Mount } from '/app/redux/pipettes/types'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'
@@ -88,11 +87,12 @@ export function AttachedInstrumentMountItem(
       />
       {showChoosePipetteModal ? (
         <ChoosePipette
-          proceed={() => {
+          proceed={initialDocstate => {
             setWizardProps({
               mount: mount as Mount,
               flowType: FLOWS.ATTACH,
               selectedPipette,
+              initialDocstate,
               closeFlow: () => {
                 setWizardProps(null)
                 setSelectedPipette(SINGLE_MOUNT_PIPETTES)

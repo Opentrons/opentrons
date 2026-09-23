@@ -41,16 +41,18 @@ async def test_prepare_root_creates_directory(tmp_path: Path) -> None:
 
 
 async def test_prepare_root_resets_marked_directory(tmp_path: Path) -> None:
-    """prepare_root should delete and recreate a directory marked for reset."""
+    """prepare_root should clear the contents of a directory marked for reset."""
     target = tmp_path / "persistence"
     target.mkdir()
     (target / "some_data.txt").write_text("important data")
     (target / "_TO_BE_DELETED_ON_REBOOT").write_text("marker")
+    original_inode = target.stat().st_ino
 
     result = await prepare_root(target)
 
     assert result == target
     assert target.exists()
+    assert target.stat().st_ino == original_inode
     assert not (target / "some_data.txt").exists()
     assert not (target / "_TO_BE_DELETED_ON_REBOOT").exists()
 
@@ -132,7 +134,9 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
             "hashed_password",
             "full_name",
             "account_type",
+            "password_set_at",
             "reset_password",
+            "deactivated",
         }
 
 

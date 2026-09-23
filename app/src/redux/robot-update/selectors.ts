@@ -130,10 +130,6 @@ export function getRobotUpdateSessionRobotName(state: State): string | null {
   return state.robotUpdate.session?.robotName || null
 }
 
-export function getRobotSessionIsManualFile(state: State): boolean | null {
-  return state.robotUpdate.session?.fileInfo?.isManualFile ?? null
-}
-
 export const getRobotUpdateRobot: (state: State) => ViewableRobot | null =
   createSelector(
     getViewableRobots,
@@ -186,6 +182,12 @@ export function getRobotUpdateAvailable(
   return isForced
     ? Constants.UPGRADE
     : getRobotUpdateType(currentVersion, updateVersion)
+}
+
+export function isRobotSoftwareUpdateAvailable(
+  updateType: RobotUpdateType | string | null
+): boolean {
+  return updateType === Constants.UPGRADE || updateType === Constants.DOWNGRADE
 }
 
 // this util returns i18n keys in device_settings

@@ -91,7 +91,13 @@ class TaskHandler:
             createdAt=self._model_utils.get_timestamp(),
             asyncioTask=asyncio_task,
         )
-        self._action_dispatcher.dispatch(StartTaskAction(task))
+        originating_command_id = self._state_store.commands.get_running_command_id()
+        self._action_dispatcher.dispatch(
+            StartTaskAction(
+                task=task,
+                originating_command_id=originating_command_id,
+            )
+        )
         return task
 
     @staticmethod

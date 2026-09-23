@@ -24,6 +24,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     ToolType,
     USBTarget,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
 from opentrons_hardware.firmware_update import FirmwareUpdate
 from opentrons_hardware.hardware_control import network, tools
 
@@ -50,7 +53,7 @@ class SubsystemManager:
     """
 
     _can_messenger: can_bus.CanMessenger
-    _usb_messenger: Optional[binary_usb.BinaryMessenger]
+    _usb_messenger: binary_usb.BinaryMessenger
     _tool_detector: tools.detector.ToolDetector
     _network_info: network.NetworkInfo
     _tool_detection_task: "Optional[asyncio.Task[None]]"
@@ -65,7 +68,7 @@ class SubsystemManager:
     def __init__(
         self,
         can_messenger: can_bus.CanMessenger,
-        usb_messenger: Optional[binary_usb.BinaryMessenger],
+        usb_messenger: binary_usb.BinaryMessenger,
         tool_detector: tools.detector.ToolDetector,
         network_info: network.NetworkInfo,
         update_bag: FirmwareUpdate,
@@ -79,19 +82,19 @@ class SubsystemManager:
             NodeId.gantry_x,
             NodeId.gantry_y,
             NodeId.head,
+            USBTarget.rear_panel,
         }
         self._tool_task_condition = asyncio.Condition()
         self._tool_task_state = False
         self._updates_required = {}
         self._updates_ongoing = {}
         self._update_bag = update_bag
-        if self._usb_messenger:
-            self._expected_core_targets.add(USBTarget.rear_panel)
         self._present_tools = tools.types.ToolSummary(
             left=None, right=None, gripper=None
         )
         # This is intended to be an internal variable but is modified in unit tests to avoid long timeouts
         self._check_device_update_timeout = 10.0
+        self._event_callback: Optional[Callable[[], None]] = None
 
     @property
     def ok(self) -> bool:
@@ -426,6 +429,10 @@ class SubsystemManager:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()
 
+            if self._event_callback is not None:
+                # Notify the subsystem event callback
+                self._event_callback()
+
     def _tool_if_ok(self, tool: ToolType, node: NodeId) -> ToolType:
         if tool is ToolType.nothing_attached:
             return tool
@@ -435,3 +442,13 @@ class SubsystemManager:
         if not device_info[node].ok:
             return ToolType.nothing_attached
         return tool
+
+    def set_event_callback(self, callback: Callable[[], None]) -> None:
+        self._event_callback = callback
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[Set[NodeId]] = None
+    ) -> Dict[NodeId, GetMotorUsageResponse]:
+        return await self._network_info.get_motor_usage_data(
+            can_messenger=self._can_messenger, expected=expected_axes
+        )

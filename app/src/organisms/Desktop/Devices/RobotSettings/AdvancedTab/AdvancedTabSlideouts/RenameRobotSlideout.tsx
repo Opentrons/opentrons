@@ -18,6 +18,7 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
@@ -25,6 +26,8 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
+  startDiscovery,
 } from '/app/redux/discovery'
 
 import type { ChangeEvent } from 'react'
@@ -132,15 +135,14 @@ export function RenameRobotSlideout({
     updateRobotName(newName)
     reset({ newRobotName: '' })
   }
-
-  const { updateRobotName } = useUpdateRobotNameMutation({
+  const documentationState = useDocumentationState()
+  const { updateRobotName } = useUpdateRobotNameMutation(documentationState, {
     onSuccess: (data: UpdatedRobotName) => {
-      // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
-      // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
-      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
-      // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && navigate('/devices')
-      dispatch(removeRobot(previousRobotName))
+      if (data.name != null) {
+        dispatch(renameRobot(previousRobotName, data.name))
+        dispatch(startDiscovery())
+        navigate(`/devices`)
+      }
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
@@ -191,7 +193,6 @@ export function RenameRobotSlideout({
             name="newRobotName"
             render={({ field, fieldState }) => (
               <InputField
-                id="newRobotName"
                 name="newRobotName"
                 type="text"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

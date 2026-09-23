@@ -225,7 +225,6 @@ export function EditLabwareQuantityModal(
       }}
     >
       <Modal
-        marginLeft="0"
         width="37.125rem"
         title={t('edit_labware_quantity')}
         type="info"

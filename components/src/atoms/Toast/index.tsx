@@ -70,6 +70,7 @@ export function Toast(props: ToastProps): JSX.Element {
     exitNow = false,
     linkText,
     onLinkClick = () => null,
+    zIndex,
     ...styleProps
   } = props
   const [isClosed, setIsClosed] = useState<boolean>(exitNow)
@@ -334,12 +335,12 @@ export function Toast(props: ToastProps): JSX.Element {
           flexDirection={showODDStyle ? DIRECTION_ROW : DIRECTION_COLUMN}
           overflow="hidden"
           width={showODDStyle ? 'auto' : '100%'}
+          gap={showODDStyle ? SPACING.spacing4 : undefined}
         >
           {headingText.length > 0 ? (
             <StyledText
               oddStyle="bodyTextSemiBold"
-              desktopStyle="bodyDefaultRegular"
-              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
+              desktopStyle="bodyDefaultSemiBold"
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
@@ -350,11 +351,11 @@ export function Toast(props: ToastProps): JSX.Element {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
-              oddStyle="bodyTextSemiBold"
+              oddStyle="bodyTextRegular"
               desktopStyle="bodyDefaultRegular"
               overflow="hidden"
-              text-overflow="ellipsis"
-              white-space="nowrap"
+              textOverflow="ellipsis"
+              whiteSpace={NO_WRAP}
             >
               {message}
             </StyledText>

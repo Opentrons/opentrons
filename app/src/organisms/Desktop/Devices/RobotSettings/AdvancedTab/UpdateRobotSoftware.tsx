@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -21,9 +21,9 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
 
 import type { ChangeEventHandler, MouseEventHandler } from 'react'
@@ -54,26 +54,48 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const pendingFilePathRef = useRef<string | null>(null)
+  const onUpdateStartRef = useRef(onUpdateStart)
+  onUpdateStartRef.current = onUpdateStart
+  const { startUpdate, isLoading } = useGatedStartRobotUpdate(robotName)
+  const [isStarting, setIsStarting] = useState(false)
   const isRunActive =
     currentRun != null && !isTerminalRunStatus(currentRun.data.status)
 
-  const handleChange: ChangeEventHandler<HTMLInputElement> = event => {
-    const { files } = event.target
-
-    if (files != null) {
-      void remote.getFilePathFrom(files[0]).then(filePath => {
-        if (files.length === 1 && !updateDisabled) {
-          dispatchStartRobotUpdate(robotName, filePath)
-          onUpdateStart()
-        }
-        // this is to reset the state of the file picker so users can reselect the same
-        // system image if the upload fails
-        if (inputRef.current?.value != null) {
-          inputRef.current.value = ''
-        }
-      })
+  useEffect(() => {
+    if (!isStarting || isLoading) {
+      return
     }
+
+    const filePath = pendingFilePathRef.current
+    pendingFilePathRef.current = null
+    setIsStarting(false)
+    if (filePath == null || filePath === '') {
+      return
+    }
+
+    const started = startUpdate(filePath)
+    if (started) {
+      onUpdateStartRef.current()
+    }
+  }, [isLoading, isStarting, startUpdate])
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = event => {
+    const file = event.target.files?.[0] ?? null
+    if (inputRef.current != null) {
+      inputRef.current.value = ''
+    }
+    if (file == null || updateDisabled || isStarting) {
+      return
+    }
+
+    void remote.getFilePathFrom(file).then(filePath => {
+      if (filePath === '') {
+        return
+      }
+      pendingFilePathRef.current = filePath
+      setIsStarting(true)
+    })
   }
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
@@ -87,7 +109,6 @@ export function UpdateRobotSoftware({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing8}
-            id="AdvancedSettings_updateRobotSoftware"
           >
             {t('update_robot_software')}
           </LegacyStyledText>
@@ -98,22 +119,23 @@ export function UpdateRobotSoftware({
             {t('branded:update_robot_software_link')}
           </ExternalLink>
         </Box>
-        <TertiaryButton
-          marginLeft={SPACING_AUTO}
-          id="AdvancedSettings_softwareUpdateButton"
-          {...updateButtonProps}
-          disabled={updateDisabled || isRunActive}
-          onClick={handleClick}
-        >
-          {t('browse_file_system')}
+        <Box marginLeft={SPACING_AUTO}>
+          <TertiaryButton
+            {...updateButtonProps}
+            disabled={updateDisabled || isRunActive}
+            onClick={handleClick}
+          >
+            {t('browse_file_system')}
+          </TertiaryButton>
           <input
             ref={inputRef}
+            data-testid="UpdateRobotSoftware_fileInput"
             type="file"
             onChange={handleChange}
             disabled={updateDisabled}
             css={HIDDEN_CSS}
           />
-        </TertiaryButton>
+        </Box>
         {updateFromFileDisabledReason != null && (
           <Tooltip tooltipProps={updateButtonTooltipProps}>
             {t(updateFromFileDisabledReason)}

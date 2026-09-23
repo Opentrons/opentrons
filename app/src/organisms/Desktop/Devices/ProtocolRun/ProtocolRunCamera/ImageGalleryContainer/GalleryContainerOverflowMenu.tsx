@@ -10,14 +10,15 @@ import {
   SIZE_1,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { useAllRunImagesRaw } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
-import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,
 } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
+import { saveFileFromUrl } from '/app/redux/shell/remote'
 
 import styles from './gallery.module.css'
 
@@ -41,8 +42,8 @@ export function GalleryContainerOverflowMenu({
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const [isPendingDownload, setIsPendingDownload] = useState(false)
-  const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(runId)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const host = useHost()
 
   const robotType = useRobotType(robotName)
 
@@ -64,21 +65,30 @@ export function GalleryContainerOverflowMenu({
 
   const onDownloadZip = (): void => {
     setShowOverflowMenu(false)
-
-    if (imagesZipFile != null) {
-      downloadFile(imagesZipFile, buildImagesZipName())
-    } else {
-      setIsPendingDownload(true)
-    }
     reportPhotoAccessUsage({
       action: 'downloadZip',
     })
+    if (host == null || isDownloading) {
+      return
+    }
+
+    setIsDownloading(true)
+    void saveFileFromUrl({
+      name: buildImagesZipName(),
+      source: `/dataFiles/${runId}/images/download`,
+      hostname: host.hostname,
+      port: host.port ?? null,
+    })
+      .catch((error: unknown) => {
+        if (!isFileSaveCanceledError(error)) {
+          throw error
+        }
+      })
+      .finally(() => {
+        setIsDownloading(false)
+      })
   }
 
-  if (imagesZipFile != null && isPendingDownload) {
-    setIsPendingDownload(false)
-    downloadFile(imagesZipFile, buildImagesZipName())
-  }
   return (
     <div className={styles.images_container_overflow_container}>
       <OverflowBtn onClick={handleOverflowClick} />
@@ -87,7 +97,7 @@ export function GalleryContainerOverflowMenu({
           <MenuItem onClick={onDownloadZip}>
             <div className={styles.overflow_menu_item}>
               {t('download_images')}
-              {isPendingDownload && isLoading && (
+              {isDownloading && (
                 <Icon
                   name="ot-spinner"
                   size={SIZE_1}

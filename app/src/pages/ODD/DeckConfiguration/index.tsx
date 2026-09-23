@@ -81,7 +81,7 @@ export function DeckConfigurationEditor(): JSX.Element {
       >
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
-          buttonText={i18n.format(t('shared:save'), 'capitalize')}
+          buttonText={t('shared:save')}
           onClickButton={handleClickConfirm}
           secondaryButtonProps={secondaryButtonProps}
         />

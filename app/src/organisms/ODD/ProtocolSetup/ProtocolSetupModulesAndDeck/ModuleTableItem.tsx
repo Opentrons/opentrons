@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -14,7 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
@@ -23,25 +23,28 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { getFlexStackerPrepCommands } from '/app/local-resources/modules'
+import {
+  getFlexStackerPrepActions,
+  getFlexStackerPrepCommands,
+} from '/app/local-resources/modules'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { getDoesModuleRequireCalibration } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
@@ -93,24 +96,21 @@ export const getModuleDisplayStatus = (
 
 interface ModuleTableItemProps {
   calibrationStatus: ProtocolCalibrationStatus
-  chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
-    continuePastCommandFailure: boolean
-  ) => Promise<CommandData[]>
   conflictedFixture: CutoutConfig | null
   module: AttachedProtocolModuleMatch
   deckDef: DeckDefinition
   robotName: string
+  runId: string
   comboFixtureId?: CutoutFixtureId
 }
 
 export function ModuleTableItem({
   module,
   calibrationStatus,
-  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
+  runId,
   comboFixtureId,
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation([
@@ -118,9 +118,16 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
+
+  // NOTE (jj 9/4/26): chainLiveCommands is only used here to home this row's Flex Stacker.
+  // If it is ever used to send other commands, this will need updating.
+  const actionsToDocument = useMemo(
+    () => getFlexStackerPrepActions([module.attachedModuleMatch]),
+    [module.attachedModuleMatch]
+  )
+  const { chainLiveCommands } = useChainLiveCommands(actionsToDocument, runId)
 
   const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
@@ -130,7 +137,6 @@ export function ModuleTableItem({
         handleModuleWizardFlows({
           attachedModule: module.attachedModuleMatch,
           robotName,
-          host,
         })
       }
     } else {
@@ -146,7 +152,14 @@ export function ModuleTableItem({
         // if the close latch command fails, we still want to home the shuttle
         true
       )
-      setShowHomeStackerWarning(false)
+        .then(() => {
+          setShowHomeStackerWarning(false)
+        })
+        .catch(error => {
+          if (!isDocumentedMutationError(error)) {
+            setShowHomeStackerWarning(false)
+          }
+        })
     }
   }
 

@@ -1,8 +1,10 @@
-import { useMutation } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateRobotSetting } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
+import { robotSettingsQueryKey } from './useRobotSettingsQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -10,7 +12,13 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { ErrorResponse, RobotSettings } from '@opentrons/api-client'
+import type {
+  ErrorResponse,
+  HostConfig,
+  RobotSettingsResponse,
+} from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface UpdateRobotSettingVariables {
   id: string
@@ -18,44 +26,48 @@ export interface UpdateRobotSettingVariables {
 }
 
 export type UseUpdateRobotSettingMutationResult = UseMutationResult<
-  RobotSettings,
+  RobotSettingsResponse,
   AxiosError<ErrorResponse>,
   UpdateRobotSettingVariables
 > & {
   updateRobotSetting: UseMutateFunction<
-    RobotSettings,
+    RobotSettingsResponse,
     AxiosError<ErrorResponse>,
     UpdateRobotSettingVariables
   >
 }
 
-export type UseUpdateRobotSettingnMutationOptions = UseMutationOptions<
-  RobotSettings,
+export type UseUpdateRobotSettingMutationOptions = UseMutationOptions<
+  RobotSettingsResponse,
   AxiosError<ErrorResponse>,
   UpdateRobotSettingVariables
 >
 
 export function useUpdateRobotSettingMutation(
-  options: UseUpdateRobotSettingnMutationOptions = {}
+  documentationState: DocumentationState,
+  options: UseUpdateRobotSettingMutationOptions = {},
+  hostOverride?: HostConfig | null
 ): UseUpdateRobotSettingMutationResult {
-  const host = useHost()
-  // const queryClient = useQueryClient()
+  const contextHost = useHost()
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
 
-  const mutation = useMutation<
-    RobotSettings,
+  const mutation = useDocumentedMutation<
+    RobotSettingsResponse,
     AxiosError<ErrorResponse>,
     UpdateRobotSettingVariables
   >(
-    [host, 'robot_settings'],
-    ({ id, value }) =>
-      updateRobotSetting(host!, id, value).then(response => {
-        // TODO: investigate ODD top level behavior when invalidating this query
-        // queryClient
-        //   .invalidateQueries([host, 'robot_settings'])
-        //   .catch((e: Error) => {
-        //     throw e
-        //   })
-        return response.data?.settings ?? []
+    documentationState,
+    ['update_settings'],
+    robotSettingsQueryKey(host),
+    ({
+      variables: { id, value },
+      userNotes,
+    }: DocumentedMutationParameters<UpdateRobotSettingVariables>) =>
+      updateRobotSetting(host!, id, value, userNotes).then(response => {
+        queryClient.setQueryData(robotSettingsQueryKey(host), response.data)
+        return response.data
       }),
     options
   )

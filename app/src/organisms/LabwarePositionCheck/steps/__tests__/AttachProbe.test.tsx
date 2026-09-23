@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
@@ -10,12 +10,14 @@ import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__f
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { AttachProbe } from '/app/organisms/LabwarePositionCheck/steps'
 import {
+  selectActivePipette,
   selectActivePipetteChannelCount,
   selectStepInfo,
 } from '/app/redux/protocol-runs'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
+import type { LoadedPipette } from '@opentrons/shared-data'
 
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,
@@ -25,7 +27,8 @@ vi.mock('/app/redux/protocol-runs')
 
 const render = (
   props: ComponentProps<typeof AttachProbe>,
-  channelCount = 1
+  channelCount = 1,
+  mount: LoadedPipette['mount'] = 'left'
 ) => {
   const mockState = {
     [props.runId]: {
@@ -35,7 +38,10 @@ const render = (
         protocolName: 'MOCK_PROTOCOL',
       },
       activePipette: {
-        channelCount: channelCount,
+        id: 'mock-pipette-id',
+        pipetteName: 'p1000_single_flex',
+        channelCount,
+        mount,
       },
     },
   }
@@ -61,6 +67,9 @@ describe('AttachProbe', () => {
     vi.mocked(selectActivePipetteChannelCount).mockImplementation(
       (runId: string) => (state: any) =>
         state[runId]?.activePipette?.channelCount || 1
+    )
+    vi.mocked(selectActivePipette).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.activePipette
     )
 
     props = {
@@ -89,23 +98,25 @@ describe('AttachProbe', () => {
     expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
   })
 
-  it('renders with single-channel pipette instructions', () => {
-    render(props, 1)
+  it('renders with single-channel pipette instructions including mount', () => {
+    render(props, 1, 'right')
 
     screen.getByText('Attach calibration probe')
     screen.getByText(
-      'Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe.'
+      nestedTextMatcher(
+        'Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the right mount pipette nozzle as far as it can go. Twist the collar to lock the probe.'
+      )
     )
     screen.getByText(
       'Test that the probe is secure by gently pulling it back and forth. It should be firmly in place.'
     )
   })
 
-  it('renders with 8-channel pipette instructions', () => {
-    render(props, 8)
+  it('renders with 8-channel pipette instructions including mount', () => {
+    render(props, 8, 'left')
 
     screen.getByText('Attach calibration probe')
-    screen.getByText(/backmost/i)
+    screen.getByText(/backmost \(left mount\)/i)
     expect(
       screen.queryByText(/A1 \(back left corner\)/i)
     ).not.toBeInTheDocument()
@@ -126,11 +137,13 @@ describe('AttachProbe', () => {
   })
 
   it('falls back to single-channel instructions for unexpected channel count', () => {
-    render(props, 42)
+    render(props, 42, 'left')
 
     screen.getByText('Attach calibration probe')
     screen.getByText(
-      'Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe.'
+      nestedTextMatcher(
+        'Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the left mount pipette nozzle as far as it can go. Twist the collar to lock the probe.'
+      )
     )
   })
 

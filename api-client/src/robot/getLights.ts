@@ -5,5 +5,5 @@ import type { HostConfig } from '../types'
 import type { Lights } from './types'
 
 export function getLights(config: HostConfig): ResponsePromise<Lights> {
-  return request<Lights>(GET, '/robot/lights', null, config)
+  return request<Lights>(GET, '/robot/lights', config)
 }

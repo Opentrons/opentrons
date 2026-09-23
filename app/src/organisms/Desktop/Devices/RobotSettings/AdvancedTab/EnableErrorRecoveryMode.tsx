@@ -33,7 +33,6 @@ export function EnableErrorRecoveryMode({
           <LegacyStyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Error_Recovery_Mode"
           >
             {t('error_recovery_mode')}
           </LegacyStyledText>
@@ -47,7 +46,6 @@ export function EnableErrorRecoveryMode({
         toggledOn={isEREnabled}
         onClick={toggleERSettings}
         disabled={isRobotBusy}
-        id="RobotSettings_enableErrorRecoveryModeToggleButton"
       />
     </Flex>
   )

@@ -6,6 +6,7 @@ import {
   getDeckSlotOriginToLabwareOrigin,
   getLabwareViewBox,
   getModuleDef,
+  getPositionFromSlotId,
   getSchema2Dimensions,
   ot3StandardDeckV5 as ot3StandardDeckV5Untyped,
 } from '../..'
@@ -82,6 +83,48 @@ describe('computeLabwareOrigin()', () => {
         z: 31,
       })
     })
+  })
+
+  test('resolves collar origin on the vacuum module dock (vacuumModuleV1DockA4)', () => {
+    // Recovery/move animations pass addressableAreaName vacuumModuleV1DockA4 as the
+    // slot id. That AA is not in FLEX_CUTOUT_BY_SLOT_ID; position must still resolve
+    // so the collar does not animate from off-deck.
+    const collarDef =
+      getAllDefinitions()['opentrons/opentrons_vacuum_manifold_collar_tall/1']
+
+    const result = computeLabwareOrigin({
+      labwareDefinitionsTopToBottom: [collarDef],
+      moduleDefinition: null,
+      slotId: 'vacuumModuleV1DockA4',
+      deckDefinition: OT3_DECK_DEF,
+    })
+
+    // cutoutA3 [328, 321, 0] + vacuumModuleV1DockA4 offset [159.5, 0, 20]
+    expect(result).toStrictEqual({
+      x: 487.5,
+      y: 321,
+      z: 20,
+    })
+  })
+})
+
+describe('getPositionFromSlotId()', () => {
+  it('returns coordinates for standard staging slot A4', () => {
+    expect(getPositionFromSlotId('A4', OT3_DECK_DEF)).toStrictEqual([
+      492, 321, 14.5,
+    ])
+  })
+
+  it('returns coordinates for vacuum module dock addressable area', () => {
+    expect(
+      getPositionFromSlotId('vacuumModuleV1DockA4', OT3_DECK_DEF)
+    ).toStrictEqual([487.5, 321, 20])
+  })
+
+  it('returns coordinates for vacuum module main addressable area', () => {
+    expect(
+      getPositionFromSlotId('vacuumModuleV1A3', OT3_DECK_DEF)
+    ).toStrictEqual([328, 321, 19])
   })
 })
 

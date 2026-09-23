@@ -1,5 +1,6 @@
 {
   "account": "Account",
+  "account_settings": "Account settings",
   "app_settings": "App Settings",
   "attached_pipettes_do_not_match": "Attached pipettes do not match pipettes specified in loaded protocol",
   "calibrate_deck_to_proceed": "Calibrate your deck to proceed",
@@ -7,8 +8,12 @@
   "deck_setup": "Deck Setup",
   "device": "Device",
   "devices": "Devices",
+  "help": "Help",
+  "help_icon": "Help icon",
   "instruments": "Instruments",
   "labware": "Labware",
+  "log_in": "Log in",
+  "log_out": "Log out",
   "modules": "modules",
   "pipettes": "pipettes",
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
@@ -23,5 +28,6 @@
   "run": "run",
   "run_details": "Run Details",
   "settings": "Settings",
+  "settings_icon": "Settings icon",
   "visualization": "Visualization"
 }

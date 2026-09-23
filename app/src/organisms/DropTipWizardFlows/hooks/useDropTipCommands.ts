@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useCoalescedJogAudit } from '/app/local-resources/access-control/useCoalescedJogAudit'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import {
@@ -11,8 +12,13 @@ import {
   MANAGED_PIPETTE_ID,
 } from '../constants'
 import { getAddressableAreaFromConfig } from '../utils'
+import { getDoorOpenErrorDetails } from './errors'
 
 import type { CommandData, PipetteData } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -42,6 +48,10 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
+  commandDocState: DocumentationState
+  deletionDocState: DocumentationState
+  actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
 }
 
 export interface UseDropTipCommandsResult {
@@ -51,6 +61,7 @@ export interface UseDropTipCommandsResult {
     isPredefinedLocation: boolean // Is a predefined location in "choose location."
   ) => Promise<void>
   handleJog: (axis: Axis, dir: Sign, step: StepSize) => void
+  flushJogAudit: () => void
   blowoutOrDropTip: (
     currentRoute: DropTipFlowsRoute,
     proceed: () => void
@@ -69,14 +80,31 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
+  commandDocState,
+  deletionDocState,
+  actionsToDocument,
+  addActionToDocument,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = useState(false)
   const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
   const [isJogging, setIsJogging] = useState(false)
   const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
+  const { recordJog, flush: flushJogAudit } = useCoalescedJogAudit(
+    commandDocState,
+    addActionToDocument
+  )
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    [...actionsToDocument, 'end_drop_tips'],
+    {
+      onError: () => {
+        setHasSeenClose(false)
+        toggleIsExiting()
+      },
+    }
+  )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {
@@ -86,6 +114,7 @@ export function useDropTipCommands({
         return Promise.resolve()
       } else {
         if (!hasSeenClose) {
+          flushJogAudit()
           setHasSeenClose(true)
           toggleIsExiting()
           if (activeMaintenanceRunId == null) {
@@ -100,7 +129,7 @@ export function useDropTipCommands({
               })
               .finally(() => {
                 deleteMaintenanceRun(activeMaintenanceRunId, {
-                  onSettled: () => {
+                  onSuccess: () => {
                     closeFlow()
                   },
                 })
@@ -168,12 +197,17 @@ export function useDropTipCommands({
           if (fixitCommandTypeUtils != null && issuedCommandsType === 'fixit') {
             fixitCommandTypeUtils.errorOverrides.generalFailure()
           } else {
-            setErrorDetails({
-              type: error.errorType ?? null,
-              message: error.detail
-                ? `Error moving to position: ${error.detail}`
-                : 'Error moving to position: invalid addressable area.',
-            })
+            const doorOpenDetails = getDoorOpenErrorDetails(error)
+            if (doorOpenDetails != null) {
+              setErrorDetails(doorOpenDetails)
+            } else {
+              setErrorDetails({
+                type: error.errorType ?? null,
+                message: error.detail
+                  ? `Error moving to position: ${error.detail}`
+                  : 'Error moving to position: invalid addressable area.',
+              })
+            }
           }
           reject(error)
         })
@@ -195,6 +229,7 @@ export function useDropTipCommands({
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
         .then(() => {
+          recordJog(axis, dir, step)
           resolve()
         })
         .catch((error: Error) => {
@@ -202,9 +237,14 @@ export function useDropTipCommands({
             fixitCommandTypeUtils.errorOverrides.generalFailure()
           }
 
-          setErrorDetails({
-            message: `Error issuing jog command: ${error.message}`,
-          })
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            setErrorDetails({
+              message: `Error issuing jog command: ${error.message}`,
+            })
+          }
           resolve()
         })
     })
@@ -252,18 +292,23 @@ export function useDropTipCommands({
             ? fixitCommandTypeUtils.errorOverrides.blowoutFailed()
             : fixitCommandTypeUtils.errorOverrides.tipDropFailed()
         } else {
-          const operation = isBlowoutRoute ? 'blowout' : 'drop tip'
-          const type = 'errorType' in error ? error.errorType : undefined
-          const messageDetail =
-            'message' in error ? error.message : error.detail
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            const operation = isBlowoutRoute ? 'blowout' : 'drop tip'
+            const type = 'errorType' in error ? error.errorType : undefined
+            const messageDetail =
+              'message' in error ? error.message : error.detail
 
-          setErrorDetails({
-            type,
-            message:
-              messageDetail != null
-                ? `Error during ${operation}: ${messageDetail}`
-                : null,
-          })
+            setErrorDetails({
+              type,
+              message:
+                messageDetail != null
+                  ? `Error during ${operation}: ${messageDetail}`
+                  : null,
+            })
+          }
         }
         reject(error)
       }
@@ -317,9 +362,14 @@ export function useDropTipCommands({
         .then(() => handleCleanUpAndClose())
         .then(resolve)
         .catch((error: Error) => {
-          setErrorDetails({
-            message: `Error homing ${error}`,
-          })
+          const doorOpenDetails = getDoorOpenErrorDetails(error)
+          if (doorOpenDetails != null) {
+            setErrorDetails(doorOpenDetails)
+          } else {
+            setErrorDetails({
+              message: `Error homing ${error}`,
+            })
+          }
           resolve()
         })
     })
@@ -329,6 +379,7 @@ export function useDropTipCommands({
     handleCleanUpAndClose,
     moveToAddressableArea,
     handleJog,
+    flushJogAudit,
     blowoutOrDropTip,
     handleMustHome,
   }

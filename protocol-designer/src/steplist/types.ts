@@ -76,10 +76,7 @@ export interface StepItemSourceDestRow {
 // NOTE: delay is NOT a source-dest-style command creator, this type exists
 // mostly to tell flow that :/
 type SourceDestCommandCreatorName =
-  | 'transfer'
-  | 'distribute'
-  | 'consolidate'
-  | 'mix'
+  'transfer' | 'distribute' | 'consolidate' | 'mix'
 export interface SourceDestSubstepItemSingleChannel {
   substepType: 'sourceDest'
   multichannel: false
@@ -98,8 +95,7 @@ export interface SourceDestSubstepItemMultiChannel {
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 }
 export type SourceDestSubstepItem =
-  | SourceDestSubstepItemSingleChannel
-  | SourceDestSubstepItemMultiChannel
+  SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
 export interface MagnetSubstepItem {
   substepType: 'magnet'
   engage: boolean

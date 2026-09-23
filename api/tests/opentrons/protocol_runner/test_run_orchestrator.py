@@ -246,22 +246,22 @@ async def test_run_calls_protocol_live_runner(
     decoy.verify(await mock_protocol_live_runner.run(deck_configuration=[]))
 
 
-def test_get_run_time_parameters_returns_an_empty_list_no_protocol(
+async def test_get_run_time_parameters_returns_an_empty_list_no_protocol(
     live_protocol_subject: RunOrchestrator,
 ) -> None:
     """Should return an empty list in case the protocol runner is not initialized."""
-    result = live_protocol_subject.get_run_time_parameters()
+    result = await live_protocol_subject.get_run_time_parameters()
     assert result == []
 
 
-def test_get_run_time_parameters_returns_an_empty_list_json_runner(
+async def test_get_run_time_parameters_returns_an_empty_list_json_runner(
     decoy: Decoy,
     mock_protocol_json_runner: JsonRunner,
     json_protocol_subject: RunOrchestrator,
 ) -> None:
     """Should return an empty list in case the protocol runner is a json runner."""
     decoy.when(mock_protocol_json_runner.run_time_parameters).then_return([])
-    result = json_protocol_subject.get_run_time_parameters()
+    result = await json_protocol_subject.get_run_time_parameters()
     assert result == []
 
 
@@ -302,13 +302,13 @@ async def test_add_command_and_wait_for_interval(
     )
 
 
-def test_estop(
+async def test_estop(
     decoy: Decoy,
     live_protocol_subject: RunOrchestrator,
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """Verify an estop call."""
-    live_protocol_subject.estop()
+    await live_protocol_subject.estop()
     decoy.verify(mock_protocol_engine.estop())
 
 
@@ -463,7 +463,7 @@ def test_get_run_id_raises(
         orchestrator.run_id
 
 
-def test_get_is_okay_to_clear(
+async def test_get_is_okay_to_clear(
     decoy: Decoy,
     mock_protocol_engine: ProtocolEngine,
     live_protocol_subject: RunOrchestrator,
@@ -472,14 +472,14 @@ def test_get_is_okay_to_clear(
     decoy.when(
         mock_protocol_engine.state_view.commands.get_is_okay_to_clear()
     ).then_return(True)
-    result = live_protocol_subject.get_is_okay_to_clear()
+    result = await live_protocol_subject.get_is_okay_to_clear()
 
     assert result is True
 
     decoy.when(
         mock_protocol_engine.state_view.commands.get_is_okay_to_clear()
     ).then_return(False)
-    result = live_protocol_subject.get_is_okay_to_clear()
+    result = await live_protocol_subject.get_is_okay_to_clear()
 
     assert result is False
 
@@ -549,14 +549,14 @@ async def test_command_generator(
         index = index + 1
 
 
-def test_create_error_recovery_policy(
+async def test_create_error_recovery_policy(
     decoy: Decoy,
     mock_protocol_engine: ProtocolEngine,
     live_protocol_subject: RunOrchestrator,
 ) -> None:
     """Should call PE set_error_recovery_policy."""
     policy = decoy.mock(cls=ErrorRecoveryPolicy)
-    live_protocol_subject.set_error_recovery_policy(policy)
+    await live_protocol_subject.set_error_recovery_policy(policy)
     decoy.verify(mock_protocol_engine.set_error_recovery_policy(policy))
 
 
@@ -570,6 +570,7 @@ async def test_transform_module_model_in_ame(
         await mock_protocol_engine.async_module_error(
             module_model=EngineModuleModel.TEMPERATURE_MODULE_V2,
             serial="whatever",
+            error=None,
         )
     ).then_return(True)
     assert (

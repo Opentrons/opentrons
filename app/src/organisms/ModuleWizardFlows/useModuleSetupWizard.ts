@@ -1,8 +1,15 @@
 import { useEffect, useReducer, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteMaintenanceRunMutation,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -13,15 +20,15 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
-import { useSendIdentifyStacker } from './hooks'
+import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
-import type { ModuleSetupWizardStep } from './types'
+import type { PipetteInformation } from '/app/resources/instruments/types'
+import type { ModuleSetupWizardStep, SendIdentifyModule } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -47,9 +54,14 @@ export interface UseModuleSetupWizardResult {
     goBack: () => void
     setErrorMessage: (message: string | null) => void
     errorMessage: string | null
+    isDoorOpenError: boolean
+    setIsDoorOpenError: (isDoorOpenError: boolean) => void
+    dismissDoorOpenError: () => void
     isOnDevice: boolean
     attachedModule: AttachedModule | null
     isExiting: boolean
+    sendIdentifyModule: SendIdentifyModule
+    updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -67,7 +79,8 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const { t } = useTranslation('module_wizard_flows')
+
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -78,10 +91,7 @@ export function useModuleSetupWizard(
   const { currentStepIndex, currentStep, totalStepCount, attachedModule } =
     state
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette =
-    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
-      ? attachedPipettes.left
-      : attachedPipettes.right
+  const attachedPipette = getCalibratedPipetteForModuleSetup(attachedPipettes)
 
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -92,17 +102,47 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('add_module', closeFlow)
+
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
+
+  const sendIdentifyModule = useSendIdentifyModule(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation(
+    commandDocState,
+    {
+      onSuccess: () => {
+        addActionToDocument('update_deck_configuration')
+      },
+    }
+  )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
-      onSuccess: (response: {
-        data: { id: SetStateAction<string | null> }
-      }) => {
-        setMaintenanceRunId(response.data.id)
-      },
-    })
+    useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
+      {
+        onSuccess: (response: {
+          data: { id: SetStateAction<string | null> }
+        }) => {
+          setMaintenanceRunId(response.data.id)
+        },
+      }
+    )
 
   useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,
@@ -111,6 +151,11 @@ export function useModuleSetupWizard(
   })
 
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
+  const [isDoorOpenError, setIsDoorOpenError] = useState<boolean>(false)
+  const dismissDoorOpenError = (): void => {
+    setErrorMessage(null)
+    setIsDoorOpenError(false)
+  }
   const [isExiting, setIsExiting] = useState<boolean>(false)
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
@@ -125,18 +170,22 @@ export function useModuleSetupWizard(
     if (onComplete != null) onComplete()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      setMaintenanceRunId(null)
-    },
-    onError: () => {
-      setMaintenanceRunId(null)
-    },
-  })
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    [...actionsToDocument, 'end_module_setup'],
+    {
+      onSuccess: () => {
+        setMaintenanceRunId(null)
+      },
+      onError: () => {
+        setIsExiting(false)
+      },
+    }
+  )
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
+    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
     if (maintenanceRunId == null) {
       console.log(
         'closing module setup wizard: no maintenance run, not deleting'
@@ -155,12 +204,21 @@ export function useModuleSetupWizard(
           console.log(
             'closing module setup wizard: homed, clearing maintenance run'
           )
-          deleteMaintenanceRun(maintenanceRunId)
-          handleClose()
+          deleteMaintenanceRun(maintenanceRunId, {
+            onSuccess: () => {
+              handleClose()
+            },
+          })
         })
         .catch(error => {
-          console.error(error.message)
-          handleClose()
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsExiting(false)
+            setIsDoorOpenError(true)
+            setErrorMessage(t('door_is_open') as string)
+          } else {
+            console.error(error.message)
+            handleClose()
+          }
         })
     }
   }
@@ -207,14 +265,24 @@ export function useModuleSetupWizard(
     restartSetup,
     setErrorMessage,
     errorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     isOnDevice,
     attachedModule,
     isExiting,
+    sendIdentifyModule,
+    updateDeckConfiguration,
   }
 
   const buildFlowForSelectedModule = (
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
+    addActionToDocument({
+      module: selectedModuleToBuildFlow,
+      type: 'attach_module',
+      step: 'start',
+    })
     dispatch({
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,

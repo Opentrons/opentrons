@@ -289,10 +289,11 @@ export function LabwareStackToolboxContainer({
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
   const slot = getSlotInLocationStack(labwareStack)
 
-  const largestStackInSlot = getLargestStackInSlot(
-    initialRobotState.labware,
-    slot
-  )
+  const largestStackInSlot = getLargestStackInSlot({
+    slot,
+    labwareState: initialRobotState.labware,
+    modulesState: initialRobotState.modules,
+  })
 
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId

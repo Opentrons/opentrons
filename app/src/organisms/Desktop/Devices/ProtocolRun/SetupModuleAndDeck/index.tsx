@@ -139,7 +139,6 @@ export const SetupModuleAndDeck = ({
             !moduleCalibrationStatus.complete
           }
           onClick={expandLabwarePositionCheckStep}
-          id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >

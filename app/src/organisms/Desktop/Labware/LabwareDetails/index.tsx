@@ -93,7 +93,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <LegacyStyledText
             forwardedAs="label"
-            id="LabwareDetails_opentronsDef"
             className={styles.brand_def_text}
           >
             {t('branded:opentrons_def')}
@@ -102,11 +101,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       )}
       {modified != null && filename != null && (
         <div className={styles.last_updated_container}>
-          <LegacyStyledText
-            forwardedAs="label"
-            color={COLORS.grey50}
-            id="LabwareDetails_dateAdded"
-          >
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </LegacyStyledText>
           <CustomLabwareOverflowMenu
