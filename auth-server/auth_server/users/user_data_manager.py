@@ -18,6 +18,7 @@ from auth_server.users.models import (
     SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
+    UserLoginStatus,
     UserResponse,
 )
 from auth_server.users.software_keyboard_characters import (
@@ -178,16 +179,24 @@ def _reject_disallowed_service_account_mutations(
         raise InvalidInputError("Service accounts cannot be locked or unlocked.")
 
 
-def must_reset_password(
+def _password_is_expired(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
 ) -> bool:
-    """Return whether the user must reset their password before full robot access."""
-    password_is_expired = (
+    """Return whether the user's password has passed the configured expiration window."""
+    return (
         password_reset_time_sec is not None
         and now
         > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
     )
-    return password_is_expired or user.reset_password
+
+
+def must_reset_password(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> bool:
+    """Return whether the user must reset their password before full robot access."""
+    return (
+        _password_is_expired(user, now, password_reset_time_sec) or user.reset_password
+    )
 
 
 class UserDataManager:
@@ -271,6 +280,23 @@ class UserDataManager:
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
         return self._to_response(user)
+
+    def get_login_status(self, username: str) -> UserLoginStatus:
+        """Return pre-auth login UI hints for ``username``.
+
+        ``resetPassword`` is true only when a temporary password is active.
+        ``passwordExpired`` is true when the real password has aged past the
+        configured reset window. Either can require a new password after login.
+        """
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        settings = self._settings_store.get_settings()
+        now = datetime.datetime.now(tz=datetime.UTC)
+        return UserLoginStatus(
+            resetPassword=user.temporary_hashed_password is not None,
+            passwordExpired=_password_is_expired(user, now, settings.passwordResetTime),
+        )
 
     def get_users_list(self) -> list[UserResponse]:
         """Return all users."""

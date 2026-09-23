@@ -16,6 +16,7 @@ stages:
       json:
         data:
           resetPassword: false
+          passwordExpired: false
 
   - name: Create a user without a password
     request:
@@ -39,7 +40,7 @@ stages:
           resetPassword: true
           temporaryPassword: !anystr
 
-  - name: Login status is true when reset password is required
+  - name: Login status is true when a temporary password was issued
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/byUsername/login_status_user/loginStatus'
@@ -48,6 +49,7 @@ stages:
       json:
         data:
           resetPassword: true
+          passwordExpired: false
 
   - name: Login status returns 404 for unknown user
     request:

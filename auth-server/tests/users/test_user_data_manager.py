@@ -15,6 +15,7 @@ from auth_server.users.models import (
     SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
+    UserLoginStatus,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -675,6 +676,70 @@ def test_get_user_reset_password_true_when_admin_flag_set(
     result = manager.get_user("flagged_user")
 
     assert result.resetPassword is True
+
+
+def test_get_login_status_true_when_temporary_password_set(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("temp_user")).then_return(
+        _make_orm_user(
+            username="temp_user",
+            temporary_hashed_password=password_hash.hash("temppass1"),
+            reset_password=True,
+        )
+    )
+
+    assert manager.get_login_status("temp_user") == UserLoginStatus(
+        resetPassword=True, passwordExpired=False
+    )
+
+
+def test_get_login_status_password_expired_without_temp(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    """Expiration is reported separately from temporary-password login."""
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
+    )
+    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(days=2)
+    decoy.when(mock_store.get("expired_user")).then_return(
+        _make_orm_user(username="expired_user", password_set_at=expired_at)
+    )
+
+    assert manager.get_login_status("expired_user") == UserLoginStatus(
+        resetPassword=False, passwordExpired=True
+    )
+
+
+def test_get_login_status_false_when_admin_flag_without_temp(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("flagged_user")).then_return(
+        _make_orm_user(username="flagged_user", reset_password=True)
+    )
+
+    assert manager.get_login_status("flagged_user") == UserLoginStatus(
+        resetPassword=False, passwordExpired=False
+    )
+
+
+def test_get_login_status_not_found_raises(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("ghost")).then_return(None)
+    with pytest.raises(UserNotFoundError):
+        manager.get_login_status("ghost")
 
 
 @pytest.mark.parametrize(

@@ -50,6 +50,7 @@ from auth_server.users.user_data_manager import (
     UserAlreadyExistsError,
     UserDataManager,
     UsernameContainsInvalidCharactersError,
+    UserNotFoundError,
 )
 
 router = fastapi.APIRouter()
@@ -197,7 +198,8 @@ async def get_user(
     path="/auth/users/byUsername/{username}/loginStatus",
     summary="Get user login status",
     description=(
-        "Return whether a user must reset their password before full robot access."
+        "Return pre-authentication login hints: whether a temporary / one-time"
+        " password is active, and whether the current password has expired."
         " This endpoint is unauthenticated so clients can adjust the login UI."
     ),
     responses={
@@ -206,14 +208,22 @@ async def get_user(
     },
 )
 async def get_user_login_status(
-    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
+    username: str,
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UserLoginStatus]]:
     """Get login status for a user by username."""
+    try:
+        login_status = user_data_manager.get_login_status(username)
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(
-            data=UserLoginStatus(resetPassword=user.resetPassword),
-        ),
+        content=SimpleBody(data=login_status),
     )
 
 

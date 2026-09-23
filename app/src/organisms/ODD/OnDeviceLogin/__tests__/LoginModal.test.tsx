@@ -72,7 +72,7 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
 
 function mockUserLoginStatus(resetPassword = false): void {
   vi.mocked(getUserLoginStatus).mockResolvedValue({
-    data: { data: { resetPassword } },
+    data: { data: { resetPassword, passwordExpired: false } },
   } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 

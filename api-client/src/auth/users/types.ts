@@ -32,6 +32,7 @@ export interface AuthUsersResponse {
 
 export interface UserLoginStatus {
   resetPassword: boolean
+  passwordExpired: boolean
 }
 
 export interface UserLoginStatusResponse {

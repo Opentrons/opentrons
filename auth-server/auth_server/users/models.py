@@ -173,8 +173,17 @@ class UserLoginStatus(BaseModel):
         bool,
         Field(
             description=(
-                "If true, the user must sign in with a temporary or one-time password"
-                " and set a new password before full robot access."
+                "If true, the user must sign in with a temporary or one-time password."
+                " This is only true when a temporary password has been issued."
+            )
+        ),
+    ]
+    passwordExpired: Annotated[
+        bool,
+        Field(
+            description=(
+                "If true, the user's current password has passed the configured"
+                " expiration window and they must choose a new password after login."
             )
         ),
     ]
