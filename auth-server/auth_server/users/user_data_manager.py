@@ -403,6 +403,7 @@ class UserDataManager:
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
         """Reset a user's password to a newly generated temporary password.
+
         Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
         doing anything else with the robot.
