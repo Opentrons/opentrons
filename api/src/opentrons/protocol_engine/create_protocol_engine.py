@@ -44,9 +44,11 @@ async def create_protocol_engine(
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
-    notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    notify_publishers: typing.Optional[
+        typing.Callable[[], typing.Awaitable[None]]
+    ] = None,
     updates_callback: typing.Optional[
-        typing.Callable[[list[EngineEventNotification]], None]
+        typing.Callable[[list[EngineEventNotification]], typing.Awaitable[None]]
     ] = None,
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler
@@ -118,6 +120,9 @@ async def create_protocol_engine(
     file_provider = file_provider or FileProvider()
     camera_provider = camera_provider or CameraProvider()
 
+    notify_and_update_task = asyncio.create_task(
+        state_store.notify_and_update_callbacks()
+    )
     pe = ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -130,6 +135,7 @@ async def create_protocol_engine(
         file_provider=file_provider,
         camera_provider=camera_provider,
         associated_command_error_recovery=associated_command_error_recovery,
+        notify_and_update_task=notify_and_update_task,
     )
 
     # todo(mm, 2024-11-08): This is a quick hack to support the absorbance reader, which

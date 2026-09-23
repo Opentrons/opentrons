@@ -260,8 +260,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
             deck_configuration=await self._robot_server_resource.get_deck_configuration(),
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
-            notify_publishers=self._robot_server_resource.get_notify_publishers(),
-            updates_callback=self._robot_server_resource.get_engine_updates_callback,
+            notify_publishers=self._robot_server_resource.notify_publishers_callback,
+            updates_callback=self._robot_server_resource.engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
             run_store_provider=self._robot_server_resource.get_run_store_provider(),
         )

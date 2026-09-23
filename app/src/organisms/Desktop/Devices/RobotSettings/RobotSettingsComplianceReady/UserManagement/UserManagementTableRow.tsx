@@ -46,7 +46,8 @@ export function UserManagementTableRow({
       action(user)
     }
 
-  const isServiceAccount = user.accountType === 'service'
+  const isServiceAccount =
+    user.accountType === 'service' || user.username === 'recovery'
   const canEdit = !isServiceAccount
   const canDelete = !isServiceAccount
   const canLockOrUnlock = !isServiceAccount

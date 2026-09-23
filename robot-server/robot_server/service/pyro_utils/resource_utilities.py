@@ -1,6 +1,6 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, Awaitable, Callable, cast
 
 import Pyro5.errors as pyro_errors
 
@@ -122,7 +122,7 @@ def register_file_provider_to_pyro_resource(
 
 def register_notify_publishers_to_pyro_resource(
     app_state: AppState,
-    notify_publishers: Callable[[], None],
+    notify_publishers: Callable[[], Awaitable[None]],
 ) -> None:
     """Set the provided Notification Publishers as the callback to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)

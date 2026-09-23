@@ -63,3 +63,19 @@ class AuthServerSettings(BaseSettings):
             " If both are unset, audit logging cannot happen."
         ),
     )
+
+    robot_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where robot-server is listening."
+            " This is mutually exclusive with robot_server_url."
+        ),
+    )
+
+    robot_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:31950`) where robot-server is listening."
+            " This is mutually exclusive with robot_server_uds."
+        ),
+    )

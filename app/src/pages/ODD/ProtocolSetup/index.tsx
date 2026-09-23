@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
@@ -51,7 +51,6 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
-  ProtocolSetupButtonsSkeleton,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -62,6 +61,8 @@ import {
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
+import { ProtocolSetupLoadingTimeoutModal } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLoadingTimeoutModal'
+import { ProtocolSetupHeaderButtonSkeleton } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupSkeleton'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -99,7 +100,9 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
+import { useEnsureProtocolAnalysis } from '/app/resources/protocols'
 import {
+  useCloseCurrentRun,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -186,6 +189,8 @@ function PrepareToRun({
     'shared',
     'deck_configuration',
   ])
+  const navigate = useNavigate()
+  const { closeCurrentRun } = useCloseCurrentRun()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -219,18 +224,18 @@ function PrepareToRun({
     [storageInfo.isImageStorageLow != null]
   )
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const analysisId = mostRecentAnalysisSummary?.id ?? null
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
   const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
+    useProtocolAnalysisAsDocumentQuery(protocolId, analysisId, {
+      enabled:
+        protocolRecord != null &&
+        isPollingForCompletedAnalysis &&
+        analysisId != null,
+      refetchInterval: ANALYSIS_POLL_MS,
+    })
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -654,21 +659,19 @@ function PrepareToRun({
             )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
+            <CloseButton
+              onClose={() => {
+                setShowConfirmCancelModal(true)
+              }}
+            />
             {!isLoading ? (
-              <>
-                <CloseButton
-                  onClose={() => {
-                    setShowConfirmCancelModal(true)
-                  }}
-                />
-                <PlayButton
-                  onPlay={onPlay}
-                  ready={isReadyToRun}
-                  isDoorOpen={doorStatus.isDoorOpen}
-                />
-              </>
+              <PlayButton
+                onPlay={onPlay}
+                ready={isReadyToRun}
+                isDoorOpen={doorStatus.isDoorOpen}
+              />
             ) : (
-              <ProtocolSetupButtonsSkeleton />
+              <ProtocolSetupHeaderButtonSkeleton />
             )}
           </Flex>
         </Flex>
@@ -753,6 +756,16 @@ function PrepareToRun({
           isActiveRun={false}
         />
       ) : null}
+      <ProtocolSetupLoadingTimeoutModal
+        enabled={isLoading}
+        onReturnToDashboard={() => {
+          closeCurrentRun({
+            onSuccess: () => {
+              navigate('/dashboard')
+            },
+          })
+        }}
+      />
     </>
   )
 }
@@ -788,36 +801,14 @@ export function ProtocolSetup(): JSX.Element {
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
-    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const { analysis: mostRecentAnalysis, protocolRecord } =
+    useEnsureProtocolAnalysis(protocolId)
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
   const [showConfirmCancelModal, setShowConfirmCancelModal] =
     useState<boolean>(false)
-
-  const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
-
-  useEffect(() => {
-    if (mostRecentAnalysis?.status === 'completed') {
-      setIsPollingForCompletedAnalysis(false)
-    } else {
-      setIsPollingForCompletedAnalysis(true)
-    }
-  }, [mostRecentAnalysis?.status])
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = useMemo(

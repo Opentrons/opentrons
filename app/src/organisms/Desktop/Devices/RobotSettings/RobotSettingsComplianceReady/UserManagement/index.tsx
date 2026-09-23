@@ -21,7 +21,6 @@ import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
-import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
 import { AddUserModal } from './AddUserModal'
 import { EditUserModal } from './EditUserModal'
 import styles from './usermanagement.module.css'
@@ -32,6 +31,7 @@ import type { AuthUser } from '@opentrons/api-client'
 
 export interface UserManagementProps {
   robotName: string
+  onShowOneTimePassword: (password: string) => void
 }
 
 interface UserManagementTableProps {
@@ -91,6 +91,7 @@ function UserManagementTable({
 
 export function UserManagement({
   robotName,
+  onShowOneTimePassword,
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
@@ -110,8 +111,6 @@ export function UserManagement({
   const [userToDeactivate, setUserToDeactivate] = useState<AuthUser | null>(
     null
   )
-  const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
-    useState<string | null>(null)
 
   const documentationState = useDocumentationState(undefined, robotName)
   const { documentationState: linkedDocumentationState } =
@@ -147,7 +146,9 @@ export function UserManagement({
         makeToast(
           t('desktop_delete_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         setUserToDelete(null)
         if (username === deletedUsername) {
@@ -176,11 +177,13 @@ export function UserManagement({
         makeToast(
           t('desktop_activate_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
-          setResetPasswordTemporaryPassword(temporaryPassword)
+          onShowOneTimePassword(temporaryPassword)
         }
       })
       .catch(() => {
@@ -194,21 +197,25 @@ export function UserManagement({
     }
 
     const resetUsername = userToResetPassword.username
+    const isResettingSelf = username === resetUsername
 
     void resetUserPassword(resetUsername)
       .then(response => {
         makeToast(
           t('desktop_reset_password_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         const { temporaryPassword } = response.data
+        setUserToResetPassword(null)
         if (temporaryPassword != null) {
-          setResetPasswordTemporaryPassword(temporaryPassword)
-        } else {
-          setUserToResetPassword(null)
-        }
-        if (username === resetUsername) {
+          // Show OTP above UserManagement so it survives token revocation when
+          // the admin resets their own password. Server already invalidates the
+          // session; client logout follows from the next auth failure.
+          onShowOneTimePassword(temporaryPassword)
+        } else if (isResettingSelf) {
           dispatch(logOut({ robotName }))
         }
       })
@@ -218,7 +225,6 @@ export function UserManagement({
   }
 
   const handleResetPasswordCancel = (): void => {
-    setResetPasswordTemporaryPassword(null)
     setUserToResetPassword(null)
   }
 
@@ -237,7 +243,9 @@ export function UserManagement({
         makeToast(
           t('desktop_lock_user_success_banner') as string,
           SUCCESS_TOAST,
-          { closeButton: true }
+          {
+            closeButton: true,
+          }
         )
         setUserToDeactivate(null)
         if (username === lockedUsername) {
@@ -278,7 +286,9 @@ export function UserManagement({
             makeToast(
               t('desktop_add_user_created_banner') as string,
               SUCCESS_TOAST,
-              { closeButton: true }
+              {
+                closeButton: true,
+              }
             )
           }}
           onClose={() => {
@@ -294,7 +304,9 @@ export function UserManagement({
             makeToast(
               t('desktop_edit_user_success_banner') as string,
               SUCCESS_TOAST,
-              { closeButton: true }
+              {
+                closeButton: true,
+              }
             )
           }}
           onClose={() => {
@@ -340,7 +352,7 @@ export function UserManagement({
           }}
         />
       ) : null}
-      {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
+      {userToResetPassword != null ? (
         <SettingsConfirmationModal
           title={t('desktop_reset_password') as string}
           heading={t('desktop_reset_password_modal_heading') as string}
@@ -349,16 +361,6 @@ export function UserManagement({
           isConfirmDisabled={isResettingPassword}
           onConfirm={handleResetPasswordConfirm}
           onCancel={handleResetPasswordCancel}
-        />
-      ) : null}
-      {resetPasswordTemporaryPassword != null ? (
-        <OneTimePasswordModal
-          password={resetPasswordTemporaryPassword}
-          message={
-            t('desktop_reset_password_one_time_password_message') as string
-          }
-          onConfirm={handleResetPasswordCancel}
-          onClose={handleResetPasswordCancel}
         />
       ) : null}
     </Accordion>

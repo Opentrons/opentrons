@@ -26,7 +26,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 )
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 

@@ -14,6 +14,15 @@ from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 _PROCESSED_COMMANDS_MAX = 10
 
 @dataclass(frozen=True)
+class CommandEntryJSON:
+    """A raw command entry in state, including its index in the list."""
+
+    command: str
+    command_type: type[Command]
+    index: int
+
+
+@dataclass(frozen=True)
 class CommandEntry:
     """A command entry in state, including its index in the list."""
 
@@ -68,7 +77,7 @@ class CommandHistory:
     _all_command_ids_but_fixit_command_ids: List[str]
     """All command IDs besides fixit command intents, in insertion order."""
 
-    _commands_by_id: Dict[str, CommandEntry]
+    _commands_by_id: Dict[str, CommandEntryJSON]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
     _queued_command_ids: OrderedSet[str]
@@ -112,7 +121,9 @@ class CommandHistory:
     def get(self, command_id: str) -> CommandEntry:
         """Get a command entry if present, otherwise raise an exception."""
         try:
-            return self._commands_by_id[command_id]
+            raw_command = self._commands_by_id[command_id]
+            command = raw_command.command_type.model_validate_json(raw_command.command)
+            return CommandEntry(command=command, index=raw_command.index)
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
@@ -120,7 +131,9 @@ class CommandHistory:
         """Get the command which follows the command associated with the given ID, if any."""
         index = self.get(command_id).index
         try:
-            return self._commands_by_id[self._all_command_ids[index + 1]]
+            raw_command = self._commands_by_id[self._all_command_ids[index + 1]]
+            command = raw_command.command_type.model_validate_json(raw_command.command)
+            return CommandEntry(command=command, index=raw_command.index)
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
         except IndexError:
@@ -133,7 +146,11 @@ class CommandHistory:
         """
         index = self.get(command_id).index
         try:
-            prev_command = self._commands_by_id[self._all_command_ids[index - 1]]
+            raw_prev_command = self._commands_by_id[self._all_command_ids[index - 1]]
+            command = raw_prev_command.command_type.model_validate_json(
+                raw_prev_command.command
+            )
+            prev_command = CommandEntry(command=command, index=raw_prev_command.index)
             return prev_command if index != 0 else None
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
@@ -142,17 +159,26 @@ class CommandHistory:
 
     def get_all_commands(self) -> List[Command]:
         """Get all commands."""
-        return [
-            self._commands_by_id[command_id].command
-            for command_id in self._all_command_ids
-        ]
+        all_commands = []
+        for raw_command_entry in self._commands_by_id.values():
+            command = raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
+            )
+            all_commands.append(command)
+
+        return all_commands
 
     def get_all_failed_commands(self) -> List[Command]:
         """Get all failed commands."""
-        return [
-            self._commands_by_id[command_id].command
-            for command_id in self._all_failed_command_ids
-        ]
+        all_failed_commands = []
+        for command_id in self._all_failed_command_ids:
+            raw_command_entry = self._commands_by_id[command_id]
+            command = raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
+            )
+            all_failed_commands.append(command)
+
+        return all_failed_commands
 
     def get_filtered_command_ids(self, include_fixit_commands: bool) -> List[str]:
         """Get all fixit command IDs."""
@@ -174,7 +200,13 @@ class CommandHistory:
             command_ids if command_ids is not None else self._all_command_ids
         )
         commands = selected_command_ids[start:stop]
-        return [self._commands_by_id[command].command for command in commands]
+        raw_command_slice = [self._commands_by_id[command] for command in commands]
+        command_slice = []
+        for raw_command_entry in raw_command_slice:
+            command_slice.append(
+                raw_command_entry.command_type.model_validate_json(raw_command_entry.command)
+            )
+        return command_slice
 
     def del_end_slice(self, length: int) -> None:
         """Delete the end of the command history up to a given length."""
@@ -185,14 +217,24 @@ class CommandHistory:
     def get_tail_command(self) -> Optional[CommandEntry]:
         """Get the command most recently added."""
         if self._commands_by_id:
-            return next(reversed(self._commands_by_id.values()))
+            tail_raw_command_entry = next(reversed(self._commands_by_id.values()))
+            command = tail_raw_command_entry.command_type.model_validate_json(
+                tail_raw_command_entry.command
+            )
+            return CommandEntry(command=command, index=tail_raw_command_entry.index)
         else:
             return None
 
     def get_most_recently_completed_command(self) -> Optional[CommandEntry]:
         """Get the command most recently marked as SUCCEEDED or FAILED."""
         if self._most_recently_completed_command_id is not None:
-            return self._commands_by_id[self._most_recently_completed_command_id]
+            completed_raw_command = self._commands_by_id[
+                self._most_recently_completed_command_id
+            ]
+            command = completed_raw_command.command_type.model_validate_json(
+                completed_raw_command.command
+            )
+            return CommandEntry(command=command, index=completed_raw_command.index)
         else:
             return None
 
@@ -201,7 +243,11 @@ class CommandHistory:
         if self._running_command_id is None:
             return None
         else:
-            return self._commands_by_id[self._running_command_id]
+            raw_running_command = self._commands_by_id[self._running_command_id]
+            command = raw_running_command.command_type.model_validate_json(
+                raw_running_command.command
+            )
+            return CommandEntry(command=command, index=raw_running_command.index)
 
     def get_queue_ids(self) -> OrderedSet[str]:
         """Get the IDs of all queued protocol commands, in FIFO order."""
@@ -322,7 +368,12 @@ class CommandHistory:
             self._all_command_ids.append(command_id)
             if command_entry.command.intent != CommandIntent.FIXIT:
                 self._all_command_ids_but_fixit_command_ids.append(command_id)
-        self._commands_by_id[command_id] = command_entry
+
+        self._commands_by_id[command_id] = CommandEntryJSON(
+            command=command_entry.command.model_dump_json(by_alias=True),
+            command_type=type(command_entry.command),
+            index=command_entry.index,
+        )
         self._command_manager.insert_command(command_entry=command_entry)
 
     def _add_to_queue(self, command_id: str) -> None:

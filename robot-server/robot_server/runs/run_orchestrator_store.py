@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Awaitable, Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
 from opentrons.config import (
@@ -338,7 +338,7 @@ class RunOrchestratorStore:
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
         camera_provider: CameraProvider,
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         # TODO(jbl 2024-08-02) combine this with run_time_param_values now that theres no ambiguity with Paths
@@ -773,7 +773,7 @@ class RunOrchestratorStore:
             # so there's no one to propagate this exception to.
             _log.exception("Exception handling E-stop event.")
 
-    def update_engine_status_callback(
+    async def update_engine_status_callback(
         self, events: list[EngineEventNotification]
     ) -> None:
         """Handle protocol engine status updates for the run orchestrator store."""

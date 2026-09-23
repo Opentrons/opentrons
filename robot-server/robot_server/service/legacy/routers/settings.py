@@ -179,13 +179,20 @@ async def post_settings(
 
         await advanced_settings.set_adv_setting(update.id, update.value)
         if update.id == "enableHardwareSubprocess" and robot_type == RobotTypeEnum.FLEX:
-            await _hardware_subprocess_transition(
-                enable=update.value if update.value is not None else False,
-                app_state=app_state,
-            )
-
-            # Refresh the hardware dependency
-            hardware = await get_hardware_resource(app_state)
+            enable = update.value is True
+            if enable:
+                # systemd starts the Pyro units  only on the next boot, once the flags file is true.
+                # A live transition here tears down in-process hardware and 503s if
+                # the nameserver is not already running, which blocks CRS enable.
+                log.info(
+                    "Persisted enableHardwareSubprocess=true; restart required to start Pyro"
+                )
+            else:
+                await _hardware_subprocess_transition(
+                    enable=False,
+                    app_state=app_state,
+                )
+                hardware = await get_hardware_resource(app_state)
 
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())

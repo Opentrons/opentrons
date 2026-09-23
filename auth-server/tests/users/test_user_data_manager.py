@@ -10,6 +10,7 @@ from auth_server.settings.models import (
     SettingsResponseData,
 )
 from auth_server.settings.store import SettingsStore
+from auth_server.users.credential_characters import CREDENTIAL_SPECIAL_CHARACTERS
 from auth_server.users.models import (
     SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
@@ -1011,7 +1012,9 @@ def test_reset_user_password_uses_password_complexity_settings(
     result = manager.reset_user_password("reset_me", now=_NOW)
 
     assert len(result.temporaryPassword or "") == 12
-    assert any(c in string.punctuation for c in result.temporaryPassword or "")
+    assert any(
+        c in CREDENTIAL_SPECIAL_CHARACTERS for c in result.temporaryPassword or ""
+    )
 
 
 def test_reset_user_password_not_found_raises(
@@ -1067,9 +1070,10 @@ def test_temporary_password_requirements(
 
 
 def test_generate_temporary_password_meets_complexity_rules() -> None:
-    password = _generate_temporary_password(12, require_special_characters=True)
-    assert len(password) == 12
-    assert any(c in string.punctuation for c in password)
+    for _ in range(50):
+        password = _generate_temporary_password(12, require_special_characters=True)
+        assert len(password) == 12
+        assert any(c in CREDENTIAL_SPECIAL_CHARACTERS for c in password)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:

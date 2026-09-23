@@ -11,9 +11,12 @@ import aiohttp.web
 import pytest
 
 from server_utils.robot.robot_server import (
+    HARDWARE_SUBPROCESS_SETTING_ID,
     HEALTH_ENDPOINT_PATH,
+    PROTOCOL_SUBPROCESS_SETTING_ID,
     PROTOCOLS_ENDPOINT_PATH,
     RUNS_ENDPOINT_PATH,
+    SETTINGS_ENDPOINT_PATH,
     ActiveCurrentRunNotFoundError,
     LocalHTTPClient,
     RobotCurrentRunLog,
@@ -52,6 +55,15 @@ class AppMock:
     get_protocols_response_status: int
     """The HTTP status code the server should respond with to a GET protocols request."""
 
+    post_settings_response: object
+    """The JSON body the server should respond with to a POST settings request."""
+
+    post_settings_response_status: int
+    """The HTTP status code the server should respond with to a POST settings request."""
+
+    posted_settings: list[object]
+    """JSON bodies received by POST /settings, in order."""
+
     app: Final[aiohttp.web.Application]
 
     def __init__(self) -> None:
@@ -67,6 +79,10 @@ class AppMock:
         self.get_protocols_response = {}
         self.get_protocols_response_status = 200
 
+        self.post_settings_response = {}
+        self.post_settings_response_status = 200
+        self.posted_settings = []
+
         app = aiohttp.web.Application()
         app.router.add_get(f"/{HEALTH_ENDPOINT_PATH}", self._get_health)
         app.router.add_get(f"/{RUNS_ENDPOINT_PATH}", self._get_runs)
@@ -76,6 +92,7 @@ class AppMock:
         app.router.add_get(
             f"/{PROTOCOLS_ENDPOINT_PATH}" + "/{protocolId}", self._get_protocols
         )
+        app.router.add_post(f"/{SETTINGS_ENDPOINT_PATH}", self._post_settings)
         self.app = app
 
     async def _get_health(self, request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -104,6 +121,15 @@ class AppMock:
         return aiohttp.web.json_response(
             data=self.get_protocols_response,
             status=self.get_protocols_response_status,
+        )
+
+    async def _post_settings(
+        self, request: aiohttp.web.Request
+    ) -> aiohttp.web.Response:
+        self.posted_settings.append(await request.json())
+        return aiohttp.web.json_response(
+            data=self.post_settings_response,
+            status=self.post_settings_response_status,
         )
 
 
@@ -363,6 +389,33 @@ async def test_get_name_and_serial_http_error(
 
     with pytest.raises(aiohttp.ClientResponseError):
         await client.get_name_and_serial()
+
+
+async def test_enable_pyro_subprocess_flags(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """The client should POST both Pyro subprocess flags as enabled."""
+    app_mock, client = mock_server
+
+    await client.enable_pyro_subprocess_flags()
+
+    assert app_mock.posted_settings == [
+        {"id": HARDWARE_SUBPROCESS_SETTING_ID, "value": True},
+        {"id": PROTOCOL_SUBPROCESS_SETTING_ID, "value": True},
+    ]
+
+
+async def test_enable_pyro_subprocess_flags_http_error(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """A non-2xx response from robot-server should be raised as an exception."""
+    app_mock, client = mock_server
+
+    app_mock.post_settings_response = {"errors": [{"detail": "oops"}]}
+    app_mock.post_settings_response_status = 500
+
+    with pytest.raises(aiohttp.ClientResponseError):
+        await client.enable_pyro_subprocess_flags()
 
 
 async def test_get_name_and_serial_raises_when_uds_server_unreachable(

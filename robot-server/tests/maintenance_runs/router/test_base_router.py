@@ -43,7 +43,7 @@ from robot_server.maintenance_runs.router.base_router import (
 from robot_server.runs.run_data_manager import RunDataManager
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
