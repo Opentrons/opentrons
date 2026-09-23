@@ -10,9 +10,8 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
-import { AspirateInPlaceParams } from '@opentrons/shared-data'
 
-export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
+export const aspirateInPlace: CommandCreator<AspirateInPlaceStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
