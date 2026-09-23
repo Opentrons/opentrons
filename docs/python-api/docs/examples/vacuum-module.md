@@ -251,10 +251,6 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
     protocol.wait_for_tasks([dry_task])
 ```
 
-<!--- maybe this should be the Phase 3, H2 section intro --->
-!!! note
-    Unlike the liquid collection step in Stage 3, this stage does not run pipetting actions in parallel with Vacuum Module operations. Instead, calling `wait_for_tasks([dry_task])` after starting the vacuum cycle switches protocol operations back to serial execution. Putting `wait_for_tasks()` after a non-blocking method pauses the protocol to help ensure each drying and washing cycle completes before the robot proceeds to the next command.
-
 ## Protocol takeaways
 
 The miniprep protocol demonstrates several key operational principles of the Vacuum Module API and hardware operations.
