@@ -129,6 +129,7 @@
   "desktop_add_user_created_banner": "New user account added",
   "desktop_add_user_legal_name_required_error": "Legal name is required",
   "desktop_add_user_success_message": "Give the one time password to the account owner. When they log in, they will be prompted to create a new password.",
+  "desktop_admin_warning_banner": "Admins cannot delete, reset the password, lock, or change the role of their own account.",
   "desktop_audit_log_requirements": "Audit log requirements",
   "desktop_auto_logout_inactivity_length": "Length of time for auto-logout due to inactivity",
   "desktop_automatically_delete_protocol_run_logs": "Automatically delete the oldest protocol run record when the robot reaches the maximum of 20 saved records",
