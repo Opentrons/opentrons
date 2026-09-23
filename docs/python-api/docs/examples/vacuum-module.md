@@ -125,6 +125,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
 During this stage, a gentle vacuum pulls clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates vacuum seal.
 
+During this stage, a gentle vacuum pulls clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates a vacuum seal
+
 <table>
   <thead>
     <tr>
@@ -135,10 +137,10 @@ During this stage, a gentle vacuum pulls clarified lysate into a 96-well collect
   <tbody>
     <tr>
       <td><strong>Stack assembly</strong></td>
-      <td>
+      <td><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a>:
         <ul>
-          <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a> uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
-          <li><code>move_labware()</code> seats the tall collar over the base to seal the labware stack.</li>
+          <li> uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
+          <li>seats the tall collar over the base to seal the labware stack.</li>
         </ul>
       </td>
     </tr>
@@ -165,7 +167,7 @@ During this stage, a gentle vacuum pulls clarified lysate into a 96-well collect
 
 ### Liquid handling
 
-Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations in parallel with extraction. Also, `clarify_task = vacuum.start_set_vacuum_pressure()` switches the robot back to serial operation to prevent the Gripper from moving labware off the Vacuum Module until the system depressurizes.
+Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations while the Vacuum Module operates. Calling `protocol.wait_for_tasks([clarify_tasks])` switches the robot back to serial operation preventing other commands from executing until the system depressurizes so the Gripper can move labware off the module.
 
 ```python
 # Pipette liquids while the Vacuum Module runs
