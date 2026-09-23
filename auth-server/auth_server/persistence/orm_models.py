@@ -36,6 +36,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(unique=True)
     hashed_password: Mapped[str]
+    # Set when a user gets a one-time password.
+    temporary_password: Mapped[str | None] = mapped_column(nullable=True)
     full_name: Mapped[str]
     account_type: Mapped[str]
     # A flag that this user must reset their password for reasons other than time-based expiration.
