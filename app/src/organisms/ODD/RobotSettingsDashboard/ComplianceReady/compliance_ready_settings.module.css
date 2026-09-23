@@ -74,7 +74,7 @@
 
 /* List button */
 
-.list_button {
+.list_button.list_button {
   display: flex;
   width: 100%;
   flex-direction: row;
