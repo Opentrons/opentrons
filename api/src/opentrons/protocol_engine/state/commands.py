@@ -70,6 +70,7 @@ from opentrons.protocol_engine.error_recovery_policy import (
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 
 class QueueStatus(enum.Enum):
@@ -298,6 +299,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        run_store_provider: RunStoreProvider,
         updates_callback: Optional[
             Callable[
                 [CurrentCommandNotification | FinalizedCommandNotification | Any], None
@@ -307,7 +309,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
-            command_history=CommandHistory(),
+            command_history=CommandHistory(run_store_provider=run_store_provider),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,

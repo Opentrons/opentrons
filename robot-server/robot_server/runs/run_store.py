@@ -740,32 +740,66 @@ class RunStore:
         )
 
     async def insert_command(self, run_id: str, command_index: int, command: Command) -> None:
-        """Insert a command into the run command table"""
+        """Insert or update a command on the run command table"""
+        select_command = sqlalchemy.select(run_command_table.c.command).where(
+            run_command_table.c.run_id == run_id,
+            run_command_table.c.command_id == command.id,
+        )
         insert_command = sqlalchemy.insert(run_command_table)
+        update_command = (
+                    sqlalchemy.update(run_command_table)
+                    .where(
+                        run_command_table.c.run_id == run_id,
+                        run_command_table.c.command_id == command.id,
+                    )
+                    .values(
+                        index_in_run=command_index,
+                        command=pydantic_to_json(command),
+                        command_intent=str(command.intent.value)
+                        if command.intent
+                        else CommandIntent.PROTOCOL,
+                        command_error=pydantic_to_json(command.error)
+                        if command.error
+                        else None,
+                        command_status=_convert_commands_status_to_sql_command_status(
+                            command.status
+                        ),
+                    )
+                )
+
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-            transaction.execute(
-                insert_command,
-                {
-                    "run_id": run_id,
-                    "index_in_run": command_index,
-                    "command_id": command.id,
-                    "command": pydantic_to_json(command),
-                    "command_intent": str(command.intent.value)
-                    if command.intent
-                    else CommandIntent.PROTOCOL,
-                    "command_error": pydantic_to_json(command.error)
-                    if command.error
-                    else None,
-                    "command_status": _convert_commands_status_to_sql_command_status(
-                        command.status
-                    ),
-                },
-            )
+
+            command = transaction.execute(select_command).scalar_one_or_none()
+            if command is None:
+                # If the command is not present, then we insert the new command
+                transaction.execute(
+                    insert_command,
+                    {
+                        "run_id": run_id,
+                        "index_in_run": command_index,
+                        "command_id": command.id,
+                        "command": pydantic_to_json(command),
+                        "command_intent": str(command.intent.value)
+                        if command.intent
+                        else CommandIntent.PROTOCOL,
+                        "command_error": pydantic_to_json(command.error)
+                        if command.error
+                        else None,
+                        "command_status": _convert_commands_status_to_sql_command_status(
+                            command.status
+                        ),
+                    },
+                )
+            else:
+                # If the command is already present, update it
+                transaction.execute(update_command)
+
 
     async def insert_command_annotation(self, run_id: str, command_annotation: CommandAnnotation) -> None:
-        """Insert a command annotation into the command annotation table"""
+        """Insert or update a command annotation into the command annotation table"""
+        # CASEY NOTE change this to include updating commands
         insert_command_annotation = sqlalchemy.insert(command_annotation_table)
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):

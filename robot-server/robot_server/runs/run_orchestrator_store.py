@@ -80,6 +80,7 @@ from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 _log = logging.getLogger(__name__)
 
@@ -215,6 +216,7 @@ class RunOrchestratorStore:
         deck_type: DeckType,
         run_process_pyro_provider: RunProcessPyroProvider,
         access_control_status: bool,
+        run_store_provider: RunStoreProvider,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -247,6 +249,7 @@ class RunOrchestratorStore:
         self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
         self._access_control_mode = access_control_status
         self._run_result: Optional[RunResult] = None
+        self._run_store_provider = run_store_provider
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -367,6 +370,7 @@ class RunOrchestratorStore:
             a new one may not be created.
         """
         self._run_result = None
+        self._run_store_provider.set_run_id(run_id)
         if feature_flags.protocol_subprocess_enabled():
             return await self.create_pyro(
                 run_id=run_id,
@@ -402,6 +406,7 @@ class RunOrchestratorStore:
             camera_provider=camera_provider,
             notify_publishers=notify_publishers,
             updates_callback=self.update_engine_status_callback,
+            run_store_provider=self._run_store_provider,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(

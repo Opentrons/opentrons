@@ -263,6 +263,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             notify_publishers=self._robot_server_resource.get_notify_publishers(),
             updates_callback=self._robot_server_resource.get_engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
+            run_store_provider=self._robot_server_resource.get_run_store_provider(),
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(

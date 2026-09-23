@@ -184,6 +184,7 @@ async def get_run_orchestrator_store(
         RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
     ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    run_store: Annotated[RunStore, Depends(get_run_store)]
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -195,6 +196,7 @@ async def get_run_orchestrator_store(
             deck_type=deck_type,
             run_process_pyro_provider=run_process_pyro_provider,
             access_control_status=access_control_status,
+            run_store_provider=run_store.get_run_store_provider(),
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed

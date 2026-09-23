@@ -4,10 +4,14 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
+import asyncio
 from ..commands import Command, CommandIntent, CommandStatus
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
+from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
+
+_PROCESSED_COMMANDS_MAX = 10
 
 @dataclass(frozen=True)
 class CommandEntry:
@@ -15,6 +19,40 @@ class CommandEntry:
 
     command: Command
     index: int
+
+class CommandManager:
+    """Manages command insertion into and queries on persistent command storage through the RunStoreProvider."""
+
+    def __init__(
+        self,
+        run_store_provider: RunStoreProvider,
+    ) -> None:
+        self._teardown_signal = asyncio.Event()
+        self._run_store_provider = run_store_provider
+        self._command_queue: list[CommandEntry] = []
+
+        # Set up the run store task
+        self._run_store_interface_task = asyncio.create_task(
+            self.run_store_interface_task()
+        )
+
+    def teardown(self) -> None:
+        """Send the teardown signal to the run store interface task."""
+        self._teardown_signal.set()
+
+    async def run_store_interface_task(self) -> None:
+        """Handle interactions with the RunStoreProvider."""
+        while not self._teardown_signal.is_set():
+            if len(self._command_queue) > 0:
+                # Remove the command from the queue and insert/update it on the RunStore
+                command_entry = self._command_queue.pop()
+                await self._run_store_provider.insert_command(command_index=command_entry.index, command=command_entry.command)
+
+            await asyncio.sleep(0.1)
+    
+    def insert_command(self, command_entry) -> None:
+        """Insert a command into the command queue for storage into persistence."""
+        self._command_queue.insert(0, command_entry)
 
 
 @dataclass  # dataclass for __eq__() autogeneration.
@@ -48,7 +86,10 @@ class CommandHistory:
     _most_recently_completed_command_id: Optional[str]
     """ID of the most recent command that SUCCEEDED or FAILED, if any"""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        run_store_provider: RunStoreProvider,
+    ) -> None:
         self._all_command_ids = []
         self._all_failed_command_ids = []
         self._all_command_ids_but_fixit_command_ids = []
@@ -58,6 +99,7 @@ class CommandHistory:
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._most_recently_completed_command_id = None
+        self._command_manager = CommandManager(run_store_provider)
 
     def length(self) -> int:
         """Get the length of all elements added to the history."""
@@ -281,6 +323,7 @@ class CommandHistory:
             if command_entry.command.intent != CommandIntent.FIXIT:
                 self._all_command_ids_but_fixit_command_ids.append(command_id)
         self._commands_by_id[command_id] = command_entry
+        self._command_manager.insert_command(command_entry=command_entry)
 
     def _add_to_queue(self, command_id: str) -> None:
         """Add new ID to the queued."""
