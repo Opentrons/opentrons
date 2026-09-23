@@ -29,9 +29,10 @@ export const aspirateInPlace: CommandCreator<AspirateInPlaceStepGenArgs> = (
     flowRate,
     runtimeParameters
   )
+  // `undefined` means the arg was omitted. `null` means a string arg failed to resolve.
   const resolvedCorrectionVolume =
     correctionVolume == null
-      ? null
+      ? undefined
       : resolveNumericRuntimeValue(correctionVolume, runtimeParameters)
 
   if (resolvedPipetteId == null) {
