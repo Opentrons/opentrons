@@ -150,22 +150,24 @@ export function RunSummary(): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const { closeCurrentRun } = useCloseCurrentRun()
-  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
-  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
-  const closeCurrentRunIfValid = (onSettled?: () => void): void => {
-    if (isRunCurrent) {
-      closeCurrentRun({
-        onSettled: () => {
-          onSettled?.()
-        },
-      })
-    } else {
-      onSettled?.()
-    }
-  }
   const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
   const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
   const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(false)
+  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
+  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+    if (isRunCurrent) {
+      closeCurrentRun({
+        onSuccess,
+        onError: () => {
+          setShowReturnToSpinner(false)
+          setShowRunAgainSpinner(false)
+        },
+      })
+    } else {
+      onSuccess?.()
+    }
+  }
 
   const robotSerialNumber =
     localRobot?.health?.robot_serial ??
@@ -227,31 +229,56 @@ export function RunSummary(): JSX.Element {
     ) : null
   }
 
-  const { determineTipStatus, setTipStatusResolved, aPipetteWithTip } =
-    useTipAttachmentStatus({
-      runId,
-      runRecord: runRecord ?? null,
-    })
+  const {
+    determineTipStatus,
+    setTipStatusResolved,
+    aPipetteWithTip,
+    initialPipettesWithTipsCount,
+  } = useTipAttachmentStatus({
+    runId,
+    runRecord: runRecord ?? null,
+  })
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({
     includeFixitCommands: false,
     pageLength: 1,
   })
+  const tipCheckSkippedBecauseER =
+    runSummaryNoFixit != null &&
+    lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
 
   useEffect(
     () => {
       // Only run tip checking if it wasn't *just* handled during Error Recovery.
-      if (
-        runSummaryNoFixit != null &&
-        !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
-      ) {
+      if (runSummaryNoFixit != null && !tipCheckSkippedBecauseER) {
         void determineTipStatus()
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isRunCurrent, runSummaryNoFixit, isEREnabled]
+  )
+
+  // After the splash, close the run if no tips need handling so desktop does
+  // not auto-document a second dismiss. Keep the run current while tips may
+  // still be on so Return / Run again can still open drop tip.
+  useEffect(
+    () => {
+      if (showSplash || !isRunCurrent) {
+        return
+      }
+      if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
+        closeCurrentRunIfValid()
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      showSplash,
+      isRunCurrent,
+      initialPipettesWithTipsCount,
+      tipCheckSkippedBecauseER,
+    ]
   )
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
@@ -335,9 +362,10 @@ export function RunSummary(): JSX.Element {
   })
   const outputFileIds = useRunGeneratedDataFiles(runId)
 
-  const [splashClicked, setSplashClicked] = useState(false)
   const handleClickSplash = (): void => {
-    setSplashClicked(true)
+    if (!showSplash) {
+      return
+    }
     trackProtocolRunEvent({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
@@ -347,10 +375,7 @@ export function RunSummary(): JSX.Element {
       transactionId: runId,
       amount: numberOfImages,
     })
-    closeCurrentRunIfValid(() => {
-      setShowSplash(false)
-      setSplashClicked(false)
-    })
+    setShowSplash(false)
   }
 
   const buildReturnToWithSpinnerText = (): JSX.Element => (
@@ -394,7 +419,7 @@ export function RunSummary(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       overflow={OVERFLOW_HIDDEN}
-      onClick={handleClickSplash}
+      onClick={showSplash ? handleClickSplash : undefined}
     >
       {showSplash ? (
         <Flex
@@ -427,16 +452,6 @@ export function RunSummary(): JSX.Element {
               <SplashBody>{protocolName}</SplashBody>
             </Flex>
           </SplashFrame>
-          {splashClicked ? (
-            <Flex
-              position={POSITION_ABSOLUTE}
-              top="0"
-              left="0"
-              width="100%"
-              height="100%"
-              backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
-            />
-          ) : null}
         </Flex>
       ) : (
         <Flex
