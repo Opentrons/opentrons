@@ -24,6 +24,7 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
+import { ComplianceReadySettings } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/ComplianceReadySettings'
 import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManager'
 import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
@@ -245,6 +246,9 @@ export function RobotSettingsDashboard(): JSX.Element {
       )
     case 'FileManager':
       return <FileManager setCurrentOption={setCurrentOption} />
+
+    case 'ComplianceReady':
+      return <ComplianceReadySettings setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:
