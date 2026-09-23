@@ -93,6 +93,25 @@ describe('useDocumentationState', () => {
     })
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
+
+  it('is not loading when access control is disabled even if audit settings are still loading', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      isLoading: false,
+      data: {
+        data: {
+          accessControlEnabled: false,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
+      isLoading: true,
+    } as ReturnType<typeof useAuditSettingsQuery>)
+
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
+
+    expect(result.current).toEqual(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
+  })
+
   it('skips both guards when access control is enabled but require reason for interaction is disabled', async () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
