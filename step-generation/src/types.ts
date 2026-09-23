@@ -302,19 +302,43 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
-export type Choices = number[] | string[]
-
-export interface RuntimeParameter {
+interface RuntimeParameterBase {
   variableName: string
   displayName: string
-  type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
-  default: string | number | boolean
-  minimum?: number
-  maximum?: number
-  choices?: Choices
-  unit?: string
   description?: string
 }
+
+export interface NumericRuntimeParameter extends RuntimeParameterBase {
+  type: 'float' | 'int'
+  default: number
+  minimum?: number
+  maximum?: number
+  choices?: number[]
+  unit?: string
+}
+
+export interface BooleanRuntimeParameter extends RuntimeParameterBase {
+  type: 'boolean'
+  default: boolean
+}
+
+export interface StringRuntimeParameter extends RuntimeParameterBase {
+  type: 'string'
+  default: string
+  choices?: string[]
+}
+
+export interface CsvRuntimeParameter extends RuntimeParameterBase {
+  type: 'csv'
+  default: string
+}
+
+export type RuntimeParameter =
+  | NumericRuntimeParameter
+  | BooleanRuntimeParameter
+  | StringRuntimeParameter
+  | CsvRuntimeParameter
+
 export interface RuntimeParameters {
   [variableName: string]: RuntimeParameter
 }
