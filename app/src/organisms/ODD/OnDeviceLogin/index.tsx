@@ -64,7 +64,7 @@ export function OnDeviceLogin({
     null
   )
   const [usernameError, setUsernameError] = useState<string | null>(null)
-  const { control, watch } = useForm<LoginFormValues>({
+  const { control, watch, resetField } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -227,6 +227,7 @@ export function OnDeviceLogin({
                 }
               : step === 'password' && !isPasswordResetRequired
                 ? () => {
+                    resetField('password')
                     onClearLoginError?.()
                     onStepChange('username')
                   }
