@@ -64,6 +64,30 @@ class SettingsResponseData(_StrictBaseModel):
     )
 
 
+class PatchSettingsResponseMeta(_StrictBaseModel):
+    """Contains metadata about the patch settings response.
+
+    This is used to determine if the user's password has been reset.
+    """
+
+    requiresLogout: Annotated[
+        bool,
+        pydantic.Field(
+            description="Whether the user needs to logout to apply the new settings."
+        ),
+    ]
+
+
+class PatchSettingsResponseBody(_StrictBaseModel):
+    """A response to a patch settings request.
+
+    This includes the new settings and metadata about the response.
+    """
+
+    data: SettingsResponseData
+    meta: PatchSettingsResponseMeta
+
+
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.
 
