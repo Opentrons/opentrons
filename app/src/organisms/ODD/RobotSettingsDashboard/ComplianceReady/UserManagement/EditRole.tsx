@@ -1,8 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StepMeter } from '@opentrons/components'
-
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 
 import { ChildNavigation } from '../../../ChildNavigation'
@@ -10,53 +8,43 @@ import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'
 
-export function ChooseRole({
-  onClickBack,
+export function EditRole({
   onCancel,
   onSubmit,
-  totalSteps,
-  currentStep,
-  savedRole,
   isLoading,
+  savedRole,
 }: {
-  onClickBack: (role?: 'admin' | 'user' | 'auditor') => void
   onCancel: () => void
-  onSubmit: (role: 'admin' | 'user' | 'auditor') => Promise<void>
-  totalSteps: number
-  currentStep: number
-  savedRole?: 'admin' | 'user' | 'auditor'
-  isLoading: boolean
+  onSubmit: (role: 'admin' | 'user' | 'auditor') => void
+  isLoading?: boolean
+  savedRole?: 'user' | 'admin' | 'auditor'
 }): ReactNode {
-  const [role, setRole] = useState<('admin' | 'user' | 'auditor') | undefined>(
+  const [role, setRole] = useState<('user' | 'admin' | 'auditor') | undefined>(
     savedRole
   )
   const { t } = useTranslation('device_settings')
 
-  const handleConfirm = useCallback(async (): Promise<void> => {
+  const handleConfirm = useCallback((): void => {
     if (role) {
-      await onSubmit(role)
+      onSubmit(role)
     }
   }, [role, onSubmit])
 
   return (
     <div className={styles.container}>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
       <ChildNavigation
-        header={t('odd_choose_role_title')}
-        onClickBack={() => {
-          onClickBack(role)
-        }}
+        header={t('odd_edit_role_title')}
+        onClickBack={onCancel}
         onClickButton={handleConfirm}
-        buttonText={t('odd_create_user_continue_button')}
+        buttonText={t('odd_save_role_button')}
         buttonType="primary"
         secondaryButtonProps={{
           buttonText: t('odd_create_user_cancel_button'),
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
-        buttonIsDisabled={isLoading}
         iconName={isLoading ? 'ot-spinner' : undefined}
-        marginTop="12px"
+        buttonIsDisabled={isLoading}
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_choose_role_buttons}>

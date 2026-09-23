@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StepMeter, TouchInputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -11,22 +11,16 @@ import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'
 
-export function AddLegalName({
-  onClickBack,
+export function EditLegalName({
   onCancel,
-  onContinue,
-  totalSteps,
-  currentStep,
-  savedLegalName,
+  onSave,
+  isLoading,
 }: {
-  onClickBack: (legalName?: string) => void
   onCancel: () => void
-  onContinue: (username: string) => void
-  totalSteps: number
-  currentStep: number
-  savedLegalName?: string
+  onSave: (legalName: string) => void
+  isLoading?: boolean
 }): ReactNode {
-  const [legalName, setLegalName] = useState<string | undefined>(savedLegalName)
+  const [legalName, setLegalName] = useState<string | undefined>(undefined)
   const { t } = useTranslation('device_settings')
   const keyboardRef = useRef(null)
   const inputElementRef = useRef(null)
@@ -38,9 +32,9 @@ export function AddLegalName({
 
   const handleConfirm = useCallback((): void => {
     if (!!legalName?.trim()) {
-      onContinue(legalName.trim())
+      onSave(legalName.trim())
     }
-  }, [legalName, onContinue])
+  }, [legalName, onSave])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
@@ -59,12 +53,8 @@ export function AddLegalName({
 
   return (
     <div className={styles.container}>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
       <ChildNavigation
         header={t('odd_add_legal_name_title')}
-        onClickBack={() => {
-          onClickBack(legalName)
-        }}
         onClickButton={handleConfirm}
         buttonText={t('odd_create_user_continue_button')}
         buttonType="primary"
@@ -73,7 +63,9 @@ export function AddLegalName({
           buttonType: 'tertiaryLowLight',
           onClick: onCancel,
         }}
-        marginTop="12px"
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        buttonIsDisabled={isLoading}
+        onClickBack={onCancel}
       />
       <div className={styles.odd_create_user_content}>
         <div className={styles.odd_create_user_input_container}>

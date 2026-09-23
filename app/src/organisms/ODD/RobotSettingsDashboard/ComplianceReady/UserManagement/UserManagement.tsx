@@ -3,23 +3,41 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+// eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
+import { Account } from '/app/pages/ODD/Account'
+import { useEditAccountHandlers } from '/app/resources/auth/hooks/useEditAccountHandlers'
+import { usePasswordComplexity } from '/app/resources/auth/hooks/usePasswordComplexity'
+
 import { ChildNavigation } from '../../../ChildNavigation'
 import { CreateUserFlow } from './CreateUserFlow'
 import styles from './user_management_settings.module.css'
 import { UserRow } from './UserRow'
 
 import type { ReactNode } from 'react'
-import type { AuthUser } from '@opentrons/api-client'
+import type { AuthUser, AuthUserResponse } from '@opentrons/api-client'
 
 export function UserManagement({
   onClickBack,
   users,
+  loggedInUser,
 }: {
   onClickBack: () => void
   users: AuthUser[]
+  loggedInUser: string
 }): ReactNode {
   const { t } = useTranslation('device_settings')
   const [createUser, setCreateUser] = useState<boolean>(false)
+  const [editUser, setEditUser] = useState<string | null>(null)
+  const editAccountHandlers = useEditAccountHandlers({
+    onNewUsername: (response: AuthUserResponse) => {
+      setEditUser(response.data.username)
+    },
+  })
+
+  const currentUserInfo = useMemo(
+    () => users.find(user => user.username === editUser),
+    [users, editUser]
+  )
 
   const handleCreateUser = (): void => {
     setCreateUser(true)
@@ -29,6 +47,8 @@ export function UserManagement({
     return users.map(user => user.username)
   }, [users])
 
+  const { passwordComplexity } = usePasswordComplexity()
+
   if (createUser) {
     return (
       <CreateUserFlow
@@ -36,6 +56,21 @@ export function UserManagement({
           setCreateUser(false)
         }}
         usernames={usernames}
+      />
+    )
+  }
+
+  if (editUser && currentUserInfo) {
+    return (
+      <Account
+        onBack={() => {
+          setEditUser(null)
+        }}
+        usernames={usernames}
+        passwordComplexity={passwordComplexity}
+        {...currentUserInfo}
+        {...editAccountHandlers(editUser)}
+        adminView={editUser !== loggedInUser}
       />
     )
   }
@@ -78,7 +113,13 @@ export function UserManagement({
             </StyledText>
           </div>
           {users.map(user => (
-            <UserRow key={user.username} user={user} onClick={() => {}} />
+            <UserRow
+              key={user.username}
+              user={user}
+              onClick={() => {
+                setEditUser(user.username)
+              }}
+            />
           ))}
         </div>
       </div>

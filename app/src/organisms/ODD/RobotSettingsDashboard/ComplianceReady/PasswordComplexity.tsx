@@ -5,6 +5,7 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
@@ -40,7 +41,12 @@ export function PasswordComplexity({
         label={t('odd_number_of_characters')}
         caption={t('odd_input_range')}
         onBack={value => {
-          patchAuthSettings({ passwordComplexityMinimumLength: value })
+          if (
+            value != null &&
+            isValidPasswordComplexityMinimumLength(String(value))
+          ) {
+            patchAuthSettings({ passwordComplexityMinimumLength: value })
+          }
           setShowMinLength(false)
         }}
         min={1}

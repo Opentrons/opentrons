@@ -5,13 +5,12 @@ import { StepMeter, TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { USERNAME_MAX_LENGTH } from '/app/resources/auth/helpers'
 
 import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'
-
-const MAX_USERNAME_LENGTH = 20
 
 export function AddUsername({
   savedUsername,
@@ -39,20 +38,31 @@ export function AddUsername({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value)
-    if (e.target.value.length > MAX_USERNAME_LENGTH) {
-      setError('' + t('odd_add_username_caption'))
-    } else if (takenUsernames.includes(e.target.value)) {
-      setError('' + t('odd_add_username_taken_caption'))
-    } else {
+    if (
+      e.target.value.length <= USERNAME_MAX_LENGTH &&
+      !takenUsernames.includes(e.target.value)
+    ) {
       setError(undefined)
     }
   }
 
   const handleConfirm = useCallback((): void => {
-    if (username && username.length <= MAX_USERNAME_LENGTH) {
-      onContinue(username)
+    const trimmedUsername = username?.trim()
+    if (!trimmedUsername) {
+      setError('' + t('odd_add_username_required'))
+      return
     }
-  }, [username, onContinue])
+    if (trimmedUsername.length > USERNAME_MAX_LENGTH) {
+      setError('' + t('odd_add_username_caption'))
+      return
+    }
+    if (takenUsernames.includes(trimmedUsername)) {
+      setError('' + t('odd_add_username_taken_caption'))
+      return
+    }
+    setError(undefined)
+    onContinue(trimmedUsername)
+  }, [username, onContinue, t, takenUsernames])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
