@@ -11,7 +11,6 @@ from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 
-_PROCESSED_COMMANDS_MAX = 10
 
 @dataclass(frozen=True)
 class CommandEntryJSON:
