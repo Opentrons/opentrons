@@ -57,8 +57,14 @@ export function useDocumentationState(
     auditSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
   const reasonForInteractionLoading = useMemo(
-    () => auditSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
-    [accessControlEnabledQuery?.isLoading, auditSettingsQuery?.isLoading]
+    () =>
+      accessControlEnabledQuery?.isLoading ||
+      (accessControlEnabled && (auditSettingsQuery?.isLoading ?? false)),
+    [
+      accessControlEnabled,
+      accessControlEnabledQuery?.isLoading,
+      auditSettingsQuery?.isLoading,
+    ]
   )
 
   const reasonForInteractionRequired = useMemo(
