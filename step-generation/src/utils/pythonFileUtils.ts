@@ -762,3 +762,12 @@ export const getSetStoredLabware = (
     ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
     : ''
 }
+
+const PYTHON_RTP_METHODS: Record<RuntimeParameter['type'], string> = {
+  boolean: 'add_bool',
+  int: 'add_int',
+  float: 'add_float',
+  string: 'add_str',
+  csv: 'add_csv',
+}
+
