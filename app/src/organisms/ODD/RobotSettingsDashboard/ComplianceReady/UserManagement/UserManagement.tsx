@@ -19,9 +19,11 @@ import type { AuthUser, AuthUserResponse } from '@opentrons/api-client'
 export function UserManagement({
   onClickBack,
   users,
+  loggedInUser,
 }: {
   onClickBack: () => void
   users: AuthUser[]
+  loggedInUser: string
 }): ReactNode {
   const { t } = useTranslation('device_settings')
   const [createUser, setCreateUser] = useState<boolean>(false)
@@ -68,7 +70,7 @@ export function UserManagement({
         passwordComplexity={passwordComplexity}
         {...currentUserInfo}
         {...editAccountHandlers(editUser)}
-        adminView
+        adminView={editUser !== loggedInUser}
       />
     )
   }

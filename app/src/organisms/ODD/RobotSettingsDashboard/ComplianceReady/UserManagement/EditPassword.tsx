@@ -62,8 +62,9 @@ export function EditPassword({
   }
 
   const handleConfirm = useCallback((): void => {
+    const trimmedPassword = password?.trim()
     if (phase === 'password') {
-      if (!password || password?.trim() === '') {
+      if (!trimmedPassword || trimmedPassword === '') {
         setError(
           t('on_device_login_password_required', {
             ns: 'access_control',
@@ -73,7 +74,7 @@ export function EditPassword({
       }
       if (passwordComplexity != null) {
         const complexityError = getPasswordComplexityError(
-          password,
+          trimmedPassword,
           passwordComplexity
         )
         if (complexityError) {
@@ -87,7 +88,8 @@ export function EditPassword({
         setPhase('confirmPassword')
       }
     } else {
-      if (!confirmPassword || confirmPassword?.trim() === '') {
+      const trimmedConfirmPassword = confirmPassword?.trim()
+      if (!trimmedConfirmPassword) {
         setConfirmPasswordError(
           t('on_device_login_password_required', {
             ns: 'access_control',
@@ -95,7 +97,7 @@ export function EditPassword({
         )
         return
       }
-      if (confirmPassword !== password) {
+      if (trimmedConfirmPassword !== trimmedPassword) {
         setConfirmPasswordError(
           t('on_device_login_password_mismatch', {
             ns: 'access_control',
@@ -105,7 +107,7 @@ export function EditPassword({
       }
       setConfirmPasswordError(undefined)
       setError(undefined)
-      onSave(password.trim())
+      onSave(trimmedPassword)
     }
   }, [password, confirmPassword, passwordComplexity, phase, t, onSave])
 

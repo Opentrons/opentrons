@@ -38,20 +38,31 @@ export function AddUsername({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value)
-    if (e.target.value.length > USERNAME_MAX_LENGTH) {
-      setError('' + t('odd_add_username_caption'))
-    } else if (takenUsernames.includes(e.target.value)) {
-      setError('' + t('odd_add_username_taken_caption'))
-    } else {
+    if (
+      e.target.value.length <= USERNAME_MAX_LENGTH &&
+      !takenUsernames.includes(e.target.value)
+    ) {
       setError(undefined)
     }
   }
 
   const handleConfirm = useCallback((): void => {
-    if (!!username?.trim() && username.trim().length <= USERNAME_MAX_LENGTH) {
-      onContinue(username.trim())
+    const trimmedUsername = username?.trim()
+    if (!trimmedUsername) {
+      setError('' + t('odd_add_username_required'))
+      return
     }
-  }, [username, onContinue])
+    if (trimmedUsername.length > USERNAME_MAX_LENGTH) {
+      setError('' + t('odd_add_username_caption'))
+      return
+    }
+    if (takenUsernames.includes(trimmedUsername)) {
+      setError('' + t('odd_add_username_taken_caption'))
+      return
+    }
+    setError(undefined)
+    onContinue(trimmedUsername)
+  }, [username, onContinue, t, takenUsernames])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {

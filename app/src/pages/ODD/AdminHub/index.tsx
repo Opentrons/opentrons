@@ -125,6 +125,7 @@ export function AdminHub(): ReactNode {
           setSelectedPage(null)
         }}
         users={usersData}
+        loggedInUser={username ?? ''}
       />
     )
   }
