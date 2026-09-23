@@ -198,8 +198,7 @@ async def get_user(
     path="/auth/users/byUsername/{username}/loginStatus",
     summary="Get user login status",
     description=(
-        "Return pre-authentication login hints: whether a temporary / one-time"
-        " password is active, and whether the current password has expired."
+        "Return whether a user must reset their password before full robot access."
         " This endpoint is unauthenticated so clients can adjust the login UI."
     ),
     responses={

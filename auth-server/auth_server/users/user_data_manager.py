@@ -282,7 +282,7 @@ class UserDataManager:
         return self._to_response(user)
 
     def get_login_status(self, username: str) -> UserLoginStatus:
-        """Return pre-auth login UI hints for ``username``.
+        """Return pre-auth login status for a user.
 
         ``resetPassword`` is true only when a temporary password is active.
         ``passwordExpired`` is true when the real password has aged past the
@@ -402,8 +402,7 @@ class UserDataManager:
         username: str,
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
-        """Issue a temporary password without replacing the user's real password hash.
-
+        """Reset a user's password to a newly generated temporary password.
         Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
         doing anything else with the robot.
