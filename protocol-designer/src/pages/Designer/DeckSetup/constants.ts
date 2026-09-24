@@ -145,6 +145,10 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
     'nest_96_wellplate_2ml_deep',
     'opentrons_vacuum_manifold_spacer_tall',
     'opentrons_vacuum_manifold_spacer_short',
+    'opentrons_vacuum_manifold_spacer_3.2mm',
+    'opentrons_vacuum_manifold_spacer_5.2mm',
+    'opentrons_vacuum_manifold_spacer_7.25mm',
+    'opentrons_vacuum_manifold_spacer_12.8mm',
   ],
   // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE_WITH_LABWARE]: [
