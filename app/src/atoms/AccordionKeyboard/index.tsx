@@ -64,6 +64,7 @@ export function AccordionKeyboard({
           styles.accordion_body,
           !isOpen && styles.accordion_body_closed
         )}
+        data-testid="AccordionKeyboard_body"
       >
         {children}
       </div>
