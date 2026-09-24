@@ -11,11 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 metadata = {
-    "protocolName": "IDT xGen 96x v9 ",
-    "author": "Opentrons <protocols@opentrons.com>",
-    "source": "Protocol Library",
-}
-requirements = {
+    "protocolName": "IDT xGen 96x v9 NOABRFOLDER",
     "robotType": "Flex",
     "apiLevel": "2.28",
 }
