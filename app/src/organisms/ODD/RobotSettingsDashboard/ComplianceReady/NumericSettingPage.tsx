@@ -50,11 +50,11 @@ export function NumericSettingPage({
       return
     }
     if (min != null && currentValue < min) {
-      setError('' + t('odd_minimum_value_is', { min }))
+      setError('' + t('odd_minimum_value_is', { min: min - 1 }))
       return
     }
     if (max != null && currentValue > max) {
-      setError('' + t('odd_maximum_value_is', { max }))
+      setError('' + t('odd_maximum_value_is', { max: max + 1 }))
       return
     }
     // max int in C lol

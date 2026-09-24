@@ -25,13 +25,14 @@ export function RequireDocumentationSettings({
   const [showMinLength, setShowMinLength] = useState(false)
 
   const documentationEnabled = !!auditSettings?.requireReasonForInteraction
+  const minLength = auditSettings?.minLengthOfReasonForInteraction ?? 1
 
   if (showMinLength) {
     return (
       <NumericSettingPage
         title={t('odd_minimum_length_for_documentation')}
         description={t('odd_minimum_length_for_documentation_description')}
-        value={auditSettings?.minLengthOfReasonForInteraction ?? 0}
+        value={minLength}
         label={t('odd_number_of_characters')}
         onBack={value => {
           patchAuditSettings({
@@ -73,7 +74,11 @@ export function RequireDocumentationSettings({
               <SettingsListButton
                 key={t('odd_minimum_length_for_documentation')}
                 title={t('odd_minimum_length_for_documentation_description')}
-                value={`${auditSettings?.minLengthOfReasonForInteraction ?? 0} ${t('odd_characters')}`}
+                value={
+                  minLength > 1
+                    ? `${minLength} ${t('odd_characters')}`
+                    : `${minLength} ${t('odd_character')}`
+                }
                 onClick={() => {
                   setShowMinLength(true)
                 }}

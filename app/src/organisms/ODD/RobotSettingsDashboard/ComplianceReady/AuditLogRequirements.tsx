@@ -31,8 +31,12 @@ export function AuditLogRequirements({
   const { t } = useTranslation(['device_settings', 'branded'])
   const [showDocumentation, setShowDocumentation] = useState(false)
 
+  const minLength = auditSettings?.minLengthOfReasonForInteraction ?? 1
+
   const documentationValue = auditSettings?.requireReasonForInteraction
-    ? `${auditSettings.minLengthOfReasonForInteraction ?? 0} ${t('odd_characters')}`
+    ? minLength > 1
+      ? `${minLength} ${t('odd_characters')}`
+      : `${minLength} ${t('odd_character')}`
     : t('off')
 
   if (showDocumentation) {

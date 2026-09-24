@@ -389,6 +389,7 @@
   "odd_auto_logout_inactivity_length": "Length of time for auto-logout due to inactivity",
   "odd_automatically_delete_protocol_run_logs": "Automatically delete the oldest protocol run record when the robot reaches the maximum of 20 saved records",
   "odd_cancel_button": "Cancel",
+  "odd_character": "char",
   "odd_characters": "chars",
   "odd_choose_role_headline": "Choose an account type",
   "odd_choose_role_title": "Choose account type",
