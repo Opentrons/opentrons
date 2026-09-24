@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
 import { TouchInputField } from '@opentrons/components'
 
@@ -153,8 +154,14 @@ export function EditPassword({
         iconName={isLoading ? 'ot-spinner' : undefined}
         buttonIsDisabled={isLoading}
       />
-      <div className={styles.odd_create_user_content}>
-        <div className={styles.odd_create_user_input_container}>
+      <div className={styles.create_user_content}>
+        <div
+          className={clsx(
+            styles.create_user_input_container,
+            !isKeyboardOpen &&
+              styles.create_user_input_container_keyboard_closed
+          )}
+        >
           <TouchInputField
             type={inputType}
             label={
@@ -178,17 +185,19 @@ export function EditPassword({
             }
           />
         </div>
-        <AccordionKeyboard
-          isOpen={isKeyboardOpen}
-          onToggle={() => {
-            setIsKeyboardOpen(!isKeyboardOpen)
-          }}
-        >
-          <FullKeyboard
-            keyboardRef={keyboardRef}
-            inputElementRef={inputElementRef}
-          />
-        </AccordionKeyboard>
+        <div className={styles.keyboard_container}>
+          <AccordionKeyboard
+            isOpen={isKeyboardOpen}
+            onToggle={() => {
+              setIsKeyboardOpen(!isKeyboardOpen)
+            }}
+          >
+            <FullKeyboard
+              keyboardRef={keyboardRef}
+              inputElementRef={inputElementRef}
+            />
+          </AccordionKeyboard>
+        </div>
       </div>
     </div>
   )

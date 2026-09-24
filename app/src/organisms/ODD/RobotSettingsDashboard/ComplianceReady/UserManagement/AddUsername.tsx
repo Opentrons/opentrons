@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
 import { StepMeter, TouchInputField } from '@opentrons/components'
 
@@ -95,8 +96,14 @@ export function AddUsername({
         }}
         marginTop="12px"
       />
-      <div className={styles.odd_create_user_content}>
-        <div className={styles.odd_create_user_input_container}>
+      <div className={styles.create_user_content}>
+        <div
+          className={clsx(
+            styles.create_user_input_container,
+            !isKeyboardOpen &&
+              styles.create_user_input_container_keyboard_closed
+          )}
+        >
           <TouchInputField
             type="text"
             label={t('odd_add_username_label')}
@@ -109,17 +116,19 @@ export function AddUsername({
             autoFocus
           />
         </div>
-        <AccordionKeyboard
-          isOpen={isKeyboardOpen}
-          onToggle={() => {
-            setIsKeyboardOpen(!isKeyboardOpen)
-          }}
-        >
-          <FullKeyboard
-            keyboardRef={keyboardRef}
-            inputElementRef={inputElementRef}
-          />
-        </AccordionKeyboard>
+        <div className={styles.keyboard_container}>
+          <AccordionKeyboard
+            isOpen={isKeyboardOpen}
+            onToggle={() => {
+              setIsKeyboardOpen(!isKeyboardOpen)
+            }}
+          >
+            <FullKeyboard
+              keyboardRef={keyboardRef}
+              inputElementRef={inputElementRef}
+            />
+          </AccordionKeyboard>
+        </div>
       </div>
     </div>
   )

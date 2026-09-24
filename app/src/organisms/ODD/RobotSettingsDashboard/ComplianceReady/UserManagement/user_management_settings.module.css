@@ -70,7 +70,7 @@
   width: 100%;
 }
 
-.odd_create_user_content {
+.create_user_content {
   display: flex;
   width: 100%;
   height: 100%;
@@ -79,16 +79,29 @@
   margin-top: 8rem;
 }
 
-.odd_create_user_input_container {
+.create_user_input_container {
   display: flex;
   width: 51.5rem;
-  height: 100%;
+  height: 16rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transform: translateY(0);
+  transition: transform 0.2s ease-in-out;
 }
 
-.odd_choose_role_buttons {
+.create_user_input_container_keyboard_closed {
+  transform: translateY(50px);
+}
+
+.keyboard_container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.choose_role_buttons {
   width: 100%;
   height: 100%;
   padding: 0 var(--spacing-40);
