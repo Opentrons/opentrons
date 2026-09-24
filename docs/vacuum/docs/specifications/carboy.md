@@ -69,7 +69,7 @@ See [Chemical Compatibility](compatibility.md) for the ratings of individual car
 The carboy cap includes two important liquid control features:
 
 * **Waste diverter:** channels liquid waste down the interior wall of the carboy, away from the exhaust port and float valve.
-* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and reaching the Control Box.
+* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and control box.
 
 !!! note
     The float valve is a passive backflow preventer. It does not electronically communicate with the vacuum pump. When the carboy is full and the overflow valve closes, the pump:
@@ -90,12 +90,8 @@ A large cap wrench (or ring spanner) is included with the carboy. This tool slip
 <figcaption>Carboy cap wrench</figcaption>
 </figure>
 
-<!--- Not ready yet
-
 ### Hose clip
 
 The magnetic hose clip mounts to the top of the Control Box. It's designed to keep the end of a disconnected hose upright so trapped liquid does not drip onto workspace surfaces. Two circular cutouts on one end of the clip are sized for 6 mm and 9 mm vacuum hoses. To use the clip, press the free end of a vacuum hose into its corresponding cutout.
 
-IMAGE PLACEHOLDER
-
---->
+<font color="red">IMAGE PLACEHOLDER</font>
