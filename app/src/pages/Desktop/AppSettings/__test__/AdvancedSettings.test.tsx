@@ -78,9 +78,9 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
   })
 
-  it('should render mock AuditLogFolder section', () => {
+  it('should render mock LogFolder section', () => {
     render()
-    screen.getByText('mock AuditLogFolder')
+    screen.getByText('mock LogFolder')
   })
 
   it('should render mock robot caching section', () => {
