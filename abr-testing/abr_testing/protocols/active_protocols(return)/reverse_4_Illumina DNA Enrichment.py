@@ -246,10 +246,10 @@ def run(protocol: ProtocolContext) -> None:
     restore_column(reagent_plate.columns()[4][0], 15.0)
     restore_column(reagent_plate.columns()[5][0], 20.0)
     restore_column(reagent_plate.columns()[6][0], 65.0)
-    restore_column(reservoir.columns()[0][0], 120.0)
-    restore_column(reservoir.columns()[1][0], 750.0)
-    restore_column(reservoir.columns()[3][0], 1000.0)
-    restore_column(reservoir.columns()[4][0], 96.0)
+    restore_column(reservoir.columns()[0][0], 120.0 / p1000.active_channels)
+    restore_column(reservoir.columns()[1][0], 750.0 / p1000.active_channels)
+    restore_column(reservoir.columns()[3][0], 1000.0 / p1000.active_channels)
+    restore_column(reservoir.columns()[4][0], 96.0 / p1000.active_channels)
     for wash_column in sample_plate_2.columns()[8:12]:
         restore_column(wash_column[0], 2000.0)
     for sample_column in sample_plate_1.columns():
