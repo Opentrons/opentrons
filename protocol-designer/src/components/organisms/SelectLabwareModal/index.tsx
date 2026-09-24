@@ -204,7 +204,7 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
     if (onMainModule.length === 0) {
       return false
     }
-    const topmost = onMainModule.sort(
+    const topmost = onMainModule.toSorted(
       (a, b) => b.stack.length - a.stack.length
     )[0]
     return topmost.def.parameters.quirks?.includes('filterPlate') ?? false
@@ -222,7 +222,7 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
     if (onMainModule.length === 0) {
       return false
     }
-    const topmost = onMainModule.sort(
+    const topmost = onMainModule.toSorted(
       (a, b) => b.stack.length - a.stack.length
     )[0]
     return getIsVacuumSpacer(topmost.def)
@@ -239,7 +239,8 @@ export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
     if (onMainModule.length === 0) {
       return []
     }
-    return onMainModule.sort((a, b) => b.stack.length - a.stack.length)[0].stack
+    return onMainModule.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      .stack
   }, [vacuumModuleId, deckSetup.labware])
 
   // collar placed on the dock slot
