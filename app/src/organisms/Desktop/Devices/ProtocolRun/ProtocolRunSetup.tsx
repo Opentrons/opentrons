@@ -11,6 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -49,6 +50,7 @@ import {
   updateRunSetupStepsComplete,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useUpdateClientLPC } from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
@@ -116,10 +118,13 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -136,6 +141,19 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  // Camera setup is Flex-only; wait for robot camera settings before showing accordions.
+  const { isLoading: isCameraLoading } = useNotifyCamera({
+    staleTime: Infinity,
+    enabled: isFlex,
+  })
+  // Protocol exists but analysis is not ready → header "Analyzing on robot" button.
+  const isProtocolAnalyzing = protocolRecord != null && protocolAnalysis == null
+  // Setup loading only when robot data is missing (run / LPC / camera).
+  const showRunLoadingState =
+    !isProtocolAnalyzing &&
+    (isRunLoading ||
+      (isFlex && lpcUtils.isFlexLPCInitializing) ||
+      (isFlex && isCameraLoading))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -451,7 +469,13 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolAnalysis != null ? (
+      {showRunLoadingState ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_setup_loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
@@ -510,10 +534,6 @@ export function ProtocolRunSetup({
             })
           )}
         </>
-      ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
       )}
     </Flex>
   )

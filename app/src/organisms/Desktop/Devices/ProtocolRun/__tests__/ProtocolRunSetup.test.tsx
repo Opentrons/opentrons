@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
   getSimplestDeckConfigForProtocol,
   simple_v4 as noModulesProtocol,
@@ -25,6 +26,7 @@ import {
 } from '/app/redux/protocol-runs'
 import * as ReduxRuns from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
@@ -47,6 +49,7 @@ import { SetupLabware } from '../SetupLabware'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
@@ -62,6 +65,14 @@ vi.mock('/app/resources/runs/useRunHasStarted')
 vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
 vi.mock('/app/resources/runs/useModuleCalibrationStatus')
 vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useProtocolQuery: vi.fn(),
+    useInstrumentsQuery: vi.fn(() => ({ data: undefined })),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/protocol-runs')
@@ -72,6 +83,7 @@ vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck')
+vi.mock('/app/resources/camera/useNotifyCamera')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -185,7 +197,10 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
@@ -199,6 +214,13 @@ describe('ProtocolRunSetup', () => {
       isLaunchingLPC: false,
       isFlexLPCInitializing: false,
     })
+    vi.mocked(useNotifyCamera).mockReturnValue({
+      data: { cameraEnabled: false },
+      isLoading: false,
+    } as any)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: undefined,
+    } as any)
     vi.mocked(selectIsAnyNecessaryDefaultOffsetMissing).mockImplementation(
       () => () => false
     )
@@ -217,7 +239,7 @@ describe('ProtocolRunSetup', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
+  it('does not render run loading info screen when analysis is null but robot data is ready', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
@@ -239,7 +261,79 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Loading data...')
+    expect(screen.queryByText('Run setup loading')).toBeNull()
+  })
+
+  it('does not render run loading info screen while protocol is analyzing', () => {
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
+      },
+    } as any)
+    render()
+    expect(screen.queryByText('Run setup loading')).toBeNull()
+  })
+
+  it('does not render run loading info screen while analyzing even if Flex LPC is initializing', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
+      },
+    } as any)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: true,
+    })
+    render()
+    expect(screen.queryByText('Run setup loading')).toBeNull()
+  })
+
+  it('renders run loading info screen while the run query is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while Flex LPC is initializing', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: true,
+    })
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while Flex camera settings are loading', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyCamera).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
