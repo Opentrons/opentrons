@@ -37,8 +37,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         minimum=0.0,
         maximum=1.0,
     )
-    parameters.add_int(
-        variable_n ame="error_capture_duration",
+        variable_name="error_capture_duration",
         display_name="Error Capture Duration",
         default=30,
         minimum=5,
