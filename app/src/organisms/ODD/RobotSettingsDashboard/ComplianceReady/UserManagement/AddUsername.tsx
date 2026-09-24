@@ -118,6 +118,7 @@ export function AddUsername({
         </div>
         <div className={styles.keyboard_container}>
           <AccordionKeyboard
+            inputRef={inputElementRef}
             isOpen={isKeyboardOpen}
             onToggle={() => {
               setIsKeyboardOpen(!isKeyboardOpen)

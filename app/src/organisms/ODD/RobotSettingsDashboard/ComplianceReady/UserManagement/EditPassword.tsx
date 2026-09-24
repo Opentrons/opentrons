@@ -187,6 +187,7 @@ export function EditPassword({
         </div>
         <div className={styles.keyboard_container}>
           <AccordionKeyboard
+            inputRef={inputElementRef}
             isOpen={isKeyboardOpen}
             onToggle={() => {
               setIsKeyboardOpen(!isKeyboardOpen)
