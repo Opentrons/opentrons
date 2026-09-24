@@ -6,11 +6,13 @@ import type { SubsystemUpdateProgressData } from './types'
 
 export function updateSubsystem(
   config: HostConfig,
-  subsystem: string
+  subsystem: string,
+  userNotes: string
 ): ResponsePromise<SubsystemUpdateProgressData> {
   return request<SubsystemUpdateProgressData>(
     POST,
     `/subsystems/updates/${subsystem}`,
-    config
+    config,
+    { userNotes }
   )
 }

@@ -1,7 +1,7 @@
 [project]
 name = "robot_server"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
@@ -29,9 +29,8 @@ dependencies = [
     "paho-mqtt==1.6.1",
     "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
+    "zipstream-ng==1.9.3",
 ]
-[tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
@@ -54,6 +53,7 @@ robot = [
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
     "Pyro5==5.16",
+    "zipstream-ng==1.9.3",
 ]
 dev = [
     "ruff==0.14.10",
@@ -82,6 +82,7 @@ dev = [
     "types-requests==2.33.*",
     "zipp==3.21.0",
     "opentrons-hardware",
+    "watchfiles>=1.2.0,<2", # For uvicorn hot reloading.
 ]
 
 [tool.ruff.lint]
@@ -154,7 +155,7 @@ source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
 root = ".."
-git_describe_command = "git describe --dirty --tags --long --match=v*"
+git_describe_command = "git describe --dirty --tags --long --match=v[0-9]*.[0-9]*"
 fallback_version = "0.0.0-dev"
 version_scheme = "only-version"
 local_scheme = "no-local-version"
@@ -237,4 +238,8 @@ module = [
     "Pyro5.*",
     "serpent"
 ]
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
 follow_untyped_imports = true

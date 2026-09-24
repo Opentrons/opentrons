@@ -200,7 +200,9 @@ def create_csv_test_report(
                 title="MEASUREMENTS",
                 lines=[
                     CSVLine(
-                        create_measurement_tag(measurement, volume, channel, trial)
+                        create_measurement_tag(
+                            measurement.value, volume, channel, trial
+                        )
                         + f"-{i}",
                         [float],
                     )

@@ -35,7 +35,7 @@ export function SetupStep({
   toggleExpanded,
   children,
   rightElement,
-}: SetupStepProps): JSX.Element {
+}: SetupStepProps): ReactNode {
   return (
     <div className={styles.container}>
       <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
@@ -45,14 +45,12 @@ export function SetupStep({
               <StyledText
                 color={COLORS.black90}
                 desktopStyle="bodyLargeSemiBold"
-                id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
-                id={`CollapsibleStep_${description}`}
                 className={styles.description_text}
               >
                 {description}

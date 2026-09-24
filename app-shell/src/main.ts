@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerAudit } from './audit'
 import { registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
@@ -17,6 +18,7 @@ import {
   registerDiscoverySecondaryWindow,
   unregisterDiscovery,
 } from './discovery'
+import { registerDownloadHandlers } from './fs/ipc'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -25,8 +27,10 @@ import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
 import {
+  clearMainWindow,
   closeSecondaryWindows,
   registerCameraStream,
+  setMainWindow,
 } from './secondary-windows'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
@@ -125,6 +129,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerUpdate(dispatch),
           registerRobotUpdate(dispatch),
           registerLabware(dispatch, window),
+          registerAudit(dispatch, window),
           registerSystemInfo(dispatch),
           registerProtocolStorage(dispatch),
           registerUsb(dispatch),
@@ -177,9 +182,11 @@ async function startUp(): Promise<void> {
 
   initializeDiscovery()
   mainWindow = createUi()
+  setMainWindow(mainWindow)
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => {
+    clearMainWindow()
     mainWindow = null
     closeSecondaryWindows()
   })
@@ -225,6 +232,7 @@ async function startUp(): Promise<void> {
     }
   })
   await registerCertIPC()
+  registerDownloadHandlers(mainWindow)
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }

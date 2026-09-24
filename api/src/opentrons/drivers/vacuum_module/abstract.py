@@ -42,6 +42,10 @@ class AbstractVacuumModuleDriver(Protocol):
         """Reset the input and output serial buffers."""
         ...
 
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        ...
+
     async def set_led(
         self,
         power: float,
@@ -100,9 +104,11 @@ class AbstractVacuumModuleDriver(Protocol):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
         ...
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:
@@ -112,15 +118,12 @@ class AbstractVacuumModuleDriver(Protocol):
     async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
-        p_window_start: Optional[float] = None,
-        p_window_end: Optional[float] = None,
-        baseline_fast_factor: Optional[float] = None,
-        max_delta_per_tick: Optional[float] = None,
-        max_rise_per_tick: Optional[float] = None,
-        max_cummulative_rise: Optional[float] = None,
         p_filter_alpha: Optional[float] = None,
-        min_window_time: Optional[float] = None,
-        max_window_time: Optional[float] = None,
+        g_sealed_max: Optional[float] = None,
+        flowing_dp_mbar: Optional[float] = None,
+        stable_hold_ms: Optional[float] = None,
+        stable_hold_deep_ms: Optional[float] = None,
+        min_waste_depth_mbar: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
         ...

@@ -13,7 +13,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function ServerInitializing(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ServerInitializing(): ReactNode {
   const { t } = useTranslation('device_details')
   return (
     <Flex

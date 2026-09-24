@@ -13,12 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
 }
-export function UpdateSoftware({
-  updateType,
-}: UpdateSoftwareProps): JSX.Element {
+export function UpdateSoftware({ updateType }: UpdateSoftwareProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const renderText = (): string | null => {
     switch (updateType) {
@@ -31,7 +31,7 @@ export function UpdateSoftware({
       case 'installing':
         return t('installing_software')
       default:
-        console.warn('Update software has an issue')
+        console.warn(`update software: unknown updateType: ${updateType}`)
         return null
     }
   }

@@ -39,6 +39,7 @@ import { useMissingProtocolHardware } from '/app/transformations/commands'
 
 import { useRerunnableStatusText } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -89,7 +90,7 @@ export function ProtocolWithLastRun({
   runData,
   protocolData,
   isProtocolFetching,
-}: ProtocolWithLastRunProps): JSX.Element {
+}: ProtocolWithLastRunProps): ReactNode {
   const { t, i18n } = useTranslation('device_details')
   const {
     missingProtocolHardware,
@@ -107,7 +108,17 @@ export function ProtocolWithLastRun({
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
-  const { cloneRun } = useCloneRun(runData.id)
+  const { cloneRun } = useCloneRun(runData.id, {
+    onSuccess: run => {
+      if (run.data.id != null) {
+        navigate(`/runs/${run.data.id}/setup`)
+      }
+    },
+    onError: () => {
+      setShowSpinner(false)
+      navigate('/dashboard')
+    },
+  })
   const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
   const protocolName =
@@ -115,10 +126,11 @@ export function ProtocolWithLastRun({
 
   const protocolId = protocolData.id
 
+  const analysisId = last(protocolData?.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
   const PROTOCOL_CARD_STYLE = css`
@@ -159,13 +171,11 @@ export function ProtocolWithLastRun({
       navigate(`/protocols/${protocolId}`)
     } else {
       cloneRun()
-      // Navigate to a dummy setup skeleton until TopLevelRedirects routes to the proper setup page. Doing so prevents
-      // needing to manage complex UI state updates for protocol cards, overzealous dashboard rendering, and potential navigation pitfalls.
-      navigate('/runs/1234/setup')
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },
       })
+      navigate('/run-loading')
     }
     // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
     // trackProtocolRunEvent({ name: 'runAgain' })

@@ -17,7 +17,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
@@ -28,7 +28,7 @@ interface TakeoverModalProps {
   terminateInProgress: boolean
 }
 
-export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
+export function TakeoverModal(props: TakeoverModalProps): ReactNode {
   const {
     title,
     showConfirmTerminateModal,

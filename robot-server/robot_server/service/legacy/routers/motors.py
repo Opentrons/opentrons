@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -6,14 +7,13 @@ from starlette import status
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons_shared_data.errors import ErrorCodes
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
-from robot_server.errors.error_responses import LegacyErrorResponse
-from robot_server.hardware import get_hardware
+from robot_server.errors.error_responses import ApiError, LegacyErrorResponse
+from robot_server.hardware import get_hardware, get_ot3_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model
 
@@ -32,7 +32,7 @@ async def get_engaged_motors(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> model.EngagedMotors:
     try:
-        engaged_axes = hardware.engaged_axes
+        engaged_axes = await asyncio.to_thread(lambda: hardware.engaged_axes)
         axes_dict = {
             str(k).lower(): model.EngagedMotor(enabled=v)
             for k, v in engaged_axes.items()
@@ -50,15 +50,18 @@ async def get_engaged_motors(
     "/motors/disengage",
     description="Disengage a motor or set of motors",
     response_model=V1BasicResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("disengage motor")),
+    ],
 )
 async def post_disengage_motors(
     axes: model.Axes, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
 ) -> V1BasicResponse:
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
     try:
-        hardware = ensure_ot3_hardware(hardware)
-    except HardwareNotSupportedError:
+        hardware = get_ot3_hardware(hardware)
+    except ApiError:
         # Filter out non-ot2 axes when running on OT2
         input_axes = [axis for axis in input_axes if axis in Axis.ot2_axes()]
 

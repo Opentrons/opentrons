@@ -160,12 +160,17 @@ export function getWellPropsForSVGLabwareV1(
 export const getIsLid = (labwareDef: LabwareDefinition): boolean =>
   labwareDef.allowedRoles?.includes('lid') ?? false
 
+// determines if the labware can be loaded directly onto a base deck slot
+export const getIsDeckSlotCompatible = (
+  labwareDef: LabwareDefinition
+): boolean => labwareDef.parameters.isDeckSlotCompatible ?? true
+
 // determines if the labware can be a target for pipetting
 export const getIsPipettableLabware = (
   labwareDef: LabwareDefinition
 ): boolean => {
   // assume the labware can be a pipetting target if labware definition's `allowedRoles` is undefined
-  if (labwareDef.allowedRoles == null) {
+  if (labwareDef.allowedRoles == null || labwareDef.allowedRoles.length === 0) {
     return true
   }
   return (

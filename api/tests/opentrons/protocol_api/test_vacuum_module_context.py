@@ -6,6 +6,10 @@ import pytest
 from decoy import Decoy
 
 from . import versions_at_or_above
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control.modules.types import VacuumModuleModel
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import Labware, VacuumModuleContext
@@ -79,7 +83,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_get_serial_number(
     decoy: Decoy, mock_core: VacuumModuleCore, subject: VacuumModuleContext
@@ -91,7 +95,7 @@ def test_get_serial_number(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_manifold_dock_property(
     subject: VacuumModuleContext,
@@ -102,7 +106,7 @@ def test_vacuum_module_manifold_dock_property(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_load_adapter_to_dock(
     decoy: Decoy,
@@ -153,7 +157,7 @@ def test_vacuum_module_load_adapter_to_dock(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_move_to_dock(
     decoy: Decoy,
@@ -164,7 +168,7 @@ def test_vacuum_module_move_to_dock(
     """It should move labware to the manifold dock."""
     mock_labware = Labware(
         core=mock_labware_core,
-        api_version=APIVersion(2, 30),
+        api_version=APIVersion(2, 31),
         protocol_core=mock_protocol_core,
         core_map=decoy.mock(cls=LoadedCoreMap),
     )
@@ -175,7 +179,7 @@ def test_vacuum_module_move_to_dock(
         mock_protocol_core.move_labware(
             labware_core=mock_labware_core,
             new_location=subject.manifold_dock,
-            use_gripper=False,
+            use_gripper=True,
             pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
@@ -184,7 +188,7 @@ def test_vacuum_module_move_to_dock(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_move_to_dock_with_options(
     decoy: Decoy,
@@ -195,7 +199,7 @@ def test_vacuum_module_move_to_dock_with_options(
     """It should pass through use_gripper and offsets correctly."""
     mock_labware = Labware(
         core=mock_labware_core,
-        api_version=APIVersion(2, 30),
+        api_version=APIVersion(2, 31),
         protocol_core=mock_protocol_core,
         core_map=decoy.mock(cls=LoadedCoreMap),
     )
@@ -223,7 +227,7 @@ def test_vacuum_module_move_to_dock_with_options(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_start_set_vacuum_pressure(
     decoy: Decoy,
@@ -252,12 +256,13 @@ def test_vacuum_module_start_set_vacuum_pressure(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_start_set_vacuum_power(
     decoy: Decoy,
@@ -286,12 +291,13 @@ def test_vacuum_module_start_set_vacuum_power(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_stop_vacuum(
     decoy: Decoy,
@@ -305,7 +311,7 @@ def test_vacuum_module_stop_vacuum(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 31))
 )
 def test_vacuum_module_start_execute_profile(
     decoy: Decoy,
@@ -384,27 +390,20 @@ def test_vacuum_module_start_execute_profile(
         ),
     ]
     repetitions = 2
-    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(0)
-    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(-800)
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(
+        MAX_GAUGE_PRESSURE_MBAR
+    )
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(
+        MIN_GAUGE_PRESSURE_MBAR
+    )
 
     subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
 
     decoy.verify(
         mock_core.start_execute_profile(
-            steps=expected_core_steps, repetitions=repetitions, vent_after=False
+            steps=expected_core_steps,
+            repetitions=repetitions,
+            vent_after=False,
+            equalize_timeout_s=None,
         )
     )
-
-
-@pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
-)
-def test_vacuum_wait_for_target(
-    decoy: Decoy,
-    subject: VacuumModuleContext,
-    mock_core: VacuumModuleCore,
-) -> None:
-    """Make sure the the protocol engine function gets called correctly."""
-    subject.wait_for_target()
-
-    decoy.verify(mock_core.wait_for_target())

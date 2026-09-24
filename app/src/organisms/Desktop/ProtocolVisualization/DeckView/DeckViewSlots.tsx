@@ -8,7 +8,7 @@ import { getSlotIsEmpty } from '../utils/getSlotIsEmpty'
 import { getStagingAreaAddressableAreas } from '../utils/getStagingAreaAddressableAreas'
 import { DeckViewOverlay } from './DeckViewOverlay'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
@@ -22,19 +22,21 @@ interface DeckViewSlotsProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   robotState: RobotState
   invariantContext: InvariantContext
   stagingAreaCutoutIds: CutoutId[]
   slotIdsBlockedBySpanning: string[]
 }
 
-export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
+export function DeckViewSlots(props: DeckViewSlotsProps): ReactNode {
   const {
     deckDef,
     robotType,
     setSelectedSlot,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     robotState,
     invariantContext,
     stagingAreaCutoutIds,
@@ -72,6 +74,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
+                selectedSlot={selectedSlot}
               />,
             ]
           }

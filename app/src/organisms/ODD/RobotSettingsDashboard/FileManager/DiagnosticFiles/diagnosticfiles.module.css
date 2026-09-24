@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.header_row {
+  padding: 0 var(--spacing-24);
+}
+
+.header_label {
+  color: var(--grey-60);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.list_item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-16) var(--spacing-24);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-35);
+}

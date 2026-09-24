@@ -1,5 +1,6 @@
 """ProtocolEngine class definition."""
 
+import asyncio
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Any, AsyncGenerator, Callable, Dict, Optional, Tuple, Union
@@ -45,6 +46,9 @@ from .execution import (
     QueueWorker,
     create_queue_worker,
 )
+from .execution.associated_command_error_recovery import (
+    AssociatedCommandErrorRecoveryOrchestrator,
+)
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
@@ -64,7 +68,6 @@ from .types import (
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.system import camera
 
 _log = getLogger(__name__)
 
@@ -101,6 +104,10 @@ class ProtocolEngine:
         file_provider: FileProvider,
         camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
+        associated_command_error_recovery: Optional[
+            AssociatedCommandErrorRecoveryOrchestrator
+        ] = None,
+        notify_and_update_task: Optional[asyncio.Task[None]] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -119,10 +126,12 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper
         self._door_watcher = door_watcher
         self._module_data_provider = module_data_provider
+        self._associated_command_error_recovery = associated_command_error_recovery
         self._queue_worker = queue_worker
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()
+        self._notify_and_update_task = notify_and_update_task
 
     @property
     def state_view(self) -> StateView:
@@ -241,6 +250,8 @@ class ProtocolEngine:
                 "failed command id should be supplied with a FIXIT command."
             )
 
+        request = self._expand_wait_for_tasks_fixit(request, failed_command_id)
+
         command_id = self._model_utils.generate_id()
         if request.intent in (
             commands.CommandIntent.SETUP,
@@ -264,6 +275,45 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
+
+    def _expand_wait_for_tasks_fixit(
+        self,
+        request: commands.CommandCreate,
+        failed_command_id: Optional[str],
+    ) -> commands.CommandCreate:
+        """Queue new originating start_* commands before a waitForTasks fixit.
+
+        App Retry re-posts the failed wait with the old task ids. Those tasks
+        already failed, so we dispatch new start_* commands (new ids) and point
+        the wait at the new task ids. The start_* commands are queued first so
+        the worker runs them before wait.
+        """
+        if not isinstance(request, commands.WaitForTasksCreate):
+            return request
+        if request.intent != commands.CommandIntent.FIXIT:
+            return request
+
+        from .commands.background_task_recovery import expand_wait_for_tasks_fixit
+        from .execution.associated_command_error_recovery import (
+            default_associated_command_recovery_resolvers,
+        )
+
+        expansion = expand_wait_for_tasks_fixit(
+            request.params.task_ids,
+            self.state_view,
+            default_associated_command_recovery_resolvers(),
+            self._model_utils,
+        )
+        if expansion is None:
+            return request
+
+        creates, rewritten_task_ids = expansion
+        for create in creates:
+            self.add_command(create, failed_command_id=failed_command_id)
+        rewritten_params = request.params.model_copy(
+            update={"task_ids": rewritten_task_ids}
+        )
+        return request.model_copy(update={"params": rewritten_params})
 
     async def wait_for_command(self, command_id: str) -> None:
         """Wait for a command to be completed.
@@ -327,7 +377,7 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def _stop_from_asynchronous_error(self) -> None:
+    def _stop_from_asynchronous_error(self, msg: str = "") -> None:
         try:
             action = self._state_store.commands.validate_action_allowed(
                 StopAction(from_asynchronous_error=True)
@@ -348,7 +398,7 @@ class ProtocolEngine:
         # against the E-stop exception propagating up from lower layers. But we need to
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
-        self._get_queue_worker.cancel()
+        self._get_queue_worker.cancel(msg)
 
     def estop(self) -> None:
         """Signal to the engine that an E-stop event occurred.
@@ -368,10 +418,13 @@ class ProtocolEngine:
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error("E-stop Pressed")
 
     async def async_module_error(
-        self, module_model: ModuleModel, serial: str | None
+        self,
+        module_model: ModuleModel,
+        serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Signal to the engine that an asynchronous module error occured.
 
@@ -404,7 +457,20 @@ class ProtocolEngine:
             # the stop behavior over and over
             return False
 
-        self._stop_from_asynchronous_error()
+        if (
+            error is not None
+            and self._associated_command_error_recovery is not None
+            and self._associated_command_error_recovery.try_recover_from_module_error(
+                module_model=module_model,
+                module_serial=serial,
+                error=error,
+            )
+        ):
+            return False
+
+        self._stop_from_asynchronous_error(
+            f"asynchronous module error from {module_model}"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -437,7 +503,9 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
-        self._stop_from_asynchronous_error()
+        self._stop_from_asynchronous_error(
+            f"Module {module_model} {serial} has disconnected"
+        )
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
         # to know that it should stop.
@@ -559,6 +627,13 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
+        if self._notify_and_update_task is not None:
+            await self._state_store.wait_for_update_events()
+            self._notify_and_update_task.cancel()
+            try:
+                await self._notify_and_update_task
+            except asyncio.CancelledError:
+                pass
 
         # We have a lot of independent things to tear down. If any teardown fails, we want
         # to continue with the rest, to avoid leaking resources or leaving the engine with a broken
@@ -599,11 +674,10 @@ class ProtocolEngine:
             finish_error_details = None
 
         try:
-            await camera.update_live_stream_status(
-                self.state_view.config.robot_type,
-                False,
-                self._camera_provider,
-                self.state_view.camera.get_enablement_settings(),
+            await self._camera_provider.update_live_stream_status(
+                robot_type=self.state_view.config.robot_type,
+                stream_status=False,
+                enablement_settings=self.state_view.camera.get_enablement_settings(),
             )
         except Exception as e:
             _log.exception(f"Exception during live stream post-run cleanup: {e}")

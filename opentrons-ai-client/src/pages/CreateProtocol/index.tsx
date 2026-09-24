@@ -22,7 +22,6 @@ import {
   chatHistoryAtom,
   createProtocolAtom,
   createProtocolChatAtom,
-  featureFlagsAtom,
   headerWithMeterAtom,
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
@@ -42,7 +41,6 @@ import type {
 } from '/ai-client/components/organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
-  protocol_format: 'Protocol Designer' | 'Python'
   application: {
     scientificApplication: string
     otherApplication: string
@@ -79,8 +77,6 @@ export function CreateProtocol(): JSX.Element | null {
   const [isResizing, setIsResizing] = useState(false)
   const [initialMouseX, setInitialMouseX] = useState(0)
   const [initialLeftWidth, setInitialLeftWidth] = useState(50)
-  const [featureFlags] = useAtom(featureFlagsAtom)
-  const isPdProtocolGenerationEnabled = featureFlags.enablePDProtocolGeneration
 
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -234,8 +230,7 @@ export function CreateProtocol(): JSX.Element | null {
     const chatPromptData = generateChatPrompt(
       methods.getValues(),
       t,
-      setCreateProtocolChatAtom,
-      isPdProtocolGenerationEnabled
+      setCreateProtocolChatAtom
     )
 
     trackEvent({

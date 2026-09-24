@@ -10,6 +10,7 @@ from .types import (
     VentState,
     WasteConfigParameters,
 )
+from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.util.async_helpers import ensure_yield
 
 
@@ -28,6 +29,26 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.current_pressure = 0.0
         self.target_rpm = 0
         self.current_rpm = 0
+        self._pending_async_error: Optional[SerialException] = None
+        self._waste_config = WasteConfigParameters(
+            waste_detection_enabled=True,
+            p_filter_alpha=0.5,
+            g_sealed_max=0.50,
+            flowing_dp_mbar=8.0,
+            stable_hold_ms=6000.0,
+            stable_hold_deep_ms=10000.0,
+            min_waste_depth_mbar=20.0,
+        )
+
+    def inject_async_error(self, error: SerialException) -> None:
+        """Queue an async module error to raise on the next polled driver read."""
+        self._pending_async_error = error
+
+    def _raise_pending_async_error(self) -> None:
+        if self._pending_async_error is not None:
+            error = self._pending_async_error
+            self._pending_async_error = None
+            raise error
 
     def model(self) -> str:
         return self._model
@@ -43,6 +64,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     @ensure_yield
     async def is_connected(self) -> bool:
         return True
+
+    @ensure_yield
+    async def move_port(self, new_port: str) -> None:
+        pass
 
     def reset_serial_buffers(self) -> None:
         pass
@@ -102,6 +127,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
+        self._raise_pending_async_error()
         return VacuumState(
             self.target_pressure,
             self.current_pressure,
@@ -129,6 +155,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_pump_state(self) -> PumpState:
         """Get the pump state."""
+        self._raise_pending_async_error()
         return PumpState(0, 0, 0, 0, False, False)
 
     async def set_vent_state(self, state: VentState) -> None:
@@ -144,31 +171,42 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
         pass
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:
         """Get the pressure control pid tunings."""
-        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0)
+        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
-        p_window_start: Optional[float] = None,
-        p_window_end: Optional[float] = None,
-        baseline_fast_factor: Optional[float] = None,
-        max_delta_per_tick: Optional[float] = None,
-        max_rise_per_tick: Optional[float] = None,
-        max_cummulative_rise: Optional[float] = None,
         p_filter_alpha: Optional[float] = None,
-        min_window_time: Optional[float] = None,
-        max_window_time: Optional[float] = None,
+        g_sealed_max: Optional[float] = None,
+        flowing_dp_mbar: Optional[float] = None,
+        stable_hold_ms: Optional[float] = None,
+        stable_hold_deep_ms: Optional[float] = None,
+        min_waste_depth_mbar: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
-        pass
+        self._waste_config.waste_detection_enabled = enable_waste_full_detection
+        if p_filter_alpha is not None:
+            self._waste_config.p_filter_alpha = p_filter_alpha
+        if g_sealed_max is not None:
+            self._waste_config.g_sealed_max = g_sealed_max
+        if flowing_dp_mbar is not None:
+            self._waste_config.flowing_dp_mbar = flowing_dp_mbar
+        if stable_hold_ms is not None:
+            self._waste_config.stable_hold_ms = stable_hold_ms
+        if stable_hold_deep_ms is not None:
+            self._waste_config.stable_hold_deep_ms = stable_hold_deep_ms
+        if min_waste_depth_mbar is not None:
+            self._waste_config.min_waste_depth_mbar = min_waste_depth_mbar
 
     async def get_waste_configs(self) -> WasteConfigParameters:
         """Get the waste full detection configs"""
-        return WasteConfigParameters(False, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        return self._waste_config

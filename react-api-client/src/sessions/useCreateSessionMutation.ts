@@ -19,6 +19,8 @@ export function useCreateSessionMutation(
   createSessionData: CreateSessionData
 ): UseCreateSessionMutationResult {
   const host = useHost()
+  // Directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this hook.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<Session, Error>(
     getQueryKey(host, 'session'),
     () =>

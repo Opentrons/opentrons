@@ -74,6 +74,17 @@ wheel:
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+.PHONY: wheel-full
+wheel-full: export OPENTRONS_PROJECT=$(PROJECT)
+wheel-full: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel-full: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+wheel-full:
+	rm -rf dist/*.whl
+	$(clean_wheel_cmd)
+	$(python) scripts/build_wheel.py --full
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
 .PHONY: sdist
 sdist: export OPENTRONS_PROJECT=$(PROJECT)
 sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
@@ -189,7 +200,7 @@ restart-ot3:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: wheel
+push-no-restart-ot3: wheel-full
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3

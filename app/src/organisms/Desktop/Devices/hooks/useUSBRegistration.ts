@@ -1,3 +1,4 @@
+/* eslint-disable opentrons/no-direct-mutating */
 import { useCallback, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 

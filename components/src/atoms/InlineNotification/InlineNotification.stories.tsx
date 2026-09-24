@@ -1,3 +1,4 @@
+import { customViewports } from '../../../../.storybook/preview'
 import { VIEWPORT } from '../../ui-style-constants'
 import { InlineNotification } from './index'
 
@@ -51,7 +52,9 @@ export default {
       if: { arg: 'hasLink' },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 export interface WrapperProps extends React.ComponentProps<
@@ -61,7 +64,7 @@ export interface WrapperProps extends React.ComponentProps<
   hasLink: boolean
 }
 
-function Wrapper(props: WrapperProps): JSX.Element {
+function Wrapper(props: WrapperProps): React.ReactNode {
   return (
     <InlineNotification
       {...props}

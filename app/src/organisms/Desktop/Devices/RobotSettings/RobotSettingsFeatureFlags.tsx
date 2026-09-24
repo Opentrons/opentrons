@@ -1,6 +1,3 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -10,24 +7,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import {
-  fetchSettings,
-  getRobotSettings,
-  updateSetting,
-} from '/app/redux/robot-settings'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import type { MouseEventHandler } from 'react'
-import type {
-  RobotSettings,
-  RobotSettingsField,
-} from '/app/redux/robot-settings/types'
-import type { Dispatch, State } from '/app/redux/types'
-
-interface RobotSettingsFeatureFlagsProps {
-  robotName: string
-}
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
@@ -40,30 +29,17 @@ const NON_FEATURE_FLAG_SETTINGS = [
   'disableStatusBar',
 ]
 
-export function RobotSettingsFeatureFlags({
-  robotName,
-}: RobotSettingsFeatureFlagsProps): JSX.Element {
-  const settings = useSelector<State, RobotSettings>((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+export function RobotSettingsFeatureFlags(): ReactNode {
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const featureFlags = settings.filter(
     ({ id }) => !NON_FEATURE_FLAG_SETTINGS.includes(id)
   )
 
-  const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
-
   return (
     <>
       {featureFlags.map(field => (
-        <FeatureFlagToggle
-          key={field.id}
-          settingField={field}
-          robotName={robotName}
-        />
+        <FeatureFlagToggle key={field.id} settingField={field} />
       ))}
     </>
   )
@@ -71,20 +47,20 @@ export function RobotSettingsFeatureFlags({
 
 interface FeatureFlagToggleProps {
   settingField: RobotSettingsField
-  robotName: string
 }
 
 export function FeatureFlagToggle({
   settingField,
-  robotName,
 }: FeatureFlagToggleProps): JSX.Element | null {
-  const dispatch = useDispatch<Dispatch>()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const { value, id, title, description } = settingField
 
   if (id == null) return null
 
   const handleClick: MouseEventHandler<Element> = () => {
-    dispatch(updateSetting(robotName, id, !value))
+    updateRobotSetting({ id, value: !value })
   }
 
   return (

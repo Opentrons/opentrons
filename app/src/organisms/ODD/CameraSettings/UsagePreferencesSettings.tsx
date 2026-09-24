@@ -6,6 +6,7 @@ import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
 
 import styles from './preferences.module.css'
 
+import type { ReactNode } from 'react'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 
 export interface UsagePreferencesSettingsProps {
@@ -21,7 +22,7 @@ export function UsagePreferencesSettings({
   isRecoveryCaptureEnabled,
   toggleRecoveryCaptureEnabled,
   toggleLiveVideoEnabled,
-}: UsagePreferencesSettingsProps): JSX.Element {
+}: UsagePreferencesSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
     <div className={styles.usage_preferences_container}>

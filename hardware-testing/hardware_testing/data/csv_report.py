@@ -497,6 +497,13 @@ class CSVReport:
             self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
 
+    def all_succeded(self) -> bool:
+        """Return True if all results are pass or None."""
+        results = [
+            line.result_passed or True for line in self[RESULTS_OVERVIEW_TITLE].lines
+        ]
+        return all(results)
+
     def print_results(self) -> None:
         """Print overall results."""
         complete_msg = "complete" if self.completed else "incomplete"

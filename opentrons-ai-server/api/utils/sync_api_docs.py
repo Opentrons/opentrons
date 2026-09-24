@@ -19,6 +19,7 @@ from api.utils.api_docs_struct_curated import (
     format_curation_coverage_issues,
     load_curated_about,
 )
+from api.utils.docs_links import rewrite_markdown_doc_links
 
 AI_SERVER_ROOT: Path = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT: Path = AI_SERVER_ROOT.parent
@@ -217,6 +218,14 @@ def copy_docs_tree(source_dir: Path, dest_dir: Path) -> None:
         shutil.rmtree(dest_dir)
     dest_dir.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source_dir, dest_dir)
+
+    for markdown_path in dest_dir.rglob("*.md"):
+        source_relpath = markdown_path.relative_to(dest_dir).as_posix()
+        content = markdown_path.read_text(encoding="utf-8")
+        markdown_path.write_text(
+            rewrite_markdown_doc_links(content, source_relpath),
+            encoding="utf-8",
+        )
 
 
 def _parse_frontmatter(content: str) -> dict[str, str]:

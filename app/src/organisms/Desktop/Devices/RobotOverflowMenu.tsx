@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -28,9 +28,11 @@ import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSli
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal.tsx'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
@@ -41,7 +43,7 @@ interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
 
-export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
+export function RobotOverflowMenu(props: RobotOverflowMenuProps): ReactNode {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
@@ -66,10 +68,19 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
+
   const handleClickRun: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowChooseProtocolSlideout(true)
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+    } else {
+      e.preventDefault()
+      e.stopPropagation()
+      setShowChooseProtocolSlideout(true)
+    }
     setShowOverflowMenu(false)
   }
   const handleClickConnectionTroubleshooting: MouseEventHandler<
@@ -111,7 +122,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          id={`RobotOverflowMenu_${robot.name}_robotSettings`}
           css={css`
             border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
           `}
@@ -126,7 +136,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         to={`/devices/${robot.name}/robot-settings`}
         as={Link}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        id={`RobotOverflowMenu_${robot.name}_robotSettings_${runId}`}
         css={css`
           border-radius: ${BORDERS.borderRadius8};
         `}
@@ -139,7 +148,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <>
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
-          id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
           css={css`
             border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0 0;
           `}
@@ -148,7 +156,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
-          id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
           css={css`
             border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
           `}
@@ -159,58 +166,73 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     )
   }
   return (
-    <Flex
-      data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      onClick={(e: MouseEvent) => {
-        e.stopPropagation()
-      }}
-      {...styleProps}
-    >
-      <OverflowBtn
-        alignSelf={ALIGN_FLEX_END}
-        aria-label="RobotOverflowMenu_button"
-        onClick={handleOverflowClick}
-      />
-      {showOverflowMenu && !showConnectionTroubleshootingModal ? (
-        <Flex
-          whiteSpace={NO_WRAP}
-          zIndex={10}
-          borderRadius={BORDERS.borderRadius8}
-          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-          top="2.25rem"
-          right="0"
-          flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${String(robot.name)}_buttons`}
-        >
-          {menuItems}
-        </Flex>
-      ) : null}
-      {showChooseProtocolSlideout && robot.status === CONNECTABLE ? (
-        <ChooseProtocolSlideout
-          robot={robot}
-          showSlideout={showChooseProtocolSlideout}
-          onCloseClick={() => {
-            setShowChooseProtocolSlideout(false)
-          }}
-        />
-      ) : null}
-      {createPortal(
-        <>
-          {showOverflowMenu && menuOverlay}
-          {showConnectionTroubleshootingModal ? (
-            <ConnectionTroubleshootingModal
-              onClose={() => {
-                setShowConnectionTroubleshootingModal(false)
+    <>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={() => {
+                navigate(`/devices/${robot.name}/robot-settings/file-manager`)
               }}
-            />
-          ) : null}
-        </>,
-        getTopPortalEl()
-      )}
-    </Flex>
+              onClose={() => {
+                setShowRobotOutOfStorageModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+
+      <Flex
+        data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
+        flexDirection={DIRECTION_COLUMN}
+        position={POSITION_RELATIVE}
+        onClick={(e: MouseEvent) => {
+          e.stopPropagation()
+        }}
+        {...styleProps}
+      >
+        <OverflowBtn
+          alignSelf={ALIGN_FLEX_END}
+          aria-label="RobotOverflowMenu_button"
+          onClick={handleOverflowClick}
+        />
+        {showOverflowMenu && !showConnectionTroubleshootingModal ? (
+          <Flex
+            whiteSpace={NO_WRAP}
+            zIndex={10}
+            borderRadius={BORDERS.borderRadius8}
+            boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+            position={POSITION_ABSOLUTE}
+            backgroundColor={COLORS.white}
+            top="2.25rem"
+            right="0"
+            flexDirection={DIRECTION_COLUMN}
+          >
+            {menuItems}
+          </Flex>
+        ) : null}
+        {showChooseProtocolSlideout && robot.status === CONNECTABLE ? (
+          <ChooseProtocolSlideout
+            robot={robot}
+            showSlideout={showChooseProtocolSlideout}
+            onCloseClick={() => {
+              setShowChooseProtocolSlideout(false)
+            }}
+          />
+        ) : null}
+        {createPortal(
+          <>
+            {showOverflowMenu && menuOverlay}
+            {showConnectionTroubleshootingModal ? (
+              <ConnectionTroubleshootingModal
+                onClose={() => {
+                  setShowConnectionTroubleshootingModal(false)
+                }}
+              />
+            ) : null}
+          </>,
+          getTopPortalEl()
+        )}
+      </Flex>
+    </>
   )
 }

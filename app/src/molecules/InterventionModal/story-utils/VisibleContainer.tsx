@@ -1,5 +1,6 @@
 import { BORDERS, Box, SPACING } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 export interface VisibleContainerProps extends StyleProps {
@@ -9,7 +10,7 @@ export interface VisibleContainerProps extends StyleProps {
 export function VisibleContainer({
   children,
   ...styleProps
-}: VisibleContainerProps): JSX.Element {
+}: VisibleContainerProps): ReactNode {
   return (
     <Box
       border={BORDERS.lineBorder}

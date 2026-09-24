@@ -12,6 +12,7 @@ class BarcodeSimulatorDriver(AbstractBarcodeScannerDriver):
         self.scan_timeout = 1000
         self.serial_number = "fake-serial"
         self.sound_profile = SoundProfile.FULL_SOUND
+        self.connected = True
 
     async def connect(self) -> None:
         """Connect to the barcode scanner."""

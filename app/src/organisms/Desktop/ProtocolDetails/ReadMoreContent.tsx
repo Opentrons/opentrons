@@ -14,6 +14,7 @@ import {
 
 import { MetadataDetails } from './MetadataDetails'
 
+import type { ReactNode } from 'react'
 import type { Metadata } from './MetadataDetails'
 
 interface ReadMoreContentProps {
@@ -24,7 +25,7 @@ interface ReadMoreContentProps {
 export function ReadMoreContent({
   metadata,
   protocolType,
-}: ReadMoreContentProps): JSX.Element {
+}: ReadMoreContentProps): ReactNode {
   const { t, i18n } = useTranslation('protocol_details')
   const [isReadMore, setIsReadMore] = useState(true)
 

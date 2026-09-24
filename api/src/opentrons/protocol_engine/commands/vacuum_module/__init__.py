@@ -7,6 +7,11 @@ from .close_vent import (
     CloseVentParams,
     CloseVentResult,
 )
+from .common import (
+    VacuumModuleCarboyFullError,
+    VacuumModuleError,
+    VacuumPressureNotReachedError,
+)
 from .open_vent import (
     OpenVent,
     OpenVentCommandType,
@@ -47,15 +52,12 @@ from .stop_vacuum import (
     StopVacuumParams,
     StopVacuumResult,
 )
-from .wait_for_target import (
-    WaitForTarget,
-    WaitForTargetCommandType,
-    WaitForTargetCreate,
-    WaitForTargetParams,
-    WaitForTargetResult,
-)
 
 __all__ = [
+    # Vacuum module defined errors
+    "VacuumModuleCarboyFullError",
+    "VacuumModuleError",
+    "VacuumPressureNotReachedError",
     # Stop vacuum command models
     "StopVacuum",
     "StopVacuumCommandType",
@@ -97,10 +99,4 @@ __all__ = [
     "VacuumModuleProfilePressureStep",
     "ProfileType",
     "StartRunProfileStepParams",
-    # wait for target command models
-    "WaitForTarget",
-    "WaitForTargetCommandType",
-    "WaitForTargetCreate",
-    "WaitForTargetParams",
-    "WaitForTargetResult",
 ]

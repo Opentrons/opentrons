@@ -28,6 +28,8 @@ from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareImplementation,
     MoveLabwareParams,
     MoveLabwareResult,
+    VacuumModuleUnderVacuumMovementError,
+    _has_vacuum_collar_neighbor,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -65,6 +67,11 @@ def patch_mock_labware_validation(
     """Mock out labware_validation.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
+    decoy.when(
+        labware_validation.validate_definition_is_deck_slot_compatible(
+            matchers.Anything()
+        )
+    ).then_return(True)
 
 
 @pytest.fixture
@@ -347,6 +354,56 @@ async def test_gripper_move_labware_implementation(
             sentinel.new_location_validated_for_gripper
         )
     ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")])
+    collar = LoadedLabware(
+        id="collar-id",
+        loadName="collar",
+        definitionUri="opentrons-test/collar/1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        offsetId=None,
+    )
+    adapter = LoadedLabware(
+        id="adapter-id",
+        loadName="adapter",
+        definitionUri="opentrons-test/adapter/1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C3),
+        offsetId=None,
+    )
+    collar_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="collar",
+            quirks=["vacuumModuleDock"],
+        ),
+    )
+    adapter_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="adapter",
+            quirks=[],
+        ),
+    )
+    decoy.when(
+        state_view.geometry.get_north_south_neighbors(
+            sentinel.from_location_validated_for_gripper
+        )
+    ).then_return([collar])
+    decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
+        collar_def
+    )
+    decoy.when(
+        labware_validation.validate_definition_is_vacuum_module_dock(collar_def)
+    ).then_return(True)
+    decoy.when(
+        state_view.geometry.get_north_south_neighbors(
+            sentinel.new_location_validated_for_gripper
+        )
+    ).then_return([adapter])
+    decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
+        adapter_def
+    )
+    decoy.when(
+        labware_validation.validate_definition_is_vacuum_module_dock(adapter_def)
+    ).then_return(False)
 
     result = await subject.execute(data)
     decoy.verify(
@@ -362,6 +419,8 @@ async def test_gripper_move_labware_implementation(
             ),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=True,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -443,6 +502,12 @@ async def test_gripper_error(
         state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
     ).then_return(new_location)
     decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+    decoy.when(
+        state_view.geometry.get_north_south_neighbors(origin_location)
+    ).then_return([])
+    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
+        []
+    )
     params = MoveLabwareParams(
         labwareId=labware_id,
         newLocation=new_location,
@@ -458,6 +523,8 @@ async def test_gripper_error(
             user_pick_up_offset=Point(),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         )
     ).then_raise(underlying_exception)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
@@ -530,6 +597,17 @@ async def test_clears_location_if_current_labware_moved_from_under_pipette(
             offsetId=None,
         )
     )
+
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+    decoy.when(
+        state_view.labware.get_definition(labware_id=moved_labware_id)
+    ).then_return(lw_def)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(to_location, None, lw_def)
+    ).then_return(to_location)
 
     decoy.when(state_view.pipettes.get_current_location()).then_return(
         CurrentWell(
@@ -632,6 +710,12 @@ async def test_gripper_move_to_waste_chute_implementation(
     decoy.when(labware_validation.validate_gripper_compatible(labware_def)).then_return(
         True
     )
+    decoy.when(
+        state_view.geometry.get_north_south_neighbors(from_location)
+    ).then_return([])
+    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
+        []
+    )
 
     result = await subject.execute(data)
     decoy.verify(
@@ -645,6 +729,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             user_pick_up_offset=Point(1, 2, 3),
             user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -1049,6 +1135,16 @@ async def test_move_labware_calls_raise_if_labware_is_contained(
         state_view.geometry.ensure_location_not_occupied(data.newLocation, None, lw_def)
     ).then_return(data.newLocation)
     decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+    origin = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    dest = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(origin)).then_return(
+        origin
+    )
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(dest)).then_return(
+        dest
+    )
+    decoy.when(state_view.geometry.get_north_south_neighbors(origin)).then_return([])
+    decoy.when(state_view.geometry.get_north_south_neighbors(dest)).then_return([])
 
     await subject.execute(data)
 
@@ -1133,6 +1229,17 @@ async def test_movable_adapter_can_move_with_labware_on_top(
             data.newLocation, None, movable_def
         )
     ).then_return(data.newLocation)
+    origin = ModuleLocation(moduleId="vacuum-module-id")
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(origin)).then_return(
+        origin
+    )
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(new_location)
+    ).then_return(new_location)
+    decoy.when(state_view.geometry.get_north_south_neighbors(origin)).then_return([])
+    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
+        []
+    )
 
     await subject.execute(data)
 
@@ -1205,3 +1312,280 @@ async def test_vacuum_module_dock_incompatibility_raises(
 
     with pytest.raises(errors.LabwareIsNotAllowedInLocationError):
         await subject.execute(data)
+
+
+async def test_move_filter_plate_directly_on_vacuum_module_raises(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """It should reject moving a filter plate directly onto the vacuum module."""
+    new_location = ModuleLocation(moduleId="vacuum-module-id")
+    data = MoveLabwareParams(
+        labwareId="filter-plate-id",
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+    )
+
+    decoy.when(state_view.labware.get("filter-plate-id")).then_return(
+        LoadedLabware(
+            id="filter-plate-id",
+            loadName="empore_96_wellplate_1200ul_c18_filter",
+            definitionUri="opentrons/empore_96_wellplate_1200ul_c18_filter/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C1),
+            offsetId=None,
+        )
+    )
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="opentrons",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            isMovableAdapter=False,
+            loadName="empore_96_wellplate_1200ul_c18_filter",
+            quirks=["filterPlate"],
+        ),
+    )
+    decoy.when(state_view.labware.get_definition("filter-plate-id")).then_return(lw_def)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(new_location)
+    decoy.when(state_view.modules.get("vacuum-module-id")).then_return(
+        LoadedModule.model_construct(
+            id="vacuum-module-id",
+            model=ModuleModel.VACUUM_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName("A3")),
+            serialNumber="serial",
+        )
+    )
+    decoy.when(
+        state_view.labware.raise_if_labware_incompatible_with_vacuum_module(lw_def)
+    ).then_raise(
+        errors.LabwareIsNotAllowedInLocationError(
+            "Cannot place 'empore_96_wellplate_1200ul_c18_filter' directly"
+            " onto the vacuum module."
+        )
+    )
+
+    with pytest.raises(
+        errors.LabwareIsNotAllowedInLocationError, match="directly onto"
+    ):
+        await subject.execute(data)
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    [
+        LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+        LabwareMovementStrategy.USING_GRIPPER,
+    ],
+)
+async def test_move_labware_raises_when_vacuum_module_still_under_vacuum(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    model_utils: ModelUtils,
+    strategy: LabwareMovementStrategy,
+) -> None:
+    """It should raise a defined error when the vacuum chamber is still evacuated."""
+    labware_id = "manifold-collar-id"
+    module_id = "vacuum-module-id"
+    current_gauge_pressure_mbar = -275.0
+    error_id = "vacuum-error-id"
+    error_created_at = datetime.now()
+    origin_location = ModuleLocation(moduleId=module_id)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    available_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+
+    data = MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+        strategy=strategy,
+    )
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+
+    decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
+        LoadedLabware(
+            id=labware_id,
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=origin_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        lw_def
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(available_new_location)
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=available_new_location,
+        )
+    ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
+            labware_id=labware_id,
+            new_location=available_new_location,
+        )
+    ).then_raise(
+        errors.VacuumModuleStillUnderVacuumError(
+            module_id=module_id,
+            current_gauge_pressure_mbar=current_gauge_pressure_mbar,
+        )
+    )
+    decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+
+    result = await subject.execute(data)
+
+    assert result == DefinedErrorData(
+        public=VacuumModuleUnderVacuumMovementError.model_construct(
+            id=error_id,
+            createdAt=error_created_at,
+            detail=(
+                f"Vacuum Module {module_id} is still under vacuum at "
+                f"{current_gauge_pressure_mbar} mbar. Wait for pressure to equalize "
+                "before moving labware to or from it."
+            ),
+            errorInfo={
+                "moduleId": module_id,
+                "currentGaugePressureMbar": current_gauge_pressure_mbar,
+            },
+        ),
+        state_update=update_types.StateUpdate(
+            addressable_area_used=update_types.AddressableAreaUsedUpdate(
+                addressable_area_name=new_location.slotName.id
+            ),
+        ),
+    )
+
+
+async def test_move_labware_raises_when_vacuum_module_pump_engaged(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+) -> None:
+    """It should raise when the vacuum module pump is still engaged."""
+    labware_id = "manifold-collar-id"
+    module_id = "vacuum-module-id"
+    origin_location = ModuleLocation(moduleId=module_id)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    available_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+
+    data = MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+    )
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+
+    decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
+        LoadedLabware(
+            id=labware_id,
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=origin_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        lw_def
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(available_new_location)
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=available_new_location,
+        )
+    ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
+            labware_id=labware_id,
+            new_location=available_new_location,
+        )
+    ).then_raise(
+        errors.LabwareMovementNotAllowedError(
+            "Cannot move labware to or from a Vacuum Module when the pump is running."
+        )
+    )
+
+    with pytest.raises(
+        errors.LabwareMovementNotAllowedError,
+        match="when the pump is running",
+    ):
+        await subject.execute(data)
+
+
+def _neighbor(labware_id: str, slot: DeckSlotName) -> LoadedLabware:
+    return LoadedLabware(
+        id=labware_id,
+        loadName=labware_id,
+        definitionUri=f"opentrons-test/{labware_id}/1",
+        location=DeckSlotLocation(slotName=slot),
+        offsetId=None,
+    )
+
+
+def test_has_vacuum_collar_neighbor_true_for_collar(
+    decoy: Decoy, state_view: StateView
+) -> None:
+    """A vacuum-module collar on a north/south neighbor restricts the gripper."""
+    location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+    collar = _neighbor("collar-id", DeckSlotName.SLOT_A3)
+    collar_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="collar",
+            quirks=["vacuumModuleDock"],
+        ),
+    )
+    decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
+        [collar]
+    )
+    decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
+        collar_def
+    )
+    decoy.when(
+        labware_validation.validate_definition_is_vacuum_module_dock(collar_def)
+    ).then_return(True)
+
+    assert _has_vacuum_collar_neighbor(location, state_view) is True
+
+
+def test_has_vacuum_collar_neighbor_false_for_non_collar(
+    decoy: Decoy, state_view: StateView
+) -> None:
+    """Non-collar neighbors (96 adapter, riser) do not restrict the gripper."""
+    location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+    adapter = _neighbor("adapter-id", DeckSlotName.SLOT_A3)
+    adapter_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="adapter",
+            quirks=[],
+        ),
+    )
+    decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
+        [adapter]
+    )
+    decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
+        adapter_def
+    )
+    decoy.when(
+        labware_validation.validate_definition_is_vacuum_module_dock(adapter_def)
+    ).then_return(False)
+
+    assert _has_vacuum_collar_neighbor(location, state_view) is False

@@ -19,8 +19,15 @@ export const SECTIONS = {
   PLACE_ADAPTER: 'PLACE_ADAPTER',
   ATTACH_PROBE: 'ATTACH_PROBE',
   DETACH_PROBE: 'DETACH_PROBE',
+  VERIFY_VACUUM: 'VERIFY_VACUUM',
   SUCCESS: 'SUCCESS',
 } as const
+
+// Target vacuum a sealed collar should reach within the verification timeout.
+export const VERIFY_VACUUM_GAUGE_PRESSURE_MBAR = -500
+export const VERIFY_VACUUM_TIMEOUT_S = 30
+export const VERIFY_VACUUM_DURATION_S = 35
+export const VERIFY_VACUUM_EQUALIZE_TIMEOUT_S = 5
 
 export const ACTIONS = {
   RESTART_FLOW: 'RESTART_FLOW',

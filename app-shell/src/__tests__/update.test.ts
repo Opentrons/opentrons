@@ -1,6 +1,7 @@
 // app-shell self-update tests
 import { EventEmitter } from 'events'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 
@@ -85,10 +86,14 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    vi.mocked(Cfg.getConfig).mockReturnValue('dev' as any)
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
-    expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update.channel')
     expect(autoUpdater.channel).toEqual('dev')
     expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
 
@@ -101,8 +106,39 @@ describe('update', () => {
       payload: { available: true, info: { version: '1.0.0' } },
     })
   })
+  it('automatically downloads updates if enabled', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: true,
+      } as any as Cfg.Config['update'])
+    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+
+    expect(autoUpdater.channel).toEqual('dev')
+    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
+
+    autoUpdater.emit('update-available', {
+      version: '1.0.0',
+    } as any)
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'shell:CHECK_UPDATE_RESULT',
+      payload: { available: true, info: { version: '1.0.0' } },
+    })
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'shell:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    })
+  })
 
   it('handles shell:CHECK_UPDATE with no available update', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
     vi.mocked(autoUpdater).emit('update-not-available', {
       version: '1.0.0',
@@ -115,6 +151,12 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with error', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
     vi.mocked(autoUpdater).emit('error', new Error('AH'))
 

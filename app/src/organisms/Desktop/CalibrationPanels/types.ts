@@ -1,5 +1,5 @@
+import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import type { Mount } from '/app/redux/pipettes/types'
 import type {
   CalibrationCheckComparisonByPipette,
   CalibrationCheckInstrument,

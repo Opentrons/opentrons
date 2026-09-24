@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -13,6 +12,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
@@ -20,6 +20,7 @@ import {
 
 import { dismissAllRequests, getRequests } from '/app/redux/robot-api'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 export interface CalibrationErrorInfo {
@@ -92,7 +93,7 @@ export function CalibrationError({
   subText,
   title,
   onClose,
-}: CalibrationErrorProps): JSX.Element {
+}: CalibrationErrorProps): ReactNode {
   const [isClosing, setIsClosing] = useState(false)
   const { t } = useTranslation('robot_calibration')
 
@@ -111,7 +112,8 @@ export function CalibrationError({
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           onClick={() => {
             setIsClosing(true)
             onClose()
@@ -119,7 +121,7 @@ export function CalibrationError({
           disabled={isClosing}
         >
           {t('exit')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

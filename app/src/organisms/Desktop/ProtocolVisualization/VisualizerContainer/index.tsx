@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -19,6 +19,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import {
+  getStepDetailViewerClosed,
   stepDetailViewerCloseAction,
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
@@ -29,7 +30,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -53,8 +54,9 @@ interface VisualizerContainerProps {
 
 export function VisualizerContainer(
   props: VisualizerContainerProps
-): JSX.Element {
+): ReactNode {
   const dispatch = useDispatch()
+  const stepDetailViewerClosed = useSelector(getStepDetailViewerClosed)
   const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =
     props
   const createdDate = new Date(analysisOutput.createdAt)
@@ -320,6 +322,15 @@ export function VisualizerContainer(
   }, [dispatch, protocolKey])
 
   useEffect(() => {
+    if (
+      stepDetailViewerClosed != null &&
+      stepDetailViewerClosed.protocolKey === protocolKey
+    ) {
+      setSelectedSlot(null)
+    }
+  }, [protocolKey, stepDetailViewerClosed])
+
+  useEffect(() => {
     return () => {
       trackEventRef.current({
         name: ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES,
@@ -378,6 +389,7 @@ export function VisualizerContainer(
           invariantContext={invariantContext}
           robotState={robotState}
           robotType={robotType ?? FLEX_ROBOT_TYPE}
+          selectedSlot={selectedSlot}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
             if (selectedRunTimeCommand != null && typeof slot === 'string') {

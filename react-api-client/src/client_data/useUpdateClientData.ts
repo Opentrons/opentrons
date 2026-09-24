@@ -29,6 +29,8 @@ export function useUpdateClientData<T = DefaultClientData>(
 ): UseUpdateClientDataMutationResult<T> {
   const host = useHost()
 
+  // Client data endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<ClientDataResponse<T>, AxiosError, T>(
     getQueryKey(host, 'client_data', key),
     (clientData: T) =>

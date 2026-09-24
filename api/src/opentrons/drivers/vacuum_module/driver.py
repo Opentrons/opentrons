@@ -34,8 +34,16 @@ MAX_REPS = 10
 MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 100
 MAX_RAMP_RATE = -10.0  # mbar/s
-MAX_PRESSURE_MBAR = -1013.25
+MIN_GAUGE_PRESSURE_MBAR = 0
+MAX_GAUGE_PRESSURE_MBAR = -800
+THEORETICAL_MAX_GAUGE_PRESSURE_MBAR = -1013.25
 MAX_VAC_DURATION_S = 60 * 60 * 24  # 24hrs
+
+# Waste M127 range — match firmware waste_detector.hpp configure().
+WASTE_H_MAX = 500.0
+WASTE_G_MAX = float(MAX_PUMP_RPM)
+WASTE_HOLD_MS_MAX = 1_000_000.0
+WASTE_N_MAX = 1000.0
 
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
@@ -88,7 +96,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
         """Parse the get pressure pid."""
-        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+)"
+        pattern = (
+            r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) "
+            r"V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+) "
+            r"A:(?P<A>\d.+) S:(?P<S>\d.+)"
+        )
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -101,27 +113,29 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("V")),
             float(match.group("H")),
             float(match.group("T")),
+            float(match.group("A")),
+            float(match.group("S")),
         )
 
     @classmethod
     def parse_get_waste_configs(cls, response: str) -> WasteConfigParameters:
         """Parse the get waste configs."""
-        pattern = r"E:(?P<E>\d) S:(?P<S>\d.+) P:(?P<P>\d.+) F:(?P<F>\d.+) D:(?P<D>\d.+) R:(?P<R>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) M:(?P<M>\d.+) X:(?P<X>\d.+)"
+        pattern = (
+            r"E:(?P<E>\d) A:(?P<A>\d.+) G:(?P<G>\d.+) H:(?P<H>\d.+) "
+            r"T:(?P<T>\d.+) U:(?P<U>\d.+) N:(?P<N>\d.+)"
+        )
         _RE = re.compile(rf"^{GCODE.GET_WASTE_CONFIG} {pattern}$")
         match = _RE.match(response)
         if not match:
-            raise ValueError(f"Incorrect Response for get waste confis: {response}")
+            raise ValueError(f"Incorrect Response for get waste configs: {response}")
         return WasteConfigParameters(
-            bool(match.group("E")),
-            float(match.group("S")),
-            float(match.group("P")),
-            float(match.group("F")),
-            float(match.group("D")),
-            float(match.group("R")),
-            float(match.group("C")),
-            float(match.group("A")),
-            float(match.group("M")),
-            float(match.group("X")),
+            waste_detection_enabled=bool(int(match.group("E"))),
+            p_filter_alpha=float(match.group("A")),
+            g_sealed_max=float(match.group("G")),
+            flowing_dp_mbar=float(match.group("H")),
+            stable_hold_ms=float(match.group("T")),
+            stable_hold_deep_ms=float(match.group("U")),
+            min_waste_depth_mbar=float(match.group("N")),
         )
 
     @classmethod
@@ -155,7 +169,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             loop=loop,
             error_keyword=VM_ERROR_KEYWORD,
             async_error_ack=VM_ASYNC_ERROR_ACK,
-            reset_buffer_before_write=True,
+            # Do not reset the input buffer before writes. Waste-full (and other async
+            # module errors) are one-shot UART notifications that can arrive between
+            # commands. Clearing the buffer on every write drops them before the
+            # next read can partition and raise them.
+            reset_buffer_before_write=False,
             error_codes=VacuumModuleErrorCodes,
         )
         return cls(connection)
@@ -197,6 +215,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def is_connected(self) -> bool:
         """Check connection to vacuum module."""
         return await self._connection.is_open()
+
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        await self._connection.update_port(new_port)
 
     def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
@@ -289,7 +311,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if gauge_pressure_mbar is not None:
             command.add_float(
                 "P",
-                min(max(gauge_pressure_mbar, MAX_PRESSURE_MBAR), 0),
+                min(max(gauge_pressure_mbar, THEORETICAL_MAX_GAUGE_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
         if duration_s is not None:
@@ -367,25 +389,26 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
 
         command = GCODE.SET_PRESSURE_PID.build_command()
-        if kp is not None:
-            command.add_float("P", kp, GCODE_ROUNDING_PRECISION)
-        if ki is not None:
-            command.add_float("I", ki, GCODE_ROUNDING_PRECISION)
-        if kd is not None:
-            command.add_float("D", kd, GCODE_ROUNDING_PRECISION)
-        if overshoot is not None:
-            command.add_float("O", overshoot, GCODE_ROUNDING_PRECISION)
-        if k_velocity is not None:
-            command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
-        if k_holding is not None:
-            command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
-        if tolerance is not None:
-            command.add_float("T", tolerance, GCODE_ROUNDING_PRECISION)
+        for letter, value in (
+            ("P", kp),
+            ("I", ki),
+            ("D", kd),
+            ("O", overshoot),
+            ("V", k_velocity),
+            ("H", k_holding),
+            ("T", tolerance),
+            ("A", approach_band),
+            ("S", slew_end_fraction),
+        ):
+            if value is not None:
+                command.add_float(letter, value, GCODE_ROUNDING_PRECISION)
         command.add_int("R", int(reset))
 
         resp = await self._connection.send_command(command)
@@ -399,40 +422,33 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         )
         return self.parse_get_pressure_pid(resp)
 
-    async def set_waste_configs(  # noqa: C901
+    async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
-        p_window_start: Optional[float] = None,
-        p_window_end: Optional[float] = None,
-        baseline_fast_factor: Optional[float] = None,
-        max_delta_per_tick: Optional[float] = None,
-        max_rise_per_tick: Optional[float] = None,
-        max_cummulative_rise: Optional[float] = None,
         p_filter_alpha: Optional[float] = None,
-        min_window_time: Optional[float] = None,
-        max_window_time: Optional[float] = None,
+        g_sealed_max: Optional[float] = None,
+        flowing_dp_mbar: Optional[float] = None,
+        stable_hold_ms: Optional[float] = None,
+        stable_hold_deep_ms: Optional[float] = None,
+        min_waste_depth_mbar: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
 
         command = GCODE.SET_WASTE_CONFIG.build_command()
-        if p_window_start is not None:
-            command.add_float("S", p_window_start, GCODE_ROUNDING_PRECISION)
-        if p_window_end is not None:
-            command.add_float("P", p_window_end, GCODE_ROUNDING_PRECISION)
-        if baseline_fast_factor is not None:
-            command.add_float("F", baseline_fast_factor, GCODE_ROUNDING_PRECISION)
-        if max_delta_per_tick is not None:
-            command.add_float("D", max_delta_per_tick, GCODE_ROUNDING_PRECISION)
-        if max_rise_per_tick is not None:
-            command.add_float("R", max_rise_per_tick, GCODE_ROUNDING_PRECISION)
-        if max_cummulative_rise is not None:
-            command.add_float("C", max_cummulative_rise, GCODE_ROUNDING_PRECISION)
-        if p_filter_alpha is not None:
-            command.add_float("A", p_filter_alpha, GCODE_ROUNDING_PRECISION)
-        if min_window_time is not None:
-            command.add_float("M", min_window_time, GCODE_ROUNDING_PRECISION)
-        if max_window_time is not None:
-            command.add_float("X", max_window_time, GCODE_ROUNDING_PRECISION)
+        for letter, value, lo, hi in (
+            ("A", p_filter_alpha, 0, 1.0),
+            ("G", g_sealed_max, 0, WASTE_G_MAX),
+            ("H", flowing_dp_mbar, 0, WASTE_H_MAX),
+            ("T", stable_hold_ms, 0, WASTE_HOLD_MS_MAX),
+            ("U", stable_hold_deep_ms, 0, WASTE_HOLD_MS_MAX),
+            ("N", min_waste_depth_mbar, 0, WASTE_N_MAX),
+        ):
+            if value is not None:
+                command.add_float(
+                    letter,
+                    max(lo, min(value, hi)),
+                    3,
+                )
         command.add_int("E", int(enable_waste_full_detection))
 
         resp = await self._connection.send_command(command)

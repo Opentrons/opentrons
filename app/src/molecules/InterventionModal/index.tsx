@@ -139,7 +139,7 @@ export function InterventionModal({
   iconHeading,
   children,
   iconSize,
-}: InterventionModalProps): JSX.Element {
+}: InterventionModalProps): ReactNode {
   const modalType = type ?? 'intervention-required'
   const headerColor =
     modalType === 'error' ? ERROR_COLOR : INTERVENTION_REQUIRED_COLOR

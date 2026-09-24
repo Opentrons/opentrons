@@ -182,4 +182,50 @@ describe('AddFixtureModal', () => {
       ])
     )
   })
+
+  it('does not offer modules on B3 when a vacuum module is on A3', () => {
+    const updatedProps = {
+      ...props,
+      cutoutId: 'cutoutB3' as CutoutId,
+      addressableAreaId: 'B3' as AddressableAreaName,
+      modules: {
+        vacuum: {
+          id: 'vacuum',
+          cutoutId: 'cutoutA3' as CutoutId,
+          model: 'vacuumModuleV1' as const,
+          type: 'vacuumModuleType' as const,
+          slot: 'A3',
+          moduleState: {} as any,
+          pythonName: 'vacuumModule',
+        },
+      },
+    }
+    render(updatedProps)
+    screen.getByText('Add to Slot B3')
+    expect(screen.queryByText('Modules')).not.toBeInTheDocument()
+  })
+
+  it('does not offer the vacuum module on A3 when B3 already has a module', () => {
+    const updatedProps = {
+      ...props,
+      cutoutId: 'cutoutA3' as CutoutId,
+      addressableAreaId: 'A3' as AddressableAreaName,
+      modules: {
+        hs: {
+          id: 'hs',
+          cutoutId: 'cutoutB3' as CutoutId,
+          model: 'heaterShakerModuleV1' as const,
+          type: 'heaterShakerModuleType' as const,
+          slot: 'B3',
+          moduleState: {} as any,
+          pythonName: 'heaterShaker',
+        },
+      },
+    }
+    render(updatedProps)
+    screen.getByText('Modules')
+    fireEvent.click(screen.getAllByText('Select options')[1])
+    expect(screen.queryByText('Vacuum Module GEN1')).not.toBeInTheDocument()
+    screen.getByText('Temperature Module GEN2')
+  })
 })

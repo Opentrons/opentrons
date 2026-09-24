@@ -2,24 +2,50 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
+import math
+from dataclasses import replace
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    List,
+    Mapping,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from typing_extensions import cast
 
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
+    VacuumModuleWasteFullError,
+)
+
+from opentrons.config import IS_ROBOT
+from opentrons.config import feature_flags as ff
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
 )
+from opentrons.drivers.vacuum_module.errors import (
+    PressureNotReached,
+    WasteContainerFull,
+    async_gcode_response_to_error,
+)
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
-    POWER_COMPARISON_WINDOW_SIZE,
-    PRESSURE_COMPARISON_WINDOW_SIZE,
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
     PumpState,
     VacuumState,
     VentState,
+    WasteConfigParameters,
 )
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
@@ -31,11 +57,11 @@ from opentrons.hardware_control.modules.types import (
     UploadFunction,
     VacuumModuleCycle,
     VacuumModuleData,
-    VacuumModuleOperationMode,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
     VacuumModuleStatus,
     VacuumModuleStep,
+    VacuumOperationMode,
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
@@ -47,10 +73,72 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 
 log = logging.getLogger(__name__)
 
+_RecoverableVacuumEnumeratedError = Type[
+    Union[
+        VacuumModulePressureNotReachedError,
+        VacuumModuleWasteFullError,
+    ]
+]
+
+_RECOVERABLE_VACUUM_DRIVER_ERRORS: dict[
+    type[Exception], _RecoverableVacuumEnumeratedError
+] = {
+    PressureNotReached: VacuumModulePressureNotReachedError,
+    WasteContainerFull: VacuumModuleWasteFullError,
+}
+
+_T = TypeVar("_T")
+
 POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
+DEFAULT_EQUALIZE_TIMEOUT_S = 120.0
 
 DFU_PID = "df11"
+
+
+# Comparison window
+TARGET_REACHED_POLL_PERIOD = 0.5
+PRESSURE_COMPARISON_WINDOW_SIZE = 5
+POWER_COMPARISON_WINDOW_SIZE = 5
+PRESSURE_TOL = 5.0
+# Open-to-atmosphere / labware-move window. Wider than PRESSURE_TOL to absorb
+# sensor offset and noise when the chamber is vented but not at exact 0 mbar.
+EQUALIZE_PRESSURE_TOL = 10.0
+POWER_TOL = 1.0
+
+# Pressure-control tuning defaults
+# See pressure_task.hpp and pressure_controller.hpp in opentrons-modules for details
+DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
+    kp=13.1,
+    ki=4.59,
+    kd=0.15,
+    overshoot_error=-2.0,
+    k_velocity=20.0,
+    k_holding=43.0,
+    tolerance_error=2.0,  # rel_tol_pct (%)
+    approach_band=80.0,
+    slew_end_fraction=0.30,
+)
+
+# Waste-full detection defaults
+# See waste_detector.hpp in opentrons-modules repo for details
+DEFAULT_WASTE_CONFIG = WasteConfigParameters(
+    waste_detection_enabled=True,
+    p_filter_alpha=0.5,
+    g_sealed_max=0.50,
+    flowing_dp_mbar=8.0,
+    stable_hold_ms=6000.0,
+    stable_hold_deep_ms=10000.0,
+    min_waste_depth_mbar=20.0,
+)
+
+
+def desired_waste_detection_enabled() -> bool:
+    """Whether waste-full detection should be enabled on the device."""
+    return (
+        DEFAULT_WASTE_CONFIG.waste_detection_enabled
+        and not ff.vacuum_module_waste_detection_disabled()
+    )
 
 
 class VacuumModule(mod_abc.AbstractModule):
@@ -112,10 +200,20 @@ class VacuumModule(mod_abc.AbstractModule):
             error_callback=error_callback,
         )
 
+        # Configure the default parameters
+        try:
+            await module._configure_device()
+        except Exception:
+            log.warning(
+                "Could not configure vacuum module defaults on port %s.",
+                port,
+                exc_info=True,
+            )
+
         try:
             await poller.start()
         except Exception:
-            log.exception(f"First read of Flex-Stacker on port {port} failed")
+            log.exception(f"First read of Vacuum Module on port {port} failed")
 
         return module
 
@@ -156,6 +254,7 @@ class VacuumModule(mod_abc.AbstractModule):
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
+        self._profile_stop_requested = False
         self._error: Optional[str] = None
 
     async def _initialized_callback(self) -> None:
@@ -164,13 +263,112 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
-        self.error_callback(exception)
+        """Forward poller/firmware faults as async module errors."""
+        # Parse mismatches (e.g. an M121 pressure line consumed as M123 pump
+        # state) are comms glitches, not firmware faults. Do not escalate them
+        # as ASYNCHRONOUS_MODULE_ERROR or a run can be stopped.
+        if isinstance(exception, ValueError):
+            return
+        self.error_callback(self._to_enumerated_error(exception))
+
+    def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
+        serial = self.serial_number or ""
+        target = self._reader.vacuum_state.target_gauge_pressure
+        current = self._reader.vacuum_state.current_gauge_pressure
+        mode = self.operation_mode.value
+        if self.operation_mode == VacuumOperationMode.POWER:
+            target = self._reader.pump_state.target_pwm
+            current = self._reader.pump_state.current_pwm
+
+        for (
+            driver_error_type,
+            enumerated_error_type,
+        ) in _RECOVERABLE_VACUUM_DRIVER_ERRORS.items():
+            if isinstance(exception, driver_error_type):
+                return enumerated_error_type(serial, mode, target, current)
+        return VacuumModuleUnknownError(serial, mode, target, current)
+
+    async def _map_err(self, awaitable: Awaitable[_T]) -> _T:
+        """Await driver calls, mapping recoverable driver errors to enumerated errors.
+
+        PE background tasks record failures via FinishTaskAction; associated-command
+        recovery needs enumerated error codes, not raw driver exceptions.
+        """
+        try:
+            return await awaitable
+        except Exception as exc:
+            if isinstance(exc, tuple(_RECOVERABLE_VACUUM_DRIVER_ERRORS)):
+                raise self._to_enumerated_error(exc) from exc
+            raise
+
+    async def soft_cleanup(self) -> None:
+        """Stop the poller and disconnect the serial driver without notifying pyro."""
+        self._unsubscribe_init()
+        self._unsubscribe_error()
+        await self._poller.stop()
+        await self._driver.disconnect()
 
     @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
-        """Stop the poller task"""
-        await self._poller.stop()
-        await self._driver.disconnect()
+        """Stop the poller task."""
+        await self.soft_cleanup()
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        """Update the module's virtual and physical port after a USB renumber."""
+        self._port = port
+        self._usb_port = usb_port
+        await self._driver.move_port(port)
+
+    async def _configure_device(self) -> None:
+        """Apply firmware configuration defaults."""
+        # Waste detection parameters
+        waste = DEFAULT_WASTE_CONFIG
+        await self._driver.set_waste_configs(
+            desired_waste_detection_enabled(),
+            waste.p_filter_alpha,
+            waste.g_sealed_max,
+            waste.flowing_dp_mbar,
+            waste.stable_hold_ms,
+            waste.stable_hold_deep_ms,
+            waste.min_waste_depth_mbar,
+        )
+
+        # Pressure control parameters
+        pid = DEFAULT_PRESSURE_CONTROL_TUNINGS
+        await self._driver.set_pressure_control_tunings(
+            kp=pid.kp,
+            ki=pid.ki,
+            kd=pid.kd,
+            overshoot=pid.overshoot_error,
+            k_velocity=pid.k_velocity,
+            k_holding=pid.k_holding,
+            tolerance=pid.tolerance_error,
+            approach_band=pid.approach_band,
+            slew_end_fraction=pid.slew_end_fraction,
+        )
+
+    async def attempt_reconnect(self) -> None:
+        """Reopen the serial connection and restart the poller after a brief disconnect."""
+        if not IS_ROBOT:
+            return
+        log.info("attempting vacuum module reconnect.")
+        try:
+            if not await self._driver.is_connected():
+                self._driver = await VacuumModuleDriver.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            self._unsubscribe_init = self._reader.set_initialized_callback(
+                self._initialized_callback
+            )
+            self._unsubscribe_error = self._reader.set_error_callback(
+                self._async_error_callback
+            )
+            await self._poller.stop()
+            await self._poller.start()
+            await self._configure_device()
+        except BaseException:
+            log.exception("Got an error when trying to reconnect vacuum module.")
 
     @classmethod
     def name(cls) -> str:
@@ -209,17 +407,40 @@ class VacuumModule(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str = "M121",
+    ) -> None:
+        """Inject a firmware-style async G-code error for vacuum module testing.
+
+        On simulated modules the error is queued on the next polled driver read.
+        On real hardware the error is delivered through the module reader callback
+        path, which matches how async firmware errors surface during a run.
+        """
+        driver_error = async_gcode_response_to_error(
+            port=self.port,
+            gcode_response=gcode_response,
+            command=command,
+        )
+        if self.is_simulated:
+            sim_driver = self._driver
+            if isinstance(sim_driver, SimulatingDriver):
+                sim_driver.inject_async_error(driver_error)
+                return
+        self._reader.on_error(driver_error)
+
     @property
     def live_data(self) -> LiveData:
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
             "pumpEngaged": self._reader.pump_state.pump_running,
-            "currentPressure": self._reader.vacuum_state.current_gauge_pressure,
+            "currentPressure": self.current_gauge_pressure_mbar,
             "targetPressure": self._reader.vacuum_state.target_gauge_pressure,
-            "currentPower": self._reader.pump_state.current_rpm,
-            "targetPower": self._reader.pump_state.target_rpm,
+            "currentPower": self._reader.pump_state.current_pwm,
+            "targetPower": self._reader.get_target_power(),
             "ventStatus": self._reader.vacuum_state.vent_state.formatted,
-            "modeType": self._reader.operation_mode,
+            "modeType": self._reader.operation_mode.value,
         }
         return {"status": self.status.value, "data": data}
 
@@ -236,7 +457,7 @@ class VacuumModule(mod_abc.AbstractModule):
         return self._reader.pump_state
 
     @property
-    def operation_mode(self) -> VacuumModuleOperationMode:
+    def operation_mode(self) -> VacuumOperationMode:
         return self._reader.operation_mode
 
     @property
@@ -244,6 +465,20 @@ class VacuumModule(mod_abc.AbstractModule):
         return (
             self._reader.pump_state.pump_running
             or self._reader.vacuum_state.vacuum_enabled
+        )
+
+    @property
+    def current_gauge_pressure_mbar(self) -> float:
+        """Gauge pressure derived from absolute and atmospheric sensor readings."""
+        state = self.vacuum_state
+        avg_pressure = round((state.pressure_abs_a + state.pressure_abs_b) / 2, 2)
+        return round(avg_pressure - state.pressure_atm, 2)
+
+    @property
+    def pressure_equalized(self) -> bool:
+        """True when derived gauge pressure indicates atmospheric pressure."""
+        return math.isclose(
+            self.current_gauge_pressure_mbar, 0.0, abs_tol=EQUALIZE_PRESSURE_TOL
         )
 
     @property
@@ -281,8 +516,20 @@ class VacuumModule(mod_abc.AbstractModule):
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
+    async def stop_vacuum(self) -> None:
+        """Stop pressure control and the pump; clear software targets."""
+        self._profile_stop_requested = True
+        await self._map_err(self._driver.set_vacuum_state(False))
+        await self._map_err(self._driver.set_pump_state(False))
+        self._reader.reset_pressure_target()
+        self._reader.reset_power_target()
+
     async def deactivate(self, must_be_running: bool = True) -> None:
-        pass
+        """Stop the pump, and open the vent."""
+        if must_be_running:
+            await self.wait_for_is_running()
+        await self.stop_vacuum()
+        await self.set_vent_state(VentState.OPENED)
 
     async def set_led_state(
         self,
@@ -293,8 +540,10 @@ class VacuumModule(mod_abc.AbstractModule):
         reps: Optional[int] = None,
     ) -> None:
         """Sets the statusbar state."""
-        return await self._driver.set_led(
-            power, color=color, pattern=pattern, duration=duration, reps=reps
+        await self._map_err(
+            self._driver.set_led(
+                power, color=color, pattern=pattern, duration=duration, reps=reps
+            )
         )
 
     def event_listener(self, event: Any) -> None:
@@ -360,8 +609,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
-        # TODO: Handle error
-        await self._driver.set_vent_state(state=vent_state)
+        await self._map_err(self._driver.set_vent_state(state=vent_state))
 
     async def set_vacuum_state(
         self,
@@ -373,15 +621,18 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Handler for internal pressure controls."""
-        self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
+        self._reader.set_operation_mode(VacuumOperationMode.PRESSURE)
+        self._reader.reset_power_target()
         self._reader.set_target_pressure(gauge_pressure_mbar)
-        await self._driver.set_vacuum_state(
-            enable_vacuum=enable_vacuum,
-            gauge_pressure_mbar=gauge_pressure_mbar,
-            duration_s=duration_s,
-            timeout_s=timeout_s,
-            rate=rate,
-            vent_after=vent_after,
+        await self._map_err(
+            self._driver.set_vacuum_state(
+                enable_vacuum=enable_vacuum,
+                gauge_pressure_mbar=gauge_pressure_mbar,
+                duration_s=duration_s,
+                timeout_s=timeout_s,
+                rate=rate,
+                vent_after=vent_after,
+            )
         )
 
     async def set_pump_state(
@@ -395,18 +646,20 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
-        self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
+        self._reader.set_operation_mode(VacuumOperationMode.POWER)
+        self._reader.reset_pressure_target()
         self._reader.set_target_power(duty_cycle)
-
-        await self._driver.set_vacuum_state(enable_vacuum=False)
-        await self._driver.set_pump_state(
-            start_pump=start_pump,
-            target_rpm=target_rpm,
-            duty_cycle=duty_cycle,
-            duration_s=duration_s,
-            timeout_s=timeout_s,
-            rate=rate,
-            vent_after=vent_after,
+        await self._map_err(self._driver.set_vacuum_state(False))
+        await self._map_err(
+            self._driver.set_pump_state(
+                start_pump=start_pump,
+                target_rpm=target_rpm,
+                duty_cycle=duty_cycle,
+                duration_s=duration_s,
+                timeout_s=timeout_s,
+                rate=rate,
+                vent_after=vent_after,
+            )
         )
 
     async def _execute_cycle_step(self, step: VacuumModuleStep) -> None:
@@ -447,6 +700,20 @@ class VacuumModule(mod_abc.AbstractModule):
                 vent_after=vent_after,
             )
 
+    async def _wait_for_step_completion(self, step: VacuumModuleStep) -> bool:
+        """Wait for a profile step to complete.
+
+        Returns True when the step was stopped externally via stopVacuum.
+        """
+        if (
+            step["hold_time_minutes"] is not None
+            or step["hold_time_seconds"] is not None
+        ):
+            await self.wait_for_command_duration()
+        else:
+            await self.wait_for_target()
+        return self._profile_stop_requested
+
     async def _execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
@@ -463,29 +730,26 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
-                        if (
-                            step["hold_time_minutes"] is not None
-                            or step["hold_time_seconds"] is not None
-                        ):
-                            await self.wait_for_command_duration()
-                        else:
-                            await self.wait_for_target()
+                        if await self._wait_for_step_completion(step):
+                            return
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
                         vent_state=VentState(this_cycle["vent_after"])
                     )
             else:
                 await self._execute_cycle_step(step_or_cycle)
-                await self.wait_for_command_duration()
+                if await self._wait_for_step_completion(step_or_cycle):
+                    return
         if vent_after:
             await self.set_vent_state(VentState.OPENED)
 
     async def execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
-        vent_after: bool = False,
+        vent_after: bool = True,
     ) -> None:
         await self.wait_for_is_running()
+        self._profile_stop_requested = False
         self._total_cycle_count = 0
         self._total_step_count = 0
         self._current_cycle_index = 0
@@ -500,42 +764,67 @@ class VacuumModule(mod_abc.AbstractModule):
             else:
                 self._total_step_count += 1
                 self._total_cycle_count += 1
-        task = self._loop.create_task(self._execute_profile(profile))
+        task = self._loop.create_task(
+            self._execute_profile(profile, vent_after=vent_after)
+        )
         self.make_cancellable(task)
         await task
 
     async def _wait_for_command_duration(self) -> None:
         await self._reader.update_vacuum_state()
-
         while self.vacuum_state.vacuum_duration > 0:
             await self._poller.wait_next_poll()
 
     async def wait_for_command_duration(self) -> None:
         await self.wait_for_is_running()
-
         task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
-        await task
+        await self._map_err(task)
 
     async def wait_for_target(self) -> None:
         await self.wait_for_is_running()
         task = self._loop.create_task(self._wait_for_target())
         self.make_cancellable(task)
-        await task
+        await self._map_err(task)
+
+    async def _wait_for_pressure_equalization(self, timeout_s: float) -> None:
+        """Poll until chamber pressure has equalized to atmospheric."""
+        start = self._loop.time()
+        while not self.pressure_equalized:
+            if self._loop.time() - start >= timeout_s:
+                log.warn(
+                    "Vacuum module pressure did not equalize within "
+                    f"{timeout_s}s. Current gauge pressure: "
+                    f"{self.current_gauge_pressure_mbar} mbar."
+                )
+                break
+            await self._poller.wait_next_poll()
+
+    async def wait_for_pressure_equalization(
+        self,
+        timeout_s: float = DEFAULT_EQUALIZE_TIMEOUT_S,
+    ) -> None:
+        """Wait until the chamber is no longer under vacuum."""
+        await self.wait_for_is_running()
+        task = self._loop.create_task(self._wait_for_pressure_equalization(timeout_s))
+        self.make_cancellable(task)
+        await self._map_err(task)
 
     async def _wait_for_target(self) -> None:
-        if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
-            if not self._reader.pump_state.pump_running:
-                return
+        if self._reader.operation_mode == VacuumOperationMode.POWER:
             while not self._reader.power_target_reached():
-                await self._poller.wait_next_poll()
+                await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
+                await self._reader.update_pump_state()
+                if not self._reader.pump_state.pump_running:
+                    return
             # clear target after it's reached
             self._reader.reset_power_target()
-        elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
-            if not self._reader.vacuum_state.vacuum_enabled:
-                return
+        elif self._reader.operation_mode == VacuumOperationMode.PRESSURE:
             while not self._reader.pressure_target_reached():
-                await self._poller.wait_next_poll()
+                await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
+                await self._reader.update_vacuum_state()
+                if not self._reader.vacuum_state.vacuum_enabled:
+                    return
             # clear target after it's reached
             self._reader.reset_pressure_target()
         else:
@@ -565,9 +854,8 @@ class VacuumModuleReader(Reader):
             pump_running=False,
             manual_control=False,
         )
-        self.operation_mode: VacuumModuleOperationMode = (
-            VacuumModuleOperationMode.PRESSURE
-        )
+        self._waste_config = replace(DEFAULT_WASTE_CONFIG)
+        self.operation_mode = VacuumOperationMode.PRESSURE
         self._driver = driver
         self.initialized = False
         self._refresh_state = False
@@ -608,6 +896,17 @@ class VacuumModuleReader(Reader):
     def set_target_power(self, duty_cycle: Optional[float]) -> None:
         self.target_power = duty_cycle
 
+    def get_target_power(self) -> Optional[float]:
+        if self.target_power is not None:
+            return self.target_power
+
+        if self.operation_mode == VacuumOperationMode.POWER:
+            target_pwm = self.pump_state.target_pwm
+            if target_pwm != 0:
+                return float(target_pwm)
+
+        return None
+
     def reset_pressure_target(self) -> None:
         self.set_target_pressure(None)
         self._pressure_readings = [None for p in self._pressure_readings]
@@ -619,7 +918,9 @@ class VacuumModuleReader(Reader):
     async def read(self) -> None:
         await self.update_vacuum_state()
         await self.update_pump_state()
+        await self._sync_waste_detection_enabled()
         if not self.initialized or self._refresh_state:
+            await self.update_waste_configs()
             initialized = True
             self._refresh_state = False
             # We are done initializing, sync the led state
@@ -630,22 +931,40 @@ class VacuumModuleReader(Reader):
 
         self._set_error(None)
 
-    def power_target_reached(self) -> bool:
-        if not all([p is not None for p in self._power_readings]):
+    def power_target_reached(self, tol: float = POWER_TOL) -> bool:
+        if self.target_power is None or any([p is None for p in self._power_readings]):
             return False
-        return all([p == self.target_power for p in self._power_readings])
+        return all(
+            [
+                math.isclose(p, self.target_power, abs_tol=tol)
+                for p in self._power_readings
+                if p is not None
+            ]
+        )
 
-    def pressure_target_reached(self) -> bool:
-        if not all([p is not None for p in self._pressure_readings]):
+    def pressure_target_reached(self, tol: float = PRESSURE_TOL) -> bool:
+        if self.target_pressure is None or any(
+            [p is None for p in self._pressure_readings]
+        ):
             return False
-        return all([p == self.target_pressure for p in self._pressure_readings])
+        return all(
+            [
+                math.isclose(p, self.target_pressure, abs_tol=tol)
+                for p in self._pressure_readings
+                if p is not None
+            ]
+        )
 
     def set_refresh_state(self) -> None:
         """Tell the reader to refresh all states, even ones that arent polled."""
         self._refresh_state = True
 
     def on_error(self, exception: Exception) -> None:
-        self._driver.reset_serial_buffers()
+        try:
+            self._driver.reset_serial_buffers()
+        except Exception:
+            # Port is often already gone on unplug; still record the poll error.
+            log.debug("Could not reset serial buffers after poll error", exc_info=True)
         self._set_error(exception)
 
     def _set_error(self, exception: Optional[Exception]) -> None:
@@ -675,5 +994,16 @@ class VacuumModuleReader(Reader):
             self._power_readings.insert(0, self.pump_state.current_pwm)
             self._power_readings.pop()
 
-    def set_operation_mode(self, mode_type: VacuumModuleOperationMode) -> None:
+    async def update_waste_configs(self) -> None:
+        """Get latest waste detection config from driver and save updated values."""
+        self._waste_config = await self._driver.get_waste_configs()
+
+    async def _sync_waste_detection_enabled(self) -> None:
+        """Apply the waste-detection feature flag if it differs from last host value."""
+        desired = desired_waste_detection_enabled()
+        if self._waste_config.waste_detection_enabled != desired:
+            await self._driver.set_waste_configs(desired)
+            self._waste_config.waste_detection_enabled = desired
+
+    def set_operation_mode(self, mode_type: VacuumOperationMode) -> None:
         self.operation_mode = mode_type

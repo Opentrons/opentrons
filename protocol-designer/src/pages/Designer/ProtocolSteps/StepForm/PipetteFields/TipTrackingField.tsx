@@ -25,14 +25,21 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import {
+  getDeckSetupForActiveItem,
+  getRobotStateAtActiveItem,
+} from '/protocol-designer/top-selectors/labware-locations'
 
 import { TipSelectionWizard } from './TipSelectionWizard'
 import { useMemoizedTipAccessibilityByTiprackIdByWellName } from './TipSelectionWizard/hooks'
-import { getValidTiprackIds } from './TipSelectionWizard/utils'
+import {
+  getAreAnyMatchingTipracksSelectable,
+  getValidTiprackIds,
+} from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
@@ -47,7 +54,7 @@ interface TipTrackingFieldProps {
   formData: FormData
 }
 
-export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
+export function TipTrackingField(props: TipTrackingFieldProps): ReactNode {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['form', 'tip_selection'])
   const [showTipSelectionModal, setShowTipSelectionModal] =
@@ -63,6 +70,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const invariantContext = useSelector(getInvariantContext)
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem) ?? null
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
@@ -151,7 +159,15 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     robotState,
   })
 
-  const hasValidTiprackForPickup = validTiprackIds.length > 0
+  const areAnyMatchingTipracksSelectable = getAreAnyMatchingTipracksSelectable({
+    allLabware: Object.values(activeDeckSetup?.labware ?? {}),
+    formTiprackUri: formData.tipRack,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+    labwareRobotState: robotState?.labware ?? {},
+  })
 
   return (
     <Flex className={styles.container}>
@@ -210,7 +226,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           </ListButton>
         </Flex>
       ) : null}
-      {!hasValidTiprackForPickup ? (
+      {!areAnyMatchingTipracksSelectable ? (
         <InlineNotification
           type="error"
           heading={t('tip_selection:no_valid_tips_available.title')}

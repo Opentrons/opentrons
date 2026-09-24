@@ -12,26 +12,21 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useAccessControlEnabledQuery,
-} from '@opentrons/react-api-client'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
-import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { logOut, useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { logOut } from '/app/redux/robot-auth'
 import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import styles from './breadcrumbs.module.css'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
@@ -43,7 +38,7 @@ interface CrumbAndSeparatorProps {
 function CrumbAndSeparator({
   crumbName,
   isLastCrumb,
-}: CrumbAndSeparatorProps): JSX.Element {
+}: CrumbAndSeparatorProps): ReactNode {
   return (
     <div
       className={clsx(
@@ -104,7 +99,7 @@ interface AccountIconAndMenuProps {
   robotName: string
 }
 
-function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
+function AccountIconAndMenu(props: AccountIconAndMenuProps): ReactNode {
   const { initial, robotName } = props
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const onClickOutside = useCallback(() => {
@@ -130,11 +125,16 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
         // todo(mm, 2026-05-28): This MenuList is rendering too far away from the button.
         // MenuList hard-codes an offset that's wrong here (and perhaps wrong everywhere),
         // and doesn't give us a way to override it.
-        //
-        // todo(mm, 2026-05-28): The account_settings menu item should link to the user's
-        // account settings, when that's implemented.
         <MenuList>
-          <MenuItem>{t('account_settings')}</MenuItem>
+          <Link to={`/devices/${robotName}/robot-settings/compliance-ready`}>
+            <MenuItem
+              onClick={() => {
+                setIsMenuOpen(false)
+              }}
+            >
+              {t('account_settings')}
+            </MenuItem>
+          </Link>
           <MenuItem
             onClick={() => {
               dispatch(logOut({ robotName }))
@@ -152,7 +152,7 @@ interface LoginLinkProps {
   robotName: string
 }
 
-function LoginLink({ robotName }: LoginLinkProps): JSX.Element {
+function LoginLink({ robotName }: LoginLinkProps): ReactNode {
   const { t } = useTranslation('top_navigation')
   const handleClick = useCallback(() => {
     if (robotName == null) {
@@ -192,9 +192,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   // determines whether a crumb is displayed for a path, and the displayed name
   const crumbNameByPath: {
     [index: string]:
-      | string
-      | null
-      | { linkPath: string; crumbName: string | null }
+      string | null | { linkPath: string; crumbName: string | null }
   } = {
     '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
@@ -286,15 +284,9 @@ export function Breadcrumbs(): JSX.Element | null {
   const { robotName } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
 
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

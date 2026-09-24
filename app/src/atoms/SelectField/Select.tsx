@@ -12,6 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
@@ -37,7 +38,7 @@ interface SelectComponentProps extends SelectProps {
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 
-export function Select(props: SelectComponentProps): JSX.Element {
+export function Select(props: SelectComponentProps): ReactNode {
   const { dropdownType, menuIsOpen, width } = props
   const CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES: StylesConfig<SelectOption> = {
     clearIndicator: NO_STYLE_FN,
@@ -152,7 +153,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
 
 function DropdownIndicator(
   props: DropdownIndicatorProps<SelectOption>
-): JSX.Element {
+): ReactNode {
   return (
     <components.DropdownIndicator {...props}>
       <Box

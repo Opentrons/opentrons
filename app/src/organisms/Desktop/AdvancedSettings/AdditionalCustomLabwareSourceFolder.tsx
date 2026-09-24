@@ -26,9 +26,10 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
+export function AdditionalCustomLabwareSourceFolder(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const labwarePath = useSelector(getCustomLabwareDirectory)
@@ -44,7 +45,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_customLabware"
         >
           {t('additional_labware_folder_title')}
         </LegacyStyledText>
@@ -65,7 +65,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
             css={TYPOGRAPHY.pRegular}
             color={COLORS.black90}
             onClick={() => dispatch(openCustomLabwareDirectory())}
-            id="AdvancedSettings_sourceFolderLink"
           >
             {labwarePath}
             <Icon
@@ -88,7 +87,6 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
               properties: {},
             })
           }}
-          id="AdvancedSettings_changeLabwareSource"
         >
           {labwarePath !== ''
             ? t('change_folder_button')

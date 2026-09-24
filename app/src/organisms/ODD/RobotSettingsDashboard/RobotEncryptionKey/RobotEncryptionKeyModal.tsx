@@ -1,20 +1,22 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import clsx from 'clsx'
 
 import { StyledText } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useCACertPasswordQuery,
-} from '@opentrons/react-api-client'
+import { useCACertPasswordQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { OddModal } from '/app/molecules/OddModal'
 import { RadialTimer } from '/app/molecules/RadialTimer'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import styles from './robot_encryption_key_modal.module.css'
+
+import type { ReactNode } from 'react'
 
 const BACKUP_REFETCH_TIME_MS = 1000
 
@@ -26,7 +28,7 @@ function RobotEncryptionKeyModalElement({
   clearClientData,
 }: {
   clearClientData: () => void
-}): JSX.Element {
+}): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const modal = useModal()
 
@@ -34,7 +36,7 @@ function RobotEncryptionKeyModalElement({
     modal.remove()
     clearClientData()
   }
-  const { password, valid_from_utc, valid_until_utc } = useCACertPasswordQuery({
+  const { data, isLoading } = useCACertPasswordQuery({
     refetchInterval: query =>
       !!query
         ? refetchTimeForPassword(
@@ -42,13 +44,16 @@ function RobotEncryptionKeyModalElement({
             new Date(query.data.valid_until_utc)
           )
         : BACKUP_REFETCH_TIME_MS,
-  }).data?.data ?? {
-    password: '',
+  })
+
+  const { password, valid_from_utc, valid_until_utc } = data?.data ?? {
+    password: null,
     valid_from_utc: new Date().toISOString(),
     valid_until_utc: new Date(
       Date.now() + BACKUP_REFETCH_TIME_MS
     ).toISOString(),
   }
+
   const header = {
     title: t('device_settings:robot_encryption_key'),
     onClick: close,
@@ -66,11 +71,15 @@ function RobotEncryptionKeyModalElement({
 
   const [lastPassword, setLastPassword] = useState<string | null>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       setLastPassword(password)
     }
   }, [password])
+
+  if (isLoading || password == null) {
+    return <></>
+  }
 
   return (
     <OddModal
@@ -90,7 +99,7 @@ function RobotEncryptionKeyModalElement({
           </StyledText>
           <StyledText
             oddStyle="bodyTextRegular"
-            className={styles.password}
+            className={clsx({ [styles.password]: lastPassword != null })}
             key={password}
           >
             {password}
@@ -103,18 +112,20 @@ function RobotEncryptionKeyModalElement({
       </div>
       <SmallButton
         flex="1"
-        buttonText={i18n.format(t('shared:ok'), 'capitalize')}
+        buttonText={i18n.format(t('shared:dismiss'))}
         onClick={close}
       />
     </OddModal>
   )
 }
 
-export const RobotEncryptionKeyModal = NiceModal.create((): JSX.Element => {
+export const RobotEncryptionKeyModal = NiceModal.create((): ReactNode => {
   const { clearClientData } = useUpdateClientDataEncryptionKeys()
+  const robotName = useLocalRobotName()
+
   return (
     <ApiHostProvider
-      hostname={_ODD_IP_ ?? 'localhost'}
+      robotName={robotName}
       requestor={appShellInternalApiRequestor}
     >
       <RobotEncryptionKeyModalElement clearClientData={clearClientData} />

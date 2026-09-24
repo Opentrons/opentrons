@@ -5,6 +5,7 @@ import mock
 import pytest
 from decoy import Decoy
 
+from . import require_live_data_real_string
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
@@ -155,6 +156,7 @@ async def test_sim_state(subject: modules.Thermocycler) -> None:
     assert subject.live_data["status"] == subject.status
     live_data = subject.live_data["data"]
     assert modules.ModuleDataValidator.is_thermocycler_data(live_data)
+    require_live_data_real_string(subject)
     assert live_data["currentTemp"] == subject.temperature
     assert live_data["targetTemp"] == subject.target
     status = subject.device_info
@@ -535,6 +537,7 @@ async def test_sync_error_response_to_poller(
         await subject_mocked_driver.set_temperature(20)
     assert subject_mocked_driver.live_data["status"] == "error"
     assert subject_mocked_driver.status == modules.TemperatureStatus.ERROR
+    require_live_data_real_string(subject_mocked_driver)
 
 
 async def test_async_error_response_to_poller(
@@ -610,3 +613,88 @@ async def test_reader_raises_error_from_get_error(
             serial=None,
         )
     )
+
+
+async def test_move_port_updates_port_and_calls_driver(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+) -> None:
+    """It should update the module's port and forward the new port to the driver."""
+    new_usb_port = USBPort(name="b", port_number=5, device_path="/dev/ot_module_tc_new")
+    await subject_mocked_driver.move_port(
+        port="/dev/ot_module_tc_new", usb_port=new_usb_port
+    )
+
+    assert subject_mocked_driver.port == "/dev/ot_module_tc_new"
+    mock_driver.move_port.assert_called_once_with("/dev/ot_module_tc_new")
+
+
+async def test_attempt_reconnect_skipped_off_robot(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+) -> None:
+    """It should no-op the reconnect attempt when not running on a robot."""
+    with mock.patch("opentrons.hardware_control.modules.thermocycler.IS_ROBOT", False):
+        await subject_mocked_driver.attempt_reconnect()
+
+    mock_driver.is_connected.assert_not_called()
+    mock_driver.disconnect.assert_not_called()
+
+
+async def test_attempt_reconnect_rebuilds_driver_when_disconnected(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+) -> None:
+    """It should rebuild the driver via the factory when the connection is down."""
+    mock_driver.is_connected.return_value = False
+    new_driver = mock.AsyncMock(spec=SimulatingDriver)
+    with (
+        mock.patch("opentrons.hardware_control.modules.thermocycler.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.thermocycler.ThermocyclerDriverFactory.create",
+            mock.AsyncMock(return_value=new_driver),
+        ) as create_mock,
+    ):
+        await subject_mocked_driver.attempt_reconnect()
+
+    mock_driver.is_connected.assert_called_once()
+    create_mock.assert_called_once_with(
+        port=subject_mocked_driver.port, loop=subject_mocked_driver.loop
+    )
+
+    assert subject_mocked_driver._reader._driver is new_driver
+
+
+async def test_attempt_reconnect_keeps_driver_when_still_connected(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+) -> None:
+    """It should not rebuild the driver if the existing connection is still up."""
+    mock_driver.is_connected.return_value = True
+    with (
+        mock.patch("opentrons.hardware_control.modules.thermocycler.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.thermocycler.ThermocyclerDriverFactory.create"
+        ) as create_mock,
+    ):
+        await subject_mocked_driver.attempt_reconnect()
+
+    create_mock.assert_not_called()
+
+    assert subject_mocked_driver._reader._driver is mock_driver
+
+
+async def test_attempt_reconnect_swallows_factory_failure(
+    subject_mocked_driver: modules.Thermocycler,
+    mock_driver: mock.AsyncMock,
+) -> None:
+    """It should not raise if reconnect cannot reestablish the connection."""
+    mock_driver.is_connected.return_value = False
+    with (
+        mock.patch("opentrons.hardware_control.modules.thermocycler.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.thermocycler.ThermocyclerDriverFactory.create",
+            mock.AsyncMock(side_effect=OSError("port gone")),
+        ),
+    ):
+        await subject_mocked_driver.attempt_reconnect()

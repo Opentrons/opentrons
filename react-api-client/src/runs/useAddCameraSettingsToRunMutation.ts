@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { addCameraSettingsToRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -11,6 +12,7 @@ import type {
   CameraResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export interface AddCameraSettingsToRunParams {
   runId: string
@@ -29,28 +31,33 @@ export type UseAddCameraSettingsToRunMutationResult = UseMutationResult<
   >
 }
 
-export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMutationResult {
+export function useAddCameraSettingsToRunMutation(
+  documentationState: DocumentationState
+): UseAddCameraSettingsToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CameraResponse,
     AxiosError<ErrorResponse>,
     AddCameraSettingsToRunParams
-  >(({ runId, settings }) =>
-    addCameraSettingsToRun(host!, runId, settings)
-      .then(response => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs', runId))
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
-        return response.data
-      })
-      .catch((e: Error) => {
-        console.error(`error adding camera settings: ${e.message}`)
-        throw e
-      })
+  >(
+    documentationState,
+    ['update_camera_settings_for_run'],
+    ({ variables: { runId, settings }, userNotes }) =>
+      addCameraSettingsToRun(host!, runId, settings, userNotes)
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'runs', runId))
+            .catch((e: Error) => {
+              console.error(`error invalidating runs query: ${e.message}`)
+            })
+          return response.data
+        })
+        .catch((e: Error) => {
+          console.error(`error adding camera settings: ${e.message}`)
+          throw e
+        })
   )
 
   return {

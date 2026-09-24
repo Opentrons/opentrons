@@ -5,6 +5,8 @@ from typing import Iterator, Optional, Tuple
 
 from typing_extensions import Protocol as TypingProtocol
 
+from opentrons_shared_data.pipette.constants import VOLUME_ROUNDING_ERROR_TOLERANCE
+
 from ..errors.exceptions import (
     InvalidAspirateVolumeError,
     InvalidDispenseVolumeError,
@@ -21,16 +23,6 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
 )
 from opentrons.types import Point
-
-# 1e-9 µL (1 femtoliter!) is a good value because:
-# * It's large relative to rounding errors that occur in practice in protocols. For
-#   example, https://opentrons.atlassian.net/browse/RESC-182 shows a rounding error
-#   on the order of 1e-15 µL.
-# * It's small relative to volumes that our users might actually care about and
-#   expect the robot to execute faithfully.
-# * It's the default absolute tolerance for math.isclose(), where it apparently works
-#   well in general.
-_VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 
 
 class PipettingHandler(TypingProtocol):
@@ -547,9 +539,7 @@ def _validate_aspirate_volume(
     # state_view.pipettes.get_available_volume()? Its whole `None` return vs. exception
     # raising thing is confusing me.
     available_volume = working_volume - current_volume
-    available_volume_with_tolerance = (
-        available_volume + _VOLUME_ROUNDING_ERROR_TOLERANCE
-    )
+    available_volume_with_tolerance = available_volume + VOLUME_ROUNDING_ERROR_TOLERANCE
 
     if aspirate_volume > available_volume_with_tolerance:
         raise InvalidAspirateVolumeError(
@@ -595,7 +585,7 @@ def _validate_dispense_volume(
         )
     else:
         remaining = aspirated_volume - dispense_volume
-        if remaining < -_VOLUME_ROUNDING_ERROR_TOLERANCE:
+        if remaining < -VOLUME_ROUNDING_ERROR_TOLERANCE:
             raise InvalidDispenseVolumeError(
                 f"Cannot dispense {dispense_volume} µL when only {aspirated_volume} µL has been aspirated."
             )

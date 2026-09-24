@@ -55,11 +55,9 @@ function checkUpdate(dispatch: Dispatch): void {
   autoUpdater.once('update-not-available', onNotAvailable)
   autoUpdater.once('error', onError)
 
-  // @ts-expect-error(mc, 2021-02-16): do not use dot-path notation
-  autoUpdater.channel = getConfig('update.channel')
+  autoUpdater.channel = getConfig('update').channel
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   autoUpdater.checkForUpdates()
-
   function done(payload: {
     info?: UpdateInfo | null
     available?: boolean
@@ -69,6 +67,12 @@ function checkUpdate(dispatch: Dispatch): void {
     autoUpdater.removeListener('update-not-available', onNotAvailable)
     autoUpdater.removeListener('error', onError)
     dispatch({ type: 'shell:CHECK_UPDATE_RESULT', payload })
+    if (
+      payload?.available === true &&
+      getConfig('update').automaticallyDownloadUpdates
+    ) {
+      dispatch({ type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } })
+    }
   }
 }
 

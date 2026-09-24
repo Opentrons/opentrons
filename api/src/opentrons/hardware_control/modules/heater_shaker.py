@@ -18,6 +18,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     HeaterShakerData,
     HeaterShakerStatus,
@@ -87,11 +88,24 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         driver: AbstractHeaterShakerDriver
         if not simulating:
-            driver = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
+
+            async def _init_driver() -> tuple[
+                AbstractHeaterShakerDriver, Mapping[str, str]
+            ]:
+                d = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
+            device_info = await driver.get_device_info()
 
         reader = HeaterShakerReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -101,7 +115,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
@@ -232,9 +246,9 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         data: HeaterShakerData = {
-            "temperatureStatus": self.temperature_status,
-            "speedStatus": self.speed_status,
-            "labwareLatchStatus": self.labware_latch_status,
+            "temperatureStatus": self.temperature_status.value,
+            "speedStatus": self.speed_status.value,
+            "labwareLatchStatus": self.labware_latch_status.value,
             "currentTemp": self.temperature,
             "targetTemp": self.target_temperature,
             "currentSpeed": self.speed,
@@ -313,7 +327,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
     # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
     # and instead, wait until status is holding
@@ -329,7 +343,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
         async def _await_temperature() -> None:
             if self.temperature_status == TemperatureStatus.HEATING:
@@ -374,7 +388,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
-        await self._reader.read_rpm()
+        await self._poller.wait_next_good_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target speed.
@@ -413,7 +427,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate_heater()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
     async def deactivate_shaker(self, must_be_running: bool = True) -> None:
         """Stop shaking and home the plate"""
@@ -474,12 +488,15 @@ class HeaterShakerReader(Reader):
         self._set_error(exception)
 
     async def read_temperature(self) -> None:
+        """Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
 
     async def read_rpm(self) -> None:
+        """Do not call directly, for the poller only."""
         self.rpm = await self._driver.get_rpm()
 
     async def read_labware_latch(self) -> None:
+        """Do not call directly, for the poller only."""
         self.labware_latch = await self._driver.get_labware_latch_status()
 
     def _set_error(self, exception: Optional[Exception]) -> None:
@@ -500,6 +517,7 @@ class HeaterShakerReader(Reader):
                 self.error = repr(exception)
 
     async def _read_errors(self) -> None:
+        """Do not call directly, for the poller only."""
         try:
             await self._driver.get_error_state()
         except UnhandledGcode:

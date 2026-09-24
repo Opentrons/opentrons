@@ -9,6 +9,7 @@ from datetime import datetime
 
 from fastapi import Depends
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -53,7 +54,10 @@ async def get_time() -> SystemTimeResponse:
     description="Update system time",
     summary="Set robot time",
     response_model=SystemTimeResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.SYSTEM_TIME_WRITE)),
+        Depends(get_audit_logger("update system time")),
+    ],
 )
 async def set_time(new_time: SystemTimeRequest) -> SystemTimeResponse:
     """Set the robot's system time."""

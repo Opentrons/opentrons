@@ -9,6 +9,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import {
   getAreAnyMatchingTipracksSelectable,
+  getFirstSelectableTiprackId,
   getIsTiprackSelectable,
   getViewboxFromSelectedLabware,
 } from '../utils'
@@ -76,6 +77,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -88,6 +90,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -101,6 +104,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -114,6 +118,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -131,6 +136,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -148,6 +154,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })
@@ -169,6 +176,7 @@ describe('getIsTiprackSelectable', () => {
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            labwareRobotState: mockRobotState.labware,
           })
         ).toBe(false)
       })
@@ -186,10 +194,88 @@ describe('getIsTiprackSelectable', () => {
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            labwareRobotState: mockRobotState.labware,
           })
         ).toBe(true)
       })
     })
+  })
+})
+
+describe('getFirstSelectableTiprackId', () => {
+  beforeEach(() => {
+    vi.mocked(getSlotInLocationStack).mockReturnValue('A1')
+    vi.mocked(getIsTiprack).mockReturnValue(true)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns the first selectable tiprack id', () => {
+    const secondTiprackId = 'secondTiprackId'
+    expect(
+      getFirstSelectableTiprackId({
+        allLabware: {
+          [mockTiprackId]: labware,
+          [secondTiprackId]: {
+            ...labware,
+            id: secondTiprackId,
+          },
+        },
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
+      })
+    ).toBe(mockTiprackId)
+  })
+
+  it('returns null when no tipracks are selectable', () => {
+    vi.mocked(getIsTiprack).mockReturnValue(false)
+    expect(
+      getFirstSelectableTiprackId({
+        allLabware: { [mockTiprackId]: labware },
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
+      })
+    ).toBe(null)
+  })
+
+  it('skips off-deck and fixed trash labware', () => {
+    vi.mocked(getSlotInLocationStack).mockImplementation(stack => {
+      if (stack != null && stack.includes('offDeck')) {
+        return 'offDeck'
+      }
+      return 'A1'
+    })
+
+    expect(
+      getFirstSelectableTiprackId({
+        allLabware: {
+          offDeckTiprack: {
+            ...labware,
+            id: 'offDeckTiprack',
+            stack: ['offDeck'],
+          },
+          fixedTrashTiprack: {
+            ...labware,
+            id: 'fixedTrashTiprack',
+            stack: ['fixedTrash'],
+          },
+          [mockTiprackId]: labware,
+        },
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        labwareRobotState: mockRobotState.labware,
+      })
+    ).toBe(mockTiprackId)
   })
 })
 
@@ -211,6 +297,7 @@ describe('getAreAnyMatchingTipracksSelectable', () => {
         nozzles: ALL,
         labwareEntities: {},
         validTiprackIds: [mockTiprackId],
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(true)
   })
@@ -223,6 +310,7 @@ describe('getAreAnyMatchingTipracksSelectable', () => {
         nozzles: ALL,
         labwareEntities: {},
         validTiprackIds: [],
+        labwareRobotState: mockRobotState.labware,
       })
     ).toBe(false)
   })

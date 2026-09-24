@@ -685,16 +685,13 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
 
-    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
-        """True if a pipette moving to this labware should center its active column on the target.
+    def get_should_center_column_or_row_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column or row on the target.
 
-        This is true for labware that have wells spanning entire columns.
+        This is true for labware that have wells spanning entire columns or rows.
         """
         has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
-        return has_quirk and (
-            len(self.get_definition(labware_id).wells) > 1
-            and len(self.get_definition(labware_id).wells) < 96
-        )
+        return has_quirk and 1 < len(self.get_definition(labware_id).wells) < 96
 
     def get_labware_stacking_maximum(self, labware: LabwareDefinition) -> int:
         """Returns the maximum number of labware allowed in a stack for a given labware definition.
@@ -721,6 +718,18 @@ class LabwareView:
     def get_has_12_subwells(self, labware_id: str) -> bool:
         """True if a labware is a reservoir with a 12-grid of sub-wells."""
         return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
+    def get_is_column_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of column-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and all(
+            len(column) == 1 for column in definition.ordering
+        )
+
+    def get_is_row_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of row-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and len(definition.ordering) == 1
 
     def get_well_definition(
         self,
@@ -1152,6 +1161,26 @@ class LabwareView:
             )
         return True
 
+    def raise_if_labware_incompatible_with_vacuum_module(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> bool:
+        """Raise if a filter plate is placed directly on the vacuum module.
+
+        Filter plates must sit on a collar, spacer, or receiver plate. Some
+        of them have their wells extend below the skirt and will not seat on
+        the module surface.
+
+        Returns True if it does not raise.
+        """
+        if labware_validation.validate_definition_is_filter_plate(labware_definition):
+            raise errors.LabwareIsNotAllowedInLocationError(
+                f"Cannot place '{labware_definition.parameters.loadName}' directly"
+                " onto the vacuum module. Filter plates must sit on a manifold"
+                " collar, spacer, or receiver plate."
+            )
+        return True
+
     def raise_if_labware_incompatible_with_vacuum_module_dock(
         self,
         location: LabwareLocation,
@@ -1189,6 +1218,13 @@ class LabwareView:
             return False
 
         labware_definition = self.get_definition(labware_id)
+
+        # Labware staged off-deck for maintenance runs are not physically stacked.
+        # Skip containedSpace checks so unrelated off-deck labware (e.g. a collar and
+        # a plate loaded separately for LPC) can be moved independently.
+        if labware.location == OFF_DECK_LOCATION:
+            return True
+
         # Check every other loaded labware to see if any contains this one
         for container in self.get_all():
             if container.id == labware_id:
@@ -1304,13 +1340,23 @@ class LabwareView:
 
         Returns True if it does not raise.
         """
-        if labware_validation.validate_definition_is_adapter(top_labware_definition):
+        top_is_vacuum_spacer = labware_validation.validate_definition_is_vacuum_spacer(
+            top_labware_definition
+        )
+        if (
+            labware_validation.validate_definition_is_adapter(top_labware_definition)
+            and not top_is_vacuum_spacer
+        ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
                 " on other labware."
             )
         below_labware = self.get(bottom_labware_id)
         below_labware_definition = self.get_definition(bottom_labware_id)
+        if top_is_vacuum_spacer:
+            self._raise_if_vacuum_spacer_cannot_be_stacked(
+                top_labware_definition, below_labware, below_labware_definition
+            )
         if (
             isinstance(top_labware_definition, LabwareDefinition2)
             and isinstance(below_labware_definition, LabwareDefinition2)
@@ -1398,12 +1444,62 @@ class LabwareView:
                 and not labware_validation.validate_definition_is_filter_plate(
                     top_labware_definition
                 )
+                and not top_is_vacuum_spacer
+                and not labware_validation.validate_definition_is_vacuum_spacer(
+                    further_below_definition
+                )
             ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
                 )
         return True
+
+    def _raise_if_vacuum_spacer_cannot_be_stacked(
+        self,
+        top_labware_definition: LabwareDefinition,
+        below_labware: LoadedLabware,
+        below_labware_definition: LabwareDefinition,
+    ) -> None:
+        """Raise if a stackable vacuum spacer cannot sit on the given parent.
+
+        The 3.2/5.2/7.25 mm spacers may stack on each other in any order.
+        The 12.8 mm locating spacer may sit on those but nothing spacer-like
+        may sit on it. At most one of each spacer, and at most three spacers
+        total (the full four-stack is unstable).
+        """
+        if not labware_validation.validate_definition_is_vacuum_spacer(
+            below_labware_definition
+        ):
+            raise errors.LabwareCannotBeStackedError(
+                f"Vacuum spacer {top_labware_definition.parameters.loadName} cannot be loaded"
+                f" onto {below_labware.loadName}."
+            )
+        if labware_validation.validate_definition_is_vacuum_spacer_seat(
+            below_labware_definition
+        ):
+            raise errors.LabwareCannotBeStackedError(
+                f"Vacuum spacer {top_labware_definition.parameters.loadName} cannot be loaded"
+                f" onto {below_labware.loadName}. The locating spacer must be the topmost spacer."
+            )
+
+        spacer_stack = [
+            lw
+            for lw in self.get_labware_stack([below_labware])
+            if labware_validation.validate_definition_is_vacuum_spacer(
+                self.get_definition(lw.id)
+            )
+        ]
+        spacer_load_names = [lw.loadName for lw in spacer_stack]
+        if top_labware_definition.parameters.loadName in spacer_load_names:
+            raise errors.LabwareCannotBeStackedError(
+                f"Vacuum spacer {top_labware_definition.parameters.loadName} is already in the stack."
+            )
+        if len(spacer_stack) >= 3:
+            raise errors.LabwareCannotBeStackedError(
+                f"Cannot load {top_labware_definition.parameters.loadName} onto a stack of"
+                " 3 vacuum spacers. Using all 4 spacers is unstable."
+            )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

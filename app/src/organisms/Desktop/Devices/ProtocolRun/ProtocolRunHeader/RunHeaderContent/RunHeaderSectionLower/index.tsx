@@ -13,7 +13,7 @@ import {
 import { useStoredProtocolAnalysis } from '/app/resources/analysis/hooks/useStoredProtocolAnalysis'
 import {
   EMPTY_TIMESTAMP,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunCreatedAtTimestamp,
   useRunTimestamps,
 } from '/app/resources/runs'
@@ -23,6 +23,7 @@ import { isSupportedVersion } from '../../utils'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionlower.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderContentProps } from '..'
 
 // Note thd following minimum supported versions from Protocol Visualization PRD
@@ -35,7 +36,7 @@ export function RunHeaderSectionLower({
   runStatus,
   robotName,
   numberOfAtomicCommands,
-}: RunHeaderContentProps): JSX.Element {
+}: RunHeaderContentProps): ReactNode {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
@@ -45,7 +46,7 @@ export function RunHeaderSectionLower({
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { protocolKey, robotType } = useProtocolDetailsForRun(runId)
+  const { protocolKey, robotType } = useQuickProtocolDetailsForRun(runId)
   const { makeSnackbar } = useToaster()
 
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

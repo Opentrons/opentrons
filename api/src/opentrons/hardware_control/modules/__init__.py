@@ -31,6 +31,8 @@ from .types import (
     UploadFunction,
     VacuumModuleProfileStep,
     VacuumModuleStatus,
+    VacuumOperationMode,
+    VentStatus,
     module_model_from_string,
 )
 from .update import update_firmware
@@ -42,7 +44,6 @@ __all__ = [
     "build",
     "update_firmware",
     "ThermocyclerStep",
-    "VacuumModuleProfileStep",
     "AbstractModule",
     "TempDeck",
     "MagDeck",
@@ -73,4 +74,7 @@ __all__ = [
     "module_model_from_string",
     "VacuumModule",
     "VacuumModuleStatus",
+    "VacuumModuleProfileStep",
+    "VacuumOperationMode",
+    "VentStatus",
 ]

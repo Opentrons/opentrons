@@ -3,7 +3,7 @@ title: "Opentrons OT-2: App Features Summary"
 description: "Protocols, Labware, and Devices tab features and settings in the app."
 ---
 
-You control the OT-2 using the Opentrons App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.
+You control the OT-2 using the Opentrons OT-2 App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.
 
 ## Protocols tab
 
@@ -146,7 +146,7 @@ You can click on any robot summary to see more information about a particular ro
 
 ### Module status and controls
 
-Use the Opentrons App to view the status of modules connected to your OT-2 and control them outside of protocols. Click **Devices** and then click on your OT-2 to view its robot details page. Under Instruments and Modules, there is a card for each attached module. The card shows the type of module, what USB port it is connected to, and its current status.
+Use the Opentrons OT-2 App to view the status of modules connected to your OT-2 and control them outside of protocols. Click **Devices** and then click on your OT-2 to view its robot details page. Under Instruments and Modules, there is a card for each attached module. The card shows the type of module, what USB port it is connected to, and its current status.
 
 <figure class="screenshot" markdown>
 ![Temperature module details card in app](../images/app-module-card.png)

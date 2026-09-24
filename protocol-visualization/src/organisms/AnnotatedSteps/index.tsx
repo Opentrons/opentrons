@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List, useDynamicRowHeight, useListCallbackRef } from 'react-window'
 
@@ -13,7 +13,7 @@ import {
   getLastVisibleAnalysisCommandId,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   AnalysisError,
   CompletedProtocolAnalysis,
@@ -63,10 +63,7 @@ interface ErrorPastStepsMessageRow {
 }
 
 type AnnotatedStepsRow =
-  | GroupRow
-  | CommandRow
-  | ErrorRow
-  | ErrorPastStepsMessageRow
+  GroupRow | CommandRow | ErrorRow | ErrorPastStepsMessageRow
 
 export interface ItemData {
   rows: AnnotatedStepsRow[]
@@ -87,9 +84,9 @@ export interface ItemData {
 // Note: Since we're using the height value that appears most frequently in the design,
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
-const DEFAULT_STEP_GROUP_SECONDS = 2000
+const DEFAULT_STEP_GROUP_MS = 2000
 
-export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
+export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
   const {
     analysis,
     currentCommandIndex,
@@ -97,7 +94,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     setIsAtBottom,
-    milliSecondsPerFrame = DEFAULT_STEP_GROUP_SECONDS,
+    milliSecondsPerFrame = DEFAULT_STEP_GROUP_MS,
     isGlobalPlaying = false,
   } = props
   const { t } = useTranslation('protocol_visualization')
@@ -125,7 +122,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     [analysis.commands]
   )
   const currentCommandId =
-    currentCommandIndex != null
+    currentCommandIndex != null && currentCommandIndex >= 0
       ? (filteredCommands[currentCommandIndex]?.id ?? null)
       : null
   const filteredGroupedCommands = useMemo(() => {
@@ -275,6 +272,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           command,
           isHighlighted:
             currentCommandIndex != null &&
+            currentCommandIndex >= 0 &&
             filteredCommands[currentCommandIndex]?.id === command.id,
           fromGroup: false,
           commandNumber: currentCommandNumber,
@@ -315,6 +313,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const [listRef, listRefCallback] = useListCallbackRef()
   const [listWidth, setListWidth] = useState(0)
   const [listViewportHeight, setListViewportHeight] = useState(0)
+  const visibleRowRangeRef = useRef({ start: 0, stop: 0 })
   const dynamicRowHeight = useDynamicRowHeight({
     defaultRowHeight: DEFAULT_ROW_HEIGHT_PX,
     key: `${listWidth}-${rows.length}`,
@@ -340,18 +339,34 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
+
+    if (!isGlobalPlaying) {
+      const { start, stop } = visibleRowRangeRef.current
+      const isRowVisible = rowIndex >= start && rowIndex <= stop
+      if (isRowVisible) {
+        return
+      }
+    }
+
     listRef?.scrollToRow({
       index: rowIndex,
       align: rowIndex >= rows.length - 1 ? 'end' : 'auto',
     })
-  }, [scrollTargetId, rowIndexByCommandId, listRef, rows.length])
+  }, [
+    scrollTargetId,
+    rowIndexByCommandId,
+    listRef,
+    rows.length,
+    isGlobalPlaying,
+  ])
 
   useEffect(() => {
     setListElement(listRef?.element ?? null)
   }, [listRef])
 
   const handleRowsRendered = useCallback(
-    ({ stopIndex }: { startIndex: number; stopIndex: number }) => {
+    ({ startIndex, stopIndex }: { startIndex: number; stopIndex: number }) => {
+      visibleRowRangeRef.current = { start: startIndex, stop: stopIndex }
       if (rows.length === 0) {
         setIsAtBottom?.(true)
       } else {
@@ -396,7 +411,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     <>
       {showErrorDetailsModal ? (
         <ProtocolAnalysisErrorModal
-          errors={analysis?.errors}
+          errors={analysis?.errors ?? []}
           onClose={() => {
             setShowErrorDetailsModal(false)
           }}

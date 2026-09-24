@@ -7,31 +7,18 @@ from __future__ import annotations
 import copy
 import json
 from functools import lru_cache
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from .. import load_shared_data
 
 if TYPE_CHECKING:
     from .types import (
-        ChannelCount,
         PipetteFusedSpec,
         PipetteModel,
         PipetteModelSpecs,
         PipetteName,
         PipetteNameSpecs,
     )
-
-
-# TODO (spp, 2023-06-22: should probably move this to definition)
-"""
-The span of pipettes in X-direction based on number of channels.
-This is needed in order to determine safe tip drop location within a labware.
-"""
-PIPETTE_X_SPAN: Dict[ChannelCount, float] = {
-    1: 75,  # includes a margin
-    8: 75,  # includes a margin
-    96: 161,
-}
 
 
 def model_config() -> PipetteModelSpecs:

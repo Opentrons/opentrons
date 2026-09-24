@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import {
   CheckUpdates,
   ErrorUpdateSoftware,
@@ -20,20 +21,22 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import {
   clearRobotUpdateSession,
+  downloadRobotUpdate,
   getRobotUpdateAvailable,
+  getRobotUpdateSession,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
-export function UpdateRobotDuringOnboarding(): JSX.Element {
+export function UpdateRobotDuringOnboarding(): ReactNode {
   const [isShowCheckingUpdates, setIsShowCheckingUpdates] =
     useState<boolean>(true)
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -41,15 +44,20 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotName =
+    typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
+  const session = useSelector(getRobotUpdateSession)
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
 
+  const hasAvailableUpdate = isRobotSoftwareUpdateAvailable(robotUpdateType)
+
   useEffect(
     () => {
-      if (robotUpdateType !== 'upgrade') {
+      if (!hasAvailableUpdate) {
         const checkUpdateTimer = setTimeout(() => {
           setIsShowCheckingUpdates(false)
         }, CHECK_UPDATES_DURATION)
@@ -94,17 +102,18 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             <MediumButton
               flex="1"
               onClick={() => {
-                dispatchStartRobotUpdate(robotName)
+                dispatch(downloadRobotUpdate())
+                startUpdate()
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>
         </ErrorUpdateSoftware>
-      ) : isShowCheckingUpdates && robotUpdateType !== 'upgrade' ? (
+      ) : isShowCheckingUpdates && !hasAvailableUpdate && session == null ? (
         <CheckUpdates />
       ) : localRobot === null ||
         localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
+        (!hasAvailableUpdate && session == null) ? (
         <NoUpdateFound
           onContinue={() => {
             navigate('/emergency-stop')
@@ -114,6 +123,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate('/emergency-stop')
+          }}
           beforeCommittingSuccessfulUpdate={handleSuccessfulUpdate}
         />
       )}

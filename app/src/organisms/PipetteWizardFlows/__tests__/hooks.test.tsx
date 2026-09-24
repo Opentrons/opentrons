@@ -13,7 +13,7 @@ import { i18n } from '/app/i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
+} from '/app/resources/instruments/__fixtures__'
 
 import { FLOWS } from '../constants'
 import { usePipetteFlowWizardHeaderText } from '../hooks'

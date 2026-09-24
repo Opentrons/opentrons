@@ -12,6 +12,8 @@ import type {
   GetDirectTranslationCommandText,
   TCProfileCycleText,
   TCProfileStepText,
+  VacuumProfileCycleText,
+  VacuumProfileStepText,
 } from './utils'
 
 export * from './utils'
@@ -45,11 +47,17 @@ export interface GetTCStartRunExtendedProfileCommandTextResult {
   commandText: string
   profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
 }
+export interface GetVacuumRunProfileCommandTextResult {
+  kind: 'vacuumModule/startRunProfile'
+  commandText: string
+  profileElementTexts: Array<VacuumProfileStepText | VacuumProfileCycleText>
+}
 export type GetCommandTextResult =
   | GetGenericCommandTextResult
   | GetTCRunProfileCommandTextResult
   | GetTCRunExtendedProfileCommandTextResult
   | GetTCStartRunExtendedProfileCommandTextResult
+  | GetVacuumRunProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
@@ -411,6 +419,22 @@ export function useCommandTextString(
           command,
         }),
       }
+
+    case 'vacuumModule/startSetVacuumPressure':
+    case 'vacuumModule/startSetVacuumPower':
+    case 'vacuumModule/stopVacuum':
+    case 'vacuumModule/openVent':
+    case 'vacuumModule/closeVent':
+      return {
+        kind: 'generic',
+        commandText: utils.getVacuumModuleCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'vacuumModule/startRunProfile':
+      return utils.getVacuumRunProfileCommandText({ ...fullParams, command })
 
     case 'unsafe/blowOutInPlace':
     case 'unsafe/dropTipInPlace':

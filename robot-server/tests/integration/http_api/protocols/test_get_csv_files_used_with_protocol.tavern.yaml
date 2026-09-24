@@ -91,6 +91,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              result: ok
           id: !anything
           protocolType: !anything
           files: !anything
@@ -141,8 +142,10 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              result: ok
             - id: !anystr
               status: completed
+              result: ok
           id: !anything
           protocolType: !anything
           files: !anything

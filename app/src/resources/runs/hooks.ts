@@ -7,6 +7,7 @@ import {
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 // TODO: refactor this so helper code doesn't spawn UI
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
@@ -48,9 +49,16 @@ type CreateRunCommandMutation = Omit<
 
 export function useCreateRunCommandMutation(
   runId: string,
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void,
   failedCommandId?: string
 ): CreateRunCommandMutation {
-  const createCommandMutation = useCreateCommandMutation()
+  const createCommandMutation = useCreateCommandMutation(
+    documentationState,
+    actionsToDocument,
+    addActionToDocument
+  )
 
   return {
     ...createCommandMutation,
@@ -68,6 +76,9 @@ export function useCreateRunCommandMutation(
 
 export function useChainRunCommands(
   runId: string,
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void,
   failedCommandId?: string,
   recoveryPolicy?: ErrorRecoveryPolicy
 ): {
@@ -81,6 +92,9 @@ export function useChainRunCommands(
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
     failedCommandId
   )
   return {
@@ -99,7 +113,12 @@ export function useChainRunCommands(
   }
 }
 
-export function useChainLiveCommands(): {
+// NOTE (jj 9/4/26): This hook is used in exactly two places to do the same two stacker commands.
+// If you want to use this to send different sets of commands with the same hook call, this will need updating.
+export function useChainLiveCommands(
+  actionsToDocument: DocumentedAction[],
+  resetKey: string
+): {
   chainLiveCommands: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
@@ -107,7 +126,15 @@ export function useChainLiveCommands(): {
   isCommandMutationLoading: boolean
 } {
   const [isLoading, setIsLoading] = useState(false)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { documentationState } = useLinkedDocumentationState(
+    actionsToDocument,
+    resetKey
+  )
+
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    documentationState,
+    actionsToDocument
+  )
   return {
     chainLiveCommands: (
       commands: CreateCommand[],

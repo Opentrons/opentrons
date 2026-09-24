@@ -45,10 +45,7 @@ import {
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
 import { OFFDECK } from '/protocol-designer/constants'
-import {
-  getEnableComment,
-  getEnableVacuumModule,
-} from '/protocol-designer/feature-flags/selectors'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
@@ -68,7 +65,7 @@ import { AddStepOverflowButton } from './AddStepOverflowButton'
 import { getConsolidatedStacks } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { StepType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -80,7 +77,7 @@ interface AddStepButtonProps {
 export function AddStepButton({
   hasText,
   sidebarWidth,
-}: AddStepButtonProps): JSX.Element {
+}: AddStepButtonProps): ReactNode {
   const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -152,7 +149,6 @@ export function AddStepButton({
     'flexStacker',
     'vacuum',
   ]
-  const enableVacuumModule = useSelector(getEnableVacuumModule)
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
     boolean
@@ -169,8 +165,7 @@ export function AddStepButton({
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
     absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
     flexStacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
-    vacuum:
-      enableVacuumModule && getIsModuleOnDeck(modules, VACUUM_MODULE_TYPE),
+    vacuum: getIsModuleOnDeck(modules, VACUUM_MODULE_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>

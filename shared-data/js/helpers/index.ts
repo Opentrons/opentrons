@@ -19,13 +19,19 @@ import type {
   ThermalAdapterName,
 } from '../types'
 
-export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+export {
+  findWellAt,
+  getWellNamePerMultiTip,
+  getWellNamePerRowMultiTip,
+  isColumnLabware,
+  isRowLabware,
+  skipEveryOtherWell,
+} from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 export { orderWells } from './orderWells'
 export { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
 export { getTipTypeFromTipRackDefinition } from './getTipTypeFromTipRackDefinition'
-export { skipEveryOtherWell } from './getWellNamePerMultiTip'
 export * from './__fixtures__'
 export * from './parseProtocolCommands'
 export * from './parseProtocolData'
@@ -39,7 +45,6 @@ export * from './matrixMath'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getFixedTrashLabwareDefinition'
 export * from './getOccludedSlotCountForModule'
-export * from './getMergedDivergingStacks'
 export * from './getFlexStackerHardwareProps'
 export * from './labwareInference'
 export * from './linearInterpolate'

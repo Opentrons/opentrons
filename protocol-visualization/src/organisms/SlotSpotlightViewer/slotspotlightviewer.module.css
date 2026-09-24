@@ -1,0 +1,7 @@
+.header {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-8);
+}

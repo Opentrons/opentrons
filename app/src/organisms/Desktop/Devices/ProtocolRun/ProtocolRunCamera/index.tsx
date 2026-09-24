@@ -14,6 +14,7 @@ import { ImageGalleryContainer } from './ImageGalleryContainer'
 import { LaunchLivestreamBtn } from './LaunchLivestreamBtn'
 import styles from './runcamera.module.css'
 
+import type { ReactNode } from 'react'
 import type { CameraData, RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
@@ -36,7 +37,7 @@ export function ProtocolRunCamera({
   runTimestamp,
   protocolName,
   runRecordCameraSettings,
-}: ProtocolRunCameraProps): JSX.Element {
+}: ProtocolRunCameraProps): ReactNode {
   const { t } = useTranslation('run_details')
   const host = useHost()
   const { enabled: runCameraEnabled } = useSelector((state: State) =>

@@ -7,6 +7,7 @@ from typing import Dict, Callable, cast, List, Union, Tuple, Literal
 from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
 from opentrons.types import Point
 
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3simulator import (
@@ -124,6 +125,8 @@ async def _cap_probe_patch(
 # ----------- END Monkey patches -----------
 
 
+LOCALIZE = helpers_ot3.get_system_langauge() == "zh-CN"
+
 metadata = {"protocolName": "96 channel production qc"}
 
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
@@ -201,7 +204,7 @@ def test_plunger(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test plunger."""
-    """Run."""
+    ctx.comment("测试探针" if LOCALIZE else "Test Plunger.")
     ax = Axis.P_L
     mount = OT3Mount.LEFT
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
@@ -294,22 +297,28 @@ def build_jaws_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-def _check_if_jaw_is_aligned_with_endstop(api: SyncHardwareAPI) -> bool:
+def _check_if_jaw_is_aligned_with_endstop(
+    ctx: ProtocolContext, api: SyncHardwareAPI
+) -> bool:
     if not api.is_simulator:
-        pass_no_hit = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
+        pass_no_hit = helpers_ot3.get_user_answer(
+            ctx, api, "are both endstop Lights OFF?"
+        )
     else:
         pass_no_hit = True
 
     return pass_no_hit
 
 
-def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bool]:
+def jaw_precheck(
+    ctx: ProtocolContext, api: SyncHardwareAPI, ax: Axis, speed: float
+) -> Tuple[bool, bool]:
     """Check the LEDs work and jaws are aligned."""
     # HOME
     helpers_ot3.home_tip_motors_sync(api, False)  # Home with no backoff
     # Check LEDs can turn on when homed
     if not api.is_simulator:
-        led_check = helpers_ot3.get_user_answer(api, "are both endstop Lights ON?")
+        led_check = helpers_ot3.get_user_answer(ctx, api, "are both endstop Lights ON?")
     else:
         led_check = True
     if not led_check:
@@ -318,7 +327,9 @@ def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bo
     helpers_ot3.move_tip_motor_relative_ot3_sync(api, RETRACT_MM, speed=speed)
     # Check Jaws are aligned
     if not api.is_simulator:
-        jaws_aligned = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
+        jaws_aligned = helpers_ot3.get_user_answer(
+            ctx, api, "are both endstop Lights OFF?"
+        )
     else:
         jaws_aligned = True
 
@@ -333,6 +344,7 @@ def test_jaws(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test jaws."""
+    ctx.comment("测试钳口" if LOCALIZE else "Test Jaws.")
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
@@ -340,7 +352,7 @@ def test_jaws(
 
     async def _save_result(tag: str, led_check: bool, jaws_aligned: bool) -> bool:
         if led_check and jaws_aligned:
-            no_hit = _check_if_jaw_is_aligned_with_endstop(api)
+            no_hit = _check_if_jaw_is_aligned_with_endstop(ctx, api)
         else:
             no_hit = False
         result = CSVResult.from_bool(led_check and jaws_aligned and no_hit)
@@ -358,7 +370,7 @@ def test_jaws(
         speeds = CURRENTS_SPEEDS_JAWS[current]
         for speed in sorted(speeds, reverse=False):
 
-            led_check, jaws_aligned = jaw_precheck(api, ax, speed)
+            led_check, jaws_aligned = jaw_precheck(ctx, api, ax, speed)
 
             if led_check and jaws_aligned:
                 helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
@@ -387,7 +399,9 @@ def test_jaws(
 
             if not passed and not api.is_simulator:
                 ctx.pause(
-                    f"current {current} failed, skipping any remaining speeds at this current"
+                    f"当前电流 {current} 失败，跳过该电流下的剩余速度"
+                    if LOCALIZE
+                    else f"current {current} failed, skipping any remaining speeds at this current"
                 )
                 break
 
@@ -481,7 +495,8 @@ def test_capacitance(
     ctx: ProtocolContext,
     pipette: Literal[200, 1000],
 ) -> None:
-    """Test capacitive sensor."""
+    """Test capacitance sensor."""
+    ctx.comment("测试电容式传感器" if LOCALIZE else "Test capacitance sensor")
     z_ax = Axis.Z_L
     p_ax = Axis.P_L
     t_ax = Axis.Q
@@ -489,7 +504,7 @@ def test_capacitance(
     default_probe_cfg = api.config.calibration.z_offset.pass_settings
     api.reset_instrument_offset(OT3Mount.LEFT)
 
-    ctx.pause("REMOVE everything from the deck")
+    ctx.pause("移走露台上的所有物品" if LOCALIZE else "REMOVE everything from the deck")
 
     for probe in PROBE_POSITIONS:
         # store the thresolds (for reference)
@@ -519,7 +534,11 @@ def test_capacitance(
         )
 
         # ATTACHED-pF
-        ctx.pause(f"ATTACH probe to {probe.name} channel")
+        ctx.pause(
+            f"将探头连接到 {probe.name} 通道"
+            if LOCALIZE
+            else f"ATTACH probe to {probe.name} channel"
+        )
         api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
         attached_pf = _read_from_cap_sensor(api, sensor_id, 10)
         if not attached_pf:
@@ -549,7 +568,7 @@ def test_capacitance(
                 relative_threshold_pf=default_probe_cfg.sensor_threshold_pf,
             )
 
-        ctx.pause("about to probe the DECK")
+        ctx.pause("即将探查甲板" if LOCALIZE else "about to probe the DECK")
         # move to 5 mm above the deck
         api.home_z(OT3Mount.LEFT)
         current_pos = api.gantry_position(OT3Mount.LEFT)
@@ -592,7 +611,7 @@ def test_capacitance(
             )
 
         api.home_z(OT3Mount.LEFT)
-        ctx.pause("REMOVE probe")
+        ctx.pause("移除探针" if LOCALIZE else "REMOVE probe")
         api.remove_tip(OT3Mount.LEFT)
 
 
@@ -783,6 +802,7 @@ def test_pressure(  # noqa: C901
     pipette: Literal[200, 1000],
 ) -> None:
     """Test pressure sensor."""
+    ctx.comment("试验压力" if LOCALIZE else "Test Pressure")
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = api.gantry_position(OT3Mount.LEFT)
@@ -793,7 +813,11 @@ def test_pressure(  # noqa: C901
         pressure_sensor.init(9600)
 
     # move to slot
-    ctx.pause(f"Place tip tack 50ul at slot - {SLOT_FOR_PICK_UP_TIP}")
+    ctx.pause(
+        f"将 50 微升的探针放置在插槽 - {SLOT_FOR_PICK_UP_TIP}"
+        if LOCALIZE
+        else f"Place tip tack 50ul at slot - {SLOT_FOR_PICK_UP_TIP}"
+    )
     tiprack = ctx.load_labware("opentrons_flex_96_tiprack_50uL", SLOT_FOR_PICK_UP_TIP)
     tip_rack_actual_pos = tiprack["A1"].top().point
 
@@ -811,7 +835,12 @@ def test_pressure(  # noqa: C901
                     api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except Exception:
-                ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
+                ctx.delay(
+                    3,
+                    msg=f"{probe} 压力传感器无法工作，跳过"
+                    if LOCALIZE
+                    else f"{probe} pressure sensor not working, skipping",
+                )
                 continue
         open_result = check_value(open_pa, "open-pa", pipette)
         report(
@@ -834,16 +863,18 @@ def test_pressure(  # noqa: C901
             # ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
 
             tip_pos = tip_rack_actual_pos + offset_pos
-            ctx.pause("Pick up tip")
+            ctx.pause("取货提示" if LOCALIZE else "Pick up tip")
             _partial_pick_up(api, tip_pos, current=0.1)
             api.prepare_for_aspirate(OT3Mount.LEFT)
             if not (USE_SEALED_FIXTURE or USE_SEALED_BLOCK):
-                ctx.pause("SEAL tip using your FINGER")
+                ctx.pause("用手指封口" if LOCALIZE else "SEAL tip using your FINGER")
             else:
                 helpers_ot3.move_to_arched_ot3_sync(
                     api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50)
                 )
-                ctx.pause("Ready for moving to sealed fixture")
+                ctx.pause(
+                    "准备好改用密封式灯具" if LOCALIZE else "Ready for moving to sealed fixture"
+                )
                 if USE_SEALED_FIXTURE:
                     calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos, ctx)
                 else:
@@ -854,7 +885,12 @@ def test_pressure(  # noqa: C901
                     api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except Exception:
-                ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
+                ctx.delay(
+                    3,
+                    msg=f"{probe} 压力传感器无法工作，跳过"
+                    if LOCALIZE
+                    else f"{probe} pressure sensor not working, skipping",
+                )
                 break
         sealed_result = check_value(sealed_pa, "sealed-pa", pipette)
         report(
@@ -872,7 +908,12 @@ def test_pressure(  # noqa: C901
                     api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except Exception:
-                ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
+                ctx.delay(
+                    3,
+                    msg=f"{probe} 压力传感器无法工作，跳过"
+                    if LOCALIZE
+                    else f"{probe} pressure sensor not working, skipping",
+                )
                 break
         aspirate_result = check_value(aspirate_pa, "aspirate-pa", pipette)
         report(
@@ -890,7 +931,12 @@ def test_pressure(  # noqa: C901
                     api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except Exception:
-                ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
+                ctx.delay(
+                    3,
+                    msg=f"{probe} 压力传感器无法工作，跳过"
+                    if LOCALIZE
+                    else f"{probe} pressure sensor not working, skipping",
+                )
                 break
         dispense_result = check_value(dispense_pa, "dispense-pa", pipette)
         report(
@@ -902,7 +948,7 @@ def test_pressure(  # noqa: C901
             helpers_ot3.move_to_arched_ot3_sync(
                 api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50)
             )
-        ctx.pause("REMOVE tip")
+        ctx.pause("移除提示" if LOCALIZE else "REMOVE tip")
 
         trash_nominal = helpers_ot3.get_slot_calibration_square_position_ot3(
             12
@@ -947,6 +993,7 @@ def test_environmental_sensor(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test environmental sensor."""
+    ctx.comment("测试环境传感器" if LOCALIZE else "Test Environmental Sensor")
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = api.gantry_position(OT3Mount.LEFT)
@@ -1001,6 +1048,7 @@ def test_tip_sensor(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test tip sensor."""
+    ctx.comment("测试尖端传感器" if LOCALIZE else "Test Tip Sensor")
     ax = Axis.Q
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
@@ -1010,13 +1058,23 @@ def test_tip_sensor(
         api.home([ax])
         if not api.is_simulator:
             if expected_state:
-                ctx.pause("press on tips to channels A1 + H12")
+                ctx.pause(
+                    "将甲片按压至 A1 和 H12 槽位"
+                    if LOCALIZE
+                    else "press on tips to channels A1 + H12"
+                )
             else:
-                ctx.pause("remove all tips from the pipette")
+                ctx.pause(
+                    "从移液器上取下所有吸头" if LOCALIZE else "remove all tips from the pipette"
+                )
         if not api.is_simulator:
             init_state = get_tip_status(api)
             if init_state != EXPECTED_STATE_AT_HOME_POSITION:
-                ctx.pause("tip sensor is not in expected state at home position")
+                ctx.pause(
+                    "倾倒传感器在归位状态下未处于预期状态"
+                    if LOCALIZE
+                    else "tip sensor is not in expected state at home position"
+                )
         helpers_ot3.move_tip_motor_relative_ot3_sync(api, TIP_PRESENCE_POSITION)
         state = expected_state if api.is_simulator else get_tip_status(api)
         tag = _get_tip_test_tag(expected_state)
@@ -1085,7 +1143,11 @@ def get_trash_nominal() -> Point:
 
 
 def aspirate_and_wait(
-    api: SyncHardwareAPI, reservoir: Point, volume: int, seconds: int = 30
+    ctx: ProtocolContext,
+    api: SyncHardwareAPI,
+    reservoir: Point,
+    volume: int,
+    seconds: int = 30,
 ) -> Tuple[bool, float]:
     """Aspirate and wait."""
     helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, reservoir)
@@ -1102,7 +1164,7 @@ def aspirate_and_wait(
     api.set_lights(True, True)
 
     if not api.is_simulator:
-        result = helpers_ot3.get_user_answer(api, "look good")
+        result = helpers_ot3.get_user_answer(ctx, api, "look good")
     else:
         result = True
     duration_seconds = monotonic() - start_time
@@ -1127,6 +1189,7 @@ def test_droplets(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test Droplets."""
+    ctx.comment("测试液滴" if LOCALIZE else "Test Droplets")
     # GATHER NOMINAL POSITIONS
     reservoir = ctx.load_labware("nest_1_reservoir_195ml", RESERVOIR_SLOT)
     adapter = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", TIP_RACK_96_SLOT)
@@ -1141,7 +1204,11 @@ def test_droplets(
         else:
             tip_rack = 50
             test_volume = 1 if pipette == 200 else 5
-        ctx.pause(f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}")
+        ctx.pause(
+            f"将 96 孔吸头盒（规格：{tip_rack} µL）放置于槽位 #{TIP_RACK_96_SLOT}"
+            if LOCALIZE
+            else f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}"
+        )
         if adapter.child:
             ctx.move_labware(adapter.child, OFF_DECK, use_gripper=False)
         tiprack = adapter.load_labware(f"opentrons_flex_96_tiprack_{tip_rack}uL")
@@ -1152,6 +1219,7 @@ def test_droplets(
         api.home_z(OT3Mount.LEFT)
 
         result, duration = aspirate_and_wait(
+            ctx,
             api,
             reservoir["A1"].top().move(OFFSET_FOR_1_WELL_LABWARE).point,
             test_volume,
@@ -1202,6 +1270,7 @@ def test_encoder(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test Encoder."""
+    ctx.comment("测试编码器" if LOCALIZE else "Test Encoder")
     cycles = 100
     mount = OT3Mount.LEFT
     api.cache_instruments()
@@ -1402,12 +1471,13 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     test_name = "ninety-six-assembly-qc-ot3"
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
     args = ctx.params.get_all()
     t_sections = {
         s: f for s, f in TESTS if not args[f"skip_{s.value.lower().replace('-', '_')}"]
@@ -1420,3 +1490,5 @@ def run(ctx: ProtocolContext) -> None:
 
     # SAVE REPORT
     report.save_to_disk()
+    if not report.all_succeded():
+        raise RuntimeError("Error during QC run.")

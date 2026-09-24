@@ -77,5 +77,4 @@ export type OT2ModuleType =
   | typeof HEATERSHAKER_MODULE_TYPE
 
 export type ModuleLabwareCompatibilityKey =
-  | ModuleType
-  | typeof VACUUM_MODULE_TYPE_WITH_LABWARE
+  ModuleType | typeof VACUUM_MODULE_TYPE_WITH_LABWARE

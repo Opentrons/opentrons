@@ -20,6 +20,7 @@ import {
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSigningOrDownloadingRequired'
 import { useLights } from '/app/resources/devices'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
@@ -53,6 +54,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/devices')
+vi.mock('/app/resources/audit/useIsSigningOrDownloadingRequired')
 vi.mock('../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
@@ -150,6 +152,11 @@ describe('RobotOverview', () => {
     vi.mocked(useErrorRecoveryBanner).mockReturnValue({
       showRecoveryBanner: false,
       recoveryIntent: 'recovering',
+    })
+    vi.mocked(useIsSigningOrDownloadingRequired).mockReturnValue({
+      isSigningRequired: false,
+      isDownloadingRequired: false,
+      onLinkClick: vi.fn(),
     })
   })
 
@@ -357,5 +364,21 @@ describe('RobotOverview', () => {
     render(props)
 
     screen.getByText('MOCK_RECOVERY_BANNER')
+  })
+
+  it('renders the SignAndDownload banner when signing is required', () => {
+    vi.mocked(useIsSigningOrDownloadingRequired).mockReturnValue({
+      isSigningRequired: true,
+      isDownloadingRequired: false,
+      onLinkClick: vi.fn(),
+    })
+
+    render(props)
+
+    screen.getByText('Signature required')
+    screen.getByText(
+      'A signature is required to verify the protocol run has ended.'
+    )
+    screen.getByText('Sign now')
   })
 })

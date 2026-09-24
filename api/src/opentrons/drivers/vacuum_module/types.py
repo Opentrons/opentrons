@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Dict
+from typing import Any, Dict
 
 from opentrons_shared_data.util import StrEnum
 
@@ -114,6 +114,27 @@ class VacuumState:
     vacuum_duration: int
     vent_state: VentState
 
+    @staticmethod
+    def to_pyro_dict(obj: "VacuumState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        # Override specific variables for safe conversion
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        pyro_dict["vent_state"] = obj.vent_state.value
+
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "VacuumState":
+        """Consumed by Serpent, convert to type from a Pyro Dictionary."""
+        data.pop("__class__", None)
+        return VacuumState(
+            **{  # type: ignore
+                key: (VentState(data[key]) if key == "vent_state" else data[key])
+                for key, value in data.items()
+            }
+        )
+
 
 @dataclass
 class PressureControlTunings:
@@ -126,22 +147,33 @@ class PressureControlTunings:
     k_velocity: float
     k_holding: float
     tolerance_error: float
+    approach_band: float
+    slew_end_fraction: float
 
 
 @dataclass
 class WasteConfigParameters:
-    """Get the waste config parameters"""
+    """Waste-full Detection config parameters.
+
+    waste_detection_enabled: Master switch.
+    p_filter_alpha: EMA on sensor B; closer to 0 = heavier filter, 1 = raw B.
+    g_sealed_max: Sealed if RPM_cmd / vacuum < G. The discriminator.
+        Lower G → harder to look sealed (fewer empty trips, more full
+        misses). Raise G to trip full more easily.
+    flowing_dp_mbar: |A−B| above this vetoes a wide-open path.
+        Hold |A−B| is mostly sensor offset;
+    stable_hold_ms: Sealed time required below −800 mbar, milliseconds.
+    stable_hold_deep_ms: Sealed time at commanded depth ≥ 800 mbar.
+    min_waste_depth_mbar: Skip detection shallower than this.
+    """
 
     waste_detection_enabled: bool
-    p_window_start: float
-    p_window_end: float
-    baseline_fast_factor: float
-    max_delta_per_tick: float
-    max_rise_per_tick: float
-    max_cummulative_rise: float
     p_filter_alpha: float
-    min_window_time: float
-    max_window_time: float
+    g_sealed_max: float
+    flowing_dp_mbar: float
+    stable_hold_ms: float
+    stable_hold_deep_ms: float
+    min_waste_depth_mbar: float
 
 
 @dataclass
@@ -155,6 +187,15 @@ class PumpState:
     pump_running: bool
     manual_control: bool
 
+    @staticmethod
+    def to_pyro_dict(obj: "PumpState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        return pyro_dict
 
-PRESSURE_COMPARISON_WINDOW_SIZE = 10
-POWER_COMPARISON_WINDOW_SIZE = 10
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PumpState":
+        """Convert from a Pyro Dictionary."""
+        data.pop("__class__", None)
+        return PumpState(**data)

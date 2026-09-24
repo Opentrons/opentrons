@@ -11,6 +11,7 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper,
     calibrate_gripper_jaw,
@@ -165,6 +166,8 @@ async def _set_active_current(
 
 # -----------------   TEST Mount   ----------------
 
+LOCALIZE = helpers_ot3.get_system_langauge() == "zh-CN"
+
 
 def _get_mount_test_tag(
     current: float, speed: float, direction: str, start_or_end: str
@@ -185,6 +188,7 @@ def test_mount(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper mount."""
+    ctx.comment("测试挂载" if LOCALIZE else "Test Mount")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -207,70 +211,74 @@ def test_mount(
             report(section, tag, [target_z, z_enc])
         return z_aligned
 
-    # LOOP THROUGH CURRENTS + SPEEDS
-    currents = list(CURRENTS_SPEEDS.keys())
-    for current in sorted(currents, reverse=True):
-        speeds = CURRENTS_SPEEDS[current]
-        for speed in sorted(speeds, reverse=False):
-            include_pass_fail = current >= MIN_PASS_CURRENT
-            # HOME
-            api.home([z_ax])
-            home_pos = api.gantry_position(OT3Mount.GRIPPER)
-            # LOWER CURRENT
-            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
-                api, z_ax, run_current=current
-            )
-            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
-                api, z_ax, default_max_speed=speed
-            )
-            api._set_active_current({z_ax: current})
-            # MOVE DOWN
-            _save_result(
-                _get_mount_test_tag(current, speed, "down", "start"),
-                target_z=home_pos.z,
-                include_pass_fail=include_pass_fail,
-            )
-            api.move_rel(
-                mount,
-                Point(z=-Z_AXIS_TRAVEL_DISTANCE),
-                speed=speed,
-                expect_stalls=True,
-            )
-            down_end_passed = _save_result(
-                _get_mount_test_tag(current, speed, "down", "end"),
-                target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
-                include_pass_fail=include_pass_fail,
-            )
-            if down_end_passed:
-                # MOVE UP
+    try:
+        helpers_ot3.enable_stall_detection(api, False)
+        # LOOP THROUGH CURRENTS + SPEEDS
+        currents = list(CURRENTS_SPEEDS.keys())
+        for current in sorted(currents, reverse=True):
+            speeds = CURRENTS_SPEEDS[current]
+            for speed in sorted(speeds, reverse=False):
+                include_pass_fail = current >= MIN_PASS_CURRENT
+                # HOME
+                api.home([z_ax])
+                home_pos = api.gantry_position(OT3Mount.GRIPPER)
+                # LOWER CURRENT
+                helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                    api, z_ax, run_current=current
+                )
+                helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                    api, z_ax, default_max_speed=speed
+                )
+                api._set_active_current({z_ax: current})
+                # MOVE DOWN
                 _save_result(
-                    _get_mount_test_tag(current, speed, "up", "start"),
-                    target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                    _get_mount_test_tag(current, speed, "down", "start"),
+                    target_z=home_pos.z,
                     include_pass_fail=include_pass_fail,
                 )
                 api.move_rel(
                     mount,
-                    Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                    Point(z=-Z_AXIS_TRAVEL_DISTANCE),
                     speed=speed,
                     expect_stalls=True,
                 )
-                up_end_passed = _save_result(
-                    _get_mount_test_tag(current, speed, "up", "end"),
-                    target_z=home_pos.z,
+                down_end_passed = _save_result(
+                    _get_mount_test_tag(current, speed, "down", "end"),
+                    target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
                     include_pass_fail=include_pass_fail,
                 )
-            else:
-                up_end_passed = False
-            # RESET CURRENTS AND HOME
-            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
-                api, z_ax, run_current=default_z_current
-            )
-            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
-                api, z_ax, default_max_speed=default_z_speed
-            )
-            api.home([z_ax])
-            if not down_end_passed or not up_end_passed and not api.is_simulator:
-                break
+                if down_end_passed:
+                    # MOVE UP
+                    _save_result(
+                        _get_mount_test_tag(current, speed, "up", "start"),
+                        target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                        include_pass_fail=include_pass_fail,
+                    )
+                    api.move_rel(
+                        mount,
+                        Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                        speed=speed,
+                        expect_stalls=True,
+                    )
+                    up_end_passed = _save_result(
+                        _get_mount_test_tag(current, speed, "up", "end"),
+                        target_z=home_pos.z,
+                        include_pass_fail=include_pass_fail,
+                    )
+                else:
+                    up_end_passed = False
+                # RESET CURRENTS AND HOME
+                helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                    api, z_ax, run_current=default_z_current
+                )
+                helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                    api, z_ax, default_max_speed=default_z_speed
+                )
+                api.home([z_ax])
+                if not down_end_passed or not up_end_passed and not api.is_simulator:
+                    break
+    finally:
+        helpers_ot3.enable_stall_detection(api, False)
 
 
 # -----------------   TEST Probe   ----------------
@@ -315,7 +323,7 @@ def test_probe(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the grippers probes."""
-    """Run."""
+    ctx.comment("测试探针" if LOCALIZE else "Test Probe")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -337,12 +345,16 @@ def test_probe(
         open_air_pf = _read_from_sensor(api, probe, 10)
 
         # take reading for baseline with pin attached (2)
-        ctx.pause(f"place calibration pin in the {probe.name}")
+        ctx.pause(
+            f"将校准销放置在{probe.name}"
+            if LOCALIZE
+            else f"place calibration pin in the {probe.name}"
+        )
         # add pin to update critical point
         probe_pf = _read_from_sensor(api, probe, 10)
 
         # begins probing
-        ctx.pause("about to probe the deck")
+        ctx.pause("即将探查甲板" if LOCALIZE else "about to probe the deck")
         helpers_ot3.move_to_arched_ot3_sync(api, mount, hover_pos)
         # move to 5 mm above the deck
         api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
@@ -353,7 +365,7 @@ def test_probe(
         valid_height = found_pos >= z_limit
         deck_pf = 0.0
         if valid_height:
-            ctx.pause("about to press into the deck")
+            ctx.pause("即将压向甲板" if LOCALIZE else "about to press into the deck")
             api.move_to(mount, probe_pos._replace(z=found_pos))
             deck_pf = _read_from_sensor(api, probe, 10)
 
@@ -370,15 +382,19 @@ def test_probe(
         api.home_z()
         api.ungrip()
 
-        ctx.pause(f"remove calibration pin in the {probe.name}")
+        ctx.pause(
+            f"拆除 {probe.name} 中的校准销"
+            if LOCALIZE
+            else f"remove calibration pin in the {probe.name}"
+        )
         api.remove_gripper_probe()
 
     def _calibrate_jaw(_p: GripperProbe) -> Point:
         api.retract(OT3Mount.GRIPPER)
-        ctx.pause(f"attach probe to {_p.name}")
+        ctx.pause(f"将探头连接到 {_p.name}" if LOCALIZE else f"attach probe to {_p.name}")
         ret = api._calibrate_gripper_jaw(_p)
         api.retract(OT3Mount.GRIPPER)
-        ctx.pause(f"remove probe from {_p.name}")
+        ctx.pause(f"从{_p.name}中取出探针" if LOCALIZE else f"remove probe from {_p.name}")
         report(section, f"jaw-probe-{_p.name.lower()}-xyz", [ret.x, ret.y, ret.z])
         return ret
 
@@ -427,6 +443,7 @@ def test_width(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper width."""
+    ctx.comment("测试宽度" if LOCALIZE else "Test Width")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -470,10 +487,14 @@ def test_width(
             # MOVE TO SLOT
             helpers_ot3.move_to_arched_ot3_sync(api, mount, hover_pos)
             # OPERATOR SETS UP GAUGE
-            ctx.pause(f"add {width} mm wide gauge to slot {slot}")
+            ctx.pause(
+                f"在插槽 {slot} 处增加 {width} 毫米宽的量规"
+                if LOCALIZE
+                else f"add {width} mm wide gauge to slot {slot}"
+            )
             # GRIPPER MOVES TO GAUGE
             api.move_to(mount, target_pos)
-            ctx.pause(f"prepare to grip {width} mm")
+            ctx.pause(f"准备夹持 {width} 毫米" if LOCALIZE else f"prepare to grip {width} mm")
             # grip once to center the thing
             api.grip(20)
             api.ungrip()
@@ -552,8 +573,16 @@ def _setup(api: SyncHardwareAPI, ctx: ProtocolContext) -> Union[Mark10, SimMark1
     mount = OT3Mount.GRIPPER
 
     # OPERATOR SETS UP GAUGE
-    ctx.pause(f"add gauge to slot {SLOT_FORCE_GAUGE} and resume")
-    ctx.pause("plug gauge into USB port on OT3 and resume")
+    ctx.pause(
+        f"将量规添加到槽位 {SLOT_FORCE_GAUGE} 并恢复"
+        if LOCALIZE
+        else f"add gauge to slot {SLOT_FORCE_GAUGE} and resume"
+    )
+    ctx.pause(
+        "将量规插入 OT3 的 USB 端口并恢复操作。"
+        if LOCALIZE
+        else "plug gauge into USB port on OT3 and resume"
+    )
     gauge = _get_gauge(api.is_simulator)
     gauge.connect()
     ret_list = _read_forces(gauge)
@@ -566,8 +595,12 @@ def _setup(api: SyncHardwareAPI, ctx: ProtocolContext) -> Union[Mark10, SimMark1
     _, target_pos = _get_force_gauge_hover_and_grip_positions(api)
     if not api.is_simulator:
         helpers_ot3.move_to_arched_ot3_sync(api, mount, target_pos + Point(z=15))
-    ctx.pause("please make sure the gauge in the middle of the gripper")
-    ctx.pause("about to grip")
+    ctx.pause(
+        "请确保量规位于夹持器中央。"
+        if LOCALIZE
+        else "please make sure the gauge in the middle of the gripper"
+    )
+    ctx.pause("即将抓住" if LOCALIZE else "about to grip")
     api.grip(20)
     for sec in range(WARMUP_SECONDS):
         if not api.is_simulator:
@@ -595,8 +628,9 @@ def test_force(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper force."""
-    gauge = _setup(api, ctx)
+    ctx.comment("测试力" if LOCALIZE else "Test Force")
 
+    gauge = _setup(api, ctx)
     # LOOP THROUGH FORCES
     for expected_force, allowed_percent_error in zip(
         GRIP_FORCES_NEWTON_FORCE, FAILURE_THRESHOLD_PERCENTAGES
@@ -622,6 +656,7 @@ def test_force_increment(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper force increment."""
+    ctx.comment("试验力增量" if LOCALIZE else "Test Force Increment")
     gauge = _setup(api, ctx)
 
     # LOOP THROUGH DUTY-CYCLES
@@ -763,7 +798,7 @@ def build_report(test_name: str) -> CSVReport:
 def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
     parameters.add_str(
-        display_name="Operator",
+        display_name="操作员" if LOCALIZE else "Operator",
         variable_name="operator",
         default="Unused",
         choices=[
@@ -804,7 +839,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
-    ctx.comment("starting robot test.")
+    ctx.comment("开始机器人测试" if LOCALIZE else "starting robot test.")
     test_name = "gripper-assembly-qc-ot3"
     api = ctx._core.get_hardware()
     if ctx.is_simulating():
@@ -818,6 +853,7 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     # Apply monkey patches
@@ -827,7 +863,7 @@ def run(ctx: ProtocolContext) -> None:
 
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
     args = ctx.params.get_all()
     t_sections = {s: f for s, f in TESTS if not args[f"skip_{s.value.lower()}"]}
     if args["increment"]:
@@ -844,3 +880,5 @@ def run(ctx: ProtocolContext) -> None:
 
     # SAVE REPORT
     report.save_to_disk()
+    if not report.all_succeded():
+        raise RuntimeError("Error during QC run.")

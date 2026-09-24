@@ -8,7 +8,7 @@ import { IndividualCommand } from './IndividualCommand'
 import { ProtocolAnalysisErrorsContent } from './ProtocolAnalysisErrorsContent'
 import { ProtocolAnalysisPastStepsMessage } from './ProtocolAnalysisPastStepsMessage'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactElement, ReactNode, SetStateAction } from 'react'
 import type { RowComponentProps } from 'react-window'
 import type {
   AnalysisError,
@@ -39,7 +39,7 @@ interface GroupAnnotatedStepRowProps {
   trailingErrors?: AnalysisError[]
 }
 
-function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
+function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): ReactNode {
   const {
     subCommands,
     milliSecondsPerFrame,
@@ -158,7 +158,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
 
 export function AnnotatedStepsRowItem(
   props: RowComponentProps<ItemData>
-): JSX.Element {
+): ReactElement {
   const { index, style, ariaAttributes, ...data } = props
   const row = data.rows[index]
 

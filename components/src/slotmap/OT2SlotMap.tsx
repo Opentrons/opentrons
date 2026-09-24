@@ -3,6 +3,8 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.module.css'
 
+import type { ReactNode } from 'react'
+
 // TODO(bc, 2021-03-29): this component is only used in PD
 // reconsider whether it belongs in components library
 
@@ -28,7 +30,7 @@ const iconSize = 20
 const numRows = 4
 const numCols = 3
 
-export function OT2SlotMap(props: SlotMapProps): JSX.Element {
+export function OT2SlotMap(props: SlotMapProps): ReactNode {
   const { collisionSlots, occupiedSlots, isError } = props
   const slots = OT2_SLOT_MAP_SLOTS
   return (

@@ -20,6 +20,7 @@ import { selectors } from '../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { ProtocolSteps } from './ProtocolSteps'
 
+import type { ReactNode } from 'react'
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
 
@@ -28,7 +29,7 @@ export interface OpenSlot {
   slot: DeckSlot
 }
 
-export function Designer(): JSX.Element {
+export function Designer(): ReactNode {
   const { t } = useTranslation([
     'starting_deck_state',
     'protocol_steps',

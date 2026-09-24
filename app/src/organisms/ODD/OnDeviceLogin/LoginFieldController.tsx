@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { Controller } from 'react-hook-form'
 
 import { LoginFieldInput } from './LoginFieldInput'
@@ -11,22 +12,30 @@ export interface LoginFieldControllerProps {
   step: LoginStep
   t: TFunction
   isPasswordResetRequired: boolean
+  loginResetPassword: boolean
   loginError: string | null
   confirmPasswordError: string | null
+  usernameError: string | null
   onClearFieldErrors: () => void
-  onFocus: () => void
 }
 
-export function LoginFieldController({
-  control,
-  step,
-  t,
-  isPasswordResetRequired,
-  loginError,
-  confirmPasswordError,
-  onClearFieldErrors,
-  onFocus,
-}: LoginFieldControllerProps): JSX.Element | null {
+export const LoginFieldController = forwardRef<
+  HTMLInputElement,
+  LoginFieldControllerProps
+>(function LoginFieldController(
+  {
+    control,
+    step,
+    t,
+    isPasswordResetRequired,
+    loginResetPassword,
+    loginError,
+    confirmPasswordError,
+    usernameError,
+    onClearFieldErrors,
+  },
+  ref
+): JSX.Element | null {
   if (step === 'username') {
     return (
       <Controller
@@ -35,12 +44,13 @@ export function LoginFieldController({
         name="username"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:username')}
-            error={null}
+            error={usernameError}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -50,6 +60,11 @@ export function LoginFieldController({
   if (step === 'password') {
     const passwordError =
       loginError != null && loginError !== '' ? loginError : null
+    const passwordLabel = isPasswordResetRequired
+      ? t('access_control:on_device_login_new_password')
+      : loginResetPassword
+        ? t('access_control:on_device_login_one_time_password')
+        : t('access_control:login_form_password_field')
 
     return (
       <Controller
@@ -58,16 +73,13 @@ export function LoginFieldController({
         name="password"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
-            label={
-              isPasswordResetRequired
-                ? t('access_control:on_device_login_new_password')
-                : t('access_control:login_form_password_field')
-            }
+            label={passwordLabel}
             error={passwordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -82,12 +94,13 @@ export function LoginFieldController({
         name="confirmPassword"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:on_device_login_confirm_password')}
             error={confirmPasswordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -95,4 +108,4 @@ export function LoginFieldController({
   }
 
   return null
-}
+})

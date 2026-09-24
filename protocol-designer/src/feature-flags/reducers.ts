@@ -33,8 +33,6 @@ const initialFlags: Flags = {
     _FF_ENV_VARS_.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS === '1' || false,
   OT_PD_ENABLE_BY_VOLUME_BUILDER:
     _FF_ENV_VARS_.OT_PD_ENABLE_BY_VOLUME_BUILDER === '1' || false,
-  OT_PD_ENABLE_VACUUM_MODULE:
-    _FF_ENV_VARS_.OT_PD_ENABLE_VACUUM_MODULE === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

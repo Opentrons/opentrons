@@ -60,6 +60,8 @@ build-local-packages:
 	@tar -xzf $(STEP_GENERATION_PACK) --strip-components=1 -C $(STEP_GENERATION_DIR)
 	@tar -xzf $(COMPONENTS_PACK) --strip-components=1 -C $(COMPONENTS_DIR)
 	@tar -xzf $(PROTOCOL_VISUALIZATION_PACK) --strip-components=1 -C $(PROTOCOL_VISUALIZATION_DIR)
+	@echo "Patching extracted package.json files for external-consumer resolution..."
+	node --experimental-strip-types ../scripts/patch-packed-packages.mts
 	@echo "Local packages built and extracted successfully!"
 
 # Unlink local packages and clean up pack directory

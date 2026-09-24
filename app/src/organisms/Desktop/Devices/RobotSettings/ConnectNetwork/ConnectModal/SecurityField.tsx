@@ -6,6 +6,7 @@ import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'
 import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 
+import type { ReactNode } from 'react'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
@@ -25,11 +26,6 @@ export interface SecurityFieldProps {
   className?: string
 }
 
-const ALL_SECURITY_OPTIONS = [
-  { options: [{ value: SECURITY_NONE, label: 'shared:none' }] },
-  { options: [{ value: SECURITY_WPA_PSK, label: 'wpa2_personal' }] },
-]
-
 const makeEapOptionsGroup = (
   eapOptions: EapOption[]
 ): { options: Array<{ value: string; label: string }> } => ({
@@ -39,7 +35,7 @@ const makeEapOptionsGroup = (
   })),
 })
 
-export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
+export const SecurityField = (props: SecurityFieldProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const {
     id,
@@ -58,8 +54,13 @@ export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
     fieldState
   )
 
+  const allSecurityOptions = [
+    { options: [{ value: SECURITY_NONE, label: t('shared:none') }] },
+    { options: [{ value: SECURITY_WPA_PSK, label: t('wpa2_personal') }] },
+  ]
+
   const options = [
-    ...(showAllOptions ? ALL_SECURITY_OPTIONS : []),
+    ...(showAllOptions ? allSecurityOptions : []),
     makeEapOptionsGroup(eapOptions),
   ]
 

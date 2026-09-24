@@ -42,7 +42,7 @@ interface VacuumControlsProps {
   propsForFields: FieldPropsByName
   showFormErrors: boolean
 }
-export function VacuumControls(props: VacuumControlsProps): JSX.Element {
+export function VacuumControls(props: VacuumControlsProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const { formData, propsForFields, showFormErrors } = props
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false)
@@ -76,7 +76,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
 
   const ventState = vacuumModuleState?.ventStatus ?? VACUUM_VENT_OPEN
   const ventToSwitch =
-    ventState === VACUUM_VENT_SET_OPEN
+    ventState === VACUUM_VENT_OPEN
       ? VACUUM_VENT_SET_CLOSED
       : VACUUM_VENT_SET_OPEN
 

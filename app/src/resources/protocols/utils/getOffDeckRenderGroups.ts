@@ -45,11 +45,9 @@ export function getOffDeckRenderGroups(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   labwareByLiquidId: LabwareByLiquidId
 ): OffDeckRenderGroup[] {
-  const offDeckItems = Object.keys(stackedItems).includes('offDeck')
-    ? stackedItems.offDeck.filter(
-        (item): item is LabwareInStack => 'labwareId' in item
-      )
-    : []
+  const offDeckItems = (stackedItems.offDeck?.[0] ?? []).filter(
+    (item): item is LabwareInStack => 'labwareId' in item
+  )
 
   return offDeckItems.reduce<OffDeckRenderGroup[]>((acc, stackItem) => {
     const wellFillInfo = getWellFillInfo(

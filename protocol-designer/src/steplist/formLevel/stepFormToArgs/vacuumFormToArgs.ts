@@ -133,7 +133,7 @@ const getPumpEndSettings = (args: {
     return null
   }
   const duration = getTimeSecondsFromString(pumpDurationTime)
-  return { duration, ventAfter: endingHoldVentCheckbox }
+  return { duration, ventAfter: endingHoldVentCheckbox ?? false }
 }
 
 export const vacuumFormToArgs = (
@@ -211,7 +211,7 @@ export const vacuumFormToArgs = (
       return {
         commandCreatorFnName: 'vacuumCloseVentStartProfile',
         profile: profileElements.map(vacuumProfileItemToPeProfileElement),
-        ventAfter: endingHoldVentCheckbox,
+        ventAfter: endingHoldVentCheckbox ?? false,
         ...baseValues,
       }
     }

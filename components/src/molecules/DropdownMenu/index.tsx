@@ -27,7 +27,7 @@ import { LiquidIcon } from '../LiquidIcon'
 import { RobotInfoLabel } from '../RobotInfoLabel'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { FocusEventHandler, MouseEvent } from 'react'
+import type { FocusEventHandler, MouseEvent, ReactNode } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -89,7 +89,7 @@ export interface DropdownMenuProps {
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
 
-export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
+export function DropdownMenu(props: DropdownMenuProps): ReactNode {
   const {
     filterOptions,
     onClick,
@@ -237,9 +237,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
       ${disabled ? COLORS.grey35 : defaultBorderColor};
-    border-radius: ${dropdownType === 'rounded'
-      ? BORDERS.borderRadiusFull
-      : BORDERS.borderRadius4};
+    border-radius: ${
+      dropdownType === 'rounded'
+        ? BORDERS.borderRadiusFull
+        : BORDERS.borderRadius4
+    };
     align-items: ${ALIGN_CENTER};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     width: ${width};
@@ -317,9 +319,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               css={css`
-                font-weight: ${dropdownType === 'rounded'
-                  ? TYPOGRAPHY.pSemiBold
-                  : TYPOGRAPHY.pRegular};
+                font-weight: ${
+                  dropdownType === 'rounded'
+                    ? TYPOGRAPHY.pSemiBold
+                    : TYPOGRAPHY.pRegular
+                };
               `}
             >
               {currentOption.deckLabel !== currentOption.name ? (
@@ -445,7 +449,7 @@ export const LINE_CLAMP_TEXT_STYLE = (
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: ${lineClamp ?? 1};
-  word-break: ${wordBreak === true
-    ? 'normal'
-    : 'break-all'}; // normal for tile and break-all for a non word case like aaaaaaaa
+  word-break: ${
+    wordBreak === true ? 'normal' : 'break-all'
+  }; // normal for tile and break-all for a non word case like aaaaaaaa
 `

@@ -17,9 +17,10 @@ import { TiprackSelectHover } from './TiprackSelectHover'
 import styles from './tipselectionwizard.module.css'
 import { getIsTiprackSelectable } from './utils'
 
+import type { ReactNode } from 'react'
 import type { TipSelectionBaseProps } from './types'
 
-export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
+export function SelectTiprack(props: TipSelectionBaseProps): ReactNode {
   const {
     selectedTiprackId,
     setSelectedTiprackId,
@@ -61,10 +62,8 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
           pipetteSpecs,
           nozzles,
           labwareEntities,
+          labwareRobotState: activeDeckSetup.labware,
         })
-        if (selectedTiprackId === null && isTiprackSelectable) {
-          setSelectedTiprackId(id)
-        }
 
         return isTiprackSelectable ? (
           <>

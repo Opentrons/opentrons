@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -6,7 +6,7 @@ import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -34,6 +34,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
@@ -60,6 +61,8 @@ import {
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
+import { ProtocolSetupLoadingTimeoutModal } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLoadingTimeoutModal'
+import { ProtocolSetupHeaderButtonSkeleton } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupSkeleton'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -97,7 +100,9 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
+import { useEnsureProtocolAnalysis } from '/app/resources/protocols'
 import {
+  useCloseCurrentRun,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -118,8 +123,10 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 
 import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
+import type { AuditLogAction } from '@opentrons/react-api-client/src/accessControl/types'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,
@@ -154,6 +161,8 @@ interface PrepareToRunProps {
   isCameraRequired: boolean
   appCameraSettings: CameraState
   storageInfo: RobotStorageInfo
+  showConfirmCancelModal: boolean
+  setShowConfirmCancelModal: Dispatch<SetStateAction<boolean>>
 }
 
 function PrepareToRun({
@@ -172,13 +181,16 @@ function PrepareToRun({
   isCameraRequired,
   appCameraSettings,
   storageInfo,
-}: PrepareToRunProps): JSX.Element {
+  showConfirmCancelModal,
+  setShowConfirmCancelModal,
+}: PrepareToRunProps): ReactNode {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
     'deck_configuration',
   ])
   const navigate = useNavigate()
+  const { closeCurrentRun } = useCloseCurrentRun()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -212,18 +224,18 @@ function PrepareToRun({
     [storageInfo.isImageStorageLow != null]
   )
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const analysisId = mostRecentAnalysisSummary?.id ?? null
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
   const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
+    useProtocolAnalysisAsDocumentQuery(protocolId, analysisId, {
+      enabled:
+        protocolRecord != null &&
+        isPollingForCompletedAnalysis &&
+        analysisId != null,
+      refetchInterval: ANALYSIS_POLL_MS,
+    })
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -232,11 +244,6 @@ function PrepareToRun({
       setIsPollingForCompletedAnalysis(true)
     }
   }, [mostRecentAnalysis?.status])
-
-  const onConfirmCancelClose = (): void => {
-    setShowConfirmCancelModal(false)
-    navigate(-1)
-  }
 
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
@@ -261,10 +268,13 @@ function PrepareToRun({
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -285,9 +295,6 @@ function PrepareToRun({
     parameter =>
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
-
-  const [showConfirmCancelModal, setShowConfirmCancelModal] =
-    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -545,9 +552,11 @@ function PrepareToRun({
   }
 
   // Labware information
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    mostRecentAnalysis?.commands ?? []
+  const { offDeckItems, onDeckItems } = useMemo(
+    () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
+
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
 
@@ -651,20 +660,19 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
             <CloseButton
-              onClose={
-                !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
-                  : onConfirmCancelClose
-              }
+              onClose={() => {
+                setShowConfirmCancelModal(true)
+              }}
             />
-            <PlayButton
-              disabled={isLoading}
-              onPlay={!isLoading ? onPlay : undefined}
-              ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={doorStatus.isDoorOpen}
-            />
+            {!isLoading ? (
+              <PlayButton
+                onPlay={onPlay}
+                ready={isReadyToRun}
+                isDoorOpen={doorStatus.isDoorOpen}
+              />
+            ) : (
+              <ProtocolSetupHeaderButtonSkeleton />
+            )}
           </Flex>
         </Flex>
       </Flex>
@@ -746,9 +754,18 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
+      <ProtocolSetupLoadingTimeoutModal
+        enabled={isLoading}
+        onReturnToDashboard={() => {
+          closeCurrentRun({
+            onSuccess: () => {
+              navigate('/dashboard')
+            },
+          })
+        }}
+      />
     </>
   )
 }
@@ -756,7 +773,7 @@ function PrepareToRun({
 const MAINTENANCE_RUN_POLL_MS = 5000
 const RUN_RECORD_REFETCH_MS = 5000
 
-export function ProtocolSetup(): JSX.Element {
+export function ProtocolSetup(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -775,8 +792,7 @@ export function ProtocolSetup(): JSX.Element {
   const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
-  const { play } = useRunControls(runId)
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+
   const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
     useState<boolean>(true)
   const robotType = useRobotType(robotName)
@@ -785,45 +801,23 @@ export function ProtocolSetup(): JSX.Element {
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
-    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const { analysis: mostRecentAnalysis, protocolRecord } =
+    useEnsureProtocolAnalysis(protocolId)
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
-  const navigate = useNavigate()
-
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
-
-  const { data: mostRecentAnalysis = null } =
-    useProtocolAnalysisAsDocumentQuery(
-      protocolId,
-      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-      {
-        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-        refetchInterval: ANALYSIS_POLL_MS,
-      }
-    )
-
-  useEffect(() => {
-    if (mostRecentAnalysis?.status === 'completed') {
-      setIsPollingForCompletedAnalysis(false)
-    } else {
-      setIsPollingForCompletedAnalysis(true)
-    }
-  }, [mostRecentAnalysis?.status])
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -851,7 +845,6 @@ export function ProtocolSetup(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: initialRobotCameraSettings } = useNotifyCamera({
@@ -890,6 +883,29 @@ export function ProtocolSetup(): JSX.Element {
   if (cameraSettingsApplied && !cameraSettingsConfirmed) {
     setCameraSettingsConfirmed(true)
   }
+
+  const actionsToDocument = useMemo(() => {
+    const actions: DocumentedAction[] = [
+      !cameraSettingsApplied ? 'update_camera_settings_for_run' : null,
+      !offsetsConfirmed ? 'apply_offsets' : null,
+      'play_run',
+    ].filter((action): action is AuditLogAction => action != null)
+    console.log('actionsToDocument', actions)
+    return actions
+  }, [cameraSettingsApplied, offsetsConfirmed])
+
+  const { documentationState: playDocumentationState } =
+    useLinkedDocumentationState(actionsToDocument, runId)
+  const { play } = useRunControls(runId, undefined, playDocumentationState)
+
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation(
+    playDocumentationState
+  )
+
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    playDocumentationState
+  )
 
   const proceedToRun = (): void => {
     // Camera settings do not require explicit confirmation by *any* user,
@@ -986,6 +1002,8 @@ export function ProtocolSetup(): JSX.Element {
         isCameraRequired={isCameraRequired}
         appCameraSettings={appCameraSettings}
         storageInfo={storageInfo}
+        showConfirmCancelModal={showConfirmCancelModal}
+        setShowConfirmCancelModal={setShowConfirmCancelModal}
       />
     ),
     instruments: (

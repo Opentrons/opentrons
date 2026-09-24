@@ -1,11 +1,9 @@
 import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 
 export type ConcurrentCreateCommand =
-  | CreateTimerCreateCommand
-  | WaitForTasksCreateCommand
+  CreateTimerCreateCommand | WaitForTasksCreateCommand
 export type ConcurrentRunTimeCommand =
-  | CreateTimerRunTimeCommand
-  | WaitForTasksRunTimeCommand
+  CreateTimerRunTimeCommand | WaitForTasksRunTimeCommand
 export interface CreateTimerParams {
   time: number
   task_id?: string | null

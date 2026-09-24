@@ -14,6 +14,7 @@ import {
   CLEAR_CACHE,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
+  DISCOVERY_RENAME,
   DISCOVERY_START,
   UI_INITIALIZED,
 } from './constants'
@@ -156,6 +157,15 @@ export function registerDiscovery(
 
       case DISCOVERY_REMOVE: {
         client.removeRobot((action.payload as { robotName: string }).robotName)
+        return
+      }
+
+      case DISCOVERY_RENAME: {
+        const { prevName, newName } = action.payload as {
+          prevName: string
+          newName: string
+        }
+        client.renameRobot(prevName, newName)
         return
       }
 

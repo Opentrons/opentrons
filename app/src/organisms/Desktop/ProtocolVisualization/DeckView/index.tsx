@@ -31,7 +31,7 @@ import { getIsPipetteOverTrash } from '../utils/getIsPipetteOverTrash'
 import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   CutoutId,
@@ -65,6 +65,7 @@ interface DeckViewProps {
   invariantContext: InvariantContext
   robotState: TimelineFrame
   robotType: RobotType
+  selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
   // filtered commands means we are filtering out the load commands
@@ -76,10 +77,11 @@ const lightFill = COLORS.grey35
 const darkFill = COLORS.grey60
 const extraSize = 260
 
-export function DeckView(props: DeckViewProps): JSX.Element {
+export function DeckView(props: DeckViewProps): ReactNode {
   const {
     robotType,
     invariantContext,
+    selectedSlot,
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,
@@ -339,6 +341,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   liquids={liquids}
                   hoveredSlot={hoveredSlot}
                   setHoveredSlot={setHoveredSlot}
+                  selectedSlot={selectedSlot}
                   robotType={robotType}
                   setSelectedSlot={setSelectedSlot}
                   robotState={robotState}

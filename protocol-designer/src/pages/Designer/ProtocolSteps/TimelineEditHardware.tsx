@@ -15,7 +15,9 @@ import { FlexHardware } from '../../../components/organisms'
 import { Ot2Modules } from '../../../components/organisms/Ot2Modules'
 import { getRobotType } from '../../../file-data/selectors'
 
-export function TimelineEditHardware(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function TimelineEditHardware(): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const robotType = useSelector(getRobotType)
   return (

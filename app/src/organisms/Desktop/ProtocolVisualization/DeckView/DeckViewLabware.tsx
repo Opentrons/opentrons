@@ -9,11 +9,12 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getActiveLayer } from '../utils/getActiveLayer'
+import { isLabwareInDisposalLocation } from '../utils/isLabwareInDisposalLocation'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckDefinition,
   Liquid,
@@ -33,10 +34,11 @@ interface DeckViewLabwareProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
 
-export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
+export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -47,6 +49,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     setSelectedSlot,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     selectedRunTimeCommand,
   } = props
   const { labware, modules, pipettes } = robotState
@@ -62,6 +65,10 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
           return []
         }
         const slot = getSlotInLocationStack(lw.stack)
+        // skip disposal location slots
+        if (isLabwareInDisposalLocation(slot)) {
+          return []
+        }
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
@@ -119,6 +126,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
             setSelectedSlot={setSelectedSlot}
             setHoveredSlot={setHoveredSlot}
             hover={hoveredSlot}
+            selectedSlot={selectedSlot}
           >
             {showCommandSummary ? null : (
               <StyledText desktopStyle="captionRegular" color={COLORS.white}>

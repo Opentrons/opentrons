@@ -1001,8 +1001,9 @@
   ],
   "parameters": {
     "format": "irregular",
-    "quirks": ["filterPlate"],
+    "quirks": ["filterPlate", "noLabwarePositionCheck"],
     "isTiprack": false,
+    "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "loadName": "invitroven_filter_plate"
   },

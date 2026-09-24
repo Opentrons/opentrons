@@ -41,4 +41,5 @@ export const MANAGED_PIPETTE_ID = 'managedPipetteId'
 
 export const DROP_TIP_SPECIAL_ERROR_TYPES = {
   MUST_HOME_ERROR: 'MustHomeError',
+  DOOR_OPEN_ERROR: 'DoorOpenError',
 } as const

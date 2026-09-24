@@ -82,6 +82,7 @@ describe('createFile selector', () => {
     trashBinEntities: {},
     gripperEntities: {},
     stagingAreaEntities: {},
+    runtimeParameters: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
 
@@ -247,7 +248,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: '9.0.0',
+        version: '9.0.1',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },

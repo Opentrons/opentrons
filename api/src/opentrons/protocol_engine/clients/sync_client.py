@@ -205,6 +205,22 @@ class SyncClient:
     @overload
     def execute_command_without_recovery(
         self,
+        params: commands.vacuum_module.StartSetVacuumPressureParams,
+        command_annotations: list[str],
+    ) -> commands.vacuum_module.StartSetVacuumPressureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self,
+        params: commands.vacuum_module.StartSetVacuumPowerParams,
+        command_annotations: list[str],
+    ) -> commands.vacuum_module.StartSetVacuumPowerResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self,
         params: commands.vacuum_module.StartRunProfileParams,
         command_annotations: list[str],
     ) -> commands.vacuum_module.StartRunProfileResult:

@@ -14,11 +14,13 @@ import {
 import { actions as analyticsActions } from '/protocol-designer/analytics'
 import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
 
+import type { ReactNode } from 'react'
+
 interface PrivacyProps {
   hasOptedIn: boolean
 }
 
-export function Privacy({ hasOptedIn }: PrivacyProps): JSX.Element {
+export function Privacy({ hasOptedIn }: PrivacyProps): ReactNode {
   const { t } = useTranslation(['feature_flags', 'shared'])
   const dispatch = useDispatch()
 

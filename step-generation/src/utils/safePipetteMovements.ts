@@ -718,15 +718,8 @@ export const getTargetTipsFromWellSets = (args: {
   primaryNozzle: string
 }): string[] => {
   const { wellSets, nozzles, channels, primaryNozzle } = args
-  // 96-channel pipette with ROW nozzle configuration needs to transpose wellSets
   if (nozzles === ROW) {
-    const numCols = wellSets[0].length
-    const transposed: string[][] = Array.from(
-      { length: numCols },
-      (_, colIndex) => wellSets.map(row => row[colIndex])
-    )
-    // Pick the first well from each row
-    return transposed.map(row => row[0])
+    return wellSets.map(row => row[0])
   }
   return wellSets.map(wellSet => {
     // 96-channel pipette with ALL nozzle configuration or 8ch with PARTIAL

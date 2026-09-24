@@ -52,15 +52,21 @@ class RTScanner(AbstractBarcodeScannerDriver):
     """Driver for the RTC214C."""
 
     @classmethod
-    async def create(cls) -> "RTScanner":
+    async def create(cls, port: Optional[str]) -> "RTScanner":
         device = None
-        for p in comports():
-            # RT214c vid:pid 1eab:1d06
-            if p.vid and p.vid == 0x1EAB:
-                device = p.device
+        ports = comports()
+        if not port:
+            for p in ports:
+                # RT214c vid:pid 1eab:1d06
+                if p.vid and p.vid == 0x1EAB:
+                    device = p.device
+        else:
+            for p in ports:
+                if p.device == port and p.vid == 0x1EAB:
+                    device = port
         if device is None:
-            raise RuntimeError("No RT scanner found.")
-        read_timeout_ms = 30000
+            raise RuntimeError("No scanner found.")
+        read_timeout_ms = 3000
         connection = await AsyncSerial.create(
             port=device,
             baud_rate=9600,
@@ -72,7 +78,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         return scanner
 
     def __init__(
-        self, connection: AsyncSerial, device: str, read_timeout_ms: int = 30000
+        self, connection: AsyncSerial, device: str, read_timeout_ms: int = 3000
     ):
         """Search for and connect to a RT214C if one is present."""
         self._device = device
@@ -141,7 +147,11 @@ class RTScanner(AbstractBarcodeScannerDriver):
         """Search for a barcode and return if found else None."""
         await self._conn.write(bytes(scan_trigger))
         await self._conn.read_until(bytes(ack))  # eat the ack response
-        barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        try:
+            barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        except BaseException:
+            log.exception("failed to scan")
+            barcode = b""
         log.debug(f"Scanned {barcode.decode('ascii')}")
         if len(barcode) == 0:
             if self._do_err_beep:

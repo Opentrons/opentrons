@@ -6,10 +6,11 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getRobotCommandText } from '../getRobotCommandText'
 
+import type { ReactNode } from 'react'
 import type { HandlesCommands } from '../../types'
 import type { SupportedCommands } from '../getRobotCommandText'
 
-function TestWrapper({ command }: { command: SupportedCommands }): JSX.Element {
+function TestWrapper({ command }: { command: SupportedCommands }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getRobotCommandText({
     command,

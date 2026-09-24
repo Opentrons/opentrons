@@ -183,7 +183,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     }
     case 'camera': {
       stepSummaryContent = (
-        <StyledTrans i18nKey={'protocol_steps:camera.capture_image'} />
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('protocol_steps:camera.capture_image')}{' '}
+        </StyledText>
       )
       break
     }

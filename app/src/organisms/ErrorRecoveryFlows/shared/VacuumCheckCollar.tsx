@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next'
 
+import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function VacuumCheckCollar(props: RecoveryContentProps): JSX.Element {
+export function VacuumCheckCollar(props: RecoveryContentProps): ReactNode {
   const { routeUpdateActions } = props
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
 
@@ -21,8 +23,7 @@ export function VacuumCheckCollar(props: RecoveryContentProps): JSX.Element {
           headline={t('check_collar')}
           message={t('proper_seal_required')}
         />
-        {/* TODO(nd, 02-24-26): Add animation */}
-        <RightColumnAnimation animationSrc={''} />
+        <RightColumnAnimation animationSrc={CheckCollar} />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}

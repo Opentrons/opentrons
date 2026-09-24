@@ -17,9 +17,10 @@ import { logOut } from '/app/redux/robot-auth'
 import styles from './account.module.css'
 import { useAccountInfo } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
-export function Account(): JSX.Element {
+export function Account(): ReactNode {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const dispatch = useDispatch()

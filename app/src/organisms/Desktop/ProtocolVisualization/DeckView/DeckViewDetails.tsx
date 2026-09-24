@@ -10,7 +10,7 @@ import { DeckViewSlots } from './DeckViewSlots'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
 import { Ot2FixedTrashCommandSummary } from './Ot2FixedTrashCommandSummary'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
@@ -35,9 +35,10 @@ interface DeckViewDetailsProps {
   deckDef: DeckDefinition
   hoveredSlot: string | null
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
+  selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
-export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
+export function DeckViewDetails(props: DeckViewDetailsProps): ReactNode {
   const {
     robotState,
     robotType,
@@ -48,6 +49,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     selectedRunTimeCommand,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     liquids,
     labwareEntitiesExtended,
   } = props
@@ -85,6 +87,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         setSelectedSlot={setSelectedSlot}
         setHoveredSlot={setHoveredSlot}
         hoveredSlot={hoveredSlot}
+        selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
       />
       {/* SlotControls for all empty deck */}
@@ -96,6 +99,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         setSelectedSlot={setSelectedSlot}
         setHoveredSlot={setHoveredSlot}
         hoveredSlot={hoveredSlot}
+        selectedSlot={selectedSlot}
         stagingAreaCutoutIds={stagingAreaCutoutIds}
         slotIdsBlockedBySpanning={slotIdsBlockedBySpanning}
       />
@@ -110,6 +114,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         setSelectedSlot={setSelectedSlot}
         setHoveredSlot={setHoveredSlot}
         hoveredSlot={hoveredSlot}
+        selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
       />
       {/* when commandSummary happens on a trash bin */}

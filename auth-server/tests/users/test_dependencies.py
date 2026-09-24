@@ -14,7 +14,6 @@ async def test_get_user_by_username_returns_user(decoy: Decoy) -> None:
         username="alice",
         fullName="Alice",
         accountType=AccountType.USER,
-        scopes=[],
         locked=False,
         resetPassword=False,
     )

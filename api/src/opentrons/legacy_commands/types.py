@@ -495,11 +495,6 @@ class VacuumModuleCloseVentCommand(TypedDict):
     payload: TextOnlyPayload
 
 
-class VacuumModuleWaitForTargetCommand(TypedDict):
-    name: Literal["command.VACUUM_MODULE_WAIT_FOR_TARGET"]
-    payload: TextOnlyPayload
-
-
 # Module command end
 
 
@@ -940,7 +935,6 @@ Command = Union[
     VacuumModuleStartExecuteProfileCommand,
     VacuumModuleOpenVentCommand,
     VacuumModuleCloseVentCommand,
-    VacuumModuleWaitForTargetCommand,
     # Task commands
     WaitForTasksCommand,
     CreateTimerCommand,

@@ -11,6 +11,7 @@ import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 
 import type { CSSProp } from 'styled-components'
+import type { ReactNode } from 'react'
 
 export function RunTimer({
   runStatus,
@@ -24,7 +25,7 @@ export function RunTimer({
   stoppedAt: string | null
   completedAt: string | null
   style?: CSSProp
-}): JSX.Element {
+}): ReactNode {
   const [now, setNow] = useState(Date())
   useInterval(
     () => {

@@ -13,6 +13,7 @@
       "require": "./lib/index.js"
     },
     "./package.json": "./package.json",
+    "./styles": "./lib/style.css",
     "./lib/style.css": "./lib/style.css"
   },
   "repository": {
@@ -34,6 +35,7 @@
     "react-i18next": "catalog:"
   },
   "dependencies": {
+    "@popperjs/core": "2.1.1",
     "@opentrons/components": "workspace:*",
     "@opentrons/shared-data": "workspace:*",
     "@opentrons/step-generation": "workspace:*",

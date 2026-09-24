@@ -14,7 +14,7 @@ import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CoordinateTuple,
   DeckDefinition,
@@ -40,6 +40,7 @@ interface DeckViewStackerProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   showModuleCommandSummary: boolean
   showLabwareCommandSummary: boolean
   slot: string
@@ -51,7 +52,7 @@ interface DeckViewStackerProps {
   renderLabware?: boolean
 }
 
-export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
+export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -61,6 +62,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
     setHoveredSlot,
     setSelectedSlot,
     hoveredSlot,
+    selectedSlot,
     labwareEntitiesExtended,
     showModuleCommandSummary,
     showLabwareCommandSummary,
@@ -126,6 +128,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           setSelectedSlot={setSelectedSlot}
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
+          selectedSlot={selectedSlot}
         >
           {showModuleCommandSummary || showLabwareCommandSummary ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>
@@ -156,6 +159,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           setSelectedSlot={setSelectedSlot}
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
+          selectedSlot={selectedSlot}
         >
           {(moduleType === FLEX_STACKER_MODULE_TYPE &&
             selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve') ||

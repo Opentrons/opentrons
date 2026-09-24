@@ -21,6 +21,7 @@ import {
   RecoverySingleColumnContentWrapper,
 } from './shared'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from './types'
 
 // There are two code paths that render this component:
@@ -37,7 +38,7 @@ export function RecoveryDoorOpen({
   recoveryMap,
   recoveryCommands,
   currentRecoveryOptionUtils,
-}: RecoveryContentProps): JSX.Element {
+}: RecoveryContentProps): ReactNode {
   const { resumeRecovery, isResumeRecoveryLoading } =
     recoveryActionMutationUtils
   const { stashedMap, proceedToRouteAndStep } = routeUpdateActions

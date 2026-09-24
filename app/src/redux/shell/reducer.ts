@@ -4,7 +4,12 @@ import { robotSystemReducer } from './is-ready/reducer'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { ShellState, ShellUpdateState } from './types'
+import type {
+  ShellState,
+  ShellUpdateState,
+  StepDetailViewerClosedState,
+  UsbMountPath,
+} from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,
@@ -64,6 +69,27 @@ export function massStorageReducer(
   return state
 }
 
+export function usbMountPathsReducer(
+  state = [] as UsbMountPath[],
+  action: Action
+): UsbMountPath[] {
+  switch (action.type) {
+    case 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED':
+      return state.some(entry => entry.path === action.payload.rootPath)
+        ? state
+        : [
+            ...state,
+            {
+              path: action.payload.rootPath,
+              isMassStorage: action.payload.isMassStorage ?? true,
+            },
+          ]
+    case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
+      return state.filter(entry => entry.path !== action.payload.rootPath)
+  }
+  return state
+}
+
 export function systemLanguageReducer(
   state: string[] | null = null,
   action: Action
@@ -75,18 +101,37 @@ export function systemLanguageReducer(
   return state
 }
 
+export function stepDetailViewerClosedReducer(
+  state: StepDetailViewerClosedState = null,
+  action: Action
+): StepDetailViewerClosedState {
+  switch (action.type) {
+    case 'shell:STEP_DETAIL_VIEWER_CLOSED':
+      return {
+        protocolKey: action.payload.protocolKey,
+        closedAt: Date.now(),
+      }
+  }
+
+  return state
+}
+
 interface ShellReducerMap {
   update: Reducer<ShellUpdateState, Action>
   isReady: Reducer<boolean, Action>
   filePaths: Reducer<string[], Action>
+  usbMountPaths: Reducer<UsbMountPath[], Action>
   systemLanguage: Reducer<string[] | null, Action>
+  stepDetailViewerClosed: Reducer<StepDetailViewerClosedState, Action>
 }
 
 const reducers: ShellReducerMap = {
   update: shellUpdateReducer,
   isReady: robotSystemReducer as Reducer<boolean, Action>,
   filePaths: massStorageReducer,
+  usbMountPaths: usbMountPathsReducer,
   systemLanguage: systemLanguageReducer,
+  stepDetailViewerClosed: stepDetailViewerClosedReducer,
 }
 
 export const shellReducer: Reducer<ShellState, Action> = (

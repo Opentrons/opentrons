@@ -28,6 +28,9 @@ import type {
   ConfigV26,
   ConfigV27,
   ConfigV28,
+  ConfigV29,
+  ConfigV30,
+  ConfigV31,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -335,5 +338,31 @@ export const MOCK_CONFIG_V28: ConfigV28 = {
   ui: {
     ...MOCK_CONFIG_V27.ui,
     minHeight: 600,
+  },
+}
+
+export const MOCK_CONFIG_V29: ConfigV29 = {
+  ...MOCK_CONFIG_V28,
+  version: 29,
+  update: {
+    ...MOCK_CONFIG_V28.update,
+    automaticallyDownloadUpdates: false,
+  },
+}
+
+export const MOCK_CONFIG_V30: ConfigV30 = {
+  ...MOCK_CONFIG_V29,
+  version: 30,
+  audit: {
+    logDirectory: null,
+  },
+}
+
+export const MOCK_CONFIG_V31: ConfigV31 = {
+  ...MOCK_CONFIG_V30,
+  version: 31,
+  protocols: {
+    ...MOCK_CONFIG_V30.protocols,
+    includeProtocolSourceInRunDownload: false,
   },
 }

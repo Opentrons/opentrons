@@ -189,6 +189,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       initialModuleState.lidOpen !== true
     ) {
       errors.push(errorCreators.absorbanceReaderLidClosed())
+    } else if (
+      initialModuleState.type === VACUUM_MODULE_TYPE &&
+      initialModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const destModuleId =
@@ -237,6 +242,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       if (destModuleState.lidOpen !== true) {
         errors.push(errorCreators.absorbanceReaderLidClosed())
       }
+    } else if (
+      destModuleState.type === VACUUM_MODULE_TYPE &&
+      destModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const isLabwareIdATiprackLid =
@@ -370,10 +380,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 
   // check compatibility of stack to move to
   if (parentSlotForSlotCompatibility != null) {
-    const largestStackInSlot = getLargestStackInSlot(
-      prevRobotState.labware,
-      parentSlotForSlotCompatibility
-    )
+    const largestStackInSlot = getLargestStackInSlot({
+      slot: parentSlotForSlotCompatibility,
+      labwareState: prevRobotState.labware,
+      modulesState: prevRobotState.modules,
+    })
 
     const slot = getSlotInLocationStack(largestStackInSlot)
     const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(

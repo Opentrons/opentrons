@@ -9,6 +9,7 @@ import {
   getComboFixtureFromFixtureIds,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
+  getModuleModelFromFixtureId,
   getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
   getWasteChuteOptions,
@@ -28,6 +29,10 @@ import {
 
 import { FLEX_MODULE_MODELS } from '/protocol-designer/pages/Designer/DeckSetup/constants'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+import {
+  isCutoutBlockedByExistingVacuumModule,
+  wouldVacuumModuleBlockExistingModule,
+} from '/protocol-designer/utils/vacuumModuleSlotRestrictions'
 
 import { AddFixtureModal } from './AddFixtureModal'
 
@@ -66,7 +71,6 @@ export function useDeckConfigurationEditing(
   modules: FormModules | InitialDeckStateModules,
   fixtures: Fixtures,
   hasGripper: boolean,
-  enableVacuumModule: boolean,
   setValue?: UseFormSetValue<WizardFormState>,
   updateInitialDeckState?: (
     value: CutoutConfigMap[],
@@ -304,16 +308,13 @@ export const getModuleFixtures = (
   moduleModel: ModuleModel,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
-  fixtures: Fixtures,
-  enableVacuumModule: boolean
+  fixtures: Fixtures
 ): CutoutConfigMap[][] => {
   const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  const filteredModuleModels = getFilteredModules(moduleModel).filter(
-    model => model !== VACUUM_MODULE_V1 || enableVacuumModule
-  )
+  const filteredModuleModels = getFilteredModules(moduleModel)
   const isStagingAreaInSlot4 =
     fixtures != null &&
     Object.values(fixtures).some(
@@ -342,12 +343,38 @@ export const getModuleFixtures = (
     .filter((config): config is CutoutConfigMap[] => config !== null)
 }
 
+const filterVacuumModuleGripperCollisions = (
+  availableOptions: CutoutConfigMap[][],
+  cutoutId: CutoutId,
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  modules?: FormModules | InitialDeckStateModules
+): CutoutConfigMap[][] => {
+  if (modules == null) {
+    return availableOptions
+  }
+  if (isCutoutBlockedByExistingVacuumModule(addressableAreaId, modules)) {
+    return []
+  }
+  if (!wouldVacuumModuleBlockExistingModule(cutoutId, modules)) {
+    return availableOptions
+  }
+  return availableOptions.filter(
+    option =>
+      !option.some(
+        config =>
+          getModuleModelFromFixtureId(
+            config.cutoutFixtureId as CutoutFixtureId
+          ) === VACUUM_MODULE_V1
+      )
+  )
+}
+
 export const getModules = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
   fixtures: Fixtures,
-  enableVacuumModule: boolean
+  modules?: FormModules | InitialDeckStateModules
 ): CutoutConfigMap[][] => {
   const availableOptions: CutoutConfigMap[][] = []
 
@@ -363,13 +390,17 @@ export const getModules = (
     )
 
   if (isStagingAreaInSlot4) {
-    return getModuleFixtures(
+    return filterVacuumModuleGripperCollisions(
+      getModuleFixtures(
+        cutoutId,
+        MAGNETIC_BLOCK_V1,
+        addressableAreaId,
+        deckDef,
+        fixtures
+      ),
       cutoutId,
-      MAGNETIC_BLOCK_V1,
       addressableAreaId,
-      deckDef,
-      fixtures,
-      enableVacuumModule
+      modules
     )
   }
 
@@ -382,13 +413,17 @@ export const getModules = (
       model as ModuleModel,
       addressableAreaId,
       deckDef,
-      fixtures,
-      enableVacuumModule
+      fixtures
     )
     availableOptions.push(...moduleOptions)
   })
 
-  return availableOptions
+  return filterVacuumModuleGripperCollisions(
+    availableOptions,
+    cutoutId,
+    addressableAreaId,
+    modules
+  )
 }
 
 export const getModuleOptions = (
@@ -396,15 +431,9 @@ export const getModuleOptions = (
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
   fixtures: Fixtures,
-  enableVacuumModule: boolean
+  modules?: FormModules | InitialDeckStateModules
 ): CutoutConfigMap[][] => {
-  return getModules(
-    cutoutId,
-    addressableAreaId,
-    deckDef,
-    fixtures,
-    enableVacuumModule
-  )
+  return getModules(cutoutId, addressableAreaId, deckDef, fixtures, modules)
 }
 
 interface AvailableOptionsProps {
@@ -414,7 +443,7 @@ interface AvailableOptionsProps {
   addressableAreaId: AddressableAreaNamesWithFakes
   fixtures: Fixtures
   existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
-  enableVacuumModule: boolean
+  modules?: FormModules | InitialDeckStateModules
 }
 export const getAvailableOptions = (
   props: AvailableOptionsProps
@@ -426,7 +455,7 @@ export const getAvailableOptions = (
     addressableAreaId,
     deckDefinition,
     fixtures,
-    enableVacuumModule,
+    modules,
   } = props
 
   let availableOptions: CutoutConfigMap[][] = []
@@ -444,7 +473,7 @@ export const getAvailableOptions = (
       addressableAreaId,
       deckDefinition,
       fixtures,
-      enableVacuumModule
+      modules
     )
   }
   if (optionStage === 'wasteChuteOptions') {

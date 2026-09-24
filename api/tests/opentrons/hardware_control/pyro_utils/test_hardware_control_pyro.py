@@ -29,6 +29,10 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler.simulator import (
     SimulatingDriver as ThermocyclerSimulatingDriver,
 )
+from opentrons.drivers.vacuum_module.simulator import (
+    SimulatingDriver as VacuumModuleSimulatingDriver,
+)
+from opentrons.drivers.vacuum_module.types import PumpState, VacuumState
 from opentrons.hardware_control import ExecutionManager, ThreadManager, modules
 from opentrons.hardware_control import types as hw_types
 from opentrons.hardware_control.instruments.ot3 import (
@@ -48,7 +52,9 @@ from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    VacuumModuleStatus,
 )
+from opentrons.hardware_control.modules.vacuum_module import VacuumModuleReader
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
@@ -58,15 +64,16 @@ from opentrons.hardware_control.types import (
     DoorStateNotification,
     HardwareEvent,
     HardwareEventHandler,
+    HardwareFeatureFlags,
     OT3Mount,
+    SubSystem,
 )
 from opentrons.types import Mount, Point
 from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncClientPyroFunctionWrapper,
-    AsyncClientPyroObject,
-    ClientPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
@@ -101,6 +108,12 @@ def mock_driver(decoy: Decoy) -> SimulatingDriver:
 def mock_thermo_driver(decoy: Decoy) -> ThermocyclerSimulatingDriver:
     """Get a mocked simulating driver of the thermocycler."""
     return decoy.mock(cls=ThermocyclerSimulatingDriver)
+
+
+@pytest.fixture
+def mock_vm_driver(decoy: Decoy) -> VacuumModuleSimulatingDriver:
+    """Get a mocked simulating driver of the vacuum module."""
+    return decoy.mock(cls=VacuumModuleSimulatingDriver)
 
 
 @pytest.fixture
@@ -296,20 +309,7 @@ async def test_pyro_behavior_ot3api_dicts_with_non_builtin_keys(
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
     ot3api = cast(OT3API, ot3_async)
     await ot3api.home()
 
@@ -368,7 +368,7 @@ async def test_pyro_behavior_ot3api_dicts_with_non_builtin_keys(
     assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
 
     # Clean up client resources.
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore
 
 
 async def test_pyro_module_properties(
@@ -424,7 +424,7 @@ async def test_pyro_module_properties(
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
@@ -435,20 +435,7 @@ async def test_pyro_module_properties(
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
     ot3api = cast(OT3API, ot3_async)
 
     # Ensure that functions which provide proxies also are wrapped asynchronously
@@ -463,7 +450,85 @@ async def test_pyro_module_properties(
     assert async_remote_tc.bundled_fw == tc.bundled_fw
     assert async_remote_tc.name() == "thermocycler"
 
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore
+
+
+async def test_pyro_vacuum_module_serialization(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_vm_driver: VacuumModuleSimulatingDriver,
+    decoy: Decoy,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> None:
+    """Test to ensure that proxy module calls to the vacuum module serialize and deserialize properly."""
+    sock = socket.socket()
+    sock.bind(("localhost", 0))
+    host, port = sock.getsockname()
+    sock.close()
+
+    pyro.config.NS_HOST = host
+    pyro.config.NS_PORT = port
+
+    name_server_ready = threading.Event()
+    # Module mocks
+    api = ot3_hardware.wrapped()
+    api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+
+    vm = VacuumModule(
+        port="/dev/ot_module_sim_vac0",
+        usb_port=USBPort(
+            name="port1",
+            port_number=1,
+            port_group="main",
+            hub=False,
+            hub_port=None,
+            device_path="",
+        ),
+        hw_control_loop=api._loop,
+        driver=mock_vm_driver,
+        reader=VacuumModuleReader(driver=mock_vm_driver),
+        poller=Poller(VacuumModuleReader(driver=mock_vm_driver), interval=0.01),
+        device_info={"serial": "awesome_serial_123"},
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
+
+    decoy.when(api._backend.module_controls.available_modules).then_return([vm])
+
+    def _nameserver_loop() -> None:
+        # start_ns returns (nameserver, daemon, uri)
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
+        name_server_ready.set()
+        # Run until the test process exits; thread is marked daemon=True.
+        ns_daemon.requestLoop()
+
+    def _pyro_daemon() -> None:
+        # Wait for the nameserver to be ready so locate_ns can succeed.
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
+
+    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
+    server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
+
+    ns_thread.start()
+    server_thread.start()
+
+    # Client-side requests below
+    register_hardware_types()
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
+    ot3api = cast(OT3API, ot3_async)
+
+    # Ensure that functions which provide proxies also are wrapped asynchronously
+    async_remote_vm = cast(VacuumModule, ot3api.attached_modules[0])
+
+    assert isinstance(async_remote_vm.pump_state, PumpState)
+    assert isinstance(async_remote_vm.vacuum_state, VacuumState)
+    assert isinstance(async_remote_vm.status, VacuumModuleStatus)
+
+    ot3_async._proxy._pyroRelease()  # type: ignore
 
 
 async def test_pyro_async_wrapped_calls(  # noqa: C901
@@ -506,7 +571,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
 
     class cool_door_class:
         def __init__(self, loop: asyncio.AbstractEventLoop):
@@ -552,24 +617,9 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
     ot3api = cast(OT3API, ot3_async)
-    door_uri = pyro.resolve(uri="PYRONAME:cool_door")
-    door_proxy = pyro.Proxy(door_uri)  # type: ignore
-    door_async = AsyncClientPyroObject(door_proxy)
+    door_async = await wait_for_proxy(proxy_name="cool_door")
 
     await ot3api.home()
 
@@ -582,11 +632,11 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     assert isinstance(async_uploader, AsyncClientPyroFunctionWrapper)
 
     # Test registering an outbound function from one remote resource with another remote resouce
-    result = ot3api.register_callback(cb=door_async.cool_hardware_event())  # type: ignore
+    result = await ot3api.register_callback_async(cb=door_async.cool_hardware_event())  # type: ignore
 
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
-    assert isinstance(result, ClientPyroFunctionWrapper)
-    result()
+    assert isinstance(result, AsyncClientPyroFunctionWrapper)
+    await result()
 
     assert (
         ot3api.build_temporary_identity_calibration().deck_calibration.source.value
@@ -597,7 +647,32 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
         is None
     )
 
-    ot3_proxy._pyroRelease()  # type: ignore
+    old_flags = HardwareFeatureFlags(
+        use_old_aspiration_functions=False,
+        require_estop=True,
+        overpressure_detection_enabled=True,
+        stall_detection_enabled=True,
+    )
+    new_flags = HardwareFeatureFlags(
+        use_old_aspiration_functions=True,
+        require_estop=True,
+        overpressure_detection_enabled=True,
+        stall_detection_enabled=True,
+    )
+
+    ot3api.hardware_feature_flags = new_flags
+    assert ot3api.hardware_feature_flags == new_flags
+    ot3api.hardware_feature_flags = old_flags
+    assert ot3api.hardware_feature_flags == old_flags
+
+    # Test the firmware update fetching route
+    fetching_callback = ot3api.update_firmware_with_fetching(
+        {SubSystem.gantry_x, SubSystem.gantry_y}
+    )
+    fetch_result = await fetching_callback()
+    assert isinstance(fetch_result, hw_types.UpdateStatus)
+
+    ot3_async._proxy._pyroRelease()  # type: ignore
 
 
 async def test_pipette_proxy_dictionary(
@@ -646,20 +721,7 @@ async def test_pipette_proxy_dictionary(
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
     ot3api = cast(OT3API, ot3_async)
 
     pipettes = ot3api.hardware_pipettes
@@ -675,4 +737,4 @@ async def test_pipette_proxy_dictionary(
     assert ot3api.get_instrument_offset(mount=Mount.LEFT).source.value == "user"  # type: ignore
     assert ot3api.get_instrument_offset(mount=Mount.RIGHT) is None
 
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore

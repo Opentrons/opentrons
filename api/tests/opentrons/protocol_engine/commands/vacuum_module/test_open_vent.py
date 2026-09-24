@@ -53,3 +53,44 @@ async def test_open_vent(
         public=expected_result,
         state_update=update_types.StateUpdate(),
     )
+
+
+async def test_open_vent_waits_to_equalize(
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+) -> None:
+    """It should wait for pressure equalization when equalizeTimeout is set."""
+    subject = OpenVentImpl(
+        state_view=state_view, equipment=equipment, movement=movement
+    )
+
+    data = vm_commands.OpenVentParams(moduleId="input-vacuum-id", equalizeTimeout=30)
+    expected_module_id = VacuumModuleId("vacuum-id")
+
+    vm_module_substate = decoy.mock(cls=VacuumModuleSubState)
+    vm_hardware = decoy.mock(cls=VacuumModule)
+
+    decoy.when(
+        state_view.modules.get_vacuum_module_substate("input-vacuum-id")
+    ).then_return(vm_module_substate)
+    decoy.when(vm_module_substate.module_id).then_return(expected_module_id)
+    decoy.when(equipment.get_module_hardware_api(expected_module_id)).then_return(
+        vm_hardware
+    )
+
+    result = await subject.execute(data)
+
+    decoy.verify(
+        await vm_hardware.set_vent_state(VentState.OPENED),
+        await vm_hardware.wait_for_pressure_equalization(30),
+    )
+    expected_state_update = update_types.StateUpdate()
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum-id", residual_vacuum=False
+    )
+    assert result == SuccessData(
+        public=vm_commands.OpenVentResult(),
+        state_update=expected_state_update,
+    )

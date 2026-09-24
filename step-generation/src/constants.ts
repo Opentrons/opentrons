@@ -172,7 +172,7 @@ export const VACUUM_DOCK_LOCATION = 'vacuumDock'
 export const VACUUM_DOCK_ADDRESSABLE_AREA =
   VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
 
-export const VACUUM_VENT_OPEN: 'open' = 'open'
+export const VACUUM_VENT_OPEN: 'opened' = 'opened'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
 
 export const VACUUM_MODE_POWER: 'power' = 'power'
@@ -193,3 +193,5 @@ export const VACUUM_SPACER_LOAD_NAMES: string[] = [
   'opentrons_vacuum_manifold_spacer_short',
   'opentrons_vacuum_manifold_spacer_tall',
 ]
+
+export const VACUUM_DOCK_DISPLAY_LOCATION: 'A4' = 'A4'

@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useCurrentMaintenanceRun } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../../useNotifyDataReady'
@@ -9,16 +11,19 @@ import type { QueryOptionsWithPolling } from '../../useNotifyDataReady'
 export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/maintenance_runs/current_run',
     options,
   })
 
   const httpQueryResult = useCurrentMaintenanceRun(queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

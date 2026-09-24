@@ -14,9 +14,7 @@ from audit_server.persistence import orm_models
 
 
 @contextmanager
-def sql_engine_ctx(
-    db_path: Path,
-) -> Generator[sqlalchemy.engine.Engine, None, None]:
+def sql_engine_ctx(db_path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Context-managed engine that disposes itself on exit.
 
     Configures the underlying ``sqlite3`` (pysqlite) connections to:

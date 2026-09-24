@@ -14,6 +14,7 @@ import {
 import { StyledTrans } from './StyledTrans'
 import { getLabwareGroupNamesString } from './utils'
 
+import type { ReactNode } from 'react'
 import type { TimelineFrame } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 
@@ -22,9 +23,7 @@ interface FlexStackerSummaryProps {
   moduleRobotState: TimelineFrame['modules']
 }
 
-export function FlexStackerSummary(
-  props: FlexStackerSummaryProps
-): JSX.Element | null {
+export function FlexStackerSummary(props: FlexStackerSummaryProps): ReactNode {
   const { currentStep, moduleRobotState } = props
   const labwareDefByURI = useSelector(getLabwareDefsByURI)
   const { fillLabwareIds, flexStackerFormType, moduleId } = currentStep

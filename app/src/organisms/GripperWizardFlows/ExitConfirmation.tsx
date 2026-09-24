@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
 } from '@opentrons/components'
@@ -19,6 +19,7 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { GRIPPER_FLOW_TYPES } from './constants'
 
+import type { ReactNode } from 'react'
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {
@@ -28,7 +29,7 @@ interface ExitConfirmationProps {
   isRobotMoving: boolean
 }
 
-export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
+export function ExitConfirmation(props: ExitConfirmationProps): ReactNode {
   const { handleGoBack, handleExit, flowType, isRobotMoving } = props
   const { i18n, t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -80,9 +81,9 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleExit}>
+          <PrimaryButton variant="warning" onClick={handleExit}>
             {i18n.format(t('shared:exit'), 'capitalize')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

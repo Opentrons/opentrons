@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -20,12 +20,12 @@ import {
 import { MediumButton } from '/app/atoms/buttons'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { getLocalRobot } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
 
 interface WifiConnectionDetailsProps {
   ssid?: string
@@ -36,15 +36,12 @@ interface WifiConnectionDetailsProps {
 export function WifiConnectionDetails({
   ssid,
   authType,
-}: WifiConnectionDetailsProps): JSX.Element {
+}: WifiConnectionDetailsProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatch = useDispatch<Dispatch>()
-  const { wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi } = useNetworkInterfaces(robotName)
 
   const noData = i18n.format(t('shared:no_data'), 'titleCase')
   const ipAddress = wifi?.ipAddress != null ? wifi.ipAddress : noData
@@ -53,15 +50,6 @@ export function WifiConnectionDetails({
 
   const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
     useState<boolean>(false)
-
-  useEffect(
-    () => {
-      dispatch(fetchStatus(robotName))
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
 
   return (
     <>
@@ -114,7 +102,7 @@ interface DisplayConnectionStatusProps {
 
 const DisplayConnectionStatus = ({
   ssid,
-}: DisplayConnectionStatusProps): JSX.Element => {
+}: DisplayConnectionStatusProps): ReactNode => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex

@@ -37,6 +37,10 @@ export function createDiscoveryClient(
     dispatch(Store.removeRobot(robotName))
   }
 
+  const renameRobot = (prevName: string, newName: string): void => {
+    dispatch(Store.renameRobot(prevName, newName))
+  }
+
   const start = (config?: DiscoveryClientConfig): void => {
     const { healthPollInterval, ...intialState } = config ?? {}
 
@@ -73,5 +77,5 @@ export function createDiscoveryClient(
     }
   }
 
-  return { getRobots, removeRobot, start, stop }
+  return { getRobots, removeRobot, renameRobot, start, stop }
 }

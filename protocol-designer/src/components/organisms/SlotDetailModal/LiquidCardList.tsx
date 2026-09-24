@@ -5,7 +5,7 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { LiquidDetailCard } from './LiquidDetailCard'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { AllIngredGroupFields } from '/protocol-designer/labware-ingred/types'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { WellContentsByNumber } from './index'
@@ -19,7 +19,7 @@ interface LiquidCardListProps {
   volumesPerLiquid: Record<string, WellContentsByNumber>
 }
 
-export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
+export const LiquidCardList = (props: LiquidCardListProps): ReactNode => {
   const {
     selectedLabware,
     selectedLiquidId,

@@ -26,6 +26,16 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('/app/resources/client_data/encryptionKeys')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: vi.fn().mockReturnValue('otie'),
+}))
 
 const render = () => {
   return renderWithProviders(
@@ -63,18 +73,18 @@ describe('RobotEncryptionKey modal', () => {
       clearClientData: mockClearClientData,
     } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
   })
-  it('should close the modal when clicking ok', () => {
+  it('should close the modal when clicking dismiss', () => {
     renderWithModal()
-    const okButton = screen.getByText('Ok')
-    fireEvent.click(okButton)
+    const dismissButton = screen.getByText('Dismiss')
+    fireEvent.click(dismissButton)
     expect(
       screen.queryByText(/enter this key into the opentrons app/i)
     ).toBeNull()
   })
-  it('should clear client data when clicking ok', () => {
+  it('should clear client data when clicking dismiss', () => {
     renderWithModal()
-    const okButton = screen.getByText('Ok')
-    fireEvent.click(okButton)
+    const dismissButton = screen.getByText('Dismiss')
+    fireEvent.click(dismissButton)
     expect(mockClearClientData).toHaveBeenCalled()
   })
   it('should render the password', () => {

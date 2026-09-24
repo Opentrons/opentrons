@@ -27,13 +27,8 @@ export function openCameraPhoto(
   params: OpenCameraPhotoParams
 ): CameraPhotoDetails {
   const createUi = (): BrowserWindow => createCameraPhotoUi(params)
-  const windowId = getWindowIdCameraPhoto(params.photoUrl)
 
-  return { createUi, windowId, type: 'camera-photo' }
-}
-
-function getWindowIdCameraPhoto(photoHash: string): string {
-  return `camera-photo-${photoHash}`
+  return { createUi, key: params.photoUrl, type: 'camera-photo' }
 }
 
 const PHOTO_URL = (robotName: string, photoUrl: string): string => {

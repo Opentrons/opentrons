@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export const TAB_BORDER_STYLE = css`
   border-bottom-style: ${BORDERS.styleSolid};
@@ -37,7 +37,7 @@ export function NavTab({
   to,
   tabName,
   disabled = false,
-}: NavTabProps): JSX.Element {
+}: NavTabProps): ReactNode {
   return (
     <StyledNavLink as={disabled ? DisabledNavLink : undefined} to={to} replace>
       {tabName}

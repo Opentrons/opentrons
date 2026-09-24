@@ -13,6 +13,8 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+import type { Mock } from 'vitest'
+
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -60,7 +62,7 @@ const render = () => {
 }
 
 describe('UnsavedOffsetsModalODD', () => {
-  let mockDispatch: ReturnType<typeof vi.fn>
+  let mockDispatch: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()

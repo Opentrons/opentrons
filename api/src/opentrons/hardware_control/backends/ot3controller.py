@@ -22,7 +22,6 @@ from typing import (
     Set,
     Tuple,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -72,10 +71,11 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.eeprom import EEPROMData, EEPROMDriver
-from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
+from opentrons_hardware.drivers.gpio import RemoteOT3GPIO
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
+    MotorUsageValueType,
     NodeId,
     SensorId,
 )
@@ -282,7 +282,7 @@ class OT3Controller(FlexBackend):
 
     _initialized: bool
     _messenger: CanMessenger
-    _usb_messenger: Optional[BinaryMessenger]
+    _usb_messenger: BinaryMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -293,7 +293,6 @@ class OT3Controller(FlexBackend):
     async def build(
         cls,
         config: OT3Config,
-        use_usb_bus: bool = False,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3Controller:
@@ -306,15 +305,13 @@ class OT3Controller(FlexBackend):
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        usb_driver = None
-        if use_usb_bus:
-            try:
-                usb_driver = await build_rear_panel_driver()
-            except IOError as e:
-                log.error(
-                    "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
-                )
-                raise e
+        try:
+            usb_driver = await build_rear_panel_driver()
+        except IOError as e:
+            log.error(
+                "No rear panel device found, probably an EVT bot, Downgrade to v9.1.2 or lower and disable rearPanelIntegration feature flag if it is"
+            )
+            raise e
         inst = cls(
             config,
             driver=driver,
@@ -329,7 +326,7 @@ class OT3Controller(FlexBackend):
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
-        usb_driver: Optional[SerialUsbDriver] = None,
+        usb_driver: SerialUsbDriver,
         eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
@@ -480,18 +477,14 @@ class OT3Controller(FlexBackend):
     @staticmethod
     def _build_system_hardware(
         can_messenger: CanMessenger,
-        usb_driver: Optional[SerialUsbDriver],
+        usb_driver: SerialUsbDriver,
         eeprom_driver: Optional[EEPROMDriver],
     ) -> SystemDrivers:
-        gpio = OT3GPIO("hardware_control")
-        eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
+        usb_messenger = BinaryMessenger(usb_driver)
+        usb_messenger.start()
+        gpio_dev = RemoteOT3GPIO(usb_messenger, "hardware_control")
+        eeprom_driver = eeprom_driver or EEPROMDriver(gpio_dev)
         eeprom_driver.setup()
-        gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
-        usb_messenger: Optional[BinaryMessenger] = None
-        if usb_driver:
-            usb_messenger = BinaryMessenger(usb_driver)
-            usb_messenger.start()
-            gpio_dev = RemoteOT3GPIO(usb_messenger)
         return SystemDrivers(
             can_messenger,
             gpio_dev,
@@ -506,6 +499,28 @@ class OT3Controller(FlexBackend):
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
         return motor_nodes(self._subsystem_manager.targets)
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[List[Axis]] = None
+    ) -> Dict[Axis, Dict[str, int]]:
+        """Request and return motor usage data."""
+        parsed_responses: Dict[Axis, Dict[str, int]] = {}
+        expected = None
+        if expected_axes:
+            expected = set([axis_to_node(axis) for axis in expected_axes])
+        usage_data = await self._subsystem_manager.get_motor_usage_data(expected)
+
+        motor_usage_payload = {
+            node_to_axis(node): usage_data[node] for node in usage_data
+        }
+        for ax in motor_usage_payload.keys():
+            usage_elements = motor_usage_payload[ax].payload.usage_elements
+            parsed_responses[ax] = {
+                MotorUsageValueType(el.key).name: el.usage_value
+                for el in usage_elements
+            }
+
+        return parsed_responses
 
     async def update_firmware(
         self,
@@ -567,7 +582,7 @@ class OT3Controller(FlexBackend):
         return hold_currents
 
     @property
-    def gpio_chardev(self) -> Union[OT3GPIO, RemoteOT3GPIO]:
+    def gpio_chardev(self) -> RemoteOT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -1479,6 +1494,10 @@ class OT3Controller(FlexBackend):
         """
         await self._subsystem_manager.refresh()
 
+    def set_subsystem_event_callback(self, event_callback: Callable[[], None]) -> None:
+        """Set the event callback to be used for network connection notifications on the subsystem manager."""
+        self._subsystem_manager.set_event_callback(event_callback)
+
     def axis_is_present(self, axis: Axis) -> bool:
         try:
             return axis_to_node(axis) in self._motor_nodes()
@@ -1661,37 +1680,29 @@ class OT3Controller(FlexBackend):
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.deactivate_estop()
         else:
-            self._gpio_dev.deactivate_estop()
+            await self._gpio_dev.deactivate_estop()
 
     async def engage_estop(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.activate_estop()
         else:
-            self._gpio_dev.activate_estop()
+            await self._gpio_dev.activate_estop()
 
     async def release_sync(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.deactivate_nsync_out()
         else:
-            self._gpio_dev.deactivate_nsync_out()
+            await self._gpio_dev.deactivate_nsync_out()
 
     async def engage_sync(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.activate_nsync_out()
         else:
-            self._gpio_dev.activate_nsync_out()
+            await self._gpio_dev.activate_nsync_out()
 
     async def door_state(self) -> DoorState:
         door_open = await get_door_state(self._usb_messenger)
@@ -1720,18 +1731,15 @@ class OT3Controller(FlexBackend):
             )
             _module_door_listener(door_state)
 
-        if self._usb_messenger is not None:
-            self._usb_messenger.add_listener(
-                _door_listener,
-                lambda message_id: bool(
-                    message_id == BinaryMessageId.door_switch_state_info
-                ),
-            )
+        self._usb_messenger.add_listener(
+            _door_listener,
+            lambda message_id: bool(
+                message_id == BinaryMessageId.door_switch_state_info
+            ),
+        )
 
     async def build_estop_detector(self) -> bool:
         """Must be called to set up the estop detector & state machine."""
-        if self._drivers.usb_messenger is None:
-            return False
         self._estop_detector = await EstopDetector.build(
             usb_messenger=self._drivers.usb_messenger
         )

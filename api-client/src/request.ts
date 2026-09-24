@@ -19,6 +19,9 @@ export const DEFAULT_HEADERS = {
   'Opentrons-Version': '3',
 }
 
+const FORM_URLENCODED_CONTENT_TYPE =
+  'application/x-www-form-urlencoded;charset=utf-8'
+
 export const GET = 'GET'
 export const POST = 'POST'
 export const PATCH = 'PATCH'
@@ -61,7 +64,7 @@ export interface RequestConfig<
 
   /**
    * If true, this request will always use HTTPS, never HTTP.
-   * (Unless it's to localhost, in which case it may still use HTTP.)
+   * (Unless the host is a local transport, loopback or USB, which always uses HTTP.)
    *
    * This must be set to true whenever a request carries secrets. For example, if
    * the request is to change a user's password, this needs to be true to avoid
@@ -94,11 +97,22 @@ export function request<
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
   const userNotesHeader =
     requestConfig?.userNotes != null
-      ? { 'Opentrons-User-Notes': requestConfig.userNotes }
+      ? // encodeURI() is nominally for URIs, and this is a header, not a URI.
+        // But encodeURI() is sufficient for percent-encoding all the characters
+        // that would be invalid in a header.
+        { 'Opentrons-User-Notes': encodeURI(requestConfig.userNotes) }
       : {}
   const extraHeaders = requestConfig?.headers ?? {}
+  const body = requestConfig?.body
+  const urlEncodedBody =
+    body instanceof URLSearchParams ? body.toString() : null
+  const urlEncodedHeaders =
+    urlEncodedBody != null
+      ? { 'Content-Type': FORM_URLENCODED_CONTENT_TYPE }
+      : {}
   const headers = {
     ...DEFAULT_HEADERS,
+    ...urlEncodedHeaders,
     ...tokenHeader,
     ...userNotesHeader,
     ...extraHeaders,
@@ -108,29 +122,40 @@ export function request<
     'Authorization' in headers ||
     (requestConfig?.requiresSecureTransport ?? false)
 
-  const protocol =
-    (secure ?? false) || (requiresSecureTransport && !isLocalhost(hostConfig))
+  // USB is an HTTP-only serial tunnel and loopback is on-robot. Neither can
+  // (or should) speak TLS, even when a token or requiresSecureTransport is set.
+  const protocol = isLocalTransport(hostConfig)
+    ? 'http'
+    : (secure ?? false) || requiresSecureTransport
       ? 'https'
       : 'http'
   const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
-  const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
+  const portToUse = port
+    ? port === DEFAULT_PORT && protocol === 'https'
+      ? DEFAULT_HTTPS_PORT
+      : port
+    : defaultPort
+
+  const baseURL = `${protocol}://${hostname}:${portToUse}`
 
   return requestor<ResponseBodyT>({
     method,
     baseURL,
     url,
     params,
-    data: requestConfig?.body,
+    data: urlEncodedBody ?? body,
     headers,
     responseType: requestConfig?.responseType,
   })
 }
 
-function isLocalhost(hostConfig: HostConfig): boolean {
+function isLocalTransport(hostConfig: HostConfig): boolean {
   return (
     hostConfig.hostname === 'localhost' ||
     hostConfig.hostname === '127.0.0.1' ||
-    hostConfig.hostname === '::1'
+    hostConfig.hostname === '::1' ||
+    // Must match OPENTRONS_USB in app/src/redux/discovery/constants.ts.
+    hostConfig.hostname === 'opentrons-usb'
   )
 }

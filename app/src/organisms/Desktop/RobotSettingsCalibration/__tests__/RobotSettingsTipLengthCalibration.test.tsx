@@ -10,13 +10,13 @@ import {
   mockTipLengthCalibration3,
 } from '/app/redux/calibration/tip-length/__fixtures__'
 import { useFeatureFlag } from '/app/redux/config'
-import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import { useAttachedPipettes } from '/app/resources/instruments'
+import { mockAttachedPipette } from '/app/resources/instruments/__fixtures__'
 
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 vi.mock('/app/redux/config')

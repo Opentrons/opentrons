@@ -8,6 +8,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 
+import type { ReactNode } from 'react'
+
 const SETTING_TILE = [1, 2, 3, 4]
 // Each tile adjusts the setting by 25%.
 const TILE_VALUE = 25
@@ -30,7 +32,7 @@ export function CameraTileSetting({
   subtext,
   adjustValue,
   isLoading,
-}: CameraTileSettingProps): JSX.Element {
+}: CameraTileSettingProps): ReactNode {
   const adjustedValue = roundValueToValidPercentage(value)
 
   // We intentionally avoid adjusting pre-existing values to a number divisible
@@ -82,7 +84,7 @@ export function CameraTileSetting({
   )
 }
 
-function SettingTile({ isActive }: { isActive: boolean }): JSX.Element {
+function SettingTile({ isActive }: { isActive: boolean }): ReactNode {
   return (
     <div
       className={clsx(

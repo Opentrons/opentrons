@@ -14,6 +14,7 @@ stages:
       json:
         data:
           publicKeyPem: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n"
+          hashedKey: 'sha256:7joao5sCagU94b_QvDskeDWJGikWPJJdsrlG6kSuWiI='
   - name: Get message signature with a none hash
     request:
       method: POST

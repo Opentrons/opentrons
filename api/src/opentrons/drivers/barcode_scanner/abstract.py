@@ -33,6 +33,11 @@ class AbstractBarcodeScannerDriver(ABC):
         """Set how long to run the decoder before timing out."""
         ...
 
+    # Scan barcode currently returns an optional instead of raising an error, this is due to a lack
+    # of error recovery in the engine for now, being an unsupported product.
+    # in order to have any kind of non-protocol-killing recovery we need to return None here from
+    # a failure so the protocol can handle it on it's own.
+    # TODO: make this raise an error if we implement error recovery in the engine.
     @abstractmethod
     async def scan_barcode(self) -> Optional[str]:
         """Scan and return a barcode."""

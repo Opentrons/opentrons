@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
@@ -20,6 +20,7 @@ import type {
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { IconName, IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -55,7 +56,7 @@ export interface ToastProps extends StyleProps {
 
 export const TOAST_ANIMATION_DURATION = 500
 
-export function Toast(props: ToastProps): JSX.Element {
+export function Toast(props: ToastProps): ReactNode {
   const {
     buttonText,
     message,
@@ -70,6 +71,7 @@ export function Toast(props: ToastProps): JSX.Element {
     exitNow = false,
     linkText,
     onLinkClick = () => null,
+    zIndex,
     ...styleProps
   } = props
   const [isClosed, setIsClosed] = useState<boolean>(exitNow)
@@ -257,27 +259,37 @@ export function Toast(props: ToastProps): JSX.Element {
     return combinedDuration
   }
 
+  const isClosingRef = useRef<boolean>(false)
+  const animationTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
   // Handle dismissal of toast when no timer is set.
-  const onCloseHandler = (): void => {
+  const onCloseHandler = useCallback((): void => {
+    if (isClosingRef.current) return
+    isClosingRef.current = true
     setIsClosed(true)
-    setTimeout(() => {
-      onClose?.()
+    animationTimerRef.current = setTimeout(() => {
+      onCloseRef.current?.()
     }, TOAST_ANIMATION_DURATION - 50)
-  }
+  }, [])
 
   const isAutomaticAnimationExit = !disableTimeout || exitNow
+  const autoCloseDelay = calculatedDuration(message, headingText, duration)
 
-  if (isAutomaticAnimationExit) {
-    setTimeout(
-      () => {
-        setIsClosed(true)
-        setTimeout(() => {
-          onClose?.()
-        }, TOAST_ANIMATION_DURATION - 50)
-      },
-      calculatedDuration(message, headingText, duration)
-    )
-  }
+  useEffect(() => {
+    if (!isAutomaticAnimationExit) return
+    const closeTimer = setTimeout(onCloseHandler, autoCloseDelay)
+    return () => {
+      clearTimeout(closeTimer)
+    }
+  }, [isAutomaticAnimationExit, autoCloseDelay, onCloseHandler])
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(animationTimerRef.current)
+    }
+  }, [])
 
   // Require intentional clicking if links and close button present on toast.
   const toastClose = (): void => {
@@ -334,12 +346,12 @@ export function Toast(props: ToastProps): JSX.Element {
           flexDirection={showODDStyle ? DIRECTION_ROW : DIRECTION_COLUMN}
           overflow="hidden"
           width={showODDStyle ? 'auto' : '100%'}
+          gap={showODDStyle ? SPACING.spacing4 : undefined}
         >
           {headingText.length > 0 ? (
             <StyledText
               oddStyle="bodyTextSemiBold"
-              desktopStyle="bodyDefaultRegular"
-              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
+              desktopStyle="bodyDefaultSemiBold"
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
@@ -350,11 +362,11 @@ export function Toast(props: ToastProps): JSX.Element {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
-              oddStyle="bodyTextSemiBold"
+              oddStyle="bodyTextRegular"
               desktopStyle="bodyDefaultRegular"
               overflow="hidden"
-              text-overflow="ellipsis"
-              white-space="nowrap"
+              textOverflow="ellipsis"
+              whiteSpace={NO_WRAP}
             >
               {message}
             </StyledText>
@@ -363,7 +375,7 @@ export function Toast(props: ToastProps): JSX.Element {
       </Flex>
 
       <Flex alignItems={ALIGN_CENTER}>
-        {linkText ? (
+        {linkText !== undefined ? (
           <Link
             role="button"
             onClick={() => {
@@ -395,7 +407,7 @@ export function Toast(props: ToastProps): JSX.Element {
             </StyledText>
           </Link>
         ) : null}
-        {closeText ? (
+        {closeText !== null ? (
           <Link
             role="button"
             onClick={() => {

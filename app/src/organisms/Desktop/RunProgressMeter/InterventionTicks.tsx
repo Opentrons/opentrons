@@ -2,6 +2,7 @@ import last from 'lodash/last'
 
 import { Tick } from './Tick'
 
+import type { ReactNode } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 // percent of the entire analysis that two individual
@@ -12,7 +13,7 @@ interface InterventionTicksProps {
   analysisCommands: RunTimeCommand[]
   makeHandleJumpToStep: (index: number) => () => void
 }
-export function InterventionTicks(props: InterventionTicksProps): JSX.Element {
+export function InterventionTicks(props: InterventionTicksProps): ReactNode {
   const { analysisCommands, makeHandleJumpToStep } = props
 
   // calculate the number of adjacent commands that will appear as separate ticks

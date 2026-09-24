@@ -15,7 +15,7 @@ import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOn
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { DeckViewStacker } from './DeckViewStacker'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   DeckDefinition,
@@ -38,10 +38,11 @@ interface DeckViewModulesProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
 
-export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
+export function DeckViewModules(props: DeckViewModulesProps): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -51,6 +52,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
     setHoveredSlot,
     setSelectedSlot,
     hoveredSlot,
+    selectedSlot,
     labwareEntitiesExtended,
     selectedRunTimeCommand,
   } = props
@@ -140,6 +142,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                   labwareLoadedOnModuleId={labwareLoadedOnModuleId}
                   showModuleCommandSummary={showModuleCommandSummary}
                   hoveredSlot={hoveredSlot}
+                  selectedSlot={selectedSlot}
                   labwareEntitiesExtended={labwareEntitiesExtended}
                   selectedRunTimeCommand={selectedRunTimeCommand}
                   renderLabware={!isThermocyclerLidClosed}
@@ -166,6 +169,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
+                selectedSlot={selectedSlot}
               />
             </Module>
           </Fragment>

@@ -381,14 +381,13 @@ export function getPositionFromSlotId(
   //  the hopper doesn't have its own AddressableAreaName
   hopperAdjustedOffset?: number
 ): CoordinateTuple | null {
-  const cutoutWithSlot =
-    deckDef.robot.model === FLEX_ROBOT_TYPE
-      ? FLEX_CUTOUT_BY_SLOT_ID[slotId]
-      : OT2_CUTOUT_BY_SLOT_ID[slotId]
+  const cutoutWithSlot = getCutoutIdForSlotOrAddressableArea(slotId, deckDef)
 
   const cutoutPosition =
-    deckDef.locations.cutouts.find(cutout => cutout.id === cutoutWithSlot)
-      ?.position ?? null
+    cutoutWithSlot != null
+      ? (deckDef.locations.cutouts.find(cutout => cutout.id === cutoutWithSlot)
+          ?.position ?? null)
+      : null
 
   // adjust for offset from cutout
   const offsetFromCutoutFixture = getAddressableAreaFromSlotId(slotId, deckDef)
@@ -406,6 +405,41 @@ export function getPositionFromSlotId(
       : null
 
   return slotPosition
+}
+
+/**
+ * Resolve the cutout that hosts a slot or addressable area.
+ *
+ * Standard single/staging slots are looked up via the hard-coded maps.
+ * Module-specific addressable areas (e.g. vacuumModuleV1DockA4) are not in those
+ * maps, so fall back to finding which cutout fixture provides the AA in the deck def.
+ * Without this, labware on the vacuum module dock resolves to null coordinates and
+ * MoveLabwareOnDeck animates it from off-deck.
+ */
+function getCutoutIdForSlotOrAddressableArea(
+  slotId: string,
+  deckDef: DeckDefinition
+): CutoutId | OT2CutoutId | null {
+  const fromSlotMap: CutoutId | OT2CutoutId | undefined =
+    deckDef.robot.model === FLEX_ROBOT_TYPE
+      ? FLEX_CUTOUT_BY_SLOT_ID[slotId]
+      : OT2_CUTOUT_BY_SLOT_ID[slotId]
+
+  if (fromSlotMap != null) {
+    return fromSlotMap
+  }
+
+  // Module addressable areas (vacuum dock, stacker shuttle, etc.)
+  for (const cutoutFixture of deckDef.cutoutFixtures) {
+    const match = Object.entries(cutoutFixture.providesAddressableAreas).find(
+      ([_, providedAAs]) => (providedAAs as string[]).includes(slotId)
+    )
+    if (match != null) {
+      return match[0] as CutoutId
+    }
+  }
+
+  return null
 }
 
 export function getPositionFromAddressableAreaId(args: {

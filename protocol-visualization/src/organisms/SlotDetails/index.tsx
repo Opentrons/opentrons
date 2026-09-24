@@ -7,11 +7,12 @@ import {
 
 import { SlotDetailsEmptyState } from '../../molecules/SlotDetailsEmptyState'
 import { ModuleContainer } from '../ModuleContainer'
-import { LabwareSlot } from '../SecondWindow/LabwareSlot'
-import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
-import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
+import { LabwareSlot } from '../SlotSpotlight/LabwareSlot'
+import { TipDisposalSlot } from '../SlotSpotlight/TipDisposalSlot'
+import { TipPickupSlot } from '../SlotSpotlight/TipPickupSlot'
 import styles from './slotdetails.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   LoadLabwareRunTimeCommand,
@@ -31,7 +32,7 @@ interface SlotDetailsProps {
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
-export function SlotDetails(props: SlotDetailsProps): JSX.Element {
+export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {
@@ -96,13 +97,13 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     if (topMostLabwareOnSlot == null) {
       return null
     }
-    if (isTopmostLabwareATiprack === true) {
+    if (isTopmostLabwareATiprack) {
       return 'tiprack'
     }
     return 'labware'
   }
 
-  const renderLabwareContent = (): JSX.Element | null => {
+  const renderLabwareContent = (): ReactNode | null => {
     const labwareType = getLabwareType()
     if (topMostLabwareOnSlot == null) {
       return null
@@ -123,7 +124,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             commands={commands}
             liquids={liquids}
             robotState={robotState}
-            moduleEntities={moduleEntities}
           />
         )
       default:
@@ -135,24 +135,18 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     <>
       {isSlotEmpty ? (
         <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState slotId={slotId} />
+          <SlotDetailsEmptyState />
         </div>
       ) : null}
       <div className={styles.slot_container}>
         <div className={styles.slot_details}>
           {renderLabwareContent()}
-          {disposalType != null ? (
-            <TipDisposalSlot
-              robotState={robotState}
-              disposalType={disposalType}
-            />
-          ) : null}
+          {disposalType != null ? <TipDisposalSlot /> : null}
           {moduleOnSlot != null ? (
             <ModuleContainer
               moduleId={moduleOnSlot[0]}
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
-              slotId={mappedSlot}
             />
           ) : null}
         </div>

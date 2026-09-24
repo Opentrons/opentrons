@@ -26,10 +26,10 @@ import {
   openPythonInterpreterDirectory,
 } from '/app/redux/protocol-analysis'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function OverridePathToPython(): JSX.Element {
+export function OverridePathToPython(): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const pathToPythonInterpreter = useSelector(getPathToPythonOverride)
   const dispatch = useDispatch<Dispatch>()
@@ -51,7 +51,6 @@ export function OverridePathToPython(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_overridePathToPython"
         >
           {t('override_path_to_python')}
         </LegacyStyledText>
@@ -72,7 +71,6 @@ export function OverridePathToPython(): JSX.Element {
             css={TYPOGRAPHY.pRegular}
             color={COLORS.black90}
             onClick={() => dispatch(openPythonInterpreterDirectory())}
-            id="AdvancedSettings_sourceFolderLinkPython"
           >
             {pathToPythonInterpreter}
             <Icon
@@ -93,7 +91,6 @@ export function OverridePathToPython(): JSX.Element {
           onClick={() =>
             dispatch(resetConfigValue('python.pathToPythonOverride'))
           }
-          id="AdvancedSettings_changePythonInterpreterSource"
         >
           {t('reset_to_default')}
         </TertiaryButton>
@@ -101,7 +98,6 @@ export function OverridePathToPython(): JSX.Element {
         <TertiaryButton
           marginLeft={SPACING_AUTO}
           onClick={handleClickPythonDirectoryChange}
-          id="AdvancedSettings_changePythonInterpreterSource"
         >
           {t('add_override_path')}
         </TertiaryButton>

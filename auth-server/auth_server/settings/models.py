@@ -5,6 +5,11 @@ from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
 
+AUTH_SERVER_AUDIT_SYSTEM_NAME = "system"
+AUTH_SERVER_AUDIT_SYSTEM_FULLNAME = "authentication subsystem"
+SECONDS_PER_DAY = 24 * 60 * 60
+MIN_PASSWORD_RESET_TIME_SEC = SECONDS_PER_DAY
+
 
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
@@ -20,15 +25,22 @@ class SettingsResponseData(_StrictBaseModel):
 
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
+        ge=1,
+        le=5,
         description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
     )
     passwordResetTime: float | None = pydantic.Field(
         default=None,
-        description="Duration in seconds until password must be changed. Set to null to remove the limit.",
+        ge=MIN_PASSWORD_RESET_TIME_SEC,
+        description=(
+            "Duration in seconds until password must be changed. "
+            f"Must be at least {MIN_PASSWORD_RESET_TIME_SEC} (1 day). "
+            "Set to null to remove the limit."
+        ),
     )
     passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
-        description="Minimum length of password. Set to null to remove the limit.",
+        description="Minimum length of passwords, measured in Unicode codepoints. Set to null to remove the length requirement.",
     )
     passwordComplexitySpecialCharacters: bool | None = pydantic.Field(
         default=None,
@@ -37,14 +49,6 @@ class SettingsResponseData(_StrictBaseModel):
     idleLogout: float = pydantic.Field(
         default=180.0,
         description="Duration in seconds until account is logged out due to inactivity.",
-    )
-    requireReasonForInteraction: bool = pydantic.Field(
-        default=True,
-        description="Require reason for interaction.",
-    )
-    minLengthOfReasonForInteraction: int | None = pydantic.Field(
-        default=None,
-        description="Minimum length of reason for interaction. Set to null to remove the requirement.",
     )
     requireAdminCredsWhenUpdatingRobotSoftware: bool = pydantic.Field(
         default=True,
@@ -70,18 +74,27 @@ class PatchSettingsRequestData(_StrictBaseModel):
     maxNumberOfLoginAttempts: Annotated[
         int | None,
         pydantic.Field(
-            description="Max number of login attempts before account deactivation."
+            ge=1,
+            le=5,
+            description="Max number of login attempts before account deactivation.",
         ),
     ] = None
     passwordResetTime: Annotated[
         float | None,
         pydantic.Field(
-            description="Duration in seconds until password must be changed."
+            ge=MIN_PASSWORD_RESET_TIME_SEC,
+            description=(
+                "Duration in seconds until password must be changed. "
+                f"Must be at least {MIN_PASSWORD_RESET_TIME_SEC} (1 day). "
+                "Set to null to remove the limit."
+            ),
         ),
     ] = None
     passwordComplexityMinimumLength: Annotated[
         int | None,
-        pydantic.Field(description="Minimum length of password."),
+        pydantic.Field(
+            description="Minimum length of passwords, measured in Unicode codepoints. Set to null to remove the length requirement."
+        ),
     ] = None
     passwordComplexitySpecialCharacters: Annotated[
         bool | None,
@@ -109,14 +122,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
         bool | None,
         pydantic.Field(description="Require admin credentials for signoff protocol."),
     ] = None
-    requireReasonForInteraction: Annotated[
-        bool | None,
-        pydantic.Field(description="Require reason for interaction."),
-    ] = None
-    minLengthOfReasonForInteraction: Annotated[
-        int | None,
-        pydantic.Field(description="Minimum length of reason for interaction."),
-    ] = None
 
     _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
         {
@@ -125,7 +130,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
             "requireAdminCredsWhenUpdatingRobotSoftware",
             "requireAdminCredsWhenSendingProtocolToRobot",
             "requireAdminCredsForSignoffProtocol",
-            "requireReasonForInteraction",
         }
     )
 
@@ -158,15 +162,13 @@ class AccessControlResponseData(pydantic.BaseModel):
     accessControlEnabled: Annotated[
         bool,
         pydantic.Field(
-            description=dedent(
-                """\
+            description=dedent("""\
                 When enabled, authorization is enforced throughout the robot's HTTP APIs.
                 Protected endpoints are blocked unless the request carries an
                 OAuth 2 access token with the appropriate scopes. See the `/auth/oauth2`
                 endpoints.
 
                 When disabled (the default), all endpoints allow unauthenticated access.
-                """
-            )
+                """)
         ),
     ]

@@ -1,6 +1,6 @@
 .exit_button {
   color: var(--grey-50);
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
   text-transform: capitalize;
@@ -11,7 +11,7 @@
 }
 
 .text {
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
 }

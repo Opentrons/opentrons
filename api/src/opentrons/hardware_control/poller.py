@@ -1,15 +1,38 @@
 import asyncio
 import contextlib
+import errno
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
 
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
+
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
-from opentrons.drivers.asyncio.communication.errors import SerialException
+from opentrons.drivers.asyncio.communication.errors import (
+    FailedCommand,
+    SerialException,
+)
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 
 log = logging.getLogger(__name__)
+
+_EXPECTED_DISCONNECT_ERRNOS = {errno.EIO, errno.ENODEV, errno.ENXIO}
+
+
+def _is_expected_disconnect_io_error(exc: BaseException) -> bool:
+    """Return whether ``exc`` is a typical unplug / vanished-port I/O error."""
+    if isinstance(exc, PySerialSerialException):
+        return True
+    if isinstance(exc, OSError) and exc.errno in _EXPECTED_DISCONNECT_ERRNOS:
+        return True
+    try:
+        import termios
+    except ImportError:
+        return False
+    return isinstance(exc, termios.error)
 
 
 class Reader(ABC):
@@ -68,6 +91,26 @@ class Poller:
         self._poll_waiters.append(poll_future)
         await poll_future
 
+    async def wait_next_good_poll(self, retries: int = 4) -> None:
+        """Wait for the next good poll to complete.
+
+        If called in the middle of a read, it will not return until
+        the next complete read. If a read raises an exception,
+        it will retry retries number of time before the exception is
+        passed through to `wait_next_good_poll`.
+        """
+        for r in range(retries):
+            try:
+                await self.wait_next_poll()
+                return
+            except BaseException:
+                if r < (retries - 1):
+                    log.error(f"Got error waiting for next poll {r} or {retries}")
+                    await asyncio.sleep(self.interval)
+                    pass
+                else:
+                    raise
+
     @contextlib.asynccontextmanager
     async def _use_read_lock(self) -> AsyncGenerator[None, None]:
         self._read_lock = self._read_lock or asyncio.Lock()
@@ -93,8 +136,14 @@ class Poller:
     def _error_callback(self, exc: Exception) -> None:
         try:
             self._reader.on_error(exc)
-        except Exception:
-            log.exception("Exception in reader callback")
+        except Exception as callback_error:
+            if _is_expected_disconnect_io_error(callback_error):
+                log.warning(
+                    "Reader cleanup failed after serial disconnect: %s",
+                    callback_error,
+                )
+            else:
+                log.exception("Exception in reader callback")
 
     def _complete_all(
         self, exc: Exception | None, previous: List["asyncio.Future[None]"]
@@ -116,8 +165,12 @@ class Poller:
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)
             self._complete_all(e, previous_waiters)
-        except SerialException as se:
-            log.error(f"Polling gcode error: {se}")
+        except FailedCommand as se:
+            log.info("Module reported an error during poll: %s", se)
+            self._error_callback(se)
+            self._complete_all(se, previous_waiters)
+        except (SerialException, PySerialSerialException) as se:
+            log.warning("Polling failed: %s", se)
             self._error_callback(se)
             self._complete_all(se, previous_waiters)
         except Exception as e:

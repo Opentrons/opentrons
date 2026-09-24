@@ -1,5 +1,7 @@
 import { ProtocolEditor } from './ProtocolEditor'
 
-export function App(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function App(): ReactNode {
   return <ProtocolEditor />
 }

@@ -27,6 +27,10 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -65,9 +69,6 @@ if TYPE_CHECKING:
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
-# Gauge pressure range for vacuum module
-MAX_GAUGE_PRESSURE_MBAR = 0
-MIN_GAUGE_PRESSURE_MBAR = -800
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -133,6 +134,21 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
     def get_min_gauge_pressure_mbar(self) -> int:
         """Get the min allowed gauge pressure in mbar."""
         return MIN_GAUGE_PRESSURE_MBAR
+
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        inject = getattr(
+            self._sync_module_hardware, "inject_async_gcode_response", None
+        )
+        if inject is None:
+            raise NotImplementedError(
+                f"inject_async_gcode_response is not supported by {self.get_model()}"
+            )
+        inject(gcode_response=gcode_response, command=command)
 
 
 class NonConnectedModuleCore(AbstractModuleCore[LabwareCore]):
@@ -1182,19 +1198,26 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+        equalize_timeout_s: Optional[int] = None,
+    ) -> EngineTaskCore:
         """Set vacuum pressure."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPressureParams(
                 moduleId=self.module_id,
                 gaugePressure=gauge_pressure_mbar,
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
+
+        start_pressure_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_pressure_task
 
     def start_set_vacuum_power(
         self,
@@ -1203,19 +1226,26 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+        equalize_timeout_s: Optional[int] = None,
+    ) -> EngineTaskCore:
         """Set vacuum power."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPowerParams(
                 moduleId=self.module_id,
                 percentPower=percent_power,
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
+
+        start_power_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_power_task
 
     def stop_vacuum(
         self,
@@ -1267,6 +1297,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         steps: List[VacuumModuleStep],
         repetitions: int,
         vent_after: bool = False,
+        equalize_timeout_s: Optional[int] = None,
     ) -> EngineTaskCore:
         """Start the execution of a vacuum module profile and return a task."""
         self._repetitions = repetitions
@@ -1276,7 +1307,10 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartRunProfileParams(
-                moduleId=self.module_id, profile=engine_steps, ventAfter=vent_after
+                moduleId=self.module_id,
+                profile=engine_steps,
+                ventAfter=vent_after,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
@@ -1285,21 +1319,17 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         return start_execute_profile_result
 
-    def open_vent(self) -> None:
+    def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
         self._engine_client.execute_command(
-            cmd.vacuum_module.OpenVentParams(moduleId=self.module_id),
+            cmd.vacuum_module.OpenVentParams(
+                moduleId=self.module_id,
+                equalizeTimeout=equalize_timeout_s,
+            ),
             command_annotations=self._protocol_core.annotation_ids,
         )
 
     def close_vent(self) -> None:
         self._engine_client.execute_command(
             cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
-        )
-
-    def wait_for_target(self) -> None:
-        """Wait until the module's pressure or pwm is reached."""
-        self._engine_client.execute_command(
-            cmd.vacuum_module.WaitForTargetParams(moduleId=self.module_id),
             command_annotations=self._protocol_core.annotation_ids,
         )

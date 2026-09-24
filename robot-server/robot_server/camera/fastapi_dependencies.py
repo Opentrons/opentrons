@@ -39,6 +39,7 @@ async def get_camera_provider(
     camera_provider = CameraProvider(
         camera_settings_callback=camera_provider_wrapper.get_camera_settings,
         image_capture_callback=camera_provider_wrapper.process_image_capture,
+        update_live_stream_status=camera_provider_wrapper.update_live_stream_status,
     )
     register_camera_provider_to_pyro_resource(app_state, camera_provider)
     return camera_provider

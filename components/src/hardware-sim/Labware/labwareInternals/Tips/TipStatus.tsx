@@ -13,6 +13,7 @@ import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
 import { UsedTip } from './UsedTip'
 
+import type { ReactNode } from 'react'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
@@ -24,7 +25,7 @@ interface TipStatusProps {
   text?: string
 }
 
-export function TipStatus(props: TipStatusProps): JSX.Element {
+export function TipStatus(props: TipStatusProps): ReactNode {
   const { type, size, text, wellMap, wellName } = props
   switch (type) {
     case NEW:

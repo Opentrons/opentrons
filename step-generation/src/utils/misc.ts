@@ -13,11 +13,13 @@ import {
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
+  getIsLid,
   getIsTiprack,
   getLabwareDefURI,
   getMaxPoolCount,
   getMmFromBottom,
   getWellNamePerMultiTip,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -50,12 +52,13 @@ import {
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
   VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators, uuid } from './index'
+import { OFF_DECK, reduceCommandCreators, uuid } from './index'
 
 import type {
   ActiveNozzleNumber,
@@ -89,6 +92,7 @@ import type {
   PathOption,
   PipetteEntity,
   RobotState,
+  RuntimeParameters,
   SourceAndDest,
   StagingAreaEntities,
   TrashBinEntities,
@@ -103,6 +107,10 @@ export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
   return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
+}
+
+const getIsVacuumCollar = (def: LabwareDefinition2): boolean => {
+  return (def.parameters.quirks ?? []).includes('vacuumModuleDock')
 }
 
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
@@ -911,6 +919,13 @@ export const getSlotInLocationStack = (
   }
 }
 
+export const getModuleLocationSlot = (moduleSlot: string): string => {
+  if (moduleSlot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA) {
+    return VACUUM_DOCK_DISPLAY_LOCATION
+  }
+  return moduleSlot
+}
+
 export const getTopLocationInStack = (stack?: string[]): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
@@ -923,16 +938,34 @@ export const getTopLocationInStack = (stack?: string[]): string => {
 export const getNearestParentInStack = (stack: string[]): string | null =>
   stack.length >= 2 ? stack[1] : null
 
-export const getLargestStackInSlot = (
-  labwareState: RobotState['labware'],
+export const getLargestStackInSlot = (args: {
   slot: string
-): string[] =>
-  Object.values(labwareState).reduce<string[]>((acc, { stack }) => {
+  labwareState: RobotState['labware']
+  modulesState: RobotState['modules']
+}): string[] => {
+  const { slot, labwareState, modulesState } = args
+  const stackerEntry = Object.values(modulesState).find(
+    ({ slot: moduleSlot, moduleState }) =>
+      moduleSlot === slot && moduleState.type === FLEX_STACKER_MODULE_TYPE
+  )
+  if (stackerEntry != null) {
+    const shuttleGroup = (stackerEntry.moduleState as FlexStackerModuleState)
+      .labwareOnShuttle
+    if (shuttleGroup == null) return []
+    const shuttleIdsTopDown = [
+      shuttleGroup.lidLabwareId,
+      shuttleGroup.primaryLabwareId,
+      shuttleGroup.adapterLabwareId,
+    ].filter((id): id is string => id != null)
+    return shuttleIdsTopDown
+  }
+  return Object.values(labwareState).reduce<string[]>((acc, { stack }) => {
     if (stack[stack.length - 1] === slot && stack.length > acc.length) {
       acc = stack
     }
     return acc
   }, [])
+}
 
 /** Single-slot deck id (e.g. A3) for a staging-area slot (e.g. A4) on Flex. */
 export const getFlexStackerCutoutBaseDeckSlotId = (
@@ -1086,6 +1119,11 @@ export const getIsLabwareCompatibleWithStack = (
     const isLidRole = allowedRoles.includes('lid')
 
     const isVacuumSpacer = getIsVacuumSpacer(topLabwareEntity.def)
+    const isOccupiedByCollar = stack.some(
+      entityId =>
+        entityId in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[entityId].def)
+    )
     const movingLabwareIsCollar =
       movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
       false
@@ -1101,7 +1139,7 @@ export const getIsLabwareCompatibleWithStack = (
           false
         )) ||
       // vacuum spacer: same rules as the main module area — only collars and filter plates
-      (isVacuumSpacer && movingLabwareIsCollar) ||
+      (!isOccupiedByCollar && movingLabwareIsCollar) ||
       // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
       ((topLabwareEntity.def.parameters.quirks?.includes(
         'providesStackingDefault'
@@ -1547,18 +1585,6 @@ export function createStagingAreaForInvariantContext(
   return {}
 }
 
-export const getLabwareIdOnHopper = (
-  labware: {
-    [labwareId: string]: LabwareTemporalProperties
-  },
-  moduleSlotLocation: string
-): string => {
-  const largestStackInSlot = getLargestStackInSlot(labware, moduleSlotLocation)
-  const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
-  const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
-  return labwareIdOnModule
-}
-
 export const getIsSlotAHopper = (slot: string): boolean => {
   return HOPPER_FAKE_LOCATIONS.includes(slot)
 }
@@ -1626,4 +1652,90 @@ export const getIsSpaceInHopper = (
   const labwareStored = stackerState?.labwareInHopper
   const numberOfLabwareStored = labwareStored?.length ?? 0
   return maximumAllowedLabware > numberOfLabwareStored
+}
+
+export const getLabwareHasLid = (args: {
+  labwareId: string
+  labwareRobotState: RobotState['labware']
+  labwareEntities: LabwareEntities
+}): boolean => {
+  const { labwareId, labwareRobotState, labwareEntities } = args
+  return Object.entries(labwareRobotState).some(
+    ([id, { stackedOnNode }]) =>
+      typeof stackedOnNode === 'object' &&
+      'labwareId' in stackedOnNode &&
+      stackedOnNode.labwareId === labwareId &&
+      getIsLid(labwareEntities[id].def)
+  )
+}
+
+export const getIsInPipettableLocation = (location: string): boolean => {
+  return ![
+    OFF_DECK,
+    GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+    ...COLUMN_4_SLOTS,
+  ].some(badLocation => location === badLocation)
+}
+
+/**
+ * Numbers pass through. Strings are runtime parameter variable names, and only
+ * float/int parameters resolve — `type` narrows `default` to `number`.
+ */
+export function resolveNumericRuntimeValue(
+  value: number | string,
+  runtimeParameters: RuntimeParameters
+): number | null {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (
+    parameter != null &&
+    (parameter.type === 'float' || parameter.type === 'int')
+  ) {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * A string id is literal unless it names a runtime parameter. Only string
+ * parameters resolve — `type` narrows `default` to `string`. Any other
+ * parameter type is invalid.
+ */
+export function resolveStringRuntimeValue(
+  value: string,
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const parameter = runtimeParameters[value]
+  if (parameter == null) {
+    return value
+  }
+  if (parameter.type === 'string') {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * Booleans pass through. Strings are runtime parameter variable names, and only
+ * boolean parameters resolve — `type` narrows `default` to `boolean`.
+ */
+export function resolveBooleanRuntimeValue(
+  value: boolean | string,
+  runtimeParameters: RuntimeParameters
+): boolean | null {
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (parameter != null && parameter.type === 'boolean') {
+    return parameter.default
+  }
+
+  return null
 }

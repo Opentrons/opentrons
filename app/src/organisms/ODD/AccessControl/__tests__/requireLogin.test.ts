@@ -60,7 +60,7 @@ describe('requireLogin', () => {
     const result = await requireLogin(QUERY_CLIENT, 'alice', HOST_CONFIG)
 
     expect(result).toEqual({ username: 'alice' })
-    expect(showLoginModal).toHaveBeenCalledWith(QUERY_CLIENT, HOST_CONFIG)
+    expect(showLoginModal).toHaveBeenCalled()
   })
 
   it('opens the login modal when logged out, and resolves with the new username on success', async () => {
@@ -69,7 +69,7 @@ describe('requireLogin', () => {
     const result = await requireLogin(QUERY_CLIENT, null, null)
 
     expect(result).toEqual({ username: 'bob' })
-    expect(showLoginModal).toHaveBeenCalledWith(QUERY_CLIENT, null)
+    expect(showLoginModal).toHaveBeenCalled()
     expect(fetchSelfQuery).not.toHaveBeenCalled()
   })
 

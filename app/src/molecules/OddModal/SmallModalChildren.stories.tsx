@@ -8,7 +8,7 @@ import type * as React from 'react'
 export default {
   title: 'ODD/Molecules/Modals/SmallModalChildren',
   argTypes: { onClick: { action: 'clicked' } },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

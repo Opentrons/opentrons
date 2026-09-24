@@ -25,7 +25,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof OddModalHeader>> = args => (

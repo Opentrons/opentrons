@@ -979,7 +979,7 @@
       {
         "id": "vacuumModuleV1A3",
         "areaType": "vacuumModule",
-        "offsetFromCutoutFixture": [0, 0, 19.0],
+        "offsetFromCutoutFixture": [0.4, 0, 18.75],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -992,7 +992,7 @@
       {
         "id": "vacuumModuleV1DockA4",
         "areaType": "lidDock",
-        "offsetFromCutoutFixture": [164.0, 0.0, 20.0],
+        "offsetFromCutoutFixture": [159.5, 0.0, 20.0],
         "boundingBox": {
           "xDimension": 128.5,
           "yDimension": 86.5,
@@ -1000,7 +1000,8 @@
         },
         "displayName": "Vacuum Module Dock in A4",
         "features": {},
-        "orientation": "right"
+        "orientation": "right",
+        "$comment": "This value is an eye-test estimate and needs hardware validation."
       }
     ],
     "cutouts": [

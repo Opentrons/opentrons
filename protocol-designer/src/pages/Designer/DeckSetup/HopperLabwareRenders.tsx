@@ -5,7 +5,7 @@ import { HighlightLabware } from '../HighlightLabware'
 import { LabwareControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckSlotId,
   FlexStackerStoredLabwareGroup,
@@ -28,9 +28,7 @@ interface HopperLabwareRendersProps {
   setHoveredLabware: Dispatch<
     SetStateAction<LabwareOnDeckType | null | undefined>
   >
-  setDraggedLabware: Dispatch<
-    SetStateAction<LabwareOnDeckType | null | undefined>
-  >
+
   selectedZoomInSlot?: DeckSlotId
 }
 
@@ -44,7 +42,7 @@ interface HopperLabwareRendersProps {
 
 export function HopperLabwareRenders(
   props: HopperLabwareRendersProps
-): JSX.Element | null {
+): ReactNode {
   const {
     labwaresOnDeck,
     slot,
@@ -55,7 +53,6 @@ export function HopperLabwareRenders(
     setShowMenuListForId,
     hover,
     setHoveredLabware,
-    setDraggedLabware,
     selectedZoomInSlot,
   } = props
   const { primaryLabwareId, adapterLabwareId, lidLabwareId } = topLabwareGroup
@@ -70,7 +67,7 @@ export function HopperLabwareRenders(
   }
   return (
     <>
-      {adapterLabwareId != null ? (
+      {adapterLabwareId != null && labwaresOnDeck[adapterLabwareId] != null ? (
         <LabwareOnDeck
           x={HOPPER_LABWARE_X_OFFSET}
           y={0}
@@ -82,7 +79,7 @@ export function HopperLabwareRenders(
         y={0}
         labwareOnDeck={primaryLabware}
       />
-      {lidLabwareId != null ? (
+      {lidLabwareId != null && labwaresOnDeck[lidLabwareId] != null ? (
         <LabwareOnDeck
           x={HOPPER_LABWARE_X_OFFSET}
           y={0}
@@ -102,7 +99,6 @@ export function HopperLabwareRenders(
         hover={hover}
         slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
         setHoveredLabware={setHoveredLabware}
-        setDraggedLabware={setDraggedLabware}
         swapBlocked={false}
         labwareOnDeck={primaryLabware}
         isSelected={selectedZoomInSlot != null}

@@ -1,6 +1,16 @@
 """Test exception handling."""
 
-from opentrons_shared_data.errors.exceptions import PythonException
+import pickle
+
+import pytest
+
+from opentrons_shared_data.errors.exceptions import (
+    PythonException,
+    RoboticsInteractionError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
+    VacuumModuleWasteFullError,
+)
 
 
 def test_exception_wrapping_single_level() -> None:
@@ -73,3 +83,103 @@ def test_exception_wrapping_error_in_except() -> None:
     assert wrapped.wrapping[0].detail["class"] == "RuntimeError"
     assert wrapped.wrapping[0].detail["traceback"]
     assert wrapped.wrapping[0].detail["args"] == "('oh no!',)"
+
+
+@pytest.mark.parametrize(
+    ("error", "expected_args"),
+    [
+        (
+            VacuumModuleUnknownError(
+                "VM123",
+                "pressure",
+                -100.0,
+                -75.0,
+                message="unknown vacuum issue",
+                detail={"node": "vacuum"},
+            ),
+            (
+                "VM123",
+                "pressure",
+                -100.0,
+                -75.0,
+                "unknown vacuum issue",
+                {"node": "vacuum"},
+                None,
+            ),
+        ),
+        (
+            VacuumModulePressureNotReachedError(
+                "VM123",
+                "pressure",
+                -100.0,
+                -75.0,
+                message="pressure not reached",
+                detail={"node": "vacuum"},
+            ),
+            (
+                "VM123",
+                -100.0,
+                -75.0,
+                "pressure",
+                "pressure not reached",
+                {"node": "vacuum"},
+                None,
+            ),
+        ),
+        (
+            VacuumModuleWasteFullError(
+                "VM123",
+                "pressure",
+                0.0,
+                0.0,
+                message="waste full",
+                detail={"node": "vacuum"},
+            ),
+            ("VM123", "waste full", {"node": "vacuum"}, None),
+        ),
+    ],
+)
+def test_vacuum_module_errors_set_args_after_init(
+    error: VacuumModuleUnknownError
+    | VacuumModulePressureNotReachedError
+    | VacuumModuleWasteFullError,
+    expected_args: tuple[object, ...],
+) -> None:
+    """Vacuum module errors should expose stable args for Pyro serialization."""
+    assert error.args == expected_args
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        VacuumModuleUnknownError("VM123", "pressure", -100.0, -75.0),
+        VacuumModulePressureNotReachedError("VM123", "pressure", -100.0, -75.0),
+        VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
+    ],
+)
+def test_vacuum_module_errors_round_trip_through_pickle(
+    error: VacuumModuleUnknownError
+    | VacuumModulePressureNotReachedError
+    | VacuumModuleWasteFullError,
+) -> None:
+    """Vacuum module errors should pickle and unpickle without losing data."""
+    restored = pickle.loads(pickle.dumps(error))
+    assert restored == error
+
+
+@pytest.mark.parametrize(
+    "error_cls",
+    [VacuumModulePressureNotReachedError, VacuumModuleWasteFullError],
+)
+def test_recoverable_vacuum_errors_are_robotics_interaction_errors(
+    error_cls: type[VacuumModulePressureNotReachedError]
+    | type[VacuumModuleWasteFullError],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """3040/3041 belong to robotics interaction, not robotics control."""
+    with caplog.at_level("ERROR"):
+        error = error_cls("VM123", "pressure", 0.0, 0.0)
+
+    assert isinstance(error, RoboticsInteractionError)
+    assert "inappropriate for a RoboticsControlError" not in caplog.text
+    assert "inappropriate for a RoboticsInteractionError" not in caplog.text

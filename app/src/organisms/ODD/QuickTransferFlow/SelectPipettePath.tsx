@@ -12,7 +12,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   PathOption,
@@ -33,7 +33,7 @@ export function SelectPipettePath({
   exitButtonProps,
   state,
   dispatch,
-}: SelectPipettePathProps): JSX.Element {
+}: SelectPipettePathProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedPath, setSelectedPath] = useState<PathOption | undefined>()
 

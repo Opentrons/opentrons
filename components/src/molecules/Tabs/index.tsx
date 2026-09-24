@@ -7,6 +7,8 @@ import { DIRECTION_ROW, POSITION_RELATIVE } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { ReactNode } from 'react'
+
 const DEFAULT_TAB_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.purple30};
@@ -75,7 +77,7 @@ export interface TabsProps {
   tabs: TabProps[]
 }
 
-export function Tabs(props: TabsProps): JSX.Element {
+export function Tabs(props: TabsProps): ReactNode {
   const { tabs } = props
 
   return (
@@ -87,7 +89,7 @@ export function Tabs(props: TabsProps): JSX.Element {
   )
 }
 
-function Tab(props: TabProps): JSX.Element {
+function Tab(props: TabProps): ReactNode {
   const {
     text,
     onClick,

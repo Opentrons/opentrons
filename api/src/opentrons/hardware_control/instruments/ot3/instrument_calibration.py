@@ -60,6 +60,91 @@ class PipetteOffsetSummary(PipetteOffsetByPipetteMount):
         default_factory=list
     )
 
+    @staticmethod
+    def to_pyro_dict(obj: "PipetteOffsetSummary") -> typing.Dict[str, typing.Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        if isinstance(obj.last_modified, datetime):
+            modified = obj.last_modified.isoformat()
+        else:
+            modified = None
+        if isinstance(obj.status.markedAt, datetime):
+            markedAt = obj.status.markedAt.isoformat()
+        else:
+            markedAt = None
+
+        # list of dictionaries
+        reasonability_check_failures_serialized = []
+        for failure in obj.reasonability_check_failures:
+            failure_offsets = {
+                mount.value: {"x": point.x, "y": point.y, "z": point.z}
+                for mount, point in failure.offsets.items()
+            }
+            reasonability_check_failures_serialized.append(
+                {
+                    "kind": failure.kind,
+                    "offsets": failure_offsets,
+                    "limit": failure.limit,
+                }
+            )
+
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "offset_x": obj.offset.x,
+            "offset_y": obj.offset.y,
+            "offset_z": obj.offset.z,
+            "source": obj.source,
+            "status_markedBad": obj.status.markedBad,
+            "status_source": obj.status.source,
+            "status_markedAt": markedAt,
+            "last_modified": modified,
+            "reasonability_check_failures": reasonability_check_failures_serialized,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: typing.Any, data: typing.Dict[str, typing.Any]
+    ) -> "PipetteOffsetSummary":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        modified = (
+            None
+            if data["last_modified"] is None
+            else datetime.fromisoformat(data["last_modified"])
+        )
+        markedAt = (
+            None
+            if data["status_markedAt"] is None
+            else datetime.fromisoformat(data["status_markedAt"])
+        )
+        status_source = (
+            None
+            if data["status_source"] is None
+            else SourceType(data["status_source"]["value"])
+        )
+        reasonability_check_failures = [
+            ReasonabilityCheckFailure(
+                kind=data["reasonability_check_failures"][i]["kind"],
+                limit=data["reasonability_check_failures"][i]["limit"],
+                offsets={
+                    Mount(mount): Point(x=point["x"], y=point["y"], z=point["z"])
+                    for mount, point in data["reasonability_check_failures"][i][
+                        "offsets"
+                    ].items()
+                },
+            )
+            for i in range(len(data["reasonability_check_failures"]))
+        ]
+        return PipetteOffsetSummary(
+            offset=Point(x=data["offset_x"], y=data["offset_y"], z=data["offset_z"]),
+            source=SourceType(data["source"]["value"]),
+            status=CalibrationStatus(
+                markedBad=(data["status_markedBad"] == "True"),
+                source=status_source,
+                markedAt=markedAt,
+            ),
+            last_modified=modified,
+            reasonability_check_failures=reasonability_check_failures,
+        )
+
 
 @dataclass
 class GripperCalibrationOffset:
@@ -74,6 +159,60 @@ class GripperCalibrationOffset:
     source: SourceType
     status: CalibrationStatus
     last_modified: typing.Optional[datetime] = None
+
+    @staticmethod
+    def to_pyro_dict(obj: "GripperCalibrationOffset") -> typing.Dict[str, typing.Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        if isinstance(obj.last_modified, datetime):
+            modified = obj.last_modified.isoformat()
+        else:
+            modified = None
+        if isinstance(obj.status.markedAt, datetime):
+            markedAt = obj.status.markedAt.isoformat()
+        else:
+            markedAt = None
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "offset_x": obj.offset.x,
+            "offset_y": obj.offset.y,
+            "offset_z": obj.offset.z,
+            "source": obj.source,
+            "status_markedBad": obj.status.markedBad,
+            "status_source": obj.status.source,
+            "status_markedAt": markedAt,
+            "last_modified": modified,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: typing.Any, data: typing.Dict[str, typing.Any]
+    ) -> "GripperCalibrationOffset":
+        """Consumed by Serpent, Convert from a Pyro Dictionary."""
+        modified = (
+            None
+            if data["last_modified"] is None
+            else datetime.fromisoformat(data["last_modified"])
+        )
+        markedAt = (
+            None
+            if data["status_markedAt"] is None
+            else datetime.fromisoformat(data["status_markedAt"])
+        )
+        status_source = (
+            None
+            if data["status_source"] is None
+            else SourceType(data["status_source"]["value"])
+        )
+        return GripperCalibrationOffset(
+            offset=Point(x=data["offset_x"], y=data["offset_y"], z=data["offset_z"]),
+            source=SourceType(data["source"]["value"]),
+            status=CalibrationStatus(
+                markedBad=(data["status_markedBad"] == "True"),
+                source=status_source,
+                markedAt=markedAt,
+            ),
+            last_modified=modified,
+        )
 
 
 @dataclass

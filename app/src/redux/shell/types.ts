@@ -70,12 +70,25 @@ export type ShellUpdateAction =
   | { type: 'shell:APPLY_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_PERCENTAGE'; payload: { percent: number } }
 
+export interface UsbMountPath {
+  path: string
+  // true if the device is a single-function USB mass-storage device
+  isMassStorage?: boolean
+}
+
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
   filePaths: string[]
+  usbMountPaths: UsbMountPath[]
   systemLanguage: string[] | null
+  stepDetailViewerClosed: StepDetailViewerClosedState
 }
+
+export type StepDetailViewerClosedState = {
+  protocolKey: string
+  closedAt: number
+} | null
 
 export interface UiInitializedAction {
   type: 'shell:UI_INITIALIZED'
@@ -138,6 +151,7 @@ export interface RobotMassStorageDeviceAdded {
   type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED'
   payload: {
     rootPath: string
+    isMassStorage?: boolean
   }
   meta: { shell: true }
 }
@@ -251,6 +265,13 @@ export interface StepDetailViewerCloseAction {
   }
 }
 
+export interface StepDetailViewerClosedAction {
+  type: 'shell:STEP_DETAIL_VIEWER_CLOSED'
+  payload: {
+    protocolKey: string
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -272,6 +293,7 @@ export type ShellAction =
   | StepDetailViewerOpenAction
   | StepDetailViewerUpdateAction
   | StepDetailViewerCloseAction
+  | StepDetailViewerClosedAction
 
 export type IPCSafeFormDataEntry =
   | {

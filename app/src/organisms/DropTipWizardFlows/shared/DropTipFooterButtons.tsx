@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Box,
@@ -13,6 +12,8 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
+
+import type { ReactNode } from 'react'
 
 interface DropTipFooterButtonsProps {
   primaryBtnOnClick: () => void
@@ -25,7 +26,7 @@ interface DropTipFooterButtonsProps {
 
 export function DropTipFooterButtons(
   props: DropTipFooterButtonsProps
-): JSX.Element {
+): ReactNode {
   return (
     <Flex width="100%" height="100%" alignItems={ALIGN_FLEX_END}>
       <Flex
@@ -59,7 +60,7 @@ function DropTipPrimaryBtn({
   primaryBtnTextOverride,
   primaryBtnDisabled,
   primaryBtnStyle,
-}: DropTipFooterButtonsProps): JSX.Element {
+}: DropTipFooterButtonsProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
 
   return (
@@ -72,13 +73,14 @@ function DropTipPrimaryBtn({
         disabled={primaryBtnDisabled}
       />
       {primaryBtnStyle === 'alertStyle' ? (
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           css={DESKTOP_ONLY_BUTTON}
           onClick={primaryBtnOnClick}
           disabled={primaryBtnDisabled}
         >
           {primaryBtnTextOverride ?? t('continue')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       ) : (
         <PrimaryButton
           css={DESKTOP_ONLY_BUTTON}

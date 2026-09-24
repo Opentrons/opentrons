@@ -1,11 +1,8 @@
-import { useSelector } from 'react-redux'
-
 import { DeckConfigurator } from '@opentrons/components'
-
-import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 
 import { useDeckConfigurationEditing } from './utils'
 
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { CutoutConfigMap, DeckConfiguration } from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
@@ -25,7 +22,7 @@ interface HardwareConfiguratorContainerProps {
 }
 export function HardwareConfiguratorContainer(
   props: HardwareConfiguratorContainerProps
-): JSX.Element {
+): ReactNode {
   const {
     modules,
     setValue,
@@ -35,14 +32,12 @@ export function HardwareConfiguratorContainer(
     updateInitialDeckState,
   } = props
 
-  const enableVacuumModule = useSelector(getEnableVacuumModule)
   const { addFixtureModal, addFixtureToCutout, removeFixtureFromCutout } =
     useDeckConfigurationEditing(
       deckConfig,
       modules,
       fixtures,
       hasGripper,
-      enableVacuumModule,
       setValue,
       updateInitialDeckState
     )

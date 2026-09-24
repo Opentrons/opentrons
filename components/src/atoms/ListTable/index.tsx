@@ -21,7 +21,7 @@ export interface ListTableProps {
 // ListTable contains the semantic HTML table identity.
 // This is a table-focused version of SubListTable, and children should include proper
 // <tr> tags when applicable.
-export function ListTable({ headers, children }: ListTableProps): JSX.Element {
+export function ListTable({ headers, children }: ListTableProps): ReactNode {
   const numHeaders = headers ? headers.filter(Boolean).length : 0
 
   return (
@@ -60,9 +60,11 @@ const TABLE_STYLE = css`
 //  column spacing to be opinionated. Various component designs conflict with feature designs (ex, LPC).
 const trStyle = (numHeaders: number): FlattenSimpleInterpolation => css`
   display: ${DISPLAY_GRID};
-  grid-template-columns: ${numHeaders === 3
-    ? `${FLEX_MAX_CONTENT} 1fr ${FLEX_MAX_CONTENT}`
-    : `repeat(${numHeaders}, 1fr)`};
+  grid-template-columns: ${
+    numHeaders === 3
+      ? `${FLEX_MAX_CONTENT} 1fr ${FLEX_MAX_CONTENT}`
+      : `repeat(${numHeaders}, 1fr)`
+  };
   gap: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

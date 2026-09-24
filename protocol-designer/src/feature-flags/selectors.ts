@@ -39,7 +39,3 @@ export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
 )
-export const getEnableVacuumModule: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_VACUUM_MODULE ?? false
-)

@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-24);
+  gap: var(--spacing-16);
+}
+
+.labware_summary {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.body_container {
+  overflow: visible;
+  padding: var(--spacing-16) var(--spacing-24);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.labware_text_align {
+  width: 100%;
+  padding-top: var(--spacing-8);
+  text-align: center;
+}

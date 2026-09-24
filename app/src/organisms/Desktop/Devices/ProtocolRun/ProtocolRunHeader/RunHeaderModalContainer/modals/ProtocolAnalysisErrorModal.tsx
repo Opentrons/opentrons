@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
+  CodeBlock,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
@@ -14,9 +15,9 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { CodeBlock } from '/app/atoms/CodeBlock'
 import { useProtocolAnalysisErrors } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { AnalysisError } from '@opentrons/shared-data'
 
 export type UseAnalysisErrorsModalProps = Omit<
@@ -72,7 +73,7 @@ export function ProtocolAnalysisErrorModal({
   onClose,
   robotName,
   displayName,
-}: ProtocolAnalysisErrorModalProps): JSX.Element {
+}: ProtocolAnalysisErrorModalProps): ReactNode {
   const { t, i18n } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
