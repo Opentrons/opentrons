@@ -19,6 +19,8 @@ import {
   SecondaryButton,
   SPACING,
   Tooltip,
+  TOOLTIP_FIXED,
+  TOOLTIP_TOP,
   useHoverTooltip,
 } from '@opentrons/components'
 
@@ -78,7 +80,10 @@ export function UpdateRobotModal({
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
   const isOEMMode = useIsOEMMode()
-  const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
+  const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+    strategy: TOOLTIP_FIXED,
+  })
   // TODO(jh 08-29-2023): revisit reasons that are/are not captured by this selector.
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
@@ -162,29 +167,30 @@ export function UpdateRobotModal({
         <SecondaryButton onClick={closeModal} css={FOOTER_BUTTON_STYLE}>
           {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
         </SecondaryButton>
-        <PrimaryButton
-          onClick={handleUpdateNow}
-          css={FOOTER_BUTTON_STYLE}
-          disabled={updateDisabled}
-          {...updateButtonProps}
-        >
-          {t('update_robot_now')}
-          {isStarting ? (
-            <Icon
-              size="1rem"
-              name="ot-spinner"
-              spin
-              aria-label="ot-spinner"
-              marginLeft={SPACING.spacing8}
-              alignSelf="center"
-            />
-          ) : null}
-        </PrimaryButton>
-        {updateDisabled && disabledReason !== '' && (
-          <Tooltip tooltipProps={updateButtonTooltipProps}>
-            {disabledReason}
-          </Tooltip>
-        )}
+        <Flex {...updateButtonProps}>
+          <PrimaryButton
+            onClick={handleUpdateNow}
+            css={FOOTER_BUTTON_STYLE}
+            disabled={updateDisabled}
+          >
+            {t('update_robot_now')}
+            {isStarting ? (
+              <Icon
+                size="1rem"
+                name="ot-spinner"
+                spin
+                aria-label="ot-spinner"
+                marginLeft={SPACING.spacing8}
+                alignSelf="center"
+              />
+            ) : null}
+          </PrimaryButton>
+          {updateDisabled && disabledReason !== '' && (
+            <Tooltip tooltipProps={updateButtonTooltipProps}>
+              {disabledReason}
+            </Tooltip>
+          )}
+        </Flex>
       </Flex>
     </Flex>
   )

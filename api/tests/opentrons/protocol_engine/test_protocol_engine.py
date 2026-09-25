@@ -892,6 +892,30 @@ async def test_finish_with_defaults(
     )
 
 
+async def test_finish_is_noop_when_already_stopped(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+) -> None:
+    """It should no-op if finish() already completed."""
+    decoy.when(state_store.commands.get_is_stopped()).then_return(True)
+
+    await subject.finish()
+
+    decoy.verify(
+        action_dispatcher.dispatch(FinishAction(set_run_status=True)),
+        times=0,
+    )
+    decoy.verify(await queue_worker.join(), times=0)
+    decoy.verify(
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
+        times=0,
+    )
+
+
 @pytest.mark.parametrize(
     argnames=["stopped_by_estop", "expected_drop_tips", "expected_end_state"],
     argvalues=[

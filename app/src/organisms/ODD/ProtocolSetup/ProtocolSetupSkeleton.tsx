@@ -17,13 +17,13 @@ export function ProtocolSetupTitleSkeleton(): ReactNode {
     <>
       <Skeleton
         height="2.25rem"
-        width="11.937rem"
+        width="12rem"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadius12}
       />
       <Skeleton
         height="2.25rem"
-        width="28rem"
+        width="100%"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadius12}
       />
@@ -58,7 +58,7 @@ const SetupSkeleton = (): ReactNode => {
       height="5.5rem"
       width="100%"
       backgroundSize="99rem"
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius16}
     />
   )
 }
@@ -66,6 +66,8 @@ const SetupSkeleton = (): ReactNode => {
 export function ProtocolSetupStepSkeleton(): ReactNode {
   return (
     <>
+      <SetupSkeleton />
+      <SetupSkeleton />
       <SetupSkeleton />
       <SetupSkeleton />
       <SetupSkeleton />
@@ -89,11 +91,19 @@ export function ProtocolSetupFullSkeleton(): ReactNode {
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing40}
+        >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing2}
+            flex="1"
+            minWidth="0"
+          >
             <ProtocolSetupTitleSkeleton />
           </Flex>
-          <Flex gridGap={SPACING.spacing16}>
+          <Flex gridGap={SPACING.spacing16} flexShrink={0}>
             <ProtocolSetupButtonsSkeleton />
           </Flex>
         </Flex>
