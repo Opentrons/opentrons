@@ -319,7 +319,7 @@ async def get_run_commands(
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    current_command = await run_data_manager.get_current_command(run_id=runId)
+    current_command = run_data_manager.get_current_command(run_id=runId)
     recovery_target_command = await run_data_manager.get_recovery_target_command(
         run_id=runId
     )

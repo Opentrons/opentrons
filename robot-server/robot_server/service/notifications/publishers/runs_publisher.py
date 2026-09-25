@@ -20,7 +20,7 @@ class _RunHooks:
     """Generated during a protocol run. Utilized by RunsPublisher."""
 
     run_id: str
-    get_current_command: Callable[[str], Awaitable[Optional[CommandPointer]]]
+    get_current_command: Callable[[str], Optional[CommandPointer]]
     get_recovery_target_command: Callable[
         [str], Coroutine[Any, Any, Optional[CommandPointer]]
     ]
@@ -62,9 +62,7 @@ class RunsPublisher:
     async def start_publishing_for_run(
         self,
         run_id: str,
-        get_current_command: Callable[
-            [str], Coroutine[Any, Any, Optional[CommandPointer]]
-        ],
+        get_current_command: Callable[[str], Optional[CommandPointer]],
         get_recovery_target_command: Callable[
             [str], Coroutine[Any, Any, Optional[CommandPointer]]
         ],
@@ -134,7 +132,7 @@ class RunsPublisher:
     async def _handle_current_command_change(self) -> None:
         """Publish a refetch flag if the current command has changed."""
         if self._run_hooks is not None and self._engine_state_slice is not None:
-            new_current_command = await self._run_hooks.get_current_command(
+            new_current_command = self._run_hooks.get_current_command(
                 self._run_hooks.run_id
             )
             if self._engine_state_slice.current_command != new_current_command:
