@@ -18,9 +18,9 @@ The chemical compatibility tables use these ratings:
 * :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
 * :material-alert-circle-outline:{ .gray } **No Data:** Information not available.
 
-## Control Box housing
+## Control box housing
 
-The exterior of the Control Box is made of aluminum. This material is resistant to many common laboratory solvents, alcohols, and neutral aqueous solutions. It can be affected or corroded by concentrated acids, strong alkalis (bases), and halogenated compounds.
+The exterior of the control box is made of aluminum. This material is resistant to many common laboratory solvents, alcohols, and neutral aqueous solutions. It can be affected or corroded by concentrated acids, strong alkalis (bases), and halogenated compounds.
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -42,9 +42,9 @@ The exterior of the Control Box is made of aluminum. This material is resistant 
 | Trichloroacetic Acid (TCA) | :material-close-circle:{ .red } Not Recommended |
 | Trifluoroacetic Acid (TFA) | :material-alert-circle-outline:{ .gray } No Data | |
 
-## Control Box hoses
+## Control box hoses
 
-Plumbing inside the Control Box is made of perfluoroalkoxy alkane (PFA). This material offers exceptional chemical inertness and resistance to strong acids, bases, biological buffers, and organic solvents (including aromatic and chlorinated hydrocarbons). It is less resistant to molten alkali metals, elemental fluorine, and certain fluorine compounds at elevated temperatures.
+Plumbing inside the control box is made of perfluoroalkoxy alkane (PFA). This material offers exceptional chemical inertness and resistance to strong acids, bases, biological buffers, and organic solvents (including aromatic and chlorinated hydrocarbons). It is less resistant to molten alkali metals, elemental fluorine, and certain fluorine compounds at elevated temperatures.
 
 | Reagent | Compatibility |
 | :--- | :--- |

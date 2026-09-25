@@ -57,13 +57,13 @@ Deck components install directly onto the Flex deck to support labware and diffe
 
 ### Module components
 
-Module components provide the external power, vacuum, data communication, and mechanical items required to run the module. These include the Control Box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and hex keys.
+Module components provide the external power, vacuum, data communication, and mechanical items required to run the module. These include the control box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and hex keys.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Control Box, vacuum pump and electronics](../images/control-box.png "Control Box includes pump and electronics")
-<figcaption>(1) Control Box</figcaption>
+![Control box, vacuum pump and electronics](../images/control-box.png "Control box includes pump and electronics")
+<figcaption>(1) Control box</figcaption>
 </figure>
 
 <figure markdown>
@@ -148,9 +148,9 @@ Waste collection components connect directly to the manifold base and provide an
 
 ## Physical specifications
 
-### Control Box
+### Control box
 
-The Control Box houses the vacuum pump, air/water separator, electronics, and power supply.
+The control box houses the vacuum pump, air/water separator, electronics, and power supply.
 
 !!! note
     Values reflect the pump manufacturer's hardware ratings. Actual flow rates and vacuum ranges may be limited by Opentrons software.
