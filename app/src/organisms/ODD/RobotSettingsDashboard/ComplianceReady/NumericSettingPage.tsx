@@ -8,6 +8,7 @@ import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard/NumericalKeyboard
 import { ChildNavigation } from '../../ChildNavigation'
 import { parseNumericalInput } from '../../utils/parseNumericalInput'
 import styles from './compliance_ready_settings.module.css'
+import { MAX_C_INT } from './constants'
 
 import type { ChangeEvent, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -50,19 +51,19 @@ export function NumericSettingPage({
       return
     }
     if (min != null && currentValue < min) {
-      setError('' + t('odd_minimum_value_is', { min }))
+      setError('' + t('odd_minimum_value_is', { min: min - 1 }))
       return
     }
     if (max != null && currentValue > max) {
-      setError('' + t('odd_maximum_value_is', { max }))
+      setError('' + t('odd_maximum_value_is', { max: max + 1 }))
       return
     }
     // max int in C lol
-    if (currentValue > 2147483647) {
+    if (currentValue > MAX_C_INT) {
       setError(
         '' +
           t('odd_maximum_value_is', {
-            max: Math.min(2147483647, max ?? 2147483647),
+            max: Math.min(MAX_C_INT, max ?? MAX_C_INT),
           })
       )
       return
