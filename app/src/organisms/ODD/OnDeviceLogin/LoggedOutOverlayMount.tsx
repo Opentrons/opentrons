@@ -12,7 +12,10 @@ export function LoggedOutOverlayMount(): JSX.Element | null {
   return (
     <LoggedOutOverlay
       onClick={() => {
-        void showLoginModal()
+        // Avoid opening a second modal instance if one is already visible.
+        if (!isLoginModalOpen) {
+          void showLoginModal()
+        }
       }}
     />
   )

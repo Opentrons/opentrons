@@ -1,6 +1,6 @@
 import { useCallback, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
@@ -15,7 +15,7 @@ import { useAuthSettingsQuery, useHost } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
@@ -37,10 +37,11 @@ const LoginModalImpl = NiceModal.create(
   (props: { key?: string }): JSX.Element => {
     const { key } = props
     const modal = useModal()
+    const dispatch = useDispatch()
     const { t } = useTranslation(['access_control', 'device_settings'])
     const passwordUpdatedToastId = useId()
     const host = useHost()
-    const shouldShowPasswordUpdatedToastRef = useRef(false)
+    const passwordSetAwaitingLoginRef = useRef(false)
     const [phase, setPhase] = useState<LoginModalPhase>('login')
     const [step, setStep] = useState<LoginStep>('username')
     const [loginError, setLoginError] = useState<string | null>(null)
@@ -51,9 +52,8 @@ const LoginModalImpl = NiceModal.create(
     const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
     const [isValidatingNewPassword, setIsValidatingNewPassword] =
       useState(false)
-    const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
-      string | null
-    >(null)
+    const [showPasswordUpdatedToast, setShowPasswordUpdatedToast] =
+      useState(false)
     const storeLoginState = useStoreLoginState()
     const localRobotName = useSelector(
       (state: State) => getLocalRobot(state)?.name ?? null
@@ -63,15 +63,8 @@ const LoginModalImpl = NiceModal.create(
     const isChoosingNewPassword = phase === 'chooseNewPassword'
 
     const finishModal = useCallback(
-      (
-        username: string,
-        options?: { showPasswordUpdatedToast?: boolean }
-      ): void => {
-        if (options?.showPasswordUpdatedToast === true) {
-          setPasswordUpdatedUsername(username)
-          return
-        }
-
+      (username: string): void => {
+        passwordSetAwaitingLoginRef.current = false
         modal.resolve({ username })
         modal.remove()
       },
@@ -92,19 +85,22 @@ const LoginModalImpl = NiceModal.create(
           setPhase('chooseNewPassword')
           setStep('password')
         } else {
-          finishModal(username, {
-            showPasswordUpdatedToast: shouldShowPasswordUpdatedToastRef.current,
-          })
-          shouldShowPasswordUpdatedToastRef.current = false
+          finishModal(username)
         }
       },
       [finishModal, storeLoginState, localRobotName]
     )
 
     const dismissModal = useCallback((): void => {
+      // Password was changed under a limited-scope session; if the user backs
+      // out before signing in with the new password, clear that session.
+      if (passwordSetAwaitingLoginRef.current && localRobotName != null) {
+        dispatch(logOut({ robotName: localRobotName }))
+      }
+      passwordSetAwaitingLoginRef.current = false
       modal.resolve(null)
       modal.remove()
-    }, [modal])
+    }, [dispatch, localRobotName, modal])
 
     const handleUsernameSubmit = async (username: string): Promise<void> => {
       setLoginUsername(username)
@@ -148,16 +144,21 @@ const LoginModalImpl = NiceModal.create(
       })
 
     const handleNewPasswordSuccess = useCallback(
-      (username: string, newPassword: string) => {
+      (username: string, _newPassword: string) => {
+        // Clear the limited-scope temp-password session (same as desktop)
+        // before the user signs in with their new password.
+        passwordSetAwaitingLoginRef.current = true
+        if (localRobotName != null) {
+          dispatch(logOut({ robotName: localRobotName }))
+        }
         setLoginError(null)
-        shouldShowPasswordUpdatedToastRef.current = true
         setLoginResetPassword(false)
         setLoginUsername(username)
         setPhase('login')
         setStep('password')
-        submitPassword(username, newPassword)
+        setShowPasswordUpdatedToast(true)
       },
-      [submitPassword]
+      [dispatch, localRobotName]
     )
 
     const documentationState = useDocumentationState()
@@ -229,7 +230,7 @@ const LoginModalImpl = NiceModal.create(
           passwordComplexity={passwordComplexity}
           onCancel={handleCancel}
         />
-        {passwordUpdatedUsername != null ? (
+        {showPasswordUpdatedToast ? (
           <Toast
             id={passwordUpdatedToastId}
             message={t('on_device_login_password_updated') as string}
@@ -239,7 +240,7 @@ const LoginModalImpl = NiceModal.create(
             right={SPACING.spacing32}
             bottom={SPACING.spacing32}
             onClose={() => {
-              finishModal(passwordUpdatedUsername)
+              setShowPasswordUpdatedToast(false)
             }}
           />
         ) : null}

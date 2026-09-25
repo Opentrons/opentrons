@@ -13,6 +13,7 @@ import { getUserLoginStatus, validateSelfPassword } from '@opentrons/api-client'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { logOut } from '/app/redux/robot-auth'
 import { robotAuthReducer } from '/app/redux/robot-auth/slice'
 import {
   useOAuth2PasswordLogin,
@@ -22,6 +23,17 @@ import {
 import { showLoginModal } from '../LoginModal'
 
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+
+vi.mock('/app/redux/robot-auth', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    logOut: vi.fn((payload: { robotName: string }) => ({
+      type: 'robotAuth/logOut',
+      payload,
+    })),
+  }
+})
 
 vi.mock('@opentrons/api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -291,7 +303,7 @@ describe('LoginModal', () => {
     expect(modalResolved).toBe(false)
   })
 
-  it('signs in after setting a new password', async () => {
+  it('returns to login after setting a new password so the user can sign in', async () => {
     let loginCallCount = 0
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
@@ -335,10 +347,19 @@ describe('LoginModal', () => {
       expect(screen.getByLabelText('Password')).toBeInTheDocument()
     })
     expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument()
-
     expect(await screen.findByText('Password updated')).toBeInTheDocument()
-    fireEvent.click(screen.getByTestId('Toast_success'))
+    // Still on the password step of this modal — not a fresh username step.
+    expect(screen.queryByLabelText('Username')).not.toBeInTheDocument()
+    expect(loginCallCount).toBe(1)
+    expect(vi.mocked(logOut)).toHaveBeenCalledWith({
+      robotName: mockConnectableRobot.name,
+    })
+
+    fillField('Password', 'newpass123')
+    clickPrimary('Confirm')
+
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
+    expect(loginCallCount).toBe(2)
   }, 10000)
 
   it('returns to the new-password step with a policy error when setting a password fails', async () => {
