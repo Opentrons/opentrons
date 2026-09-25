@@ -15,11 +15,12 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
     MagneticModuleContext,
     AbsorbanceReaderContext,
+    ThermocyclerStep,
 )
 
 
 from typing import List, Dict
-
+import datetime
 metadata = {
     "protocolName": "ABR OFF MiSeq Library Preparation Protocol",
     "author": "Anurag Kanase <anurag.kanase@opentrons.com>",
@@ -163,19 +164,6 @@ def set_hs_speed(
     if deactivate:
         hs.deactivate_shaker()
 
-
-def use_disposable_lid_with_tc(
-    protocol: ProtocolContext,
-    lid_stack: Labware,
-    plate_in_thermocycler: Labware,
-    thermocycler: ThermocyclerContext,
-) -> None:
-    """Use disposable lid with thermocycler."""
-    thermocycler.open_lid()
-    protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
-    thermocycler.close_lid()
-
-
 # FUNCTIONS FOR COMMON PIPETTE COMMAND SEQUENCES
 
 
@@ -253,9 +241,22 @@ def load_wells_with_custom_liquids(
             for well in wells:
                 well.load_liquid(liquid, volume)
 
-
-
-
+def move_lid(
+    protocol: ProtocolContext,
+    num_of_lids: int,
+    deck_slot: str,
+    deck_riser: bool = False,
+) -> Labware:
+    """Load Stack of Disposable lids."""
+    lid_str = "opentrons_tough_pcr_auto_sealing_lid"
+    if deck_riser:
+        deck_riser_adapter = protocol.load_adapter(
+            "opentrons_flex_deck_riser", deck_slot
+        )
+        unused_lids = deck_riser_adapter.load_lid_stack(lid_str, num_of_lids)
+    else:
+        unused_lids = protocol.load_lid_stack(lid_str, deck_slot[0], num_of_lids)
+    return unused_lids
 
 
 
@@ -477,7 +478,7 @@ def run(protocol: ProtocolContext) -> None:
         pipette.flow_rate.dispense = original_disp_rate
 
     # Load modules
-    protocol.load_waste_chute()
+    waste_chute = protocol.load_waste_chute()
     thermocycler: ThermocyclerContext = protocol.load_module(
         "thermocyclerModuleV2"
     )  # type: ignore[assignment]
@@ -557,14 +558,16 @@ def run(protocol: ProtocolContext) -> None:
             protocol, liquid_vols_and_wells=liquid_vols_and_wells
         )
     # Protocol steps
+    lid_stack = protocol.load_lid_stack(load_name = "opentrons_tough_pcr_auto_sealing_lid", quantity=3, location="B4",)
     protocol.comment("Starting MiSeq library preparation protocol")
 
     # Step 1-2: Set temperatures
     thermocycler.open_lid()
+    protocol.move_lid(lid_stack, pcr1_plate, use_gripper=True)
     temp_mod_task = temp_module.start_set_temperature(8)
     tc_block_task = thermocycler.start_set_block_temperature(8)
     protocol.wait_for_tasks([tc_block_task, temp_mod_task])
-
+    protocol.move_lid(pcr1_plate, waste_chute, use_gripper=True)
     column_tips = partial_tiprack.rows()[0][::-1]
     if column_tip_pick_up:
         # Step 3: Dispense PCR1 master mix (avoiding multidispense to maintian accuracy)
@@ -595,6 +598,7 @@ def run(protocol: ProtocolContext) -> None:
     # Step 6: PCR1 thermal cycling
     protocol.comment("Starting PCR1 thermal cycling")
     protocol.move_labware(pcr1_plate, thermocycler, use_gripper=True)
+    protocol.move_lid(lid_stack, pcr1_plate, use_gripper=True)
     heater_shaker.close_labware_latch()
     thermocycler.close_lid()
     thermocycler.set_lid_temperature(105)
@@ -626,6 +630,7 @@ def run(protocol: ProtocolContext) -> None:
     thermocycler.set_block_temperature(8)
     thermocycler.open_lid()
     # Steps 7-8: Move plates
+    protocol.move_lid(pcr1_plate, waste_chute, use_gripper=True)
     protocol.comment("Setting up PCR2")
     protocol.move_labware(pcr1_plate, "B2", use_gripper=True)
 
@@ -669,6 +674,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # Step 14: PCR2 thermal cycling
     protocol.comment("Starting PCR2 thermal cycling")
+    protocol.move_lid(lid_stack, pcr2_plate, use_gripper=True)
     thermocycler.close_lid()
     thermocycler.set_lid_temperature(105)
     # Initial denaturation
@@ -695,6 +701,7 @@ def run(protocol: ProtocolContext) -> None:
     )
 
     thermocycler.open_lid()
+    protocol.move_lid(pcr2_plate, waste_chute, use_gripper=True)
 
     # Step 15: Move PCR2 plate
     protocol.comment("Moving PCR2 plate")
