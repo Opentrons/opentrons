@@ -217,14 +217,13 @@ def discard(
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
-    length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
     use_lid = ctx.params.use_lid  # type: ignore[attr-defined]
     use_temp = ctx.params.use_temp  # type: ignore[attr-defined]
-    
+
     ctx.comment("Protocol Version: 01")
     ctx.capture_image(filename="start_of_run")
-    
+
     num_col_full = num_sample // 8
     num_well_last_col = num_sample % 8
     num_col_total = num_col_full + (1 if num_well_last_col > 0 else 0)
@@ -244,16 +243,12 @@ def run(ctx: ProtocolContext) -> None:
         temp_mod: TemperatureModuleContext = ctx.load_module(
             "temperature module gen2", "C1"
         )  # type: ignore[assignment]
-        temp_adapter = temp_mod.load_adapter(
-            "opentrons_96_deep_well_temp_mod_adapter"
-        )
+        temp_adapter = temp_mod.load_adapter("opentrons_96_deep_well_temp_mod_adapter")
         reagent_plate = temp_adapter.load_labware(
             "nest_96_wellplate_2ml_deep", "Reagent Plate"
         )
     else:
-        reagent_plate = ctx.load_labware(
-            "nest_96_wellplate_2ml_deep", "C1", "REAGENTS"
-        )
+        reagent_plate = ctx.load_labware("nest_96_wellplate_2ml_deep", "C1", "REAGENTS")
 
     hs: HeaterShakerContext = ctx.load_module(
         "heaterShakerModuleV1", "D1"
@@ -286,9 +281,7 @@ def run(ctx: ProtocolContext) -> None:
     rxn_total = working_plate.rows()[0][:num_col_total]
     rxn_full = working_plate.rows()[0][:num_col_full]
     rxn_remainder = (
-        working_plate.wells()[
-            num_col_full * 8 : num_col_full * 8 + num_well_last_col
-        ]
+        working_plate.wells()[num_col_full * 8 : num_col_full * 8 + num_well_last_col]
         if num_well_last_col > 0
         else []
     )
@@ -375,5 +368,5 @@ def run(ctx: ProtocolContext) -> None:
         # discard uses 200uL tips
         p1k_8.tip_racks = tips_200
         discard(ctx, p1k_8, rxn_total, vol, waste)
-        
+
     ctx.capture_image(filename="end_of_run")

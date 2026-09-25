@@ -98,7 +98,6 @@ def run(protocol: ProtocolContext) -> None:
     # ======================== DOWNLOADED PARAMETERS ========================
     global COLUMNS  # Number of Columns of Samples
     # =================== LOADING THE RUNTIME PARAMETERS ====================
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     DRYRUN = protocol.params.dry_run  # type: ignore[attr-defined]
     FRAG_MODE = protocol.params.FRAG_MODE  # type: ignore[attr-defined]
     FRAGTIME = protocol.params.FRAGTIME  # type: ignore[attr-defined]
@@ -1136,9 +1135,7 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.open_lid()
         else:
             if DRYRUN is False:
-                protocol.pause(
-                    "Pausing to run PCR on an off deck Thermocycler ~20min"
-                )
+                protocol.pause("Pausing to run PCR on an off deck Thermocycler ~20min")
             else:
                 protocol.comment(
                     "Pausing to run PCR on an off deck Thermocycler ~20min"

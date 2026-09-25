@@ -77,7 +77,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-
     protocol.capture_image(filename="start_of_run")
 
     protocol.comment("Protocol Version: 03")
@@ -422,9 +421,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.return_tip()
             # ===============================================
 
-        protocol.comment(
-            "MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_1"
-        )
+        protocol.comment("MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_1")
         protocol.move_lid(lids, sample_plate_1, use_gripper=True)
 
         if ONDECK_THERMO:
@@ -482,9 +479,7 @@ def run(protocol: ProtocolContext) -> None:
             # 96-channel operation - process entire plate at once
             p200.pick_up_tip()
             p200.aspirate(FSMMVol, FSMM.bottom(z=Deep384_Z_offset))
-            p200.dispense(
-                FSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1)
-            )
+            p200.dispense(FSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
             p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
             p200.mix(FSMMMixRep, FSMMMixVol)
             p200.blow_out(sample_plate_1["A1"].top(z=-5))
@@ -552,19 +547,13 @@ def run(protocol: ProtocolContext) -> None:
             # Aspirate from multiple SSMM wells to get sufficient volume (A3, A4)
             p200.aspirate(
                 SSMMVol // 2,
-                reagent_plate_1.wells_by_name()["A1"].bottom(
-                    z=Deep384_Z_offset + 1
-                ),
+                reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset + 1),
             )
             p200.aspirate(
                 SSMMVol // 2,
-                reagent_plate_1.wells_by_name()["A1"].bottom(
-                    z=Deep384_Z_offset + 1
-                ),
+                reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset + 1),
             )
-            p200.dispense(
-                SSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1)
-            )
+            p200.dispense(SSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
             p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
             p200.mix(SSMMMixRep, SSMMMixVol)
             p200.blow_out(sample_plate_1["A1"].top(z=-5))
@@ -690,9 +679,7 @@ def run(protocol: ProtocolContext) -> None:
         nozzlecheck("96", tiprack_20_2)
         # ===============================================
         p200.pick_up_tip()
-        p200.aspirate(
-            RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
-        )
+        p200.aspirate(RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
         protocol.delay(minutes=0.1)
         p200.aspirate(3, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
         p200.default_speed = 5
@@ -747,9 +734,7 @@ def run(protocol: ProtocolContext) -> None:
         nozzlecheck("96", tiprack_20_X)
         # ===============================================
         p200.pick_up_tip()
-        p200.aspirate(
-            ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1)
-        )
+        p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1))
         p200.move_to(ETOH_reservoir["A1"].top(z=0))
         p200.move_to(ETOH_reservoir["A1"].top(z=-5))
         p200.move_to(ETOH_reservoir["A1"].top(z=0))
@@ -808,9 +793,7 @@ def run(protocol: ProtocolContext) -> None:
         # ===============================================
         p200.reset_tipracks()
         p200.pick_up_tip()
-        p200.aspirate(
-            ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1)
-        )
+        p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1))
         p200.move_to(ETOH_reservoir["A1"].top(z=0))
         p200.move_to(ETOH_reservoir["A1"].top(z=-5))
         p200.move_to(ETOH_reservoir["A1"].top(z=0))
@@ -863,9 +846,7 @@ def run(protocol: ProtocolContext) -> None:
         nozzlecheck("96", tiprack_20_4)
         # ===============================================
         p200.pick_up_tip()
-        p200.aspirate(
-            RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
-        )
+        p200.aspirate(RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
         protocol.delay(minutes=0.1)
         p200.aspirate(RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
         p200.default_speed = 5
@@ -1025,9 +1006,7 @@ def run(protocol: ProtocolContext) -> None:
         p200.return_tip()
         # ===============================================
 
-        protocol.comment(
-            "MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_1"
-        )
+        protocol.comment("MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_1")
         protocol.move_lid(lids, sample_plate_2, use_gripper=True)
         if ONDECK_THERMO:
             thermocycler.close_lid()
@@ -1073,9 +1052,7 @@ def run(protocol: ProtocolContext) -> None:
                 use_gripper=True,
                 pick_up_offset=deck_pick_up_offset,
             )
-        protocol.comment(
-            "MOVING: tiprack_20_X = SCP_Position --> tiprack_A3_adapter"
-        )
+        protocol.comment("MOVING: tiprack_20_X = SCP_Position --> tiprack_A3_adapter")
 
         protocol.move_labware(
             labware=tiprack_20_X,
@@ -1103,16 +1080,12 @@ def run(protocol: ProtocolContext) -> None:
             # 96-channel operation - process entire plate at once
             p200.pick_up_tip()
             p200.aspirate(TAGSTOPVol, TAGSTOP.bottom(z=PCRPlate_Z_offset))
-            p200.dispense(
-                TAGSTOPVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset)
-            )
+            p200.dispense(TAGSTOPVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
             p200.return_tip()
             # ===============================================
 
-        protocol.comment(
-            "MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_2"
-        )
+        protocol.comment("MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_2")
         protocol.move_lid(lids, sample_plate_2, use_gripper=True)
         if ONDECK_THERMO:
             thermocycler.close_lid()
@@ -1154,9 +1127,7 @@ def run(protocol: ProtocolContext) -> None:
                 use_gripper=True,
                 pick_up_offset=deck_pick_up_offset,
             )
-        protocol.comment(
-            "MOVING: tiprack_20_X = tiprack_A3_adapter --> SCP_Position"
-        )
+        protocol.comment("MOVING: tiprack_20_X = tiprack_A3_adapter --> SCP_Position")
         protocol.move_labware(
             labware=tiprack_20_X,
             new_location=tiprack_C2_adapter,
@@ -1490,9 +1461,7 @@ def run(protocol: ProtocolContext) -> None:
         p200.return_tip()
         # ===============================================
 
-        protocol.comment(
-            "MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_2"
-        )
+        protocol.comment("MOVING: Plate Lid #1 = Plate Lid Stack --> sample_plate_2")
         protocol.move_lid(lids, sample_plate_2, use_gripper=True)
         if ONDECK_THERMO:
             thermocycler.close_lid()
@@ -1839,9 +1808,7 @@ def run(protocol: ProtocolContext) -> None:
 
         # ============================================================================================
         if MODETRASH == "RECYCLE":
-            protocol.comment(
-                "MOVING: tiprack_50_10 = SCP_Position --> stacker 50|D"
-            )
+            protocol.comment("MOVING: tiprack_50_10 = SCP_Position --> stacker 50|D")
             protocol.move_labware(
                 labware=tiprack_50_10,
                 new_location=stacker_50_2,
@@ -2134,9 +2101,7 @@ def run(protocol: ProtocolContext) -> None:
 
         # ============================================================================================
         if MODETRASH == "RECYCLE":
-            protocol.comment(
-                "MOVING: tiprack_20_X = SCP_Position --> stacker 200|A"
-            )
+            protocol.comment("MOVING: tiprack_20_X = SCP_Position --> stacker 200|A")
             protocol.move_labware(
                 labware=tiprack_20_X,
                 new_location=stacker_20_1,
@@ -2454,9 +2419,7 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.open_lid()
         else:
             if DRYRUN is False:
-                protocol.pause(
-                    "Pausing to run PCR on an off deck Thermocycler ~25min"
-                )
+                protocol.pause("Pausing to run PCR on an off deck Thermocycler ~25min")
             else:
                 protocol.comment(
                     "Pausing to run PCR on an off deck Thermocycler ~25min"

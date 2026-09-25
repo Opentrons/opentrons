@@ -138,7 +138,6 @@ def unload_tipracks_from_stacker(
 
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
-
     ctx.capture_image(filename="start_of_run")
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
     ctx.comment("Protocol Version: 03")
@@ -192,9 +191,7 @@ def run(ctx: ProtocolContext) -> None:
     water = ctx.get_liquid_class("water")
     # unload tipracks
     unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
-    move_plates_to_deck_fill_and_store(
-        stacker_pcrplates, ctx, p96, water, reservoir
-    )
+    move_plates_to_deck_fill_and_store(stacker_pcrplates, ctx, p96, water, reservoir)
     # Move old tipracks
     old_tipracks = p96.tip_racks
     ctx.move_labware(old_tipracks[0], "D2", use_gripper=True)
@@ -202,9 +199,7 @@ def run(ctx: ProtocolContext) -> None:
     # Get new tipracks
     unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
     # Second labware
-    move_plates_to_deck_fill_and_store(
-        stacker_384plates, ctx, p96, water, reservoir
-    )
+    move_plates_to_deck_fill_and_store(stacker_384plates, ctx, p96, water, reservoir)
 
     # Unload last tip racks
     unused_tiprack1 = stacker_50ul.retrieve()
@@ -225,8 +220,5 @@ def run(ctx: ProtocolContext) -> None:
     p96.tip_racks.append(unused_tiprack1)
     p96.tip_racks.append(unused_tiprack2)
     set_liquid_class_behavior(ctx, p96, [unused_tiprack1, unused_tiprack2], water)
-    move_plates_to_deck_fill_and_store(
-        stacker_nest96deep, ctx, p96, water, reservoir
-    )
+    move_plates_to_deck_fill_and_store(stacker_nest96deep, ctx, p96, water, reservoir)
     ctx.capture_image(filename="end_of_run")
-

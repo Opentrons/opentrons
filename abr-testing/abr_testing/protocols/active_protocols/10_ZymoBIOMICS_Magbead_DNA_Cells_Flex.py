@@ -1,7 +1,7 @@
 """Flex ZymoBIOMICS Magbead DNA Extraction: Cells."""
 import math
 from opentrons import types
-from typing import List, Dict
+from typing import List, Dict, TypedDict, cast
 from opentrons import protocol_api
 from opentrons.protocol_api import Well, InstrumentContext
 import numpy as np
@@ -49,6 +49,13 @@ drop_count = 0
 m1000_tips = 0
 
 
+class LiquidWells(TypedDict):
+    """Wells and per-well volume for a defined liquid."""
+
+    well: Well | List[Well]
+    volume: float
+
+
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Define parameters."""
     pass
@@ -56,7 +63,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
-
     protocol.capture_image(filename="start_of_run")
 
     # Standardized run variables to replace former custom parameters
@@ -114,20 +120,24 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     protocol.load_trash_bin("A3")
 
     # Native Module & Labware Loading
-    h_s: HeaterShakerContext = protocol.load_module("heaterShakerModuleV1", "D1")
+    h_s: HeaterShakerContext = protocol.load_module(
+        "heaterShakerModuleV1", "D1"
+    )  # type: ignore[assignment]
     h_s_adapter = h_s.load_adapter("opentrons_96_deep_well_adapter")
     sample_plate = h_s_adapter.load_labware(deepwell_type, "Samples")
     h_s.close_labware_latch()
 
     temp: TemperatureModuleContext = protocol.load_module(
         "temperature module gen2", "D3"
-    )
+    )  # type: ignore[assignment]
     temp_adapter = temp.load_adapter("opentrons_96_well_aluminum_block")
     elutionplate = temp_adapter.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
     )
 
-    magblock: MagneticBlockContext = protocol.load_module("magneticBlockV1", "C1")
+    magblock: MagneticBlockContext = protocol.load_module(
+        "magneticBlockV1", "C1"
+    )  # type: ignore[assignment]
 
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "B3", "Liquid Waste"
@@ -151,9 +161,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     lm = "liquid-meniscus"
     for tip in tip_racks:
         props = water.get_for(m1000, tip)
-        props.aspirate.aspirate_position.position_reference = lm
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
         props.aspirate.aspirate_position.offset.z = meniscus_z
-        props.dispense.dispense_position.position_reference = lm
+        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
         props.dispense.dispense_position.offset.z = meniscus_z
 
     def remove_supernatant(vol: float) -> None:
@@ -169,7 +179,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             for _ in range(num_trans):
                 m1000.move_to(m.center())
                 if vol_per_trans > m.current_liquid_volume():
-                    vol_per_trans = m.current_liquid_volume() - 100
+                    vol_per_trans = cast(float, m.current_liquid_volume() - 100)
                 m1000.transfer_with_liquid_class(
                     water,
                     vol_per_trans,
@@ -420,7 +430,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             src = source[whichwash]
             for n in range(num_trans):
                 if vol_per_trans > src.current_liquid_volume():
-                    vol_per_trans = src.current_liquid_volume()
+                    vol_per_trans = cast(float, src.current_liquid_volume())
 
                 m1000.transfer_with_liquid_class(
                     water,
@@ -524,7 +534,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     elution_samples_m = elutionplate.rows()[0][:num_cols]
     samps = sample_plate.wells()[: (8 * num_cols)]
 
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
+    liquid_vols_and_wells: Dict[str, List[LiquidWells]] = {
         "Lysis and PK": [{"well": lysis_, "volume": 12320.0}],
         "Beads and Binding": [{"well": binding_buffer, "volume": 11875.0}],
         "Binding 2": [{"well": bind2_res, "volume": 13500.0}],

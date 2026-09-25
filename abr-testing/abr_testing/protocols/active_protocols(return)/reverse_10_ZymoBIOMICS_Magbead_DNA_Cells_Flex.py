@@ -122,14 +122,10 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         reservoir.load_empty(reservoir.wells())
 
     tip_racks = [
-        protocol.load_labware(
-            "opentrons_flex_96_tiprack_1000ul", slot, f"Tips {index}"
-        )
+        protocol.load_labware("opentrons_flex_96_tiprack_1000ul", slot, f"Tips {index}")
         for index, slot in enumerate(("A1", "A2", "B1"), start=1)
     ]
-    m1000 = protocol.load_instrument(
-        "flex_8channel_1000", mount, tip_racks=tip_racks
-    )
+    m1000 = protocol.load_instrument("flex_8channel_1000", mount, tip_racks=tip_racks)
 
     lysis_ = res1.wells()[0]
     binding_buffer = res1.wells()[1:8]

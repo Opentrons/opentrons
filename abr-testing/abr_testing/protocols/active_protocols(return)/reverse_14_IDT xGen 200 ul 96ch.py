@@ -7,7 +7,11 @@ automated rerun.
 
 from opentrons import protocol_api
 from opentrons.protocol_api import OFF_DECK
-from opentrons.protocol_api.module_contexts import FlexStackerContext
+from opentrons.protocol_api.module_contexts import (
+    FlexStackerContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+)
 
 metadata = {
     "protocolName": "Reverse IDT xGen 200 uL 96x v9",
@@ -87,8 +91,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "but not the completed end-state reset performed here."
     )
 
-    thermocycler = protocol.load_module("thermocycler module gen2")
-    temp_module = protocol.load_module("temperature module gen2", "C1")
+    thermocycler: ThermocyclerContext = protocol.load_module(
+        "thermocycler module gen2"
+    )  # type: ignore[assignment]
+    temp_module: TemperatureModuleContext = protocol.load_module(
+        "temperature module gen2", "C1"
+    )  # type: ignore[assignment]
     reagent_plate_1 = temp_module.load_labware("greiner_384_wellplate_240ul")
     protocol.load_labware("greiner_384_wellplate_240ul", "B3")
     liquid_waste = protocol.load_labware("nest_96_wellplate_2ml_deep", "B2")

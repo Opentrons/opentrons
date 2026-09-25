@@ -8,6 +8,7 @@ from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     Labware,
+    Well,
 )
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
@@ -221,7 +222,9 @@ def run(protocol: ProtocolContext) -> None:
     if COLUMNS != 4:
         raise RuntimeError(f"Unsupported COLUMNS={COLUMNS} for reverse reset.")
 
-    protocol.comment("Return Sample Plate 2 to the heater-shaker for the next forward run.")
+    protocol.comment(
+        "Return Sample Plate 2 to the heater-shaker for the next forward run."
+    )
     heatershaker.open_labware_latch()
     protocol.move_labware(sample_plate_2, hs_adapter, use_gripper=True)
     heatershaker.close_labware_latch()
@@ -230,7 +233,7 @@ def run(protocol: ProtocolContext) -> None:
     p1000.reset_tipracks()
     p1000.pick_up_tip()
 
-    def restore_column(column_well, volume):
+    def restore_column(column_well: Well, volume: float) -> None:
         remaining = float(volume)
         while remaining > 0:
             chunk = min(remaining, 180.0)
@@ -256,9 +259,7 @@ def run(protocol: ProtocolContext) -> None:
         restore_column(sample_column[0], 150.0)
     p1000.return_tip()
 
-    wells_col_1_to_7 = [
-        well for col in sample_plate_2.columns()[:7] for well in col
-    ]
+    wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
     sample_plate_2.load_empty(wells_col_1_to_7)
 
     # Forward end state: universal lid returned to the B4 stack, TC open.

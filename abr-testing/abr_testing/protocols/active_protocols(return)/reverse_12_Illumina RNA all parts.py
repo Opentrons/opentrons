@@ -5,9 +5,15 @@ restores starting volumes from the liquid-waste reservoir, and resets movable
 labware for automated rerun.
 """
 
+from typing import Optional
+
 from opentrons import protocol_api
 from opentrons.protocol_api import OFF_DECK
-from opentrons.protocol_api.module_contexts import FlexStackerContext
+from opentrons.protocol_api.module_contexts import (
+    FlexStackerContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+)
 
 metadata = {
     "protocolName": "Reverse Illumina RNA Enrichment 96x All Parts",
@@ -75,7 +81,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "the original overrides/ignores them in its executed path."
     )
 
-    thermocycler = protocol.load_module("thermocycler module gen2")
+    thermocycler: ThermocyclerContext = protocol.load_module(
+        "thermocycler module gen2"
+    )  # type: ignore[assignment]
     sample_plate_3 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "Sample Plate 3 end state",
@@ -92,13 +100,16 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     )
 
     protocol.load_labware("greiner_384_wellplate_240ul", "B2", "Reagent Plate 2")
+    temp_module: Optional[TemperatureModuleContext] = None
     if protocol.params.temperature_module:  # type: ignore[attr-defined]
-        temp_module = protocol.load_module("temperature module gen2", "C1")
-        reagent_plate_1 = temp_module.load_labware(
+        loaded_temp_module: TemperatureModuleContext = protocol.load_module(
+            "temperature module gen2", "C1"
+        )  # type: ignore[assignment]
+        temp_module = loaded_temp_module
+        reagent_plate_1 = loaded_temp_module.load_labware(
             "greiner_384_wellplate_240ul", "Reagent Plate 1"
         )
     else:
-        temp_module = None
         reagent_plate_1 = protocol.load_labware(
             "greiner_384_wellplate_240ul", "C1", "Reagent Plate 1"
         )
@@ -122,29 +133,21 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     stacker_20_used: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "A4"
     )  # type: ignore[assignment]
-    stacker_20_used.set_stored_labware(
-        "opentrons_flex_96_tiprack_20ul", count=0
-    )
+    stacker_20_used.set_stored_labware("opentrons_flex_96_tiprack_20ul", count=0)
     stacker_20_source: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "B4"
     )  # type: ignore[assignment]
-    stacker_20_source.set_stored_labware(
-        "opentrons_flex_96_tiprack_20ul", count=6
-    )
+    stacker_20_source.set_stored_labware("opentrons_flex_96_tiprack_20ul", count=6)
     stacker_50_used: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "C4"
     )  # type: ignore[assignment]
-    stacker_50_used.set_stored_labware(
-        "opentrons_flex_96_tiprack_50ul", count=0
-    )
+    stacker_50_used.set_stored_labware("opentrons_flex_96_tiprack_50ul", count=0)
     stacker_50_source: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "D4"
     )  # type: ignore[assignment]
-    stacker_50_source.set_stored_labware(
-        "opentrons_flex_96_tiprack_50ul", count=6
-    )
+    stacker_50_source.set_stored_labware("opentrons_flex_96_tiprack_50ul", count=6)
 
-    tiprack_a3 = protocol.load_labware(
+    protocol.load_labware(
         "opentrons_flex_96_tiprack_20ul",
         "A3",
         adapter="opentrons_flex_96_tiprack_adapter",
@@ -211,6 +214,4 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     thermocycler.deactivate_lid()
 
     pipette.reset_tipracks()
-    protocol.comment(
-        "Deck layout matches forward start. Rerun original."
-    )
+    protocol.comment("Deck layout matches forward start. Rerun original.")

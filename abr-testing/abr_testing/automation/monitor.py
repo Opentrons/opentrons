@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Opentrons run monitor + error clip recorder.
+"""Opentrons run monitor + error clip recorder.
 
 Continuously watches one or more Opentrons robots over their HTTP API
 (port 31950). While a run is active it records the robot's live HLS camera
@@ -33,14 +32,18 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from read_robot_logs import get_logs
+from types import FrameType
+from typing import Any, Dict, List, Optional, Union
+from read_robot_logs import get_logs  # type: ignore[import-not-found]
 
 import requests
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
 except ImportError:  # pragma: no cover
-    raise SystemExit("Missing dependency PyYAML. Install with: pip install -r requirements.txt")
+    raise SystemExit(
+        "Missing dependency PyYAML. Install with: pip install -r requirements.txt"
+    )
 
 
 log = logging.getLogger("monitor")
@@ -69,7 +72,7 @@ TERMINAL_STATUSES = {"succeeded", "failed", "stopped"}
 # recorder stops running, so a naive "restart if not running" loop respawns it
 # every poll. Once we've seen this many consecutive failed starts we conclude
 # the stream is down and only retry every STREAM_RETRY_BACKOFF seconds.
-STREAM_DOWN_AFTER_FAILURES = 0 #TODO: fix this memory leak??
+STREAM_DOWN_AFTER_FAILURES = 0  # TODO: fix this memory leak??
 STREAM_RETRY_BACKOFF = 60.0
 # Ignore all error triggers for this long after the watcher starts so a robot
 # already sitting in error recovery doesn't immediately alert (no video buffer
@@ -87,16 +90,20 @@ def utcstamp() -> str:
 # --------------------------------------------------------------------------- #
 @dataclass
 class ClipConfig:
+    """Clip length, buffering, and retention settings."""
+
     pre_error_seconds: int = 120
-    post_error_seconds: int = 10      # keep recording this long after an error
+    post_error_seconds: int = 10  # keep recording this long after an error
     segment_seconds: int = 10
     buffer_seconds: int = 180
     cooldown_seconds: int = 60
-    max_clips: int = 5             # keep only the N most recent saved clips
+    max_clips: int = 5  # keep only the N most recent saved clips
 
 
 @dataclass
 class TriggerConfig:
+    """Which run events trigger a clip."""
+
     on_error_recovery: bool = True
     on_failed: bool = True
     on_command_error: bool = True
@@ -104,6 +111,8 @@ class TriggerConfig:
 
 @dataclass
 class NotifyConfig:
+    """Notification settings shared by all robots."""
+
     enabled: bool = False
     type: str = "none"  # slack | webhook | none
 
@@ -113,28 +122,32 @@ class NotifyConfig:
     #   token_file: a plain file whose contents are the xoxb-... token
     token_ini: str = ""
     token_file: str = ""
-    channel: str = ""                 # default channel (robots can override)
-    username: str = ""                # blank -> poster name defaults to robot name
-    upload_clip: bool = True          # attach the mp4 (and .json) to the message
+    channel: str = ""  # default channel (robots can override)
+    username: str = ""  # blank -> poster name defaults to robot name
+    upload_clip: bool = True  # attach the mp4 (and .json) to the message
 
     # --- type: "webhook" (Slack Incoming Webhook or any JSON endpoint) ---
     webhook_url: str = ""
-    webhook_format: str = "slack"     # slack -> {"text": ...} | generic -> full JSON
+    webhook_format: str = "slack"  # slack -> {"text": ...} | generic -> full JSON
 
 
 @dataclass
 class RobotConfig:
+    """Connection and Slack settings for a single robot."""
+
     name: str
     ip: str
     # Per-robot Slack settings. The token comes from the shared notify.token_ini
     # by default; set config_ini only to override the key for this one robot.
-    slack_channel: str = ""           # falls back to notify.channel if empty
-    slack_username: str = ""          # falls back to notify.username if empty
-    config_ini: str = ""              # optional per-robot key override
+    slack_channel: str = ""  # falls back to notify.channel if empty
+    slack_username: str = ""  # falls back to notify.username if empty
+    config_ini: str = ""  # optional per-robot key override
 
 
 @dataclass
 class Config:
+    """Top-level monitor configuration."""
+
     poll_interval_seconds: float = 3.0
     opentrons_version: str = "2"
     output_dir: str = "./clips"
@@ -146,6 +159,7 @@ class Config:
 
 
 def load_config(path: str, storage_dir: Path) -> Config:
+    """Load the YAML config, resolving relative paths against storage_dir."""
     with open(path, "r") as fh:
         raw = yaml.safe_load(fh) or {}
 
@@ -171,7 +185,9 @@ def load_config(path: str, storage_dir: Path) -> Config:
         for r in raw.get("robots", [])
     ]
     if not robots:
-        raise SystemExit("No robots defined in config. Add at least one under 'robots:'.")
+        raise SystemExit(
+            "No robots defined in config. Add at least one under 'robots:'."
+        )
 
     raw_notify = raw.get("notify") or {}
     notify_cfg = NotifyConfig(
@@ -218,19 +234,16 @@ def _read_token_file(path: str) -> str:
 
 
 def _format_message(robot_name: str, meta: dict) -> str:
-    reason = meta.get('reason')
-    protocol = meta.get('protocol_name')
+    reason = meta.get("reason")
+    protocol = meta.get("protocol_name")
     if reason == "run_started":
-        return (
-            f":rocket: Protocol: {protocol} has started.\n"
-        )
+        return f":rocket: Protocol: {protocol} has started.\n"
     if reason == "error_recovery_instant":
-        return(f":eyes: *{robot_name}* is in error recovery mode :eyes:\n")
-    
+        return f":eyes: *{robot_name}* is in error recovery mode :eyes:\n"
+
     if reason == "run_finished":
-        return(f":tada: Protocol {protocol} has finished :tada:")
-    
-    
+        return f":tada: Protocol {protocol} has finished :tada:"
+
     return (
         f":rotating_light: *{robot_name}* error clip saved\n"
         f"> reason: {meta.get('reason')}\n"
@@ -244,16 +257,22 @@ def _format_message(robot_name: str, meta: dict) -> str:
 class WebhookNotifier:
     """Posts to a Slack Incoming Webhook or any JSON endpoint (no file upload)."""
 
-    def __init__(self, cfg: NotifyConfig):
+    def __init__(self, cfg: NotifyConfig) -> None:
+        """Store the webhook URL and payload format."""
         self.url = cfg.webhook_url
         self.fmt = cfg.webhook_format
 
     def notify(self, robot_name: str, meta: dict) -> None:
+        """Post the event to the webhook."""
         if not self.url:
             return
         try:
             if self.fmt == "slack":
-                requests.post(self.url, json={"text": _format_message(robot_name, meta)}, timeout=10)
+                requests.post(
+                    self.url,
+                    json={"text": _format_message(robot_name, meta)},
+                    timeout=10,
+                )
             else:
                 requests.post(self.url, json=meta, timeout=10)
             log.debug("[%s] webhook notification sent", robot_name)
@@ -269,9 +288,15 @@ class SlackNotifier:
     config.ini via SlackNotifier.from_ini().
     """
 
-    def __init__(self, token: str, channel: str,
-                 username: str = "robot-monitor", upload_clip: bool = True,
-                 gemini_api_key: str = ""):
+    def __init__(
+        self,
+        token: str,
+        channel: str,
+        username: str = "robot-monitor",
+        upload_clip: bool = True,
+        gemini_api_key: str = "",
+    ) -> None:
+        """Create the Slack client and resolve the channel ID."""
         try:
             from slack_sdk import WebClient
         except ImportError as exc:  # pragma: no cover
@@ -287,12 +312,21 @@ class SlackNotifier:
         self.gemini_api_key = gemini_api_key
         self.channel_id = self._channel_id_from_name(channel)
         if self.channel_id is None:
-            log.warning("Slack channel '%s' not found (file upload may fail); "
-                        "is the bot invited to it?", channel)
+            log.warning(
+                "Slack channel '%s' not found (file upload may fail); "
+                "is the bot invited to it?",
+                channel,
+            )
 
     @classmethod
-    def from_token_file(cls, token_file: str, channel: str,
-                        username: str = "robot-monitor", upload_clip: bool = True) -> "SlackNotifier":
+    def from_token_file(
+        cls,
+        token_file: str,
+        channel: str,
+        username: str = "robot-monitor",
+        upload_clip: bool = True,
+    ) -> "SlackNotifier":
+        """Build a notifier from a plain token file."""
         return cls(_read_token_file(token_file), channel, username, upload_clip)
 
     def _channel_id_from_name(self, channel_name: str) -> str | None:
@@ -303,16 +337,20 @@ class SlackNotifier:
             try:
                 while True:
                     resp = self.client.conversations_list(
-                        exclude_archived=True, limit=1000, cursor=cursor, types=types,
+                        exclude_archived=True,
+                        limit=1000,
+                        cursor=cursor,
+                        types=types,
                     )
-                    for ch in resp.get("channels", []):
+                    channels: List[Dict[str, Any]] = resp.get("channels", [])
+                    for ch in channels:
                         if ch.get("name") == channel_name:
                             return ch["id"]
                     cursor = (resp.get("response_metadata") or {}).get("next_cursor")
                     if not cursor:
                         break
                 return None  # listed successfully but name not present
-            except Exception as exc:  # noqa: BLE001 - best-effort, try next types
+            except Exception as exc:  # best-effort, try next types
                 if "missing_scope" in str(exc) and types != "public_channel":
                     continue
                 log.warning("Slack channel lookup failed: %s", exc)
@@ -320,6 +358,7 @@ class SlackNotifier:
         return None
 
     def notify(self, robot_name: str, meta: dict) -> None:
+        """Post the event, upload attachments, and start AI analysis."""
         text = _format_message(robot_name, meta)
         try:
             parent = self.client.chat_postMessage(
@@ -329,7 +368,7 @@ class SlackNotifier:
                 icon_emoji=":movie_camera:",
             )
             thread_ts = parent["ts"]
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             log.warning("[%s] Slack message failed: %s", robot_name, exc)
             return
 
@@ -358,7 +397,7 @@ class SlackNotifier:
                         channel=self.channel_id,
                         thread_ts=thread_ts,
                     )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("[%s] Slack upload of %s failed: %s", robot_name, path, exc)
         log.debug("[%s] Slack notification sent", robot_name)
 
@@ -368,8 +407,9 @@ class SlackNotifier:
         if not self.gemini_api_key:
             log.info("[%s] skipping AI analysis: GEMINI_API_KEY not set", robot_name)
         elif not (clip_path and os.path.exists(clip_path)):
-            log.info("[%s] skipping AI analysis: no clip on disk (%s)",
-                     robot_name, clip_path)
+            log.info(
+                "[%s] skipping AI analysis: no clip on disk (%s)", robot_name, clip_path
+            )
         else:
             threading.Thread(
                 target=self._post_analysis,
@@ -379,13 +419,16 @@ class SlackNotifier:
 
     def _post_analysis(self, robot_name: str, clip_path: str, thread_ts: str) -> None:
         """Run Gemini analysis on the local clip and reply in-thread."""
-        log.info("[%s] starting AI video analysis of %s",
-                 robot_name, os.path.basename(clip_path))
+        log.info(
+            "[%s] starting AI video analysis of %s",
+            robot_name,
+            os.path.basename(clip_path),
+        )
         try:
-            from ai_analysis import analyze_video
+            from ai_analysis import analyze_video  # type: ignore[import-not-found]
 
             analysis = analyze_video(clip_path, self.gemini_api_key)
-        except Exception as exc:  # noqa: BLE001 - never let analysis break alerts
+        except Exception as exc:  # never let analysis break alerts
             log.warning("[%s] AI video analysis failed: %s", robot_name, exc)
             return
         if not analysis:
@@ -398,8 +441,11 @@ class SlackNotifier:
                 text=f"*AI Video Analysis:*\n{analysis}",
             )
             log.info("[%s] posted AI video analysis", robot_name)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             log.warning("[%s] posting AI analysis failed: %s", robot_name, exc)
+
+
+Notifier = Union[WebhookNotifier, SlackNotifier]
 
 
 def _resolve_slack_token(n: NotifyConfig) -> str:
@@ -443,7 +489,7 @@ def _read_token_from_ini(path: str) -> str:
     return token
 
 
-def build_robot_notifier(robot: RobotConfig, cfg: Config):
+def build_robot_notifier(robot: RobotConfig, cfg: Config) -> Optional[Notifier]:
     """Build this robot's notifier using the shared Slack key + per-robot channel."""
     n = cfg.notify
     if not n.enabled or n.type == "none":
@@ -455,7 +501,11 @@ def build_robot_notifier(robot: RobotConfig, cfg: Config):
         return None
 
     # Shared token by default; per-robot config_ini overrides the key.
-    token = _read_token_from_ini(robot.config_ini) if robot.config_ini else _resolve_slack_token(n)
+    token = (
+        _read_token_from_ini(robot.config_ini)
+        if robot.config_ini
+        else _resolve_slack_token(n)
+    )
     channel = robot.slack_channel or n.channel
     if not channel:
         raise SystemExit(
@@ -475,7 +525,8 @@ def build_robot_notifier(robot: RobotConfig, cfg: Config):
 class Recorder:
     """Records the robot's HLS feed into a rolling buffer of .ts segments."""
 
-    def __init__(self, robot: RobotConfig, work_dir: str, clip: ClipConfig):
+    def __init__(self, robot: RobotConfig, work_dir: str, clip: ClipConfig) -> None:
+        """Set up the segment directory and stream URL for this robot."""
         self.robot = robot
         self.clip = clip
         self.seg_dir = os.path.join(work_dir, robot.name)
@@ -484,9 +535,11 @@ class Recorder:
 
     @property
     def running(self) -> bool:
+        """Whether the ffmpeg recorder process is alive."""
         return self._proc is not None and self._proc.poll() is None
 
     def start(self) -> None:
+        """Start ffmpeg recording the HLS feed into rolling segments."""
         if self.running:
             return
         os.makedirs(self.seg_dir, exist_ok=True)
@@ -494,14 +547,22 @@ class Recorder:
         cmd = [
             "ffmpeg",
             "-nostdin",
-            "-loglevel", "warning",
-            "-fflags", "+genpts",
-            "-i", self.stream_url,
-            "-c", "copy",
-            "-f", "segment",
-            "-segment_time", str(self.clip.segment_seconds),
-            "-segment_format", "mpegts",
-            "-strftime", "0",
+            "-loglevel",
+            "warning",
+            "-fflags",
+            "+genpts",
+            "-i",
+            self.stream_url,
+            "-c",
+            "copy",
+            "-f",
+            "segment",
+            "-segment_time",
+            str(self.clip.segment_seconds),
+            "-segment_format",
+            "mpegts",
+            "-strftime",
+            "0",
             seg_pattern,
         ]
         log.debug("[%s] starting recorder -> %s", self.robot.name, self.stream_url)
@@ -510,6 +571,7 @@ class Recorder:
         )
 
     def stop(self) -> None:
+        """Terminate the ffmpeg recorder process if it is running."""
         if self._proc and self._proc.poll() is None:
             self._proc.terminate()
             try:
@@ -535,6 +597,7 @@ class Recorder:
             pass
 
     def cleanup(self) -> None:
+        """Delete all recorded segments for this robot."""
         shutil.rmtree(self.seg_dir, ignore_errors=True)
 
     def _segments_newest_last(self) -> list[str]:
@@ -549,8 +612,14 @@ class Recorder:
         files.sort(key=lambda p: os.path.getmtime(p))
         return files
 
-    def extract_clip(self, output_dir: str, run_id: str, reason: str,
-                     drop_active: bool = True, base_name: str | None = None) -> str | None:
+    def extract_clip(
+        self,
+        output_dir: str,
+        run_id: str,
+        reason: str,
+        drop_active: bool = True,
+        base_name: str | None = None,
+    ) -> str | None:
         """Concatenate the most recent segments into a single mp4. Returns path.
 
         drop_active: when True (recorder still running) the newest, still-being-
@@ -564,8 +633,12 @@ class Recorder:
             log.warning("[%s] no recorded segments to clip", self.robot.name)
             return None
 
-        if (drop_active and len(segments) > 1
-                and (time.time() - os.path.getmtime(segments[-1])) < self.clip.segment_seconds):
+        if (
+            drop_active
+            and len(segments) > 1
+            and (time.time() - os.path.getmtime(segments[-1]))
+            < self.clip.segment_seconds
+        ):
             segments = segments[:-1]
 
         # Include pre-error footage plus the post-error tail we kept recording.
@@ -587,13 +660,19 @@ class Recorder:
         cmd = [
             "ffmpeg",
             "-nostdin",
-            "-loglevel", "error",
+            "-loglevel",
+            "error",
             "-y",
-            "-fflags", "+genpts",
-            "-i", concat_input,
-            "-c", "copy",
-            "-avoid_negative_ts", "make_zero",
-            "-movflags", "+faststart",
+            "-fflags",
+            "+genpts",
+            "-i",
+            concat_input,
+            "-c",
+            "copy",
+            "-avoid_negative_ts",
+            "make_zero",
+            "-movflags",
+            "+faststart",
             clip_path,
         ]
         try:
@@ -602,8 +681,13 @@ class Recorder:
             log.error("[%s] clip extraction failed: %s", self.robot.name, exc)
             return None
 
-        log.debug("[%s] saved clip %s (%d segments, reason=%s)",
-                  self.robot.name, clip_path, len(chosen), reason)
+        log.debug(
+            "[%s] saved clip %s (%d segments, reason=%s)",
+            self.robot.name,
+            clip_path,
+            len(chosen),
+            reason,
+        )
         return clip_path
 
 
@@ -631,7 +715,9 @@ def prune_old_clips(output_dir: str, keep: int) -> None:
         log.debug("pruned old incident folder %s", path)
 
 
-def fetch_robot_logs(ip: str, storage_dir: str, dest_dir: str | None = None) -> str | None:
+def fetch_robot_logs(
+    ip: str, storage_dir: str, dest_dir: str | None = None
+) -> str | None:
     """Download a robot's logs via abr-testing's get_logs; return the .zip path.
 
     Loads read_robot_logs.py from READ_ROBOT_LOGS_PATH (its package root is added
@@ -649,7 +735,7 @@ def fetch_robot_logs(ip: str, storage_dir: str, dest_dir: str | None = None) -> 
             shutil.move(zip_path, moved)
             return moved
         return zip_path
-    except Exception as exc:  # noqa: BLE001 - never let log collection break alerts
+    except Exception as exc:  # never let log collection break alerts
         log.warning("log collection failed for %s: %s", ip, exc)
         return None
 
@@ -659,6 +745,8 @@ def fetch_robot_logs(ip: str, storage_dir: str, dest_dir: str | None = None) -> 
 # --------------------------------------------------------------------------- #
 @dataclass
 class RunState:
+    """Per-run trigger bookkeeping."""
+
     run_id: str
     reported_error_ids: set[str] = field(default_factory=set)
     recovery_reported: bool = False
@@ -667,6 +755,7 @@ class RunState:
     last_clip_ts: float = 0.0
     finished: bool = False  # clip captured OR run ended; stop recording it
 
+
 # --------------------------------------------------------------------------- #
 # Robot HTTP client
 # --------------------------------------------------------------------------- #
@@ -674,12 +763,14 @@ class RobotClient:
     """Thin wrapper around the robot HTTP API (port 31950)."""
 
     def __init__(self, robot: RobotConfig, opentrons_version: str) -> None:
+        """Create an HTTP session for the robot."""
         self.robot = robot
         self.base_url = f"http://{robot.ip}:31950"
         self.session = requests.Session()
         self.session.headers.update({"Opentrons-Version": opentrons_version})
 
     def get_current_run(self) -> dict | None:
+        """Return the robot's current run, or None if there is none."""
         resp = self.session.get(f"{self.base_url}/runs", timeout=8)
         resp.raise_for_status()
         data = resp.json().get("data", []) or []
@@ -689,6 +780,7 @@ class RobotClient:
         return None
 
     def get_protocol_name(self, protocol_id: str | None) -> str:
+        """Look up a protocol's display name, falling back to its ID."""
         if not protocol_id:
             return "Unknown / No Protocol"
         try:
@@ -725,6 +817,7 @@ class RobotClient:
         detail: str | None = None,
         clip_path: str | None = None,
     ) -> dict:
+        """Build the notification metadata for a run event."""
         if protocol_name is None:
             protocol_name = self.get_protocol_name(run.get("protocolId"))
         return {
@@ -750,9 +843,10 @@ class IncidentHandler:
         robot: RobotConfig,
         cfg: Config,
         recorder: Recorder,
-        notifier,
+        notifier: Optional[Notifier],
         stop_event: threading.Event,
     ) -> None:
+        """Store collaborators used to save clips and notify."""
         self.robot = robot
         self.cfg = cfg
         self.recorder = recorder
@@ -760,6 +854,7 @@ class IncidentHandler:
         self.stop_event = stop_event
 
     def save_and_notify(self, run: dict, reason: str, detail: str | None) -> None:
+        """Save the clip and robot logs for an incident, then notify."""
         run_id = run.get("id", "unknown")
         log.info(
             "[%s] %s on run %s (status=%s)%s",
@@ -830,14 +925,16 @@ class TriggerEvaluator:
         cfg: Config,
         client: RobotClient,
         incidents: IncidentHandler,
-        notifier,
+        notifier: Optional[Notifier],
     ) -> None:
+        """Store collaborators used to evaluate triggers."""
         self.cfg = cfg
         self.client = client
         self.incidents = incidents
         self.notifier = notifier
 
     def evaluate(self, run: dict, state: RunState) -> None:
+        """Check the run for new error triggers and handle the incident."""
         if state.finished:
             return
 
@@ -897,6 +994,7 @@ class RecorderSupervisor:
     """Start/restart the recorder and track HLS stream health."""
 
     def __init__(self, robot_name: str, recorder: Recorder) -> None:
+        """Initialize stream health tracking for the recorder."""
         self.robot_name = robot_name
         self.recorder = recorder
         self.stream_ok = True
@@ -906,6 +1004,7 @@ class RecorderSupervisor:
         self._recorder_retry_at = 0.0
 
     def ensure_recording(self) -> None:
+        """Start or restart the recorder, backing off if the stream is down."""
         now = time.monotonic()
         if self.recorder.running:
             if now - self._recorder_start_ts > 3.0:
@@ -941,6 +1040,7 @@ class RecorderSupervisor:
         )
 
     def reset_health(self) -> None:
+        """Reset stream health tracking for a new run."""
         self.stream_ok = True
         self._recorder_fails = 0
         self._recorder_start_ts = 0.0
@@ -961,8 +1061,9 @@ class RunLifecycle:
         evaluator: TriggerEvaluator,
         recorder: Recorder,
         supervisor: RecorderSupervisor,
-        notifier,
+        notifier: Optional[Notifier],
     ) -> None:
+        """Store collaborators used to track the run lifecycle."""
         self.robot = robot
         self.client = client
         self.evaluator = evaluator
@@ -973,6 +1074,7 @@ class RunLifecycle:
         self.recording_paused = False
 
     def handle_run(self, run: dict | None, *, first_poll_done: bool) -> None:
+        """Update run state, recording, and triggers from the latest poll."""
         if run is None:
             if self.run_state is not None:
                 log.debug("[%s] run ended/cleared", self.robot.name)
@@ -991,7 +1093,9 @@ class RunLifecycle:
             self.supervisor.reset_health()
 
             is_startup = not first_poll_done
-            existing_errors = {e.get("id") for e in run.get("errors", []) if e.get("id")}
+            existing_errors = {
+                e.get("id") for e in run.get("errors", []) if e.get("id")
+            }
             is_recovering = status in ERROR_STATUSES
             is_failed = status == "failed"
 
@@ -1062,8 +1166,9 @@ class RobotWatcher(threading.Thread):
         robot: RobotConfig,
         cfg: Config,
         stop_event: threading.Event,
-        notifier=None,
+        notifier: Optional[Notifier] = None,
     ) -> None:
+        """Wire up the recorder, client, and run handling for one robot."""
         super().__init__(name=f"watch-{robot.name}", daemon=True)
         self.robot = robot
         self.cfg = cfg
@@ -1072,7 +1177,9 @@ class RobotWatcher(threading.Thread):
 
         self.recorder = Recorder(robot, cfg.work_dir, cfg.clip)
         self.client = RobotClient(robot, cfg.opentrons_version)
-        self.incidents = IncidentHandler(robot, cfg, self.recorder, notifier, stop_event)
+        self.incidents = IncidentHandler(
+            robot, cfg, self.recorder, notifier, stop_event
+        )
         self.evaluator = TriggerEvaluator(cfg, self.client, self.incidents, notifier)
         self.supervisor = RecorderSupervisor(robot.name, self.recorder)
         self.lifecycle = RunLifecycle(
@@ -1083,6 +1190,7 @@ class RobotWatcher(threading.Thread):
         self._first_poll_done = False
 
     def run(self) -> None:
+        """Poll the robot until the stop event is set."""
         backoff = self.cfg.poll_interval_seconds
         while not self.stop_event.is_set():
             try:
@@ -1099,7 +1207,7 @@ class RobotWatcher(threading.Thread):
                     log.warning("[%s] unreachable: %s", self.robot.name, exc)
                     self.reachable = False
                 backoff = min(backoff * 1.5, 30.0)
-            except Exception:  # noqa: BLE001 - never let one robot kill the loop
+            except Exception:  # never let one robot kill the loop
                 log.exception("[%s] unexpected error", self.robot.name)
                 backoff = min(backoff * 1.5, 30.0)
 
@@ -1111,7 +1219,7 @@ class RobotWatcher(threading.Thread):
             ):
                 try:
                     self.supervisor.ensure_recording()
-                except Exception:  # noqa: BLE001
+                except Exception:
                     log.exception("[%s] recorder restart failed", self.robot.name)
 
             self.stop_event.wait(backoff)
@@ -1124,11 +1232,20 @@ class RobotWatcher(threading.Thread):
 # Entry point
 # --------------------------------------------------------------------------- #
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Opentrons run monitor + error clip recorder")
+    """Parse arguments, start a watcher per robot, and wait for shutdown."""
+    parser = argparse.ArgumentParser(
+        description="Opentrons run monitor + error clip recorder"
+    )
     # Add the new storage directory argument
-    parser.add_argument("--storage-directory", required=True, help="Base directory for configs, clips, and recordings")
+    parser.add_argument(
+        "--storage-directory",
+        required=True,
+        help="Base directory for configs, clips, and recordings",
+    )
     # Make config default to just the filename, since we will append it to storage-directory
-    parser.add_argument("--config", default="config.yaml", help="Name or path of YAML config")
+    parser.add_argument(
+        "--config", default="config.yaml", help="Name or path of YAML config"
+    )
     parser.add_argument("--verbose", action="store_true", help="Debug logging")
     args = parser.parse_args()
 
@@ -1139,27 +1256,29 @@ def main() -> None:
     logging.getLogger("slack_sdk").setLevel(logging.WARNING)
 
     if shutil.which("ffmpeg") is None:
-        raise SystemExit("ffmpeg not found on PATH. Install it (e.g. `sudo apt install ffmpeg`).")
+        raise SystemExit(
+            "ffmpeg not found on PATH. Install it (e.g. `sudo apt install ffmpeg`)."
+        )
 
     # Resolve the storage directory and config path
     storage_dir = Path(args.storage_directory).expanduser().resolve()
-    
+
     # If the user passes an absolute path for --config, this will use that absolute path.
     # Otherwise, it looks for config.yaml inside the storage_directory.
     config_path = storage_dir / args.config
 
     if not config_path.exists():
-         raise SystemExit(f"Configuration file not found: {config_path}")
+        raise SystemExit(f"Configuration file not found: {config_path}")
 
     # Pass the storage_dir to load_config so it can resolve interior paths
     cfg = load_config(str(config_path), storage_dir)
-    
+
     os.makedirs(cfg.output_dir, exist_ok=True)
     os.makedirs(cfg.work_dir, exist_ok=True)
 
     stop_event = threading.Event()
 
-    def _shutdown(signum, _frame):
+    def _shutdown(signum: int, _frame: Optional[FrameType]) -> None:
         log.info("signal %s received, shutting down…", signum)
         stop_event.set()
 

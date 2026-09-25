@@ -4,7 +4,11 @@ Water-only ABR: mixed waste is recoverable. Restores reagent-reservoir starting
 volumes from the shared liquid-waste reservoir for automated rerun.
 """
 
-from opentrons.protocol_api import ParameterContext, ProtocolContext
+from opentrons.protocol_api import (
+    HeaterShakerContext,
+    ParameterContext,
+    ProtocolContext,
+)
 
 metadata = {
     "protocolName": "Reverse Duolink PLA Safe Reset",
@@ -49,9 +53,7 @@ def run(protocol: ProtocolContext) -> None:
     num_col_full = num_sample // 8
     num_well_last_col = num_sample % 8
 
-    protocol.load_labware(
-        "milliplex_r_96_well_microtiter_plate", "C2", "ASSAY PLATE"
-    )
+    protocol.load_labware("milliplex_r_96_well_microtiter_plate", "C2", "ASSAY PLATE")
     waste_reservoir = protocol.load_labware(
         "nest_1_reservoir_290ml", "D2", "LIQUID WASTE"
     )
@@ -67,7 +69,9 @@ def run(protocol: ProtocolContext) -> None:
         reagent_plate = protocol.load_labware(
             "nest_96_wellplate_2ml_deep", "C1", "Reagent Plate"
         )
-    heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
+    heater_shaker: HeaterShakerContext = protocol.load_module(
+        "heaterShakerModuleV1", "D1"
+    )  # type: ignore[assignment]
     heater_shaker.load_adapter("opentrons_universal_flat_adapter_type_b")
 
     tips_1k = [
@@ -94,8 +98,7 @@ def run(protocol: ProtocolContext) -> None:
         ("ANTI-FADE BUFFER", "#AEB6BF"),
     ]
     consumed_volume_by_row = [
-        TRANSFER_VOLUME
-        * (num_col_full + (1 if row < num_well_last_col else 0))
+        TRANSFER_VOLUME * (num_col_full + (1 if row < num_well_last_col else 0))
         for row in range(8)
     ]
     for column, (name, color) in zip(reagent_columns, reagent_info):

@@ -89,7 +89,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-
     protocol.capture_image(filename="start_of_run")
 
     # ======================== DOWNLOADED PARAMETERS ========================
@@ -457,9 +456,7 @@ def run(protocol: ProtocolContext) -> None:
         # ===============================================
         p1000.pick_up_tip(tiprack_50_1["A1"])
         p1000.aspirate(ERATVol, ERAT.bottom(z=0.5))
-        p1000.dispense(
-            ERATVol, location=sample_plate_1.wells_by_name()["A1"].bottom(1)
-        )
+        p1000.dispense(ERATVol, location=sample_plate_1.wells_by_name()["A1"].bottom(1))
         p1000.mix(ERATMixRep, ERATMixVol, rate=0.5)
         p1000.move_to(sample_plate_1["A1"].top(z=-3))
         protocol.delay(seconds=1)
@@ -494,7 +491,9 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.comment(
                     "Pausing to run End Repair on an off deck Thermocycler ~60min"
                 )
-        protocol.comment("MOVING: Plate Lid #1 = sample_plate_1 --> OFF_DECK (retained)")
+        protocol.comment(
+            "MOVING: Plate Lid #1 = sample_plate_1 --> OFF_DECK (retained)"
+        )
         protocol.move_lid(
             source_location=sample_plate_1, new_location=lids, use_gripper=True
         )
@@ -577,7 +576,9 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.comment(
                     "Pausing to run Ligation on an off deck Thermocycler ~20min"
                 )
-        protocol.comment("MOVING: Plate Lid #2 = sample_plate_1 --> OFF_DECK (retained)")
+        protocol.comment(
+            "MOVING: Plate Lid #2 = sample_plate_1 --> OFF_DECK (retained)"
+        )
         protocol.move_lid(
             source_location=sample_plate_1, new_location=lids, use_gripper=True
         )
@@ -588,23 +589,15 @@ def run(protocol: ProtocolContext) -> None:
         # ============================================================
         # GRIPPER MOVE tiprack_50_1 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_50_1,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE tiprack_50_2 FROM: tiprack_A3_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_50_2,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE tiprack_200_1 FROM: D1 --> tiprack_A3_adapter
         tiprack_200_1 = stacker_200_ul_tips.retrieve()
@@ -672,13 +665,9 @@ def run(protocol: ProtocolContext) -> None:
         )
         # GRIPPER MOVE tiprack_200_1 FROM: tiprack_A3_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_1,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE tiprack_200_X FROM: A4 --> tiprack_A3_adapter
         tiprack_200_X = stacker_200_ul_tips.retrieve()
@@ -753,13 +742,9 @@ def run(protocol: ProtocolContext) -> None:
         # ==============================================================
         # GRIPPER MOVE tiprack_200_2 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_2,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         protocol.comment("MOVING: tiprack_200_3 = A4 --> tiprack_A2_adapter")
@@ -820,13 +805,9 @@ def run(protocol: ProtocolContext) -> None:
         # =================================================================
         # GRIPPER MOVE tiprack_200_3 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_3,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         tiprack_200_4 = stacker_200_ul_tips.retrieve()
@@ -887,13 +868,9 @@ def run(protocol: ProtocolContext) -> None:
         )
         # GRIPPER MOVE tiprack_200_4 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_4,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         tiprack_50_3 = stacker_50_ul_tips.retrieve()
@@ -943,13 +920,9 @@ def run(protocol: ProtocolContext) -> None:
         )
         # GRIPPER MOVE sample_plate_1 FROM: THERMOCYCLER --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=sample_plate_1,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE sample_plate_2 FROM: C3 --> THERMOCYCLER
         protocol.move_labware(
@@ -960,13 +933,9 @@ def run(protocol: ProtocolContext) -> None:
 
         # GRIPPER MOVE tiprack_50_3 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_50_3,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         protocol.comment("MOVING: tiprack_50_4 = B4 --> tiprack_A2_adapter")
@@ -1068,14 +1037,14 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.open_lid()
         else:
             if DRYRUN is False:
-                protocol.pause(
-                    "Pausing to run PCR on an off deck Thermocycler ~20min"
-                )
+                protocol.pause("Pausing to run PCR on an off deck Thermocycler ~20min")
             else:
                 protocol.comment(
                     "Pausing to run PCR on an off deck Thermocycler ~20min"
                 )
-        protocol.comment("MOVING: Plate Lid #3 = sample_plate_1 --> OFF_DECK (retained)")
+        protocol.comment(
+            "MOVING: Plate Lid #3 = sample_plate_1 --> OFF_DECK (retained)"
+        )
         protocol.move_lid(
             source_location=sample_plate_2, new_location=lids, use_gripper=True
         )
@@ -1088,23 +1057,15 @@ def run(protocol: ProtocolContext) -> None:
         # ===================================================================
         # GRIPPER MOVE CleanupPlate_1 FROM: HEATER SHAKER --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=CleanupPlate_1,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE tiprack_50_4 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_50_4,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE CleanupPlate_2 FROM: D4 --> D1
         protocol.move_labware(
@@ -1172,13 +1133,9 @@ def run(protocol: ProtocolContext) -> None:
         )
         # GRIPPER MOVE tiprack_50_5 FROM: tiprack_A2_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_50_5,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         tiprack_200_5 = stacker_200_ul_tips.retrieve()
@@ -1347,23 +1304,15 @@ def run(protocol: ProtocolContext) -> None:
         )
         # GRIPPER MOVE tiprack_200_6 FROM tiprack_A3_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_5,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # GRIPPER MOVE  FROM tiprack_A3_adapter --> OFF_DECK (retained)
         protocol.move_labware(
-
             labware=tiprack_200_X,
-
             new_location=OFF_DECK,
-
             use_gripper=False,
-
         )
         # TOWER DISPENSES NEW PLATE
         tiprack_50_6 = stacker_50_ul_tips.retrieve()
@@ -1407,23 +1356,15 @@ def run(protocol: ProtocolContext) -> None:
         # GRIPPER MOVE sample_plate_2 FROM THERMOCYCLER --> OFF_DECK (retained)
         if ONDECK_THERMO:
             protocol.move_labware(
-
                 labware=sample_plate_2,
-
                 new_location=OFF_DECK,
-
                 use_gripper=False,
-
             )
         else:
             protocol.move_labware(
-
                 labware=sample_plate_2,
-
                 new_location=OFF_DECK,
-
                 use_gripper=False,
-
             )
         # ==============================================================
 
@@ -1461,4 +1402,3 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment("--> Report")
     protocol.comment("==============================================")
     protocol.capture_image(filename="end_of_run")
-

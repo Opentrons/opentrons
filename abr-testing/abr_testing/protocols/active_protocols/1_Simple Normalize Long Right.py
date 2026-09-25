@@ -6,7 +6,7 @@ from opentrons.protocol_api import (
     ALL,
     Well,
     InstrumentContext,
-    Labware
+    Labware,
 )
 from typing import List, Dict, Union
 
@@ -17,6 +17,8 @@ metadata = {
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+
+
 def load_wells_with_water(
     protocol: ProtocolContext, wells: List[Well], volumes: List[float]
 ) -> None:
@@ -24,6 +26,7 @@ def load_wells_with_water(
     water = protocol.define_liquid("Water", display_color="#0000FF")
     for well, volume in zip(wells, volumes):
         well.load_liquid(water, volume)
+
 
 def comment_height_of_specific_labware(
     protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
@@ -195,7 +198,6 @@ def run(protocol: ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     use_trash_bin = protocol.params.use_trash_bin  # type: ignore[attr-defined]
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
 
     # DECK SETUP AND LABWARE
@@ -247,7 +249,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     # LOAD LIQUIDS
     liquid_volumes = [675.0, 675.0, 675.0, 675.0, 675.0]
-    wells = [Dye_1, Dye_2, Dye_3, Diluent_1, Diluent_2, Diluent_3]
+    wells: List[Well] = [Dye_1, Dye_2, Dye_3, Diluent_1, Diluent_2, Diluent_3]
     load_wells_with_water(protocol, wells, liquid_volumes)
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Dye": [{"well": [Dye_1, Dye_2, Dye_3], "volume": 675.0}],
@@ -274,16 +276,14 @@ def run(protocol: ProtocolContext) -> None:
     p1000.configure_nozzle_layout(style=SINGLE, start="H1", tip_racks=[tiprack_x_1])
 
     if probe_height_bool:
-        wells: list[Well] = [
+        wells = [
             well
             for items in liquid_vols_and_wells.values()
             for entry in items
             if isinstance(entry["well"], (Well, list)) and entry["volume"] != 0.0
             # Ensure "well" is Well or list of Well
             for well in (
-                entry["well"]
-                if isinstance(entry["well"], list)
-                else [entry["well"]]
+                entry["well"] if isinstance(entry["well"], list) else [entry["well"]]
             )
         ]
     else:
@@ -334,7 +334,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.blow_out(location=waste_reservoir["A1"])
             p1000.touch_tip()
             current += 1
-        if protocol.params.use_trash_bin is True:
+        if use_trash_bin is True:
             p1000.drop_tip()
         else:
             p1000.return_tip()

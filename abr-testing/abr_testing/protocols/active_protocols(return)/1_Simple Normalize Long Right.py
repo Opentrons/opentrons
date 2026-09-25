@@ -1,4 +1,6 @@
 """Simple Normalize Long with LPD and Single Tip."""
+from typing import Union
+from opentrons.protocol_api import InstrumentContext, Labware
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -17,8 +19,9 @@ metadata = {
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
-
-def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_heights):
+def comment_height_of_specific_labware(
+    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
+) -> None:
     """Comment height found of specific labware."""
     total_height = 0.0
     for key in dict_of_labware_heights.keys():
@@ -28,7 +31,10 @@ def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_h
     protocol.comment(f"Liquid Waste Total Height: {total_height}")
 
 
-def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
+def load_wells_with_custom_liquids(
+    protocol: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+) -> None:
     """Load custom liquids into wells."""
     from opentrons.protocol_api import Well
 
@@ -68,14 +74,18 @@ def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
                 well.load_liquid(liquid, volume)
 
 
-def load_wells_with_water(protocol, wells, volumes):
+def load_wells_with_water(
+    protocol: ProtocolContext, wells: List[Well], volumes: List[float]
+) -> None:
     """Load liquids into wells."""
     water = protocol.define_liquid("Water", display_color="#0000FF")
     for well, volume in zip(wells, volumes):
         well.load_liquid(water, volume)
 
 
-def find_liquid_height_of_all_wells(protocol, pipette, wells):
+def find_liquid_height_of_all_wells(
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
+) -> Dict:
     """Find the liquid height of all wells in protocol."""
     dict_of_labware_heights = {}
     pipette.pick_up_tip()
@@ -104,7 +114,11 @@ def find_liquid_height_of_all_wells(protocol, pipette, wells):
     return dict_of_labware_heights
 
 
-def find_liquid_height_of_loaded_liquids(ctx, liquid_vols_and_wells, pipette):
+def find_liquid_height_of_loaded_liquids(
+    ctx: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+    pipette: InstrumentContext,
+) -> List[Well]:
     """Find Liquid height of loaded liquids."""
     from opentrons.protocol_api import Well
 
@@ -124,7 +138,13 @@ def find_liquid_height_of_loaded_liquids(ctx, liquid_vols_and_wells, pipette):
     return wells
 
 
-def transfer_volume(protocol, pipette, source, destination, volume):
+def transfer_volume(
+    protocol: ProtocolContext,
+    pipette: InstrumentContext,
+    source: Well,
+    destination: Well,
+    volume: float,
+) -> None:
     """Transfer a possibly over-capacity volume without changing tips."""
     remaining = float(volume)
     while remaining > 0:
@@ -134,7 +154,12 @@ def transfer_volume(protocol, pipette, source, destination, volume):
         remaining -= chunk
 
 
-def clean_up_plates(protocol, pipette, list_of_labware, liquid_waste):
+def clean_up_plates(
+    protocol: ProtocolContext,
+    pipette: InstrumentContext,
+    list_of_labware: List[Labware],
+    liquid_waste: Well,
+) -> None:
     """Move every tracked liquid volume into waste with one returned tip."""
     pipette.pick_up_tip()
     pipette.liquid_presence_detection = False
@@ -142,12 +167,20 @@ def clean_up_plates(protocol, pipette, list_of_labware, liquid_waste):
         for well in labware.wells():
             volume = well.current_liquid_volume()  # type: ignore[attr-defined]
             if volume > 0:
-                transfer_volume(protocol, pipette, well, liquid_waste, volume)
+                transfer_volume(
+                    protocol, pipette, well, liquid_waste, volume  # type: ignore[arg-type]
+                )
     pipette.return_tip()
     pipette.reset_tipracks()
 
 
-def restore_reagent_reservoir(protocol, pipette, waste, reagent_wells, volume):
+def restore_reagent_reservoir(
+    protocol: ProtocolContext,
+    pipette: InstrumentContext,
+    waste: Well,
+    reagent_wells: List[Well],
+    volume: float,
+) -> None:
     """Physically restore equal starting volumes from waste with one tip."""
     pipette.pick_up_tip()
     pipette.liquid_presence_detection = False
@@ -197,7 +230,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def _legacy_run(protocol: ProtocolContext) -> None:
     """Retained source version; the automated entry point is defined below."""
-
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
@@ -370,9 +402,7 @@ def _legacy_run(protocol: ProtocolContext) -> None:
                     sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2),
                 )
                 p1000_single.blow_out(location=waste_reservoir["A1"])
-                p1000_single.touch_tip(
-                    sample_plate_2.wells_by_name()[CurrentWell]
-                )
+                p1000_single.touch_tip(sample_plate_2.wells_by_name()[CurrentWell])
                 p1000_single.return_tip()
             current += 1
 
@@ -413,9 +443,7 @@ def _legacy_run(protocol: ProtocolContext) -> None:
                     sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2),
                 )
                 p1000_single.blow_out(location=waste_reservoir["A1"])
-                p1000_single.touch_tip(
-                    sample_plate_3.wells_by_name()[CurrentWell]
-                )
+                p1000_single.touch_tip(sample_plate_3.wells_by_name()[CurrentWell])
                 p1000_single.return_tip()
             current += 1
 
@@ -460,9 +488,7 @@ def _legacy_run(protocol: ProtocolContext) -> None:
                 if DilutionVol > 20:
                     wells.append(sample_plate_4.wells_by_name()[CurrentWell])
                 p1000_single.blow_out(location=waste_reservoir["A1"])
-                p1000_single.touch_tip(
-                    sample_plate_4.wells_by_name()[CurrentWell]
-                )
+                p1000_single.touch_tip(sample_plate_4.wells_by_name()[CurrentWell])
                 p1000_single.return_tip()
             current += 1
 
@@ -475,9 +501,7 @@ def _legacy_run(protocol: ProtocolContext) -> None:
         [sample_plate_1, sample_plate_2, sample_plate_3, sample_plate_4, reservoir],
         waste_reservoir["A1"],
     )
-    find_liquid_height_of_all_wells(
-        protocol, p1000_single, [waste_reservoir["A1"]]
-    )
+    find_liquid_height_of_all_wells(protocol, p1000_single, [waste_reservoir["A1"]])
 
 
 STARTING_REAGENT_VOLUME = 10800.0
@@ -499,27 +523,17 @@ def run(protocol: ProtocolContext) -> None:
     if enable_camera:
         protocol.capture_image(filename="start_of_run")
 
-    tiprack_multi = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "D1"
-    )
-    tiprack_single_1 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "D2"
-    )
-    tiprack_single_2 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "A1"
-    )
+    tiprack_multi = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+    tiprack_single_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
+    tiprack_single_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "A1")
     sample_plates = [
-        protocol.load_labware(
-            "armadillo_96_wellplate_200ul_pcr_full_skirt", slot
-        )
+        protocol.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", slot)
         for slot in ["D3", "C2", "B2", "A2"]
     ]
     for plate in sample_plates:
         plate.load_empty(plate.wells())
 
-    reservoir = protocol.load_labware(
-        "opentrons_tough_12_reservoir_22ml", "B3"
-    )
+    reservoir = protocol.load_labware("opentrons_tough_12_reservoir_22ml", "B3")
     reservoir.load_empty(reservoir.wells()[6:])
     waste = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C1", "Liquid Waste"
@@ -569,8 +583,12 @@ def run(protocol: ProtocolContext) -> None:
             raise ValueError(f"Total volume for {well_name} exceeds 200 uL.")
 
     def transfer_component(
-        pipette, source, plate, component_index, component_name
-    ):
+        pipette: InstrumentContext,
+        source: Well,
+        plate: Labware,
+        component_index: int,
+        component_name: str,
+    ) -> None:
         protocol.comment(f"Adding {component_name} to {plate.load_name}")
         pipette.pick_up_tip()
         for well_name, dye_volume, diluent_volume in rows:
@@ -599,9 +617,7 @@ def run(protocol: ProtocolContext) -> None:
     ]
 
     for repetition in range(RUN_REPETITIONS):
-        protocol.comment(
-            f"Normalization cycle {repetition + 1} of {RUN_REPETITIONS}"
-        )
+        protocol.comment(f"Normalization cycle {repetition + 1} of {RUN_REPETITIONS}")
         for pipette, plate, dye_source, diluent_source in assignments:
             transfer_component(pipette, dye_source, plate, 0, "Dye")
             transfer_component(pipette, diluent_source, plate, 1, "Diluent")

@@ -68,7 +68,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-
     protocol.capture_image(filename="start_of_run")
 
     protocol.comment("Protocol Version: 03")

@@ -32,7 +32,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global COLUMNS  # Number of Columns of Samples
-    
+
     # =================== RUNTIME PARAMETERS ====================
     DRYRUN = False
     FRAG_MODE = "MC"  # "MC" or "EZ"
@@ -64,7 +64,7 @@ def run(protocol: ProtocolContext) -> None:
     TIP_MIX = True  # Default False   | Use Tip Mixing instead of Heatershaker
     ONDECK_THERMO = True  # Default True    | On Deck Thermocycler
     ONDECK_TEMP = True
-    
+
     protocol.comment("Protocol Version: 03")
 
     # =============================== PIPETTE ===============================
@@ -80,7 +80,7 @@ def run(protocol: ProtocolContext) -> None:
     # STACKERS
     stacker_200_ul_tips: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "B4"
-    )
+    )  # type: ignore[assignment]
     stacker_200_ul_tips.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
         lid="opentrons_flex_tiprack_lid",
@@ -88,7 +88,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     stacker_50_ul_tips: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "C4"
-    )
+    )  # type: ignore[assignment]
     stacker_50_ul_tips.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_50ul",
         lid="opentrons_flex_tiprack_lid",
@@ -98,7 +98,7 @@ def run(protocol: ProtocolContext) -> None:
     # ========== FIRST ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
         "thermocycler module gen2"
-    )
+    )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
     )
@@ -125,7 +125,7 @@ def run(protocol: ProtocolContext) -> None:
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
         "temperature module gen2", "C1"
-    )
+    )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Reagent Plate 1"
     )
@@ -135,7 +135,7 @@ def run(protocol: ProtocolContext) -> None:
     lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "C3", 4)
     mag_block: MagneticBlockContext = protocol.load_module(
         "magneticBlockV1", "D2"
-    )
+    )  # type: ignore[assignment]
     CleanupPlate_1 = mag_block.load_labware(
         "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
     )
@@ -203,15 +203,11 @@ def run(protocol: ProtocolContext) -> None:
     Reagent_Adapter = protocol.define_liquid(
         name="Adapter", description="Adapter", display_color="#0EFF00"
     )
-    protocol.define_liquid(
-        name="PRIMER", description="PRIMER", display_color="#0EFF00"
-    )
+    protocol.define_liquid(name="PRIMER", description="PRIMER", display_color="#0EFF00")
     Reagent_Barcodes = protocol.define_liquid(
         name="Barcodes", description="Barcodes", display_color="#7DFFC4"
     )
-    protocol.define_liquid(
-        name="H20", description="H20", display_color="#AABFBF"
-    )
+    protocol.define_liquid(name="H20", description="H20", display_color="#AABFBF")
     Placeholder_Sample = protocol.define_liquid(
         name="Placeholder_Sample",
         description="Excess Sample",

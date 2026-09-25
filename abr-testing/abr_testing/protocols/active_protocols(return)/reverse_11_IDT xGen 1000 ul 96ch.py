@@ -105,16 +105,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "flexStackerModuleV1", "B4"
     )
     # End state: all six originally stored 200 uL racks were retrieved.
-    stacker_200.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_200ul", count=0
-    )
+    stacker_200.set_stored_labware(load_name="opentrons_flex_96_tiprack_200ul", count=0)
     stacker_50: FlexStackerContext = protocol.load_module(  # type: ignore[assignment]
         "flexStackerModuleV1", "C4"
     )
     # End state: five of six originally stored 50 uL racks were retrieved.
-    stacker_50.set_stored_labware(
-        load_name="opentrons_flex_96_tiprack_50ul", count=1
-    )
+    stacker_50.set_stored_labware(load_name="opentrons_flex_96_tiprack_50ul", count=1)
 
     thermocycler: ThermocyclerContext = protocol.load_module(  # type: ignore[assignment]
         "thermocycler module gen2"
@@ -146,12 +142,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     reagent_plate_1 = temp_block.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Reagent Plate 1"
     )
-    protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "C2", "Depleted EtOH Reservoir"
-    )
-    protocol.load_lid_stack(
-        "opentrons_tough_pcr_auto_sealing_lid", "C3", 4
-    )
+    protocol.load_labware("nest_96_wellplate_2ml_deep", "C2", "Depleted EtOH Reservoir")
+    protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "C3", 4)
     mag_block: MagneticBlockContext = protocol.load_module(  # type: ignore[assignment]
         "magneticBlockV1", "D2"
     )
@@ -194,9 +186,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             protocol.define_liquid("Reagents", display_color="#704848"), volume=0
         )
 
-    protocol.comment(
-        f"Reversing final RSB/eluate remainder for {frag_mode} branch."
-    )
+    protocol.comment(f"Reversing final RSB/eluate remainder for {frag_mode} branch.")
     p1000.pick_up_tip(tiprack_50_6["A1"])
     p1000.aspirate(12, cleanup_plate_2["A1"].bottom(z=0.5))
     p1000.dispense(12, reagent_plate_1["B2"].bottom(z=0.5))
@@ -262,12 +252,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         OFF_DECK,
         "Original Used 50 uL Rack 2",
     )
-    protocol.move_labware(
-        initial_50_rack_1, tiprack_a2_adapter, use_gripper=False
-    )
-    protocol.move_labware(
-        initial_50_rack_2, tiprack_a3_adapter, use_gripper=False
-    )
+    protocol.move_labware(initial_50_rack_1, tiprack_a2_adapter, use_gripper=False)
+    protocol.move_labware(initial_50_rack_2, tiprack_a3_adapter, use_gripper=False)
 
     used_200_racks = [
         protocol.load_labware(

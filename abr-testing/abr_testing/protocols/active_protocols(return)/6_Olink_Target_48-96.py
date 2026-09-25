@@ -111,7 +111,6 @@ def add_parameters(p: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
-
     enable_camera = protocol.params.enable_camera  # type: ignore[attr-defined]
     if enable_camera:
         protocol.capture_image(filename="start_of_run")

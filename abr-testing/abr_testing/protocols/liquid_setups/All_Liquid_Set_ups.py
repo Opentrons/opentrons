@@ -7,17 +7,18 @@ from opentrons.protocol_api import (
     OFF_DECK,
     SINGLE,
 )
-'''
-Follow the jira ticket https://opentrons.atlassian.net/browse/RQA-5704 
+
+"""
+Follow the jira ticket https://opentrons.atlassian.net/browse/RQA-5704
 your goal is to address:
-1. ABR2 doesn't fill up the wells enough? 
-2. Row/column/single tip pickup now can have return tip! 
-for 
+1. ABR2 doesn't fill up the wells enough?
+2. Row/column/single tip pickup now can have return tip!
+for
  for robot in robot_list:
         parameters.add_bool(variable_name=robot, display_name=robot, default=True)
- put robots you aren't interested in to false 
-'''
-# For runtime parameters, 
+ put robots you aren't interested in to false
+"""
+# For runtime parameters,
 
 metadata = {
     "protocolName": "Liquid Set up for all robots",
@@ -339,7 +340,13 @@ def run(protocol: ProtocolContext) -> None:
         pipette.transfer(
             volume=[200, 200, 100, 200, 200],
             source=5 * [src_reservoir["A1"]],
-            dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"], pcr_dilution["A1"], pcr_dilution2["A1"]],
+            dest=[
+                reservoir["A1"],
+                indices_plate["A1"],
+                dna_plate["A1"],
+                pcr_dilution["A1"],
+                pcr_dilution2["A1"],
+            ],
             trash=False,
             blow_out=False,
             blowout_location="destination well",
@@ -362,7 +369,14 @@ def run(protocol: ProtocolContext) -> None:
             blow_out=False,
             blowout_location="destination well",
         )
-        dvt2abr5_plates = [reservoir, pcr_reagents_plate, indices_plate, dna_plate, pcr_dilution, pcr_dilution2]
+        dvt2abr5_plates = [
+            reservoir,
+            pcr_reagents_plate,
+            indices_plate,
+            dna_plate,
+            pcr_dilution,
+            pcr_dilution2,
+        ]
         for plate in dvt2abr5_plates:
             protocol.move_labware(plate, OFF_DECK, use_gripper=False)
 

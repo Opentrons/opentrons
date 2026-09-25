@@ -1,3 +1,4 @@
+"""Comment stress test protocol."""
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {
@@ -13,6 +14,7 @@ COMMENT_COUNT = 70000
 
 
 def run(protocol: ProtocolContext) -> None:
+    """Issue a large number of comments when running on a robot."""
     if not protocol.is_simulating():
         for i in range(1, COMMENT_COUNT):
             protocol.comment(f"this is step {i}")

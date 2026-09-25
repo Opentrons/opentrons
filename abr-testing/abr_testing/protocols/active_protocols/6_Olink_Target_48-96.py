@@ -4,21 +4,10 @@ from opentrons.protocol_api import (
     Labware,
     ParameterContext,
     Well,
-    SINGLE
+    SINGLE,
 )
-from typing import Tuple, Optional, Union
 from opentrons.protocol_api import COLUMN, ALL
-from opentrons.protocol_api.module_contexts import (
-    HeaterShakerContext,
-    MagneticBlockContext,
-    ThermocyclerContext,
-    TemperatureModuleContext,
-    MagneticModuleContext,
-    AbsorbanceReaderContext,
-)
-
-
-from typing import List, Dict
+from typing import Any, List
 
 metadata = {
     "protocolName": "Olink Target 96/ 48 v3: NOABRFOLDER",
@@ -27,7 +16,7 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
-open_location: any = "A4"
+open_location: Any = "A4"
 
 
 def add_parameters(p: ParameterContext) -> None:
@@ -102,12 +91,10 @@ def add_parameters(p: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
- 
     global open_location
     protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
     ep_to_sample_plate = protocol.params.ep_to_sample_plate  # type: ignore[attr-defined]
     mm_col = protocol.params.mm_col  # type: ignore[attr-defined]
@@ -294,7 +281,7 @@ def run(protocol: ProtocolContext) -> None:
         pip.touch_tip(well)
 
     def transfer_mm(
-        src: Well, destination: List[any], volume: float, multi_disp: bool = False
+        src: Well, destination: List[Any], volume: float, multi_disp: bool = False
     ) -> None:
         """Transfer Mastermix to Sample Plate."""
         global open_location
@@ -502,7 +489,6 @@ def run(protocol: ProtocolContext) -> None:
             protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
             protocol.move_labware(col_tips[0], loc, use_gripper=True)
 
-
     if mmx_to_sample_plate:
         protocol.comment(
             "\n*****\nTransferring Mastermix to Each Well of Sample Plate\n*****\n"
@@ -540,4 +526,3 @@ def run(protocol: ProtocolContext) -> None:
         liquid_heights[ifp_plate_well.well_name] = height
     protocol.comment(str(liquid_heights))
     protocol.capture_image(filename="end_of_run")
-    

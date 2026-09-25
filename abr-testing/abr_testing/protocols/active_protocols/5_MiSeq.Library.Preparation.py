@@ -20,7 +20,8 @@ from opentrons.protocol_api.module_contexts import (
 
 
 from typing import List, Dict
-import datetime
+from datetime import datetime
+
 metadata = {
     "protocolName": "ABR OFF MiSeq Library Preparation Protocol",
     "author": "Anurag Kanase <anurag.kanase@opentrons.com>",
@@ -52,7 +53,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "0.9", "value": 0.9},
             {"display_name": "1.0", "value": 1.0},
         ],
-    )    
+    )
     parameters.add_int(
         variable_name="error_capture_duration",
         display_name="Error Capture Duration",
@@ -87,6 +88,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Perform Column Tip Pickup",
         default=True,
     )
+
 
 def plate_reader_actions(
     protocol: ProtocolContext,
@@ -163,6 +165,7 @@ def set_hs_speed(
     )
     if deactivate:
         hs.deactivate_shaker()
+
 
 # FUNCTIONS FOR COMMON PIPETTE COMMAND SEQUENCES
 
@@ -241,6 +244,7 @@ def load_wells_with_custom_liquids(
             for well in wells:
                 well.load_liquid(liquid, volume)
 
+
 def move_lid(
     protocol: ProtocolContext,
     num_of_lids: int,
@@ -257,9 +261,6 @@ def move_lid(
     else:
         unused_lids = protocol.load_lid_stack(lid_str, deck_slot[0], num_of_lids)
     return unused_lids
-
-
-
 
 
 def comment_height_of_specific_labware(
@@ -420,16 +421,13 @@ def perform_pcr(
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
- 
     # Load Parameters
     protocol.capture_image(filename="start_of_run")
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    
 
     def transfer(
         pipette: InstrumentContext,
@@ -558,7 +556,11 @@ def run(protocol: ProtocolContext) -> None:
             protocol, liquid_vols_and_wells=liquid_vols_and_wells
         )
     # Protocol steps
-    lid_stack = protocol.load_lid_stack(load_name = "opentrons_tough_pcr_auto_sealing_lid", quantity=3, location="B4",)
+    lid_stack = protocol.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
+        quantity=3,
+        location="B4",
+    )
     protocol.comment("Starting MiSeq library preparation protocol")
 
     # Step 1-2: Set temperatures
@@ -661,15 +663,11 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment("Setting up PCR1 dilution")
     p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 40.0, reservoir["A1"], pcr1_dilution_plate["A1"])
-    transfer(
-        p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
 
     # Step 13: Transfer diluted PCR1 to PCR2
     protocol.comment("Transferring diluted PCR1 to PCR2")
-    transfer(
-        p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45))
     p96.return_tip()
 
     # Step 14: PCR2 thermal cycling
@@ -712,9 +710,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment("Setting up PCR2 dilution")
     p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 25, reservoir["A1"], pcr2_dilution_plate["A1"])
-    transfer(
-        p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45))
     p96.return_tip()
     protocol.move_labware(reservoir, "C4", use_gripper=True)
     protocol.move_labware(eppendorf_384, "D2", use_gripper=True)
@@ -739,4 +735,3 @@ def run(protocol: ProtocolContext) -> None:
     # Pause for plate removal
     protocol.comment("Protocol complete!")
     protocol.capture_image(filename="end_of_run")
-    

@@ -20,24 +20,16 @@ STARTING_REAGENT_VOLUME = 10800.0
 
 def run(protocol: ProtocolContext) -> None:
     """Physically return all mixed water to the six reagent wells."""
-    tiprack_multi = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "D1"
-    )
-    tiprack_single_1 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "D2"
-    )
-    tiprack_single_2 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", "A1"
-    )
+    tiprack_multi = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+    tiprack_single_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
+    tiprack_single_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "A1")
     for slot in ["D3", "C2", "B2", "A2"]:
         plate = protocol.load_labware(
             "armadillo_96_wellplate_200ul_pcr_full_skirt", slot
         )
         plate.load_empty(plate.wells())
 
-    reservoir = protocol.load_labware(
-        "opentrons_tough_12_reservoir_22ml", "B3"
-    )
+    reservoir = protocol.load_labware("opentrons_tough_12_reservoir_22ml", "B3")
     reservoir.load_empty(reservoir.wells())
     waste = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C1", "Liquid Waste"

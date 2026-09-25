@@ -6,7 +6,7 @@ from opentrons.protocol_api import (
     Well,
     ParameterContext,
     InstrumentContext,
-    Labware
+    Labware,
 )
 import numpy as np
 from opentrons.protocol_api.module_contexts import (
@@ -18,6 +18,8 @@ from opentrons.protocol_api.module_contexts import (
     AbsorbanceReaderContext,
 )
 from typing import List, Union, Dict, Tuple
+from datetime import datetime
+from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 
 metadata = {
@@ -107,6 +109,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         unit="seconds",
     )
 
+
 # FUNCTIONS FOR COMMON MODULE SEQUENCES
 def deactivate_modules(protocol: ProtocolContext) -> None:
     """Deactivate all loaded modules."""
@@ -158,6 +161,8 @@ def plate_reader_actions(
     plate_reader.open_lid()
     protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
     plate_reader.close_lid()
+
+
 def load_temp_adapter_and_labware(
     labware_str: str, temp_mod: TemperatureModuleContext, labware_name: str
 ) -> Tuple[Labware, Labware]:
@@ -306,6 +311,7 @@ def load_wells_with_custom_liquids(
             # Load liquid into each well
             for well in wells:
                 well.load_liquid(liquid, volume)
+
 
 def comment_height_of_specific_labware(
     protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
@@ -465,15 +471,12 @@ def perform_pcr(
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
- 
     protocol.capture_image(filename="start_of_run")
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-
 
     dry_run = False
     TIP_TRASH = False
@@ -742,9 +745,7 @@ def run(protocol: ProtocolContext) -> None:
 
         protocol.comment("-----Mixing then Heating AL and Sample-----")
 
-        set_hs_speed(
-            protocol, h_s, heater_shaker_speed, A_lysis_time_1, False
-        )
+        set_hs_speed(protocol, h_s, heater_shaker_speed, A_lysis_time_1, False)
         if not dry_run:
             hs_task = h_s.set_target_temperature(55)
             protocol.wait_for_tasks([hs_task])
@@ -814,9 +815,7 @@ def run(protocol: ProtocolContext) -> None:
         set_hs_speed(protocol, h_s, speed_val, bind_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        move_labware_from_hs_to_destination(
-            protocol, sample_plate, h_s, magnetic_block
-        )
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magnetic_block)
         for bindi in np.arange(
             settling_time + 1, 0, -0.5
         ):  # Settling time delay with countdown timer
@@ -860,13 +859,9 @@ def run(protocol: ProtocolContext) -> None:
                 )
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
-        set_hs_speed(
-            protocol, h_s, heater_shaker_speed, elute_wash_time, True
-        )
+        set_hs_speed(protocol, h_s, heater_shaker_speed, elute_wash_time, True)
 
-        move_labware_from_hs_to_destination(
-            protocol, sample_plate, h_s, magnetic_block
-        )
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magnetic_block)
 
         for washi in np.arange(
             settling_time, 0, -0.5
@@ -899,9 +894,7 @@ def run(protocol: ProtocolContext) -> None:
         set_hs_speed(protocol, h_s, speed_val, elute_wash_time, True)
 
         # Transfer back to magnet
-        move_labware_from_hs_to_destination(
-            protocol, sample_plate, h_s, magnetic_block
-        )
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magnetic_block)
 
         for elutei in np.arange(settling_time, 0, -0.5):
             protocol.delay(
@@ -920,14 +913,13 @@ def run(protocol: ProtocolContext) -> None:
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
         protocol.move_lid(lid, elutionplate, use_gripper=True)
+
     protocol.move_lid(elutionplate, lid, use_gripper=True)
     h_s.close_labware_latch()
     if not probe_height_bool:
         load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     else:
-        find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, m1000
-        )
+        find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
     protocol.move_lid(lid, elutionplate, use_gripper=True)
 
     move_labware_to_hs(protocol, sample_plate, h_s, h_s)
@@ -959,14 +951,9 @@ def run(protocol: ProtocolContext) -> None:
     ]
     m1000.reset_tipracks()
     protocol.move_lid(elutionplate, lid, use_gripper=True)
-    clean_up_plates(
-        protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
-    )
-    find_liquid_height_of_all_wells(
-        protocol, m1000, end_wells_with_liquid
-    )
+    clean_up_plates(protocol, m1000, [res1, elutionplate], waste_reservoir["A1"])
+    find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
     protocol.capture_image(filename="end_of_run")
 
     if deactivate_modules_bool:
         deactivate_modules(protocol)
-       

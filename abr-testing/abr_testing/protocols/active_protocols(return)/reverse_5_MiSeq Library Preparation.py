@@ -4,7 +4,16 @@ Water-only ABR: cross-contamination is acceptable. Reverses nominal liquid
 transfers and labware moves from the forward end state for automated rerun.
 """
 
-from opentrons.protocol_api import ALL, COLUMN, ParameterContext, ProtocolContext
+from opentrons.protocol_api import (
+    ALL,
+    COLUMN,
+    HeaterShakerContext,
+    ParameterContext,
+    ProtocolContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+    Well,
+)
 
 metadata = {
     "protocolName": "Reverse MiSeq Library Preparation",
@@ -75,11 +84,17 @@ def run(protocol: ProtocolContext) -> None:
     """Undo transfers in dependency order and restore all gripper moves."""
     column_tip_pickup = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
 
-    tc = protocol.load_module("thermocyclerModuleV2")
+    tc: ThermocyclerContext = protocol.load_module(
+        "thermocyclerModuleV2"
+    )  # type: ignore[assignment]
     tc.open_lid()
-    temp = protocol.load_module("temperatureModuleV2", "C1")
+    temp: TemperatureModuleContext = protocol.load_module(
+        "temperatureModuleV2", "C1"
+    )  # type: ignore[assignment]
     reagent_block = temp.load_adapter("opentrons_96_well_aluminum_block")
-    hs = protocol.load_module("heaterShakerModuleV1", "D1")
+    hs: HeaterShakerContext = protocol.load_module(
+        "heaterShakerModuleV1", "D1"
+    )  # type: ignore[assignment]
     hs_adapter = hs.load_adapter("opentrons_96_pcr_adapter")
 
     # Load every item where the forward protocol leaves it.
@@ -118,14 +133,10 @@ def run(protocol: ProtocolContext) -> None:
         "D2",
         label="Applied Biosystems 384",
     )
-    partial_tiprack = protocol.load_labware(
-        "opentrons_flex_96_tiprack_50ul", "D4"
-    )
+    partial_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "D4")
     tiprack_adapter = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "B3")
     tiprack = tiprack_adapter.load_labware("opentrons_flex_96_tiprack_50ul")
-    p96 = protocol.load_instrument(
-        "flex_96channel_200", "left", tip_racks=[tiprack]
-    )
+    p96 = protocol.load_instrument("flex_96channel_200", "left", tip_racks=[tiprack])
 
     end_material = protocol.define_liquid(
         "Forward end-state material",
@@ -145,7 +156,7 @@ def run(protocol: ProtocolContext) -> None:
         for well in plate.wells():
             well.load_liquid(end_material, volume)
 
-    def reverse_transfer(volume: float, source, destination) -> None:
+    def reverse_transfer(volume: float, source: Well, destination: Well) -> None:
         p96.aspirate(volume, source.bottom(0.5))
         p96.dispense(volume, destination.bottom(0.5))
 
@@ -184,9 +195,7 @@ def run(protocol: ProtocolContext) -> None:
         p96.configure_nozzle_layout(style=COLUMN, start="A1")
         p96.pick_up_tip(partial_tiprack["A1"])
         for column_index in reversed(range(12)):
-            reverse_transfer(
-                6, pcr2_plate.rows()[0][column_index], pcr_reagents["A2"]
-            )
+            reverse_transfer(6, pcr2_plate.rows()[0][column_index], pcr_reagents["A2"])
         p96.return_tip()
 
     protocol.move_labware(pcr2_plate, "D4", use_gripper=True)

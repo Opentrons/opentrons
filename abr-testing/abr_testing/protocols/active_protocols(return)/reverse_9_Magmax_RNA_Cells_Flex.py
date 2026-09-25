@@ -153,14 +153,10 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     plate_reader.close_lid()
 
     tip_racks = [
-        protocol.load_labware(
-            "opentrons_flex_96_tiprack_200ul", slot, f"Tips {index}"
-        )
+        protocol.load_labware("opentrons_flex_96_tiprack_200ul", slot, f"Tips {index}")
         for index, slot in enumerate(("A1", "A2", "B1", "B2", "C2"), start=1)
     ]
-    m1000 = protocol.load_instrument(
-        "flex_8channel_1000", mount, tip_racks=tip_racks
-    )
+    m1000 = protocol.load_instrument("flex_8channel_1000", mount, tip_racks=tip_racks)
 
     waste_reservoir["A1"].load_liquid(
         protocol.define_liquid(
@@ -212,15 +208,17 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     total_volume = 0.0
     for wells_info in liquid_vols_and_wells.values():
         for well_info in wells_info:
-            volume = float(well_info["volume"])
+            raw_volume = well_info["volume"]
+            assert isinstance(raw_volume, (int, float))
+            volume = float(raw_volume)
             if volume <= 0:
                 continue
             raw_wells = well_info["well"]
-            wells = (
-                [raw_wells]
-                if isinstance(raw_wells, protocol_api.Well)
-                else list(raw_wells)
-            )
+            if isinstance(raw_wells, protocol_api.Well):
+                wells = [raw_wells]
+            else:
+                assert isinstance(raw_wells, list)
+                wells = list(raw_wells)
             total_volume += volume * len(wells)
             for well in wells:
                 well.load_liquid(water, volume)

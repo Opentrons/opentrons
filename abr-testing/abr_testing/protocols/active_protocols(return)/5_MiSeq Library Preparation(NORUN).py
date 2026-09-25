@@ -1,4 +1,5 @@
 """MiSeq Library Preparation Protocol."""
+from typing import Union
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -24,8 +25,9 @@ metadata = {
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
-
-def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_heights):
+def comment_height_of_specific_labware(
+    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
+) -> None:
     """Comment height found of specific labware."""
     total_height = 0.0
     for key in dict_of_labware_heights.keys():
@@ -35,7 +37,10 @@ def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_h
     protocol.comment(f"Liquid Waste Total Height: {total_height}")
 
 
-def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
+def load_wells_with_custom_liquids(
+    protocol: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+) -> None:
     """Load custom liquids into wells."""
     from opentrons.protocol_api import Well
 
@@ -75,7 +80,9 @@ def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
                 well.load_liquid(liquid, volume)
 
 
-def find_liquid_height_of_all_wells(protocol, pipette, wells):
+def find_liquid_height_of_all_wells(
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
+) -> Dict:
     """Find the liquid height of all wells in protocol."""
     dict_of_labware_heights = {}
     pipette.pick_up_tip()
@@ -106,7 +113,11 @@ def find_liquid_height_of_all_wells(protocol, pipette, wells):
     return dict_of_labware_heights
 
 
-def find_liquid_height_of_loaded_liquids(ctx, liquid_vols_and_wells, pipette):
+def find_liquid_height_of_loaded_liquids(
+    ctx: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+    pipette: InstrumentContext,
+) -> List[Well]:
     """Find Liquid height of loaded liquids."""
     from opentrons.protocol_api import Well
 
@@ -192,7 +203,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-
     # Load Parameters
     protocol.capture_image(filename="start_of_run")
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
@@ -427,15 +437,11 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment("Setting up PCR1 dilution")
     p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 40.0, reservoir["A1"], pcr1_dilution_plate["A1"])
-    transfer(
-        p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5.0, pcr1_plate["A1"], pcr1_dilution_plate["A1"], mix_after=(10, 45))
 
     # Step 13: Transfer diluted PCR1 to PCR2
     protocol.comment("Transferring diluted PCR1 to PCR2")
-    transfer(
-        p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5.0, pcr1_dilution_plate["A1"], pcr2_plate["A1"], mix_after=(10, 45))
     p96.return_tip()
 
     # Step 14: PCR2 thermal cycling
@@ -476,9 +482,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment("Setting up PCR2 dilution")
     p96.pick_up_tip(tiprack_1["A1"])
     transfer(p96, 25, reservoir["A1"], pcr2_dilution_plate["A1"])
-    transfer(
-        p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45)
-    )
+    transfer(p96, 5, pcr2_plate["A1"], pcr2_dilution_plate["A1"], mix_after=(10, 45))
     p96.return_tip()
     protocol.move_labware(reservoir, "C4", use_gripper=True)
     protocol.move_labware(eppendorf_384, "D2", use_gripper=True)

@@ -5,7 +5,12 @@ restores reagent-reservoir and elution-plate starting volumes from liquid waste,
 and resets tip racks for automated rerun.
 """
 
-from opentrons.protocol_api import ParameterContext, ProtocolContext
+from opentrons.protocol_api import (
+    HeaterShakerContext,
+    ParameterContext,
+    ProtocolContext,
+    TemperatureModuleContext,
+)
 
 metadata = {
     "protocolName": "Reverse Omega HDQ DNA Extraction Reset",
@@ -76,13 +81,15 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Restore starting liquids from waste and return sample plate to B3."""
-    heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
-    temp_module = protocol.load_module("temperature module gen2", "D3")
+    heater_shaker: HeaterShakerContext = protocol.load_module(
+        "heaterShakerModuleV1", "D1"
+    )  # type: ignore[assignment]
+    temp_module: TemperatureModuleContext = protocol.load_module(
+        "temperature module gen2", "D3"
+    )  # type: ignore[assignment]
     elution_plate = temp_module.load_adapter(
         "opentrons_96_well_aluminum_block"
-    ).load_labware(
-        "opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
-    )
+    ).load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate")
     elution_plate.load_empty(elution_plate.wells())
     protocol.load_lid_stack("opentrons_tough_universal_lid", "C3", 2)
     magnetic_block = protocol.load_module("magneticBlockV1", "C1")

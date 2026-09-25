@@ -293,10 +293,12 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     refill_targets: list[tuple[protocol_api.Well, float]] = []
     for wells_info in liquid_vols_and_wells.values():
         for well_info in wells_info:
-            volume = float(well_info["volume"])
+            volume = float(cast(float, well_info["volume"]))
             if volume <= 0:
                 continue
-            raw_wells = well_info["well"]
+            raw_wells = cast(
+                "protocol_api.Well | list[protocol_api.Well]", well_info["well"]
+            )
             wells = (
                 [raw_wells]
                 if isinstance(raw_wells, protocol_api.Well)

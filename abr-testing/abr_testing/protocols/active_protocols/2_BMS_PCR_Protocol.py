@@ -1,6 +1,9 @@
 """BMS PCR Protocol."""
 
-from opentrons.protocol_api import ParameterContext, ProtocolContext, InstrumentContext, ModuleContext, Well, Labware,  HeaterShakerContext,MagneticModuleContext, AbsorbanceReaderContext
+from opentrons.protocol_api import (
+    ParameterContext,
+    ProtocolContext,
+)
 
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
@@ -180,7 +183,9 @@ def run(protocol: ProtocolContext) -> None:
     real_mode = True
     # DECK SETUP AND LABWARE
 
-    tc_mod: ThermocyclerContext = protocol.load_module("thermocycler module gen2")  # type: ignore[assignment]
+    tc_mod: ThermocyclerContext = protocol.load_module(
+        "thermocycler module gen2"
+    )  # type: ignore[assignment]
 
     temp_mod: TemperatureModuleContext = protocol.load_module(
         "temperature module gen2", location="D3"

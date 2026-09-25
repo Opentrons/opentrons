@@ -1,4 +1,6 @@
 """BMS PCR Protocol."""
+from typing import Union
+from opentrons.protocol_api import InstrumentContext, Labware
 
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.protocol_api.module_contexts import (
@@ -7,6 +9,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.protocol_api import SINGLE, Well, ALL
 from typing import List, Dict
+from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 
 metadata = {
@@ -16,8 +19,9 @@ metadata = {
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
-
-def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_heights):
+def comment_height_of_specific_labware(
+    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
+) -> None:
     """Comment height found of specific labware."""
     total_height = 0.0
     for key in dict_of_labware_heights.keys():
@@ -27,7 +31,10 @@ def comment_height_of_specific_labware(protocol, labware_name, dict_of_labware_h
     protocol.comment(f"Liquid Waste Total Height: {total_height}")
 
 
-def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
+def load_wells_with_custom_liquids(
+    protocol: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+) -> None:
     """Load custom liquids into wells."""
     from opentrons.protocol_api import Well
 
@@ -67,7 +74,9 @@ def load_wells_with_custom_liquids(protocol, liquid_vols_and_wells):
                 well.load_liquid(liquid, volume)
 
 
-def find_liquid_height_of_all_wells(protocol, pipette, wells):
+def find_liquid_height_of_all_wells(
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
+) -> Dict:
     """Find the liquid height of all wells in protocol."""
     dict_of_labware_heights = {}
     pipette.pick_up_tip()
@@ -96,7 +105,11 @@ def find_liquid_height_of_all_wells(protocol, pipette, wells):
     return dict_of_labware_heights
 
 
-def find_liquid_height_of_loaded_liquids(ctx, liquid_vols_and_wells, pipette):
+def find_liquid_height_of_loaded_liquids(
+    ctx: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+    pipette: InstrumentContext,
+) -> List[Well]:
     """Find Liquid height of loaded liquids."""
     from opentrons.protocol_api import Well
 
@@ -116,7 +129,12 @@ def find_liquid_height_of_loaded_liquids(ctx, liquid_vols_and_wells, pipette):
     return wells
 
 
-def load_disposable_lids(protocol, num_of_lids, deck_slot, deck_riser=False):
+def load_disposable_lids(
+    protocol: ProtocolContext,
+    num_of_lids: int,
+    deck_slot: str,
+    deck_riser: bool = False,
+) -> Labware:
     """Load Stack of Disposable lids."""
     lid_str = "opentrons_tough_pcr_auto_sealing_lid"
     if deck_riser:
@@ -129,7 +147,7 @@ def load_disposable_lids(protocol, num_of_lids, deck_slot, deck_riser=False):
     return unused_lids
 
 
-def deactivate_modules(protocol):
+def deactivate_modules(protocol: ProtocolContext) -> None:
     """Deactivate all loaded modules."""
     from opentrons.protocol_api.module_contexts import (
         HeaterShakerContext,
@@ -152,14 +170,24 @@ def deactivate_modules(protocol):
                 module.deactivate()
 
 
-def use_disposable_lid_with_tc(protocol, lid_stack, plate_in_thermocycler, thermocycler):
+def use_disposable_lid_with_tc(
+    protocol: ProtocolContext,
+    lid_stack: Labware,
+    plate_in_thermocycler: Labware,
+    thermocycler: ThermocyclerContext,
+) -> None:
     """Use disposable lid with thermocycler."""
     thermocycler.open_lid()
     protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
     thermocycler.close_lid()
 
 
-def clean_up_plates(protocol, pipette, list_of_labware, liquid_waste):
+def clean_up_plates(
+    protocol: ProtocolContext,
+    pipette: InstrumentContext,
+    list_of_labware: List[Labware],
+    liquid_waste: Well,
+) -> None:
     """Aspirate liquid from labware and dispense into liquid waste."""
     pipette.pick_up_tip()
     pipette.liquid_presence_detection = False
@@ -185,25 +213,25 @@ def clean_up_plates(protocol, pipette, list_of_labware, liquid_waste):
 
 
 def perform_pcr(
-    protocol,
-    thermocycler,
-    initial_denature_time_sec,
-    denaturation_time_sec,
-    anneal_time_sec,
-    extension_time_sec,
-    cycle_repetitions,
-    final_extension_time_min,
-):
+    protocol: ProtocolContext,
+    thermocycler: ThermocyclerContext,
+    initial_denature_time_sec: int,
+    denaturation_time_sec: int,
+    anneal_time_sec: int,
+    extension_time_sec: int,
+    cycle_repetitions: int,
+    final_extension_time_min: int,
+) -> None:
     """Perform PCR."""
-    initial_denaturation_profile = [
+    initial_denaturation_profile: List[ThermocyclerStep] = [
         {"temperature": 98, "hold_time_seconds": initial_denature_time_sec}
     ]
-    cycling_profile = [
+    cycling_profile: List[ThermocyclerStep] = [
         {"temperature": 98, "hold_time_seconds": denaturation_time_sec},
         {"temperature": 60, "hold_time_seconds": anneal_time_sec},
         {"temperature": 72, "hold_time_seconds": extension_time_sec},
     ]
-    final_extension_profile = [
+    final_extension_profile: List[ThermocyclerStep] = [
         {"temperature": 72, "hold_time_minutes": final_extension_time_min}
     ]
     protocol.comment(f"Initial Denaturation for {initial_denature_time_sec} seconds.")
@@ -281,7 +309,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-
     protocol.capture_image(filename="start_of_run")
 
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
@@ -350,9 +377,7 @@ def run(protocol: ProtocolContext) -> None:
         "DNA": [{"well": dna_pic, "volume": 100.0}],
     }
     if probe_height_bool:
-        find_liquid_height_of_loaded_liquids(
-            protocol, liquid_vols_and_wells, p50
-        )
+        find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
     else:
         load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
     # adding water
@@ -412,9 +437,7 @@ def run(protocol: ProtocolContext) -> None:
         p50.aspirate(
             mmx_vol,
             location=reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="start"),
-            end_location=reagent_rack[mmx_tube].meniscus(
-                z=meniscus_z, target="end"
-            ),
+            end_location=reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end"),
         )
         p50.dispense(
             mmx_vol,
@@ -462,12 +485,8 @@ def run(protocol: ProtocolContext) -> None:
         )
         p50.dispense(
             dna_vol,
-            location=dest_plate_1[dest_and_source_well].meniscus(
-                z=2, target="start"
-            ),
-            end_location=dest_plate_1[dest_and_source_well].meniscus(
-                z=2, target="end"
-            ),
+            location=dest_plate_1[dest_and_source_well].meniscus(z=2, target="start"),
+            end_location=dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
             rate=0.5,
         )
 
@@ -484,9 +503,7 @@ def run(protocol: ProtocolContext) -> None:
 
     if real_mode:
         if disposable_lid:
-            use_disposable_lid_with_tc(
-                protocol, unused_lids, dest_plate_1, tc_mod
-            )
+            use_disposable_lid_with_tc(protocol, unused_lids, dest_plate_1, tc_mod)
             tc_mod.close_lid()
         perform_pcr(
             protocol,
@@ -510,9 +527,7 @@ def run(protocol: ProtocolContext) -> None:
     # Empty plates and leftover reagents into liquid waste so reverse can
     # restore full starting volumes with no operator refill.
     p50.configure_nozzle_layout(style=ALL, tip_racks=tiprack_50)
-    clean_up_plates(
-        protocol, p50, [source_plate_1, dest_plate_1], liquid_waste
-    )
+    clean_up_plates(protocol, p50, [source_plate_1, dest_plate_1], liquid_waste)
     p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
     p50.pick_up_tip()
     p50.liquid_presence_detection = False
@@ -522,7 +537,10 @@ def run(protocol: ProtocolContext) -> None:
         vol_transfer = well.current_liquid_volume()  # type: ignore
         if vol_transfer and vol_transfer > 0:
             p50.transfer(
-                vol_transfer, well, liquid_waste.top(), new_tip="never"
+                vol_transfer,  # type: ignore[arg-type]
+                well,
+                liquid_waste.top(),
+                new_tip="never",
             )
     p50.return_tip()
     p50.reset_tipracks()

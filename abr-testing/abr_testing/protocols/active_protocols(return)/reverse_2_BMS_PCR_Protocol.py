@@ -5,7 +5,16 @@ mastermix starting volumes from liquid waste, returns the used disposable lid to
 the unused stack, and resets tip racks so forward can rerun with no operator step.
 """
 
-from opentrons.protocol_api import ALL, SINGLE, ParameterContext, ProtocolContext, Well
+from opentrons.protocol_api import (
+    ALL,
+    SINGLE,
+    InstrumentContext,
+    ParameterContext,
+    ProtocolContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+    Well,
+)
 
 metadata = {
     "protocolName": "Reverse BMS PCR Protocol",
@@ -80,7 +89,9 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def _restore_volume(pipette, waste: Well, destination: Well, volume: float) -> None:
+def _restore_volume(
+    pipette: InstrumentContext, waste: Well, destination: Well, volume: float
+) -> None:
     """Aspirate volume from waste and dispense into destination in tip-sized chunks."""
     remaining = float(volume)
     while remaining > 0:
@@ -97,9 +108,13 @@ def run(protocol: ProtocolContext) -> None:
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
 
-    tc = protocol.load_module("thermocycler module gen2")
+    tc: ThermocyclerContext = protocol.load_module(
+        "thermocycler module gen2"
+    )  # type: ignore[assignment]
     tc.open_lid()
-    temp = protocol.load_module("temperature module gen2", "D3")
+    temp: TemperatureModuleContext = protocol.load_module(
+        "temperature module gen2", "D3"
+    )  # type: ignore[assignment]
     reagent_rack = temp.load_labware(
         "opentrons_24_aluminumblock_nest_1.5ml_snapcap", "Reagent Rack"
     )

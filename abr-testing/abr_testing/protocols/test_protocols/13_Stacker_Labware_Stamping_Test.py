@@ -147,16 +147,16 @@ def run(ctx: ProtocolContext) -> None:
     reservoir = ctx.load_labware("nest_1_reservoir_195ml", "D1")
     water_liq = ctx.define_liquid("water", "#C0C0C0")
     reservoir["A1"].load_liquid(water_liq, 10000)
-    
+
     if use_temp_mod:
         temp_mod: TemperatureModuleContext = ctx.load_module(
             "temperaturModuleV1", "D1"
         )  # type: ignore[assignment]
         temp_mod.set_temperature(4)
         DECK_SLOTS.remove("D1")
-        
+
     stackers = []
-    
+
     # Use tuples for labware name and count
     labware_dict = {
         "A4": ("opentrons_flex_96_tiprack_50ul", 6),
@@ -173,7 +173,7 @@ def run(ctx: ProtocolContext) -> None:
             ctx.params.num_nest_plates,  # type: ignore[attr-defined]
         ),
     }
-    
+
     try:
         for slot, (labware_name, count) in labware_dict.items():
             stacker: FlexStackerContext = ctx.load_module(
@@ -182,28 +182,28 @@ def run(ctx: ProtocolContext) -> None:
             )  # type: ignore[assignment]
             stacker.set_stored_labware(labware_name, count=count)
             stackers.append(stacker)
-            
+
         stacker_50ul = stackers[0]
         stacker_pcrplates = stackers[1]
         stacker_384plates = stackers[2]
         stacker_nest96deep = stackers[3]
         water = ctx.get_liquid_class("water")
         ctx.load_trash_bin("A1")
-        
+
         # unload tipracks
         unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
         move_plates_to_deck_fill_and_store(
             stacker_pcrplates, ctx, p96, water, reservoir
         )
-        
+
         # Move old tipracks
         old_tipracks = p96.tip_racks
         ctx.move_labware(old_tipracks[0], "D2", use_gripper=True)
         ctx.move_labware(old_tipracks[1], "D3", use_gripper=True)
-        
+
         # Get new tipracks
         unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
-        
+
         # Second labware
         move_plates_to_deck_fill_and_store(
             stacker_384plates, ctx, p96, water, reservoir
@@ -219,7 +219,7 @@ def run(ctx: ProtocolContext) -> None:
         for tip in p96.tip_racks:
             ctx.move_labware(tip, stacker_50ul, use_gripper=True)
             stacker_50ul.store()
-            
+
         # Move Tip racks to adapters
         ctx.move_labware(unused_tiprack1, tiprack_adapters[0], use_gripper=True)
         ctx.move_labware(unused_tiprack2, tiprack_adapters[1], use_gripper=True)
@@ -232,7 +232,7 @@ def run(ctx: ProtocolContext) -> None:
         move_plates_to_deck_fill_and_store(
             stacker_nest96deep, ctx, p96, water, reservoir
         )
-        
+
         ctx.capture_image(filename="end_of_run")
 
     except Exception as e:

@@ -93,9 +93,11 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     )
     stackers: list[FlexStackerContext] = []
     for slot, load_name, count in stacker_specs:
-        stacker = protocol.load_module("flexStackerModuleV1", slot)
+        stacker: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", slot
+        )  # type: ignore[assignment]
         stacker.set_stored_labware(load_name, count=count)
-        stackers.append(stacker)  # type: ignore[arg-type]
+        stackers.append(stacker)
 
     recovered_water = protocol.define_liquid(
         name="Stamped water",
