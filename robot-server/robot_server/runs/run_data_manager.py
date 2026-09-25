@@ -539,10 +539,9 @@ class RunDataManager:
                 length=length,
                 include_fixit_commands=include_fixit_commands,
             )
-        # CASEY NOTE get rid of ROS version
 
         # Let exception propagate
-        return await self._run_store.get_commands_slice(
+        return self._run_store.get_commands_slice(
             run_id=run_id, cursor=cursor, length=length, include_fixit_commands=True
         )
 
@@ -626,9 +625,8 @@ class RunDataManager:
             and not await self._run_orchestrator_store.get_commands_deleted()
         ):
             return await self._run_orchestrator_store.get_command(command_id=command_id)
-        # CASEY NOTE clear out the run orchestrator version
 
-        return await self._run_store.get_command(run_id=run_id, command_id=command_id)
+        return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
     async def get_command_errors_count(self, run_id: str) -> int:
         """Get all command errors."""
@@ -658,8 +656,7 @@ class RunDataManager:
             return await self._run_orchestrator_store.get_command_annotations_slice(
                 cursor=cursor, length=length
             )
-        # CASEY NOTE get rid of the ROS version
-        return await self._run_store.get_command_annotations_slice(
+        return self._run_store.get_command_annotations_slice(
             run_id=run_id, cursor=cursor, length=length
         )
 
@@ -671,8 +668,8 @@ class RunDataManager:
             return await self._run_orchestrator_store.get_command_annotation(
                 annotation_id
             )
-        # CASEY NOTE get rid of the ROS version
-        return await self._run_store.get_command_annotation(run_id, annotation_id)
+
+        return self._run_store.get_command_annotation(run_id, annotation_id)
 
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""

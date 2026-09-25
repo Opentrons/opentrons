@@ -54,7 +54,12 @@ class CommandManager:
             if len(self._command_queue) > 0:
                 # Remove the command from the queue and insert/update it on the RunStore
                 command_entry_json = self._command_queue.pop()
-                command_entry = CommandEntry(command=command_entry_json.command_type.model_validate_json(command_entry_json.command), index=command_entry_json.index)
+                command_entry = CommandEntry(
+                    command=command_entry_json.command_type.model_validate_json(
+                        command_entry_json.command
+                    ),
+                    index=command_entry_json.index,
+                )
                 await self._run_store_provider.insert_command(
                     command_index=command_entry.index, command=command_entry.command
                 )
@@ -379,7 +384,9 @@ class CommandHistory:
             command_type=type(command_entry.command),
             index=command_entry.index,
         )
-        self._command_manager.insert_command(command_entry=self._commands_by_id[command_id])
+        self._command_manager.insert_command(
+            command_entry=self._commands_by_id[command_id]
+        )
 
     def _add_to_queue(self, command_id: str) -> None:
         """Add new ID to the queued."""

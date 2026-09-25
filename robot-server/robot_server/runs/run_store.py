@@ -143,11 +143,6 @@ class RunStore:
         self._run_store_provider = RunStoreProvider(
             run_id=None,
             store_insert_command=self.insert_command,
-            store_insert_command_annotation=self.insert_command_annotation,
-            store_get_command=self.get_command,
-            store_get_commands_slice=self.get_commands_slice,
-            store_get_command_annotation=self.get_command_annotation,
-            store_get_command_annotation_slice=self.get_command_annotations_slice,
         )
 
     def get_run_store_provider(self) -> RunStoreProvider:
@@ -533,7 +528,7 @@ class RunStore:
             )
             return []
 
-    async def get_commands_slice(
+    def get_commands_slice(
         self,
         run_id: str,
         length: int,
@@ -800,23 +795,8 @@ class RunStore:
                 # If the command is already present, update it
                 transaction.execute(update_command)
 
-    async def insert_command_annotation(
-        self, run_id: str, command_annotation: CommandAnnotation
-    ) -> None:
-        """Insert or update a command annotation into the command annotation table"""
-        # CASEY NOTE change this to include updating commands
-        insert_command_annotation = sqlalchemy.insert(command_annotation_table)
-        with self._sql_engine.begin() as transaction:
-            if not self._run_exists(run_id, transaction):
-                raise RunNotFoundError(run_id=run_id)
-
-            transaction.execute(
-                insert_command_annotation,
-                _convert_command_annotation_to_sql_values(run_id, command_annotation),
-            )
-
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    async def get_command(self, run_id: str, command_id: str) -> Command:
+    def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
 
         Args:
@@ -856,7 +836,7 @@ class RunStore:
             count_result: int = transaction.execute(select_count).scalar_one()
             return count_result
 
-    async def get_command_annotations_slice(
+    def get_command_annotations_slice(
         self,
         run_id: str,
         cursor: int,
@@ -918,7 +898,7 @@ class RunStore:
                 total_length=total_count,
             )
 
-    async def get_command_annotation(
+    def get_command_annotation(
         self, run_id: str, command_annotation_id: str
     ) -> CommandAnnotation:
         """Get run command annotation by id."""
