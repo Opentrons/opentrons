@@ -24,16 +24,14 @@ export interface ProtocolAnalyticsData {
   robotSerialNumber: string
 }
 
-export type RobotAnalyticsData = {
+export interface RobotAnalyticsData {
   robotApiServerVersion: string
   robotSmoothieVersion: string
-  robotLeftPipette: string
-  robotRightPipette: string
   robotSerialNumber: string
-} & {
+
   // feature flags
   // e.g. robotFF_settingName
-  [ffName: string]: boolean
+  [ffName: string]: boolean | string
 }
 
 export interface BuildrootAnalyticsData {

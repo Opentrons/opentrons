@@ -76,6 +76,7 @@ describe('replaceTip', () => {
           },
           [lidId]: {
             stack: [tiprackURI1, '1'],
+            stackedOnNode: { labwareId: tiprackURI1 },
           },
         },
       }

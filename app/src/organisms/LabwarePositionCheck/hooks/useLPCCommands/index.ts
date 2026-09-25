@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 
@@ -15,6 +16,10 @@ import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToM
 import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
 
 import type { CommandData } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'
@@ -28,7 +33,11 @@ import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
 import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
 
-export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
+export interface UseLPCCommandsProps extends LPCWizardFlexProps {
+  commandDocState: DocumentationState
+  actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
+}
 
 export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleConditionalCleanupResult &
@@ -41,6 +50,8 @@ export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleResetLwModulesOnDeckResult &
   UseHandleValidMoveToMaintenancePositionResult & {
     errorMessage: string | null
+    isDoorOpenError: boolean
+    dismissDoorOpenError: () => void
     isRobotMoving: boolean
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
     home: () => Promise<void>
@@ -51,9 +62,14 @@ export function useLPCCommands(
   props: UseLPCCommandsProps
 ): UseLPCCommandsResult {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isDoorOpenError, setIsDoorOpenError] = useState(false)
   const [isRobotMoving, setIsRobotMoving] = useState(false)
 
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const { chainRunCommands } = useChainMaintenanceCommands(
+    props.commandDocState,
+    props.actionsToDocument,
+    props.addActionToDocument
+  )
 
   const chainLPCCommands = (
     commands: CreateCommand[],
@@ -65,6 +81,10 @@ export function useLPCCommands(
       commands,
       continuePastCommandFailure
     ).catch((e: Error) => {
+      if (isMaintenanceDoorOpenError(e)) {
+        setIsDoorOpenError(true)
+        return Promise.reject(e)
+      }
       if (!shouldPropogateError) {
         console.error(`Error during LPC command: ${e.message}`)
         setErrorMessage(`Error during LPC command: ${e.message}`)
@@ -79,9 +99,13 @@ export function useLPCCommands(
   const handleJogUtils = useHandleJog({
     ...props,
     setErrorMessage,
+    setIsDoorOpenError,
     chainLPCCommands,
   })
-  const handleConditionalCleanupUtils = useHandleClose(props)
+  const handleConditionalCleanupUtils = useHandleClose({
+    ...props,
+    flushJogAudit: handleJogUtils.flushJogAudit,
+  })
   const handleProbeCommands = useHandleProbeCommands({
     ...props,
     chainLPCCommands,
@@ -107,6 +131,10 @@ export function useLPCCommands(
 
   return {
     errorMessage,
+    isDoorOpenError,
+    dismissDoorOpenError: () => {
+      setIsDoorOpenError(false)
+    },
     isRobotMoving,
     toggleRobotMoving: (isMoving: boolean) =>
       new Promise<void>(resolve => {

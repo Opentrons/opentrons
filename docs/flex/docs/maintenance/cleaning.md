@@ -9,7 +9,7 @@ If you have any questions about cleaning your Flex and its related components, c
 
 ## Before you begin
 
-Flex is an electrically powered mechanical device. As a good practice, turn off the power before you start cleaning it and before reaching inside the enclosure. You may even want to unplug the robot as well. These are simple safety steps you can take to make the robot inoperable until you're finished.
+Flex is an electrically powered mechanical device. As a good practice, [turn off the power](../touchscreen/dashboard.md#dashboard-settings) before you start cleaning it and before reaching inside the enclosure. You may even want to unplug the robot as well. These are simple safety steps you can take to make the robot inoperable until you're finished.
 
 Along with turning the power off, remove any instruments, modules, and labware before cleaning the robot. Removing attached items gives you more room to work and provides better access to the deck, gantry, and other spaces.
 

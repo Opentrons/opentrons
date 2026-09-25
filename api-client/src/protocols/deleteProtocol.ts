@@ -5,12 +5,10 @@ import type { EmptyResponse, HostConfig } from '../types'
 
 export function deleteProtocol(
   config: HostConfig,
-  protocolId: string
+  protocolId: string,
+  userNotes?: string
 ): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse>(
-    DELETE,
-    `/protocols/${protocolId}`,
-    null,
-    config
-  )
+  return request<EmptyResponse>(DELETE, `/protocols/${protocolId}`, config, {
+    userNotes,
+  })
 }

@@ -1,10 +1,11 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { mockHeaterShaker } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 

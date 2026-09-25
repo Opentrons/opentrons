@@ -56,7 +56,6 @@ def test_move_labware_flex(page: Page, pd_base_url: str) -> None:
     editor.verify_add_step_menu_options()
     editor.select_step_type("Move")
     editor.move_labware("A3 Opentrons Tough PCR Auto-Sealing Lid", "D3 Waste Chute in D3")
-    page.get_by_role("button", name="Confirm").click()
 
     # Add Manual Move to move Universal Lid to off-deck
     editor.open_add_step_menu()

@@ -11,7 +11,6 @@ export function getErrorRecoveryPolicy(
   return request<ErrorRecoveryPolicyResponse>(
     GET,
     `/runs/${runId}/errorRecoveryPolicy`,
-    null,
     config
   )
 }

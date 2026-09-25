@@ -37,6 +37,7 @@ import {
 import { actions as steplistActions } from '../../steplist'
 import { uuid } from '../../utils'
 import { AddMetadata } from './AddMetadata'
+import { FLEX_TRASH_FIXTURE_INFO } from './constants'
 import { SelectBasics } from './SelectBasics'
 import { SelectFlexHardware } from './SelectFlexHardware'
 
@@ -85,7 +86,7 @@ const initialFormState: WizardFormState = {
   },
   modules: {},
   hasGripper: null,
-  fixtures: {},
+  fixtures: { [uuid()]: FLEX_TRASH_FIXTURE_INFO },
   hasThermocycler: null,
   hasWasteChute: null,
 }

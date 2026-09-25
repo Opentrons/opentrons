@@ -1,4 +1,5 @@
 import { ListItem as ListItemComponent, ListItemCustomize } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
@@ -31,7 +32,9 @@ const meta: Meta<typeof ListItemComponent> = {
       },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 }
 
 export default meta

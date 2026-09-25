@@ -177,7 +177,9 @@ push: wheel
 .PHONY: push-ot3
 push-ot3: wheel
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: install-key
 install-key:

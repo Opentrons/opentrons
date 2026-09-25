@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
@@ -15,11 +16,15 @@ import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({
     currentRunId: null,
     oddRunId: null,
+    oddRunPending: false,
   }),
   setOddRunIds: () => null,
 }
@@ -57,12 +62,29 @@ describe('MaintenanceRunTakeover', () => {
     expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
   })
 
+  it('does not render a takeover modal if a maintenance run has been initiated by the ODD and is pending', () => {
+    const MOCK_ODD_RUN = {
+      ...MOCK_MAINTENANCE_RUN,
+      getRunIds: () => ({
+        currentRunId: 'testODD',
+        oddRunId: null,
+        oddRunPending: true,
+      }),
+    }
+
+    vi.mocked(useMaintenanceRunTakeover).mockReturnValue(MOCK_ODD_RUN)
+
+    render(props)
+    expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
+  })
+
   it('does not render a takeover modal if a maintenance run has been initiated by the ODD', () => {
     const MOCK_ODD_RUN = {
       ...MOCK_MAINTENANCE_RUN,
       getRunIds: () => ({
         currentRunId: 'testODD',
         oddRunId: 'testODD',
+        oddRunPending: false,
       }),
     }
 
@@ -78,6 +100,7 @@ describe('MaintenanceRunTakeover', () => {
       getRunIds: () => ({
         currentRunId: 'testRunDesktop',
         oddRunId: null,
+        oddRunPending: false,
       }),
     }
 

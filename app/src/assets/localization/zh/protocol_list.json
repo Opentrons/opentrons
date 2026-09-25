@@ -1,4 +1,5 @@
 {
+  "compliance_ready": "合规就绪",
   "csv_file_required": "需要CSV文件进行分析。请在运行设置时添加CSV文件。",
   "delete_protocol_message": " 并且其运行历史记录将被永久删除。",
   "delete_this_protocol": "删除此协议？",

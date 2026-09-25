@@ -21,7 +21,7 @@ export function createSplash(
   return request<void, FormData>(
     POST,
     '/system/oem_mode/upload_splash',
-    formData,
-    config
+    config,
+    { body: formData }
   )
 }

@@ -5,11 +5,9 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { mockMagneticModuleGen2, mockVacuumModule } from '@opentrons/api-client'
+
 import { useIsFlex } from '/app/redux-resources/robots'
-import {
-  mockMagneticModuleGen2,
-  mockVacuumModule,
-} from '/app/redux/modules/__fixtures__'
 
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'

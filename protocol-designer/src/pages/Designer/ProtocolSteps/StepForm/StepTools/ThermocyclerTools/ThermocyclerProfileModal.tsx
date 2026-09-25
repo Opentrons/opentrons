@@ -26,8 +26,7 @@ import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
 
 export type ThermocyclerStepTypeGeneral =
-  | ThermocyclerCycleType
-  | ThermocyclerStepType
+  ThermocyclerCycleType | ThermocyclerStepType
 
 interface ThermocyclerModalProps {
   formData: FormData
@@ -63,7 +62,6 @@ export function ThermocyclerProfileModal(
 
   return (
     <Modal
-      marginLeft="0"
       zIndexOverlay={11} // toolbox zIndex is set to 10
       title={t('form:step_edit_form.field.thermocyclerProfile.edit')}
       width="45rem"

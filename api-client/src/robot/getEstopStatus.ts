@@ -7,5 +7,5 @@ import type { EstopStatus } from './types'
 export function getEstopStatus(
   config: HostConfig
 ): ResponsePromise<EstopStatus> {
-  return request<EstopStatus>(GET, '/robot/control/estopStatus', null, config)
+  return request<EstopStatus>(GET, '/robot/control/estopStatus', config)
 }

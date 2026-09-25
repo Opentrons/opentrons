@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../../request'
+import { GET, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
@@ -15,8 +15,7 @@ export function getCommandsAsPreSerializedList(
   return request<CommandsAsPreSerializedListData>(
     GET,
     `/runs/${runId}/commandsAsPreSerializedList`,
-    null,
     config,
-    params && createAxiosConfig({ params })
+    { queryParams: { ...params } }
   )
 }

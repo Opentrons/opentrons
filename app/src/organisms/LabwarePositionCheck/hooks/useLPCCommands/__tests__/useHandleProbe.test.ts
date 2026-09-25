@@ -112,6 +112,30 @@ describe('useHandleProbeCommands', () => {
     expect(result.current.unableToDetect).toBe(true)
   })
 
+  it('should not treat a door-open error as a missing probe', async () => {
+    const mockDoorOpenError = {
+      isAxiosError: true,
+      message: 'Request failed with status code 409',
+      response: {
+        status: 409,
+        data: {
+          errors: [{ id: 'MaintenanceCommandDoorOpen' }],
+        },
+      },
+    }
+    mockChainLPCCommands.mockRejectedValueOnce(mockDoorOpenError)
+
+    const { result } = renderHook(() => useHandleProbeCommands(mockProps))
+
+    await act(async () => {
+      await expect(
+        result.current.handleProbeAttachment(mockPipette)
+      ).rejects.toEqual(mockDoorOpenError)
+    })
+
+    expect(result.current.unableToDetect).toBe(false)
+  })
+
   it('should call chainLPCCommands with correct commands when handleProbeDetachment is called', async () => {
     const { result } = renderHook(() => useHandleProbeCommands(mockProps))
 

@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
 } from '@opentrons/components'
@@ -80,9 +80,9 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleExit}>
+          <PrimaryButton variant="warning" onClick={handleExit}>
             {i18n.format(t('shared:exit'), 'capitalize')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

@@ -22,6 +22,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
@@ -47,6 +48,7 @@ import type {
   LegacyLabwareOffsetCreateData,
   LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -222,7 +224,10 @@ export const LegacyLabwarePositionCheckComponent = (
     )
   }, [workingOffsets, protocolData, existingOffsets])
 
-  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
+  // CRS is disabled on OT-2s.
+  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const calculateAndApplyOffset = (
     initialPosition: Vector3D | null,
     finalPosition: Vector3D | null,
@@ -271,10 +276,22 @@ export const LegacyLabwarePositionCheckComponent = (
   }
 
   const [isExiting, setIsExiting] = useState(false)
+  const accessControlDisabledDocumentationState: DocumentationState = {
+    isLoading: false,
+    accessControlEnabled: false,
+  }
   const { createMaintenanceCommand: createSilentCommand } =
-    useCreateMaintenanceCommandMutation()
+    useCreateMaintenanceCommandMutation(
+      accessControlDisabledDocumentationState,
+      [],
+      () => {}
+    ) // No ACM on the OT-2
   const { chainRunCommands, isCommandMutationLoading: isCommandChainLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(
+      accessControlDisabledDocumentationState,
+      [],
+      () => {}
+    ) // No ACM on the OT-2
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {

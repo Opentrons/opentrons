@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from 'react-query'
 
 import { getCurrentMaintenanceRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
@@ -14,13 +14,13 @@ export function useCurrentMaintenanceRun<TError = Error>(
   const queryClient = useQueryClient()
 
   const query = useQuery<MaintenanceRun, TError>(
-    [host, 'maintenance_runs', 'current_run'],
+    getQueryKey(host, 'maintenance_runs', 'current_run'),
     () => getCurrentMaintenanceRun(host!).then(response => response.data),
     {
       enabled: host !== null && options.enabled !== false,
       onError: () => {
         queryClient.setQueryData(
-          [host, 'maintenance_runs', 'current_run'],
+          getQueryKey(host, 'maintenance_runs', 'current_run'),
           undefined
         )
       },

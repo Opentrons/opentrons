@@ -26,7 +26,6 @@ describe('UserSettings', () => {
       canClearHintDismissals: true,
       flags: {
         OT_PD_ENABLE_HOT_KEYS_DISPLAY: true,
-        OT_PD_ENABLE_MULTIPLE_TEMPS_OT2: true,
         OT_PD_DISABLE_MODULE_RESTRICTIONS: true,
       },
     }
@@ -41,15 +40,11 @@ describe('UserSettings', () => {
     screen.getByText(
       'Show information about working with steps next to the protocol timeline'
     )
-    screen.getByText('Allow two temperature modules on OT-2')
-    screen.getByText(
-      'This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use.'
-    )
     screen.getByText('Disable module placement restrictions')
     screen.getByText(
       'Turn off all restrictions on module placement and related pipette crash guidance.'
     )
-    expect(screen.getAllByRole('switch').length).toBe(3)
+    expect(screen.getAllByRole('switch').length).toBe(2)
   })
 
   it('should not reset button if canClearHintDismissals is false', () => {
@@ -78,11 +73,6 @@ describe('UserSettings', () => {
     })
 
     fireEvent.click(toggleButtons[1])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_MULTIPLE_TEMPS_OT2: false,
-    })
-
-    fireEvent.click(toggleButtons[2])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
     })

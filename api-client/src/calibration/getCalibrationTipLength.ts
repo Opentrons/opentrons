@@ -10,7 +10,6 @@ export function getCalibrationTipLength(
   return request<AllTipLengthCalibrations>(
     GET,
     '/calibration/tip_length',
-    null,
     config
   )
 }

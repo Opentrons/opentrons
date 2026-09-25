@@ -23,7 +23,6 @@ export const ERROR: 'error' = 'error'
 
 export const OT2_BALENA: 'ot2-balena' = 'ot2-balena'
 export const OT2_BUILDROOT: 'ot2-buildroot' = 'ot2-buildroot'
-export const FLEX: 'flex' = 'flex'
 
 // update types
 
@@ -91,9 +90,6 @@ export const ROBOTUPDATE_READ_USER_FILE: 'robotUpdate:READ_USER_FILE' =
 
 export const ROBOTUPDATE_READ_SYSTEM_FILE: 'robotUpdate:READ_SYSTEM_FILE' =
   'robotUpdate:READ_SYSTEM_FILE'
-
-export const ROBOTUPDATE_UPLOAD_FILE: 'robotUpdate:UPLOAD_FILE' =
-  'robotUpdate:UPLOAD_FILE'
 
 export const ROBOTUPDATE_FILE_UPLOAD_DONE: 'robotUpdate:FILE_UPLOAD_DONE' =
   'robotUpdate:FILE_UPLOAD_DONE'

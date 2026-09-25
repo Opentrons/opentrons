@@ -19,6 +19,7 @@ from otupdate.common.file_actions import (
     unzip_update,
     verify_signature,
 )
+from otupdate.common.session import UpdateCancelled
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 
 UPDATE_PKG_OE = ["system-update.zip"]
@@ -122,6 +123,7 @@ class RootFSInterface:
                 while True:
                     chunk = fsrc.read(chunk_size)
                     total_size += len(chunk)
+                    progress_callback(0)
                     if len(chunk) != chunk_size:
                         break
 
@@ -144,6 +146,8 @@ class RootFSInterface:
                     if len(chunk) != chunk_size:
                         break
             return True, ""
+        except UpdateCancelled:
+            raise
         except Exception:
             LOG.exception("RootFSInterface::write_update exception reading")
             return False, "Unknown error"
@@ -161,7 +165,7 @@ class OT3UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -314,3 +318,11 @@ class OT3UpdateActions(UpdateActionsInterface):
                 os.remove(filepath)
             except Exception:
                 LOG.exception(f"Could not delete update file {filepath}.")
+
+    def restart(self) -> None:
+        """Restart the robot."""
+        subprocess.check_call(["reboot"])
+
+    def shutdown(self) -> None:
+        """Shut down the robot."""
+        subprocess.check_call(["shutdown", "-h", "now"])

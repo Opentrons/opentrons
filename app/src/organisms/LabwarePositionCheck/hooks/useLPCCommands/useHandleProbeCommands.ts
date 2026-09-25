@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { LPC_STEP, selectCurrentStep } from '/app/redux/protocol-runs'
 
 import {
@@ -44,7 +45,10 @@ export function useHandleProbeCommands({
     ]
 
     return chainLPCCommands(attachmentCommands, false, true)
-      .catch(() => {
+      .catch((e: Error) => {
+        if (isMaintenanceDoorOpenError(e)) {
+          return Promise.reject(e)
+        }
         setShowUnableToDetect(true)
         return Promise.reject(new Error('Unable to detect probe.'))
       })

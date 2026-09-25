@@ -21,7 +21,6 @@ import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 const userFacingFlags: FlagTypes[] = [
   'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-  'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2',
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
 ]
 

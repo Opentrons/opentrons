@@ -6,13 +6,16 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   CURSOR_DEFAULT,
+  DIRECTION_COLUMN,
   DISPLAY_FLEX,
+  FLEX_AUTO,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
+  OVERFLOW_VISIBLE,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  POSITION_STICKY,
 } from '../styles'
 import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
 
@@ -25,9 +28,9 @@ export interface ModalShellProps extends StyleProps {
   children: ReactNode
   /** Optional close on outside click **/
   onOutsideClick?: MouseEventHandler
-  /** Optional sticky header */
+  /** Optional header */
   header?: ReactNode
-  /** Optional sticky footer */
+  /** Optional footer */
   footer?: ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
@@ -46,9 +49,10 @@ export interface ModalShellProps extends StyleProps {
  *
  * It includes:
  * - An overlay
- * - A content area, with `overflow-y: auto` and customizable with style props
- * - An optional sticky header
- * - An optional sticky footer
+ * - A shell clipped to border-radius (overflow: hidden) so corners stay rounded
+ * - A content area that scrolls independently of the header and footer
+ * - An optional header
+ * - An optional footer
  * - An optional onOutsideClick function
  */
 export function ModalShell(props: ModalShellProps): JSX.Element {
@@ -66,6 +70,12 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     ...styleProps
   } = props
 
+  // Keep nested clipping off when a caller opts into overflow: visible
+  // (ex, dropdown menus that must extend outside the modal).
+  const allowOverflow =
+    styleProps.overflow === OVERFLOW_VISIBLE ||
+    styleProps.overflowY === OVERFLOW_VISIBLE
+
   return (
     <Overlay
       showOverlay={showOverlay}
@@ -79,6 +89,8 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <ContentArea zIndex={zIndex} position={position} noPadding={noPadding}>
         <ModalArea
           aria-label="ModalShell_ModalArea"
+          role="dialog"
+          aria-modal="true"
           isFullPage={fullPage}
           onClick={(e: MouseEvent) => {
             e.stopPropagation()
@@ -86,7 +98,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
           {...styleProps}
         >
           {header != null ? <Header>{header}</Header> : null}
-          {children}
+          <ModalBody allowOverflow={allowOverflow}>{children}</ModalBody>
           {footer != null ? <Footer>{footer}</Footer> : null}
         </ModalArea>
       </ContentArea>
@@ -132,7 +144,9 @@ const ModalArea = styled.div<
   { isFullPage: boolean; backgroundColor?: string } & StyleProps
 >`
   position: ${POSITION_RELATIVE};
-  overflow-y: ${OVERFLOW_AUTO};
+  display: ${DISPLAY_FLEX};
+  flex-direction: ${DIRECTION_COLUMN};
+  overflow: ${OVERFLOW_HIDDEN};
   max-height: 100%;
   width: 100%;
   border-radius: ${BORDERS.borderRadius8};
@@ -146,13 +160,26 @@ const ModalArea = styled.div<
   ${styleProps as any};
 `
 
+const ModalBody = styled.div.withConfig({
+  shouldForwardProp: prop => (prop as string) !== 'allowOverflow',
+})<{ allowOverflow: boolean }>`
+  flex: ${FLEX_AUTO};
+  min-height: 0;
+  overflow-y: ${({ allowOverflow }) =>
+    allowOverflow ? OVERFLOW_VISIBLE : OVERFLOW_AUTO};
+`
+
 const Footer = styled.div`
+  flex-shrink: 0;
+  overflow: ${OVERFLOW_HIDDEN};
   background-color: ${COLORS.white};
-  position: ${POSITION_STICKY};
-  bottom: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 `
 const Header = styled.div`
+  flex-shrink: 0;
+  overflow: ${OVERFLOW_HIDDEN};
   background-color: ${COLORS.white};
-  position: ${POSITION_STICKY};
-  top: 0;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 `

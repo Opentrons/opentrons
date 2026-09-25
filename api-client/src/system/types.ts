@@ -16,3 +16,19 @@ export type CreateRegistrationParams = Registrant
 export interface ActiveConnections {
   connections: Registrant[]
 }
+
+export interface SystemTimeData {
+  id: 'time'
+  systemTime: string
+}
+
+export interface SystemTimeResponse {
+  data: SystemTimeData
+  links?: { self?: { href: string } }
+}
+
+export interface SystemTimeRequest {
+  data: {
+    systemTime: string
+  }
+}

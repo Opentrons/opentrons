@@ -31,6 +31,7 @@ import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
+  getIsDeckSlotCompatible,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
@@ -41,9 +42,13 @@ import {
   OT2_ROBOT_TYPE,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { VACUUM_MODULE_TYPE_WITH_LABWARE } from '/protocol-designer/constants'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
 import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
@@ -58,13 +63,18 @@ import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
 } from '/protocol-designer/pages/Designer/DeckSetup/constants'
-import { getLabwareIsRecommended } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import {
+  getIsVacuumCollar,
+  getIsVacuumSpacer,
+  getLabwareIsRecommended,
+} from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 import { getHas96Channel } from '/protocol-designer/utils'
 import {
   ADAPTER_96_CHANNEL,
+  COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
   getLabwareCompatibleWithModule,
 } from '/protocol-designer/utils/labwareModuleCompatibility'
 
@@ -122,7 +132,7 @@ export function SelectLabwareModal(
     zoomedInSlotInfo
 
   const hasNoLabware =
-    selectedTopLabware == null && selectedAdapterDefURI == null
+    selectedTopLabware?.labwareDefURI == null && selectedAdapterDefURI == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -164,11 +174,107 @@ export function SelectLabwareModal(
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
   const isOnHopper = getIsSlotAHopper(slot)
+  const isOnVacuumDock = getIsSlotAVacuumDock(slot)
+
+  const vacuumModuleId =
+    Object.entries(modulesById).find(
+      ([, module]) => module.type === VACUUM_MODULE_TYPE && module.slot === 'A3'
+    )?.[0] ?? null
+
+  // collar placed on the main module area (not the dock)
+  const mainModuleHasCollar =
+    vacuumModuleId != null &&
+    Object.values(deckSetup.labware).some(labware => {
+      return (
+        labware.stack.includes(vacuumModuleId) &&
+        !labware.stack.includes('vacuumDock') &&
+        getIsVacuumCollar(labware.def)
+      )
+    })
+
+  // topmost labware on main module area is a filter plate (no collar)
+  const mainModuleTopIsFilterPlate = useMemo(() => {
+    if (vacuumModuleId == null || mainModuleHasCollar) {
+      return false
+    }
+    const onMainModule = Object.values(deckSetup.labware).filter(
+      lw =>
+        lw.stack.includes(vacuumModuleId) && !lw.stack.includes('vacuumDock')
+    )
+    if (onMainModule.length === 0) {
+      return false
+    }
+    const topmost = onMainModule.sort(
+      (a, b) => b.stack.length - a.stack.length
+    )[0]
+    return topmost.def.parameters.quirks?.includes('filterPlate') ?? false
+  }, [vacuumModuleId, mainModuleHasCollar, deckSetup.labware])
+
+  // topmost labware on main module area is a bare spacer (nothing on top of it)
+  const mainModuleTopIsSpacer = useMemo(() => {
+    if (vacuumModuleId == null) {
+      return false
+    }
+    const onMainModule = Object.values(deckSetup.labware).filter(
+      lw =>
+        lw.stack.includes(vacuumModuleId) && !lw.stack.includes('vacuumDock')
+    )
+    if (onMainModule.length === 0) {
+      return false
+    }
+    const topmost = onMainModule.sort(
+      (a, b) => b.stack.length - a.stack.length
+    )[0]
+    return getIsVacuumSpacer(topmost.def)
+  }, [vacuumModuleId, deckSetup.labware])
+
+  // collar placed on the dock slot
+  const dockHasCollar =
+    vacuumModuleId != null &&
+    isOnVacuumDock &&
+    Object.values(deckSetup.labware).some(labware => {
+      const isOnDock = labware.stack.includes('vacuumDock')
+      const isCollar = getIsVacuumCollar(labware.def)
+      return isOnDock && isCollar
+    })
+
+  useEffect(() => {
+    if (isOnVacuumDock) {
+      if (!dockHasCollar) {
+        setUserCategoryExpandState(prev => ({ ...prev, adapter: true }))
+      } else {
+        setUserCategoryExpandState(prev => ({ ...prev, wellPlate: true }))
+      }
+    } else if (
+      moduleType === VACUUM_MODULE_TYPE &&
+      moduleHasLabware &&
+      !mainModuleTopIsSpacer
+    ) {
+      if (mainModuleHasCollar || mainModuleTopIsFilterPlate) {
+        setUserCategoryExpandState(prev => ({ ...prev, wellPlate: true }))
+      } else {
+        setUserCategoryExpandState(prev => ({
+          ...prev,
+          adapter: true,
+          wellPlate: true,
+        }))
+      }
+    }
+  }, [
+    isOnVacuumDock,
+    dockHasCollar,
+    moduleType,
+    moduleHasLabware,
+    mainModuleHasCollar,
+    mainModuleTopIsFilterPlate,
+    mainModuleTopIsSpacer,
+  ])
+
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
   const [filterRecommended, setFilterRecommended] = useState<boolean>(
-    moduleType != null
+    moduleType != null || isOnVacuumDock || isOnHopper
   )
   //    for OT-2 usage only due to H-S collisions
   const isNextToHeaterShaker = initialModules.some(
@@ -186,9 +292,18 @@ export function SelectLabwareModal(
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
         return true
       }
-      return getLabwareCompatibleWithModule(def, moduleType, moduleHasLabware)
+      // for vacuum dock, use dock-specific compatibility
+      if (isOnVacuumDock && moduleType === VACUUM_MODULE_TYPE) {
+        return (
+          COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[
+            VACUUM_MODULE_TYPE_WITH_LABWARE
+          ].includes(def.parameters.loadName) ||
+          def.metadata.displayCategory === 'wellPlate'
+        )
+      }
+      return getLabwareCompatibleWithModule(def, moduleType)
     },
-    [moduleType, moduleHasLabware]
+    [moduleType, isOnVacuumDock]
   )
 
   const getIsLabwareFiltered = useCallback(
@@ -202,39 +317,70 @@ export function SelectLabwareModal(
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
+      const isVacuumCollar = getIsVacuumCollar(labwareDef)
+      const isBaseDeckSlot =
+        moduleType == null &&
+        !isOnVacuumDock &&
+        !isOnHopper &&
+        slot !== 'offDeck'
 
-      const isRecommendedFilter =
-        filterRecommended &&
-        !getLabwareIsRecommended(
-          labwareDef,
-          selectedModuleModel,
-          moduleHasLabware
-        )
-      const isHeightFilter =
-        filterHeight &&
-        getIsLabwareAboveHeight(
-          labwareDef,
-          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-        )
-      const isNotCompatible = !getIsLabwareCompatible(labwareDef)
-      const isIrregularAdapter =
-        isAdapter &&
-        isIrregularSize &&
-        moduleType !== HEATERSHAKER_MODULE_TYPE &&
-        moduleType !== VACUUM_MODULE_TYPE
+      // for vacuum dock, show collars when empty, filter plates when collar present
+      if (isOnVacuumDock) {
+        if (!dockHasCollar) {
+          // no collar on dock yet, so show only collars
+          return !isVacuumCollar
+        }
+        // collar present on dock, so show only filter plates
+        const isFilterPlate = (parameters.quirks ?? []).includes('filterPlate')
+        return !isFilterPlate
+      }
 
-      const isFiltered =
-        isRecommendedFilter ||
-        isHeightFilter ||
-        isNotCompatible ||
-        isIrregularAdapter ||
+      // for main vacuum module area with existing labware, filter explicitly
+      // (skip when only a bare spacer is present — treat like an empty module)
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        moduleHasLabware &&
+        !mainModuleTopIsSpacer
+      ) {
+        const isFilterPlate = (parameters.quirks ?? []).includes('filterPlate')
+        if (mainModuleHasCollar) {
+          // collar already placed: only allow filter plates on top
+          return !isFilterPlate
+        }
+        if (mainModuleTopIsFilterPlate) {
+          // filter plate already on top: max stack reached, only allow collars
+          return !isVacuumCollar
+        }
+        // collection plate (or empty-ish): allow collars and filter plates
+        return !(isVacuumCollar || isFilterPlate)
+      }
+
+      return (
+        (filterRecommended &&
+          !getLabwareIsRecommended(
+            labwareDef,
+            selectedModuleModel,
+            moduleHasLabware,
+            isOnVacuumDock,
+            dockHasCollar
+          )) ||
+        (filterHeight &&
+          getIsLabwareAboveHeight(
+            labwareDef,
+            MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+          )) ||
+        !getIsLabwareCompatible(labwareDef) ||
+        (isAdapter &&
+          isIrregularSize &&
+          moduleType !== HEATERSHAKER_MODULE_TYPE &&
+          moduleType !== VACUUM_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
         (slot === 'offDeck' && (isAdapter || isLid)) ||
+        (isBaseDeckSlot && !getIsDeckSlotCompatible(labwareDef)) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
         parameters.loadName === TIPRACK_LID_LOADNAME
-
-      return isFiltered
+      )
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -243,8 +389,13 @@ export function SelectLabwareModal(
       filterHeight,
       getIsLabwareCompatible,
       moduleType,
-      slot,
       moduleHasLabware,
+      slot,
+      isOnVacuumDock,
+      dockHasCollar,
+      mainModuleHasCollar,
+      mainModuleTopIsFilterPlate,
+      mainModuleTopIsSpacer,
     ]
   )
 
@@ -335,7 +486,7 @@ export function SelectLabwareModal(
       defs[selectedTopLabware.labwareDefURI] ??
       customLabwareDefs[selectedTopLabware.labwareDefURI]
 
-    const amount = selectedTopLabware.amount ?? 0
+    const amount = selectedTopLabware.amount ?? 1
     const hopperStackLimit = getMaxPoolCount({
       labwareDefinitions: {
         primary: selectedLabwareDef,
@@ -376,7 +527,6 @@ export function SelectLabwareModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t('add_labware')}
       type="info"
       width="37.125rem"

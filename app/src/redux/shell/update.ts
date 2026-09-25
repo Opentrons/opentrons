@@ -32,3 +32,14 @@ export const getAvailableShellUpdate: (state: State) => string | null =
   createSelector(getShellUpdateState, state =>
     state.available && state.info ? state.info.version : null
   )
+
+export function getShellUsbMountPaths(state: State): string[] {
+  return state.shell.usbMountPaths.map(entry => entry.path)
+}
+
+// Only mounts whose backing device is a single-function USB mass-storage device
+export function getShellUsbMassStorageMountPaths(state: State): string[] {
+  return state.shell.usbMountPaths.reduce<string[]>((acc, entry) => {
+    return entry.isMassStorage ? [...acc, entry.path] : acc
+  }, [])
+}

@@ -60,7 +60,6 @@ export const AnnouncementModal = (
       {showAnnouncementModal && (
         <Modal
           childrenPadding={SPACING.spacing24}
-          marginLeft="0"
           title={heading}
           type="info"
           width="47rem"

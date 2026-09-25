@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../request'
+import { GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -8,11 +8,7 @@ export function getPipettes(
   config: HostConfig,
   params: GetPipettesParams
 ): ResponsePromise<Pipettes> {
-  return request<Pipettes>(
-    GET,
-    `/pipettes`,
-    null,
-    config,
-    params && createAxiosConfig({ params })
-  )
+  return request<Pipettes>(GET, `/pipettes`, config, {
+    queryParams: { ...params },
+  })
 }

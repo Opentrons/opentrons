@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getRunLoadedLabwareDefintions } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -21,7 +21,7 @@ export function useRunLoadedLabwareDefinitions(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
   return useQuery<RunLoadedLabwareDefinitions, AxiosError>(
-    [host, 'runs', runId, 'loaded_labware_definitions'],
+    getQueryKey(host, 'runs', runId, 'loaded_labware_definitions'),
     () =>
       getRunLoadedLabwareDefintions(host!, runId!).then(
         response => response.data

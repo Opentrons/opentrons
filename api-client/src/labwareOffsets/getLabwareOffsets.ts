@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../request'
+import { GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -24,11 +24,7 @@ export function getLabwareOffsets(
   config: HostConfig,
   params: LabwareOffsetsSearchParams = {}
 ): ResponsePromise<LabwareOffsetsResponse> {
-  return request<LabwareOffsetsResponse>(
-    GET,
-    '/labwareOffsets',
-    null,
-    config,
-    params && createAxiosConfig({ params })
-  )
+  return request<LabwareOffsetsResponse>(GET, '/labwareOffsets', config, {
+    queryParams: { ...params },
+  })
 }

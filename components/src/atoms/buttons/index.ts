@@ -1,4 +1,3 @@
-export * from './AlertPrimaryButton'
 export * from './BasicButton'
 export * from './EmptySelectorButton'
 export * from './LargeButton'

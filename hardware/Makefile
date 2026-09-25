@@ -158,7 +158,9 @@ push-no-restart-ot3: wheel
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 
 # Launch the emulator application.

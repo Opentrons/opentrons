@@ -31,7 +31,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof OnDeviceLogin> = {
   title: 'ODD/Organisms/OnDeviceLogin',
   component: OnDeviceLogin,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>
@@ -60,6 +60,10 @@ export const Default: Story = {
     onCancel: action('onCancel'),
     loginError: null,
     onClearLoginError: action('onClearLoginError'),
+    onUsernameSubmit: async (username: string) => {
+      action('onUsernameSubmit')(username)
+    },
+    passwordComplexity: null,
   },
 }
 
@@ -68,9 +72,39 @@ export const WithLoginError: Story = {
   args: {
     ...Default.args,
     step: 'password',
-    loginError: i18n.t('on_device_login_error_incorrect', {
-      ns: 'device_settings',
+    loginError: i18n.t('login_error_incorrect', {
+      ns: 'access_control',
     }),
     onClearLoginError: action('onClearLoginError'),
+  },
+}
+
+/** First-time login: enter the admin-provided one-time password. */
+export const FirstTimeLogin: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    loginResetPassword: true,
+    initialUsername: 'alice',
+  },
+}
+
+/** Choose a new password after signing in with a temporary password. */
+export const PasswordResetRequired: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
+  },
+}
+
+/** Confirm-password step in the reset-password flow. */
+export const PasswordResetConfirmPassword: Story = {
+  args: {
+    ...Default.args,
+    step: 'confirmPassword',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
   },
 }

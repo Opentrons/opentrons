@@ -16,9 +16,7 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getNetworkInterfaces } from '/app/redux/networking'
-
-import type { State } from '/app/redux/types'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;
@@ -38,9 +36,7 @@ export function EthernetConnectionDetails(
   const { t, i18n } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const { ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { ethernet } = useNetworkInterfaces(robotName)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>

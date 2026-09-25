@@ -81,7 +81,7 @@ async def test_calibrate_pipette_does_not_save_during_error(
         await calibration.find_pipette_offset(
             hcapi=ot3_hardware_api, mount=OT3Mount.LEFT, slot=5
         )
-    ).then_raise(EarlyCapacitiveSenseTrigger(5.0, 3.0))
+    ).then_raise(EarlyCapacitiveSenseTrigger())
 
     with pytest.raises(EarlyCapacitiveSenseTrigger):
         await subject.execute(params)

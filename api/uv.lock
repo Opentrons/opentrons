@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-11T14:24:25.734373Z"
+exclude-newer = "2026-08-27T21:04:21.910468Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -1339,6 +1339,7 @@ dependencies = [
     { name = "pyserial" },
     { name = "pyusb" },
     { name = "typing-extensions" },
+    { name = "zipstream-ng" },
 ]
 
 [package.dev-dependencies]
@@ -1379,6 +1380,7 @@ dev = [
     { name = "typing-extensions" },
     { name = "wheel" },
     { name = "zipp" },
+    { name = "zipstream-ng" },
 ]
 robot = [
     { name = "anyio" },
@@ -1391,6 +1393,7 @@ robot = [
     { name = "pyro5" },
     { name = "pyusb" },
     { name = "zipp" },
+    { name = "zipstream-ng" },
 ]
 
 [package.metadata]
@@ -1410,6 +1413,7 @@ requires-dist = [
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -1450,6 +1454,7 @@ dev = [
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "wheel", specifier = "==0.37.0" },
     { name = "zipp", specifier = "==3.21.0" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 robot = [
     { name = "anyio", specifier = "==4.9.0" },
@@ -1462,6 +1467,7 @@ robot = [
     { name = "pyro5", specifier = "==5.16" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "zipp", specifier = "==3.21.0" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [[package]]
@@ -2611,4 +2617,13 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3f/50/bad581df71744867e9468ebd0bcd6505de3b275e06f202c2cb016e3ff56f/zipp-3.21.0.tar.gz", hash = "sha256:2c9958f6430a2040341a52eb608ed6dd93ef4392e02ffe219417c1b28b5dd1f4", size = 24545, upload-time = "2024-11-10T15:05:20.202Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/1a/7e4798e9339adc931158c9d69ecc34f5e6791489d469f5e50ec15e35f458/zipp-3.21.0-py3-none-any.whl", hash = "sha256:ac1bbe05fd2991f160ebce24ffbac5f6d11d83dc90891255885223d42b3cd931", size = 9630, upload-time = "2024-11-10T15:05:19.275Z" },
+]
+
+[[package]]
+name = "zipstream-ng"
+version = "1.9.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/e0/76e5a674b0f6a6b7f90af9b87a92fbe1f2b97da447fb09078bcba6f6a28e/zipstream_ng-1.9.3.tar.gz", hash = "sha256:6cebd055025699c0af594c76a9452cdf13f4be67ee005b6907f0d3c9c6f44ced", size = 32729, upload-time = "2026-08-20T03:53:00.746Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/44/e6d863aebd6d57a1de20d2350328379b5b970c29a217af349793f12d753c/zipstream_ng-1.9.3-py3-none-any.whl", hash = "sha256:6614580d7ae56bc9f3c2a342210108450e2d191b62038e818bae7845612584b7", size = 23678, upload-time = "2026-08-20T03:52:59.846Z" },
 ]

@@ -16,11 +16,16 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../../constants'
+import {
+  HOPPER_STACKER_LOCATION,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+} from '../../constants'
 import {
   formatChangeTipArg,
   getDefineLiquids,
@@ -115,6 +120,7 @@ const moduleId = '1'
 const moduleId2 = '2'
 const moduleId3 = '3'
 const moduleId4 = '4'
+const moduleId5 = '5'
 const mockModuleEntities: ModuleEntities = {
   [moduleId]: {
     id: moduleId,
@@ -248,6 +254,66 @@ adapter_2 = protocol.load_adapter_from_definition(
     CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
     location="B2",
 )`.trimStart()
+    )
+  })
+
+  it('should generate loadAdapters for vacuum adapters on vacuum main area', () => {
+    const mockVacuumEntity = {
+      [moduleId5]: {
+        id: moduleId5,
+        model: VACUUM_MODULE_V1,
+        type: VACUUM_MODULE_TYPE,
+        pythonName: 'vacuum_module_1',
+      },
+    }
+
+    expect(
+      getLoadAdapters(
+        mockVacuumEntity,
+        { [labwareId1]: mockLabwareEntities[labwareId1] },
+        {
+          [labwareId1]: {
+            stack: [labwareId1, moduleId5],
+          },
+        }
+      )
+    ).toBe(
+      `# Load Adapters:
+adapter_1 = vacuum_module_1.load_adapter(
+    "fixture_flex_96_tiprack_adapter",
+    namespace="opentrons",
+    version=1,
+)`
+    )
+  })
+  it('should generate loadAdapters for vacuum adapters on dock', () => {
+    const mockVacuumEntity = {
+      [moduleId5]: {
+        id: moduleId5,
+        model: VACUUM_MODULE_V1,
+        type: VACUUM_MODULE_TYPE,
+        pythonName: 'vacuum_module_1',
+      },
+    }
+
+    expect(
+      getLoadAdapters(
+        mockVacuumEntity,
+        { [labwareId1]: mockLabwareEntities[labwareId1] },
+        {
+          [labwareId1]: {
+            stack: [labwareId1, VACUUM_DOCK_ADDRESSABLE_AREA, moduleId5],
+          },
+        }
+      )
+    ).toBe(
+      `# Load Adapters:
+adapter_1 = protocol.load_adapter(
+    "fixture_flex_96_tiprack_adapter",
+    location=vacuum_module_1.manifold_dock,
+    namespace="opentrons",
+    version=1,
+)`
     )
   })
 })

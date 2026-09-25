@@ -58,7 +58,7 @@ async def test_schema_15_persistence_migrates_boolean_settings_to_v16() -> None:
             ac.raise_for_status()
             assert ac.json()["data"] == {
                 "requireSignoffForProtocolLog": True,
-                "requireLogsToBeSavedInApp": True,
+                "requireLogsToBeSavedInApp": False,
                 "deleteOverMaxOnDiskProtocols": True,
             }
 

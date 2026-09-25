@@ -110,6 +110,17 @@ _96_RECTANGLE_MAP = NozzleMap.build(
         }
     ),
 )
+_96_ROW_H_MAP = NozzleMap.build(
+    physical_nozzles=pipette_fixtures.NINETY_SIX_MAP,
+    physical_rows=pipette_fixtures.NINETY_SIX_ROWS,
+    physical_columns=pipette_fixtures.NINETY_SIX_COLS,
+    starting_nozzle="H1",
+    back_left_nozzle="H1",
+    front_right_nozzle="H12",
+    valid_nozzle_maps=ValidNozzleMaps(
+        maps={"RowH": pipette_fixtures.NINETY_SIX_ROWS["H"]}
+    ),
+)
 _8_FULL_MAP = NozzleMap.build(
     physical_nozzles=pipette_fixtures.EIGHT_CHANNEL_MAP,
     physical_rows=pipette_fixtures.EIGHT_CHANNEL_ROWS,
@@ -395,6 +406,34 @@ def test_wells_covered_sparse_1(
             _1_reservoir,
         )
     ) == ["A1"]
+
+
+@pytest.mark.parametrize(
+    "target_well,result",
+    [
+        ("A1", ["A1", "A2", "A3"]),
+        ("A2", ["A2", "A3"]),
+        ("A3", ["A3"]),
+    ],
+)
+def test_wells_covered_sparse_h1_taller_than_wide(
+    target_well: str, result: list[str]
+) -> None:
+    """It should not over-index columns for an H1-fronted row config on a taller-than-wide reservoir."""
+    # A sparse reservoir with more rows than columns (3 columns x 6 rows), column-major ordering.
+    grid = [[f"{chr(65 + r)}{c + 1}" for r in range(6)] for c in range(3)]
+    assert (
+        list(
+            wells_covered_sparse(
+                _96_ROW_H_MAP.columns,
+                _96_ROW_H_MAP.rows,
+                _96_ROW_H_MAP.starting_nozzle,
+                target_well,
+                grid,
+            )
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(

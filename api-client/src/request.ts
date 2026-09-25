@@ -19,28 +19,72 @@ export const DEFAULT_HEADERS = {
   'Opentrons-Version': '3',
 }
 
+const FORM_URLENCODED_CONTENT_TYPE =
+  'application/x-www-form-urlencoded;charset=utf-8'
+
 export const GET = 'GET'
 export const POST = 'POST'
 export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
 export const PUT = 'PUT'
 
-export type BrandedAxiosConfig = AxiosRequestConfig & {
-  readonly __axiosConfigBrand: unique symbol
-}
-export function createAxiosConfig(
-  config: AxiosRequestConfig
-): BrandedAxiosConfig {
-  return config as BrandedAxiosConfig
+export interface RequestConfig<
+  RequestBodyT extends AxiosRequestConfig['data'],
+> {
+  /**
+   * The request body.
+   */
+  body?: RequestBodyT
+
+  /**
+   * Query parameters, e.g. {foo: "bar"} for ?foo=bar.
+   */
+  queryParams?: Record<string, string | number | boolean>
+
+  /**
+   * Request-specific headers.
+   *
+   * Common headers like Authorization, Opentrons-Version,
+   * and Opentrons-User-Notes don't need to be set here;
+   * they'll be added automatically.
+   */
+  headers?: Record<string, string>
+
+  /**
+   * The user-entered reason for this interaction with the robot.
+   * Generally required by the server for any mutation when
+   * Compliance Ready Software is enabled.
+   */
+  userNotes?: string
+
+  /**
+   * What kind of response body to expect and how Axios should parse it.
+   */
+  responseType?: AxiosRequestConfig['responseType']
+
+  /**
+   * If true, this request will always use HTTPS, never HTTP.
+   * (Unless the host is a local transport, loopback or USB, which always uses HTTP.)
+   *
+   * This must be set to true whenever a request carries secrets. For example, if
+   * the request is to change a user's password, this needs to be true to avoid
+   * exposing the new password over the network.
+   *
+   * This should otherwise be set to false because HTTPS requires some onerous manual
+   * setup, and so not every robot will support it.
+   */
+  requiresSecureTransport?: boolean
 }
 
-export function request<ResData, ReqData = null>(
+export function request<
+  ResponseBodyT,
+  RequestBodyT extends AxiosRequestConfig['data'] = never,
+>(
   method: Method,
   url: string,
-  data: ReqData,
   hostConfig: HostConfig,
-  axiosConfig?: BrandedAxiosConfig
-): ResponsePromise<ResData> {
+  requestConfig?: RequestConfig<RequestBodyT>
+): ResponsePromise<ResponseBodyT> {
   const {
     hostname,
     port,
@@ -49,20 +93,69 @@ export function request<ResData, ReqData = null>(
     secure,
   } = hostConfig
 
+  const params = requestConfig?.queryParams ?? {}
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
-  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
+  const userNotesHeader =
+    requestConfig?.userNotes != null
+      ? // encodeURI() is nominally for URIs, and this is a header, not a URI.
+        // But encodeURI() is sufficient for percent-encoding all the characters
+        // that would be invalid in a header.
+        { 'Opentrons-User-Notes': encodeURI(requestConfig.userNotes) }
+      : {}
+  const extraHeaders = requestConfig?.headers ?? {}
+  const body = requestConfig?.body
+  const urlEncodedBody =
+    body instanceof URLSearchParams ? body.toString() : null
+  const urlEncodedHeaders =
+    urlEncodedBody != null
+      ? { 'Content-Type': FORM_URLENCODED_CONTENT_TYPE }
+      : {}
+  const headers = {
+    ...DEFAULT_HEADERS,
+    ...urlEncodedHeaders,
+    ...tokenHeader,
+    ...userNotesHeader,
+    ...extraHeaders,
+  }
 
-  const protocol = (secure ?? false) ? 'https' : 'http'
-  const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
+  const requiresSecureTransport =
+    'Authorization' in headers ||
+    (requestConfig?.requiresSecureTransport ?? false)
 
-  const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
+  // USB is an HTTP-only serial tunnel and loopback is on-robot. Neither can
+  // (or should) speak TLS, even when a token or requiresSecureTransport is set.
+  const protocol = isLocalTransport(hostConfig)
+    ? 'http'
+    : (secure ?? false) || requiresSecureTransport
+      ? 'https'
+      : 'http'
+  const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
-  return requestor<ResData>({
-    headers,
+  const portToUse = port
+    ? port === DEFAULT_PORT && protocol === 'https'
+      ? DEFAULT_HTTPS_PORT
+      : port
+    : defaultPort
+
+  const baseURL = `${protocol}://${hostname}:${portToUse}`
+
+  return requestor<ResponseBodyT>({
     method,
     baseURL,
     url,
-    data,
-    ...axiosConfig,
+    params,
+    data: urlEncodedBody ?? body,
+    headers,
+    responseType: requestConfig?.responseType,
   })
+}
+
+function isLocalTransport(hostConfig: HostConfig): boolean {
+  return (
+    hostConfig.hostname === 'localhost' ||
+    hostConfig.hostname === '127.0.0.1' ||
+    hostConfig.hostname === '::1' ||
+    // Must match OPENTRONS_USB in app/src/redux/discovery/constants.ts.
+    hostConfig.hostname === 'opentrons-usb'
+  )
 }

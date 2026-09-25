@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -30,6 +30,8 @@ interface ToasterOvenProps {
   children: ReactNode
 }
 
+const DEFAULT_TOAST_CONTAINER_Z_INDEX = 1000
+
 /**
  * A toaster oven that renders up to 5 toasts in an app-level display container
  * @param children passes through and renders children
@@ -50,60 +52,80 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
    * @param {MakeToastOptions} options
    * @returns {string} returns the id to allow imperative eatToast close from caller
    */
-  function makeToast(
-    message: string,
-    type: ToastType,
-    options?: MakeToastOptions
-  ): string {
-    const id = uuidv4()
-    const toastsForRemoval = toasts.map(toast => {
-      return {
-        ...toast,
-        exitNow: true,
-        zIndex: 1,
-        position: POSITION_FIXED,
-      }
-    })
-    setToasts(t => [
-      {
-        id,
-        message,
-        type,
-        ...options,
-        zIndex: 2,
-        position: POSITION_FIXED,
-      },
-      ...toastsForRemoval,
-    ])
+  const makeToast = useCallback(
+    (message: string, type: ToastType, options?: MakeToastOptions): string => {
+      const id = uuidv4()
 
-    return id
-  }
+      setToasts(t => {
+        const toastsForRemoval = t.map(toast => {
+          return {
+            ...toast,
+            exitNow: true,
+            zIndex: 1,
+            position: POSITION_FIXED,
+          }
+        })
+        return [
+          {
+            id,
+            message,
+            type,
+            zIndex: 2,
+            position: POSITION_FIXED,
+            // Allow callers to override stacking
+            ...options,
+          },
+          ...toastsForRemoval,
+        ]
+      })
 
-  function makeSnackbar(
-    message: string,
-    duration?: number,
-    options?: MakeSnackbarOptions
-  ): void {
-    setSnackbar({ message, duration, ...options })
-  }
+      return id
+    },
+    []
+  )
+
+  const toastContainerZIndex = Math.max(
+    DEFAULT_TOAST_CONTAINER_Z_INDEX,
+    ...toasts.map(toast =>
+      typeof toast.zIndex === 'number'
+        ? toast.zIndex
+        : DEFAULT_TOAST_CONTAINER_Z_INDEX
+    )
+  )
+
+  const makeSnackbar = useCallback(
+    (
+      message: string,
+      duration?: number,
+      options?: MakeSnackbarOptions
+    ): void => {
+      setSnackbar({ message, duration, ...options })
+    },
+    []
+  )
 
   // This function is needed to actually make the snackbar auto-close in the context of the
   // ToasterOven. It closes fine by itself in tests and storybook, but we need to eat it
   // here to remove it from the page as a whole.
-  function eatSnackbar(): void {
+  const eatSnackbar = useCallback((): void => {
     setSnackbar(null)
-  }
+  }, [])
 
   /**
    * removes (eats) a toast from toaster oven display container
    * @param {string} toastId the id of the toast to remove
    */
-  function eatToast(toastId: string): void {
+  const eatToast = useCallback((toastId: string): void => {
     setToasts(t => t.filter(toast => toast.id !== toastId))
-  }
+  }, [])
+
+  const contextValue = useMemo(
+    () => ({ eatToast, makeToast, makeSnackbar }),
+    [eatToast, makeToast, makeSnackbar]
+  )
 
   return (
-    <ToasterContext.Provider value={{ eatToast, makeToast, makeSnackbar }}>
+    <ToasterContext.Provider value={contextValue}>
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
@@ -112,7 +134,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           position={POSITION_FIXED}
           right={SPACING.spacing32}
           bottom={SPACING.spacing32}
-          zIndex={1000}
+          zIndex={toastContainerZIndex}
           width="100%"
         >
           {toasts.map(toast => (

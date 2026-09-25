@@ -15,7 +15,7 @@ def get_run_ids_from_robot(ip: str) -> Set[str]:
     run_ids = set()
     try:
         response = requests.get(
-            f"http://{ip}:31950/runs", headers={"opentrons-version": "3"}
+            f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}
         )
         run_data = response.json()
         run_list = run_data.get("data", "")
@@ -33,7 +33,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     """Use http requests to get command, health, and protocol data from robot."""
     response = requests.get(
         f"http://{ip}:31950/runs/{one_run}/commands",
-        headers={"opentrons-version": "3"},
+        headers={"opentrons-version": "*"},
         params={"cursor": 0, "pageLength": 0},
     )
     data = response.json()
@@ -47,25 +47,25 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     for cursor in range(0, command_count, page_length):
         response = requests.get(
             f"http://{ip}:31950/runs/{one_run}/commands",
-            headers={"opentrons-version": "3"},
+            headers={"opentrons-version": "*"},
             params={"cursor": cursor, "pageLength": page_length},
         )
         command_data = response.json()
         commands.extend(command_data.get("data", ""))
     run["commands"] = commands
     response = requests.get(
-        f"http://{ip}:31950/runs/{one_run}", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/runs/{one_run}", headers={"opentrons-version": "*"}
     )
     run_meta_data = response.json()
     protocol_id = run_meta_data["data"]["protocolId"]
     run.update(run_meta_data["data"])
     response = requests.get(
-        f"http://{ip}:31950/protocols/{protocol_id}", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/protocols/{protocol_id}", headers={"opentrons-version": "*"}
     )
     protocol_data = response.json()
     run["protocol"] = protocol_data["data"]
     response = requests.get(
-        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
     )
     health_data = response.json()
     run["robot_name"] = health_data.get("name", "")
@@ -75,7 +75,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
 
     # Instruments Attached
     response = requests.get(
-        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "*"}
     )
     instrument_data = response.json()
     for instrument in instrument_data["data"]:

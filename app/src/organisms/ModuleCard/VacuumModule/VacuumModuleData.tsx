@@ -8,10 +8,11 @@ import {
 } from '@opentrons/components'
 
 import { getPumpStatusProps } from '../utils'
+import { formatDisplayPressureMbar } from './utils/formatDisplayPressureMbar'
 import styles from './vacuummodule.module.css'
 
 import type { TFunction } from 'i18next'
-import type { VacuumModuleData as VacuumModuleDataType } from '/app/redux/modules/api-types'
+import type { VacuumModuleData as VacuumModuleDataType } from '@opentrons/api-client'
 
 interface VacuumModuleDataProps {
   moduleData: VacuumModuleDataType
@@ -21,14 +22,16 @@ export function VacuumModuleData(props: VacuumModuleDataProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { moduleData } = props
   const {
-    currentPressure,
-    targetPressure,
+    currentPressure: rawCurrentPressure,
+    targetPressure: rawTargetPressure,
     currentPower,
     targetPower,
     modeType,
     ventStatus,
     status,
   } = moduleData
+  const currentPressure = formatDisplayPressureMbar(rawCurrentPressure)
+  const targetPressure = formatDisplayPressureMbar(rawTargetPressure)
   return (
     <div className={styles.vacuum_module_container}>
       {/* Vacuum Pump section */}
@@ -79,7 +82,7 @@ export function VacuumModuleData(props: VacuumModuleDataProps): JSX.Element {
         </StyledText>
         <Chip
           type="neutral"
-          text={t(ventStatus === 'open' ? 'vent_open' : 'vent_closed')}
+          text={t(ventStatus === 'opened' ? 'vent_open' : 'vent_closed')}
           iconName="connection-status"
           chipSize="small"
           width={FLEX_MAX_CONTENT}

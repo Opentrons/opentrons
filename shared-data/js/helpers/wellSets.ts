@@ -14,8 +14,11 @@
 import uniq from 'lodash/uniq'
 
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
-import { SINGLE } from '../../command/types'
-import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import { ROW, SINGLE } from '../../command/types'
+import {
+  getWellNamePerMultiTip,
+  getWellNamePerRowMultiTip,
+} from './getWellNamePerMultiTip'
 
 import type { NozzleConfigurationStyle } from '../../command/types'
 import type {
@@ -27,6 +30,20 @@ import type {
 
 type WellSetByPrimaryWell = string[][]
 
+const VALID_COLUMN_WELL_SET_SIZES = [1, 8] as const
+const VALID_ROW_WELL_SET_SIZES = [1, 12] as const
+
+function isValidWellSet(
+  wellSet: string[],
+  validUniqueCounts: readonly number[]
+): boolean {
+  const uniqueWells = uniq(wellSet)
+  return (
+    uniqueWells.every(well => well != null) &&
+    validUniqueCounts.includes(uniqueWells.length)
+  )
+}
+
 // Compute all well sets for a labware def (non-memoized)
 function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition
@@ -36,6 +53,22 @@ function _getAllWellSetsForLabware(
 
   for (const well of allWells) {
     const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
+    if (wellSet != null) {
+      wellSets.push(wellSet)
+    }
+  }
+
+  return wellSets
+}
+
+function _getAllRowWellSetsForLabware(
+  labwareDef: LabwareDefinition
+): WellSetByPrimaryWell {
+  const allWells: string[] = Object.keys(labwareDef.wells)
+  const wellSets: WellSetByPrimaryWell = []
+
+  for (const well of allWells) {
+    const wellSet = getWellNamePerRowMultiTip(labwareDef, well)
     if (wellSet != null) {
       wellSets.push(wellSet)
     }
@@ -226,6 +259,20 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
     }
   }
 
+  const hasValidColumnWellSets = (labwareDef: LabwareDefinition): boolean => {
+    const allWellSets = getAllWellSetsForLabware(labwareDef)
+    return allWellSets.some(wellSet =>
+      isValidWellSet(wellSet, VALID_COLUMN_WELL_SET_SIZES)
+    )
+  }
+
+  const hasValidRowWellSets = (labwareDef: LabwareDefinition): boolean => {
+    const allRowWellSets = _getAllRowWellSetsForLabware(labwareDef)
+    return allRowWellSets.some(wellSet =>
+      isValidWellSet(wellSet, VALID_ROW_WELL_SET_SIZES)
+    )
+  }
+
   const canPipetteUseLabware = (
     pipetteSpec: PipetteV2Specs,
     nozzleConfiguration: NozzleConfigurationStyle,
@@ -238,21 +285,19 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       // assume all labware can be used by single-channel
       return true
     }
-    if (labwareDef != null) {
-      const allWellSets = getAllWellSetsForLabware(labwareDef)
-      return allWellSets.some(wellSet => {
-        const uniqueWells = uniq(wellSet)
-        // if all wells are non-null, and there are either 1 (reservoir-like)
-        // or 8 (well plate-like) unique wells in the set,
-        // then assume both 8 and 96 channel pipettes will work
-        return (
-          uniqueWells.every(well => well != null) &&
-          [1, 8].includes(uniqueWells.length)
-        )
-      })
-    } else {
+    if (labwareDef == null) {
       return false
     }
+
+    // row tips span X. Use row geometry so row troughs (ex 8-well reservoirs
+    // with centerMultichannelOnWells) are not judged by column Y spacing.
+    if (nozzleConfiguration === ROW) {
+      return hasValidRowWellSets(labwareDef)
+    }
+
+    // column/partial column/full multi: tips span Y.
+    // full 96 nozzles still need Y-aligned wells... row-only troughs stay incompatible.
+    return hasValidColumnWellSets(labwareDef)
   }
   return {
     getAllWellSetsForLabware,

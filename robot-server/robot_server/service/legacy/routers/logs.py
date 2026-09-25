@@ -16,6 +16,10 @@ IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
     LogIdentifier.update_server: "opentrons-update-server",
     LogIdentifier.touchscreen: "opentrons-robot-app",
     LogIdentifier.can: "opentrons-api-serial-can",
+    LogIdentifier.auth: "opentrons-auth-server",
+    LogIdentifier.audit: "opentrons-audit-server",
+    LogIdentifier.kernel: log_control.KERNEL_SPECIAL,
+    LogIdentifier.remote_access: log_control.REMOTE_ACCESS_SPECIAL,
 }
 
 

@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getHealth } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -12,7 +12,7 @@ export function useHealthQuery(
   options: UseQueryOptions<AxiosResponse<Health>, AxiosError> = {}
 ): UseQueryResult<AxiosResponse<Health>, AxiosError> {
   const host = useHost()
-  const queryKey = ['health', host]
+  const queryKey = getQueryKey(host, 'health')
   const query = useQuery<AxiosResponse<Health>, AxiosError>(
     queryKey,
     () => getHealth(host!),

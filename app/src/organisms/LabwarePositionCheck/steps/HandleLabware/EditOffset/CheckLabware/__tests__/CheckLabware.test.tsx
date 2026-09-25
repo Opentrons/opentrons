@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -79,6 +79,7 @@ describe('CheckLabware', () => {
   let mockHandleJog: Mock
   let mockResetJog: Mock
   let mockHandleResetLwModulesOnDeck: Mock
+  let mockFlushJogAudit: Mock
   let props: ComponentProps<typeof CheckLabware>
 
   beforeEach(() => {
@@ -97,6 +98,7 @@ describe('CheckLabware', () => {
       })
     mockResetJog = vi.fn().mockResolvedValue(undefined)
     mockHandleResetLwModulesOnDeck = vi.fn().mockResolvedValue(undefined)
+    mockFlushJogAudit = vi.fn()
 
     props = {
       runId: 'test-run-id',
@@ -107,6 +109,7 @@ describe('CheckLabware', () => {
         handleJog: mockHandleJog,
         resetJog: mockResetJog,
         handleResetLwModulesOnDeck: mockHandleResetLwModulesOnDeck,
+        flushJogAudit: mockFlushJogAudit,
       } as any,
       handleAddConfirmedWorkingVector: vi.fn(),
     } as any
@@ -145,6 +148,10 @@ describe('CheckLabware', () => {
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_EDIT_OFFSET_SUBSTEP',
     } as any)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   const render = (propsToRender: ComponentProps<typeof CheckLabware>) => {
@@ -211,6 +218,7 @@ describe('CheckLabware', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       proceedEditOffsetSubstep(props.runId, true)
     )
+    expect(mockFlushJogAudit).toHaveBeenCalled()
   })
 
   it('calls handleAddConfirmedWorkingVector on ODD when confirm is clicked', async () => {
@@ -221,5 +229,15 @@ describe('CheckLabware', () => {
     primaryButton.click()
 
     expect(props.handleAddConfirmedWorkingVector).toHaveBeenCalled()
+    expect(mockFlushJogAudit).toHaveBeenCalled()
+  })
+
+  it('flushes coalesced jog audit and goes back when back is clicked', () => {
+    render(props)
+
+    screen.getByTestId('back-button').click()
+
+    expect(mockFlushJogAudit).toHaveBeenCalled()
+    expect(mockToggleRobotMoving).toHaveBeenCalledWith(true)
   })
 })
