@@ -1,4 +1,7 @@
 """Omega HDQ DNA Extraction: Bacteria - Tissue Protocol."""
+from typing import Tuple, Union
+from opentrons.protocol_api import Labware
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 import math
 from opentrons import types
 from opentrons.protocol_api import (
@@ -6,25 +9,18 @@ from opentrons.protocol_api import (
     Well,
     ParameterContext,
     InstrumentContext,
-    Labware,
 )
 import numpy as np
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
-    MagneticBlockContext,
-    ThermocyclerContext,
     TemperatureModuleContext,
-    MagneticModuleContext,
-    AbsorbanceReaderContext,
+    MagneticBlockContext,
 )
-from typing import List, Union, Dict, Tuple
-from datetime import datetime
-from opentrons.hardware_control.modules.types import ThermocyclerStep
-
+from typing import List, Dict
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Omega HDQ DNA Extraction: Bacteria- Tissue Protocol NOABRFOLDER",
+    "protocolName": "Omega HDQ DNA Extraction: Bacteria",
 }
 
 requirements = {
@@ -58,109 +54,119 @@ drop_count = 0
 waste_vol = 0
 
 
-def add_parameters(parameters: ParameterContext) -> None:
-    """Define Parameters."""
-    parameters.add_str(
-        variable_name="pipette_mount",
-        display_name="Pipette Mount",
-        choices=[
-            {"display_name": "Left", "value": "left"},
-            {"display_name": "Right", "value": "right"},
-        ],
-        default="left",
-    )
-    parameters.add_int(
-        variable_name="heater_shaker_speed",
-        display_name="Heater Shaker Shake Speed",
-        description="Speed to set the heater shaker to",
-        default=2000,
-        minimum=200,
-        maximum=3000,
-        unit="rpm",
-    )
-    parameters.add_bool(
-        variable_name="deactivate_modules",
-        display_name="Deactivate Modules",
-        description="deactivate all modules at end of run",
-        default=True,
-    )
-    parameters.add_bool(
-        variable_name="probe_liquid_height",
-        display_name="Probe Liquid Height",
-        description="True means probe liquid height at start of run.",
-        default=False,
-    )
-    parameters.add_float(
-        variable_name="meniscus_z",
-        display_name="Meniscus Z",
-        default=-0.5,
-        minimum=-10.0,
-        maximum=10.0,
-        description="Z offset for meniscus height. Default is -1.5mm.",
-    )
-
-    parameters.add_int(
-        variable_name="error_capture_duration",
-        display_name="Error Capture Duration",
-        description="Length of video clip to capture on error (in seconds).",
-        default=30,
-        minimum=5,
-        maximum=6000,
-        unit="seconds",
-    )
-
-
-# FUNCTIONS FOR COMMON MODULE SEQUENCES
-def deactivate_modules(protocol: ProtocolContext) -> None:
-    """Deactivate all loaded modules."""
-    modules = protocol.loaded_modules
-
-    if modules:
-        for module in modules.values():
-            if isinstance(module, HeaterShakerContext):
-                module.deactivate_shaker()
-                module.deactivate_heater()
-            elif isinstance(module, TemperatureModuleContext):
-                module.deactivate()
-            elif isinstance(module, MagneticModuleContext):
-                module.disengage()
-            elif isinstance(module, ThermocyclerContext):
-                module.deactivate()
-
-
-def plate_reader_actions(
-    protocol: ProtocolContext,
-    plate_reader: AbsorbanceReaderContext,
-    hellma_plate: Labware,
-    hellma_plate_name: str,
+def comment_height_of_specific_labware(
+    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
 ) -> None:
-    """Plate reader single and multi wavelength readings."""
-    wavelengths = [450, 650]
-    # Single Wavelength Readings
-    hellma_plate_slot = hellma_plate.parent
-    plate_reader.close_lid()
-    for wavelength in wavelengths:
-        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-        plate_reader.close_lid()
-        result = plate_reader.read(str(datetime.now()))
-        msg = f"{hellma_plate_name} result: {result}"
-        protocol.comment(msg=msg)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-        plate_reader.close_lid()
-    # Multi Wavelength
-    plate_reader.initialize("multi", [450, 650])
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-    plate_reader.close_lid()
-    result = plate_reader.read(str(datetime.now()))
-    msg = f"{hellma_plate_name} result: {result}"
+    """Comment height found of specific labware."""
+    total_height = 0.0
+    for key in dict_of_labware_heights.keys():
+        if key[0] == labware_name:
+            height = dict_of_labware_heights[key]
+            total_height += height
+    protocol.comment(f"Liquid Waste Total Height: {total_height}")
+
+
+def load_wells_with_custom_liquids(
+    protocol: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+) -> None:
+    """Load custom liquids into wells."""
+    from opentrons.protocol_api import Well
+
+    liquid_colors = [
+        "#008000",
+        "#A52A2A",
+        "#00FFFF",
+        "#0000FF",
+        "#800080",
+        "#ADD8E6",
+        "#FF0000",
+        "#FFFF00",
+        "#FF00FF",
+        "#00008B",
+        "#7FFFD4",
+        "#FFC0CB",
+        "#FFA500",
+        "#00FF00",
+        "#C0C0C0",
+    ]
+    i = 0
+    volume = 0.0
+    for liquid_name, wells_info in liquid_vols_and_wells.items():
+        liquid = protocol.define_liquid(
+            liquid_name, display_color=liquid_colors[i % len(liquid_colors)]
+        )
+        for well_info in wells_info:
+            if isinstance(well_info["well"], list):
+                wells = well_info["well"]
+            elif isinstance(well_info["well"], Well):
+                wells = [well_info["well"]]
+            else:
+                wells = []
+            if isinstance(well_info["volume"], (float, int)):
+                volume = well_info["volume"]
+            for well in wells:
+                well.load_liquid(liquid, volume)
+
+
+def find_liquid_height_of_all_wells(
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
+) -> Dict:
+    """Find the liquid height of all wells in protocol."""
+    dict_of_labware_heights = {}
+    pipette.pick_up_tip()
+    pip_channels = pipette.active_channels
+    for well in wells:
+        labware_name = well.parent.name
+        total_number_of_wells_in_plate = len(well.parent.wells())
+        if (
+            pip_channels > 1
+            and total_number_of_wells_in_plate > 12
+            and well.well_name.startswith("A")
+        ):
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
+        elif total_number_of_wells_in_plate <= 12:
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
+    if pip_channels != pipette.channels:
+        pipette.drop_tip()
+    else:
+        pipette.return_tip()
+        pipette.reset_tipracks()
+    msg = f"result: {dict_of_labware_heights}"
     protocol.comment(msg=msg)
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-    plate_reader.close_lid()
+    comment_height_of_specific_labware(
+        protocol, "Liquid Waste", dict_of_labware_heights
+    )
+    return dict_of_labware_heights
+
+
+def find_liquid_height_of_loaded_liquids(
+    ctx: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+    pipette: InstrumentContext,
+) -> List[Well]:
+    """Find Liquid height of loaded liquids."""
+    from opentrons.protocol_api import Well
+
+    load_wells_with_custom_liquids(ctx, liquid_vols_and_wells)
+    wells = [
+        well
+        for items in liquid_vols_and_wells.values()
+        for entry in items
+        if isinstance(entry["well"], (Well, list)) and entry["volume"] != 0.0
+        for well in (
+            entry["well"] if isinstance(entry["well"], list) else [entry["well"]]
+        )
+    ]
+    if pipette.active_channels == 96:
+        wells = [well for well in wells if well.display_name.split(" ")[0] == "A1"]
+    # Simulated probing returns sentinel values instead of numeric heights,
+    # which makes later liquid-volume cleanup arithmetic invalid.
+    if not ctx.is_simulating():
+        find_liquid_height_of_all_wells(ctx, pipette, wells)
+    return wells
 
 
 def load_temp_adapter_and_labware(
@@ -179,6 +185,29 @@ def load_temp_adapter_and_labware(
     else:
         labware_on_temp_mod = temp_mod.load_labware(labware_str, labware_name)
     return labware_on_temp_mod, temp_adapter
+
+
+def deactivate_modules(protocol: ProtocolContext) -> None:
+    """Deactivate all loaded modules."""
+    from opentrons.protocol_api.module_contexts import (
+        HeaterShakerContext,
+        TemperatureModuleContext,
+        MagneticModuleContext,
+        ThermocyclerContext,
+    )
+
+    modules = protocol.loaded_modules
+    if modules:
+        for module in modules.values():
+            if isinstance(module, HeaterShakerContext):
+                module.deactivate_shaker()
+                module.deactivate_heater()
+            elif isinstance(module, TemperatureModuleContext):
+                module.deactivate()
+            elif isinstance(module, MagneticModuleContext):
+                module.disengage()
+            elif isinstance(module, ThermocyclerContext):
+                module.deactivate()
 
 
 def move_labware_from_hs_to_destination(
@@ -223,21 +252,6 @@ def set_hs_speed(
         hs.deactivate_shaker()
 
 
-def use_disposable_lid_with_tc(
-    protocol: ProtocolContext,
-    lid_stack: Labware,
-    plate_in_thermocycler: Labware,
-    thermocycler: ThermocyclerContext,
-) -> None:
-    """Use disposable lid with thermocycler."""
-    thermocycler.open_lid()
-    protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
-    thermocycler.close_lid()
-
-
-# FUNCTIONS FOR COMMON PIPETTE COMMAND SEQUENCES
-
-
 def clean_up_plates(
     protocol: ProtocolContext,
     pipette: InstrumentContext,
@@ -256,12 +270,17 @@ def clean_up_plates(
         elif num_of_active_channels == 96:
             list_of_wells = [labware.wells()[0]]
         for well in list_of_wells:
-            if protocol.is_simulating():
-                vol_transfer = well.max_volume
-            else:
-                vol_transfer = well.current_liquid_volume()  # type: ignore
+            vol_transfer = well.current_liquid_volume()
+            # A multi-channel pipette's volume is per nozzle. Plate wells are
+            # distinct, but all active nozzles share one trough in a reservoir.
+            if len(well.parent.wells()) <= 12:
+                vol_transfer /= num_of_active_channels
+            if vol_transfer > 0:
                 pipette.transfer(
-                    vol_transfer, well, liquid_waste.top(), new_tip="never"
+                    vol_transfer,  # type: ignore[arg-type]
+                    well,
+                    liquid_waste.top(),
+                    new_tip="never",
                 )
     if pipette.channels != num_of_active_channels:
         pipette.drop_tip()
@@ -269,203 +288,54 @@ def clean_up_plates(
         pipette.return_tip()
 
 
-def load_wells_with_custom_liquids(
-    protocol: ProtocolContext,
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
-) -> None:
-    """Load custom liquids into wells."""
-    liquid_colors = [
-        "#008000",
-        "#A52A2A",
-        "#00FFFF",
-        "#0000FF",
-        "#800080",
-        "#ADD8E6",
-        "#FF0000",
-        "#FFFF00",
-        "#FF00FF",
-        "#00008B",
-        "#7FFFD4",
-        "#FFC0CB",
-        "#FFA500",
-        "#00FF00",
-        "#C0C0C0",
-    ]
-    i = 0
-    volume = 0.0
-    for liquid_name, wells_info in liquid_vols_and_wells.items():
-        # Define the liquid with a color
-        liquid = protocol.define_liquid(
-            liquid_name, display_color=liquid_colors[i % len(liquid_colors)]
-        )
-        # Load liquid into each specified well or list of wells
-        for well_info in wells_info:
-            if isinstance(well_info["well"], list):
-                wells = well_info["well"]
-            elif isinstance(well_info["well"], Well):
-                wells = [well_info["well"]]
-            else:
-                wells = []
-            if isinstance(well_info["volume"], (float, int)):
-                volume = well_info["volume"]
-            # Load liquid into each well
-            for well in wells:
-                well.load_liquid(liquid, volume)
-
-
-def comment_height_of_specific_labware(
-    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
-) -> None:
-    """Comment height found of specific labware."""
-    total_height = 0.0
-    for key in dict_of_labware_heights.keys():
-        if key[0] == labware_name:
-            height = dict_of_labware_heights[key]
-            total_height += height
-    protocol.comment(f"Liquid Waste Total Height: {total_height}")
-
-
-def find_liquid_height_of_all_wells(
-    protocol: ProtocolContext,
-    pipette: InstrumentContext,
-    wells: List[Well],
-) -> Dict:
-    """Find the liquid height of all wells in protocol."""
-    dict_of_labware_heights = {}
-    pipette.pick_up_tip()
-    pip_channels = pipette.active_channels
-    for well in wells:
-        labware_name = well.parent.name
-        total_number_of_wells_in_plate = len(well.parent.wells())
-        # if pip_channels is > 1 and total_wells > 12 - only probe 1st row.
-        if (
-            pip_channels > 1
-            and total_number_of_wells_in_plate > 12
-            and well.well_name.startswith("A")
-        ):
-            height = pipette.measure_liquid_height(well)
-            dict_of_labware_heights[labware_name, well] = height
-        elif total_number_of_wells_in_plate <= 12:
-            height = pipette.measure_liquid_height(well)
-            dict_of_labware_heights[labware_name, well] = height
-    if pip_channels != pipette.channels:
-        pipette.drop_tip()
-    else:
-        pipette.return_tip()
-        pipette.reset_tipracks()
-    msg = f"result: {dict_of_labware_heights}"
-    protocol.comment(msg=msg)
-    comment_height_of_specific_labware(
-        protocol, "Liquid Waste", dict_of_labware_heights
+def add_parameters(parameters: ParameterContext) -> None:
+    """Define Parameters."""
+    parameters.add_str(
+        variable_name="pipette_mount",
+        display_name="Pipette Mount",
+        choices=[
+            {"display_name": "Left", "value": "left"},
+            {"display_name": "Right", "value": "right"},
+        ],
+        default="left",
     )
-    return dict_of_labware_heights
-
-
-def find_liquid_height_of_loaded_liquids(
-    ctx: ProtocolContext,
-    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
-    pipette: InstrumentContext,
-) -> List[Well]:
-    """Find Liquid height of loaded liquids."""
-    load_wells_with_custom_liquids(ctx, liquid_vols_and_wells)
-    # Get flattened list of wells.
-    wells: list[Well] = [
-        well
-        for items in liquid_vols_and_wells.values()
-        for entry in items
-        if isinstance(entry["well"], (Well, list)) and entry["volume"] != 0.0
-        # Ensure "well" is Well or list of Well
-        for well in (
-            entry["well"] if isinstance(entry["well"], list) else [entry["well"]]
-        )
-    ]
-    if pipette.active_channels == 96:
-        wells = [well for well in wells if well.display_name.split(" ")[0] == "A1"]
-    find_liquid_height_of_all_wells(ctx, pipette, wells)
-    return wells
-
-
-def load_wells_with_water(
-    protocol: ProtocolContext, wells: List[Well], volumes: List[float]
-) -> None:
-    """Load liquids into wells."""
-    water = protocol.define_liquid("Water", display_color="#0000FF")
-    for well, volume in zip(wells, volumes):
-        well.load_liquid(water, volume)
-
-
-# CONSTANTS
-
-hs_str = "heaterShakerModuleV1"
-mag_str = "magneticBlockV1"
-temp_str = "temperature module gen2"
-tc_str = "thermocycler module gen2"
-abs_mod_str = "absorbanceReaderV1"
-liquid_colors = [
-    "#008000",
-    "#008000",
-    "#A52A2A",
-    "#A52A2A",
-    "#00FFFF",
-    "#0000FF",
-    "#800080",
-    "#ADD8E6",
-    "#FF0000",
-    "#FFFF00",
-    "#FF00FF",
-    "#00008B",
-    "#7FFFD4",
-    "#FFC0CB",
-    "#FFA500",
-    "#00FF00",
-    "#C0C0C0",
-]
-
-# Modules with deactivate
-ModuleTypes = Union[
-    TemperatureModuleContext,
-    ThermocyclerContext,
-    HeaterShakerContext,
-    MagneticModuleContext,
-    AbsorbanceReaderContext,
-]
-# THERMOCYCLER PROFILES
-
-
-def perform_pcr(
-    protocol: ProtocolContext,
-    thermocycler: ThermocyclerContext,
-    initial_denature_time_sec: int,
-    denaturation_time_sec: int,
-    anneal_time_sec: int,
-    extension_time_sec: int,
-    cycle_repetitions: int,
-    final_extension_time_min: int,
-) -> None:
-    """Perform PCR."""
-    # Define profiles.
-    initial_denaturation_profile: List[ThermocyclerStep] = [
-        {"temperature": 98, "hold_time_seconds": initial_denature_time_sec}
-    ]
-    cycling_profile: List[ThermocyclerStep] = [
-        {"temperature": 98, "hold_time_seconds": denaturation_time_sec},
-        {"temperature": 60, "hold_time_seconds": anneal_time_sec},
-        {"temperature": 72, "hold_time_seconds": extension_time_sec},
-    ]
-    final_extension_profile: List[ThermocyclerStep] = [
-        {"temperature": 72, "hold_time_minutes": final_extension_time_min}
-    ]
-    protocol.comment(f"Initial Denaturation for {initial_denature_time_sec} seconds.")
-    thermocycler.execute_profile(
-        steps=initial_denaturation_profile, repetitions=1, block_max_volume=50
+    parameters.add_int(
+        variable_name="heater_shaker_speed",
+        display_name="Heater Shaker Shake Speed",
+        description="Speed to set the heater shaker to",
+        default=2000,
+        minimum=200,
+        maximum=3000,
+        unit="rpm",
     )
-    protocol.comment(f"PCR for {cycle_repetitions} cycles.")
-    thermocycler.execute_profile(
-        steps=cycling_profile, repetitions=cycle_repetitions, block_max_volume=50
+    parameters.add_bool(
+        variable_name="deactivate_modules",
+        display_name="Deactivate Modules",
+        description="deactivate all modules at end of run",
+        default=True,
     )
-    protocol.comment(f"Final Extension profile for {final_extension_time_min} minutes.")
-    thermocycler.execute_profile(
-        steps=final_extension_profile, repetitions=1, block_max_volume=50
+    parameters.add_bool(
+        variable_name="probe_liquid_height",
+        display_name="Probe Liquid Height",
+        description="True means probe liquid height at start of run.",
+        default=False,
+    )
+    parameters.add_float(
+        variable_name="meniscus_z",
+        display_name="Meniscus Z",
+        default=-0.5,
+        minimum=-10.0,
+        maximum=10.0,
+        description="Z offset for meniscus height. Default is -1.5mm.",
+    )
+    parameters.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
     )
 
 
@@ -478,11 +348,12 @@ def run(protocol: ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
 
+    protocol.comment("Protocol Version: 05")
+
     dry_run = False
-    TIP_TRASH = False
     res_type = "opentrons_tough_12_reservoir_22ml"
 
-    num_samples = 96
+    num_samples = sample_max
     wash1_vol = 600.0
     wash2_vol = 600.0
     wash3_vol = 600.0
@@ -510,26 +381,27 @@ def run(protocol: ProtocolContext) -> None:
     binding_buffer_vol = bind_vol + bead_vol
 
     h_s: HeaterShakerContext = protocol.load_module(
-        hs_str, "D1"
+        "heaterShakerModuleV1", "D1"
     )  # type: ignore[assignment]
     temp: TemperatureModuleContext = protocol.load_module(
-        temp_str, "D3"
+        "temperature module gen2", "D3"
     )  # type: ignore[assignment]
     elutionplate, temp_adapter = load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
+    elutionplate.load_empty(elutionplate.wells())
     lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "C3", 2)
     protocol.move_lid(lid, elutionplate, use_gripper=True)
     magnetic_block: MagneticBlockContext = protocol.load_module(
-        mag_str, "C1"
+        "magneticBlockV1", "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C2", "Liquid Waste"
     )
     waste = waste_reservoir.wells()[0]
     waste_reservoir.load_empty(waste_reservoir.wells())
-    protocol.load_trash_bin("A3")
     sample_plate = protocol.load_labware(deepwell_type, "B3", "Sample Plate")
+    sample_plate.load_empty(sample_plate.wells())
 
     res1 = protocol.load_labware(res_type, "D2", "Reagent Reservoir 1")
     num_cols = math.ceil(num_samples / 8)
@@ -570,13 +442,11 @@ def run(protocol: ProtocolContext) -> None:
     elution_samples_m = elutionplate.rows()[0][:num_cols]
     # Probe wells
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
-        "AL Lysis": [{"well": AL, "volume": AL_vol}],
-        "PK": [{"well": AL, "volume": PK_vol}],
-        "Beads": [{"well": binding_buffer, "volume": bead_vol}],
-        "Binding": [{"well": binding_buffer, "volume": bind_vol}],
-        "Wash 1": [{"well": wash1, "volume": wash1_vol}],
-        "Wash 2": [{"well": wash2, "volume": wash2_vol}],
-        "Wash 3": [{"well": wash3, "volume": wash3_vol}],
+        "AL Lysis and PK": [{"well": AL, "volume": 14310.0}],
+        "Beads and Binding": [{"well": binding_buffer, "volume": 9900.0}],
+        "Wash 1": [{"well": wash1, "volume": 11400.0}],
+        "Wash 2": [{"well": wash2, "volume": 11400.0}],
+        "Wash 3": [{"well": wash3, "volume": 11400.0}],
         "Samples": [{"well": sample_plate.wells()[:num_samples], "volume": sample_vol}],
         "Elution Buffer": [
             {"well": elutionplate.wells()[:num_samples], "volume": elution_vol}
@@ -620,10 +490,11 @@ def run(protocol: ProtocolContext) -> None:
                     new_tip="never",
                     return_tip=True,
                     group_wells=False,
+                    trash_location=waste,
                 )
                 m1000.blow_out(waste)
                 m1000.air_gap(20)
-            m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
         m1000.flow_rate.aspirate = 300
         move_labware_to_hs(protocol, sample_plate, h_s, h_s)
 
@@ -741,7 +612,7 @@ def run(protocol: ProtocolContext) -> None:
             )  # vol is 250 AL + 180 sample
             m1000.dispense(m1000.current_volume, waste)
             m1000.air_gap(20)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
         protocol.comment("-----Mixing then Heating AL and Sample-----")
 
@@ -776,7 +647,7 @@ def run(protocol: ProtocolContext) -> None:
         for i, well in enumerate(samples_m):
             num_trans = math.ceil(vol / 980)
             vol_per_trans = vol / num_trans
-            source = binding_buffer[i // 7]
+            source = binding_buffer[i // 3]
             if i == 0:
                 reps = 6 if not dry_run else 1
             else:
@@ -796,6 +667,7 @@ def run(protocol: ProtocolContext) -> None:
                     new_tip="never",
                     return_tip=True,
                     group_wells=False,
+                    trash_location=waste,
                 )
                 if t < num_trans - 1:
                     m1000.air_gap(20)
@@ -807,7 +679,7 @@ def run(protocol: ProtocolContext) -> None:
             mixing(
                 samples_m[i], m1000, vol + starting_vol, reps=10 if not dry_run else 1
             )
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
         protocol.comment("-----Incubating Beads and Bind on H-S-----")
 
@@ -844,7 +716,7 @@ def run(protocol: ProtocolContext) -> None:
         vol_per_trans = vol / num_trans
         tiptrack(tips)
         for i, m in enumerate(samples_m):
-            src = source[i // 4]
+            src = source[i // 2]
             for n in range(num_trans):
                 if m1000.current_volume > 0:
                     m1000.dispense(m1000.current_volume, src.top())
@@ -856,8 +728,9 @@ def run(protocol: ProtocolContext) -> None:
                     return_tip=True,
                     group_wells=False,
                     new_tip="never",
+                    trash_location=waste,
                 )
-        m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+        m1000.return_tip()
 
         set_hs_speed(protocol, h_s, heater_shaker_speed, elute_wash_time, True)
 
@@ -888,7 +761,7 @@ def run(protocol: ProtocolContext) -> None:
             m1000.air_gap(20)
             m1000.dispense(m1000.current_volume, m.top())
         m1000.flow_rate.aspirate = 150
-        m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+        m1000.return_tip()
 
         speed_val = heater_shaker_speed * 1.1
         set_hs_speed(protocol, h_s, speed_val, elute_wash_time, True)
@@ -907,11 +780,18 @@ def run(protocol: ProtocolContext) -> None:
             m1000.flow_rate.dispense = 100
             m1000.flow_rate.aspirate = 150
             m1000.transfer_with_liquid_class(
-                water, vol, m, e, return_tip=True, group_wells=False, new_tip="never"
+                water,
+                vol,
+                m,
+                e,
+                return_tip=True,
+                group_wells=False,
+                new_tip="never",
+                trash_location=waste,
             )
             m1000.blow_out(e.top(-2))
             m1000.air_gap(20)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
         protocol.move_lid(lid, elutionplate, use_gripper=True)
 
     protocol.move_lid(elutionplate, lid, use_gripper=True)
@@ -952,7 +832,8 @@ def run(protocol: ProtocolContext) -> None:
     m1000.reset_tipracks()
     protocol.move_lid(elutionplate, lid, use_gripper=True)
     clean_up_plates(protocol, m1000, [res1, elutionplate], waste_reservoir["A1"])
-    find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
+    if probe_height_bool:
+        find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
     protocol.capture_image(filename="end_of_run")
 
     if deactivate_modules_bool:

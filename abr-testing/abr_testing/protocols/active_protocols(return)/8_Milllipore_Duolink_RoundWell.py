@@ -14,13 +14,13 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List, Union
 
 metadata = {
-    "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2 NOABRFOLDER",
+    "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2",
     "author": "Opentrons Science Team",
 }
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.29",
+    "apiLevel": "2.27",
 }
 
 # ----------------------------
@@ -34,6 +34,7 @@ VOL_AMP = 40
 VOL_DAPI = 40
 VOL_AF = 40
 VOL_WASH = 200
+REAGENT_DEAD_VOLUME = 40
 
 MIN_BLOCK = 60
 MIN_PROBE = 60
@@ -220,10 +221,8 @@ def run(ctx: ProtocolContext) -> None:
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
     use_lid = ctx.params.use_lid  # type: ignore[attr-defined]
     use_temp = ctx.params.use_temp  # type: ignore[attr-defined]
-
     ctx.comment("Protocol Version: 01")
     ctx.capture_image(filename="start_of_run")
-
     num_col_full = num_sample // 8
     num_well_last_col = num_sample % 8
     num_col_total = num_col_full + (1 if num_well_last_col > 0 else 0)
@@ -236,7 +235,6 @@ def run(ctx: ProtocolContext) -> None:
     )
     waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
     waste = waste_res.wells()[0]
-    ctx.load_trash_bin("A3")
     ctx.load_lid_stack("opentrons_tough_universal_lid", "C4", 1)
 
     if use_temp:
@@ -288,41 +286,44 @@ def run(ctx: ProtocolContext) -> None:
     # ----------------------------
     # Define liquids
     # ----------------------------
-    vol_ab = 40 * num_col_full + 40
-    vol_ab_plus_one = 40 * (num_col_full + 1) + 40
-    def_ab = ctx.define_liquid(
-        name="ANTIBODY SOLUTION", description="", display_color="#98FB98"
-    )  # green
-    if num_well_last_col > 0:
-        [
-            reagent_plate.rows()[row][0].load_liquid(
-                liquid=def_ab, volume=vol_ab_plus_one
-            )
-            for row in range(num_well_last_col)
-        ]
-    [
-        reagent_plate.rows()[row][0].load_liquid(liquid=def_ab, volume=vol_ab)
-        for row in range(num_well_last_col, 8)
+    reagent_columns = reagent_plate.columns()[:7]
+    reagent_info = [
+        ("ANTIBODY SOLUTION", "#98FB98"),
+        ("BLOCKING SOLUTION", "#FFC300"),
+        ("PLA PROBE SOLUTION", "#FF5733"),
+        ("LIGATION SOLUTION", "#F39C12"),
+        ("AMPLIFICATION SOLUTION", "#52BE80"),
+        ("DAPI", "#A569BD"),
+        ("ANTI-FADE BUFFER", "#AEB6BF"),
     ]
-
-    vol_re = 40 * num_col_total + 40
-    def_block = ctx.define_liquid(
-        name="BLOCKING SOLUTION", description="", display_color="#FFC300"
-    )  # yellow
-    [
-        reagent_plate.rows()[row][1].load_liquid(liquid=def_block, volume=vol_re)
+    reagent_volume_by_row = [
+        40 * (num_col_full + (1 if row < num_well_last_col else 0))
+        + REAGENT_DEAD_VOLUME
         for row in range(8)
     ]
+    for column, (name, color) in zip(reagent_columns, reagent_info):
+        liquid = ctx.define_liquid(name=name, description="", display_color=color)
+        for well, volume in zip(column, reagent_volume_by_row):
+            well.load_liquid(liquid=liquid, volume=volume)
+
+    ab_sources = reagent_columns[0]
+    block_sources = reagent_columns[1]
+    day2_source_columns = reagent_columns[2:7]
     # Day 1: Blocking and Primary Ab
     # ----------------------------
-    block = reagent_plate.rows()[0][1]
-    ab = reagent_plate.rows()[0][0]
+    block = block_sources[0]
+    ab = ab_sources[0]
 
     # transfer blocking (uses 1000uL tips we already assigned)
     transfer(p1k_8, block, rxn_full, VOL_BLOCK)
     if num_well_last_col:
         # pairwise remainder: p1k_1 is assigned 1k tipracks too
-        transfer(p1k_1, [block] * len(rxn_remainder), rxn_remainder, VOL_BLOCK)
+        transfer(
+            p1k_1,
+            block_sources[:num_well_last_col],
+            rxn_remainder,
+            VOL_BLOCK,
+        )
 
     if use_lid:
         cover_plate(ctx, "C4", working_plate)
@@ -341,22 +342,34 @@ def run(ctx: ProtocolContext) -> None:
 
     transfer(p1k_8, ab, rxn_full, VOL_AB)
     if num_well_last_col:
-        transfer(p1k_1, [ab] * len(rxn_remainder), rxn_remainder, VOL_AB)
+        transfer(
+            p1k_1,
+            ab_sources[:num_well_last_col],
+            rxn_remainder,
+            VOL_AB,
+        )
 
     # ----------------------------
     # Day 2: PLA Probe, Ligation, Amplification, DAPI, AF
     # ----------------------------
-    reagents_day2 = reagent_plate.rows()[0][:5]
+    reagents_day2 = [column[0] for column in day2_source_columns]
     vols_day2 = [VOL_PROBE, VOL_LIGATION, VOL_AMP, VOL_DAPI, VOL_AF]
     mins_day2 = [MIN_PROBE, MIN_LIGATION, MIN_AMP, MIN_DAPI, 0]
 
-    for reagent, vol, min_incub in zip(reagents_day2, vols_day2, mins_day2):
+    for reagent_column, reagent, vol, min_incub in zip(
+        day2_source_columns, reagents_day2, vols_day2, mins_day2
+    ):
         # transfer reagent -> use 1k tipracks
         p1k_8.tip_racks = tips_1k
         p1k_1.tip_racks = tips_1k
         transfer(p1k_8, reagent, rxn_full, vol)
         if num_well_last_col:
-            transfer(p1k_1, [reagent] * len(rxn_remainder), rxn_remainder, vol)
+            transfer(
+                p1k_1,
+                reagent_column[:num_well_last_col],
+                rxn_remainder,
+                vol,
+            )
 
         if use_lid:
             cover_plate(ctx, "C4", working_plate)
@@ -368,5 +381,4 @@ def run(ctx: ProtocolContext) -> None:
         # discard uses 200uL tips
         p1k_8.tip_racks = tips_200
         discard(ctx, p1k_8, rxn_total, vol, waste)
-
-    ctx.capture_image(filename="end_of_run")
+        ctx.capture_image(filename="end_of_run")

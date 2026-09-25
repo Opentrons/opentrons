@@ -2,8 +2,9 @@
 *.egg
 build
 htmlcov
-
+*.env
 abr_testing/_version.py
+slack_app_manifest.yaml
 
 # Secrets / keys — never commit these. Keep templates/*.example.json tracked.
 *ssh*
