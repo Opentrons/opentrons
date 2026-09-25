@@ -1,6 +1,7 @@
 """Protocol Engine CommandStore sub-state."""
 
 import asyncio
+import logging
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -11,6 +12,9 @@ from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_engine.resources.command_store_provider import (
     CommandStoreProvider,
 )
+
+log = logging.getLogger(__name__)
+_COMMAND__BATCH_MAX = 10
 
 
 @dataclass(frozen=True)
@@ -40,6 +44,7 @@ class CommandManager:
         self._teardown_signal = asyncio.Event()
         self._command_store_provider = command_store_provider
         self._command_queue: list[CommandEntryJSON] = []
+        self._commands_total = 0
 
         # Set up the run store task
         self._command_store_interface_task = asyncio.create_task(
@@ -50,37 +55,49 @@ class CommandManager:
         """Send the teardown signal to the command store interface task."""
         self._teardown_signal.set()
 
-    async def _send_command_insert_request(
-        self, command_json: CommandEntryJSON
+    async def _send_batch_command_insert_request(
+        self, command_json_batch: list[CommandEntryJSON]
     ) -> None:
         """Send insert command request to the CommandStoreProvider."""
-        command_entry = CommandEntry(
-            command=command_json.command_type.model_validate_json(command_json.command),
-            index=command_json.index,
-        )
-        await self._command_store_provider.insert_command(
-            command_index=command_entry.index, command=command_entry.command
+        log.warning(f"SEND BATCH COMMANDS: {len(command_json_batch)}")
+        command_batch: list[Command] = []
+        for command_json in command_json_batch:
+            command_batch.append(
+                command_json.command_type.model_validate_json(command_json.command)
+            )
+        await self._command_store_provider.insert_batch_commands(
+            self._commands_total, command_batch
         )
 
     async def command_store_interface_task(self) -> None:
         """Handle interactions with the CommandStoreProvider."""
+        log.warning("MAKING COMMAND STORE TASK")
+        command_entry_json_batch: list[CommandEntryJSON] = []
         while not self._teardown_signal.is_set():
+            command_entry_json_batch = []
             if len(self._command_queue) > 0:
-                # Remove the command from the queue and insert/update it on the RunStore
-                command_entry_json = self._command_queue.pop()
-                await self._send_command_insert_request(command_entry_json)
+                log.warning("HAVE SOME COMMANDS TO BATCH")
+                # Remove batch of commands from the queue and insert/update them on the RunStore
+                for i in range(min(_COMMAND__BATCH_MAX, len(self._command_queue))):
+                    command_entry_json = self._command_queue.pop()
+                    command_entry_json_batch.append(command_entry_json)
+                await self._send_batch_command_insert_request(command_entry_json_batch)
 
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.1)
 
         # In teardown, send the remaining commands until none remain before task completion to ensure all commands are written
         while self._command_queue:
-            command_entry_json = self._command_queue.pop()
-            await self._send_command_insert_request(command_entry_json)
+            command_entry_json_batch = []
+            for i in range(min(_COMMAND__BATCH_MAX, len(self._command_queue))):
+                command_entry_json = self._command_queue.pop()
+                command_entry_json_batch.append(command_entry_json)
+            await self._send_batch_command_insert_request(command_entry_json_batch)
 
     def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
 
         self._command_queue.insert(0, command_entry)
+        self._commands_total += 1
 
 
 @dataclass  # dataclass for __eq__() autogeneration.

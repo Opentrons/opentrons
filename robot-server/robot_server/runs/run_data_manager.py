@@ -772,9 +772,7 @@ class RunDataManager:
         else:
             return self._run_store.get_run_time_parameters(run_id=run_id)
 
-    def _get_historical_run_last_command(
-        self, run_id: str
-    ) -> Optional[CommandPointer]:
+    def _get_historical_run_last_command(self, run_id: str) -> Optional[CommandPointer]:
         command_slice = self._run_store.get_commands_slice(
             run_id=run_id, cursor=None, length=1, include_fixit_commands=True
         )

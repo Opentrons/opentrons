@@ -130,15 +130,16 @@ class AnalysisStore:
         self._commands_json_list: List[str] = []
         self._analysis_store_provider = CommandStoreProvider(
             run_id=None,
-            store_insert_command=self.insert_analysis_command,
+            store_insert_batch_commands=self.insert_batch_analysis_command,
         )
 
-    async def insert_analysis_command(
-        self, run_id: str, command_index: int, command: Command
+    async def insert_batch_analysis_command(
+        self, run_id: str, commands_total: int, batch_commands: list[Command]
     ) -> None:
         """Store a command from analysis as a command JSON string locally."""
-        command_json = command.model_dump_json(by_alias=True)
-        self._commands_json_list.append(command_json)
+        for command in batch_commands:
+            command_json = command.model_dump_json(by_alias=True)
+            self._commands_json_list.append(command_json)
 
     def set_analysis_provider_id(self, analysis_id: str) -> None:
         """Set the ID used by the analysis provider."""
@@ -266,7 +267,11 @@ class AnalysisStore:
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
+        _log.info(
+            f"ANALYSIS CLEARING COMMANDS LIST OF SIZE : {len(self._commands_json_list)}"
+        )
         self._commands_json_list.clear()
+        _log.info(f"COMMANDS LIST CLEARED TO SIZE : {len(self._commands_json_list)}")
 
     async def save_initialization_failed_analysis(
         self,

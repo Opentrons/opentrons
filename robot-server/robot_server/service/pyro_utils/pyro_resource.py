@@ -133,6 +133,7 @@ class RobotServerPyroResource:
     def set_run_store_provider(self, run_store_provider: CommandStoreProvider) -> None:
         """Set the CommandStoreProvider for the RunStore of the RobotServerPyroResource, not serialized for remote processes."""
         if self._run_store_provider is None:
+            log.info("SETTING RUN STORE PROVIDER")
             self._run_store_provider = run_store_provider
 
     def set_analysis_store_provider(
@@ -140,6 +141,7 @@ class RobotServerPyroResource:
     ) -> None:
         """Set the CommandStoreProvider for the AnalysisStore of the RobotServerPyroResource, not serialized for remote processes."""
         if self._analysis_store_provider is None:
+            log.info("SETTING ANALYSIS STORE PROVIDER")
             self._analysis_store_provider = analysis_store_provider
 
     ### Interface methods for remote access ###

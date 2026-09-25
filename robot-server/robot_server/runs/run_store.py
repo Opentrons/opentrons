@@ -144,11 +144,12 @@ class RunStore:
         self._sql_engine = sql_engine
         self._run_store_provider = CommandStoreProvider(
             run_id=None,
-            store_insert_command=self.insert_command,
+            store_insert_batch_commands=self.insert_batch_commands,
         )
 
     def get_run_store_provider(self) -> CommandStoreProvider:
         """Get the CommandStoreProvider created by the RunStore."""
+        log.info(f"GETTING RUN STORE PROVIDER: {self._run_store_provider}")
         return self._run_store_provider
 
     def update_run_state(
@@ -738,48 +739,36 @@ class RunStore:
             commands_errors=sliced_commands,
         )
 
-    async def insert_command(
-        self, run_id: str, command_index: int, command: Command
+    async def insert_batch_commands(
+        self, run_id: str, commands_total: int, batch_commands: list[Command]
     ) -> None:
         """Insert or update a command on the run command table"""
-        select_command = sqlalchemy.select(run_command_table.c.command).where(
-            run_command_table.c.run_id == run_id,
-            run_command_table.c.command_id == command.id,
-        )
-        insert_command = sqlalchemy.insert(run_command_table)
-        update_command = (
-            sqlalchemy.update(run_command_table)
-            .where(
-                run_command_table.c.run_id == run_id,
-                run_command_table.c.command_id == command.id,
-            )
-            .values(
-                index_in_run=command_index,
-                command=pydantic_to_json(command),
-                command_intent=str(command.intent.value)
-                if command.intent
-                else CommandIntent.PROTOCOL,
-                command_error=pydantic_to_json(command.error)
-                if command.error
-                else None,
-                command_status=_convert_commands_status_to_sql_command_status(
-                    command.status
-                ),
-            )
-        )
+        log.info(f"IN RUN STORE INSERT BATCH COMMANDS WITH {len(batch_commands)}")
 
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-
-            existing_command = transaction.execute(select_command).scalar_one_or_none()  # type: ignore
-            if existing_command is None:
+            for command_index, command in enumerate(batch_commands):
+                select_command = sqlalchemy.select(run_command_table.c.command).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command.id,
+                )
+                insert_command = sqlalchemy.insert(run_command_table)
+                existing_command = transaction.execute(
+                    select_command
+                ).scalar_one_or_none()
+                delete_existing_command = sqlalchemy.delete(run_command_table).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command.id,
+                )
+                if existing_command is  not None:
+                    transaction.execute(delete_existing_command)
                 # If the command is not present, then we insert the new command
                 transaction.execute(
                     insert_command,
                     {
                         "run_id": run_id,
-                        "index_in_run": command_index,
+                        "index_in_run": commands_total + command_index,
                         "command_id": command.id,
                         "command": pydantic_to_json(command),
                         "command_intent": str(command.intent.value)
@@ -793,9 +782,6 @@ class RunStore:
                         ),
                     },
                 )
-            else:
-                # If the command is already present, update it
-                transaction.execute(update_command)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
