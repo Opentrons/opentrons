@@ -66,6 +66,7 @@ export function useCloseCurrentRun(): {
 
   const isDismissInFlight = useRef(false)
   const lastDismissedRunId = useRef<string | null>(null)
+  const closeRequestedRef = useRef(false)
 
   const [isClosePending, setIsClosePending] = useState(false)
   const isSignRunPending = useRef(false)
@@ -73,27 +74,33 @@ export function useCloseCurrentRun(): {
 
   const resetClosePending = useCallback(() => {
     setIsClosePending(false)
+    closeRequestedRef.current = false
     isSignRunPending.current = false
     closeOptions.current = undefined
     isDismissInFlight.current = false
   }, [])
 
   const closeCurrentRun = (options?: CloseOptions): void => {
-    if (
-      currentRunId != null &&
-      !isClosePending &&
-      // blocks callers trying to dismiss the same run again while queries load
-      currentRunId !== lastDismissedRunId.current
-    ) {
-      isSignRunPending.current = false
-      setIsClosePending(true)
-      closeOptions.current = options
+    if (currentRunId == null || currentRunId === lastDismissedRunId.current) {
+      options?.onSuccess?.()
+      options?.onSettled?.()
+      return
     }
+    // A close is already in flight.
+    // Attach the latest callbacks instead of settling early, othwerise we
+    // navigate away while the run was still current.
+    if (closeRequestedRef.current) {
+      closeOptions.current = { ...closeOptions.current, ...options }
+      return
+    }
+    closeRequestedRef.current = true
+    isSignRunPending.current = false
+    setIsClosePending(true)
+    closeOptions.current = options
   }
 
   const handleDismiss = useCallback(async () => {
     isDismissInFlight.current = true
-    const callerOptions = closeOptions.current ?? {}
 
     if (currentRunId != null) {
       // on the ODD, if downloading is required, runs can now only be dismissed on the Desktop app.
@@ -102,39 +109,45 @@ export function useCloseCurrentRun(): {
           .then(downloaded => {
             if (!downloaded) {
               console.warn('failed to download logs')
-              callerOptions.onError?.(new Error('failed to download logs'))
+              closeOptions.current?.onError?.(
+                new Error('failed to download logs')
+              )
             } else {
-              callerOptions.onSuccess?.()
+              closeOptions.current?.onSuccess?.()
             }
           })
           .catch((error: AxiosError) => {
             console.warn('failed to download logs')
-            callerOptions.onError?.(error)
+            closeOptions.current?.onError?.(error)
           })
           .finally(() => {
-            callerOptions.onSettled?.()
+            const settled = closeOptions.current?.onSettled
             resetClosePending()
+            settled?.()
           })
         return
       }
 
       dismissCurrentRun(currentRunId, {
-        ...callerOptions,
-        onSuccess: (response: Run, ...args) => {
+        onSuccess: (response: Run) => {
           lastDismissedRunId.current = response.data.id
-          callerOptions.onSuccess?.()
+          closeOptions.current?.onSuccess?.()
         },
-        onError: async (error: AxiosError) => {
+        onError: (error: AxiosError) => {
           console.warn('failed to dismiss current run')
-          callerOptions.onError?.(error)
+          closeOptions.current?.onError?.(error)
         },
         onSettled: () => {
+          const settled = closeOptions.current?.onSettled
           resetClosePending()
-          callerOptions.onSettled?.()
+          settled?.()
         },
       })
     } else {
+      const opts = closeOptions.current
       resetClosePending()
+      opts?.onSuccess?.()
+      opts?.onSettled?.()
     }
   }, [
     currentRunId,
@@ -160,18 +173,28 @@ export function useCloseCurrentRun(): {
         return
       }
       isSignRunPending.current = true
-      void showSignRunModal(documentationState).then(signed => {
-        if (!signed) {
+      void showSignRunModal(documentationState)
+        .then(signed => {
+          if (!signed) {
+            const callerOptions = closeOptions.current ?? {}
+            resetClosePending()
+            callerOptions.onError?.(
+              new Error(
+                'Sign run modal resolved false while closing current run; signing is required before dismiss'
+              )
+            )
+            return
+          }
+          void handleDismiss()
+        })
+        .catch((error: Error) => {
+          const callerOptions = closeOptions.current ?? {}
           resetClosePending()
-          throw new Error(
-            'Sign run modal resolved false while closing current run; signing is required before dismiss'
-          )
-        }
-        handleDismiss()
-      })
+          callerOptions.onError?.(error)
+        })
       return
     }
-    handleDismiss()
+    void handleDismiss()
   }, [
     documentationState,
     handleDismiss,
@@ -182,10 +205,7 @@ export function useCloseCurrentRun(): {
     showSignRunModal,
   ])
 
-  const closeCurrentRunCallback = useCallback(closeCurrentRun, [
-    currentRunId,
-    isClosePending,
-  ])
+  const closeCurrentRunCallback = useCallback(closeCurrentRun, [currentRunId])
 
   return {
     closeCurrentRun: closeCurrentRunCallback,
