@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
+import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from './constants'
 import { RequireDocumentationSettings } from './RequireDocumentationSettings'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
@@ -31,10 +32,12 @@ export function AuditLogRequirements({
   const { t } = useTranslation(['device_settings', 'branded'])
   const [showDocumentation, setShowDocumentation] = useState(false)
 
-  const minLength = auditSettings?.minLengthOfReasonForInteraction ?? 1
+  const minLength =
+    auditSettings?.minLengthOfReasonForInteraction ??
+    MIN_LENGTH_OF_REASON_FOR_INTERACTION
 
   const documentationValue = auditSettings?.requireReasonForInteraction
-    ? minLength > 1
+    ? minLength > MIN_LENGTH_OF_REASON_FOR_INTERACTION
       ? `${minLength} ${t('odd_characters')}`
       : `${minLength} ${t('odd_character')}`
     : t('off')

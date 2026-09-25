@@ -5,6 +5,7 @@ import { StyledText } from '@opentrons/components'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
+import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
@@ -25,7 +26,9 @@ export function RequireDocumentationSettings({
   const [showMinLength, setShowMinLength] = useState(false)
 
   const documentationEnabled = !!auditSettings?.requireReasonForInteraction
-  const minLength = auditSettings?.minLengthOfReasonForInteraction ?? 1
+  const minLength =
+    auditSettings?.minLengthOfReasonForInteraction ??
+    MIN_LENGTH_OF_REASON_FOR_INTERACTION
 
   if (showMinLength) {
     return (
@@ -40,7 +43,7 @@ export function RequireDocumentationSettings({
           })
           setShowMinLength(false)
         }}
-        min={1}
+        min={MIN_LENGTH_OF_REASON_FOR_INTERACTION}
       />
     )
   }
@@ -75,7 +78,7 @@ export function RequireDocumentationSettings({
                 key={t('odd_minimum_length_for_documentation')}
                 title={t('odd_minimum_length_for_documentation_description')}
                 value={
-                  minLength > 1
+                  minLength > MIN_LENGTH_OF_REASON_FOR_INTERACTION
                     ? `${minLength} ${t('odd_characters')}`
                     : `${minLength} ${t('odd_character')}`
                 }
