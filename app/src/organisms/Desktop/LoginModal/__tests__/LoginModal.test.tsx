@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom/vitest'
 
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { getUserLoginStatus } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -21,6 +23,13 @@ import { showLoginModal } from '..'
 
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = await importOriginal<typeof import('@opentrons/api-client')>()
+  return {
+    ...actual,
+    getUserLoginStatus: vi.fn(),
+  }
+})
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
@@ -66,6 +75,20 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     ...AUTH_USER,
     ...overrides,
   }
+}
+
+function mockUserLoginStatus(options?: {
+  resetPassword?: boolean
+  passwordExpired?: boolean
+}): void {
+  vi.mocked(getUserLoginStatus).mockResolvedValue({
+    data: {
+      data: {
+        resetPassword: options?.resetPassword ?? false,
+        passwordExpired: options?.passwordExpired ?? false,
+      },
+    },
+  } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 
 function mockLoginSuccess(
@@ -149,14 +172,20 @@ const renderAndOpenLoginModal = (): void => {
   fireEvent.click(screen.getByRole('button', { name: 'Open login modal' }))
 }
 
-function logInWithTempPassword(): void {
+async function logInWithPassword(
+  password = 'temp-password',
+  username = 'alice'
+): Promise<void> {
   fireEvent.change(screen.getByLabelText('Username'), {
-    target: { value: 'alice' },
+    target: { value: username },
   })
-  fireEvent.change(screen.getByLabelText('Password'), {
-    target: { value: 'temp-password' },
+  fireEvent.change(screen.getByLabelText(/Password|One-time password/), {
+    target: { value: password },
   })
   fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+  await waitFor(() => {
+    expect(getUserLoginStatus).toHaveBeenCalled()
+  })
 }
 
 describe('LoginModal', () => {
@@ -181,11 +210,12 @@ describe('LoginModal', () => {
       submitNewPassword,
       isLoading: false,
     })
-    vi.mocked(useRobot).mockReturnValue(null)
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useUpdateClientDataEncryptionKeys).mockReturnValue({
       requestKeyDisplay: vi.fn(() => 'request-key'),
       clearKeyDisplay: vi.fn(),
     } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
+    mockUserLoginStatus()
   })
 
   afterEach(() => {
@@ -270,20 +300,16 @@ describe('LoginModal', () => {
     screen.getByLabelText('Password')
   })
 
-  it('submits credentials, stores login state, and closes on success', () => {
+  it('submits credentials, stores login state, and closes on success', async () => {
     mockLoginSuccess(submitPassword)
 
     renderAndOpenLoginModal()
 
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'secret-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    await logInWithPassword('secret-password')
 
-    expect(submitPassword).toHaveBeenCalledWith('alice', 'secret-password')
+    await waitFor(() => {
+      expect(submitPassword).toHaveBeenCalledWith('alice', 'secret-password')
+    })
     expect(storeLoginState).toHaveBeenCalledWith(
       ROBOT_NAME,
       AUTH_USER,
@@ -292,53 +318,86 @@ describe('LoginModal', () => {
     expect(screen.queryByText('Compliance Ready Software login')).toBeNull()
   })
 
-  it('shows an error when authentication fails', () => {
+  it('shows an error when authentication fails', async () => {
     mockLoginFailure('Test error message')
 
     renderAndOpenLoginModal()
 
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'wrong-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    await logInWithPassword('wrong-password')
 
-    screen.getByText('Test error message')
+    await waitFor(() => {
+      screen.getByText('Test error message')
+    })
     screen.getByText('Compliance Ready Software login')
   })
 
-  it('shows an account locked error when the account is locked', () => {
+  it('shows an account locked error when the account is locked', async () => {
     mockLoginAccountLocked()
 
     renderAndOpenLoginModal()
 
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'secret-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    await logInWithPassword('secret-password')
 
-    screen.getByText(
-      'Account locked. Please contact an administrator to unlock your account.'
-    )
+    await waitFor(() => {
+      screen.getByText(
+        'Account locked. Please contact an administrator to unlock your account.'
+      )
+    })
   })
 
-  it('shows password expired view when login requires a new password', () => {
+  it('shows one-time password field and set-new-password copy after temp password login', async () => {
+    mockUserLoginStatus({ resetPassword: true })
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
 
-    expect(storeLoginState).toHaveBeenCalledWith(
-      ROBOT_NAME,
-      mockAuthUser({ resetPassword: true }),
-      TOKEN_RESPONSE
-    )
-    screen.getByText('Your password has expired')
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.blur(screen.getByLabelText('Username'))
+
+    await waitFor(() => {
+      screen.getByLabelText('One-time password')
+    })
+
+    fireEvent.change(screen.getByLabelText('One-time password'), {
+      target: { value: 'temp-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    await waitFor(() => {
+      expect(storeLoginState).toHaveBeenCalledWith(
+        ROBOT_NAME,
+        mockAuthUser({ resetPassword: true }),
+        TOKEN_RESPONSE
+      )
+    })
+    await waitFor(() => {
+      screen.getByText('Create a new password')
+    })
+    screen.getByText('Create a new password to use')
+    expect(screen.queryByText('Your password has expired')).toBeNull()
+    expect(screen.getByLabelText('New password')).toHaveFocus()
+    screen.getByRole('button', { name: 'Confirm' })
+  })
+
+  it('shows password expired view when login requires a new password due to expiration', async () => {
+    mockUserLoginStatus({ passwordExpired: true })
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      expect(storeLoginState).toHaveBeenCalledWith(
+        ROBOT_NAME,
+        mockAuthUser({ resetPassword: true }),
+        TOKEN_RESPONSE
+      )
+    })
+    await waitFor(() => {
+      screen.getByText('Your password has expired')
+    })
     screen.getByText('Create a new password to use')
     expect(screen.getByLabelText('New password')).toHaveFocus()
     expect(screen.getByLabelText('New password')).toHaveAttribute(
@@ -355,11 +414,15 @@ describe('LoginModal', () => {
     screen.getByRole('button', { name: 'Confirm' })
   })
 
-  it('toggles new and confirm password visibility independently', () => {
+  it('toggles new and confirm password visibility independently', async () => {
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -407,11 +470,15 @@ describe('LoginModal', () => {
     )
   })
 
-  it('logs out when closing the set new password view', () => {
+  it('logs out when closing the set new password view', async () => {
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.click(
       screen.getByTestId(
@@ -421,14 +488,19 @@ describe('LoginModal', () => {
 
     expect(vi.mocked(logOut)).toHaveBeenCalledWith({ robotName: ROBOT_NAME })
     expect(screen.queryByText('Your password has expired')).toBeNull()
+    expect(screen.queryByText('Create a new password')).toBeNull()
   })
 
-  it('returns to login after setting a new password', () => {
+  it('returns to login after setting a new password', async () => {
     mockLoginRequiringPasswordReset()
     mockSetNewPasswordSuccess(submitNewPassword)
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -447,11 +519,15 @@ describe('LoginModal', () => {
     expect(screen.getByLabelText('Password')).toHaveValue('')
   })
 
-  it('shows a mismatch error when confirm password does not match', () => {
+  it('shows a mismatch error when confirm password does not match', async () => {
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -464,11 +540,15 @@ describe('LoginModal', () => {
     screen.getByText('Passwords do not match.')
   })
 
-  it('shows a mismatch error when confirm password loses focus', () => {
+  it('shows a mismatch error when confirm password loses focus', async () => {
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -481,11 +561,15 @@ describe('LoginModal', () => {
     screen.getByText('Passwords do not match.')
   })
 
-  it('shows a mismatch error on blur when confirm password is whitespace-only', () => {
+  it('shows a mismatch error on blur when confirm password is whitespace-only', async () => {
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-    logInWithTempPassword()
+    await logInWithPassword()
+
+    await waitFor(() => {
+      screen.getByLabelText('New password')
+    })
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -498,7 +582,7 @@ describe('LoginModal', () => {
     screen.getByText('Passwords do not match.')
   })
 
-  it('shows a robot cert import modal when the login fails due to an SSL error', () => {
+  it('shows a robot cert import modal when the login fails due to an SSL error', async () => {
     vi.mocked(useRobot).mockReturnValue({
       ...mockConnectableRobot,
       ip: '1.2.3.4',
@@ -507,15 +591,11 @@ describe('LoginModal', () => {
 
     renderAndOpenLoginModal()
 
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'secret-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    await logInWithPassword('secret-password')
 
-    expect(screen.getAllByText('Robot encryption key')).toHaveLength(2)
+    await waitFor(() => {
+      expect(screen.getAllByText('Robot encryption key')).toHaveLength(2)
+    })
     screen.getByText('Verify robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()
   })

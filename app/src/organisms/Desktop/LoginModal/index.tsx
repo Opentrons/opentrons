@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { getUserLoginStatus } from '@opentrons/api-client'
 import {
   BasicButton,
   COLORS,
@@ -36,6 +37,7 @@ import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { HostConfig } from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -53,6 +55,14 @@ interface SetNewPasswordFormState {
   error: string | null
 }
 
+interface LoginHints {
+  hasTemporaryPassword: boolean
+  passwordExpired: boolean
+}
+
+/** Why the user must choose a new password after a successful login. */
+type SetNewPasswordReason = 'temporaryPassword' | 'passwordExpired' | 'required'
+
 type LoginModalScreen =
   | {
       kind: 'login'
@@ -60,7 +70,11 @@ type LoginModalScreen =
       passwordResetSuccess?: boolean
     }
   | { kind: 'forgotPassword'; formData: LoginFormState }
-  | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
+  | {
+      kind: 'setNewPassword'
+      formData: SetNewPasswordFormState
+      reason: SetNewPasswordReason
+    }
 
 const INITIAL_LOGIN_FORM: LoginFormState = {
   username: '',
@@ -77,6 +91,32 @@ function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
     confirmPassword: '',
     confirmPasswordError: null,
     error: null,
+  }
+}
+
+function getSetNewPasswordReason(
+  hints: LoginHints | null
+): SetNewPasswordReason {
+  if (hints?.hasTemporaryPassword === true) {
+    return 'temporaryPassword'
+  }
+  if (hints?.passwordExpired === true) {
+    return 'passwordExpired'
+  }
+  return 'required'
+}
+
+async function fetchLoginHints(
+  host: HostConfig | null,
+  username: string
+): Promise<LoginHints | null> {
+  if (host == null || username.trim() === '') {
+    return null
+  }
+  const response = await getUserLoginStatus(host, username.trim())
+  return {
+    hasTemporaryPassword: response.data.data.resetPassword,
+    passwordExpired: response.data.data.passwordExpired,
   }
 }
 
@@ -98,6 +138,7 @@ function updateSetNewPasswordFormData(
     if (prev.kind !== 'setNewPassword') return prev
     return {
       kind: 'setNewPassword',
+      reason: prev.reason,
       formData: { ...prev.formData, ...updates },
     }
   })
@@ -139,12 +180,19 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     kind: 'login',
     formData: INITIAL_LOGIN_FORM,
   })
+  const [loginHints, setLoginHints] = useState<LoginHints | null>(null)
+  const loginHintsRef = useRef<LoginHints | null>(null)
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
   const passwordResetSuccessToastId = useId()
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
+
+  const updateLoginHints = (hints: LoginHints | null): void => {
+    loginHintsRef.current = hints
+    setLoginHints(hints)
+  }
 
   const handleClose = (): void => {
     if (screen.kind === 'setNewPassword') {
@@ -169,6 +217,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
+          reason: getSetNewPasswordReason(loginHintsRef.current),
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -229,7 +278,14 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       usernameRequiredError: null,
       passwordRequiredError: null,
     })
-    submitPassword(trimmedUsername, trimmedPassword)
+
+    void (async (): Promise<void> => {
+      // Ensure we know temp-password vs expiration before login succeeds.
+      const hints =
+        loginHintsRef.current ?? (await fetchLoginHints(host, trimmedUsername))
+      updateLoginHints(hints)
+      submitPassword(trimmedUsername, trimmedPassword)
+    })()
   }
 
   const validateConfirmPasswordMatch = (
@@ -320,12 +376,17 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             <LoginView
               formId={loginFormId}
               formData={screen.formData}
+              hasTemporaryPassword={loginHints?.hasTemporaryPassword === true}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
+                updateLoginHints(null)
                 updateLoginFormData(setScreen, {
                   username: value,
                   usernameRequiredError: null,
                 })
+              }}
+              onUsernameBlur={username => {
+                void fetchLoginHints(host, username).then(updateLoginHints)
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {
@@ -343,6 +404,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
           ) : (
             <SetNewPasswordView
               formData={screen.formData}
+              reason={screen.reason}
               onNewPasswordChange={value => {
                 updateSetNewPasswordFormData(setScreen, {
                   newPassword: value,
@@ -398,8 +460,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 interface LoginViewProps {
   formId: string
   formData: LoginFormState
+  hasTemporaryPassword: boolean
   onSubmit: ComponentProps<'form'>['onSubmit']
   onUsernameChange: (value: string) => void
+  onUsernameBlur: (username: string) => void
   onLogInPasswordChange: (value: string) => void
   onForgotPasswordClick: () => void
 }
@@ -408,8 +472,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
   const {
     formId,
     formData,
+    hasTemporaryPassword,
     onSubmit,
     onUsernameChange,
+    onUsernameBlur,
     onLogInPasswordChange,
     onForgotPasswordClick,
   } = props
@@ -422,6 +488,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
   const handleTogglePasswordVisibility = (): void => {
     setShowPassword(current => !current)
   }
+
+  const passwordFieldTitle = hasTemporaryPassword
+    ? t('access_control:on_device_login_one_time_password')
+    : t('access_control:login_form_password_field')
 
   return (
     <>
@@ -445,11 +515,14 @@ function LoginView(props: LoginViewProps): JSX.Element {
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
+          onBlur={() => {
+            onUsernameBlur(formData.username)
+          }}
         />
         <InputField
           ref={passwordInputRef}
           name="password"
-          title={t('access_control:login_form_password_field')}
+          title={passwordFieldTitle}
           type={showPassword ? 'text' : 'password'}
           value={formData.logInPassword}
           error={formData.passwordRequiredError ?? formData.error ?? undefined}
@@ -491,6 +564,7 @@ function ForgotPasswordView(): JSX.Element {
 
 interface SetNewPasswordViewProps {
   formData: SetNewPasswordFormState
+  reason: SetNewPasswordReason
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   onPasswordFieldBlur: () => void
@@ -499,6 +573,7 @@ interface SetNewPasswordViewProps {
 function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
   const {
     formData,
+    reason,
     onNewPasswordChange,
     onConfirmPasswordChange,
     onPasswordFieldBlur,
@@ -520,14 +595,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
     setShowConfirmPassword(current => !current)
   }
 
+  const heading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_heading')
+      : t('access_control:desktop_set_new_password_heading')
+  const subheading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_subheading')
+      : t('access_control:desktop_set_new_password_subheading')
+
   return (
     <>
       <div className={styles.text_container}>
-        <StyledText desktopStyle="headingSmallBold">
-          {t('access_control:desktop_password_expired_heading')}
-        </StyledText>
+        <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
         <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-          {t('access_control:desktop_password_expired_subheading')}
+          {subheading}
         </StyledText>
       </div>
 
