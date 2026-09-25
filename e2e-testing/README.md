@@ -1,6 +1,6 @@
 # E2E Testing
 
-End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Library (LL)** using Playwright and pytest. Soon we will add app tests and API testing.
+End-to-end tests for the Opentrons **Protocol Designer (PD)**, **Labware Library (LL)**, and **Opentrons desktop app (Electron)** using Playwright and pytest.
 
 ## Prerequisites
 
@@ -63,6 +63,21 @@ make test-ll-staging                             # Against staging
 make test-ll-prod                                # Against production
 ```
 
+### Opentrons App (Electron)
+
+Requires a connected Flex/OT-3 (USB or Wi-Fi) or the `fake-robot` dev profile.
+
+```bash
+make configure-robot                             # Interactive .env setup
+make check-robot                                 # Verify robot connectivity
+make test-app-nav                                # Navigation smoke tests
+make test-app-nav-headed                         # Headed Electron window
+make test-app-device-cards-headed                # Device card exercises (headed)
+python main_script.py fake-robot tests/app/nav/  # Dev app + local robot-server
+```
+
+Use `--robot-profile fake-robot`, `--robot-name QA1Potato`, or positional args via `main_script.py`.
+
 ### Other Targets
 
 ```bash
@@ -101,9 +116,13 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
   - `base_page.py` — Shared `BasePage` class inherited by all page objects
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
+  - `app_pages/` — Opentrons desktop app page objects (import from `automation.app_pages`)
+  - `app_helpers/` — Electron launch, robot connection, and app-specific helpers
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
+  - `app/` — Opentrons desktop app tests (markers: `smoke`, `device_cards`)
+- `open_app.py`, `configure_robot.py`, `main_script.py` — Electron app test runner utilities
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
 - `eyes.py` — Applitools Eyes wrapper and pytest fixture
