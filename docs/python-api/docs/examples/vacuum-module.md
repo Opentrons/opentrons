@@ -5,47 +5,21 @@ description: An analysis of the Opentrons Python API code used by the Vacuum Mod
 
 This use case is taken from a plasmid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules, and labware.
 
-## Overview
+!!! note
+    The Vacuum Module is supported on Opentrons Flex only and requires Python API version 2.30 or higher.
+
+## Workflow overview
 
 A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This use case focuses exclusively on the procedures that interact with API methods used by the Vacuum Module such as:
 
 * **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. The vacuum then draws clarified lysate into a collection plate.
 
-* **Waste collection:** The Gripper automatically moves well plates and Vacuum Module components to create different stacked configurations for each stage of the process. The module applies different vacuum profiles to collect and dispose of material.
-
-* **Elution:** In this last part of our use case, the robot stacks a filter plate directly on a collection plate and runs the module to recover purified DNA .
-
-API methods highlighted in this use case include:
-
-* [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to initiate non-blocking vacuum tasks.
-* [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to synchronize background filtration and ensure system depressurization before moving labware.
-* [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock] and [`move_to_dock()`][opentrons.protocol_api.VacuumModuleContext.move_to_dock] to stage and manipulate manifold collars.
+* **Sample binding and waste disposal:** The Gripper reconfigures the stack so the module pulls waste through the manifold into an external carboy. The module then applies different vacuum pressures to collect and dispose of material.
 
 The code analysis starts below.
 
-## Stage 1: protocol metadata
 
-Every protocol file begins with the `metadata` and `requirements` dictionaries.
-
-<!--- perhpas a table to match sections below, but too much for just 2 bullets --->
-
-- `metadata`: Contains key-value pairs for the protocol name (`protocolName`) and a concise description (`description`), which are displayed in Opentrons software and on the Flex touchscreen.
-
-- `requirements`: Contains the key-value pairs `robotType` and `apiLevel`. These parameters tell the Flex what robot model is being used (Flex or OT-2) and the API version. The Vacuum Module only works with Flex and API version 2.30, or higher.
-
-```python
-from opentrons import protocol_api
-from opentrons.protocol_api import VacuumModuleContext
-
-metadata = {
-    "protocolName": "Nucleic acid miniprep",
-    "description": "A Vacuum Module use case using the Python API."
-}
-
-requirements = {"robotType": "Flex", "apiLevel": "2.31"}
-```
-
-## Stage 2: Loading modules and labware
+## Stage 1: Loading modules and labware
 
 During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, this code to tells the robot what's going to be used and where it can be found.
 
@@ -117,15 +91,13 @@ def run(protocol: protocol_api.ProtocolContext):
     tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B2")
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
-## Stage 3: Concurrent actions
+## Stage 2: Concurrent actions
 <!--- figure out something after new spacer info is available --->
 <font color="red">Needs some intro here. During this stage, the robot does all the things.</font>
 
 ### Liquid collection
 
 During this stage, a gentle vacuum pulls clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates vacuum seal.
-
-During this stage, a gentle vacuum pulls clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates a vacuum seal
 
 <table>
   <thead>
@@ -183,7 +155,7 @@ Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can c
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
-## Stage 4: Direct-to-waste wash and dry
+## Stage 3: Direct-to-waste wash and dry
 
 In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying.
 
@@ -213,12 +185,12 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
         </ul>
       </td>
     </tr>
-    <tr>
+<tr>
       <td><strong>Membrane drying</strong></td>
       <td>
         <ul>
-          <li><code>start_set_vacuum_pressure()</code> pulls a deep vacuum at maximum capacity (<code>-800</code> mbar) for 60 seconds to purge residual wash ethanol from the silica membrane.</li>
-          <li><code>wait_for_tasks()</code> forces the robot to pause until venting and pressure equalization complete (<code>equalize_timeout_s=30</code>) before subsequent gripper operations</li>
+          <li><code>start_set_vacuum_pressure()</code> pulls a deep vacuum (<code>-800</code> mbar) for 60 seconds to purge residual wash ethanol, configuring the module to vent and equalize for up to 30 seconds (<code>vent_after=True</code>, <code>equalize_timeout_s=30</code>).</li>
+          <li><code>wait_for_tasks()</code> forces the robot to pause until the drying cycle and pressure equalization finish before subsequent gripper operations.</li>
         </ul>
       </td>
     </tr>
