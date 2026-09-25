@@ -35,7 +35,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(unique=True)
-    hashed_password: Mapped[str]
+    # Null when the account only has a temporary password (not yet set by the user).
+    hashed_password: Mapped[str | None]
     full_name: Mapped[str]
     account_type: Mapped[str]
     # A flag that this user must reset their password for reasons other than time-based expiration.
@@ -44,6 +45,8 @@ class User(Base):
     password_set_at: Mapped[datetime]
     # When true, the account was deactivated by an admin and cannot log in.
     deactivated: Mapped[bool] = mapped_column(server_default=false(), default=False)
+    # Set when a user gets a one-time password. Placed last to match Alembic ADD COLUMN order.
+    temporary_hashed_password: Mapped[str | None] = mapped_column(nullable=True)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",

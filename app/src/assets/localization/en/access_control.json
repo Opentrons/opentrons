@@ -17,6 +17,8 @@
   "desktop_password_expired_mismatch": "Passwords do not match.",
   "desktop_password_expired_new_password_field": "New password",
   "desktop_password_expired_subheading": "Create a new password to use",
+  "desktop_set_new_password_heading": "Create a new password",
+  "desktop_set_new_password_subheading": "Create a new password to use",
   "documentation_is_required": "Documentation is required",
   "documentation_required": "Documentation required",
   "download_audit_logs": "Download audit logs",

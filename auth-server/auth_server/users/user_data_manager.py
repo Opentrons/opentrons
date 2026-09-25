@@ -18,6 +18,8 @@ from auth_server.users.models import (
     SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
+    UserLoginStatus,
+    UserLoginStatusReason,
     UserResponse,
 )
 from auth_server.users.software_keyboard_characters import (
@@ -114,6 +116,18 @@ class PasswordPreviouslyUsedError(InvalidInputError):
     """Raised when a new password matches the user's current password."""
 
 
+def _reject_reused_password(password: str, user: User | None) -> None:
+    """Raise if ``password`` matches the user's previous used password."""
+    if user is None:
+        return
+    if user.hashed_password is not None and password_hash.verify(
+        password, user.hashed_password
+    ):
+        raise PasswordPreviouslyUsedError(
+            "New password must be different from the current password."
+        )
+
+
 class UsernameContainsInvalidCharactersError(InvalidInputError):
     """Raised when a username contains whitespace or other disallowed characters."""
 
@@ -178,16 +192,24 @@ def _reject_disallowed_service_account_mutations(
         raise InvalidInputError("Service accounts cannot be locked or unlocked.")
 
 
-def must_reset_password(
+def _password_is_expired(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
 ) -> bool:
-    """Return whether the user must reset their password before full robot access."""
-    password_is_expired = (
+    """Return whether the user's password has passed the configured expiration window."""
+    return (
         password_reset_time_sec is not None
         and now
         > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
     )
-    return password_is_expired or user.reset_password
+
+
+def must_reset_password(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> bool:
+    """Return whether the user must reset their password before full robot access."""
+    return (
+        _password_is_expired(user, now, password_reset_time_sec) or user.reset_password
+    )
 
 
 class UserDataManager:
@@ -239,17 +261,22 @@ class UserDataManager:
         _validate_username_characters(username)
         settings = self._settings_store.get_settings()
         reset_password = password is None
+        temporary_password_hash: str | None = None
+        real_hashed_password: str | None = None
         if reset_password:
             min_length, require_special = _password_complexity_requirements(settings)
             password = _generate_temporary_password(min_length, require_special)
+            temporary_password_hash = password_hash.hash(password)
         elif password is not None:
             _validate_password_complexity(password, settings)
+            real_hashed_password = password_hash.hash(password)
         assert password is not None
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
             username=username,
-            hashed_password=password_hash.hash(password),
+            hashed_password=real_hashed_password,
+            temporary_password=temporary_password_hash,
             full_name=full_name,
             account_type=account_type,
             now=now,
@@ -266,6 +293,25 @@ class UserDataManager:
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
         return self._to_response(user)
+
+    def get_login_status(self, username: str) -> UserLoginStatus:
+        """Return pre-auth login UI hints for ``username``.
+
+        Prefers temporary-password over expiration when both could apply.
+        """
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        settings = self._settings_store.get_settings()
+        now = datetime.datetime.now(tz=datetime.UTC)
+        reason: UserLoginStatusReason | None
+        if user.temporary_hashed_password is not None:
+            reason = UserLoginStatusReason.TEMPORARY_PASSWORD
+        elif _password_is_expired(user, now, settings.passwordResetTime):
+            reason = UserLoginStatusReason.PASSWORD_EXPIRED
+        else:
+            reason = None
+        return UserLoginStatus(reason=reason)
 
     def get_users_list(self) -> list[UserResponse]:
         """Return all users."""
@@ -314,12 +360,7 @@ class UserDataManager:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
-            if existing_user is not None and password_hash.verify(
-                new_password, existing_user.hashed_password
-            ):
-                raise PasswordPreviouslyUsedError(
-                    "New password must be different from the current password."
-                )
+            _reject_reused_password(new_password, existing_user)
         if (
             new_username is not None
             and new_username != username_to_update
@@ -337,30 +378,46 @@ class UserDataManager:
                     deactivated = False
             if new_password is not None:
                 reset_password = False
-            updated_user = self._user_store.update(
-                username_to_update,
-                new_username=new_username,
-                hashed_password=(
-                    password_hash.hash(new_password)
-                    if new_password is not None
-                    else None
-                ),
-                full_name=new_full_name,
-                account_type=new_account_type,
-                reset_password=reset_password,
-                deactivated=deactivated,
-                now=now,
-            )
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=password_hash.hash(new_password),
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    clear_temporary_hashed_password=True,
+                    now=now,
+                )
+            else:
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=None,
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    now=now,
+                )
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
+
+    def validate_new_password(self, username: str, password: str) -> None:
+        """Validate password complexity and password reuse."""
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        _validate_password_complexity(password, self._settings_store.get_settings())
+        _reject_reused_password(password, user)
 
     def reset_user_password(
         self,
         username: str,
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
-        """Reset a user's password to a random temporary password.
+        """Reset a user's password to a newly generated temporary password.
 
         Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
@@ -374,7 +431,7 @@ class UserDataManager:
             self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
-                hashed_password=password_hash.hash(temporary_password),
+                temporary_hashed_password=password_hash.hash(temporary_password),
                 reset_password=True,
                 deactivated=False,
                 now=now,

@@ -138,6 +138,19 @@ class UpdateSelf(BaseModel):
     ] = None
 
 
+class ValidateSelfPassword(BaseModel):
+    """Request body for validating a prospective password without saving it."""
+
+    password: Annotated[
+        SecretStr,
+        Field(
+            description=(
+                "The password to validate against complexity and reuse rules."
+            ),
+        ),
+    ]
+
+
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
@@ -166,18 +179,27 @@ class UserResponse(BaseModel):
     ]
 
 
+class UserLoginStatusReason(StrEnum):
+    """Why the user should adjust their password."""
+
+    TEMPORARY_PASSWORD = "temporaryPassword"
+    PASSWORD_EXPIRED = "passwordExpired"
+
+
 class UserLoginStatus(BaseModel):
     """Pre-authentication login hints for a user."""
 
-    resetPassword: Annotated[
-        bool,
+    reason: Annotated[
+        UserLoginStatusReason | None,
         Field(
+            default=None,
             description=(
-                "If true, the user must sign in with a temporary or one-time password"
-                " and set a new password before full robot access."
-            )
+                "temporaryPassword: sign in with a one-time password."
+                " passwordExpired: the current password has aged past the configured"
+                " window."
+            ),
         ),
-    ]
+    ] = None
 
 
 class TemporaryPasswordResponse(UserResponse):

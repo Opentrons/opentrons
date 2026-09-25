@@ -190,7 +190,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          password: securepassword123
+          password: brandnewpassword456
     response:
       status_code: 200
       json:
@@ -209,7 +209,7 @@ stages:
         client_id: opentrons_app
         grant_type: password
         username: test_new_user_upd
-        password: securepassword123
+        password: brandnewpassword456
     response:
       status_code: 200
       json:
