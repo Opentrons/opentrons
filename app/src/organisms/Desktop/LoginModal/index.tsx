@@ -36,8 +36,8 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
+import type { HostConfig, UserLoginStatus } from '@opentrons/api-client'
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -53,11 +53,6 @@ interface SetNewPasswordFormState {
   confirmPassword: string
   confirmPasswordError: string | null
   error: string | null
-}
-
-interface LoginHints {
-  hasTemporaryPassword: boolean
-  passwordExpired: boolean
 }
 
 /** Why the user must choose a new password after a successful login. */
@@ -95,28 +90,29 @@ function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
 }
 
 function getSetNewPasswordReason(
-  hints: LoginHints | null
+  loginStatus: UserLoginStatus | null
 ): SetNewPasswordReason {
-  if (hints?.hasTemporaryPassword === true) {
+  if (loginStatus?.resetPassword === true) {
     return 'temporaryPassword'
   }
-  if (hints?.passwordExpired === true) {
+  if (loginStatus?.passwordExpired === true) {
     return 'passwordExpired'
   }
   return 'required'
 }
 
-async function fetchLoginHints(
+async function fetchLoginStatus(
   host: HostConfig | null,
   username: string
-): Promise<LoginHints | null> {
+): Promise<UserLoginStatus | null> {
   if (host == null || username.trim() === '') {
     return null
   }
-  const response = await getUserLoginStatus(host, username.trim())
-  return {
-    hasTemporaryPassword: response.data.data.resetPassword,
-    passwordExpired: response.data.data.passwordExpired,
+  try {
+    const response = await getUserLoginStatus(host, username.trim())
+    return response.data.data
+  } catch {
+    return null
   }
 }
 
@@ -180,8 +176,8 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     kind: 'login',
     formData: INITIAL_LOGIN_FORM,
   })
-  const [loginHints, setLoginHints] = useState<LoginHints | null>(null)
-  const loginHintsRef = useRef<LoginHints | null>(null)
+  const [loginStatus, setLoginStatus] = useState<UserLoginStatus | null>(null)
+  const loginStatusRef = useRef<UserLoginStatus | null>(null)
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
@@ -189,9 +185,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
 
-  const updateLoginHints = (hints: LoginHints | null): void => {
-    loginHintsRef.current = hints
-    setLoginHints(hints)
+  const updateLoginStatus = (status: UserLoginStatus | null): void => {
+    loginStatusRef.current = status
+    setLoginStatus(status)
   }
 
   const handleClose = (): void => {
@@ -217,7 +213,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
-          reason: getSetNewPasswordReason(loginHintsRef.current),
+          reason: getSetNewPasswordReason(loginStatusRef.current),
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -281,9 +277,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
     void (async (): Promise<void> => {
       // Ensure we know temp-password vs expiration before login succeeds.
-      const hints =
-        loginHintsRef.current ?? (await fetchLoginHints(host, trimmedUsername))
-      updateLoginHints(hints)
+      const status =
+        loginStatusRef.current ??
+        (await fetchLoginStatus(host, trimmedUsername))
+      updateLoginStatus(status)
       submitPassword(trimmedUsername, trimmedPassword)
     })()
   }
@@ -376,17 +373,17 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             <LoginView
               formId={loginFormId}
               formData={screen.formData}
-              hasTemporaryPassword={loginHints?.hasTemporaryPassword === true}
+              hasTemporaryPassword={loginStatus?.resetPassword === true}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
-                updateLoginHints(null)
+                updateLoginStatus(null)
                 updateLoginFormData(setScreen, {
                   username: value,
                   usernameRequiredError: null,
                 })
               }}
               onUsernameBlur={username => {
-                void fetchLoginHints(host, username).then(updateLoginHints)
+                void fetchLoginStatus(host, username).then(updateLoginStatus)
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {
