@@ -9,7 +9,7 @@ This use case is taken from a plasmid miniprep protocol. These excerpted code sa
 
 A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This use case focuses exclusively on the procedures that interact with API methods used by the Vacuum Module such as:
 
-* **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. Vacuum the then draws clarified lysate into a collection plate.
+* **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. The vacuum then draws clarified lysate into a collection plate.
 
 * **Waste collection:** The Gripper automatically moves well plates and Vacuum Module components to create different stacked configurations for each stage of the process. The module applies different vacuum profiles to collect and dispose of material.
 
@@ -93,7 +93,7 @@ During this stage, the `run()` function initializes hardware, defines the deck l
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load modules and external waste chute
-    vacuum: VacuumModuleContext = protocol.load_module("vacuumModuleV1", "A3")
+    vacuum = protocol.load_module("vacuumModuleV1", "A3")
     heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
     waste_chute = protocol.load_waste_chute()
 
@@ -167,7 +167,7 @@ During this stage, a gentle vacuum pulls clarified lysate into a 96-well collect
 
 ### Liquid handling
 
-Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations while the Vacuum Module operates. Calling `protocol.wait_for_tasks([clarify_tasks])` switches the robot back to serial operation preventing other commands from executing until the system depressurizes so the Gripper can move labware off the module.
+Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations while the Vacuum Module operates. Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to serial operation preventing other commands from executing until the system depressurizes so the Gripper can move labware off the module.
 
 ```python
 # Pipette liquids while the Vacuum Module runs
