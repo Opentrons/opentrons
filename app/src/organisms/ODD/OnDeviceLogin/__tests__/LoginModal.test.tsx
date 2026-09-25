@@ -70,9 +70,11 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   }
 }
 
-function mockUserLoginStatus(resetPassword = false): void {
+function mockUserLoginStatus(
+  reason: 'temporaryPassword' | 'passwordExpired' | null = null
+): void {
   vi.mocked(getUserLoginStatus).mockResolvedValue({
-    data: { data: { resetPassword, passwordExpired: false } },
+    data: { data: { reason } },
   } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 
@@ -150,7 +152,7 @@ async function advanceFromUsername(): Promise<void> {
 
 describe('LoginModal', () => {
   beforeEach(() => {
-    mockUserLoginStatus(false)
+    mockUserLoginStatus(null)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
@@ -233,7 +235,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -267,7 +269,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -311,7 +313,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -358,7 +360,7 @@ describe('LoginModal', () => {
     void clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')

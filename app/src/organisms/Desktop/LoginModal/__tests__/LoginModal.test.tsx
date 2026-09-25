@@ -78,14 +78,12 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
 }
 
 function mockUserLoginStatus(options?: {
-  resetPassword?: boolean
-  passwordExpired?: boolean
+  reason?: 'temporaryPassword' | 'passwordExpired' | null
 }): void {
   vi.mocked(getUserLoginStatus).mockResolvedValue({
     data: {
       data: {
-        resetPassword: options?.resetPassword ?? false,
-        passwordExpired: options?.passwordExpired ?? false,
+        reason: options?.reason ?? null,
       },
     },
   } as Awaited<ReturnType<typeof getUserLoginStatus>>)
@@ -346,7 +344,7 @@ describe('LoginModal', () => {
   })
 
   it('shows one-time password field and set-new-password copy after temp password login', async () => {
-    mockUserLoginStatus({ resetPassword: true })
+    mockUserLoginStatus({ reason: 'temporaryPassword' })
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
@@ -382,7 +380,7 @@ describe('LoginModal', () => {
   })
 
   it('shows password expired view when login requires a new password due to expiration', async () => {
-    mockUserLoginStatus({ passwordExpired: true })
+    mockUserLoginStatus({ reason: 'passwordExpired' })
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()

@@ -110,7 +110,7 @@ const LoginModalImpl = NiceModal.create(
       setIsFetchingLoginStatus(true)
       try {
         const response = await getUserLoginStatus(host, username)
-        setLoginResetPassword(response.data.data.resetPassword as boolean)
+        setLoginResetPassword(response.data.data.reason === 'temporaryPassword')
       } catch {
         setLoginResetPassword(false)
       } finally {

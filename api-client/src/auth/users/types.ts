@@ -30,9 +30,10 @@ export interface AuthUsersResponse {
   }
 }
 
+export type UserLoginStatusReason = 'temporaryPassword' | 'passwordExpired'
+
 export interface UserLoginStatus {
-  resetPassword: boolean
-  passwordExpired: boolean
+  reason: UserLoginStatusReason | null
 }
 
 export interface UserLoginStatusResponse {

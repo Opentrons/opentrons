@@ -37,7 +37,11 @@ import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, FormEvent, SetStateAction } from 'react'
-import type { HostConfig, UserLoginStatus } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  UserLoginStatus,
+  UserLoginStatusReason,
+} from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -55,9 +59,6 @@ interface SetNewPasswordFormState {
   error: string | null
 }
 
-/** Why the user must choose a new password after a successful login. */
-type SetNewPasswordReason = 'temporaryPassword' | 'passwordExpired' | 'required'
-
 type LoginModalScreen =
   | {
       kind: 'login'
@@ -68,7 +69,7 @@ type LoginModalScreen =
   | {
       kind: 'setNewPassword'
       formData: SetNewPasswordFormState
-      reason: SetNewPasswordReason
+      reason: UserLoginStatusReason | null
     }
 
 const INITIAL_LOGIN_FORM: LoginFormState = {
@@ -87,18 +88,6 @@ function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
     confirmPasswordError: null,
     error: null,
   }
-}
-
-function getSetNewPasswordReason(
-  loginStatus: UserLoginStatus | null
-): SetNewPasswordReason {
-  if (loginStatus?.resetPassword === true) {
-    return 'temporaryPassword'
-  }
-  if (loginStatus?.passwordExpired === true) {
-    return 'passwordExpired'
-  }
-  return 'required'
 }
 
 async function fetchLoginStatus(
@@ -213,7 +202,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
-          reason: getSetNewPasswordReason(loginStatusRef.current),
+          reason: loginStatusRef.current?.reason ?? null,
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -371,7 +360,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             <LoginView
               formId={loginFormId}
               formData={screen.formData}
-              hasTemporaryPassword={loginStatus?.resetPassword === true}
+              reason={loginStatus?.reason ?? null}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
                 updateLoginStatus(null)
@@ -455,7 +444,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 interface LoginViewProps {
   formId: string
   formData: LoginFormState
-  hasTemporaryPassword: boolean
+  reason: UserLoginStatusReason | null
   onSubmit: ComponentProps<'form'>['onSubmit']
   onUsernameChange: (value: string) => void
   onUsernameBlur: (username: string) => void
@@ -467,7 +456,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
   const {
     formId,
     formData,
-    hasTemporaryPassword,
+    reason,
     onSubmit,
     onUsernameChange,
     onUsernameBlur,
@@ -484,9 +473,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
     setShowPassword(current => !current)
   }
 
-  const passwordFieldTitle = hasTemporaryPassword
-    ? t('access_control:on_device_login_one_time_password')
-    : t('access_control:login_form_password_field')
+  const passwordFieldTitle =
+    reason === 'temporaryPassword'
+      ? t('access_control:on_device_login_one_time_password')
+      : t('access_control:login_form_password_field')
 
   return (
     <>
@@ -559,7 +549,7 @@ function ForgotPasswordView(): JSX.Element {
 
 interface SetNewPasswordViewProps {
   formData: SetNewPasswordFormState
-  reason: SetNewPasswordReason
+  reason: UserLoginStatusReason | null
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   onPasswordFieldBlur: () => void
