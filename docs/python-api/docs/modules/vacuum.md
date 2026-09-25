@@ -244,4 +244,4 @@ You can close the vent by using [`VacuumModuleContext.close_vent()`][opentrons.p
 
 ## Use cases
 
-Text and link commented out until merging the use case. The princess is in another castle.
+See [Vacuum Module Examples](../examples/vacuum-module.md) for a description of a miniprep use case and code samples.
