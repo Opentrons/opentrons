@@ -772,8 +772,8 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
 
-            command = transaction.execute(select_command).scalar_one_or_none()  # type: ignore
-            if command is None:
+            existing_command = transaction.execute(select_command).scalar_one_or_none()  # type: ignore
+            if existing_command is None:
                 # If the command is not present, then we insert the new command
                 transaction.execute(
                     insert_command,
