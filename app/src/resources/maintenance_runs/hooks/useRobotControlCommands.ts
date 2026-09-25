@@ -9,7 +9,10 @@ import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
 import type { MaintenanceRun, Mount } from '@opentrons/api-client'
-import type { DocumentedAction } from '@opentrons/react-api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface PendingExecution {
@@ -43,6 +46,8 @@ export interface UseRobotControlCommandsProps {
   onError?: (error: Error) => void
   runStartedAction: DocumentedAction
   runEndedAction: DocumentedAction
+  // If provided, skip documentation and use the provided state.
+  documentationState?: DocumentationState
 }
 // Issue commands to the robot, creating an on-the-fly maintenance run for the duration of the issued commands, loading
 // the relevant pipette if necessary. Commands are then executed, and regardless of the success status of those commands,
@@ -55,6 +60,7 @@ export function useRobotControlCommands({
   onError,
   runStartedAction,
   runEndedAction,
+  documentationState,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
   const pendingExecutionRef = useRef<PendingExecution | null>(null)
@@ -78,7 +84,7 @@ export function useRobotControlCommands({
     runStartedAction,
     handleDocumentationCancel,
     undefined,
-    isExecuting // block prompting until execution begins
+    isExecuting && !documentationState // block prompting until execution begins
   )
 
   // wait until documentation is ready before executing commands
@@ -86,18 +92,18 @@ export function useRobotControlCommands({
     isDocumentationLoading || !isDocumentationProvided(commandDocState)
 
   const { chainRunCommands } = useChainMaintenanceCommands(
-    commandDocState,
+    !!documentationState ? documentationState : commandDocState,
     actionsToDocument,
     addActionToDocument
   )
   const { mutateAsync: deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
-    deletionDocState,
+    !!documentationState ? documentationState : deletionDocState,
     [...actionsToDocument, runEndedAction]
   )
 
   const { createTargetedMaintenanceRun } =
     useCreateTargetedMaintenanceRunMutation(
-      commandDocState,
+      !!documentationState ? documentationState : commandDocState,
       [runStartedAction],
       {
         onSuccess: response => {
