@@ -114,7 +114,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 robot_type=self._protocol_resource.source.robot_type,
                 run_time_parameters=result.parameters,
-                commands_json=self._analysis_store.get_commands_list(),
+                commands_json=None,
                 labware=result.state_summary.labware,
                 modules=result.state_summary.modules,
                 pipettes=result.state_summary.pipettes,
@@ -126,7 +126,6 @@ class ProtocolAnalyzer:
                 labware_offsets=result.state_summary.labwareOffsets,
             )
 
-            self._analysis_store.clear_commands_list()
         finally:
             await self.clean_up()
 

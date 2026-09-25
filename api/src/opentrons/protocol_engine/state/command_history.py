@@ -46,9 +46,21 @@ class CommandManager:
             self.command_store_interface_task()
         )
 
-    def teardown(self) -> None:
-        """Send the teardown signal to the run store interface task."""
+    def teardown_command_store_task(self) -> None:
+        """Send the teardown signal to the command store interface task."""
         self._teardown_signal.set()
+
+    async def _send_command_insert_request(
+        self, command_json: CommandEntryJSON
+    ) -> None:
+        """Send insert command request to the CommandStoreProvider."""
+        command_entry = CommandEntry(
+            command=command_json.command_type.model_validate_json(command_json.command),
+            index=command_json.index,
+        )
+        await self._command_store_provider.insert_command(
+            command_index=command_entry.index, command=command_entry.command
+        )
 
     async def command_store_interface_task(self) -> None:
         """Handle interactions with the CommandStoreProvider."""
@@ -56,17 +68,14 @@ class CommandManager:
             if len(self._command_queue) > 0:
                 # Remove the command from the queue and insert/update it on the RunStore
                 command_entry_json = self._command_queue.pop()
-                command_entry = CommandEntry(
-                    command=command_entry_json.command_type.model_validate_json(
-                        command_entry_json.command
-                    ),
-                    index=command_entry_json.index,
-                )
-                await self._command_store_provider.insert_command(
-                    command_index=command_entry.index, command=command_entry.command
-                )
+                await self._send_command_insert_request(command_entry_json)
 
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
+
+        # In teardown, send the remaining commands until none remain before task completion to ensure all commands are written
+        while self._command_queue:
+            command_entry_json = self._command_queue.pop()
+            await self._send_command_insert_request(command_entry_json)
 
     def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
@@ -360,6 +369,10 @@ class CommandHistory:
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
         self._all_failed_command_ids.append(command.id)
+
+    def teardown_command_manager(self) -> None:
+        """Handle teardown of the interface that interacts with the RunStore and AnalysisStore remotely."""
+        self._command_manager.teardown_command_store_task()
 
     # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
     # Explicitly clearing all history before dereferencing protocol engine and the run's run orchestrator eliminates

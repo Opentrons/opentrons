@@ -140,14 +140,6 @@ class AnalysisStore:
         command_json = command.model_dump_json(by_alias=True)
         self._commands_json_list.append(command_json)
 
-    def clear_commands_list(self) -> None:
-        """Clear the stored list of command JSON strings."""
-        self._commands_json_list.clear()
-
-    def get_commands_list(self) -> List[str]:
-        """Get the list of stored command JSON strings."""
-        return self._commands_json_list
-
     def set_analysis_provider_id(self, analysis_id: str) -> None:
         """Set the ID used by the analysis provider."""
         self._analysis_store_provider.set_run_id(analysis_id)
@@ -186,7 +178,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands_json: List[str],
+        commands_json: Optional[List[str]],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -218,6 +210,9 @@ class AnalysisStore:
             labware_offsets: See `CompletedAnalysis.labware_offsets`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
+        if commands_json is None:
+            # Use the locally stored commands list
+            commands_json = self._commands_json_list
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
         assert protocol_id is not None, (
@@ -271,6 +266,7 @@ class AnalysisStore:
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
+        self._commands_json_list.clear()
 
     async def save_initialization_failed_analysis(
         self,

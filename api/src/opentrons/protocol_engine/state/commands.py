@@ -672,6 +672,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.is_stopping_because_of_async_error = False
                 self._state.stopped_by_async_error = True
 
+        # Always teardown the persistence storage manager gracefully so no commands are lost
+        self._state.command_history.teardown_command_manager()
+
     def _handle_hardware_stopped_action(self, action: HardwareStoppedAction) -> None:
         self._state.queue_status = QueueStatus.PAUSED
         self._state.run_result = self._state.run_result or RunResult.STOPPED
