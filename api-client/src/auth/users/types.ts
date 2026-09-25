@@ -57,6 +57,12 @@ export interface UpdateSelfRequest {
   }
 }
 
+export interface ValidateSelfPasswordRequest {
+  data: {
+    password: string
+  }
+}
+
 export interface UpdateUserRequest {
   data: {
     username?: string
