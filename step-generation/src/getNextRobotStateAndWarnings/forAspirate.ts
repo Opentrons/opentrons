@@ -38,6 +38,8 @@ export function forAspirate(
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const primaryNozzle =
     robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+  const backLeftNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].backLeftNozzle
 
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
@@ -46,6 +48,7 @@ export function forAspirate(
     pipetteSpec,
     nozzles,
     primaryNozzle,
+    backLeftNozzle,
   })
 
   const { allWellsShared, wellsForTips } = getWellsForTips(

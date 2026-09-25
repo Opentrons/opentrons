@@ -1,15 +1,9 @@
-import type {
-  NozzleConfigurationStyle,
-  PrimaryNozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import type { NozzleConfigurationParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 interface ConfigureNozzleLayoutParams {
   pipetteId: string
-  configurationParams: {
-    style: NozzleConfigurationStyle
-    primaryNozzle?: PrimaryNozzleConfigurationStyle
-  }
+  configurationParams: NozzleConfigurationParams
 }
 
 export function forConfigureNozzleLayout(
@@ -19,8 +13,9 @@ export function forConfigureNozzleLayout(
 ): void {
   const { pipetteId, configurationParams } = params
   const { robotState } = robotStateAndWarnings
+  const { style, primaryNozzle, backLeftNozzle } = configurationParams
 
-  robotState.pipettes[pipetteId].nozzles = configurationParams.style
-  robotState.pipettes[pipetteId].primaryNozzle =
-    configurationParams.primaryNozzle
+  robotState.pipettes[pipetteId].nozzles = style
+  robotState.pipettes[pipetteId].primaryNozzle = primaryNozzle
+  robotState.pipettes[pipetteId].backLeftNozzle = backLeftNozzle
 }

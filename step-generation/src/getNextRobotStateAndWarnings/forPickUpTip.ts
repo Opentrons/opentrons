@@ -4,6 +4,7 @@ import {
   getIsTiprack,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
+  QUADRANT,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -32,6 +33,8 @@ export function forPickUpTip(
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   const primaryNozzle =
     robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+  const backLeftNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].backLeftNozzle
   const nozzleConfiguration = getNozzleConfig(nozzles, pipetteSpec)
 
   const getTiprackColumnForWell = (
@@ -90,6 +93,24 @@ export function forPickUpTip(
       partialTips.forEach(function (wellName) {
         tipState.tipracks[labwareId][wellName] = EMPTY
       })
+    }
+  } else if (nozzleConfiguration === QUADRANT && backLeftNozzle != null) {
+    const nozzleCount =
+      PARTIAL_NOZZLE_MAP[backLeftNozzle as PartialPrimaryNozzles]
+    if (nozzleCount != null) {
+      const columnIndex = tiprackDef.ordering.findIndex(col =>
+        col.includes(wellName)
+      )
+      const column = tiprackDef.ordering[columnIndex]
+      const rowIndex = column.indexOf(wellName)
+      const start = Math.max(0, rowIndex - nozzleCount + 1)
+      column.slice(start, rowIndex + 1).forEach(w => {
+        tipState.tipracks[labwareId][w] = EMPTY
+      })
+    } else {
+      console.error(
+        `Could not determine nozzle count for QUADRANT pickup: ${backLeftNozzle}`
+      )
     }
   } else if (nozzleConfiguration === COLUMN) {
     const allWells = getTiprackColumnForWell(tiprackDef.ordering, wellName)
