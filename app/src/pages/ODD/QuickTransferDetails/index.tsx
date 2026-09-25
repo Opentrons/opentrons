@@ -117,7 +117,8 @@ const QuickTransferHeader = ({
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -126,13 +127,15 @@ const QuickTransferHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isTransferFetching ? (
@@ -158,23 +161,25 @@ const QuickTransferHeader = ({
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunTransfer()
-          trackEventWithRobotSerial({
-            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
-            properties: {
-              name: title,
-            },
-          })
-        }}
-        buttonText={t('start_setup')}
-        disabled={isTransferFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={() => {
+            setStartSetup(true)
+            handleRunTransfer()
+            trackEventWithRobotSerial({
+              name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+              properties: {
+                name: title,
+              },
+            })
+          }}
+          buttonText={t('start_setup')}
+          disabled={isTransferFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
