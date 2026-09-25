@@ -8,7 +8,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getUserLoginStatus } from '@opentrons/api-client'
+import { getUserLoginStatus, validateSelfPassword } from '@opentrons/api-client'
 
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
@@ -28,6 +28,7 @@ vi.mock('@opentrons/api-client', async importOriginal => {
   return {
     ...actual,
     getUserLoginStatus: vi.fn(),
+    validateSelfPassword: vi.fn(),
   }
 })
 
@@ -153,6 +154,9 @@ async function advanceFromUsername(): Promise<void> {
 describe('LoginModal', () => {
   beforeEach(() => {
     mockUserLoginStatus(null)
+    vi.mocked(validateSelfPassword).mockResolvedValue({
+      data: null,
+    } as any)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
@@ -323,6 +327,7 @@ describe('LoginModal', () => {
 
     fillField('New password', 'newpass123')
     clickPrimary('Next')
+    expect(await screen.findByLabelText('Confirm password')).toBeInTheDocument()
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
@@ -370,6 +375,7 @@ describe('LoginModal', () => {
 
     fillField('New password', 'newpass123')
     clickPrimary('Next')
+    expect(await screen.findByLabelText('Confirm password')).toBeInTheDocument()
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 

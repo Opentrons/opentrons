@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { getUserLoginStatus } from '@opentrons/api-client'
+import { getUserLoginStatus, validateSelfPassword } from '@opentrons/api-client'
 import {
   POSITION_FIXED,
   SPACING,
@@ -19,6 +19,7 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
+  mapSetNewPasswordError,
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
@@ -36,7 +37,7 @@ const LoginModalImpl = NiceModal.create(
   (props: { key?: string }): JSX.Element => {
     const { key } = props
     const modal = useModal()
-    const { t } = useTranslation(['access_control'])
+    const { t } = useTranslation(['access_control', 'device_settings'])
     const passwordUpdatedToastId = useId()
     const host = useHost()
     const shouldShowPasswordUpdatedToastRef = useRef(false)
@@ -48,6 +49,8 @@ const LoginModalImpl = NiceModal.create(
     )
     const [loginResetPassword, setLoginResetPassword] = useState(false)
     const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
+    const [isValidatingNewPassword, setIsValidatingNewPassword] =
+      useState(false)
     const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
       string | null
     >(null)
@@ -115,6 +118,24 @@ const LoginModalImpl = NiceModal.create(
         setLoginResetPassword(false)
       } finally {
         setIsFetchingLoginStatus(false)
+      }
+    }
+
+    const handleValidateNewPassword = async (
+      password: string
+    ): Promise<string | null> => {
+      if (host == null) {
+        return t('set_new_password_error_session_expired') as string
+      }
+
+      setIsValidatingNewPassword(true)
+      try {
+        await validateSelfPassword(host, { data: { password } })
+        return null
+      } catch (error: unknown) {
+        return mapSetNewPasswordError(error, t)
+      } finally {
+        setIsValidatingNewPassword(false)
       }
     }
 
@@ -187,12 +208,15 @@ const LoginModalImpl = NiceModal.create(
           onUsernameSubmit={
             phase === 'login' ? handleUsernameSubmit : undefined
           }
+          onValidateNewPassword={
+            isChoosingNewPassword ? handleValidateNewPassword : undefined
+          }
           submitPassword={
             isChoosingNewPassword ? submitNewPassword : submitPassword
           }
           isAuthLoading={
             isChoosingNewPassword
-              ? isSetNewPasswordLoading
+              ? isSetNewPasswordLoading || isValidatingNewPassword
               : isLoginAuthLoading || isFetchingLoginStatus
           }
           isPasswordResetRequired={isChoosingNewPassword}
