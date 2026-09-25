@@ -168,9 +168,9 @@ class CompletedAnalysis(BaseModel):
             " if none are specified in the request."
         ),
     )
-    commands: List[Command] = Field(
+    commandsJson: List[str] = Field(
         ...,
-        description="The protocol commands the run is expected to produce",
+        description="The protocol commands the run is expected to produce, stored as a JSON string.",
     )
     labware: List[LoadedLabware] = Field(
         ...,

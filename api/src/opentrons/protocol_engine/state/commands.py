@@ -69,8 +69,8 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
+from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 
 class QueueStatus(enum.Enum):

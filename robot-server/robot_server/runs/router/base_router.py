@@ -804,7 +804,7 @@ async def get_current_state(  # noqa: C901
         for pipette_id, has_tip in pipette_tip_states.items()
     }
 
-    current_command = run_data_manager.get_current_command(run_id=runId)
+    current_command = await run_data_manager.get_current_command(run_id=runId)
 
     estop_engaged = False
     place_labware = None
@@ -908,7 +908,9 @@ async def get_current_state(  # noqa: C901
     else:
         flex_stacker_states = None
 
-    last_completed_command = await run_data_manager.get_last_completed_command(run_id=runId)
+    last_completed_command = await run_data_manager.get_last_completed_command(
+        run_id=runId
+    )
     links = CurrentStateLinks.model_construct(
         lastCompleted=(
             CommandLinkNoMeta.model_construct(

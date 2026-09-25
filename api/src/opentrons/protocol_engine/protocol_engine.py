@@ -44,11 +44,11 @@ from .execution import (
     DoorWatcher,
     HardwareStopper,
     QueueWorker,
-    create_queue_worker,
 )
 from .execution.associated_command_error_recovery import (
     AssociatedCommandErrorRecoveryOrchestrator,
 )
+from .execution.create_queue_worker import create_queue_worker
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings

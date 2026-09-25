@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated, Any, Callable, Coroutine, Optional, Awaitable
+from typing import Annotated, Any, Awaitable, Callable, Coroutine, Optional
 
 from fastapi import Depends
 
@@ -62,7 +62,9 @@ class RunsPublisher:
     async def start_publishing_for_run(
         self,
         run_id: str,
-        get_current_command: Callable[[str], Optional[CommandPointer]],
+        get_current_command: Callable[
+            [str], Coroutine[Any, Any, Optional[CommandPointer]]
+        ],
         get_recovery_target_command: Callable[
             [str], Coroutine[Any, Any, Optional[CommandPointer]]
         ],

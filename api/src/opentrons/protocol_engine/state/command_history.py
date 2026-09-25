@@ -1,15 +1,14 @@
 """Protocol Engine CommandStore sub-state."""
 
+import asyncio
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-import asyncio
 from ..commands import Command, CommandIntent, CommandStatus
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-from opentrons.protocol_runner.run_store_provider import RunStoreProvider
-
+from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 
 
 @dataclass(frozen=True)
@@ -28,6 +27,7 @@ class CommandEntry:
     command: Command
     index: int
 
+
 class CommandManager:
     """Manages command insertion into and queries on persistent command storage through the RunStoreProvider."""
 
@@ -37,7 +37,7 @@ class CommandManager:
     ) -> None:
         self._teardown_signal = asyncio.Event()
         self._run_store_provider = run_store_provider
-        self._command_queue: list[CommandEntry] = []
+        self._command_queue: list[CommandEntryJSON] = []
 
         # Set up the run store task
         self._run_store_interface_task = asyncio.create_task(
@@ -53,13 +53,17 @@ class CommandManager:
         while not self._teardown_signal.is_set():
             if len(self._command_queue) > 0:
                 # Remove the command from the queue and insert/update it on the RunStore
-                command_entry = self._command_queue.pop()
-                await self._run_store_provider.insert_command(command_index=command_entry.index, command=command_entry.command)
+                command_entry_json = self._command_queue.pop()
+                command_entry = CommandEntry(command=command_entry_json.command_type.model_validate_json(command_entry_json.command), index=command_entry_json.index)
+                await self._run_store_provider.insert_command(
+                    command_index=command_entry.index, command=command_entry.command
+                )
 
             await asyncio.sleep(0.1)
-    
-    def insert_command(self, command_entry) -> None:
+
+    def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
+
         self._command_queue.insert(0, command_entry)
 
 
@@ -203,7 +207,9 @@ class CommandHistory:
         command_slice = []
         for raw_command_entry in raw_command_slice:
             command_slice.append(
-                raw_command_entry.command_type.model_validate_json(raw_command_entry.command)
+                raw_command_entry.command_type.model_validate_json(
+                    raw_command_entry.command
+                )
             )
         return command_slice
 
@@ -373,7 +379,7 @@ class CommandHistory:
             command_type=type(command_entry.command),
             index=command_entry.index,
         )
-        self._command_manager.insert_command(command_entry=command_entry)
+        self._command_manager.insert_command(command_entry=self._commands_by_id[command_id])
 
     def _add_to_queue(self, command_id: str) -> None:
         """Add new ID to the queued."""

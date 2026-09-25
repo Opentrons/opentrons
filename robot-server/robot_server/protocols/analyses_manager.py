@@ -67,6 +67,7 @@ class AnalysesManager:
             run_process_pyro_provider=self._run_process_pyro_provider,
         )
         try:
+            self._analysis_store.set_analysis_provider_id(analysis_id=analysis_id)
             await analyzer.load_orchestrator(
                 run_time_param_values=run_time_param_values,
                 run_time_param_paths=run_time_param_paths,

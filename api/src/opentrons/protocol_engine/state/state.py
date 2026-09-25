@@ -59,9 +59,9 @@ from .tasks import TaskState, TaskStore, TaskView
 from .tips import TipState, TipStore, TipView
 from .wells import WellState, WellStore, WellView
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
-from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")

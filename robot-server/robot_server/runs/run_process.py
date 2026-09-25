@@ -93,7 +93,6 @@ from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
-from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 log = logging.getLogger(__name__)
 
@@ -232,10 +231,9 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
         self._run_id = run_id
 
-        # Create the RunStoreProvider
+        # Get the RunStoreProvider
         run_store_provider = self._robot_server_resource.get_run_store_provider()
         run_store_provider.set_run_id(self._run_id)
-
 
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
@@ -295,9 +293,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def create_simulating(self, protocol_resource: ProtocolResource) -> None:
         """Create a simulating runner for use in analysis."""
+        if self._robot_server_resource is None:
+            await self._connect_to_robot_server_resource()
+            assert self._robot_server_resource is not None
+
         self._run_orchestrator = await create_simulating_orchestrator(
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
+            analysis_store_provider=self._robot_server_resource.get_analysis_store_provider(),
         )
 
     @property

@@ -30,8 +30,8 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.resources.labware_data_provider import (
     LabwareDataProvider,
 )
+from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.util.async_helpers import async_context_manager_in_thread
-from opentrons.protocol_runner.run_store_provider import RunStoreProvider
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to

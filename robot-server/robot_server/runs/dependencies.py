@@ -57,10 +57,10 @@ from robot_server.service.notifications import (
 from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_run_orchestrator_store_to_pyro_resource,
+    register_run_store_provider_to_pyro_resource,
 )
 from robot_server.service.task_runner import get_task_runner
 from robot_server.settings import get_settings
-from robot_server.service.pyro_utils.resource_utilities import register_run_store_provider_to_pyro_resource
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
@@ -82,7 +82,9 @@ async def get_run_store(
 
     if run_store is None:
         run_store = RunStore(sql_engine=sql_engine)
-        register_run_store_provider_to_pyro_resource(app_state=app_state, run_store_provider=run_store.get_run_store_provider())
+        register_run_store_provider_to_pyro_resource(
+            app_state=app_state, run_store_provider=run_store.get_run_store_provider()
+        )
         _run_store_accessor.set_on(app_state, run_store)
 
     return run_store
@@ -184,7 +186,7 @@ async def get_run_orchestrator_store(
         RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
     ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
-    run_store: Annotated[RunStore, Depends(get_run_store)]
+    run_store: Annotated[RunStore, Depends(get_run_store)],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)

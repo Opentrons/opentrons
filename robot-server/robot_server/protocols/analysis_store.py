@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -124,6 +125,34 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
         self._access_control_status = access_control_status
+        self._commands_json_list: List[str] = []
+        self._analysis_store_provider = RunStoreProvider(
+            run_id=None,
+            store_insert_command=self.insert_analysis_command,
+        )
+
+    async def insert_analysis_command(
+        self, run_id: str, command_index: int, command: Command
+    ) -> None:
+        """Store a command from analysis as a command JSON string."""
+        command_json = command.model_dump_json(by_alias=True)
+        self._commands_json_list.append(command_json)
+
+    def clear_commands_list(self) -> None:
+        """Clear the stored list of command JSON strings."""
+        self._commands_json_list.clear()
+
+    def get_commands_list(self) -> List[str]:
+        """Get the list of stored command JSON strings."""
+        return self._commands_json_list
+
+    def set_analysis_provider_id(self, analysis_id: str) -> None:
+        """Set the ID used by the analysis provider."""
+        self._analysis_store_provider.set_run_id(analysis_id)
+
+    def get_analysis_store_provider(self) -> RunStoreProvider:
+        """Get the AnalysisStoreProvider."""
+        return self._analysis_store_provider
 
     def add_pending(
         self,
@@ -155,7 +184,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands: List[Command],
+        commands_json: List[str],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -212,7 +241,7 @@ class AnalysisStore:
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
             runTimeParameters=run_time_parameters,
-            commands=commands,
+            commandsJson=commands_json,
             labware=labware,
             modules=modules,
             pipettes=pipettes,
@@ -256,7 +285,7 @@ class AnalysisStore:
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
             runTimeParameters=run_time_parameters,
-            commands=[],
+            commandsJson=[],
             labware=[],
             modules=[],
             pipettes=[],
