@@ -52,13 +52,16 @@ The Vacuum Module includes two support grids with perforations that match differ
 
 In a vacuum filtration protocol, you can place an internal spacer beneath a sample collection plate to raise it closer to the source filter plate. Elevating the collection plate minimizes the vertical gap between the two well plates, ensuring fluid droplets fall cleanly into the receiving wells. Reducing the space between plates also prevents vacuum pressure from pulling liquid sideways, eliminating cross-contamination. The short and tall spacers can be paired interchangeably with either collar.
 
-The Vacuum Module includes two spacers to match different labware profiles:
-
-* **Short Spacer:** 27 mm
-* **Tall Spacer:** 34 mm
+The Vacuum Module includes four spacers to match different labware profiles.
 
 <figure class="side-by-side" markdown>
-![Illustration of short spacer, 27 mm](../images/spacer-short.svg)
-![Illustration of tall spacer, 34 mm](../images/spacer-tall.svg)
-<figcaption>Short and tall spacers</figcaption>
+![Image of 3.2mm spacer](../images/spacer-3mm.svg)
+![Image of 5.2mm spacer](../images/spacer-5mm.svg)
+<figcaption>3.2 mm and 5.2 mm spacers</figcaption>
+</figure>
+
+<figure class="side-by-side" markdown>
+![Image of 7.25 mm spacer](../images/spacer-7mm.svg)
+![Image of 12.8 mm spacer](../images/spacer-12mm.svg)
+<figcaption>7.25 mm and 12.8 mm spacers</figcaption>
 </figure>
