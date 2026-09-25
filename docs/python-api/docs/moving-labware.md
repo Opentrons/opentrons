@@ -175,7 +175,7 @@ plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
 # load lid stack
 lid_stack = protocol.load_lid_stack(
     load_name="opentrons_tough_pcr_auto_sealing_lid",
-    location="B2",
+    location="D4",
     quantity=4
 )
 # move one lid to a compatible well plate in the Thermocycler
@@ -189,6 +189,7 @@ protocol.move_lid(
 
 When you're done with a lid, use `move_lid()` to dispose of it in the waste chute or a trash bin:
 
+<!-- test: continue-previous -->
 ```python
 protocol.move_lid(
     source_location=plate,

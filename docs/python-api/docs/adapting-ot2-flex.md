@@ -96,6 +96,7 @@ The Magnetic Module is not compatible with Flex. For protocols that load `magnet
 This simplified example, taken from a DNA extraction protocol, shows how using the Flex Gripper and the Magnetic Block can save time. Instead of pipetting an entire plate's worth of liquid from the Heater-Shaker to the Magnetic Module and then engaging the module, the gripper moves the plate to the Magnetic Block in one step.
 
 === "Original OT-2 code"
+    <!-- test: syntax-only -->
     ```python
     hs_mod.set_and_wait_for_shake_speed(2000)
     protocol.delay(minutes=5)
@@ -121,6 +122,7 @@ This simplified example, taken from a DNA extraction protocol, shows how using t
     ```
 
 === "Updated Flex code"
+    <!-- test: syntax-only -->
     ```python
     hs_mod.set_and_wait_for_shake_speed(2000)
     protocol.delay(minutes=5)

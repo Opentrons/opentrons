@@ -6,6 +6,7 @@ description: "Control the Heater-Shaker: temperature, speed, and latch position 
 The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
 
 The Heater-Shaker Module is represented in code by a [`HeaterShakerContext`][opentrons.protocol_api.HeaterShakerContext] object. For example:
+
 ```python
 hs_mod = protocol.load_module(
     module_name="heaterShakerModuleV1", location="D1"

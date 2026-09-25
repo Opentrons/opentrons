@@ -17,6 +17,7 @@ The destination labware and well order will remain fixed, to focus on using thes
 
 To get started, let's set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description:
 
+<!-- test: params-template -->
 ```python
 def add_parameters(parameters):
     parameters.add_csv_file(
@@ -47,6 +48,7 @@ Our protocol will use the information contained in the selected CSV for loading 
 
 We’ll use the Python API’s [`parse_as_csv()`][opentrons.protocol_api.CSVParameter.parse_as_csv] method to allow easy access to different portions of the CSV data at different points in the protocol:
 
+<!-- test: syntax-only -->
 ```python
 def run(protocol):
     well_data = protocol.params.cherrypicking_wells.parse_as_csv()
@@ -88,6 +90,7 @@ for slot in unique_source_slots:
 Note that loading labware in a loop like this doesn't assign each labware instance to a variable. That's fine, because we'll use [`ProtocolContext.deck`][opentrons.protocol_api.ProtocolContext.deck] to refer to them by slot name later on.
 
 The entire start of the `run()` function, including a pipette and fixed labware (i.e., labware not affected by the CSV runtime parameter) will look like this:
+<!-- test: syntax-only -->
 ```python
 from opentrons import protocol_api
 
