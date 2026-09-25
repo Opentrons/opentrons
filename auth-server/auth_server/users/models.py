@@ -166,27 +166,27 @@ class UserResponse(BaseModel):
     ]
 
 
+class UserLoginStatusReason(StrEnum):
+    """Why the user should adjust their password."""
+
+    TEMPORARY_PASSWORD = "temporaryPassword"
+    PASSWORD_EXPIRED = "passwordExpired"
+
+
 class UserLoginStatus(BaseModel):
     """Pre-authentication login hints for a user."""
 
-    resetPassword: Annotated[
-        bool,
+    reason: Annotated[
+        UserLoginStatusReason | None,
         Field(
+            default=None,
             description=(
-                "If true, the user must sign in with a temporary or one-time password."
-                " This is only true when a temporary password has been issued."
-            )
+                "temporaryPassword: sign in with a one-time password."
+                " passwordExpired: the current password has aged past the configured"
+                " window."
+            ),
         ),
-    ]
-    passwordExpired: Annotated[
-        bool,
-        Field(
-            description=(
-                "If true, the user's current password has passed the configured"
-                " expiration window and they must choose a new password after login."
-            )
-        ),
-    ]
+    ] = None
 
 
 class TemporaryPasswordResponse(UserResponse):

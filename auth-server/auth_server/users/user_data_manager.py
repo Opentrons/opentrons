@@ -19,6 +19,7 @@ from auth_server.users.models import (
     AccountType,
     TemporaryPasswordResponse,
     UserLoginStatus,
+    UserLoginStatusReason,
     UserResponse,
 )
 from auth_server.users.software_keyboard_characters import (
@@ -282,21 +283,23 @@ class UserDataManager:
         return self._to_response(user)
 
     def get_login_status(self, username: str) -> UserLoginStatus:
-        """Return pre-auth login status for a user.
+        """Return pre-auth login UI hints for ``username``.
 
-        ``resetPassword`` is true only when a temporary password is active.
-        ``passwordExpired`` is true when the real password has aged past the
-        configured reset window. Either can require a new password after login.
+        Prefers temporary-password over expiration when both could apply.
         """
         user = self._user_store.get(username)
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
         settings = self._settings_store.get_settings()
         now = datetime.datetime.now(tz=datetime.UTC)
-        return UserLoginStatus(
-            resetPassword=user.temporary_hashed_password is not None,
-            passwordExpired=_password_is_expired(user, now, settings.passwordResetTime),
-        )
+        reason: UserLoginStatusReason | None
+        if user.temporary_hashed_password is not None:
+            reason = UserLoginStatusReason.TEMPORARY_PASSWORD
+        elif _password_is_expired(user, now, settings.passwordResetTime):
+            reason = UserLoginStatusReason.PASSWORD_EXPIRED
+        else:
+            reason = None
+        return UserLoginStatus(reason=reason)
 
     def get_users_list(self) -> list[UserResponse]:
         """Return all users."""

@@ -16,6 +16,7 @@ from auth_server.users.models import (
     AccountType,
     TemporaryPasswordResponse,
     UserLoginStatus,
+    UserLoginStatusReason,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -678,7 +679,7 @@ def test_get_user_reset_password_true_when_admin_flag_set(
     assert result.resetPassword is True
 
 
-def test_get_login_status_true_when_temporary_password_set(
+def test_get_login_status_temporary_password(
     decoy: Decoy,
     mock_store: UserStore,
     mock_settings: SettingsStore,
@@ -694,17 +695,16 @@ def test_get_login_status_true_when_temporary_password_set(
     )
 
     assert manager.get_login_status("temp_user") == UserLoginStatus(
-        resetPassword=True, passwordExpired=False
+        reason=UserLoginStatusReason.TEMPORARY_PASSWORD
     )
 
 
-def test_get_login_status_password_expired_without_temp(
+def test_get_login_status_password_expired(
     decoy: Decoy,
     mock_store: UserStore,
     mock_settings: SettingsStore,
     manager: UserDataManager,
 ) -> None:
-    """Expiration is reported separately from temporary-password login."""
     decoy.when(mock_settings.get_settings()).then_return(
         SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
     )
@@ -714,11 +714,11 @@ def test_get_login_status_password_expired_without_temp(
     )
 
     assert manager.get_login_status("expired_user") == UserLoginStatus(
-        resetPassword=False, passwordExpired=True
+        reason=UserLoginStatusReason.PASSWORD_EXPIRED
     )
 
 
-def test_get_login_status_false_when_admin_flag_without_temp(
+def test_get_login_status_none_when_admin_flag_without_temp(
     decoy: Decoy,
     mock_store: UserStore,
     mock_settings: SettingsStore,
@@ -729,8 +729,30 @@ def test_get_login_status_false_when_admin_flag_without_temp(
         _make_orm_user(username="flagged_user", reset_password=True)
     )
 
-    assert manager.get_login_status("flagged_user") == UserLoginStatus(
-        resetPassword=False, passwordExpired=False
+    assert manager.get_login_status("flagged_user") == UserLoginStatus(reason=None)
+
+
+def test_get_login_status_prefers_temporary_password_over_expiration(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
+    )
+    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(days=2)
+    decoy.when(mock_store.get("both_user")).then_return(
+        _make_orm_user(
+            username="both_user",
+            password_set_at=expired_at,
+            temporary_hashed_password=password_hash.hash("temppass1"),
+            reset_password=True,
+        )
+    )
+
+    assert manager.get_login_status("both_user") == UserLoginStatus(
+        reason=UserLoginStatusReason.TEMPORARY_PASSWORD
     )
 
 

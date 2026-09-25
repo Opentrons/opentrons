@@ -7,7 +7,7 @@ marks:
       - seed_users
 
 stages:
-  - name: Login status is false for a user without reset required
+  - name: Login status has no reason for a normal user
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
@@ -15,8 +15,7 @@ stages:
       status_code: 200
       json:
         data:
-          resetPassword: false
-          passwordExpired: false
+          reason: null
 
   - name: Create a user without a password
     request:
@@ -40,7 +39,7 @@ stages:
           resetPassword: true
           temporaryPassword: !anystr
 
-  - name: Login status is true when a temporary password was issued
+  - name: Login status is temporaryPassword when a temporary password was issued
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/byUsername/login_status_user/loginStatus'
@@ -48,8 +47,7 @@ stages:
       status_code: 200
       json:
         data:
-          resetPassword: true
-          passwordExpired: false
+          reason: temporaryPassword
 
   - name: Login status returns 404 for unknown user
     request:
