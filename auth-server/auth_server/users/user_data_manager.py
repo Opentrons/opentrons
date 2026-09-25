@@ -116,6 +116,18 @@ class PasswordPreviouslyUsedError(InvalidInputError):
     """Raised when a new password matches the user's current password."""
 
 
+def _reject_reused_password(password: str, user: User | None) -> None:
+    """Raise if ``password`` matches the user's previous used password."""
+    if user is None:
+        return
+    if user.hashed_password is not None and password_hash.verify(
+        password, user.hashed_password
+    ):
+        raise PasswordPreviouslyUsedError(
+            "New password must be different from the current password."
+        )
+
+
 class UsernameContainsInvalidCharactersError(InvalidInputError):
     """Raised when a username contains whitespace or other disallowed characters."""
 
@@ -348,15 +360,7 @@ class UserDataManager:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
-            is_reusing_current_password = (
-                existing_user is not None
-                and existing_user.hashed_password is not None
-                and password_hash.verify(new_password, existing_user.hashed_password)
-            )
-            if is_reusing_current_password:
-                raise PasswordPreviouslyUsedError(
-                    "New password must be different from the current password."
-                )
+            _reject_reused_password(new_password, existing_user)
         if (
             new_username is not None
             and new_username != username_to_update
@@ -399,6 +403,14 @@ class UserDataManager:
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
+
+    def validate_new_password(self, username: str, password: str) -> None:
+        """Validate password complexity and password reuse."""
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        _validate_password_complexity(password, self._settings_store.get_settings())
+        _reject_reused_password(password, user)
 
     def reset_user_password(
         self,

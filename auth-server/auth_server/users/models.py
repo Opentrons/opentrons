@@ -138,6 +138,19 @@ class UpdateSelf(BaseModel):
     ] = None
 
 
+class ValidateSelfPassword(BaseModel):
+    """Request body for validating a prospective password without saving it."""
+
+    password: Annotated[
+        SecretStr,
+        Field(
+            description=(
+                "The password to validate against complexity and reuse rules."
+            ),
+        ),
+    ]
+
+
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
