@@ -32,6 +32,7 @@ import type { AuthUser } from '@opentrons/api-client'
 export interface UserManagementProps {
   robotName: string
   onShowOneTimePassword: (password: string) => void
+  onEditSelf: () => void
 }
 
 interface UserManagementTableProps {
@@ -41,6 +42,7 @@ interface UserManagementTableProps {
   onActivate: (user: AuthUser) => void
   onResetPassword: (user: AuthUser) => void
   onDeactivate: (user: AuthUser) => void
+  username: string | null
 }
 
 const USER_REFETCH_TIME = 10000
@@ -52,6 +54,7 @@ function UserManagementTable({
   onActivate,
   onResetPassword,
   onDeactivate,
+  username,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -82,6 +85,7 @@ function UserManagementTable({
             onActivate={onActivate}
             onResetPassword={onResetPassword}
             onDeactivate={onDeactivate}
+            isLoggedInUser={user.username === username}
           />
         ))}
       </div>
@@ -92,6 +96,7 @@ function UserManagementTable({
 export function UserManagement({
   robotName,
   onShowOneTimePassword,
+  onEditSelf,
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
@@ -257,16 +262,21 @@ export function UserManagement({
       })
   }
 
+  const handleEdit = (user: AuthUser): void => {
+    user.username === username ? onEditSelf() : setUserToEdit(user)
+  }
+
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
       <div className={styles.content}>
         <UserManagementTable
           users={users}
-          onEdit={setUserToEdit}
+          onEdit={handleEdit}
           onDelete={setUserToDelete}
           onActivate={setUserToActivate}
           onResetPassword={setUserToResetPassword}
           onDeactivate={setUserToDeactivate}
+          username={username}
         />
         <div className={styles.add_user_button}>
           <EmptySelectorButton
