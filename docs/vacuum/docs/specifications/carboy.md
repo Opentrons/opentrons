@@ -5,12 +5,15 @@ description: "Carboy features, accessories, specifications, and chemical compati
 
 The Vacuum Module ships with a glass carboy, cap, cap wrench, and carboy holder.
 
-## Carboy features
+!!! tip
+    Always inspect and empty the carboy before starting a protocol.
+
+## Material composition
 
 The Vacuum Module includes a 2 L borosilicate 3.3 glass carboy for liquid waste collection. The carboy features a graduated scale that ranges from 400 mL to 2,000 mL and an etched marking square for labeling.
 
 !!! note
-    Inspect the glass carboy for damage during unpacking, installation, and use. Replace if chipped or cracked.
+    Examine the glass carboy for damage during unpacking, installation, and use. Replace if chipped or cracked.
 
 The carboy cap is a blue polypropylene (PP) cap with GL80 wide-mouth threads. The cap is ported and threaded for CPC quick-connect couplings.
 
@@ -18,8 +21,6 @@ The carboy cap is a blue polypropylene (PP) cap with GL80 wide-mouth threads. Th
 ![Carboy and cap with labeled features](../images/carboy-labeled.png)
 <figcaption>Carboy features</figcaption>
 </figure>
-
-The cap assembly features a waste diverter and mechanical float. The diverter directs incoming fluid away from the float. The float acts as a mechanical backflow preventer. As liquid fills the carboy, the float rises to seal the vacuum port which protects the Control Box and pump from contact with waste liquid. After the port closes, the pump will detect a pressure change and shut down.
 
 ## Specifications
 
@@ -63,6 +64,21 @@ The waste carboy is made of borosilicate 3.3 glass. This material is resistant t
 
 See [Chemical Compatibility](compatibility.md) for the ratings of individual carboy pieces and materials.
 
+## Cap assembly
+
+The carboy cap includes two important liquid control features:
+
+* **Waste diverter:** channels liquid waste down the interior wall of the carboy, away from the exhaust port and float valve.
+* **Float valve:** a mechanical backflow preventer. If the carboy reaches capacity, the float rises and closes the vacuum exhaust port. This prevents liquid from entering the vacuum line and control box.
+
+!!! note
+    The float valve is a passive backflow preventer. It does not electronically communicate with the vacuum pump. When the carboy is full and the overflow valve closes, the pump:
+
+    - Shuts off automatically when operating at a set vacuum pressure (e.g., –400 mbar). Detection takes about 30 seconds.
+    - Does not shut off automatically when operating at a set power rating (e.g., 60% power).
+
+    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../../python-api/modules/vacuum/#controlling-vacuum-operations) in the Python Protocol API documentation.
+
 ## Accessories
 
 ### Cap wrench
@@ -74,12 +90,8 @@ A large cap wrench (or ring spanner) is included with the carboy. This tool slip
 <figcaption>Carboy cap wrench</figcaption>
 </figure>
 
-<!--- Not ready yet
-
 ### Hose clip
 
 The magnetic hose clip mounts to the top of the Control Box. It's designed to keep the end of a disconnected hose upright so trapped liquid does not drip onto workspace surfaces. Two circular cutouts on one end of the clip are sized for 6 mm and 9 mm vacuum hoses. To use the clip, press the free end of a vacuum hose into its corresponding cutout.
 
-IMAGE PLACEHOLDER
-
---->
+<font color="red">IMAGE PLACEHOLDER</font>

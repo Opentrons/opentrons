@@ -50,9 +50,9 @@ The following Vacuum Module components can be serviced at the intervals indicate
 Turn off and unplug the module from the wall outlet before cleaning it.
 
 !!! Warning
-    Do not disassemble the Control Box for cleaning or attempt to clean its internal electronic components or mechanical parts.
+    Do not disassemble the control box for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-The following table lists the chemicals you can use to clean the exterior of the Control Box and carboy. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options.
+The following table lists the chemicals you can use to clean the exterior of the control box and carboy. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options.
 
 | Solution | Recommendations |
 |----|----|
@@ -69,7 +69,7 @@ For cleaning or decontaminating vacuum hoses and the carboy, wear the required p
 
 ## Cleaning the air-liquid separator
 
-The Control Box includes an air-liquid separator located in a niche on its side panel. This device traps liquid droplets in a clear, removable collection bowl while allowing dry air to pass through the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
+The control box includes an air-liquid separator located in a niche on its side panel. This device traps liquid droplets in a clear, removable collection bowl while allowing dry air to pass through the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
 
 ### Detach and clean the bowl
 
