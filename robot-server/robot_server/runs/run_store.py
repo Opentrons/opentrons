@@ -21,7 +21,9 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
@@ -140,13 +142,13 @@ class RunStore:
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
-        self._run_store_provider = RunStoreProvider(
+        self._run_store_provider = CommandStoreProvider(
             run_id=None,
             store_insert_command=self.insert_command,
         )
 
-    def get_run_store_provider(self) -> RunStoreProvider:
-        """Get the RunStoreProvider created by the RunStore."""
+    def get_run_store_provider(self) -> CommandStoreProvider:
+        """Get the CommandStoreProvider created by the RunStore."""
         return self._run_store_provider
 
     def update_run_state(

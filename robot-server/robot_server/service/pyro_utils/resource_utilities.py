@@ -7,8 +7,10 @@ import Pyro5.errors as pyro_errors
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -148,26 +150,26 @@ def register_hardware_state_store_to_pyro_resource(
 
 
 def register_run_store_provider_to_pyro_resource(
-    app_state: AppState, run_store_provider: RunStoreProvider
+    app_state: AppState, run_store_provider: CommandStoreProvider
 ) -> None:
-    """Set the Run Store Provider as the active instance to be used by the Robot Server's Pyro Resource."""
+    """Set the CommandStoreProvider for RunStore as the active instance to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
     if robot_server_pyro_resource is not None:
         robot_server_pyro_resource.set_run_store_provider(run_store_provider)
     else:
         raise RuntimeError(
-            "Cannot set RunStoreProvider, RobotServerPyroResource is not initialized."
+            "Cannot set CommandStoreProvider for RunStore, RobotServerPyroResource is not initialized."
         )
 
 
 def register_analysis_store_provider_to_pyro_resource(
-    app_state: AppState, analysis_store_provider: RunStoreProvider
+    app_state: AppState, analysis_store_provider: CommandStoreProvider
 ) -> None:
-    """Set the Analysis Store Provider as the active instance to be used by the Robot Server's Pyro Resource."""
+    """Set the CommandStoreProvider for AnalysisStore as the active instance to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
     if robot_server_pyro_resource is not None:
         robot_server_pyro_resource.set_analysis_store_provider(analysis_store_provider)
     else:
         raise RuntimeError(
-            "Cannot set AnalysisStoreProvider, RobotServerPyroResource is not initialized."
+            "Cannot set CommandStoreProvider for AnalysisStore, RobotServerPyroResource is not initialized."
         )

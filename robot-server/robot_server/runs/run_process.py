@@ -231,9 +231,9 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
         self._run_id = run_id
 
-        # Get the RunStoreProvider
-        run_store_provider = self._robot_server_resource.get_run_store_provider()
-        run_store_provider.set_run_id(self._run_id)
+        # Get the CommandStoreProvider
+        command_store_provider = self._robot_server_resource.get_run_store_provider()
+        command_store_provider.set_run_id(self._run_id)
 
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
@@ -261,7 +261,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             notify_publishers=self._robot_server_resource.notify_publishers_callback,
             updates_callback=self._robot_server_resource.engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
-            run_store_provider=self._robot_server_resource.get_run_store_provider(),
+            command_store_provider=self._robot_server_resource.get_run_store_provider(),
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(

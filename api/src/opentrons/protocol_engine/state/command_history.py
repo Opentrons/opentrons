@@ -8,7 +8,9 @@ from typing import Dict, List, Optional
 from ..commands import Command, CommandIntent, CommandStatus
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 
 
 @dataclass(frozen=True)
@@ -29,27 +31,27 @@ class CommandEntry:
 
 
 class CommandManager:
-    """Manages command insertion into and queries on persistent command storage through the RunStoreProvider."""
+    """Manages command insertion into and queries on persistent command storage through the CommandStoreProvider."""
 
     def __init__(
         self,
-        run_store_provider: RunStoreProvider,
+        command_store_provider: CommandStoreProvider,
     ) -> None:
         self._teardown_signal = asyncio.Event()
-        self._run_store_provider = run_store_provider
+        self._command_store_provider = command_store_provider
         self._command_queue: list[CommandEntryJSON] = []
 
         # Set up the run store task
-        self._run_store_interface_task = asyncio.create_task(
-            self.run_store_interface_task()
+        self._command_store_interface_task = asyncio.create_task(
+            self.command_store_interface_task()
         )
 
     def teardown(self) -> None:
         """Send the teardown signal to the run store interface task."""
         self._teardown_signal.set()
 
-    async def run_store_interface_task(self) -> None:
-        """Handle interactions with the RunStoreProvider."""
+    async def command_store_interface_task(self) -> None:
+        """Handle interactions with the CommandStoreProvider."""
         while not self._teardown_signal.is_set():
             if len(self._command_queue) > 0:
                 # Remove the command from the queue and insert/update it on the RunStore
@@ -60,7 +62,7 @@ class CommandManager:
                     ),
                     index=command_entry_json.index,
                 )
-                await self._run_store_provider.insert_command(
+                await self._command_store_provider.insert_command(
                     command_index=command_entry.index, command=command_entry.command
                 )
 
@@ -105,7 +107,7 @@ class CommandHistory:
 
     def __init__(
         self,
-        run_store_provider: RunStoreProvider,
+        command_store_provider: CommandStoreProvider,
     ) -> None:
         self._all_command_ids = []
         self._all_failed_command_ids = []
@@ -116,7 +118,7 @@ class CommandHistory:
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._most_recently_completed_command_id = None
-        self._command_manager = CommandManager(run_store_provider)
+        self._command_manager = CommandManager(command_store_provider)
 
     def length(self) -> int:
         """Get the length of all elements added to the history."""

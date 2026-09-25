@@ -59,7 +59,9 @@ from .tasks import TaskState, TaskStore, TaskView
 from .tips import TipState, TipStore, TipView
 from .wells import WellState, WellStore, WellView
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
@@ -274,7 +276,7 @@ class StateStore(StateView, ActionHandler):
         robot_definition: RobotDefinition,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
-        run_store_provider: RunStoreProvider,
+        command_store_provider: CommandStoreProvider,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
@@ -309,7 +311,7 @@ class StateStore(StateView, ActionHandler):
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
             updates_callback=self._append_update_events,
-            run_store_provider=run_store_provider,
+            command_store_provider=command_store_provider,
         )
         self._pipette_store = PipetteStore(updates_callback=self._append_update_events)
         if deck_configuration is None:

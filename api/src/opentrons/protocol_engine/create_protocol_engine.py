@@ -27,10 +27,12 @@ from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchroni
     ErrorRecoveryHardwareStateSynchronizer,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.labware_data_provider import (
     LabwareDataProvider,
 )
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
 from opentrons.util.async_helpers import async_context_manager_in_thread
 
 
@@ -53,7 +55,7 @@ async def create_protocol_engine(
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler
     ] = None,
-    run_store_provider: typing.Optional[RunStoreProvider] = None,
+    command_store_provider: typing.Optional[CommandStoreProvider] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -70,8 +72,8 @@ async def create_protocol_engine(
         updates_callback: Notified robot server of specific Protocol Engine events.
         proxy_of_callback_for_handling_door_events: Optional remote callback for door events, used when in subprocess mode.
     """
-    if run_store_provider is None:
-        run_store_provider = RunStoreProvider()
+    if command_store_provider is None:
+        command_store_provider = CommandStoreProvider()
 
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
@@ -93,7 +95,7 @@ async def create_protocol_engine(
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
         updates_callback=updates_callback,
-        run_store_provider=run_store_provider,
+        command_store_provider=command_store_provider,
     )
     model_utils = ModelUtils()
     hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(

@@ -18,7 +18,9 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.resources.run_store_provider import RunStoreProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -126,7 +128,7 @@ class AnalysisStore:
         )
         self._access_control_status = access_control_status
         self._commands_json_list: List[str] = []
-        self._analysis_store_provider = RunStoreProvider(
+        self._analysis_store_provider = CommandStoreProvider(
             run_id=None,
             store_insert_command=self.insert_analysis_command,
         )
@@ -134,7 +136,7 @@ class AnalysisStore:
     async def insert_analysis_command(
         self, run_id: str, command_index: int, command: Command
     ) -> None:
-        """Store a command from analysis as a command JSON string."""
+        """Store a command from analysis as a command JSON string locally."""
         command_json = command.model_dump_json(by_alias=True)
         self._commands_json_list.append(command_json)
 
@@ -150,7 +152,7 @@ class AnalysisStore:
         """Set the ID used by the analysis provider."""
         self._analysis_store_provider.set_run_id(analysis_id)
 
-    def get_analysis_store_provider(self) -> RunStoreProvider:
+    def get_analysis_store_provider(self) -> CommandStoreProvider:
         """Get the AnalysisStoreProvider."""
         return self._analysis_store_provider
 

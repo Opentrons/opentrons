@@ -1,4 +1,4 @@
-"""RunStore/AnalysisStore provider."""
+"""Command Store provider to allow commands to be submitted to RunStore and AnalysisStore."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.command_history import CommandEntry
 
 
-class RunStoreProvider:
+class CommandStoreProvider:
     """Provider class to allow read/write access to the RunStore or AnalysisStore."""
 
     def __init__(
@@ -31,7 +31,7 @@ class RunStoreProvider:
         self._run_id = run_id
 
     async def insert_command(self, command_index: int, command: "Command") -> None:
-        """insert or update a command"""
+        """Insert or update a command."""
         if self._run_id and self._store_insert_command:
             await self._store_insert_command(self._run_id, command_index, command)
         else:

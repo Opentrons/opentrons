@@ -198,7 +198,7 @@ async def get_run_orchestrator_store(
             deck_type=deck_type,
             run_process_pyro_provider=run_process_pyro_provider,
             access_control_status=access_control_status,
-            run_store_provider=run_store.get_run_store_provider(),
+            command_store_provider=run_store.get_run_store_provider(),
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
