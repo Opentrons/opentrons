@@ -72,7 +72,7 @@ The Vacuum Module ships in multiple boxes containing all the components required
 
 ## Part 3: Carboy and vacuum hose connections
 
-15. Place the Control Box in a safe, stable, and well ventilated location.
+15. Place the control box in a safe, stable, and well ventilated location.
 
 16. Remove the carboy from its box and put it in the holder.
 
@@ -88,21 +88,21 @@ The Vacuum Module ships in multiple boxes containing all the components required
     !!! tip
         When routing the 6 mm vacuum hose, try to maintain a continuous downward slope from the robot to the carboy. Avoid sharp bends, kinks, or low dips that could allow fluid to accumulate in the hose and restrict airflow.
 
-20. Attach the 9.5 mm (&frac38;") vacuum hose coupling into the connector on the cap and on the Control Box.
+20. Attach the 9.5 mm (&frac38;") vacuum hose coupling into the connector on the cap and on the control box.
 
     !!! note
         With all hoses connected, check to make sure they're secure and clear of walkways to help prevent trip hazards.
 
 ## Part 4: Data and power connections
 
-21. Connect the USB cable to the USB port on the Control Box and to an available USB port on the side of your Flex.
+21. Connect the USB cable to the USB port on the control box and to an available USB port on the side of your Flex.
 
-22. Connect the power cable to the Control Box power inlet and and into a power outlet.
+22. Connect the power cable to the control box power inlet and and into a power outlet.
 
     !!! warning
         Connect the Vacuum Module to a grounded/earthed (⏚) electrical outlet only.
 
-23. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates solid white when the module is ready for use.
+23. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the control box illuminates solid white when the module is ready for use.
 
 </div>
 
