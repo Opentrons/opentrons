@@ -21,6 +21,7 @@ export interface UserManagementTableRowProps {
   onActivate: (user: AuthUser) => void
   onResetPassword: (user: AuthUser) => void
   onDeactivate: (user: AuthUser) => void
+  isLoggedInUser: boolean
 }
 
 export function UserManagementTableRow({
@@ -30,6 +31,7 @@ export function UserManagementTableRow({
   onActivate,
   onResetPassword,
   onDeactivate,
+  isLoggedInUser,
 }: UserManagementTableRowProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const {
@@ -46,11 +48,12 @@ export function UserManagementTableRow({
       action(user)
     }
 
-  const isServiceAccount = user.accountType === 'service'
+  const isServiceAccount =
+    user.accountType === 'service' || user.username === 'recovery'
   const canEdit = !isServiceAccount
-  const canDelete = !isServiceAccount
-  const canLockOrUnlock = !isServiceAccount
-  const canResetPassword = !user.locked
+  const canDelete = !isServiceAccount && !isLoggedInUser
+  const canLockOrUnlock = !isServiceAccount && !isLoggedInUser
+  const canResetPassword = !user.locked && !isLoggedInUser
 
   return (
     <ListItem type="default">

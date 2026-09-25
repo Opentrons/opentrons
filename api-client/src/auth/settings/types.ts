@@ -25,6 +25,13 @@ export interface AuthSettingsResponse {
   data: AuthSettingsData
 }
 
+export interface PatchAuthSettingsResponse {
+  data: AuthSettingsData
+  meta: {
+    requiresLogout: boolean
+  }
+}
+
 export interface PatchAuthSettingsRequest {
   data: Partial<AuthSettingsData>
 }

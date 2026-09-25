@@ -1,11 +1,13 @@
 """A collaborator for managing protocol analyses."""
 
-from typing import Optional
+import asyncio
+from typing import List, Optional
 
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
     PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
 )
 from opentrons.util import helpers as datetime_helper
 
@@ -41,6 +43,7 @@ class AnalysesManager:
         self._analysis_store = analysis_store
         self._task_runner = task_runner
         self._run_process_pyro_provider = run_process_pyro_provider
+        self._lock = asyncio.Lock()
 
     async def initialize_analyzer(
         self,
@@ -73,20 +76,44 @@ class AnalysesManager:
             )
         except Exception as error:
             internal_error = em.map_unexpected_error(error)
+            errors = [
+                ErrorOccurrence.from_failed(
+                    id="internal-error",
+                    createdAt=datetime_helper.utc_now(),
+                    error=internal_error,
+                )
+            ]
             try:
-                await self._analysis_store.save_initialization_failed_analysis(
+                run_time_parameters = await analyzer.get_verified_run_time_parameters()
+            except Exception:
+                run_time_parameters = []
+            try:
+                if self._pending_analysis_exists(
                     protocol_id=protocol_resource.protocol_id,
                     analysis_id=analysis_id,
-                    robot_type=protocol_resource.source.robot_type,
-                    run_time_parameters=await analyzer.get_verified_run_time_parameters(),
-                    errors=[
-                        ErrorOccurrence.from_failed(
-                            id="internal-error",
-                            createdAt=datetime_helper.utc_now(),
-                            error=internal_error,
-                        )
-                    ],
-                )
+                ):
+                    await self._analysis_store.update(
+                        analysis_id=analysis_id,
+                        robot_type=protocol_resource.source.robot_type,
+                        run_time_parameters=run_time_parameters,
+                        commands=[],
+                        labware=[],
+                        modules=[],
+                        pipettes=[],
+                        errors=errors,
+                        liquids=[],
+                        liquidClasses=[],
+                        command_annotations=[],
+                        labware_offsets=[],
+                    )
+                else:
+                    await self._analysis_store.save_initialization_failed_analysis(
+                        protocol_id=protocol_resource.protocol_id,
+                        analysis_id=analysis_id,
+                        robot_type=protocol_resource.source.robot_type,
+                        run_time_parameters=run_time_parameters,
+                        errors=errors,
+                    )
             finally:
                 await analyzer.clean_up()
             raise FailedToInitializeAnalyzer() from error
@@ -112,4 +139,166 @@ class AnalysesManager:
             id=analysis_id,
             status=AnalysisStatus.PENDING,
             runTimeParameters=run_time_parameters,
+        )
+
+    async def enqueue_analysis(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+        run_time_parameters: Optional[List[RunTimeParameter]] = None,
+    ) -> AnalysisSummary:
+        """Record a pending analysis immediately and run it when the global lock is free.
+
+        Recording pending first lets the client poll while this job waits its turn,
+        instead of initializing on the HTTP request.
+        """
+        pending_parameters = run_time_parameters or []
+        self._analysis_store.add_pending(
+            protocol_id=protocol_resource.protocol_id,
+            analysis_id=analysis_id,
+            run_time_parameters=pending_parameters,
+        )
+        self._task_runner.run(
+            self._run_analysis_job,
+            analysis_id=analysis_id,
+            protocol_resource=protocol_resource,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+        )
+        return AnalysisSummary(
+            id=analysis_id,
+            status=AnalysisStatus.PENDING,
+            runTimeParameters=pending_parameters,
+        )
+
+    async def _run_analysis_job(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+    ) -> None:
+        async with self._lock:
+            try:
+                analyzer = await self.initialize_analyzer(
+                    analysis_id=analysis_id,
+                    protocol_resource=protocol_resource,
+                    run_time_param_values=run_time_param_values,
+                    run_time_param_paths=run_time_param_paths,
+                )
+            except FailedToInitializeAnalyzer:
+                return
+            try:
+                await analyzer.analyze(analysis_id=analysis_id)
+            except Exception as error:
+                await self._promote_pending_on_failure(
+                    analyzer=analyzer,
+                    analysis_id=analysis_id,
+                    protocol_resource=protocol_resource,
+                    error=error,
+                )
+
+    async def start_analysis_if_rtps_differ(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+        last_analysis_summary: AnalysisSummary,
+    ) -> Optional[AnalysisSummary]:
+        """Initialize under the global lock and start analysis only if RTPs changed.
+
+        Waits until the job has either skipped (RTPs match) or recorded pending.
+        Analyze continues in the background while holding the lock.
+        """
+        decision: asyncio.Future[Optional[AnalysisSummary]] = (
+            asyncio.get_running_loop().create_future()
+        )
+        self._task_runner.run(
+            self._run_rtp_compare_job,
+            analysis_id=analysis_id,
+            protocol_resource=protocol_resource,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+            last_analysis_summary=last_analysis_summary,
+            decision=decision,
+        )
+        return await decision
+
+    async def _run_rtp_compare_job(
+        self,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
+        run_time_param_paths: Optional[CSVRuntimeParamPaths],
+        last_analysis_summary: AnalysisSummary,
+        decision: "asyncio.Future[Optional[AnalysisSummary]]",
+    ) -> None:
+        try:
+            async with self._lock:
+                analyzer = await self.initialize_analyzer(
+                    analysis_id=analysis_id,
+                    protocol_resource=protocol_resource,
+                    run_time_param_values=run_time_param_values,
+                    run_time_param_paths=run_time_param_paths,
+                )
+                run_time_parameters = await analyzer.get_verified_run_time_parameters()
+                if await self._analysis_store.matching_rtp_values_in_analysis(
+                    last_analysis_summary=last_analysis_summary,
+                    new_parameters=run_time_parameters,
+                ):
+                    await analyzer.clean_up()
+                    if not decision.done():
+                        decision.set_result(None)
+                    return
+                self._analysis_store.add_pending(
+                    protocol_id=protocol_resource.protocol_id,
+                    analysis_id=analysis_id,
+                    run_time_parameters=run_time_parameters,
+                )
+                if not decision.done():
+                    decision.set_result(
+                        AnalysisSummary(
+                            id=analysis_id,
+                            status=AnalysisStatus.PENDING,
+                            runTimeParameters=run_time_parameters,
+                        )
+                    )
+                try:
+                    await analyzer.analyze(analysis_id=analysis_id)
+                except Exception as error:
+                    await self._promote_pending_on_failure(
+                        analyzer=analyzer,
+                        analysis_id=analysis_id,
+                        protocol_resource=protocol_resource,
+                        error=error,
+                    )
+        except Exception as error:
+            if not decision.done():
+                decision.set_exception(error)
+
+    async def _promote_pending_on_failure(
+        self,
+        analyzer: protocol_analyzer.ProtocolAnalyzer,
+        analysis_id: str,
+        protocol_resource: ProtocolResource,
+        error: Exception,
+    ) -> None:
+        if self._pending_analysis_exists(
+            protocol_id=protocol_resource.protocol_id,
+            analysis_id=analysis_id,
+        ):
+            await analyzer.update_to_failed_analysis(
+                analysis_id=analysis_id,
+                protocol_robot_type=protocol_resource.source.robot_type,
+                error=error,
+                run_time_parameters=[],
+            )
+
+    def _pending_analysis_exists(self, protocol_id: str, analysis_id: str) -> bool:
+        return any(
+            summary.id == analysis_id and summary.status == AnalysisStatus.PENDING
+            for summary in self._analysis_store.get_summaries_by_protocol(protocol_id)
         )

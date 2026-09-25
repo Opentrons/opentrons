@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
+import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getPasswordComplexityError } from '/app/resources/auth'
@@ -67,7 +69,7 @@ export function OnDeviceLogin({
     null
   )
   const [usernameError, setUsernameError] = useState<string | null>(null)
-  const { control, watch } = useForm<LoginFormValues>({
+  const { control, watch, resetField } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -227,6 +229,8 @@ export function OnDeviceLogin({
     }
   }, [handleEnterPress])
 
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
+
   return (
     <>
       <div className={styles.container}>
@@ -242,6 +246,7 @@ export function OnDeviceLogin({
                 }
               : step === 'password' && !isPasswordResetRequired
                 ? () => {
+                    resetField('password')
                     onClearLoginError?.()
                     onStepChange('username')
                   }
@@ -258,7 +263,12 @@ export function OnDeviceLogin({
           }
           onClickButton={handleNext}
         />
-        <div className={styles.content_container}>
+        <div
+          className={clsx(
+            styles.content_container,
+            !isKeyboardOpen && styles.content_container_keyboard_closed
+          )}
+        >
           <div className={styles.form_inner_container}>
             <LoginFieldController
               ref={inputElementRef}
@@ -276,10 +286,18 @@ export function OnDeviceLogin({
         </div>
       </div>
       <div className={styles.keyboard_container}>
-        <FullKeyboard
-          keyboardRef={keyboardRef}
-          inputElementRef={inputElementRef}
-        />
+        <AccordionKeyboard
+          inputRef={inputElementRef}
+          isOpen={isKeyboardOpen}
+          onToggle={() => {
+            setIsKeyboardOpen(prev => !prev)
+          }}
+        >
+          <FullKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
+          />
+        </AccordionKeyboard>
       </div>
     </>
   )

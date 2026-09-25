@@ -4,10 +4,12 @@ import { useDispatch } from 'react-redux'
 import { Icon, SecondaryButton } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,
 } from '/app/redux-resources/analytics/'
+import { OPENTRONS_USB } from '/app/redux/discovery'
 import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
@@ -24,6 +26,8 @@ export function LaunchLivestreamBtn({
   const { t } = useTranslation('run_details')
   const dispatch = useDispatch()
   const host = useHost()
+  const { makeSnackbar } = useToaster()
+  const isUsbConnection = host?.hostname === OPENTRONS_USB
   const isLaunchCameraEnabled =
     host?.robotName != null && host?.hostname != null
   const { reportLiveFeedUsage } = useCameraAnalytics({
@@ -31,6 +35,11 @@ export function LaunchLivestreamBtn({
     robotType,
   })
   const handleOpenCameraStream = (): void => {
+    if (isUsbConnection) {
+      makeSnackbar(t('connect_to_network_for_live_camera') as string)
+      return
+    }
+
     dispatch(
       cameraStreamOpenAction(
         host?.hostname ?? 'UNKNOWN',

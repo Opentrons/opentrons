@@ -17,11 +17,11 @@ import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
+import { USERNAME_MAX_LENGTH } from '../../../../../../resources/auth/helpers'
 import {
   ADD_USER_WIZARD_CREATE_ACCOUNT_STEP,
   ADD_USER_WIZARD_TOTAL_STEPS,
   MANAGEABLE_USER_ACCOUNT_TYPES,
-  USERNAME_MAX_LENGTH,
 } from '../userAccount/constants'
 import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
 import styles from '../userAccount/userAccountForm.module.css'
