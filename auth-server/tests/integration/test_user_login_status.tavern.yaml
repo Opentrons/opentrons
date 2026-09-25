@@ -14,8 +14,8 @@ stages:
     response:
       status_code: 200
       json:
-        data:
-          reason: null
+        # Optional nulls are omitted by BaseResponseBody (exclude_none).
+        data: {}
 
   - name: Create a user without a password
     request:
