@@ -21,7 +21,17 @@ export default defineConfig<EyesFixture>({
     screenshot: 'on',
     eyesConfig: {
       appName: 'js-package-testing',
-      failTestsOnDiff: 'afterEach',
+      // CI fails on visual diffs so baselines must be accepted in Eyes after
+      // intentional fixture changes. Locally, diffs are reported but do not
+      // fail the run (override with APPLITOOLS_FAIL_ON_DIFF=true|false).
+      failTestsOnDiff:
+        process.env.APPLITOOLS_FAIL_ON_DIFF === 'true'
+          ? 'afterEach'
+          : process.env.APPLITOOLS_FAIL_ON_DIFF === 'false'
+            ? false
+            : isCI
+              ? 'afterEach'
+              : false,
     },
   },
 
