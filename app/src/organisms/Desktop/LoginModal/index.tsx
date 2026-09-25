@@ -36,8 +36,8 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
+import type { ComponentProps, Dispatch, FormEvent, SetStateAction } from 'react'
 import type { HostConfig, UserLoginStatus } from '@opentrons/api-client'
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 
 interface LoginFormState {
   username: string
@@ -246,7 +246,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       },
     })
 
-  const handleLoginSubmit: ComponentProps<'form'>['onSubmit'] = event => {
+  const handleLoginSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     event.preventDefault()
     if (screen.kind !== 'login') return
     const { username, logInPassword } = screen.formData
@@ -275,14 +277,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       passwordRequiredError: null,
     })
 
-    void (async (): Promise<void> => {
-      // Ensure we know temp-password vs expiration before login succeeds.
-      const status =
-        loginStatusRef.current ??
-        (await fetchLoginStatus(host, trimmedUsername))
-      updateLoginStatus(status)
-      submitPassword(trimmedUsername, trimmedPassword)
-    })()
+    if (loginStatusRef.current == null) {
+      updateLoginStatus(await fetchLoginStatus(host, trimmedUsername))
+    }
+    submitPassword(trimmedUsername, trimmedPassword)
   }
 
   const validateConfirmPasswordMatch = (
