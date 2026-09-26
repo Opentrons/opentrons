@@ -117,6 +117,27 @@ live-hf:
 live-test:
 	$(pytest) tests -m live --env $(ENV)
 
+# Golden Studio harness: generate protocols from catalog prompts against a running server.
+# Outputs land in tmp/golden-studio (gitignored). Pass extra flags with ARGS="--only 'PCR-*' --limit 2".
+ARCHIVE ?=
+ARGS ?=
+
+.PHONY: golden-extract
+golden-extract:
+	$(python) -m tests.helpers.golden_harness extract $(if $(ARCHIVE),--archive "$(ARCHIVE)",) $(ARGS)
+
+.PHONY: golden-list
+golden-list:
+	$(python) -m tests.helpers.golden_harness list $(ARGS)
+
+.PHONY: golden-run
+golden-run:
+	$(python) -m tests.helpers.golden_harness run --env $(ENV) $(ARGS)
+
+.PHONY: golden-analyze
+golden-analyze:
+	$(python) -m tests.helpers.golden_harness analyze $(ARGS)
+
 IMAGE_NAME=ai-server-local
 CONTAINER_NAME=ai-server-container
 ENV_FILE=.env
