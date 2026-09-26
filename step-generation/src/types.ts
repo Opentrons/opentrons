@@ -1219,3 +1219,12 @@ export type UnsafePipetteMovementReason =
 
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+
+export interface AspirateInPlaceStepGenArgs {
+  // A pipette id, or a string runtime parameter whose default is a pipette id.
+  pipetteId: string
+  // A number, or a float/int runtime parameter variable name.
+  volume: number | string
+  flowRate: number | string // µL/s
+  correctionVolume?: number | string
+}
