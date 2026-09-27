@@ -35,7 +35,23 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Downgrade schema."""
+    """Downgrade schema.
+
+    Before restoring NOT NULL on ``hashed_password``, copy any temporary hash
+    into ``hashed_password`` for accounts that never set a permanent password.
+    Remaining NULL ``hashed_password`` rows will make the alter fail — those
+    accounts are invalid under the pre-migration schema.
+    """
+    op.execute(
+        sa.text(
+            """
+            UPDATE user
+            SET hashed_password = temporary_hashed_password
+            WHERE hashed_password IS NULL
+              AND temporary_hashed_password IS NOT NULL
+            """
+        )
+    )
     with op.batch_alter_table("user", schema=None) as batch_op:
         batch_op.drop_column("temporary_hashed_password")
         batch_op.alter_column(
