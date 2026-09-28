@@ -93,7 +93,6 @@ class CommandManager:
 
     def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
-
         self._command_queue.insert(0, command_entry)
         self._commands_total += 1
 
@@ -131,7 +130,7 @@ class CommandHistory:
 
     def __init__(
         self,
-        command_store_provider: CommandStoreProvider,
+        command_store_provider: Optional[CommandStoreProvider] = None,
     ) -> None:
         self._all_command_ids = []
         self._all_failed_command_ids = []
@@ -142,7 +141,9 @@ class CommandHistory:
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._most_recently_completed_command_id = None
-        self._command_manager = CommandManager(command_store_provider)
+        self._command_manager = (
+            CommandManager(command_store_provider) if command_store_provider else None
+        )
 
     def length(self) -> int:
         """Get the length of all elements added to the history."""
@@ -357,9 +358,10 @@ class CommandHistory:
         self._remove_queue_id(command.id)
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
-        self._command_manager.insert_command(
-            command_entry=self._commands_by_id[command.id]
-        )
+        if self._command_manager:
+            self._command_manager.insert_command(
+                command_entry=self._commands_by_id[command.id]
+            )
 
     def set_command_failed(self, command: Command) -> None:
         """Validate and mark a command as failed in the command history."""
@@ -387,13 +389,15 @@ class CommandHistory:
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
         self._all_failed_command_ids.append(command.id)
-        self._command_manager.insert_command(
-            command_entry=self._commands_by_id[command.id]
-        )
+        if self._command_manager:
+            self._command_manager.insert_command(
+                command_entry=self._commands_by_id[command.id]
+            )
 
     async def teardown_command_manager(self) -> None:
         """Handle teardown of the interface that interacts with the RunStore and AnalysisStore remotely."""
-        await self._command_manager.teardown_command_store_task()
+        if self._command_manager:
+            await self._command_manager.teardown_command_store_task()
 
     # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
     # Explicitly clearing all history before dereferencing protocol engine and the run's run orchestrator eliminates

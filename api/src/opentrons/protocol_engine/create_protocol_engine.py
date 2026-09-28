@@ -71,6 +71,7 @@ async def create_protocol_engine(
         notify_publishers: Notifies robot server publishers of internal state change.
         updates_callback: Notified robot server of specific Protocol Engine events.
         proxy_of_callback_for_handling_door_events: Optional remote callback for door events, used when in subprocess mode.
+        command_store_provider: Provider interface for the presistence Run Store.
     """
     if command_store_provider is None:
         command_store_provider = CommandStoreProvider()

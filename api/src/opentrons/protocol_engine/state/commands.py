@@ -301,7 +301,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
-        command_store_provider: CommandStoreProvider,
+        command_store_provider: Optional[CommandStoreProvider] = None,
         updates_callback: Optional[
             Callable[
                 [CurrentCommandNotification | FinalizedCommandNotification | Any], None
