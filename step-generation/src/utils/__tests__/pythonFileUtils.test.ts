@@ -999,4 +999,51 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     )`.trimStart()
     )
   })
+  it('should generate multiple parameters in order', () => {
+    expect(
+      getRunTimeParameters({
+        dry_run: {
+          type: 'boolean',
+          variableName: 'dry_run',
+          displayName: 'Dry Run',
+          default: true,
+        },
+        volume: {
+          type: 'int',
+          variableName: 'volume',
+          displayName: 'Volume',
+          default: 20,
+          minimum: 10,
+          maximum: 100,
+          unit: 'µL',
+        },
+        wells: {
+          type: 'csv',
+          variableName: 'wells',
+          displayName: 'Wells',
+          default: '',
+        },
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_bool(
+        variable_name="dry_run",
+        display_name="Dry Run",
+        default=True,
+    )
+    parameters.add_int(
+        variable_name="volume",
+        display_name="Volume",
+        default=20,
+        minimum=10,
+        maximum=100,
+        unit="µL",
+    )
+    parameters.add_csv_file(
+        variable_name="wells",
+        display_name="Wells",
+    )`.trimStart()
+    )
+  })
 })
