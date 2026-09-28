@@ -1258,6 +1258,51 @@ def test_update_user_rejects_password_from_before_temp_reset(
         )
 
 
+def test_update_user_rejects_temporary_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    """A one-time password must not be kept as the user's permanent password."""
+    temporary_password = "temppass1"
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=None,
+            temporary_hashed_password=password_hash.hash(temporary_password),
+            reset_password=True,
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.update_user(
+            "alice",
+            new_password=temporary_password,
+            now=_NOW,
+        )
+
+
+def test_validate_new_password_rejects_temporary_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    temporary_password = "temppass1"
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=password_hash.hash("otherpassword123"),
+            temporary_hashed_password=password_hash.hash(temporary_password),
+            reset_password=True,
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.validate_new_password("alice", temporary_password)
+
+
 def _make_service_user(
     username: str = "service",
     full_name: str = SERVICE_ACCOUNT_FULL_NAME,

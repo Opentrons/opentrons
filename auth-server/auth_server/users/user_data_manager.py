@@ -113,11 +113,11 @@ class PasswordContainsInvalidCharactersError(InvalidInputError):
 
 
 class PasswordPreviouslyUsedError(InvalidInputError):
-    """Raised when a new password matches the user's current password."""
+    """Raised when a new password matches the user's current or temporary password."""
 
 
 def _reject_reused_password(password: str, user: User | None) -> None:
-    """Raise if ``password`` matches the user's previous used password."""
+    """Raise if ``password`` matches the user's current or temporary password."""
     if user is None:
         return
     if user.hashed_password is not None and password_hash.verify(
@@ -125,6 +125,12 @@ def _reject_reused_password(password: str, user: User | None) -> None:
     ):
         raise PasswordPreviouslyUsedError(
             "New password must be different from the current password."
+        )
+    if user.temporary_hashed_password is not None and password_hash.verify(
+        password, user.temporary_hashed_password
+    ):
+        raise PasswordPreviouslyUsedError(
+            "New password must be different from the temporary password."
         )
 
 
