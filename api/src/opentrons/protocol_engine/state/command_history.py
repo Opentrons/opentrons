@@ -53,7 +53,6 @@ class CommandManager:
 
     async def teardown_command_store_task(self) -> None:
         """Send the teardown signal to the command store interface task."""
-        log.warning("INITIATING TEARDOWN")
         self._teardown_signal.set()
         await self._command_store_interface_task
 
@@ -85,11 +84,7 @@ class CommandManager:
             await asyncio.sleep(0.1)
 
         # In teardown, send the remaining commands until none remain before task completion to ensure all commands are written
-        log.warning("INITIATING TEARDOWN - SENDING REMAINING COMMANDS")
         while self._command_queue:
-            log.warning(
-                f"SENDING TEARDOWN BATCH, REMAINING = {len(self._command_queue)}"
-            )
             command_entry_json_batch = []
             for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
                 command_entry_json = self._command_queue.pop()
@@ -398,7 +393,6 @@ class CommandHistory:
 
     async def teardown_command_manager(self) -> None:
         """Handle teardown of the interface that interacts with the RunStore and AnalysisStore remotely."""
-        log.warning("BEGINNING TEARDOWN")
         await self._command_manager.teardown_command_store_task()
 
     # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
