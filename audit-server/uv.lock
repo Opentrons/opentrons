@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.12"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-09-11T17:50:08.849826Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -181,6 +181,7 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
+    { name = "zipstream-ng" },
 ]
 
 [package.dev-dependencies]
@@ -215,6 +216,7 @@ robot = [
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
+    { name = "zipstream-ng" },
 ]
 
 [package.metadata]
@@ -230,6 +232,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = "==2.0.48" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -264,6 +267,7 @@ robot = [
     { name = "sqlalchemy", specifier = "==2.0.48" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
 
 [[package]]
@@ -2094,4 +2098,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/be/f9f7594e23b5b93affff0318e4593c1920331bcaefda326cabcad94296a1/yarl-1.24.2-cp314-cp314t-win_amd64.whl", hash = "sha256:a7624b1ca46ca5d7b864ef0d2f8efe3091454085ee1855b4e992314529972215", size = 102980, upload-time = "2026-05-19T21:30:59.735Z" },
     { url = "https://files.pythonhosted.org/packages/65/a4/ba80dccd3593ff1f01051a818694d07b58cb8232677ee9a22a5a1f93a9fc/yarl-1.24.2-cp314-cp314t-win_arm64.whl", hash = "sha256:e434a45ce2e7a947f951fc5a8944c8cc080b7e59f9c50ae80fd39107cf88126d", size = 91219, upload-time = "2026-05-19T21:31:01.934Z" },
     { url = "https://files.pythonhosted.org/packages/fd/4d/4b880086bd0d3e034d25647be1d830afc3e3f610e98c4ab3490af6b1b6d5/yarl-1.24.2-py3-none-any.whl", hash = "sha256:2783d9226db8797636cd6896e4de81feed252d1db72265686c9558d97a4d94b9", size = 53576, upload-time = "2026-05-19T21:31:03.909Z" },
+]
+
+[[package]]
+name = "zipstream-ng"
+version = "1.9.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/e0/76e5a674b0f6a6b7f90af9b87a92fbe1f2b97da447fb09078bcba6f6a28e/zipstream_ng-1.9.3.tar.gz", hash = "sha256:6cebd055025699c0af594c76a9452cdf13f4be67ee005b6907f0d3c9c6f44ced", size = 32729, upload-time = "2026-08-20T03:53:00.746Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/44/e6d863aebd6d57a1de20d2350328379b5b970c29a217af349793f12d753c/zipstream_ng-1.9.3-py3-none-any.whl", hash = "sha256:6614580d7ae56bc9f3c2a342210108450e2d191b62038e818bae7845612584b7", size = 23678, upload-time = "2026-08-20T03:52:59.846Z" },
 ]

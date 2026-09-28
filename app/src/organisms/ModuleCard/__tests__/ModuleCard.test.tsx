@@ -72,6 +72,15 @@ vi.mock('/app/redux/discovery')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useRequireAdminForUpdates',
+  () => ({
+    useRequireAdminForUpdates: () => ({
+      isLoading: false,
+      ensureCanUpdate: () => true,
+    }),
+  })
+)
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',

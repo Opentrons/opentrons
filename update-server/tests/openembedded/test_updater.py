@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from otupdate.common.session import UpdateCancelled
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded.update_actions import (
     OT3UpdateActions,
@@ -138,7 +139,8 @@ def test_lzma(testing_partition, tmpdir):
             calls = int(total_size / chunk_size) + 1
         else:
             calls = total_size / chunk_size
-        assert cb.call_count == calls
+        # Size-count pass and write pass each call the callback once per chunk.
+        assert cb.call_count == calls * 2
         assert success
         assert msg == ""
 
@@ -191,6 +193,45 @@ def test_write_update_fails(testing_partition, tmpdir):
         mock.Mock(return_value=1),
     ):
         success, msg = root_FS_intf.write_update(rfs_path, p, cb, chunk_size)
-        cb.assert_not_called()
+        assert all(call.args[0] == 0 for call in cb.call_args_list)
         assert not success
         assert msg != ""
+
+
+def test_write_update_aborts_during_size_count(testing_partition, tmpdir):
+    """Cancel during the xz size-count pass must propagate, not become a write failure."""
+    rfs_path = os.path.join(tmpdir, "rootfs.xz")
+    with lzma.open(rfs_path, "w") as f:
+        f.write(os.urandom(400000))
+    root_FS_intf = RootFSInterface()
+    p = Partition(2, testing_partition, "/media/mmcblk0p2")
+
+    def cb(_progress: float) -> None:
+        raise UpdateCancelled()
+
+    with mock.patch(
+        "otupdate.openembedded.update_actions.PartitionManager.get_partition_size",
+        mock.Mock(return_value=99999999),
+    ):
+        with pytest.raises(UpdateCancelled):
+            root_FS_intf.write_update(rfs_path, p, cb, 1024 * 32)
+
+
+def test_write_update_aborts_during_write_pass(testing_partition, tmpdir):
+    """Cancel once real progress starts must also propagate as UpdateCancelled."""
+    rfs_path = os.path.join(tmpdir, "rootfs.xz")
+    with lzma.open(rfs_path, "w") as f:
+        f.write(os.urandom(400000))
+    root_FS_intf = RootFSInterface()
+    p = Partition(2, testing_partition, "/media/mmcblk0p2")
+
+    def cb(progress: float) -> None:
+        if progress > 0:
+            raise UpdateCancelled()
+
+    with mock.patch(
+        "otupdate.openembedded.update_actions.PartitionManager.get_partition_size",
+        mock.Mock(return_value=99999999),
+    ):
+        with pytest.raises(UpdateCancelled):
+            root_FS_intf.write_update(rfs_path, p, cb, 1024 * 32)

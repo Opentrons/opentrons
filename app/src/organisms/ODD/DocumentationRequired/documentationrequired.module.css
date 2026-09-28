@@ -21,6 +21,7 @@
   min-width: 0;
   flex-direction: column;
   gap: var(--spacing-8);
+  transition: height 0.2s ease-in-out;
 }
 
 .text_area_container_keyboard_expanded {
@@ -37,6 +38,12 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
+}
+
+.text_area_field_fill textarea {
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
 }
 
 .keyboard_container {

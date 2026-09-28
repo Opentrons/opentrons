@@ -1,5 +1,7 @@
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Thread
 from typing import Generator
 
 import pytest
@@ -66,10 +68,42 @@ def auth_db_path(auth_persistence_directory: Path) -> str:
 
 
 @pytest.fixture
+def mock_robot_server_url(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[str, None, None]:
+    """Serve POST /settings so CRS enable can persist pyro flags in tests."""
+
+    class _Handler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length:
+                self.rfile.read(length)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b"{}")
+
+        def log_message(self, format: str, *args: object) -> None:
+            return
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    url = f"http://127.0.0.1:{server.server_address[1]}"
+    monkeypatch.setenv("OT_AUTH_SERVER_robot_server_url", url)
+    try:
+        yield url
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+@pytest.fixture
 def run_server(
     unused_tcp_port: int,
     auth_persistence_directory: Path,
     monkeypatch: pytest.MonkeyPatch,
+    mock_robot_server_url: str,
 ) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test."""
     monkeypatch.setenv(

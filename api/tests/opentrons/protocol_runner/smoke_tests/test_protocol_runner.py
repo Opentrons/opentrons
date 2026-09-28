@@ -53,7 +53,7 @@ async def test_runner_with_python(
         protocol_source=protocol_source,
         run_time_param_values=None,
     )
-    commands_result = result.commands
+    commands_result = await subject.get_all_commands()
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
     modules_result = result.state_summary.modules
@@ -128,7 +128,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
 
-    commands_result = result.commands
+    commands_result = await subject.get_all_commands()
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
 
@@ -196,7 +196,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         run_time_param_values=None,
     )
 
-    commands_result = result.commands
+    commands_result = await subject.get_all_commands()
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
 
@@ -261,7 +261,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         run_time_param_values=None,
     )
 
-    commands_result = result.commands
+    commands_result = await subject.get_all_commands()
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
 
@@ -328,7 +328,7 @@ async def test_runner_with_python_and_run_time_parameters(
         protocol_source=protocol_source,
         run_time_param_values={"aspirate_volume": 40.2},
     )
-    commands_result = result.commands
+    commands_result = await subject.get_all_commands()
     pipettes_result = result.state_summary.pipettes
     tiprack_result = result.state_summary.labware
 

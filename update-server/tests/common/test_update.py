@@ -4,8 +4,11 @@ import asyncio
 import binascii
 import hashlib
 import os
+import threading
+import time
 import zipfile
-from typing import Tuple
+from typing import Callable, Tuple
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -14,9 +17,9 @@ from tests.openembedded.conftest import (
     mock_partition_manager_valid_switch_,
 )
 
-from otupdate.common import config, file_actions, update
+from otupdate.common import config, file_actions, update, update_actions
 from otupdate.common.session import Stages, UpdateSession, get_current_session
-from otupdate.common.update_actions import UpdateActionsInterface
+from otupdate.common.update_actions import Partition, UpdateActionsInterface
 from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 
 
@@ -110,6 +113,122 @@ async def test_cancel(test_cli: Tuple[UpdateServerClient, str]):
 
     resp = await test_cli[0].post("/server/update/cancel")
     assert resp.status_code == 200
+
+
+async def _wait_for_thread_event(event: threading.Event, timeout: float = 5) -> None:
+    deadline = time.monotonic() + timeout
+    while not event.is_set():
+        if time.monotonic() > deadline:
+            raise AssertionError("timed out waiting for update pipeline")
+        await asyncio.sleep(0.01)
+
+
+def _install_mock_actions(
+    test_cli: Tuple[UpdateServerClient, str],
+) -> MagicMock:
+    actions = MagicMock(spec=update_actions.UpdateActionsInterface)
+    actions.validate_update.return_value = "rootfs"
+    actions.write_update.return_value = Partition(2, "/dev/null")
+    update_actions.install_update_actions(test_cli[0].asgi_app.state, actions)
+    return actions
+
+
+async def test_concurrent_begin_only_one_succeeds(
+    test_cli: Tuple[UpdateServerClient, str],
+) -> None:
+    first, second = await asyncio.gather(
+        test_cli[0].post("/server/update/begin"),
+        test_cli[0].post("/server/update/begin"),
+    )
+    statuses = sorted(r.status_code for r in (first, second))
+    assert statuses == [201, 409]
+    assert current_session(test_cli) is not None
+
+
+async def test_cancel_during_write_skips_autocommit_and_allows_begin(
+    test_cli: Tuple[UpdateServerClient, str],
+) -> None:
+    write_started = threading.Event()
+    actions = _install_mock_actions(test_cli)
+
+    def slow_write(
+        rootfs_filepath: str,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = -1,
+        file_size: object = None,
+    ) -> Partition:
+        write_started.set()
+        for i in range(1000):
+            progress_callback(i / 1000)
+            time.sleep(0.01)
+        return Partition(2, "/dev/null")
+
+    actions.write_update.side_effect = slow_write
+
+    begin = await test_cli[0].post(
+        "/server/update/begin", json={"auto_commit_and_restart": True}
+    )
+    assert begin.status_code == 201
+    token = begin.json()["token"]
+
+    upload = await test_cli[0].post(
+        session_endpoint(token, "file"),
+        files={"system-update.zip": ("system-update.zip", b"pretend this is a zip")},
+    )
+    assert upload.status_code == 201
+
+    await _wait_for_thread_event(write_started)
+
+    cancel = await test_cli[0].post("/server/update/cancel")
+    assert cancel.status_code == 200
+    assert current_session(test_cli) is None
+
+    actions.commit_update.assert_not_called()
+    actions.restart.assert_not_called()
+
+    retry = await test_cli[0].post("/server/update/begin")
+    assert retry.status_code == 201
+    assert current_session(test_cli) is not None
+    assert current_session(test_cli).token == retry.json()["token"]
+
+
+async def test_cancel_during_validate_does_not_write(
+    test_cli: Tuple[UpdateServerClient, str],
+) -> None:
+    validate_started = threading.Event()
+    actions = _install_mock_actions(test_cli)
+
+    def slow_validate(
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: object,
+    ) -> str:
+        validate_started.set()
+        for i in range(1000):
+            progress_callback(i / 1000)
+            time.sleep(0.01)
+        return "rootfs"
+
+    actions.validate_update.side_effect = slow_validate
+
+    begin = await test_cli[0].post("/server/update/begin")
+    assert begin.status_code == 201
+    token = begin.json()["token"]
+
+    upload = await test_cli[0].post(
+        session_endpoint(token, "file"),
+        files={"system-update.zip": ("system-update.zip", b"pretend this is a zip")},
+    )
+    assert upload.status_code == 201
+
+    await _wait_for_thread_event(validate_started)
+
+    cancel = await test_cli[0].post("/server/update/cancel")
+    assert cancel.status_code == 200
+    assert current_session(test_cli) is None
+    actions.write_update.assert_not_called()
+    actions.commit_update.assert_not_called()
+    actions.restart.assert_not_called()
 
 
 async def test_commit_fails_wrong_state(test_cli, update_session):

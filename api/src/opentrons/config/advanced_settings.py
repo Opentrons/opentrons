@@ -234,6 +234,7 @@ settings = [
         _id="enableProtocolSubprocess",
         title="Enable running Protocols as a seperate process",
         description="Protocol execution will run in a seperate process and utilize Pyro to communicate with the robot-server process.",
+        restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
@@ -241,6 +242,7 @@ settings = [
         _id="enableHardwareSubprocess",
         title="Enable running Hardware Controller as a seperate process",
         description="The Hardware Controller will run in a seperate process hosted by a systemd service and utilize Pyro to communicate with the robot-server and protocol processes.",
+        restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
@@ -834,13 +836,10 @@ def _migrate41to42(previous: SettingsMap) -> SettingsMap:
 
 
 def _migrate42to43(previous: SettingsMap) -> SettingsMap:
-    """Migrate to version 43 of the feature flags file.
-
-    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
-    """
+    """Migrate to version 43 of the feature flags file."""
     newmap = {k: v for k, v in previous.items()}
-    newmap["enableProtocolSubprocess"] = True
-    newmap["enableHardwareSubprocess"] = True
+    newmap["enableProtocolSubprocess"] = False
+    newmap["enableHardwareSubprocess"] = False
     return newmap
 
 

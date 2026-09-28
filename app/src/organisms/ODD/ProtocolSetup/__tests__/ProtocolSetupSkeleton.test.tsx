@@ -33,7 +33,7 @@ describe('ProtocolSetupSkeleton', () => {
   it('renders Skeletons to replace the SetupStep components', () => {
     render(<ProtocolSetupStepSkeleton />)
     const titleSkeletons = screen.getAllByRole('status')
-    expect(titleSkeletons.length).toBe(4)
+    expect(titleSkeletons.length).toBe(6)
 
     titleSkeletons.forEach(titleSkeleton => {
       expect(titleSkeleton).toHaveStyle('background-size: 99rem')

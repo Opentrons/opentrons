@@ -350,7 +350,7 @@ export function Toast(props: ToastProps): ReactNode {
         >
           {headingText.length > 0 ? (
             <StyledText
-              oddStyle="bodyTextBold"
+              oddStyle="bodyTextSemiBold"
               desktopStyle="bodyDefaultSemiBold"
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
@@ -362,11 +362,11 @@ export function Toast(props: ToastProps): ReactNode {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
-              oddStyle="bodyTextSemiBold"
+              oddStyle="bodyTextRegular"
               desktopStyle="bodyDefaultRegular"
               overflow="hidden"
               textOverflow="ellipsis"
-              whiteSpace="nowrap"
+              whiteSpace={NO_WRAP}
             >
               {message}
             </StyledText>

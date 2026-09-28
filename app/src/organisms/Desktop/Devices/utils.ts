@@ -5,32 +5,6 @@ import type {
   PipetteOffsetCalibration,
 } from '@opentrons/api-client'
 
-export function downloadFile(
-  data: Blob | string | object,
-  fileName: string,
-  mimeType?: string
-): void {
-  const createBlob = (data: Blob | string | object): Blob => {
-    if (data instanceof Blob) {
-      return data
-    } else {
-      const content = typeof data === 'string' ? data : JSON.stringify(data)
-      return new Blob([content], { type: mimeType ?? 'text/json' })
-    }
-  }
-
-  const blob = createBlob(data)
-
-  const url = window.URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.download = fileName
-  a.href = url
-  a.click()
-
-  a.remove()
-  window.URL.revokeObjectURL(url)
-}
-
 export function getIs96ChannelPipetteAttached(
   leftMountAttachedPipette: FetchPipettesResponsePipette | null
 ): boolean {

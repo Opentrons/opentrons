@@ -81,7 +81,7 @@ export function DocumentationRequired({
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
           secondaryButtonProps={{
-            buttonText: 'View actions',
+            buttonText: t('view_actions'),
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
@@ -116,6 +116,7 @@ export function DocumentationRequired({
       </div>
       <div className={styles.keyboard_container}>
         <AccordionKeyboard
+          inputRef={textAreaRef}
           isOpen={keyboardExpanded}
           onToggle={handleKeyboardToggle}
         >

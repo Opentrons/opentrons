@@ -18,10 +18,11 @@ export const useRunTimeParameters = (
   protocolId: string
 ): RunTimeParameter[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
   return analysis?.runTimeParameters ?? []

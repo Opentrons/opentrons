@@ -127,6 +127,7 @@ export type DISCOVERY_START_TYPE = 'discovery:START'
 export type DISCOVERY_FINISH_TYPE = 'discovery:FINISH'
 export type DISCOVERY_UPDATE_LIST_TYPE = 'discovery:UPDATE_LIST'
 export type DISCOVERY_REMOVE_TYPE = 'discovery:REMOVE'
+export type DISCOVERY_RENAME_TYPE = 'discovery:RENAME'
 export type CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 
 export interface ConfigInitializedAction {

@@ -306,30 +306,6 @@ async def test_deck_config(
     )
 
 
-async def test_notify_publisher(
-    ot3_hardware_api: OT3API,
-    mock_app_state: AppState,
-    mock_feature_flags: None,
-    decoy: Decoy,
-) -> None:
-    """Enforce that the RobotServerPyroResource provides a Proxy of the Notify Publisher."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-        hw_api=ot3_hardware_api, app_state=mock_app_state
-    )
-    # Cast the two Async proxies on the nameserver as a locally useful type
-    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
-
-    resource_utilities.register_notify_publishers_to_pyro_resource(
-        mock_app_state,
-        lambda: [],  # type: ignore
-    )
-
-    result = robot_server_resource.get_notify_publishers()
-
-    assert isinstance(result, ClientPyroFunctionWrapper)
-
-
 async def test_run_hardware_state_update_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,

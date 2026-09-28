@@ -40,7 +40,7 @@ class QueueWorker:
         if self._worker_task is None:
             self._worker_task = asyncio.create_task(self._run_commands())
 
-    def cancel(self) -> None:
+    def cancel(self, msg: str = "") -> None:
         """Cancel any in-progress commands.
 
         This method is synchronous to allow synchronous callers to
@@ -51,8 +51,8 @@ class QueueWorker:
         propagate errors.
         """
         if self._worker_task:
-            self._worker_task.cancel()
-            self._command_executor.cancel_tasks("Engine cancelled")
+            self._worker_task.cancel(msg)
+            self._command_executor.cancel_tasks(f"Engine cancelled {msg}")
 
     async def join(self) -> None:
         """Wait for the worker to finish, propagating any errors."""

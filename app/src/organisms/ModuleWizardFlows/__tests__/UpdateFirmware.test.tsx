@@ -22,6 +22,15 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useRequireAdminForUpdates',
+  () => ({
+    useRequireAdminForUpdates: () => ({
+      isLoading: false,
+      ensureCanUpdate: () => true,
+    }),
+  })
+)
 
 const render = (props: ComponentProps<typeof UpdateFirmware>) => {
   return renderWithProviders(<UpdateFirmware {...props} />, {
@@ -76,6 +85,7 @@ describe('UpdateFirmware', () => {
       patchModuleAfterUpdate: vi.fn(),
       sendIdentifyModule,
       setExitCleanupCommands: vi.fn(),
+      robotName: 'otie',
     }
     mockMutation()
     vi.mocked(useModulesQuery).mockReturnValue({ data: undefined } as any)

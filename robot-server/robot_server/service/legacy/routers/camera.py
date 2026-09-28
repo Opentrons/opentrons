@@ -1,4 +1,3 @@
-import io
 import logging
 import os
 import tempfile
@@ -9,7 +8,6 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import FileResponse
 from starlette import status
 from starlette.background import BackgroundTask
-from starlette.responses import StreamingResponse
 
 from opentrons.config import IS_ROBOT
 from opentrons.protocol_engine import EngineStatus
@@ -349,14 +347,14 @@ async def post_camera_preview_image(
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
-        Depends(get_audit_logger("capture image")),
+        Depends(get_audit_logger("capture image", auto_log_request_body=False)),
     ],
 )
 async def post_picture_capture(
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
-) -> StreamingResponse:
+) -> FileResponse:
     """Take a picture"""
     filename = Path(tempfile.mktemp(suffix=".jpg"))
 
@@ -365,13 +363,11 @@ async def post_picture_capture(
         try:
             await camera.take_picture(filename)
             log.info(f"Image taken at {filename}")
-            # Open the file. It will be closed and deleted when the response is
-            # finished.
-            fd = filename.open("rb")
-            return StreamingResponse(
-                fd,
+            return FileResponse(
+                path=filename,
                 media_type=JPG,
-                background=BackgroundTask(func=_cleanup, filename=filename, fd=fd),
+                filename=filename.name,
+                background=BackgroundTask(func=_cleanup, filename=filename),
             )
         except camera.CameraException as e:
             raise HTTPException(
@@ -384,11 +380,10 @@ async def post_picture_capture(
         )
 
 
-def _cleanup(filename: Path, fd: io.IOBase) -> None:
-    """Clean up after sending the response"""
+def _cleanup(filename: Path) -> None:
+    """Clean up after sending the response."""
     try:
-        log.info(f"Closing and deleting image at {filename}")
-        fd.close()
+        log.info(f"Deleting image at {filename}")
         os.remove(filename)
     except OSError:
         pass

@@ -154,6 +154,18 @@ describe('OnDeviceLogin', () => {
     expect(screen.getByLabelText('access_control:username')).toHaveValue('ab')
   })
 
+  it('shows the one-time password label when reset password is required', () => {
+    renderLogin({
+      initialStep: 'password',
+      loginResetPassword: true,
+      initialUsername: 'alice',
+    })
+
+    expect(
+      screen.getByLabelText('access_control:on_device_login_one_time_password')
+    ).toBeInTheDocument()
+  })
+
   it('advances from username to password', () => {
     const { onStepChange } = renderLogin({ initialStep: 'username' })
 

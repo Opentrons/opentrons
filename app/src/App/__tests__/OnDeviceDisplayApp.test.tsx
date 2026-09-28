@@ -240,6 +240,40 @@ describe('OnDeviceDisplayApp', () => {
     screen.getByLabelText('loading indicator')
     expect(vi.mocked(LocalizationProvider)).not.toHaveBeenCalled()
   })
+  it('does not return to the loading screen if access-control queries reset after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: undefined,
+      isSuccess: false,
+    } as any)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+  })
+  it('does not return to the loading screen if the shell becomes unready after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+  })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')
     expect(vi.mocked(EmergencyStop)).toHaveBeenCalled()

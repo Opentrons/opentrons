@@ -125,7 +125,6 @@ def _massage_nmcli_error(error_string: str) -> str:
     response_model=WifiConfigurationResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
-        status.HTTP_401_UNAUTHORIZED: {"model": LegacyErrorResponse},
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
@@ -151,10 +150,11 @@ async def post_wifi_configure(
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
     if not ok:
+        # 400, not 401: 401 is reserved for HTTP authentication (CRS login).
         raise LegacyErrorResponse(
             message=_massage_nmcli_error(message),
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status.HTTP_401_UNAUTHORIZED)
+        ).as_error(status.HTTP_400_BAD_REQUEST)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 

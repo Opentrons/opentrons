@@ -19,7 +19,7 @@ import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function AuditLogFolder(): ReactNode {
+export function LogFolder(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const logDirectory = useSelector(getAuditLogDirectory)
@@ -35,10 +35,10 @@ export function AuditLogFolder(): ReactNode {
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
-          {t('audit_log_folder_title')}
+          {t('log_folder_title')}
         </LegacyStyledText>
         <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
-          {t('audit_log_folder_description')}
+          {t('log_folder_description')}
         </LegacyStyledText>
         <LegacyStyledText
           forwardedAs="h6"
@@ -46,11 +46,11 @@ export function AuditLogFolder(): ReactNode {
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
-          {t('audit_log_folder_location')}
+          {t('log_folder_location')}
         </LegacyStyledText>
 
         <LegacyStyledText forwardedAs="p">
-          {logDirectory ?? t('no_audit_log_folder')}
+          {logDirectory ?? t('no_log_folder')}
         </LegacyStyledText>
       </Flex>
 
@@ -61,8 +61,8 @@ export function AuditLogFolder(): ReactNode {
         }}
       >
         {logDirectory !== null
-          ? t('change_audit_log_folder_button')
-          : t('add_audit_log_folder_button')}
+          ? t('change_log_folder_button')
+          : t('add_log_folder_button')}
       </TertiaryButton>
     </Flex>
   )

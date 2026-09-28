@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
@@ -6,6 +5,7 @@ import {
   BasicButton,
   Divider,
   InfoScreen,
+  InlineNotification,
   StyledText,
 } from '@opentrons/components'
 import { useUpdateSelfMutation } from '@opentrons/react-api-client'
@@ -20,11 +20,15 @@ import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
 
 import type { TFunction } from 'i18next'
-import type { JSX, ReactNode } from 'react'
+import type { JSX, ReactNode, RefObject } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
 export interface PersonalAccountSettingsProps {
   robotName: string
+  isEditing: boolean
+  setIsEditing: (isEditing: boolean) => void
+  viewRef: RefObject<HTMLDivElement>
+  showAdminWarningBanner: boolean
 }
 
 interface FieldRowProps {
@@ -55,6 +59,10 @@ function LoggedOutMessage(): JSX.Element {
 
 export function PersonalAccountSettings({
   robotName,
+  isEditing,
+  setIsEditing,
+  viewRef,
+  showAdminWarningBanner,
 }: PersonalAccountSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings') as {
     t: TFunction
@@ -64,8 +72,6 @@ export function PersonalAccountSettings({
   const loggedInUser = useLoggedInUserForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
     useUpdateSelfMutation(documentationState)
-
-  const [isEditing, setIsEditing] = useState(false)
 
   const handleSave = (request: UpdateSelfRequest): Promise<void> => {
     return updateSelf(request).then(updatedSelf => {
@@ -85,11 +91,17 @@ export function PersonalAccountSettings({
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={viewRef}>
       {loggedInUser == null ? (
         <LoggedOutMessage />
       ) : (
         <>
+          {showAdminWarningBanner && (
+            <InlineNotification
+              message={t('desktop_admin_warning_banner')}
+              type="neutral"
+            />
+          )}
           <div className={styles.header}>
             <StyledText desktopStyle="bodyLargeSemiBold">
               {t('desktop_personal_account_settings') as string}

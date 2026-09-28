@@ -86,7 +86,6 @@ export function uploadSystemFile(
   const url = buildRobotHttpUrl(robot, urlPath, {
     token: httpOptions.token,
     secure: httpOptions.secure,
-    forceHttp: isUsbUpload,
   })
 
   const headers: Record<string, string> = {}

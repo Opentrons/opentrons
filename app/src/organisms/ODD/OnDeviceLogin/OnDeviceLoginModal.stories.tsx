@@ -60,6 +60,9 @@ export const Default: Story = {
     onCancel: action('onCancel'),
     loginError: null,
     onClearLoginError: action('onClearLoginError'),
+    onUsernameSubmit: async (username: string) => {
+      action('onUsernameSubmit')(username)
+    },
     passwordComplexity: null,
   },
 }
@@ -73,6 +76,16 @@ export const WithLoginError: Story = {
       ns: 'access_control',
     }),
     onClearLoginError: action('onClearLoginError'),
+  },
+}
+
+/** First-time login: enter the admin-provided one-time password. */
+export const FirstTimeLogin: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    loginResetPassword: true,
+    initialUsername: 'alice',
   },
 }
 

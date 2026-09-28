@@ -2,6 +2,7 @@ import type {
   ClearDiscoveryCacheAction,
   FinishDiscoveryAction,
   RemoveRobotAction,
+  RenameRobotAction,
   StartDiscoveryAction,
 } from './types'
 
@@ -13,6 +14,8 @@ export const DISCOVERY_UPDATE_LIST: 'discovery:UPDATE_LIST' =
   'discovery:UPDATE_LIST'
 
 export const DISCOVERY_REMOVE: 'discovery:REMOVE' = 'discovery:REMOVE'
+
+export const DISCOVERY_RENAME: 'discovery:RENAME' = 'discovery:RENAME'
 
 export const CLEAR_CACHE: 'discovery:CLEAR_CACHE' = 'discovery:CLEAR_CACHE'
 
@@ -38,6 +41,17 @@ export function removeRobot(robotName: string): RemoveRobotAction {
   return {
     type: DISCOVERY_REMOVE,
     payload: { robotName },
+    meta: { shell: true },
+  }
+}
+
+export function renameRobot(
+  prevName: string,
+  newName: string
+): RenameRobotAction {
+  return {
+    type: DISCOVERY_RENAME,
+    payload: { prevName, newName },
     meta: { shell: true },
   }
 }

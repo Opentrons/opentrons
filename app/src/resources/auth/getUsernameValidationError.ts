@@ -1,4 +1,4 @@
-import { CREDENTIAL_ALLOWED_PATTERN } from './credentialCharacters'
+import { hasOnlyAllowedUsernameCharacters } from './credentialCharacters'
 
 export type UsernameValidationErrorKind = 'tooLong' | 'invalidCharacters'
 
@@ -12,7 +12,7 @@ export function getUsernameValidationError(
   if (usernameMaxLength != null && username.length > usernameMaxLength) {
     return 'tooLong'
   }
-  if (!CREDENTIAL_ALLOWED_PATTERN.test(username)) {
+  if (!hasOnlyAllowedUsernameCharacters(username)) {
     return 'invalidCharacters'
   }
   return null

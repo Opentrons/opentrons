@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useAccessControlEnabledQuery,
   usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
@@ -72,7 +73,14 @@ vi.mock('/app/resources/networking', async () => {
   }
 })
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async importOriginal => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateAvailable: vi.fn(),
+    getRobotUpdateInfoForRobot: vi.fn(),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
@@ -120,6 +128,9 @@ const mockDispatch = vi.fn()
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
     } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
@@ -449,6 +460,18 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
     render()
     screen.getByText('Update available')
+  })
+
+  it('should return an update available when the channel version is a downgrade', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('downgrade')
+    render()
+    screen.getByText('Update available')
+  })
+
+  it('should not return an update available for a reinstall', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('reinstall')
+    render()
+    expect(screen.queryByText('Update available')).not.toBeInTheDocument()
   })
 
   it('should render component when tapping Language', () => {

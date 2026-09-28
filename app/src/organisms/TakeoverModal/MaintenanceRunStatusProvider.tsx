@@ -2,20 +2,25 @@ import { createContext, useEffect, useMemo, useState } from 'react'
 
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
-import type { ReactNode } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface MaintenanceRunIds {
   currentRunId: string | null
   oddRunId: string | null
+  oddRunPending: boolean
 }
 
 export interface MaintenanceRunStatus {
   getRunIds: () => MaintenanceRunIds
-  setOddRunIds: (state: MaintenanceRunIds) => void
+  setOddRunIds: Dispatch<SetStateAction<MaintenanceRunIds>>
 }
 
 export const MaintenanceRunContext = createContext<MaintenanceRunStatus>({
-  getRunIds: () => ({ currentRunId: null, oddRunId: null }),
+  getRunIds: () => ({
+    currentRunId: null,
+    oddRunId: null,
+    oddRunPending: false,
+  }),
   setOddRunIds: () => {},
 })
 
@@ -29,6 +34,7 @@ export function MaintenanceRunStatusProvider(
   const [oddRunIds, setOddRunIds] = useState<MaintenanceRunIds>({
     currentRunId: null,
     oddRunId: null,
+    oddRunPending: false,
   })
 
   const currentRunIdQueryResult = useNotifyCurrentMaintenanceRun({

@@ -15,12 +15,15 @@ import * as UpdateRobotSoftware from '../'
 
 import type { State } from '/app/redux/types'
 
-const mockStartUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
-  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: mockStartUpdate,
+    isLoading: false,
+  }),
 }))
 vi.mock('/app/organisms/UpdateRobotSoftware/CheckUpdates')
 vi.mock('/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
@@ -101,6 +104,7 @@ describe('UpdateRobotSoftware', () => {
     mockAfterError.mockClear()
     mockBeforeCommitting.mockClear()
     mockAfterCancel.mockClear()
+    vi.mocked(RobotUpdate.downloadRobotUpdate).mockClear()
     vi.mocked(CompleteUpdateSoftware).mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
     )
@@ -108,10 +112,17 @@ describe('UpdateRobotSoftware', () => {
   })
 
   it('should start the robot update through the orchestrator on mount', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    render()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
+  })
+
+  it('does not re-download if a session already exists', () => {
     vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
     render()
-    expect(mockStartUpdate).toHaveBeenCalledWith('oddtie')
-    expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(RobotUpdate.downloadRobotUpdate).not.toHaveBeenCalled()
   })
 
   it('should render complete screen when finished', () => {

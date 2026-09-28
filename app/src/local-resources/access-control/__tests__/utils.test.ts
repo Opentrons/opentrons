@@ -6,6 +6,8 @@ import {
   isAdminEquivalentAccountType,
   isForbiddenError,
   isProtocolWritePermissionError,
+  isRunSignoffRequiredError,
+  isUpdatesWritePermissionError,
 } from '../utils'
 
 const GENERAL_ERROR = 'Protocol run could not be created on the robot.'
@@ -75,6 +77,40 @@ describe('getAuditLogDeleteErrorMessage', () => {
   })
 })
 
+describe('isRunSignoffRequiredError', () => {
+  it('is true when the API error id is RunSignoffRequired', () => {
+    expect(
+      isRunSignoffRequiredError({
+        isAxiosError: true,
+        response: {
+          data: {
+            errors: [{ id: 'RunSignoffRequired' }],
+          },
+        },
+      })
+    ).toBe(true)
+  })
+
+  it('is false for a different API error id', () => {
+    expect(
+      isRunSignoffRequiredError({
+        isAxiosError: true,
+        response: {
+          data: {
+            errors: [{ id: 'RunNotIdle' }],
+          },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for a generic Error', () => {
+    expect(
+      isRunSignoffRequiredError(new Error('One or more runs failed to delete'))
+    ).toBe(false)
+  })
+})
+
 describe('isProtocolWritePermissionError', () => {
   it('is true for a 403 missing protocols.write', () => {
     expect(isProtocolWritePermissionError(permissionDeniedError)).toBe(true)
@@ -94,6 +130,44 @@ describe('isProtocolWritePermissionError', () => {
 
   it('is false for non-axios errors', () => {
     expect(isProtocolWritePermissionError(new Error('nope'))).toBe(false)
+  })
+})
+
+const updatesWriteDeniedError = {
+  isAxiosError: true,
+  response: {
+    status: 403,
+    data: {
+      debugMessage: 'missing scopes',
+      requiredScopes: ['updates.write'],
+      providedScopes: ['users.read.self', 'users.write.self'],
+    },
+  },
+}
+
+describe('isUpdatesWritePermissionError', () => {
+  it('is true for a 403 missing updates.write', () => {
+    expect(isUpdatesWritePermissionError(updatesWriteDeniedError)).toBe(true)
+  })
+
+  it('is false for a protocols.write 403', () => {
+    expect(isUpdatesWritePermissionError(permissionDeniedError)).toBe(false)
+  })
+
+  it('is false for other 403s', () => {
+    expect(
+      isUpdatesWritePermissionError({
+        isAxiosError: true,
+        response: {
+          status: 403,
+          data: { requiredScopes: ['robot.settings.write'] },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for non-axios errors', () => {
+    expect(isUpdatesWritePermissionError(new Error('nope'))).toBe(false)
   })
 })
 

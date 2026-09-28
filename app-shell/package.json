@@ -24,9 +24,12 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
+    "@types/archiver": "^8.0.0",
     "@types/node-fetch": "2.6.11",
     "@types/yargs-parser": "^21.0.3",
     "electron-notarize": "^1.2.1",
@@ -45,6 +48,7 @@
     "@types/pump": "^1.1.0",
     "agent-base": "6.0.2",
     "ajv": "6.12.3",
+    "archiver": "^8.0.0",
     "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-context-menu": "3.6.1",

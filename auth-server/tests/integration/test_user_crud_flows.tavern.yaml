@@ -1032,7 +1032,7 @@ stages:
       status_code: 200
       json:
         access_token: !anystr
-        scope: users.read.others
+        scope: users.read.others users.read.self users.write.self
       strict:
         - json:off
 

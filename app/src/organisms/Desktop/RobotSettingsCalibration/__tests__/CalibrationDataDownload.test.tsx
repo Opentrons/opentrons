@@ -22,7 +22,7 @@ import { CalibrationDataDownload } from '../CalibrationDataDownload'
 vi.mock('/app/resources/devices/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
-const mockDownloadCalibration = vi.fn()
+const mockDownloadCalibration = vi.fn().mockResolvedValue(undefined)
 const mockSetShowHowCalibrationWorksModal = vi.fn()
 const ROBOT_NAME = 'otie'
 

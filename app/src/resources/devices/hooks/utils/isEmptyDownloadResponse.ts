@@ -10,3 +10,17 @@ export function isEmptyDownloadResponse(
   }
   return data == null || data === ''
 }
+
+/**
+ * True when main-process saveFileFromUrl rejected because the robot returned
+ * an empty download (HTTP 204), matching the old getRunRaw soft-skip path.
+ */
+export function isEmptyDownloadError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false
+  }
+  return (
+    error.name === 'EmptyDownloadError' ||
+    error.message.includes('Empty download')
+  )
+}

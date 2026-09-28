@@ -515,7 +515,10 @@ async def _start_new_analysis_if_necessary(
     analyses_manager: AnalysesManager,
     access_control_status: bool,
 ) -> Tuple[List[AnalysisSummary], bool]:
-    """Check RTP values and start a new analysis if necessary.
+    """Enqueue a new analysis if the protocol has none, force is set, or RTPs changed.
+
+    Records pending immediately and runs initialize+analyze under AnalysesManager's
+    lock instead of initializing on the HTTP request.
 
     Returns a tuple of the latest list of analysis summaries (including any newly
     started analysis) and whether a new analysis was started.
@@ -525,12 +528,31 @@ async def _start_new_analysis_if_necessary(
     # Update the analysis store's access control status reference
     analysis_store.set_access_control_status(access_control_mode=access_control_status)
 
+    # Record pending immediately and run initialize+analyze under AnalysesManager's
+    # lock instead of initializing on the HTTP request.
+    if analyses and analyses[-1].status == AnalysisStatus.PENDING:
+        raise AnalysisIsPendingError(analyses[-1].id)
+
+    if force_analyze or len(analyses) == 0:
+        log.info(f'Starting new analysis "{analysis_id}" for protocol "{protocol_id}".')
+        started_new_analysis = True
+        analyses.append(
+            await analyses_manager.enqueue_analysis(
+                analysis_id=analysis_id,
+                protocol_resource=protocol_resource,
+                run_time_param_values=rtp_values,
+                run_time_param_paths=rtp_files,
+            )
+        )
+        return analyses, started_new_analysis
+
     try:
-        analyzer = await analyses_manager.initialize_analyzer(
+        summary = await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id=analysis_id,
             protocol_resource=protocol_resource,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_files,
+            last_analysis_summary=analyses[-1],
         )
     except FailedToInitializeAnalyzer:
         analyses.append(
@@ -540,33 +562,12 @@ async def _start_new_analysis_if_necessary(
                 result=AnalysisResult.NOT_OK,
             )
         )
-    else:
-        if (
-            force_analyze
-            or
-            # Unexpected situations, like powering off the robot after a protocol upload
-            # but before the analysis is complete, can leave the protocol resource
-            # without an associated analysis.
-            len(analyses) == 0
-            or
-            # The most recent analysis was done using different RTP values
-            not await analysis_store.matching_rtp_values_in_analysis(
-                last_analysis_summary=analyses[-1],
-                new_parameters=await analyzer.get_verified_run_time_parameters(),
-            )
-        ):
-            log.info(
-                f'Starting new analysis "{analysis_id}" for protocol "{protocol_id}".'
-            )
-            started_new_analysis = True
-            analyses.append(
-                await analyses_manager.start_analysis(
-                    analysis_id=analysis_id,
-                    analyzer=analyzer,
-                )
-            )
-        else:
-            await analyzer.clean_up()
+        return analyses, started_new_analysis
+
+    if summary is not None:
+        log.info(f'Starting new analysis "{analysis_id}" for protocol "{protocol_id}".')
+        started_new_analysis = True
+        analyses.append(summary)
 
     return analyses, started_new_analysis
 

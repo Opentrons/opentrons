@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, TypeVar, Union
+from typing import Awaitable, Callable, Dict, List, Optional, Sequence, TypeVar, Union
 
 from typing_extensions import ParamSpec
 
@@ -277,9 +278,9 @@ class StateStore(StateView, ActionHandler):
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
-        notify_publishers: Optional[Callable[[], None]] = None,
+        notify_publishers: Optional[Callable[[], Awaitable[None]]] = None,
         updates_callback: Optional[
-            Callable[[list[EngineEventNotification]], None]
+            Callable[[list[EngineEventNotification]], Awaitable[None]]
         ] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
@@ -300,7 +301,9 @@ class StateStore(StateView, ActionHandler):
             updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
         self._updates_callback = updates_callback
-        self._update_events: list[EngineEventNotification] = []
+        self._update_events_queue: asyncio.Queue[EngineEventNotification] = (
+            asyncio.Queue()
+        )
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
@@ -464,12 +467,7 @@ class StateStore(StateView, ActionHandler):
         return current_value
 
     def _append_update_events(self, event: EngineEventNotification) -> None:
-        latest_events = []
-        for old_event in self._update_events:
-            if not isinstance(old_event, event.__class__):
-                latest_events.append(old_event)
-        latest_events.append(event)
-        self._update_events = latest_events
+        self._update_events_queue.put_nowait(event)
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
@@ -546,9 +544,25 @@ class StateStore(StateView, ActionHandler):
         self._tasks._state = next_state.tasks
         self._camera._state = next_state.camera
         self._change_notifier.notify()
-        if self._notify_robot_server is not None:
-            self._notify_robot_server()
 
-        if self._updates_callback is not None:
-            self._updates_callback(self._update_events)
-            self._update_events = []
+    async def notify_and_update_callbacks(self) -> None:
+        """Async loop that waits for update events to be available before updating and notifying the robot server."""
+        while True:
+            events = [await self._update_events_queue.get()]
+            try:
+                while True:
+                    events.append(self._update_events_queue.get_nowait())
+            except asyncio.QueueEmpty:
+                pass
+            if self._notify_robot_server is not None:
+                await self._notify_robot_server()
+
+            if self._updates_callback is not None:
+                await self._updates_callback(events)
+
+            for _ in events:
+                self._update_events_queue.task_done()
+
+    async def wait_for_update_events(self) -> None:
+        """Block until all items in the update events queue have been processed."""
+        await self._update_events_queue.join()

@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@opentrons/app": "workspace:*",
+    "@types/archiver": "^8.0.0",
     "@types/node-fetch": "2.6.11",
     "@types/yargs-parser": "^21.0.3",
     "is-ip": "5.0.1",
@@ -47,6 +48,7 @@
     "@types/lodash": "catalog:",
     "@types/pump": "^1.1.0",
     "ajv": "6.12.3",
+    "archiver": "^8.0.0",
     "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-devtools-installer": "4.0.0",

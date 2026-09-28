@@ -41,6 +41,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
 } from '/app/redux/discovery'
 
 import type { ReactNode } from 'react'
@@ -159,7 +160,7 @@ export function RobotNameEditor(): ReactNode {
             setRobotNameConfirmation(data.name)
           }
           if (previousName != null) {
-            dispatch(removeRobot(previousName))
+            dispatch(renameRobot(previousName, data.name))
           }
         }
       },

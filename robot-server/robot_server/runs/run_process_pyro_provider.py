@@ -17,12 +17,13 @@ import Pyro5.api
 from opentrons.config import feature_flags, robot_configs
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
+from ..persistence.protocol_user_permissions import PROTOCOL_USER_NAME
 from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
 
 _log = logging.getLogger(__name__)
 
-_RESTRICTED_USER_NAME = "ot-protocol"
+_RESTRICTED_USER_NAME = PROTOCOL_USER_NAME
 _ROOT_USER_NAME = "root"
 
 _RUN_PROXY_NAME = (
@@ -36,6 +37,7 @@ _SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 _RUN_PROCESS_TIMEOUT = 60  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
+_RUN_PROXY_READY_TIMEOUT = 180  # seconds
 
 
 class _ProcessStatus(enum.Enum):
@@ -172,12 +174,17 @@ class RunProcessPyroProvider:
                     return process
         return None
 
-    def _set_active_process(self, process_registry: List[_RunProcess]) -> _RunProcess:
+    async def _set_active_process(
+        self, process_registry: List[_RunProcess]
+    ) -> _RunProcess:
         """Set a run process in a given process registry as the active process to be used by a run."""
-        for process in process_registry:
-            if process.status == _ProcessStatus.UNUSED:
-                process.status = _ProcessStatus.ACTIVE
-                return process
+        start_time = time.monotonic()
+        while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
+            for process in process_registry:
+                if process.status == _ProcessStatus.UNUSED:
+                    process.status = _ProcessStatus.ACTIVE
+                    return process
+            await asyncio.sleep(0.01)
         raise RuntimeError("Could not identify unused process in process registry.")
 
     def set_active_process_as_used(self, simulator: Optional[bool] = False) -> None:
@@ -231,17 +238,28 @@ class RunProcessPyroProvider:
     ) -> DirectedRunProcess:
         """Returns a proxy for the run process or simulating run process.
 
-        Depending on how recently the desired process started, this may take up to around 25 seconds to resolve.
+        After a process is recycled, the replacement child must import and
+        register with the nameserver before this returns. That can take up to
+        `_RUN_PROXY_READY_TIMEOUT` seconds.
         """
         process_regisry = await self._validate_process_registry_ready(
             simulator=simulator
         )
         run_process = self._get_active_run_process(process_registry=process_regisry)
+        claimed_unused = False
         if run_process is None:
-            run_process = self._set_active_process(process_registry=process_regisry)
+            run_process = await self._set_active_process(
+                process_registry=process_regisry
+            )
+            claimed_unused = True
 
-        run_proxy = await wait_for_proxy(proxy_name=run_process.pyroname)
+        run_proxy = await wait_for_proxy(
+            proxy_name=run_process.pyroname,
+            timeout=_RUN_PROXY_READY_TIMEOUT,
+        )
         if run_proxy is None:
+            if claimed_unused:
+                run_process.status = _ProcessStatus.UNUSED
             raise RuntimeError(f"Can't resolve pyro proxy '{run_process.pyroname}'")
         return cast(DirectedRunProcess, cast(object, run_proxy))
 

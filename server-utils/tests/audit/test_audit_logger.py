@@ -41,6 +41,7 @@ def subject(mock_client: Client, request: pytest.FixtureRequest) -> AuditLogger:
         auto_log_response_head=True,
         auto_log_request_body=True,
         auto_log_response_body=True,
+        auto_log_request_full_headers=True,
     )
 
 
@@ -60,6 +61,7 @@ def parametrized_subject(
             auto_log_response_head=True,
             auto_log_request_body=True,
             auto_log_response_body=True,
+            auto_log_request_full_headers=True,
         )
         .set_action("a")
         .set_username("u")
@@ -261,6 +263,18 @@ async def test_audit_logger_does_not_log_if_not_authenticated(
 ) -> None:
     parametrized_subject.append_message_chunk("m")
     parametrized_subject.set_auth_details(AuthenticationNotRequiredResult())
+    await parametrized_subject.log()
+    decoy.verify(await mock_client.submit_log_message(matchers.Anything()), times=0)
+
+
+async def test_audit_logger_skip_persist_does_not_submit(
+    parametrized_subject: AuditLogger,
+    mock_client: Client,
+    decoy: Decoy,
+) -> None:
+    """skip_persist should prevent audit-server persist for this request."""
+    parametrized_subject.append_message_chunk("m")
+    parametrized_subject.skip_persist()
     await parametrized_subject.log()
     decoy.verify(await mock_client.submit_log_message(matchers.Anything()), times=0)
 

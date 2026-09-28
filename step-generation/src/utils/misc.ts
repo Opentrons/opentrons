@@ -92,6 +92,7 @@ import type {
   PathOption,
   PipetteEntity,
   RobotState,
+  RuntimeParameters,
   SourceAndDest,
   StagingAreaEntities,
   TrashBinEntities,
@@ -1674,4 +1675,67 @@ export const getIsInPipettableLocation = (location: string): boolean => {
     GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
     ...COLUMN_4_SLOTS,
   ].some(badLocation => location === badLocation)
+}
+
+/**
+ * Numbers pass through. Strings are runtime parameter variable names, and only
+ * float/int parameters resolve — `type` narrows `default` to `number`.
+ */
+export function resolveNumericRuntimeValue(
+  value: number | string,
+  runtimeParameters: RuntimeParameters
+): number | null {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (
+    parameter != null &&
+    (parameter.type === 'float' || parameter.type === 'int')
+  ) {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * A string id is literal unless it names a runtime parameter. Only string
+ * parameters resolve — `type` narrows `default` to `string`. Any other
+ * parameter type is invalid.
+ */
+export function resolveStringRuntimeValue(
+  value: string,
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const parameter = runtimeParameters[value]
+  if (parameter == null) {
+    return value
+  }
+  if (parameter.type === 'string') {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * Booleans pass through. Strings are runtime parameter variable names, and only
+ * boolean parameters resolve — `type` narrows `default` to `boolean`.
+ */
+export function resolveBooleanRuntimeValue(
+  value: boolean | string,
+  runtimeParameters: RuntimeParameters
+): boolean | null {
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (parameter != null && parameter.type === 'boolean') {
+    return parameter.default
+  }
+
+  return null
 }
