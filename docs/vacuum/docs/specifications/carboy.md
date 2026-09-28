@@ -77,7 +77,7 @@ The carboy cap includes two important liquid control features:
     - Shuts off automatically when operating at a set vacuum pressure (e.g., –400 mbar). Detection takes about 30 seconds.
     - Does not shut off automatically when operating at a set power rating (e.g., 60% power).
 
-    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../../python-api/modules/vacuum/#controlling-vacuum-operations) in the Python Protocol API documentation.
+    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../python-api/modules/vacuum.md#controlling-vacuum-operations) in the Python Protocol API documentation.
 
 ## Accessories
 

@@ -1,6 +1,6 @@
 ---
 title: "Vacuum Module: Deck Components"
-description: "General descriptions of Vacuum Module deck pieces."
+description: "Overview of Vacuum Module base, collars, and spacers."
 ---
 
 Module deck components consist of a vacuum base, interchangeable collars, internal spacers, and well plate support grids. The vacuum base forms the foundation of this on-deck hardware stack. Collars and spacers rest sequentially on the base to control labware stacking heights between well plates and help ensure an airtight seal. At the top of the stack, a wide or narrow aperture metal grid provides extra support for a filter plate when placed under vacuum.
@@ -48,20 +48,70 @@ The Vacuum Module includes two support grids with perforations that match differ
 <figcaption>Wide and narrow support grids</figcaption>
 </figure>
 
+<font color="red">DO WE NEED A NEW PAGE FOR SPACERS ONLY?</FONT>
+
 ## Spacers
 
-In a vacuum filtration protocol, you can place an internal spacer beneath a sample collection plate to raise it closer to the source filter plate. Elevating the collection plate minimizes the vertical gap between the two well plates, ensuring fluid droplets fall cleanly into the receiving wells. Reducing the space between plates also prevents vacuum pressure from pulling liquid sideways, eliminating cross-contamination. The short and tall spacers can be paired interchangeably with either collar.
+Spacers (shims) sit directly inside the vacuum manifold base to raise a collection plate closer to the filter plate above it. Minimizing the gap between plates ensures fluid droplets fall cleanly into receiving wells rather than being pulled sideways into adjacent wells.
 
-The Vacuum Module includes four spacers to match different labware profiles.
+!!! note
+    Spacers are not gripper-compatible. You must place them into and remove them from the vacuum base manually.
 
-<figure class="side-by-side" markdown>
-![Image of 3.2mm spacer](../images/spacer-3mm.svg)
-![Image of 5.2mm spacer](../images/spacer-5mm.svg)
-<figcaption>3.2 mm and 5.2 mm spacers</figcaption>
+### Available heights
+
+The system includes three flat spacers (3.2 mm, 5.2 mm, and 7.25 mm) and a 12.8 mm spacer. The taller 12.8 mm spacer is equipped with locating clips that hold a standard ANSI/SLAS 96-well filter plate.
+
+<div class="parts-list" markdown>
+
+<figure markdown>
+![3.2 mm spacer](../images/spacer-3mm.svg)
+<figcaption>3.2 mm spacer</figcaption>
 </figure>
 
-<figure class="side-by-side" markdown>
-![Image of 7.25 mm spacer](../images/spacer-7mm.svg)
-![Image of 12.8 mm spacer](../images/spacer-12mm.svg)
-<figcaption>7.25 mm and 12.8 mm spacers</figcaption>
+<figure markdown>
+![5.2 mm spacer](../images/spacer-5mm.svg)
+<figcaption>5.2 mm spacer</figcaption>
 </figure>
+
+</div>
+
+<div class="parts-list" markdown>
+
+<figure markdown>
+![7.25 mm spacer](../images/spacer-7mm.svg)
+<figcaption>7.25 mm spacer</figcaption>
+</figure>
+
+<figure markdown>
+![12.8 mm spacer](../images/spacer-12mm.svg)
+<figcaption>12.8 mm spacer</figcaption>
+</figure>
+
+</div>
+
+### Display and load names
+
+Spacers are defined in software and the robot by their JSON labware definitions. These definitions govern the display names that appear in the Opentrons App, in Protocol Designer, and on the Flex touchscreen, as well as the API `loadName` strings.
+
+| Spacer height | Display and API load name |
+| :--- | :--- |
+| **3.2 mm** | Opentrons Vacuum Manifold Spacer 3.2 mm<br>`opentrons_vacuum_manifold_spacer_3.2mm` |
+| **5.2 mm** | Opentrons Vacuum Manifold Spacer 5.2 mm<br>`opentrons_vacuum_manifold_spacer_5.2mm` |
+| **7.25 mm** | Opentrons Vacuum Manifold Spacer 7.25 mm<br>`opentrons_vacuum_manifold_spacer_7.25mm` |
+| **12.8 mm** | Opentrons Vacuum Manifold Spacer 12.8 mm<br>`opentrons_vacuum_manifold_spacer_12.8mm` |
+
+### Stacking rules
+
+* **Maximum stack height:** A stack may contain up to three spacers total.
+* **No stack duplicates:** Use only one spacer of each height per stack.
+* **Hierarchy:** Flat spacers (3.2 mm, 5.2 mm, and 7.25 mm) stack directly on the vacuum base or atop one another in any sequence.
+* **Topmost spacer:** When used, the 12.8 mm spacer must always sit at the very top of a spacer stack because it has the locating clips and recessed pocket to hold a well plate. You cannot place the other spacers on top of the 12.8 mm spacer.
+
+The following table lists the supported lower surfaces or spacers each spacer can rest on.
+
+| Top spacer | Lower spacer or surface |
+|----|----|
+| **12.8 mm** | Vacuum base, 3.2 mm, 5.2 mm, 7.25 mm |
+| **7.25 mm** | Vacuum base, 3.2 mm, 5.2 mm |
+| **5.2 mm** | Vacuum base, 3.2 mm, 7.25 mm |
+| **3.2 mm** | Vacuum base, 5.2 mm, 7.25 mm |
