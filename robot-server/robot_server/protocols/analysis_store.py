@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from logging import getLogger
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import sqlalchemy
 from typing_extensions import Final
@@ -127,7 +127,7 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
         self._access_control_status = access_control_status
-        self._commands_json_list: List[str] = []
+        self._commands_json_list: List[dict[str, Any]] = []
         self._analysis_store_provider = CommandStoreProvider(
             run_id=None,
             store_insert_batch_commands=self.insert_batch_analysis_command,
@@ -138,7 +138,7 @@ class AnalysisStore:
     ) -> None:
         """Store a command from analysis as a command JSON string locally."""
         for command in batch_commands:
-            command_json = command.model_dump_json(by_alias=True)
+            command_json = command.model_dump(by_alias=True)
             self._commands_json_list.append(command_json)
 
     def set_analysis_provider_id(self, analysis_id: str) -> None:
@@ -179,7 +179,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands_json: Optional[List[str]],
+        commands_json: Optional[List[dict[str, Any]]],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -239,7 +239,7 @@ class AnalysisStore:
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
             runTimeParameters=run_time_parameters,
-            commandsJson=commands_json,
+            commands=commands_json,
             labware=labware,
             modules=modules,
             pipettes=pipettes,
@@ -270,6 +270,8 @@ class AnalysisStore:
         _log.info(
             f"ANALYSIS CLEARING COMMANDS LIST OF SIZE : {len(self._commands_json_list)}"
         )
+        for i in range(len(self._commands_json_list)):
+            _log.info(f"{self._commands_json_list[i]}")
         self._commands_json_list.clear()
         _log.info(f"COMMANDS LIST CLEARED TO SIZE : {len(self._commands_json_list)}")
 
@@ -288,7 +290,7 @@ class AnalysisStore:
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
             runTimeParameters=run_time_parameters,
-            commandsJson=[],
+            commands=[],
             labware=[],
             modules=[],
             pipettes=[],

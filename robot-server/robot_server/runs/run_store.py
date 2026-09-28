@@ -761,7 +761,7 @@ class RunStore:
                     run_command_table.c.run_id == run_id,
                     run_command_table.c.command_id == command.id,
                 )
-                if existing_command is  not None:
+                if existing_command is not None:
                     transaction.execute(delete_existing_command)
                 # If the command is not present, then we insert the new command
                 transaction.execute(

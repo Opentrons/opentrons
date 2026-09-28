@@ -1,7 +1,7 @@
 """Response models for protocol analysis."""
 
 # TODO(mc, 2021-08-25): add modules to simulation result
-from typing import List, NamedTuple, Optional, Union
+from typing import Any, List, NamedTuple, Optional, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -168,7 +168,7 @@ class CompletedAnalysis(BaseModel):
             " if none are specified in the request."
         ),
     )
-    commandsJson: List[str] = Field(
+    commands: List[dict[str, Any]] = Field(
         ...,
         description="The protocol commands the run is expected to produce, stored as a JSON string.",
     )
