@@ -743,7 +743,6 @@ class RunStore:
         self, run_id: str, commands_total: int, batch_commands: list[Command]
     ) -> None:
         """Insert or update a command on the run command table"""
-        log.info(f"IN RUN STORE INSERT BATCH COMMANDS WITH {len(batch_commands)}")
 
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
@@ -763,7 +762,7 @@ class RunStore:
                 )
                 if existing_command is not None:
                     transaction.execute(delete_existing_command)
-                # If the command is not present, then we insert the new command
+
                 transaction.execute(
                     insert_command,
                     {
