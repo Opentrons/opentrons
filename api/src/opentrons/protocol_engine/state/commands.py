@@ -1436,3 +1436,7 @@ class CommandView:
         # todo(mm, 2024-10-04): Instead of allowlisting command types, maybe we should
         # add a `mayRunWithDoorOpen: bool` field to command requests.
         return fixit_command.commandType in allowed_command_types
+
+    async def teardown_command_history(self) -> None:
+        """Teardown the interface with the persistence command store."""
+        await self._state.command_history.teardown_command_manager()

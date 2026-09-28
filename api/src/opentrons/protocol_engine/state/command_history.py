@@ -14,7 +14,7 @@ from opentrons.protocol_engine.resources.command_store_provider import (
 )
 
 log = logging.getLogger(__name__)
-_COMMAND__BATCH_MAX = 10
+_COMMAND_BATCH_MAX = 10
 
 
 @dataclass(frozen=True)
@@ -80,7 +80,7 @@ class CommandManager:
             if len(self._command_queue) > 0:
                 log.warning("HAVE SOME COMMANDS TO BATCH")
                 # Remove batch of commands from the queue and insert/update them on the RunStore
-                for i in range(min(_COMMAND__BATCH_MAX, len(self._command_queue))):
+                for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
                     command_entry_json = self._command_queue.pop()
                     command_entry_json_batch.append(command_entry_json)
                 await self._send_batch_command_insert_request(command_entry_json_batch)
@@ -94,7 +94,7 @@ class CommandManager:
                 f"SENDING TEARDOWN BATCH, REMAINING = {len(self._command_queue)}"
             )
             command_entry_json_batch = []
-            for i in range(min(_COMMAND__BATCH_MAX, len(self._command_queue))):
+            for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
                 command_entry_json = self._command_queue.pop()
                 command_entry_json_batch.append(command_entry_json)
             await self._send_batch_command_insert_request(command_entry_json_batch)

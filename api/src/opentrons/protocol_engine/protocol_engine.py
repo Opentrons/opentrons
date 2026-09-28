@@ -607,9 +607,10 @@ class ProtocolEngine:
             drop_tips_after_run=drop_tips_after_run,
         )
         exit_stack.callback(self._door_watcher.stop)
-        # Teardown the command history command manager
+
+        # Teardown the command history persistence interface
         exit_stack.push_async_callback(
-            self._state_store._command_store._state.command_history.teardown_command_manager
+            self._state_store.commands.teardown_command_history
         )
 
         disengage_before_stopping = (
