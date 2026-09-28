@@ -62,6 +62,7 @@ import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobo
 import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { useHandleInsufficientPermissions } from '../local-resources/access-control/useHandleInsufficientPermissions'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
@@ -292,6 +293,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             ) : null}
                             <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
+                              <InsufficientPermissionsToasts />
                               {!showModuleSetupModal ? (
                                 <ModuleAttachedToasts
                                   openFlow={(open: boolean) => {
@@ -406,6 +408,11 @@ export function OnDeviceDisplayAppRoutes({
 
 function ProtocolReceiptToasts(): null {
   useProtocolReceiptToast()
+  return null
+}
+
+function InsufficientPermissionsToasts(): null {
+  useHandleInsufficientPermissions()
   return null
 }
 

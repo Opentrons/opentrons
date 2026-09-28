@@ -50,6 +50,21 @@ export function isForbiddenError(error: unknown): error is AxiosError {
   return isAxiosError(error) && error.response?.status === 403
 }
 
+/**
+ * True for a 403 from the robot's authorization layer, i.e. the logged-in
+ * account lacks a required scope. Other 403s (e.g. action forbidden while a
+ * run is active) do not include requiredScopes.
+ */
+export function isInsufficientScopeError(error: unknown): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes)
+}
+
 export function isRunSignoffRequiredError(error: unknown): boolean {
   if (!isAxiosError(error)) {
     return false

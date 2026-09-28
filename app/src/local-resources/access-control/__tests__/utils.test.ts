@@ -5,6 +5,7 @@ import {
   getProtocolOrRunCreationErrorMessage,
   isAdminEquivalentAccountType,
   isForbiddenError,
+  isInsufficientScopeError,
   isProtocolWritePermissionError,
   isRunSignoffRequiredError,
   isUpdatesWritePermissionError,
@@ -48,6 +49,37 @@ describe('isForbiddenError', () => {
 
   it('is false for a null error', () => {
     expect(isForbiddenError(null)).toBe(false)
+  })
+})
+
+describe('isInsufficientScopeError', () => {
+  it('is true for a 403 with requiredScopes', () => {
+    expect(isInsufficientScopeError(permissionDeniedError)).toBe(true)
+  })
+
+  it('is false for a 403 without requiredScopes', () => {
+    expect(
+      isInsufficientScopeError({
+        isAxiosError: true,
+        response: {
+          status: 403,
+          data: { errors: [{ id: 'ActionForbidden' }] },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for a non-403 with requiredScopes', () => {
+    expect(
+      isInsufficientScopeError({
+        isAxiosError: true,
+        response: { status: 401, data: { requiredScopes: [] } },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for non-axios errors', () => {
+    expect(isInsufficientScopeError(new Error('nope'))).toBe(false)
   })
 })
 
