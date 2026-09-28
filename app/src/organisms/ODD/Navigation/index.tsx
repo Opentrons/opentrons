@@ -14,7 +14,7 @@ import { useNetworkConnection } from '/app/resources/networking/hooks/useNetwork
 import styles from './navigation.module.css'
 import { NavigationMenu } from './NavigationMenu'
 
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { ReactNode } from 'react'
 import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
@@ -26,15 +26,7 @@ const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
 const CHAR_LIMIT_WITH_ICON = 12
 const CHAR_LIMIT_NO_ICON = 15
 
-interface NavigationProps {
-  //  optionalProps for setting the zIndex and position between multiple sticky elements
-  //  used for ProtocolDashboard
-  setNavMenuIsOpened?: Dispatch<SetStateAction<boolean>>
-  longPressModalIsOpened?: boolean
-}
-export function Navigation(props: NavigationProps): ReactNode {
-  const { setNavMenuIsOpened } = props
-
+export function Navigation(): ReactNode {
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
@@ -55,9 +47,6 @@ export function Navigation(props: NavigationProps): ReactNode {
   const { icon: iconName } = networkConnection
 
   const handleMenu = (openMenu: boolean): void => {
-    if (setNavMenuIsOpened != null) {
-      setNavMenuIsOpened(openMenu)
-    }
     setShowNavMenu(openMenu)
   }
 

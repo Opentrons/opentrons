@@ -11,7 +11,6 @@ import {
   DIRECTION_ROW,
   Flex,
   LegacyStyledText,
-  POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
   Z_INDEX,
@@ -59,9 +58,6 @@ export function ProtocolDashboard({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
-  const [longPressModalIsOpened, setLongPressModalOpened] =
-    useState<boolean>(false)
   const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] =
     useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = useState<string>('')
@@ -191,10 +187,7 @@ export function ProtocolDashboard({
         minHeight="25rem"
         paddingBottom={SPACING.spacing40}
       >
-        <Navigation
-          setNavMenuIsOpened={setNavMenuIsOpened}
-          longPressModalIsOpened={longPressModalIsOpened}
-        />
+        <Navigation />
         <Box paddingX={SPACING.spacing40}>
           {pinnedProtocols.length > 0 && (
             <Flex
@@ -210,7 +203,6 @@ export function ProtocolDashboard({
               </LegacyStyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
-                longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
                 isRequiredCSV={isRequiredCSV}
@@ -300,7 +292,6 @@ export function ProtocolDashboard({
                       key={protocol.id}
                       lastRun={lastRun}
                       protocol={protocol}
-                      longPress={setLongPressModalOpened}
                       setShowDeleteConfirmationModal={
                         setShowDeleteConfirmationModal
                       }
