@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING, Awaitable, Callable, Optional
-
-log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.commands import Command
@@ -24,7 +21,6 @@ class CommandStoreProvider:
         """Initialize a provider to access the RunStore or AnalysisStore."""
         self._run_id = run_id
         self._store_insert_batch_commands = store_insert_batch_commands
-        log.warning(f"COMMAND STORE CREATED WITH {self._store_insert_batch_commands}")
 
     def set_run_id(self, run_id: str) -> None:
         """Set the current Run Id."""
@@ -34,13 +30,7 @@ class CommandStoreProvider:
         self, commands_total: int, commands_batch: list["Command"]
     ) -> None:
         """Insert or update a batch of commands."""
-        log.warning(
-            f"INSERT BATCH COMMANDS CALLED WITH: {self._run_id} {self._store_insert_batch_commands}"
-        )
         if self._run_id and self._store_insert_batch_commands:
-            log.warning(
-                f"LOGGING BATCH COMMANDS ON COMMAND STORE OF SIZE: {len(commands_batch)}"
-            )
             await self._store_insert_batch_commands(
                 self._run_id,
                 commands_total,

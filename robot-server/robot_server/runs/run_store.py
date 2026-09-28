@@ -149,7 +149,6 @@ class RunStore:
 
     def get_run_store_provider(self) -> CommandStoreProvider:
         """Get the CommandStoreProvider created by the RunStore."""
-        log.info(f"GETTING RUN STORE PROVIDER: {self._run_store_provider}")
         return self._run_store_provider
 
     def update_run_state(

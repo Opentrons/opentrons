@@ -267,13 +267,7 @@ class AnalysisStore:
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
-        _log.info(
-            f"ANALYSIS CLEARING COMMANDS LIST OF SIZE : {len(self._commands_json_list)}"
-        )
-        for i in range(len(self._commands_json_list)):
-            _log.info(f"{self._commands_json_list[i]}")
         self._commands_json_list.clear()
-        _log.info(f"COMMANDS LIST CLEARED TO SIZE : {len(self._commands_json_list)}")
 
     async def save_initialization_failed_analysis(
         self,

@@ -61,7 +61,6 @@ class CommandManager:
         self, command_json_batch: list[CommandEntryJSON]
     ) -> None:
         """Send insert command request to the CommandStoreProvider."""
-        log.warning(f"SEND BATCH COMMANDS: {len(command_json_batch)}")
         command_batch: list[Command] = []
         for command_json in command_json_batch:
             command_batch.append(
@@ -73,12 +72,10 @@ class CommandManager:
 
     async def command_store_interface_task(self) -> None:
         """Handle interactions with the CommandStoreProvider."""
-        log.warning("MAKING COMMAND STORE TASK")
         command_entry_json_batch: list[CommandEntryJSON] = []
         while not self._teardown_signal.is_set():
             command_entry_json_batch = []
             if len(self._command_queue) > 0:
-                log.warning("HAVE SOME COMMANDS TO BATCH")
                 # Remove batch of commands from the queue and insert/update them on the RunStore
                 for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
                     command_entry_json = self._command_queue.pop()
