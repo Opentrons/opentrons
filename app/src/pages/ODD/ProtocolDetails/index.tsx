@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import last from 'lodash/last'
 
 import { getProtocol } from '@opentrons/api-client'
 import {
@@ -31,8 +30,6 @@ import {
   useDeleteProtocolMutation,
   useDeleteRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
-  useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
@@ -51,7 +48,10 @@ import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
-import { useRunTimeParameters } from '/app/resources/protocols'
+import {
+  useEnsureProtocolAnalysis,
+  useRunTimeParameters,
+} from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
@@ -112,7 +112,8 @@ const ProtocolHeader = ({
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -121,13 +122,15 @@ const ProtocolHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isProtocolFetching ? (
@@ -153,14 +156,16 @@ const ProtocolHeader = ({
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={handleRunProtocol}
-        buttonText={t('protocol_details:start_setup')}
-        disabled={isProtocolFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={handleRunProtocol}
+          buttonText={t('protocol_details:start_setup')}
+          disabled={isProtocolFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -330,22 +335,18 @@ export function ProtocolDetails(): JSX.Element | null {
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
-  const { data: protocolRecord, isLoading: isProtocolFetching } =
-    useProtocolQuery(protocolId, {
-      staleTime: Infinity,
-    })
+  const {
+    analysis: mostRecentAnalysis,
+    isAnalyzing,
+    protocolRecord,
+  } = useEnsureProtocolAnalysis(protocolId)
+  const isProtocolFetching = isAnalyzing
 
   // Watch for scrolling to toggle dropshadow
   const { scrollRef, isScrolled } = useScrollPosition()
 
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
-
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
-  )
   const { documentationState: deleteDocumentationState } =
     useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)
   const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
@@ -387,6 +388,9 @@ export function ProtocolDetails(): JSX.Element | null {
   const handleRunProtocol = (): void => {
     if (isRobotOutOfStorage) {
       setShowRobotOutOfStorageModal(true)
+      return
+    }
+    if (mostRecentAnalysis?.status !== 'completed') {
       return
     }
     setStartSetup(true)
@@ -519,7 +523,7 @@ export function ProtocolDetails(): JSX.Element | null {
           chipText={chipText}
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
-          startSetup={startSetup}
+          startSetup={startSetup || isAnalyzing}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

@@ -10,10 +10,13 @@ from auth_server.settings.models import (
     SettingsResponseData,
 )
 from auth_server.settings.store import SettingsStore
+from auth_server.users.credential_characters import CREDENTIAL_SPECIAL_CHARACTERS
 from auth_server.users.models import (
     SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
+    UserLoginStatus,
+    UserLoginStatusReason,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -61,18 +64,20 @@ def manager(
 
 def _make_orm_user(
     username: str = "user",
-    hashed_password: str = "h",
+    hashed_password: str | None = "h",
     full_name: str = "Full Name",
     account_type: AccountType = AccountType.USER,
     reset_password: bool = False,
     deactivated: bool = False,
     password_set_at: datetime.datetime = _NOW,
     user_id: int | None = None,
+    temporary_hashed_password: str | None = None,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
     user = User(
         username=username,
         hashed_password=hashed_password,
+        temporary_hashed_password=temporary_hashed_password,
         full_name=full_name,
         account_type=account_type,
         reset_password=reset_password,
@@ -104,6 +109,7 @@ def test_create_user_success(
         mock_store.add(
             username="new_user",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name="New User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
@@ -145,6 +151,7 @@ def test_create_service_user_forces_legal_name(
         mock_store.add(
             username="service",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name=SERVICE_ACCOUNT_FULL_NAME,
             account_type=AccountType.SERVICE,
             now=matchers.IsA(datetime.datetime),
@@ -186,6 +193,7 @@ def test_create_service_user_ignores_empty_client_legal_name(
         mock_store.add(
             username="service",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name=SERVICE_ACCOUNT_FULL_NAME,
             account_type=AccountType.SERVICE,
             now=matchers.IsA(datetime.datetime),
@@ -225,6 +233,7 @@ def test_create_non_service_user_keeps_provided_legal_name(
         mock_store.add(
             username="keep_name",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name="Provided Name",
             account_type=account_type,
             now=matchers.IsA(datetime.datetime),
@@ -261,6 +270,7 @@ def test_create_user_hashes_password(
             AccountType.USER,
             now=matchers.IsA(datetime.datetime),
             reset_password=False,
+            temporary_password=None,
         )
     ).then_return(created)
     result = manager.create_user(
@@ -320,6 +330,7 @@ def test_create_user_password_with_spaces_succeeds(
         mock_store.add(
             username="test_user",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name="X",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
@@ -379,14 +390,17 @@ def test_create_user_without_password_sets_reset_password(
     decoy.when(mock_store.get("temp_pw_user")).then_return(None)
     expected = _make_orm_user(
         username="temp_pw_user",
+        hashed_password=None,
         full_name="Temp PW User",
         account_type=AccountType.USER,
         reset_password=True,
+        temporary_hashed_password="temp-hash",
     )
     decoy.when(
         mock_store.add(
             username="temp_pw_user",
-            hashed_password=matchers.IsA(str),
+            hashed_password=None,
+            temporary_password=matchers.IsA(str),
             full_name="Temp PW User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
@@ -406,6 +420,7 @@ def test_create_user_without_password_sets_reset_password(
     assert result.accountType == AccountType.USER
     assert result.locked is False
     assert result.resetPassword is True
+    assert result.passwordResetReason == UserLoginStatusReason.TEMPORARY_PASSWORD
     assert result.temporaryPassword is not None
     assert len(result.temporaryPassword) == 8
     assert all(
@@ -443,6 +458,7 @@ def test_create_user_enforces_password_length(
         mock_store.add(
             username="test_user",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
@@ -491,6 +507,7 @@ def test_create_user_enforces_password_special_characters(
         mock_store.add(
             username="test_user",
             hashed_password=matchers.IsA(str),
+            temporary_password=None,
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
@@ -665,6 +682,91 @@ def test_get_user_reset_password_true_when_admin_flag_set(
     assert result.resetPassword is True
 
 
+def test_get_login_status_temporary_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("temp_user")).then_return(
+        _make_orm_user(
+            username="temp_user",
+            temporary_hashed_password=password_hash.hash("temppass1"),
+            reset_password=True,
+        )
+    )
+
+    assert manager.get_login_status("temp_user") == UserLoginStatus(
+        reason=UserLoginStatusReason.TEMPORARY_PASSWORD
+    )
+
+
+def test_get_login_status_password_expired(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
+    )
+    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(days=2)
+    decoy.when(mock_store.get("expired_user")).then_return(
+        _make_orm_user(username="expired_user", password_set_at=expired_at)
+    )
+
+    assert manager.get_login_status("expired_user") == UserLoginStatus(
+        reason=UserLoginStatusReason.PASSWORD_EXPIRED
+    )
+
+
+def test_get_login_status_none_when_admin_flag_without_temp(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("flagged_user")).then_return(
+        _make_orm_user(username="flagged_user", reset_password=True)
+    )
+
+    assert manager.get_login_status("flagged_user") == UserLoginStatus(reason=None)
+
+
+def test_get_login_status_prefers_temporary_password_over_expiration(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
+    )
+    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(days=2)
+    decoy.when(mock_store.get("both_user")).then_return(
+        _make_orm_user(
+            username="both_user",
+            password_set_at=expired_at,
+            temporary_hashed_password=password_hash.hash("temppass1"),
+            reset_password=True,
+        )
+    )
+
+    assert manager.get_login_status("both_user") == UserLoginStatus(
+        reason=UserLoginStatusReason.TEMPORARY_PASSWORD
+    )
+
+
+def test_get_login_status_not_found_raises(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("ghost")).then_return(None)
+    with pytest.raises(UserNotFoundError):
+        manager.get_login_status("ghost")
+
+
 @pytest.mark.parametrize(
     ("password_reset_time_sec", "password_age", "reset_password", "expected"),
     [
@@ -824,6 +926,7 @@ def test_update_user_password_is_hashed(
             None,
             False,
             None,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(updated)
@@ -839,6 +942,7 @@ def test_update_user_password_is_hashed(
             None,
             False,
             None,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     )
@@ -862,6 +966,7 @@ def test_update_user_password_clears_reset_password_flag(
             None,
             False,
             None,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(updated)
@@ -882,6 +987,7 @@ def test_update_user_password_clears_reset_password_flag(
             None,
             False,
             None,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     )
@@ -927,7 +1033,7 @@ def test_reset_user_password(
     decoy.when(
         mock_store.update(
             "reset_me",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -950,7 +1056,7 @@ def test_reset_user_password(
     decoy.verify(
         mock_store.update(
             "reset_me",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -972,7 +1078,7 @@ def test_reset_user_password_clears_failed_logins(
     decoy.when(
         mock_store.update(
             "reset_me",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1001,7 +1107,7 @@ def test_reset_user_password_uses_password_complexity_settings(
     decoy.when(
         mock_store.update(
             "reset_me",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1011,7 +1117,9 @@ def test_reset_user_password_uses_password_complexity_settings(
     result = manager.reset_user_password("reset_me", now=_NOW)
 
     assert len(result.temporaryPassword or "") == 12
-    assert any(c in string.punctuation for c in result.temporaryPassword or "")
+    assert any(
+        c in CREDENTIAL_SPECIAL_CHARACTERS for c in result.temporaryPassword or ""
+    )
 
 
 def test_reset_user_password_not_found_raises(
@@ -1024,7 +1132,7 @@ def test_reset_user_password_not_found_raises(
     decoy.when(
         mock_store.update(
             "ghost",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),
@@ -1067,9 +1175,10 @@ def test_temporary_password_requirements(
 
 
 def test_generate_temporary_password_meets_complexity_rules() -> None:
-    password = _generate_temporary_password(12, require_special_characters=True)
-    assert len(password) == 12
-    assert any(c in string.punctuation for c in password)
+    for _ in range(50):
+        password = _generate_temporary_password(12, require_special_characters=True)
+        assert len(password) == 12
+        assert any(c in CREDENTIAL_SPECIAL_CHARACTERS for c in password)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
@@ -1121,6 +1230,77 @@ def test_update_user_rejects_current_password(
             new_password=current_password,
             now=_NOW,
         )
+
+
+def test_update_user_rejects_password_from_before_temp_reset(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    """After admin reset, the prior real password must not be reusable."""
+    prior_password = "priorpassword123"
+    temporary_password = "temppass1"
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=password_hash.hash(prior_password),
+            temporary_hashed_password=password_hash.hash(temporary_password),
+            reset_password=True,
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.update_user(
+            "alice",
+            new_password=prior_password,
+            now=_NOW,
+        )
+
+
+def test_update_user_rejects_temporary_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    """A one-time password must not be kept as the user's permanent password."""
+    temporary_password = "temppass1"
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=None,
+            temporary_hashed_password=password_hash.hash(temporary_password),
+            reset_password=True,
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.update_user(
+            "alice",
+            new_password=temporary_password,
+            now=_NOW,
+        )
+
+
+def test_validate_new_password_rejects_temporary_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    temporary_password = "temppass1"
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=password_hash.hash("otherpassword123"),
+            temporary_hashed_password=password_hash.hash(temporary_password),
+            reset_password=True,
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.validate_new_password("alice", temporary_password)
 
 
 def _make_service_user(
@@ -1245,6 +1425,7 @@ def test_update_service_user_allows_password_change(
             account_type=None,
             reset_password=False,
             deactivated=None,
+            clear_temporary_hashed_password=True,
             now=matchers.IsA(datetime.datetime),
         )
     ).then_return(existing)
@@ -1265,7 +1446,7 @@ def test_reset_service_user_password(
     decoy.when(
         mock_store.update(
             "service",
-            hashed_password=matchers.IsA(str),
+            temporary_hashed_password=matchers.IsA(str),
             reset_password=True,
             deactivated=False,
             now=matchers.IsA(datetime.datetime),

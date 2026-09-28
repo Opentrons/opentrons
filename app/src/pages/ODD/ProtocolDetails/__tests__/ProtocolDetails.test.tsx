@@ -24,7 +24,10 @@ import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fix
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
-import { useRunTimeParameters } from '/app/resources/protocols'
+import {
+  useEnsureProtocolAnalysis,
+  useRunTimeParameters,
+} from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
@@ -92,6 +95,11 @@ const MOCK_DATA = {
   },
 }
 
+const MOCK_COMPLETED_ANALYSIS = {
+  id: 'mockAnalysisId',
+  status: 'completed',
+}
+
 const render = (path = '/protocols/fakeProtocolId') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -128,15 +136,18 @@ describe('ODDProtocolDetails', () => {
       isLoading: false,
       conflictedSlots: [],
     })
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: MOCK_COMPLETED_ANALYSIS as any,
+      analysisId: MOCK_COMPLETED_ANALYSIS.id,
+      isAnalyzing: false,
+      protocolRecord: MOCK_DATA as any,
+    })
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,
     } as any)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
-      },
+      data: MOCK_COMPLETED_ANALYSIS,
     } as any)
     when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(getProtocol).mockResolvedValue({
@@ -239,10 +250,12 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('should render a loading skeleton while awaiting a response from the server', () => {
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: MOCK_DATA,
-      isLoading: true,
-    } as any)
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: null,
+      analysisId: null,
+      isAnalyzing: true,
+      protocolRecord: MOCK_DATA as any,
+    })
     render()
     expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
   })
@@ -257,24 +270,20 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('render chip about modules when missing a hardware', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
-      },
-    } as any)
     render()
     screen.getByText('mock missing hardware chip text')
   })
 
   it('render requires csv text when a csv file is required', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: {
+        ...MOCK_COMPLETED_ANALYSIS,
         result: 'parameter-value-required',
-      },
-    } as any)
+      } as any,
+      analysisId: MOCK_COMPLETED_ANALYSIS.id,
+      isAnalyzing: false,
+      protocolRecord: MOCK_DATA as any,
+    })
     render()
     screen.getByText('mock missing hardware chip text & requires CSV')
   })
@@ -288,5 +297,27 @@ describe('ODDProtocolDetails', () => {
     const startSetupButton = screen.getByRole('button', { name: 'Start setup' })
     fireEvent.click(startSetupButton)
     screen.getByText('mockRobotOutOfStorageModal')
+  })
+
+  it('disables start setup and does not create a run while analysis is missing', () => {
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: null,
+      analysisId: null,
+      isAnalyzing: true,
+      protocolRecord: MOCK_DATA as any,
+    })
+    render()
+    const startSetupButton = screen.getByRole('button', {
+      name: /Start setup/i,
+    })
+    expect(startSetupButton).toBeDisabled()
+    fireEvent.click(startSetupButton)
+    expect(mockCreateRun).not.toHaveBeenCalled()
+  })
+
+  it('creates a run when start setup is clicked and analysis is complete', () => {
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    expect(mockCreateRun).toHaveBeenCalledWith({ protocolId: 'fakeProtocolId' })
   })
 })

@@ -4,13 +4,13 @@ import base64
 import hashlib
 import json
 import tempfile
-import zipfile
 from pathlib import Path
-from typing import Annotated, Final
+from typing import Annotated, AsyncIterator, Dict, Final
 
 import fastapi
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
+from zipstream import ZIP_DEFLATED, ZipStream  # type: ignore[import-untyped]
 
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
@@ -46,6 +46,7 @@ from audit_server.log_storage.models import (
     TotalUsageSummary,
 )
 from audit_server.log_storage.store import NoPeriodById, PeriodIsActiveError
+from audit_server.log_storage.types import LogPeriodEntries
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 router = fastapi.APIRouter()
@@ -111,7 +112,7 @@ async def download_log_period(
     persistence_directory_root: Annotated[
         Path, fastapi.Depends(get_persistence_directory_root)
     ],
-) -> FileResponse:
+) -> StreamingResponse:
     """Download a zipped verifiable audit log period."""
     try:
         period_entries = log_data_manager.get_period_entries(period_id=periodId)
@@ -121,7 +122,6 @@ async def download_log_period(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail=f"No log period found with ID {periodId}",
         ) from exc
-
     headers: dict[str, str] = {}
 
     # The period exists, so mint a deletion key linked to it and hand it back in
@@ -134,8 +134,66 @@ async def download_log_period(
     except PeriodIsActiveError:
         pass
 
+    temp_root = ensure_persistence_temp_directory(persistence_directory_root)
+    temp_dir = tempfile.TemporaryDirectory(
+        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(temp_root)
+    )
+    hasher_zip_stream: ZipStream = ZipStream(compress_type=ZIP_DEFLATED)
+    download_zip_stream: ZipStream = ZipStream(compress_type=ZIP_DEFLATED)
+
+    temp_path = Path(temp_dir.name)
+
+    logs_dict = await _get_logs_dict(
+        key_client=key_client,
+        robot_server_client=robot_server_client,
+        period_entries=period_entries,
+        period_details=period_details,
+    )
+
+    for log_filename, content in logs_dict.items():
+        log_path = temp_path / log_filename
+        with open(log_path, "w") as log:
+            log.write(content)
+        hasher_zip_stream.add_path(log_path)
+        download_zip_stream.add_path(log_path)
+
+    for robot_log in period_entries.robot_log_entries:
+        download_zip_stream.add_path(Path(robot_log.file_path))
+        hasher_zip_stream.add_path(Path(robot_log.file_path))
+
+    hasher = hashlib.sha256()
+
+    for chunk in hasher_zip_stream:
+        hasher.update(chunk)
+    digest_b64 = base64.b64encode(hasher.digest()).decode("ascii")
+    headers["Content-Digest"] = f"sha-256=:{digest_b64}:"
+
+    def cleanup_files() -> None:
+        temp_dir.cleanup()
+
+    async def download_zs_generator() -> AsyncIterator[bytes]:
+        for chunk in download_zip_stream:
+            yield chunk
+
+    return StreamingResponse(
+        content=download_zs_generator(),
+        media_type="application/zip",
+        headers=headers,
+        background=BackgroundTask(cleanup_files),
+    )
+
+
+async def _get_logs_dict(
+    key_client: Annotated[KeyClient, fastapi.Depends(get_key_client)],
+    robot_server_client: Annotated[
+        RobotServerClient, fastapi.Depends(get_robot_client)
+    ],
+    period_entries: LogPeriodEntries,
+    period_details: LogPeriodDetails,
+) -> Dict[str, str]:
     signing_key = await key_client.get_key_and_hash()
     robot_info = await robot_server_client.get_name_and_serial()
+
     if period_details.endedAt is None:
         try:
             current_run_log_response = await robot_server_client.get_current_run_log()
@@ -162,39 +220,14 @@ async def download_log_period(
         )
     )
 
-    temp_root = ensure_persistence_temp_directory(persistence_directory_root)
-    temp_dir = tempfile.TemporaryDirectory(
-        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(temp_root)
-    )
-
-    zip_file_path = Path(temp_dir.name) / "log_period.zip"
-    with zipfile.ZipFile(zip_file_path, mode="w") as zh:
-        zh.writestr("log_period.json", period_entries.user_log.model_dump_json())
-        zh.writestr("signing_key.pem", signing_key.publicKey)
-        zh.writestr("robot_identity.json", signed_robot_identity.model_dump_json())
-        for robot_log in period_entries.robot_log_entries:
-            robot_log_path = Path(robot_log.file_path)
-            zh.write(robot_log_path, arcname=robot_log_path.name)
-        if serialized_log is not None:
-            zh.writestr(serialized_log.filename, serialized_log.serialized_json)
-
-    hasher = hashlib.sha256()
-    with zip_file_path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            hasher.update(chunk)
-    digest_b64 = base64.b64encode(hasher.digest()).decode("ascii")
-    headers["Content-Digest"] = f"sha-256=:{digest_b64}:"
-
-    def cleanup_files() -> None:
-        zip_file_path.unlink()
-        temp_dir.cleanup()
-
-    return FileResponse(
-        zip_file_path,
-        media_type="application/zip",
-        headers=headers,
-        background=BackgroundTask(cleanup_files),
-    )
+    logs_dict = {
+        "log_period.json": period_entries.user_log.model_dump_json(),
+        "signing_key.pem": signing_key.publicKey,
+        "robot_identity.json": signed_robot_identity.model_dump_json(),
+    }
+    if serialized_log is not None:
+        logs_dict[serialized_log.filename] = serialized_log.serialized_json
+    return logs_dict
 
 
 @router.get(

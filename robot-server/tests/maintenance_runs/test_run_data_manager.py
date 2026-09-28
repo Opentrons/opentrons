@@ -42,7 +42,7 @@ from robot_server.service.notifications import (
 )
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 

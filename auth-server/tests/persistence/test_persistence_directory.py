@@ -132,6 +132,7 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
             "id",
             "username",
             "hashed_password",
+            "temporary_hashed_password",
             "full_name",
             "account_type",
             "password_set_at",

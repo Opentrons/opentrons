@@ -8,10 +8,10 @@ from starlette.responses import FileResponse, Response, StreamingResponse
 
 from .audit_server import Client as AuditClient
 from .audit_server import SubmitAuditLogMessageData
-from server_utils.auth.resource_server.fastapi import (
-    RequireAuthenticationResult,
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
 )
-from server_utils.auth.resource_server.types import AuthenticatedResult
 
 MAX_LOG_CHUNK_SIZE = 1 * 1024
 TRUNCATION_MESSAGE = f"(truncated after {MAX_LOG_CHUNK_SIZE} elements)"
@@ -284,7 +284,10 @@ class AuditLogger:
         self._fullname = fullname
         return self
 
-    def set_auth_details(self: Self, auth_details: RequireAuthenticationResult) -> Self:
+    def set_auth_details(
+        self: Self,
+        auth_details: AuthenticatedResult | AuthenticationNotRequiredResult,
+    ) -> Self:
         """Set the username and fullname to be used in the log from auth details."""
         if isinstance(auth_details, AuthenticatedResult):
             self._fullname = auth_details.fullname

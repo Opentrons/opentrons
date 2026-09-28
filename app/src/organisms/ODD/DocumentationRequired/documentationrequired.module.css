@@ -21,6 +21,7 @@
   min-width: 0;
   flex-direction: column;
   gap: var(--spacing-8);
+  transition: height 0.2s ease-in-out;
 }
 
 .text_area_container_keyboard_expanded {

@@ -58,10 +58,11 @@ const TableDatum = styled('td')`
 export const Liquids = (props: { protocolId: string }): JSX.Element => {
   const { protocolId } = props
   const { data: protocolData } = useProtocolQuery(protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
   const liquidsInOrder = parseLiquidsInLoadOrder(
     mostRecentAnalysis!.liquids ?? [],

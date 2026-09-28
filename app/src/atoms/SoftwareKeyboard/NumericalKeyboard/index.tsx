@@ -19,6 +19,7 @@ interface NumericalKeyboardProps {
   /**
    * The underlying element that the software keyboard should type into.
    * See `useSoftwareKeyboardControl()`.
+   * Also see `parseNumericalInput()` for validation.
    */
   inputElementRef: SoftwareKeyboardControlOptions['inputElementRef']
   isDecimal?: boolean

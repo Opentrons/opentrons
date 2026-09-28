@@ -41,7 +41,7 @@ from robot_server.runs.run_orchestrator_store import (
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 

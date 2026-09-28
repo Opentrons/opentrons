@@ -125,10 +125,11 @@ export function ProtocolWithLastRun({
 
   const protocolId = protocolData.id
 
+  const analysisId = last(protocolData?.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
   const PROTOCOL_CARD_STYLE = css`

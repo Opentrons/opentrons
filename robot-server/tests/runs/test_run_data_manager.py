@@ -74,7 +74,7 @@ from robot_server.runs.run_store import (
 from robot_server.service.notifications import RunsPublisher
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 

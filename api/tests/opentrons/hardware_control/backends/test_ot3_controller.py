@@ -32,14 +32,25 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.drivers.eeprom import EEPROMDriver
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    MotorUsageValueType,
     NodeId,
     USBTarget,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MotorUsageTypeField
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    GetMotorUsageResponsePayload,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+)
 from opentrons_hardware.hardware_control import current_settings
 from opentrons_hardware.hardware_control.motion import (
     MoveGroupSingleAxisStep,
@@ -1694,3 +1705,128 @@ async def test_pressure_disable(
                 )
             else:
                 monitor.assert_called_once_with([NodeId.pipette_right])
+
+
+@pytest.mark.parametrize(
+    "lifetime_data",
+    [
+        {
+            NodeId.gantry_x: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+        {
+            NodeId.gantry_x: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            NodeId.pipette_right: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(4),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=287997293,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5514,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.overpressure_error_count,
+                            length=4,
+                            usage_value=161,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.resin_tip_dispense_count,
+                            length=4,
+                            usage_value=0,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            NodeId.gripper_g: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(3),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=314519951,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.force_application_time,
+                            length=4,
+                            usage_value=15446218,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=7536,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+    ],
+)
+async def test_get_motor_usage_data(
+    controller: OT3Controller,
+    mock_subsystem_manager: SubsystemManager,
+    lifetime_data: Dict[NodeId, GetMotorUsageResponse],
+    decoy: Decoy,
+) -> None:
+    """Ensure that get_motor_usage_data returns the dict it receives as input with nodes convert to axes."""
+
+    decoy.when(await mock_subsystem_manager.get_motor_usage_data(None)).then_return(
+        lifetime_data
+    )
+    expected_response: Dict[Axis, Dict[str, int]] = {}
+
+    motor_usage_payload = {
+        node_to_axis(node): lifetime_data[node] for node in lifetime_data
+    }
+    for ax in motor_usage_payload.keys():
+        usage_elements = motor_usage_payload[ax].payload.usage_elements
+        expected_response[ax] = {
+            MotorUsageValueType(el.key).name: el.usage_value for el in usage_elements
+        }
+    usage_data = await controller.get_motor_usage_data()
+    assert usage_data == expected_response

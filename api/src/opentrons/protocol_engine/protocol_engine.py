@@ -1,5 +1,6 @@
 """ProtocolEngine class definition."""
 
+import asyncio
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Any, AsyncGenerator, Callable, Dict, Optional, Tuple, Union
@@ -106,6 +107,7 @@ class ProtocolEngine:
         associated_command_error_recovery: Optional[
             AssociatedCommandErrorRecoveryOrchestrator
         ] = None,
+        notify_and_update_task: Optional[asyncio.Task[None]] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -129,6 +131,7 @@ class ProtocolEngine:
         if self._queue_worker:
             self._queue_worker.start()
         self._door_watcher.start()
+        self._notify_and_update_task = notify_and_update_task
 
     @property
     def state_view(self) -> StateView:
@@ -539,6 +542,9 @@ class ProtocolEngine:
             post_run_hardware_state: The state in which to leave the gantry and motors in
                 after the run is over.
         """
+        if self._state_store.commands.get_is_stopped():
+            return
+
         if self._state_store.commands.get_is_stopped_by_async_error():
             # This handles the case where the E-stop was pressed while we were *not* in the middle
             # of some hardware interaction that would raise it as an exception. For example, imagine
@@ -583,6 +589,13 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
+        if self._notify_and_update_task is not None:
+            await self._state_store.wait_for_update_events()
+            self._notify_and_update_task.cancel()
+            try:
+                await self._notify_and_update_task
+            except asyncio.CancelledError:
+                pass
 
         # We have a lot of independent things to tear down. If any teardown fails, we want
         # to continue with the rest, to avoid leaking resources or leaving the engine with a broken

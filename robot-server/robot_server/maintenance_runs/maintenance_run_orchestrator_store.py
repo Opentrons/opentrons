@@ -3,7 +3,7 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import Callable, Optional, Sequence
+from typing import Awaitable, Callable, Optional, Sequence
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -158,7 +158,7 @@ class MaintenanceRunOrchestratorStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: Sequence[LegacyLabwareOffsetCreate | LabwareOffsetCreate],
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         deck_configuration: Optional[DeckConfigurationType] = [],
         proxy_of_callback_for_handling_door_events: HardwareEventHandler | None = None,
     ) -> StateSummary:

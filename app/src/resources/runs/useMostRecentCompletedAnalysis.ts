@@ -17,10 +17,11 @@ export function useMostRecentCompletedAnalysis(
   const { data: protocolData } = useProtocolQuery(protocolId, {
     enabled: protocolId != null,
   })
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
   return analysis != null

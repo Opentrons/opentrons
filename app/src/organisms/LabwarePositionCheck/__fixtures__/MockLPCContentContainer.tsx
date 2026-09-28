@@ -32,6 +32,7 @@ export const MockLPCContentContainer: Mock = vi.fn(
           data-category={secondaryButtonProps?.buttonCategory}
           data-type={secondaryButtonProps?.buttonType}
           data-has-click={String(!!secondaryButtonProps?.onClick)}
+          onClick={secondaryButtonProps?.onClick}
         />
         {onClickBack != null && (
           <button data-testid="back-button" onClick={onClickBack} />

@@ -5,17 +5,17 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
-import { AuditLogFolder } from '../AuditLogFolder'
+import { LogFolder } from '../LogFolder'
 
 vi.mock('/app/redux/audit')
 
 const render = () => {
-  return renderWithProviders(<AuditLogFolder />, {
+  return renderWithProviders(<LogFolder />, {
     i18nInstance: i18n,
   })
 }
 
-describe('AuditLogFolder', () => {
+describe('LogFolder', () => {
   beforeEach(() => {
     vi.mocked(getAuditLogDirectory).mockReturnValue(null)
   })
@@ -24,23 +24,25 @@ describe('AuditLogFolder', () => {
     vi.clearAllMocks()
   })
 
-  it('renders the audit log folder section with no folder selected', () => {
+  it('renders the log folder section with no folder selected', () => {
     render()
-    expect(screen.getAllByText('Audit Log Folder')).toHaveLength(2)
+    screen.getByText('Default Downloads Folder')
     screen.getByText(
-      'If you want to specify a folder to save audit logs into, you can add the directory here.'
+      'Select the folder where files and logs downloaded from the app should be saved by default.'
     )
-    screen.getByText('No audit log folder selected')
+    screen.getByText('Default Folder')
+    screen.getByText('No folder selected')
     screen.getByRole('button', { name: 'Select folder' })
   })
 
-  it('renders the audit log folder section with a folder selected', () => {
+  it('renders the log folder section with a folder selected', () => {
     vi.mocked(getAuditLogDirectory).mockReturnValue('/mock/audit-log-path')
     render()
-    expect(screen.getAllByText('Audit Log Folder')).toHaveLength(2)
+    screen.getByText('Default Downloads Folder')
     screen.getByText(
-      'If you want to specify a folder to save audit logs into, you can add the directory here.'
+      'Select the folder where files and logs downloaded from the app should be saved by default.'
     )
+    screen.getByText('Default Folder')
     screen.getByText('/mock/audit-log-path')
     screen.getByRole('button', { name: 'Change folder' })
   })
