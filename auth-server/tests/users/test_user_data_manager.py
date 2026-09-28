@@ -64,7 +64,7 @@ def manager(
 
 def _make_orm_user(
     username: str = "user",
-    hashed_password: str = "h",
+    hashed_password: str | None = "h",
     full_name: str = "Full Name",
     account_type: AccountType = AccountType.USER,
     reset_password: bool = False,
@@ -390,9 +390,11 @@ def test_create_user_without_password_sets_reset_password(
     decoy.when(mock_store.get("temp_pw_user")).then_return(None)
     expected = _make_orm_user(
         username="temp_pw_user",
+        hashed_password=None,
         full_name="Temp PW User",
         account_type=AccountType.USER,
         reset_password=True,
+        temporary_hashed_password="temp-hash",
     )
     decoy.when(
         mock_store.add(
@@ -418,6 +420,7 @@ def test_create_user_without_password_sets_reset_password(
     assert result.accountType == AccountType.USER
     assert result.locked is False
     assert result.resetPassword is True
+    assert result.passwordResetReason == UserLoginStatusReason.TEMPORARY_PASSWORD
     assert result.temporaryPassword is not None
     assert len(result.temporaryPassword) == 8
     assert all(

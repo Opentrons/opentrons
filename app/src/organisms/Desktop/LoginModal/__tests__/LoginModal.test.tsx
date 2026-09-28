@@ -101,10 +101,16 @@ function mockLoginSuccess(
   }))
 }
 
-function mockLoginRequiringPasswordReset(): void {
+function mockLoginRequiringPasswordReset(
+  passwordResetReason: AuthUser['passwordResetReason'] = 'temporaryPassword'
+): void {
   vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
     submitPassword: (username: string, _password: string) => {
-      onSuccess(username, mockAuthUser({ resetPassword: true }), TOKEN_RESPONSE)
+      onSuccess(
+        username,
+        mockAuthUser({ resetPassword: true, passwordResetReason }),
+        TOKEN_RESPONSE
+      )
     },
     isAuthLoading: false,
   }))
@@ -366,7 +372,10 @@ describe('LoginModal', () => {
     await waitFor(() => {
       expect(storeLoginState).toHaveBeenCalledWith(
         ROBOT_NAME,
-        mockAuthUser({ resetPassword: true }),
+        mockAuthUser({
+          resetPassword: true,
+          passwordResetReason: 'temporaryPassword',
+        }),
         TOKEN_RESPONSE
       )
     })
@@ -381,7 +390,7 @@ describe('LoginModal', () => {
 
   it('shows password expired view when login requires a new password due to expiration', async () => {
     mockUserLoginStatus({ reason: 'passwordExpired' })
-    mockLoginRequiringPasswordReset()
+    mockLoginRequiringPasswordReset('passwordExpired')
 
     renderAndOpenLoginModal()
     await logInWithPassword()
@@ -389,7 +398,10 @@ describe('LoginModal', () => {
     await waitFor(() => {
       expect(storeLoginState).toHaveBeenCalledWith(
         ROBOT_NAME,
-        mockAuthUser({ resetPassword: true }),
+        mockAuthUser({
+          resetPassword: true,
+          passwordResetReason: 'passwordExpired',
+        }),
         TOKEN_RESPONSE
       )
     })

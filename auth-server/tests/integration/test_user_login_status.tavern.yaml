@@ -37,6 +37,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
+          passwordResetReason: temporaryPassword
           temporaryPassword: !anystr
 
   - name: Login status is temporaryPassword when a temporary password was issued

@@ -1,11 +1,15 @@
 export type AuthUserAccountType = 'admin' | 'user' | 'auditor' | 'service'
 
+export type UserLoginStatusReason = 'temporaryPassword' | 'passwordExpired'
+
 export interface AuthUser {
   username: string
   fullName: string
   accountType: AuthUserAccountType
   locked: boolean
   resetPassword: boolean
+  /** Present when the server knows why a password change is required. */
+  passwordResetReason?: UserLoginStatusReason | null
 }
 
 export interface AuthUserResponse {
@@ -29,8 +33,6 @@ export interface AuthUsersResponse {
     totalLength: number
   }
 }
-
-export type UserLoginStatusReason = 'temporaryPassword' | 'passwordExpired'
 
 export interface UserLoginStatus {
   reason: UserLoginStatusReason | null

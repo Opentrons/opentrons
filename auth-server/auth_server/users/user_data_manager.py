@@ -212,6 +212,20 @@ def must_reset_password(
     )
 
 
+def password_reset_reason(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> UserLoginStatusReason | None:
+    """Return why a password change is needed, if a specific reason is known.
+
+    Prefers temporary-password over expiration when both could apply.
+    """
+    if user.temporary_hashed_password is not None:
+        return UserLoginStatusReason.TEMPORARY_PASSWORD
+    if _password_is_expired(user, now, password_reset_time_sec):
+        return UserLoginStatusReason.PASSWORD_EXPIRED
+    return None
+
+
 class UserDataManager:
     """Manages user data operations."""
 
@@ -239,6 +253,9 @@ class UserDataManager:
             accountType=account_type,
             locked=user.deactivated or is_failed_login_locked,
             resetPassword=must_reset_password(user, now, settings.passwordResetTime),
+            passwordResetReason=password_reset_reason(
+                user, now, settings.passwordResetTime
+            ),
         )
 
     def create_user(
@@ -304,14 +321,9 @@ class UserDataManager:
             raise UserNotFoundError(f"User {username!r} not found")
         settings = self._settings_store.get_settings()
         now = datetime.datetime.now(tz=datetime.UTC)
-        reason: UserLoginStatusReason | None
-        if user.temporary_hashed_password is not None:
-            reason = UserLoginStatusReason.TEMPORARY_PASSWORD
-        elif _password_is_expired(user, now, settings.passwordResetTime):
-            reason = UserLoginStatusReason.PASSWORD_EXPIRED
-        else:
-            reason = None
-        return UserLoginStatus(reason=reason)
+        return UserLoginStatus(
+            reason=password_reset_reason(user, now, settings.passwordResetTime)
+        )
 
     def get_users_list(self) -> list[UserResponse]:
         """Return all users."""

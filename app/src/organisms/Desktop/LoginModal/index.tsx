@@ -166,18 +166,12 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     formData: INITIAL_LOGIN_FORM,
   })
   const [loginStatus, setLoginStatus] = useState<UserLoginStatus | null>(null)
-  const loginStatusRef = useRef<UserLoginStatus | null>(null)
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
   const passwordResetSuccessToastId = useId()
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
-
-  const updateLoginStatus = (status: UserLoginStatus | null): void => {
-    loginStatusRef.current = status
-    setLoginStatus(status)
-  }
 
   const handleClose = (): void => {
     if (screen.kind === 'setNewPassword') {
@@ -202,7 +196,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
-          reason: loginStatusRef.current?.reason ?? null,
+          reason: user.passwordResetReason ?? null,
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -266,8 +260,8 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       passwordRequiredError: null,
     })
 
-    if (loginStatusRef.current == null) {
-      updateLoginStatus(await fetchLoginStatus(host, trimmedUsername))
+    if (loginStatus == null) {
+      setLoginStatus(await fetchLoginStatus(host, trimmedUsername))
     }
     submitPassword(trimmedUsername, trimmedPassword)
   }
@@ -363,14 +357,14 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
               reason={loginStatus?.reason ?? null}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
-                updateLoginStatus(null)
+                setLoginStatus(null)
                 updateLoginFormData(setScreen, {
                   username: value,
                   usernameRequiredError: null,
                 })
               }}
               onUsernameBlur={username => {
-                void fetchLoginStatus(host, username).then(updateLoginStatus)
+                void fetchLoginStatus(host, username).then(setLoginStatus)
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {

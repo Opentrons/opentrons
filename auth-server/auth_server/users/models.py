@@ -151,6 +151,13 @@ class ValidateSelfPassword(BaseModel):
     ]
 
 
+class UserLoginStatusReason(StrEnum):
+    """Why the user should adjust their password."""
+
+    TEMPORARY_PASSWORD = "temporaryPassword"
+    PASSWORD_EXPIRED = "passwordExpired"
+
+
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
@@ -177,13 +184,19 @@ class UserResponse(BaseModel):
             )
         ),
     ]
-
-
-class UserLoginStatusReason(StrEnum):
-    """Why the user should adjust their password."""
-
-    TEMPORARY_PASSWORD = "temporaryPassword"
-    PASSWORD_EXPIRED = "passwordExpired"
+    passwordResetReason: Annotated[
+        UserLoginStatusReason | None,
+        Field(
+            default=None,
+            description=(
+                "Why resetPassword is required, when known."
+                " temporaryPassword: the user must replace a one-time password."
+                " passwordExpired: the current password aged past the configured window."
+                " Omitted/null when resetPassword is false, or when only the reset flag"
+                " is set without a temporary password or expiration."
+            ),
+        ),
+    ] = None
 
 
 class UserLoginStatus(BaseModel):

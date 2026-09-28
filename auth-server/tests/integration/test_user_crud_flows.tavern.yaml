@@ -146,6 +146,7 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
+          passwordResetReason: temporaryPassword
           temporaryPassword: !anystr
 
   - name: Log in with the temporary password
@@ -855,6 +856,7 @@ stages:
       json:
         data:
           resetPassword: true
+          passwordResetReason: temporaryPassword
           temporaryPassword: !anystr
       strict:
         - json:off
@@ -1201,6 +1203,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
+          passwordResetReason: temporaryPassword
           temporaryPassword: !anystr
 
   - name: Get the user and confirm resetPassword is true
@@ -1218,6 +1221,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
+          passwordResetReason: temporaryPassword
 
   - name: User can log in with the temporary password but only gets self-write scopes
     request:
