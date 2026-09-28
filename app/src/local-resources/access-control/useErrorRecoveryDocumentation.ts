@@ -40,17 +40,8 @@ export const useErrorRecoveryDocumentation = ({
   }, [ignoreErrors])
 
   const retryThenResumeActions = useMemo(
-    (): DocumentedAction[] => [
-      ...actionsToDocument,
-      'retry_action',
-      ...resumeAndPolicyActions,
-    ],
-    [actionsToDocument, resumeAndPolicyActions]
-  )
-
-  const skipThenResumeActions = useMemo(
-    (): DocumentedAction[] => [...actionsToDocument, ...resumeAndPolicyActions],
-    [actionsToDocument, resumeAndPolicyActions]
+    (): DocumentedAction[] => ['retry_action', ...resumeAndPolicyActions],
+    [resumeAndPolicyActions]
   )
 
   const {
@@ -61,7 +52,7 @@ export const useErrorRecoveryDocumentation = ({
   const {
     documentationState: skipThenResumeDocState,
     clearDocreport: clearSkipThenResumeDocreport,
-  } = useLinkedDocumentationState(skipThenResumeActions, recoverySessionKey)
+  } = useLinkedDocumentationState(resumeAndPolicyActions, recoverySessionKey)
 
   return {
     documentationState,

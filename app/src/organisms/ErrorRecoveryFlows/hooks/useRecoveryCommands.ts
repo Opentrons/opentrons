@@ -160,7 +160,7 @@ export function useRecoveryCommands({
   const { chainRunCommands: chainRetryRunCommands } = useChainRunCommands(
     runId,
     retryThenResumeDocState,
-    [...actionsToDocument, 'retry_action'],
+    ['retry_action'],
     addActionToDocument,
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
