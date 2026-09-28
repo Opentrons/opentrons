@@ -169,7 +169,7 @@ class CompletedAnalysis(BaseModel):
     )
     commands: List[dict[str, Any]] = Field(
         ...,
-        description="The protocol commands the run is expected to produce, stored as a JSON string.",
+        description="The protocol commands the run is expected to produce.",
     )
     labware: List[LoadedLabware] = Field(
         ...,

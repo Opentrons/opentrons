@@ -127,7 +127,7 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
         self._access_control_status = access_control_status
-        self._commands_json_list: List[dict[str, Any]] = []
+        self._commands_dict_list: List[dict[str, Any]] = []
         self._analysis_store_provider = CommandStoreProvider(
             run_id=None,
             store_insert_batch_commands=self.insert_batch_analysis_command,
@@ -139,7 +139,7 @@ class AnalysisStore:
         """Store a command from analysis as a command JSON string locally."""
         for command in batch_commands:
             command_json = command.model_dump(by_alias=True)
-            self._commands_json_list.append(command_json)
+            self._commands_dict_list.append(command_json)
 
     def set_analysis_provider_id(self, analysis_id: str) -> None:
         """Set the ID used by the analysis provider."""
@@ -213,7 +213,7 @@ class AnalysisStore:
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
         if commands is None:
             # Use the locally stored commands list
-            commands = self._commands_json_list
+            commands = self._commands_dict_list
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
         assert protocol_id is not None, (
@@ -267,7 +267,7 @@ class AnalysisStore:
         )
 
         self._pending_store.remove(analysis_id=analysis_id)
-        self._commands_json_list.clear()
+        self._commands_dict_list.clear()
 
     async def save_initialization_failed_analysis(
         self,

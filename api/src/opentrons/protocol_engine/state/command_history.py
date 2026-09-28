@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -34,8 +34,8 @@ class CommandEntry:
     index: int
 
 
-class CommandManager:
-    """Manages command insertion into and queries on persistent command storage through the CommandStoreProvider."""
+class CommandPersistenceInterface:
+    """Provides command insertion into and queries on persistent command storage through the CommandStoreProvider."""
 
     def __init__(
         self,
@@ -43,7 +43,7 @@ class CommandManager:
     ) -> None:
         self._teardown_signal = asyncio.Event()
         self._command_store_provider = command_store_provider
-        self._command_queue: list[CommandEntryJSON] = []
+        self._command_queue: deque[CommandEntryJSON] = deque()
         self._commands_total = 0
 
         # Set up the run store task
@@ -60,40 +60,35 @@ class CommandManager:
         self, command_json_batch: list[CommandEntryJSON]
     ) -> None:
         """Send insert command request to the CommandStoreProvider."""
-        command_batch: list[Command] = []
-        for command_json in command_json_batch:
-            command_batch.append(
-                command_json.command_type.model_validate_json(command_json.command)
-            )
+        command_batch = [
+            command_json.command_type.model_validate_json(command_json.command)
+            for command_json in command_json_batch
+        ]
+
         await self._command_store_provider.insert_batch_commands(
             self._commands_total, command_batch
         )
 
     async def command_store_interface_task(self) -> None:
         """Handle interactions with the CommandStoreProvider."""
-        command_entry_json_batch: list[CommandEntryJSON] = []
-        while not self._teardown_signal.is_set():
+        while True:
             command_entry_json_batch = []
             if len(self._command_queue) > 0:
                 # Remove batch of commands from the queue and insert/update them on the RunStore
-                for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
-                    command_entry_json = self._command_queue.pop()
-                    command_entry_json_batch.append(command_entry_json)
+                batch_length = min(_COMMAND_BATCH_MAX, len(self._command_queue))
+                command_entry_json_batch = [
+                    self._command_queue.pop() for _ in range(batch_length)
+                ]
+
                 await self._send_batch_command_insert_request(command_entry_json_batch)
 
             await asyncio.sleep(0.1)
-
-        # In teardown, send the remaining commands until none remain before task completion to ensure all commands are written
-        while self._command_queue:
-            command_entry_json_batch = []
-            for i in range(min(_COMMAND_BATCH_MAX, len(self._command_queue))):
-                command_entry_json = self._command_queue.pop()
-                command_entry_json_batch.append(command_entry_json)
-            await self._send_batch_command_insert_request(command_entry_json_batch)
+            if self._teardown_signal.is_set() and not self._command_queue:
+                break
 
     def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
-        self._command_queue.insert(0, command_entry)
+        self._command_queue.appendleft(command_entry)
         self._commands_total += 1
 
 
@@ -142,7 +137,9 @@ class CommandHistory:
         self._running_command_id = None
         self._most_recently_completed_command_id = None
         self._command_manager = (
-            CommandManager(command_store_provider) if command_store_provider else None
+            CommandPersistenceInterface(command_store_provider)
+            if command_store_provider
+            else None
         )
 
     def length(self) -> int:
@@ -194,13 +191,14 @@ class CommandHistory:
 
     def get_all_commands(self) -> List[Command]:
         """Get all commands."""
-        all_commands = []
-        for raw_command_entry in self._commands_by_id.values():
-            command = raw_command_entry.command_type.model_validate_json(
+        all_commands = [
+            raw_command_entry.command_type.model_validate_json(
                 raw_command_entry.command
             )
-            all_commands.append(command)
+            for raw_command_entry in self._commands_by_id.values()
+        ]
 
+        # todo (chb, 2026-09-28): We should avoid using this in the future, it can cause a huge jump in memory size on long protocols.
         return all_commands
 
     def get_all_failed_commands(self) -> List[Command]:
@@ -236,13 +234,12 @@ class CommandHistory:
         )
         commands = selected_command_ids[start:stop]
         raw_command_slice = [self._commands_by_id[command] for command in commands]
-        command_slice = []
-        for raw_command_entry in raw_command_slice:
-            command_slice.append(
-                raw_command_entry.command_type.model_validate_json(
-                    raw_command_entry.command
-                )
+        command_slice = [
+            raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
             )
+            for raw_command_entry in raw_command_slice
+        ]
         return command_slice
 
     def del_end_slice(self, length: int) -> None:
