@@ -38,6 +38,24 @@ export const HeightGuidingText = (props: {
       </>
     )
   }
+  if (labwareType === 'filterPlate' || labwareType === 'wellPlate') {
+    return (
+      <>
+        <p>
+          Measure the total height of the labware: from the highest point on top
+          down to the lowest point. Include any well tips or nozzles that hang
+          below the skirt.
+        </p>
+        <p>
+          Skirt height is optional. Measure the skirt itself, from its top edge
+          down to the bottom of the skirt. Enter 0 if the labware has no skirt.
+          Where the plate sits on a parent (for example nested into a collection
+          plate) is set later with stacking offsets.
+        </p>
+        {footer}
+      </>
+    )
+  }
   if (labwareType === 'tipRack') {
     return (
       <>
@@ -51,7 +69,11 @@ export const HeightGuidingText = (props: {
   }
   return (
     <>
-      <p>Include any well lip in the measurement. Exclude any cover or cap.</p>
+      <p>
+        Include any lips or flanges here, and exclude any cover or cap when
+        measuring. If your labware is more than one tip length above the deck,
+        it may be incompatible with some tip + pipette combinations.
+      </p>
       {footer}
     </>
   )

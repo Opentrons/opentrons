@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useFormikContext } from 'formik'
 
 import {
@@ -27,6 +28,11 @@ import {
 import { makeMaskToDecimal } from '../../fieldMasks'
 import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
+import {
+  getVacuumCollarSeatingInset,
+  getVacuumCollarStackingMeasurement,
+  isVacuumCollar,
+} from '../../utils/vacuumCollarStacking'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { StackingAlerts } from '../alerts/StackingAlerts'
 import { TextField } from '../TextField'
@@ -59,10 +65,6 @@ export function StackingOffsets(): JSX.Element | null {
   const { values, errors, touched, setFieldValue } =
     useFormikContext<LabwareFields>()
 
-  if (isEveryFieldHidden(fieldList, values)) {
-    return null
-  }
-
   const label = 'Stacking Offset (Optional)'
 
   const isTiprack = values.labwareType === 'tipRack'
@@ -71,22 +73,37 @@ export function StackingOffsets(): JSX.Element | null {
   const isCircular = values.wellShape === 'circular'
   const isReservoir = values.labwareType === 'reservoir'
   const isWellPlate = values.labwareType === 'wellPlate'
+  const isFilterPlate = values.labwareType === 'filterPlate'
   const isStackableLabware =
-    values.labwareType === 'wellPlate' || values.labwareType === 'tipRack'
+    isWellPlate || isFilterPlate || values.labwareType === 'tipRack'
   const labwareHeight = values.labwareZDimension
   const has12Columns =
     values.gridColumns != null && parseInt(values.gridColumns) === 12
   const has8Rows = values.gridRows != null && parseInt(values.gridRows) === 8
   const has96Wells = has12Columns && has8Rows
+  const skirtHeightMm = Number(values.skirtHeight)
+  const canDeriveCollarStacking =
+    isFilterPlate && Number.isFinite(skirtHeightMm) && skirtHeightMm > 0
 
   let modifiedAdapterDefinitions: LabwareDefinition2[] = []
-  if (isTiprack) {
+  if (isFilterPlate) {
+    modifiedAdapterDefinitions = adapterDefinitions.filter(definition =>
+      (definition.parameters.quirks ?? []).some(
+        quirk => quirk === 'vacuumModuleDock' || quirk === 'vacuumSpacer'
+      )
+    )
+  } else if (isTiprack) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
         definition.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
     )
   }
-  if (isVBottom && values.labwareType !== 'reservoir' && has96Wells) {
+  if (
+    !isFilterPlate &&
+    isVBottom &&
+    values.labwareType !== 'reservoir' &&
+    has96Wells
+  ) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
         definition.parameters.loadName === 'opentrons_96_pcr_adapter' ||
@@ -116,7 +133,7 @@ export function StackingOffsets(): JSX.Element | null {
         definition.parameters.loadName === 'opentrons_universal_flat_adapter'
     )
   }
-  if (!isCircular && isVBottom && has96Wells) {
+  if (!isFilterPlate && !isCircular && isVBottom && has96Wells) {
     modifiedAdapterDefinitions = adapterDefinitions.filter(
       definition =>
         definition.parameters.loadName === 'opentrons_96_deep_well_adapter' ||
@@ -126,7 +143,9 @@ export function StackingOffsets(): JSX.Element | null {
   }
 
   let modifiedModuleModels = MODULE_MODELS_WITH_NO_ADAPTERS
-  if (has96Wells) {
+  if (isFilterPlate) {
+    modifiedModuleModels = []
+  } else if (has96Wells) {
     if (
       (labwareHeight != null &&
         parseInt(labwareHeight) > HIGHEST_TC_COMPATIBLE_LABWARE_HEIGHT) ||
@@ -146,7 +165,92 @@ export function StackingOffsets(): JSX.Element | null {
     modifiedModuleModels = []
   }
 
+  const vacuumCollars = modifiedAdapterDefinitions.filter(isVacuumCollar)
+  const checkedCollarLoadNames = Object.keys(values.compatibleAdapters)
+    .filter(loadName =>
+      vacuumCollars.some(
+        definition => definition.parameters.loadName === loadName
+      )
+    )
+    .sort()
+    .join(',')
+  const didPreselectCollarsRef = useRef(false)
+
+  // Pre-select both vacuum collars for filter plates (once per filter-plate session).
+  useEffect(() => {
+    if (!isFilterPlate) {
+      didPreselectCollarsRef.current = false
+      return
+    }
+    if (didPreselectCollarsRef.current || vacuumCollars.length === 0) {
+      return
+    }
+    const anyCollarChecked = vacuumCollars.some(
+      definition =>
+        values.compatibleAdapters[definition.parameters.loadName] !== undefined
+    )
+    if (anyCollarChecked) {
+      didPreselectCollarsRef.current = true
+      return
+    }
+
+    const nextAdapters = { ...values.compatibleAdapters }
+    vacuumCollars.forEach(definition => {
+      nextAdapters[definition.parameters.loadName] = canDeriveCollarStacking
+        ? getVacuumCollarStackingMeasurement(
+            definition.dimensions.zDimension,
+            skirtHeightMm,
+            getVacuumCollarSeatingInset(definition)
+          )
+        : 0
+    })
+    didPreselectCollarsRef.current = true
+    setFieldValue('compatibleAdapters', nextAdapters)
+  }, [
+    canDeriveCollarStacking,
+    isFilterPlate,
+    setFieldValue,
+    skirtHeightMm,
+    vacuumCollars
+      .map(definition => definition.parameters.loadName)
+      .sort()
+      .join(','),
+  ])
+
+  // Keep checked collar measurements in sync when skirt height changes.
+  useEffect(() => {
+    if (!canDeriveCollarStacking || checkedCollarLoadNames === '') {
+      return
+    }
+    let changed = false
+    const nextAdapters = { ...values.compatibleAdapters }
+    vacuumCollars.forEach(definition => {
+      const loadName = definition.parameters.loadName
+      if (nextAdapters[loadName] === undefined) {
+        return
+      }
+      const derived = getVacuumCollarStackingMeasurement(
+        definition.dimensions.zDimension,
+        skirtHeightMm,
+        getVacuumCollarSeatingInset(definition)
+      )
+      if (nextAdapters[loadName] !== derived) {
+        nextAdapters[loadName] = derived
+        changed = true
+      }
+    })
+    if (changed) {
+      setFieldValue('compatibleAdapters', nextAdapters)
+    }
+  }, [
+    canDeriveCollarStacking,
+    checkedCollarLoadNames,
+    setFieldValue,
+    skirtHeightMm,
+  ])
+
   if (
+    isEveryFieldHidden(fieldList, values) ||
     values.labwareType === 'tubeRack' ||
     values.labwareType === 'aluminumBlock' ||
     (modifiedModuleModels.length === 0 &&
@@ -154,6 +258,7 @@ export function StackingOffsets(): JSX.Element | null {
   ) {
     return null
   }
+
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="StackingOffsets">
@@ -227,65 +332,55 @@ export function StackingOffsets(): JSX.Element | null {
                   const isChecked = values.compatibleAdapters[key] !== undefined
                   return (
                     <Flex
-                      flexDirection={DIRECTION_COLUMN}
                       key={`${key}_${index}`}
+                      justifyContent={JUSTIFY_SPACE_BETWEEN}
+                      alignItems={ALIGN_CENTER}
+                      flexDirection={DIRECTION_ROW}
+                      height="2rem"
                     >
-                      <Flex
-                        key={index}
-                        justifyContent={JUSTIFY_SPACE_BETWEEN}
-                        alignItems={ALIGN_CENTER}
-                        flexDirection={DIRECTION_ROW}
-                        height="2rem"
-                      >
-                        <Flex zIndex={2}>
-                          <CheckboxField
-                            name={fieldName}
-                            value={isChecked}
-                            label={definition.metadata.displayName}
-                            onChange={() => {
-                              const compatibleAdaptersCopy = {
-                                ...values.compatibleAdapters,
-                              }
-                              if (isChecked) {
-                                const { [key]: _, ...newCompatibleAdapters } =
-                                  compatibleAdaptersCopy
-                                setFieldValue(
-                                  'compatibleAdapters',
-                                  newCompatibleAdapters
-                                )
-                              } else {
-                                setFieldValue('compatibleAdapters', {
-                                  ...compatibleAdaptersCopy,
-                                  [key]: 0,
-                                })
-                              }
-                            }}
-                          />
-                        </Flex>
-                        <div className={styles.form_fields_column}>
-                          {isChecked ? (
-                            <TextField
-                              name={fieldName as any}
-                              inputMasks={[makeMaskToDecimal(2)]}
-                              units="mm"
-                            />
-                          ) : null}
-                        </div>
-                      </Flex>
-                      {isChecked ? (
-                        <div
-                          style={{
-                            height: '2.0rem',
-                            fontSize: '0.75rem',
+                      <Flex zIndex={2}>
+                        <CheckboxField
+                          name={fieldName}
+                          value={isChecked}
+                          label={definition.metadata.displayName}
+                          onChange={() => {
+                            const compatibleAdaptersCopy = {
+                              ...values.compatibleAdapters,
+                            }
+                            if (isChecked) {
+                              const { [key]: _, ...newCompatibleAdapters } =
+                                compatibleAdaptersCopy
+                              setFieldValue(
+                                'compatibleAdapters',
+                                newCompatibleAdapters
+                              )
+                            } else {
+                              const initialValue =
+                                canDeriveCollarStacking &&
+                                isVacuumCollar(definition)
+                                  ? getVacuumCollarStackingMeasurement(
+                                      definition.dimensions.zDimension,
+                                      skirtHeightMm,
+                                      getVacuumCollarSeatingInset(definition)
+                                    )
+                                  : 0
+                              setFieldValue('compatibleAdapters', {
+                                ...compatibleAdaptersCopy,
+                                [key]: initialValue,
+                              })
+                            }
                           }}
-                        >
-                          <p>
-                            {key === 'opentrons_flex_96_tiprack_adapter'
-                              ? 'Measure from the bottom of the tip rack adapter to the highest part of the tip rack, not including the tips themselves.'
-                              : 'Measure from the bottom of the adapter to the highest part of the labware.'}
-                          </p>
-                        </div>
-                      ) : null}
+                        />
+                      </Flex>
+                      <div className={styles.form_fields_column}>
+                        {isChecked ? (
+                          <TextField
+                            name={fieldName as any}
+                            inputMasks={[makeMaskToDecimal(2)]}
+                            units="mm"
+                          />
+                        ) : null}
+                      </div>
                     </Flex>
                   )
                 })}

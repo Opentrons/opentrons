@@ -2,6 +2,7 @@ import { createRegularLabware, getModuleDef } from '@opentrons/shared-data'
 
 import { DISPLAY_VOLUME_UNITS } from './fields'
 import { getIsCustomTubeRack } from './utils'
+import { labwareAllowsProtrudingWells } from './utils/protrudingWells'
 
 import type {
   //   createIrregularLabware,
@@ -17,6 +18,7 @@ import type { ProcessedLabwareFields } from './fields'
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
 export const MULTI_CHANNEL_WIDTH_MM = 64
+const GRIP_HEIGHT_BELOW_LABWARE_TOP_MM = 2.5
 
 export const _getGroupMetadataDisplayCategory = (args: {
   aluminumBlockChildType: string | null | undefined
@@ -65,8 +67,14 @@ export function fieldsToLabware(
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
     const format = 'irregular'
+    const isFilterPlate = fields.labwareType === 'filterPlate'
     let quirks: string[] =
-      fields.hasLpcQuirk === 'true' ? ['noLabwarePositionCheck'] : []
+      isFilterPlate || fields.hasLpcQuirk === 'true'
+        ? ['noLabwarePositionCheck']
+        : []
+    if (isFilterPlate) {
+      quirks = ['filterPlate', ...quirks]
+    }
     const heightOrDiameter =
       fields.wellShape === 'circular'
         ? fields.wellDiameter
@@ -104,6 +112,8 @@ export function fieldsToLabware(
     })
 
     const isTiprack = fields.labwareType === 'tipRack'
+    // Total extents. well.z = height - depth (material under the inside bottom).
+    const overallHeight = fields.labwareZDimension
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
@@ -118,7 +128,7 @@ export function fieldsToLabware(
       stackingOffsetWithLabware[loadName] = {
         x: 0,
         y: 0,
-        z: fields.labwareZDimension + adapterHeight - zValue,
+        z: overallHeight + adapterHeight - zValue,
       }
     })
 
@@ -130,11 +140,22 @@ export function fieldsToLabware(
         y: 0,
         //  ensure that z is a number!
         z:
-          fields.labwareZDimension -
+          overallHeight -
           parseFloat(String(z)) +
           moduleDefinition.labwareOffset.z,
       })
     })
+
+    // A default overlap lets a filter plate sit on labware that is not listed
+    // by name. The labware bottom, which includes a well that reaches the
+    // bottom, sits on the labware below.
+    if (isFilterPlate) {
+      stackingOffsetWithLabware.default = {
+        x: 0,
+        y: 0,
+        z: 0,
+      }
+    }
 
     const def = createRegularLabware({
       strict: false,
@@ -148,6 +169,7 @@ export function fieldsToLabware(
         format,
         quirks,
         isTiprack,
+        ...(isFilterPlate ? { isDeckSlotCompatible: false } : {}),
         // NOTE: `wellDepth` field is used to represent tip length for tip racks
         ...(isTiprack ? { tipLength: fields.wellDepth } : {}),
         // Currently, assume labware is not magnetic module compatible. We don't have the information here.
@@ -157,17 +179,15 @@ export function fieldsToLabware(
       dimensions: {
         xDimension: fields.footprintXDimension,
         yDimension: fields.footprintYDimension,
-        zDimension: fields.labwareZDimension,
+        zDimension: overallHeight,
       },
       brand,
       version: 1,
       offset: {
         x: fields.gridOffsetX,
         y: fields.gridOffsetY,
-        // NOTE: must give wells a z offset b/c `well.z = offset.z - wellDepth`.
-        // We include well lip as part of Z dimension in Labware Creator's fields,
-        // so labware's offset.z is the SAME as labwareZDimension.
-        z: fields.labwareZDimension,
+        // `well.z = offset.z - wellDepth` → height - depth under the inside bottom.
+        z: overallHeight,
       },
       grid: {
         column: fields.gridColumns,
@@ -205,12 +225,25 @@ export function fieldsToLabware(
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
+    const skirtHeight = fields.skirtHeight ?? 0
+    if (
+      labwareAllowsProtrudingWells(fields.labwareType) &&
+      skirtHeight > 0
+    ) {
+      def.skirtHeight = skirtHeight
+    }
+    if (isFilterPlate) {
+      const gripHeight = overallHeight - GRIP_HEIGHT_BELOW_LABWARE_TOP_MM
+      if (gripHeight > 0) {
+        def.gripHeightFromLabwareBottom = Math.round(gripHeight * 100) / 100
+      }
+    }
     // Calculate stack offset for labware on itself
     if (fields.stackedLabwareZDimension) {
       stackingOffsetWithLabware[def.parameters.loadName] = {
         x: 0,
         y: 0,
-        z: fields.stackedLabwareZDimension - 2 * fields.labwareZDimension,
+        z: fields.stackedLabwareZDimension - 2 * overallHeight,
       }
     }
     return def

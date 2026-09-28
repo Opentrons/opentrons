@@ -56,7 +56,10 @@ import { getDefaultedDef } from './getDefaultedDef'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
 import styles from './styles.module.css'
-import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
+import {
+  getIsSideViewGeometryChanged,
+  getIsXYGeometryChanged,
+} from './utils/getIsXYGeometryChanged'
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { WizardHeader } from './WizardHeader'
 
@@ -314,6 +317,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
+            fields.labwareType === 'filterPlate' ||
             fields.labwareType === 'reservoir' ||
             fields.labwareType === 'tipRack'
           ) {
@@ -430,7 +434,8 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
 
           if (
             (status.prevValues !== values && status.prevValues == null) ||
-            getIsXYGeometryChanged(status.prevValues, values)
+            getIsXYGeometryChanged(status.prevValues, values) ||
+            getIsSideViewGeometryChanged(status.prevValues, values)
           ) {
             // update defaultedDef with new values
             setStatus({
@@ -453,6 +458,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
+            values.labwareType === 'filterPlate' ||
             values.labwareType === 'reservoir' ||
             values.labwareType === 'tipRack' ||
             (values.labwareType === 'tubeRack' &&
@@ -734,7 +740,10 @@ function CreateForm(props: CreateFileFormProps): JSX.Element {
               onClick={() => {
                 proceed(1)
               }}
-              disabled={errors.labwareZDimension != null}
+              disabled={
+                errors.labwareZDimension != null ||
+                errors.skirtHeight != null
+              }
             >
               Next
             </PrimaryButton>
@@ -952,6 +961,7 @@ function CreateForm(props: CreateFileFormProps): JSX.Element {
               onClick={() => {
                 proceed(1)
               }}
+              disabled={errors.compatibleAdapters != null}
             >
               Next
             </PrimaryButton>

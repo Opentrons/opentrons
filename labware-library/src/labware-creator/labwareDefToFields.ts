@@ -63,6 +63,11 @@ export function labwareDefToFields(
   let labwareType: LabwareFields['labwareType'] | null = null
 
   if (
+    def.metadata.displayCategory === 'filterPlate' ||
+    def.parameters.quirks?.includes('filterPlate') === true
+  ) {
+    labwareType = 'filterPlate'
+  } else if (
     def.metadata.displayCategory === 'wellPlate' ||
     def.metadata.displayCategory === 'tubeRack' ||
     def.metadata.displayCategory === 'aluminumBlock' ||
@@ -135,6 +140,7 @@ export function labwareDefToFields(
     footprintXDimension: String(def.dimensions.xDimension),
     footprintYDimension: String(def.dimensions.yDimension),
     labwareZDimension: String(def.dimensions.zDimension),
+    skirtHeight: def.skirtHeight != null ? String(def.skirtHeight) : '0',
 
     // Missing values or zeroes for these fields should be translated to null
     gridRows: gridRowsNum > 0 ? String(gridRowsNum) : null,
