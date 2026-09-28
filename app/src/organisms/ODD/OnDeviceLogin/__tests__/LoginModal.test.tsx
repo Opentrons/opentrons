@@ -8,7 +8,8 @@ import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getUserLoginStatus, validateSelfPassword } from '@opentrons/api-client'
+import { getUserLoginStatus } from '@opentrons/api-client'
+import { useValidateSelfPasswordMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
@@ -40,7 +41,6 @@ vi.mock('@opentrons/api-client', async importOriginal => {
   return {
     ...actual,
     getUserLoginStatus: vi.fn(),
-    validateSelfPassword: vi.fn(),
   }
 })
 
@@ -49,6 +49,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: vi.fn(() => ({ hostname: 'localhost', port: 31950 })),
+    useValidateSelfPasswordMutation: vi.fn(),
   }
 })
 
@@ -166,8 +167,8 @@ async function advanceFromUsername(): Promise<void> {
 describe('LoginModal', () => {
   beforeEach(() => {
     mockUserLoginStatus(null)
-    vi.mocked(validateSelfPassword).mockResolvedValue({
-      data: null,
+    vi.mocked(useValidateSelfPasswordMutation).mockReturnValue({
+      validateSelfPassword: vi.fn().mockResolvedValue(null),
     } as any)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),

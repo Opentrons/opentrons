@@ -24,7 +24,7 @@ import { showLoginModal } from '..'
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof import('@opentrons/api-client')>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getUserLoginStatus: vi.fn(),

@@ -40,7 +40,7 @@ export interface OnDeviceLoginProps {
   onClearLoginError?: () => void
   /** When set, called before advancing from the username step to the password step. */
   onUsernameSubmit?: (username: string) => Promise<void>
-  /**When set during password reset, called after client-side complexity checks.*/
+  /** When set during password reset, called after client-side complexity checks. */
   onValidateNewPassword?: (password: string) => Promise<string | null>
   /** Robot password policy for client-side validation on the new-password step. */
   passwordComplexity: PasswordComplexityRequirements | null
