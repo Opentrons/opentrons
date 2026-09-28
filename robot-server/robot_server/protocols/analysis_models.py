@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
-    Command,
     ErrorOccurrence,
     LabwareOffset,
     Liquid,

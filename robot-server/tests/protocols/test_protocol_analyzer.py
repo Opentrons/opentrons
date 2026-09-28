@@ -296,7 +296,7 @@ async def test_analyze(
             analysis_id="analysis-id",
             robot_type=robot_type,
             run_time_parameters=[bool_parameter],
-            commands=[analysis_command],
+            commands=[analysis_command.model_dump(by_alias=True)],
             labware=[analysis_labware],
             modules=[],
             pipettes=[analysis_pipette],

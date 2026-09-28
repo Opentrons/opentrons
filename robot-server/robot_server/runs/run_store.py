@@ -741,8 +741,7 @@ class RunStore:
     async def insert_batch_commands(
         self, run_id: str, commands_total: int, batch_commands: list[Command]
     ) -> None:
-        """Insert or update a command on the run command table"""
-
+        """Insert or update a command on the run command table."""
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)

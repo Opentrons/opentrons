@@ -187,7 +187,6 @@ async def construct_run_result(
     Of note, in order to prevent copies of the data appearing in both the robot-server and
     the protocol process the commands are deleted to preserve memory.
     """
-
     return RunResult(
         state_summary=await run_coordinator.get_state_summary(),
         commands=[],
@@ -219,6 +218,7 @@ class RunOrchestratorStore:
             run_process_pyro_provider: If in protocol subprocess mode, provides
                 the run process proxy when running a protocol.
             access_control_status: Status of the Auth-Server access control enablement.
+            command_store_provider: Provider interface for the persistence commands store.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type

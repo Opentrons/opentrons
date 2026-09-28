@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated, Any, Awaitable, Callable, Coroutine, Optional
+from typing import Annotated, Any, Callable, Coroutine, Optional
 
 from fastapi import Depends
 

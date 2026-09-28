@@ -179,7 +179,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands_json: Optional[List[dict[str, Any]]],
+        commands: Optional[List[dict[str, Any]]],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -211,9 +211,9 @@ class AnalysisStore:
             labware_offsets: See `CompletedAnalysis.labware_offsets`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
-        if commands_json is None:
+        if commands is None:
             # Use the locally stored commands list
-            commands_json = self._commands_json_list
+            commands = self._commands_json_list
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
         assert protocol_id is not None, (
@@ -239,7 +239,7 @@ class AnalysisStore:
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
             runTimeParameters=run_time_parameters,
-            commands=commands_json,
+            commands=commands,
             labware=labware,
             modules=modules,
             pipettes=pipettes,
