@@ -5,7 +5,6 @@ import type {
   DocumentationState,
 } from '@opentrons/react-api-client'
 
-const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
 const UPDATES_WRITE_SCOPE = 'updates.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
@@ -75,33 +74,14 @@ export function isRunSignoffRequiredError(error: unknown): boolean {
   return errorId === RUN_SIGNOFF_REQUIRED
 }
 
-export function getAuditLogDeleteErrorMessage(
-  error: unknown,
-  permissionErrorMessage: string,
-  generalErrorMessage: string
-): string {
-  if (isForbiddenError(error)) {
-    return permissionErrorMessage
-  }
-  return generalErrorMessage
-}
-
-export function isProtocolWritePermissionError(error: unknown): boolean {
-  return isForbiddenMissingScope(error, PROTOCOLS_WRITE_SCOPE)
-}
-
 export function isUpdatesWritePermissionError(error: unknown): boolean {
   return isForbiddenMissingScope(error, UPDATES_WRITE_SCOPE)
 }
 
 export function getProtocolOrRunCreationErrorMessage(
   error: unknown,
-  generalErrorMessage: string,
-  permissionErrorMessage: string
+  generalErrorMessage: string
 ): string {
-  if (isProtocolWritePermissionError(error)) {
-    return permissionErrorMessage
-  }
   if (isAxiosError(error)) {
     const detail = (
       error.response?.data as
