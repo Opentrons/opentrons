@@ -38,11 +38,15 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 
 from hardware_testing import data
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 from opentrons.hardware_control.types import TipStateType
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     get_latest_tip_overlap_before_version,
     validate_and_default_tip_overlap_version,
+)
+from opentrons_shared_data.errors.exceptions import (
+    FirmwareUpdateRequiredError,
+    MoveConditionNotMetError,
 )
 from opentrons_shared_data.labware import load_definition as load_labware
 
@@ -491,6 +495,47 @@ async def _return_tip(
     await api.drop_tip(MOUNT)
 
 
+async def _home_all_axes_after_error(api: Any, logger: logging.Logger) -> str:
+    """Best-effort recovery homing after a failed cycle.
+
+    ``api.home()`` is intentionally attempted first because it is the only
+    supported operation that homes every currently attached axis, including
+    the high-throughput tip axis.  A stale pipette firmware can make that
+    call fail before the gantry axes are homed, so retry the gantry-only axes
+    as a separate home request. Recovery errors are returned to the caller instead of
+    being raised: the lifetime test must record the failed cycle and continue.
+    """
+    try:
+        await api.home()
+        logger.info("Recovery homing completed for all axes")
+        return ""
+    except asyncio.CancelledError:
+        raise
+    except Exception as error:
+        logger.exception("Recovery home of all axes failed: %s", error)
+
+    # If one pipette subsystem requires a firmware update, the controller may
+    # reject the all-axis request before homing X/Y/Z.  Home the gantry axes
+    # separately so the next cycle starts from a known physical position.
+    gantry_axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.Z_G]
+    gantry_error: Optional[BaseException] = None
+    try:
+        await api.home(axes=gantry_axes)
+        logger.info("Recovery homing completed for gantry axes: %s", gantry_axes)
+    except asyncio.CancelledError:
+        raise
+    except Exception as error:
+        gantry_error = error
+        logger.exception("Recovery gantry homing failed: %s", error)
+
+    if gantry_error is None:
+        return "all-axis home failed; gantry-only home completed"
+    return (
+        "all-axis home failed; gantry-only home also failed: "
+        f"{type(gantry_error).__name__}: {gantry_error}"
+    )
+
+
 def _cycle_row(
     *,
     started_at: float,
@@ -530,7 +575,7 @@ async def _run_cycles(
     model: str,
     serial: str,
     rack_position: Point,
-) -> None:
+) -> int:
     """Execute and persist all requested pickup/return cycles."""
     started_at = perf_counter()
     settings = _get_tip_settings(api, attached, config.pipette_volume)
@@ -542,6 +587,7 @@ async def _run_cycles(
         settings.return_height,
         settings.extra_retract,
     )
+    recovered_errors = 0
     for cycle in range(1, config.cycles + 1):
         pickup_presence = "SKIPPED" if not config.check_tip_presence else "NOT_RUN"
         return_presence = "SKIPPED" if not config.check_tip_presence else "NOT_RUN"
@@ -585,11 +631,26 @@ async def _run_cycles(
             error = f"Cancelled during {stage}; inspect the pipette and rack"
             logger.warning("Cycle %d/%d: %s", cycle, config.cycles, error)
             raise
+        except (MoveConditionNotMetError, FirmwareUpdateRequiredError) as error_value:
+            error = f"{stage}: {type(error_value).__name__}: {error_value}"
+            logger.exception("Cycle %d/%d: FAIL", cycle, config.cycles)
+            home_error = await _home_all_axes_after_error(api, logger)
+            if home_error:
+                error += f"; recovery: {home_error}"
+            recovered_errors += 1
+            result = "FAIL_RECOVERED"
+            logger.warning(
+                "Cycle %d/%d: %s; continuing with the next cycle",
+                cycle,
+                config.cycles,
+                error,
+            )
         except Exception as error_value:
             error = f"{stage}: {type(error_value).__name__}: {error_value}"
             logger.exception("Cycle %d/%d: FAIL", cycle, config.cycles)
-            # A partial pickup or failed move can leave both the physical tip
-            # state and position uncertain. Do not eject tips at that position.
+            # A non-motion error is not safe to recover from automatically.
+            # Preserve the previous fail-fast behavior for configuration,
+            # sensor, and programming errors.
             logger.warning(
                 "Stopped during %s; inspect the pipette and rack before recovery",
                 stage,
@@ -610,10 +671,11 @@ async def _run_cycles(
                     error=error,
                 ),
             )
+    return recovered_errors
 
 
 async def _main(config: AgingConfig) -> RunArtifacts:
-    """Run the test, home on success, and close the hardware connection."""
+    """Run the test, recover motion errors, and close the hardware connection."""
     artifacts = _create_run_artifacts(config)
     logger, handlers = _configure_logger(artifacts)
     api: Any = None
@@ -672,7 +734,7 @@ async def _main(config: AgingConfig) -> RunArtifacts:
             ],
         )
         if not config.calibrate_only:
-            await _run_cycles(
+            recovered_errors = await _run_cycles(
                 api,
                 config,
                 artifacts,
@@ -682,13 +744,36 @@ async def _main(config: AgingConfig) -> RunArtifacts:
                 serial,
                 rack_position,
             )
-            logger.info("Completed %d pickup/return cycles", config.cycles)
-        # Home only after a completed operation. On failure the position and
-        # tip state may be unknown, so leave mechanical recovery to the operator.
-        await api.home()
-        logger.info("Robot homed")
+            if recovered_errors:
+                logger.warning(
+                    "Completed %d pickup/return cycles with %d recovered error(s)",
+                    config.cycles,
+                    recovered_errors,
+                )
+            else:
+                logger.info("Completed %d pickup/return cycles", config.cycles)
+        else:
+            recovered_errors = 0
+
+        # Do not turn a completed run into a failed run if the same stale
+        # firmware condition prevents the final home. The recovery helper
+        # attempts every axis and records any limitation in the log.
+        final_home_error = await _home_all_axes_after_error(api, logger)
+        if final_home_error:
+            logger.warning("Final recovery home was incomplete: %s", final_home_error)
         await api.clean_up()
         api = None
+        if config.calibrate_only:
+            summary_result = "CALIBRATED"
+        elif recovered_errors:
+            summary_result = "COMPLETED_WITH_ERRORS"
+        else:
+            summary_result = "PASS"
+        summary_error = (
+            f"recovered_motion_errors={recovered_errors}"
+            if recovered_errors
+            else final_home_error
+        )
         _append_csv_row(
             artifacts,
             [
@@ -703,8 +788,8 @@ async def _main(config: AgingConfig) -> RunArtifacts:
                 "A1",
                 "",
                 "",
-                "CALIBRATED" if config.calibrate_only else "PASS",
-                "",
+                summary_result,
+                summary_error,
             ],
         )
         return artifacts
