@@ -33,7 +33,7 @@ interface NavigationProps {
   longPressModalIsOpened?: boolean
 }
 export function Navigation(props: NavigationProps): ReactNode {
-  const { setNavMenuIsOpened, longPressModalIsOpened } = props
+  const { setNavMenuIsOpened } = props
 
   const { t } = useTranslation('top_navigation')
 
@@ -71,8 +71,6 @@ export function Navigation(props: NavigationProps): ReactNode {
     })
   }, [])
 
-  const navMenuOrModalIsOpened = showNavMenu || Boolean(longPressModalIsOpened)
-
   function getPathDisplayName(path: (typeof NAV_LINKS)[number]): string {
     switch (path) {
       case '/instruments':
@@ -93,9 +91,7 @@ export function Navigation(props: NavigationProps): ReactNode {
       <nav
         className={clsx(
           styles.nav_bar,
-          navMenuOrModalIsOpened
-            ? styles.nav_bar_static
-            : styles.nav_bar_sticky,
+          styles.nav_bar_sticky,
           isScrolled && styles.nav_bar_scrolled
         )}
       >

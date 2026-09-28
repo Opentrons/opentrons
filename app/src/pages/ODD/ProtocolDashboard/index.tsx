@@ -14,6 +14,7 @@ import {
   POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -224,13 +225,9 @@ export function ProtocolDashboard({
                 flexDirection={DIRECTION_ROW}
                 paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
-                position={
-                  navMenuIsOpened || longPressModalIsOpened
-                    ? POSITION_STATIC
-                    : POSITION_STICKY
-                }
+                position={POSITION_STICKY}
                 top="7.75rem"
-                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
+                zIndex={Z_INDEX.DETAILS}
                 width="100%"
               >
                 <Flex width="32.3125rem">

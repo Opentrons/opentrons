@@ -28,6 +28,7 @@ import {
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
 
@@ -230,7 +231,7 @@ export function Labware(): ReactNode {
           {showSortByMenu && (
             <Flex
               width="9.375rem"
-              zIndex={2}
+              zIndex={Z_INDEX.MENUS}
               borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}

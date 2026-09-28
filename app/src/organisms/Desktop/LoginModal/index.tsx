@@ -16,6 +16,7 @@ import {
   StyledText,
   SUCCESS_TOAST,
   Toast,
+  Z_INDEX,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
@@ -310,9 +311,12 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
       <Modal
         title={t('access_control:desktop_login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
-        // Login is 10001 so it sits above SignRun (1000) and documentation (10000).
-        // Drop to 9999 on set-new-password so the documentation modal is visible.
-        zIndexOverlay={screen.kind === 'setNewPassword' ? 9999 : 10001}
+        zIndexOverlay={
+          // bounce below documentation modal when setting a new password
+          screen.kind === 'setNewPassword'
+            ? Z_INDEX.COMPLIANCE_MODALS - 1
+            : Z_INDEX.LOGIN_MODAL
+        }
         footer={<div className={styles.modal_footer_container}>{footer}</div>}
       >
         <div className={styles.content_container}>

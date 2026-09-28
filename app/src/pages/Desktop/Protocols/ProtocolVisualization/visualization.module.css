@@ -88,19 +88,18 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 /* Hide thumb initially */
 .range_input::-webkit-slider-thumb {
-  z-index: 5;
+  z-index: var(--z-index-details);
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
@@ -117,7 +116,7 @@
 .range_input:focus::-webkit-slider-thumb,
 .range_input:active::-webkit-slider-thumb {
   position: relative;
-  z-index: 5;
+  z-index: var(--z-index-details);
   opacity: 1;
   pointer-events: auto;
 }

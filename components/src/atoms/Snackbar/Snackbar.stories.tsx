@@ -78,7 +78,7 @@ const SnackbarRenderComponent: React.FC<
           width="100%"
           position="absolute"
           bottom={SPACING.spacing40}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
         >
           <SnackbarComponent
             {...args}

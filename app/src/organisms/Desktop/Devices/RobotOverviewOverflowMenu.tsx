@@ -19,6 +19,7 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useMountEffect,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -161,7 +162,7 @@ export const RobotOverviewOverflowMenu = (
       {showOverflowMenu ? (
         <Flex
           whiteSpace={NO_WRAP}
-          zIndex={10}
+          zIndex={Z_INDEX.MODALS}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

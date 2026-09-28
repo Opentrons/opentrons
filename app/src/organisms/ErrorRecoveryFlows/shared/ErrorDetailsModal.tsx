@@ -13,6 +13,7 @@ import {
   ModalShell,
   SPACING,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
@@ -191,7 +192,7 @@ export function ErrorDetailsModalODD(props: ErrorDetailsModalType): ReactNode {
     <OddModal
       header={modalHeader}
       onOutsideClick={toggleModal}
-      zIndex={15}
+      zIndex={Z_INDEX.MODAL_DETAILS}
       gridGap={SPACING.spacing32}
     >
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>

@@ -12,6 +12,7 @@ import {
   Snackbar,
   SPACING,
   Toast,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
@@ -29,8 +30,6 @@ import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 interface ToasterOvenProps {
   children: ReactNode
 }
-
-const DEFAULT_TOAST_CONTAINER_Z_INDEX = 1000
 
 /**
  * A toaster oven that renders up to 5 toasts in an app-level display container
@@ -85,11 +84,9 @@ export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
   )
 
   const toastContainerZIndex = Math.max(
-    DEFAULT_TOAST_CONTAINER_Z_INDEX,
-    ...toasts.map(toast =>
-      typeof toast.zIndex === 'number'
-        ? toast.zIndex
-        : DEFAULT_TOAST_CONTAINER_Z_INDEX
+    Z_INDEX.TOASTS,
+    ...toasts.map((toast: ToastProps): number =>
+      typeof toast.zIndex === 'number' ? toast.zIndex : Z_INDEX.TOASTS
     )
   )
 
@@ -157,7 +154,7 @@ export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
           width="100%"
           position="absolute"
           bottom={SPACING.spacing40}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
           onClick={() => {
             eatSnackbar()
           }}

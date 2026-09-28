@@ -2,6 +2,7 @@ import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
+import { Z_INDEX } from '../styles'
 import styles from './Select.module.css'
 
 import type { ReactNode } from 'react'
@@ -72,7 +73,7 @@ const CLEAR_STYLES: StylesConfig<SelectOption> = {
   indicatorSeparator: NO_STYLE_FN,
   input: (styles: CSSObjectWithLabel) => ({
     ...styles,
-    zIndex: 2,
+    zIndex: Z_INDEX.BASE,
     position: 'absolute',
   }),
   loadingIndicator: NO_STYLE_FN,
