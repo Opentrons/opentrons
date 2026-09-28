@@ -30,7 +30,6 @@ class CommandStoreProvider:
         """Set the current Run Id."""
         self._run_id = run_id
 
-
     async def insert_batch_commands(
         self, commands_total: int, commands_batch: list["Command"]
     ) -> None:

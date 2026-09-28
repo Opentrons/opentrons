@@ -51,9 +51,11 @@ class CommandManager:
             self.command_store_interface_task()
         )
 
-    def teardown_command_store_task(self) -> None:
+    async def teardown_command_store_task(self) -> None:
         """Send the teardown signal to the command store interface task."""
+        log.warning("INITIATING TEARDOWN")
         self._teardown_signal.set()
+        await self._command_store_interface_task
 
     async def _send_batch_command_insert_request(
         self, command_json_batch: list[CommandEntryJSON]
@@ -86,7 +88,11 @@ class CommandManager:
             await asyncio.sleep(0.1)
 
         # In teardown, send the remaining commands until none remain before task completion to ensure all commands are written
+        log.warning("INITIATING TEARDOWN - SENDING REMAINING COMMANDS")
         while self._command_queue:
+            log.warning(
+                f"SENDING TEARDOWN BATCH, REMAINING = {len(self._command_queue)}"
+            )
             command_entry_json_batch = []
             for i in range(min(_COMMAND__BATCH_MAX, len(self._command_queue))):
                 command_entry_json = self._command_queue.pop()
@@ -359,6 +365,9 @@ class CommandHistory:
         self._remove_queue_id(command.id)
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
+        self._command_manager.insert_command(
+            command_entry=self._commands_by_id[command.id]
+        )
 
     def set_command_failed(self, command: Command) -> None:
         """Validate and mark a command as failed in the command history."""
@@ -386,10 +395,14 @@ class CommandHistory:
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
         self._all_failed_command_ids.append(command.id)
+        self._command_manager.insert_command(
+            command_entry=self._commands_by_id[command.id]
+        )
 
-    def teardown_command_manager(self) -> None:
+    async def teardown_command_manager(self) -> None:
         """Handle teardown of the interface that interacts with the RunStore and AnalysisStore remotely."""
-        self._command_manager.teardown_command_store_task()
+        log.warning("BEGINNING TEARDOWN")
+        await self._command_manager.teardown_command_store_task()
 
     # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
     # Explicitly clearing all history before dereferencing protocol engine and the run's run orchestrator eliminates
@@ -415,9 +428,6 @@ class CommandHistory:
             command=command_entry.command.model_dump_json(by_alias=True),
             command_type=type(command_entry.command),
             index=command_entry.index,
-        )
-        self._command_manager.insert_command(
-            command_entry=self._commands_by_id[command_id]
         )
 
     def _add_to_queue(self, command_id: str) -> None:
