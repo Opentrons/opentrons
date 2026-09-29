@@ -1,25 +1,24 @@
-"""Helper functions commonly used in protocols."""
+"""DVT1ABR4: Illumina DNA Enrichment."""
+from typing import Tuple, Union
+from opentrons.protocol_api import Labware
 from opentrons.protocol_api import (
-    ProtocolContext,
-    Labware,
-    InstrumentContext,
     ParameterContext,
+    ProtocolContext,
     Well,
+    InstrumentContext,
 )
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
     ThermocyclerContext,
     TemperatureModuleContext,
-    MagneticModuleContext,
-    AbsorbanceReaderContext,
 )
-from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
+from typing import List, Dict
 
 
 metadata = {
-    "protocolName": "ABR OFF Illumina DNA Enrichment v4 with TC Auto Sealing Lid",
+    "protocolName": "Illumina DNA Enrichment v4 with TC Auto Sealing Lid",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
@@ -29,41 +28,7 @@ requirements = {
     "robotType": "Flex",
     "apiLevel": "2.28",
 }
-# CONSTANTS
 
-hs_str = "heaterShakerModuleV1"
-mag_str = "magneticBlockV1"
-temp_str = "temperature module gen2"
-tc_str = "thermocycler module gen2"
-abs_mod_str = "absorbanceReaderV1"
-liquid_colors = [
-    "#008000",
-    "#008000",
-    "#A52A2A",
-    "#A52A2A",
-    "#00FFFF",
-    "#0000FF",
-    "#800080",
-    "#ADD8E6",
-    "#FF0000",
-    "#FFFF00",
-    "#FF00FF",
-    "#00008B",
-    "#7FFFD4",
-    "#FFC0CB",
-    "#FFA500",
-    "#00FF00",
-    "#C0C0C0",
-]
-
-# Modules with deactivate
-ModuleTypes = Union[
-    TemperatureModuleContext,
-    ThermocyclerContext,
-    HeaterShakerContext,
-    MagneticModuleContext,
-    AbsorbanceReaderContext,
-]
 
 # SCRIPT SETTINGS
 DRYRUN = False  # True = skip incubation times, shorten mix, for testing purposes
@@ -95,126 +60,6 @@ total_waste_volume = 0.0
 RUN = 1
 
 
-def add_parameters(parameters: ParameterContext) -> None:
-    """Add parameters."""
-    parameters.add_int(
-        variable_name="heater_shaker_speed",
-        display_name="Heater Shaker Shake Speed",
-        description="Speed to set the heater shaker to",
-        default=2000,
-        minimum=200,
-        maximum=3000,
-        unit="rpm",
-    )
-    parameters.add_int(
-        variable_name="error_capture_duration",
-        display_name="Error Capture Duration",
-        description="Length of video clip to capture on error (in seconds).",
-        default=30,
-        minimum=5,
-        maximum=6000,
-        unit="seconds",
-    )
-    """Create parameter for dot bottom value."""
-    parameters.add_float(
-        variable_name="dot_bottom",
-        display_name=".bottom",
-        description="Lowest value pipette will go to.",
-        default=0.5,
-        choices=[
-            {"display_name": "0.0", "value": 0.0},
-            {"display_name": "0.1", "value": 0.1},
-            {"display_name": "0.2", "value": 0.2},
-            {"display_name": "0.3", "value": 0.3},
-            {"display_name": "0.4", "value": 0.4},
-            {"display_name": "0.5", "value": 0.5},
-            {"display_name": "0.6", "value": 0.6},
-            {"display_name": "0.7", "value": 0.7},
-            {"display_name": "0.8", "value": 0.8},
-            {"display_name": "0.9", "value": 0.9},
-            {"display_name": "1.0", "value": 1.0},
-        ],
-    )
-    """Create parameter to use/not use disposable lid."""
-    parameters.add_bool(
-        variable_name="disposable_lid",
-        display_name="Disposable Lid",
-        description="True means use lid.",
-        default=True,
-    )
-    """Create parameter to save tips without using trash bin."""
-    parameters.add_bool(
-        variable_name="use_trash_bin",
-        display_name="Use Trash Bin",
-        description="Save tips without using trash bin.",
-        default=False,
-    )
-    """Create parameter for tc lid deck riser."""
-    parameters.add_bool(
-        variable_name="deck_riser",
-        display_name="Deck Riser",
-        description="True means use deck riser.",
-        default=True,
-    )
-    parameters.add_bool(
-        variable_name="trash_lid",
-        display_name="Trash Disposable Lid",
-        description="True means trash lid, false means keep on deck.",
-        default=True,
-    )
-    """Create parameter for deactivating modules at the end fof run."""
-    parameters.add_bool(
-        variable_name="deactivate_modules",
-        display_name="Deactivate Modules",
-        description="deactivate all modules at end of run",
-        default=True,
-    )
-    """Create parameter for probe liquid height."""
-    parameters.add_bool(
-        variable_name="probe_liquid_height",
-        display_name="Probe Liquid Height",
-        description="True means probe liquid height at start of run.",
-        default=False,
-    )
-    # NOTE: meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    parameters.add_float(
-        variable_name="meniscus_z",
-        display_name="Meniscus Z",
-        default=-0.5,
-        minimum=-10.0,
-        maximum=10.0,
-        description="Z offset for meniscus height. Default is -1.5mm.",
-    )
-
-
-def use_disposable_lid_with_tc(
-    protocol: ProtocolContext,
-    lid_stack: Labware,
-    plate_in_thermocycler: Labware,
-    thermocycler: ThermocyclerContext,
-) -> None:
-    """Use disposable lid with thermocycler."""
-    thermocycler.open_lid()
-    protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
-    thermocycler.close_lid()
-
-
-def load_common_liquid_setup_labware_and_instruments(
-    protocol: ProtocolContext,
-) -> Tuple[Labware, Labware, InstrumentContext]:
-    """Load Commonly used Labware and Instruments."""
-    # Tip rack
-    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
-    # Pipette
-    p1000 = protocol.load_instrument(
-        instrument_name="flex_8channel_1000", mount="left", tip_racks=[tip_rack]
-    )
-    # Source_reservoir
-    source_reservoir = protocol.load_labware("nest_1_reservoir_290ml", "C2")
-    protocol.load_trash_bin("A3")
-    return source_reservoir, tip_rack, p1000
-
-
 def comment_height_of_specific_labware(
     protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
 ) -> None:
@@ -227,29 +72,13 @@ def comment_height_of_specific_labware(
     protocol.comment(f"Liquid Waste Total Height: {total_height}")
 
 
-def set_hs_speed(
-    protocol: ProtocolContext,
-    hs: HeaterShakerContext,
-    hs_speed: int,
-    time_min: float,
-    deactivate: bool,
-) -> None:
-    """Set heatershaker for a speed and duration."""
-    hs.close_labware_latch()
-    hs.set_and_wait_for_shake_speed(hs_speed)
-    protocol.delay(
-        minutes=time_min,
-        msg=f"Shake at {hs_speed}  rpm for {time_min} minutes.",
-    )
-    if deactivate:
-        hs.deactivate_shaker()
-
-
 def load_wells_with_custom_liquids(
     protocol: ProtocolContext,
     liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
 ) -> None:
     """Load custom liquids into wells."""
+    from opentrons.protocol_api import Well
+
     liquid_colors = [
         "#008000",
         "#A52A2A",
@@ -270,11 +99,9 @@ def load_wells_with_custom_liquids(
     i = 0
     volume = 0.0
     for liquid_name, wells_info in liquid_vols_and_wells.items():
-        # Define the liquid with a color
         liquid = protocol.define_liquid(
             liquid_name, display_color=liquid_colors[i % len(liquid_colors)]
         )
-        # Load liquid into each specified well or list of wells
         for well_info in wells_info:
             if isinstance(well_info["well"], list):
                 wells = well_info["well"]
@@ -284,15 +111,12 @@ def load_wells_with_custom_liquids(
                 wells = []
             if isinstance(well_info["volume"], (float, int)):
                 volume = well_info["volume"]
-            # Load liquid into each well
             for well in wells:
                 well.load_liquid(liquid, volume)
 
 
 def find_liquid_height_of_all_wells(
-    protocol: ProtocolContext,
-    pipette: InstrumentContext,
-    wells: List[Well],
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
 ) -> Dict:
     """Find the liquid height of all wells in protocol."""
     dict_of_labware_heights = {}
@@ -301,7 +125,6 @@ def find_liquid_height_of_all_wells(
     for well in wells:
         labware_name = well.parent.name
         total_number_of_wells_in_plate = len(well.parent.wells())
-        # if pip_channels is > 1 and total_wells > 12 - only probe 1st row.
         if (
             pip_channels > 1
             and total_number_of_wells_in_plate > 12
@@ -312,11 +135,9 @@ def find_liquid_height_of_all_wells(
         elif total_number_of_wells_in_plate <= 12:
             height = pipette.measure_liquid_height(well)
             dict_of_labware_heights[labware_name, well] = height
-    if pip_channels != pipette.channels:
-        pipette.drop_tip()
-    else:
+    if pipette.has_tip:
         pipette.return_tip()
-        pipette.reset_tipracks()
+    pipette.reset_tipracks()
     msg = f"result: {dict_of_labware_heights}"
     protocol.comment(msg=msg)
     comment_height_of_specific_labware(
@@ -331,14 +152,14 @@ def find_liquid_height_of_loaded_liquids(
     pipette: InstrumentContext,
 ) -> List[Well]:
     """Find Liquid height of loaded liquids."""
+    from opentrons.protocol_api import Well
+
     load_wells_with_custom_liquids(ctx, liquid_vols_and_wells)
-    # Get flattened list of wells.
-    wells: list[Well] = [
+    wells = [
         well
         for items in liquid_vols_and_wells.values()
         for entry in items
         if isinstance(entry["well"], (Well, list)) and entry["volume"] != 0.0
-        # Ensure "well" is Well or list of Well
         for well in (
             entry["well"] if isinstance(entry["well"], list) else [entry["well"]]
         )
@@ -363,20 +184,8 @@ def load_disposable_lids(
         )
         unused_lids = deck_riser_adapter.load_lid_stack(lid_str, num_of_lids)
     else:
-        unused_lids = protocol.load_lid_stack(lid_str, deck_slot[0], num_of_lids)
+        unused_lids = protocol.load_lid_stack(lid_str, deck_slot, num_of_lids)
     return unused_lids
-
-
-def move_labware_from_hs_to_destination(
-    protocol: ProtocolContext,
-    labware_to_move: Labware,
-    hs: HeaterShakerContext,
-    new_module: Union[MagneticBlockContext, ThermocyclerContext],
-) -> None:
-    """Move labware from heatershaker to magnetic block."""
-    hs.open_labware_latch()
-    protocol.move_labware(labware_to_move, new_module, use_gripper=True)
-    hs.close_labware_latch()
 
 
 def load_hs_adapter_and_labware(
@@ -397,35 +206,6 @@ def load_hs_adapter_and_labware(
     return labware_on_hs, hs_adapter
 
 
-def deactivate_modules(protocol: ProtocolContext) -> None:
-    """Deactivate all loaded modules."""
-    modules = protocol.loaded_modules
-
-    if modules:
-        for module in modules.values():
-            if isinstance(module, HeaterShakerContext):
-                module.deactivate_shaker()
-                module.deactivate_heater()
-            elif isinstance(module, TemperatureModuleContext):
-                module.deactivate()
-            elif isinstance(module, MagneticModuleContext):
-                module.disengage()
-            elif isinstance(module, ThermocyclerContext):
-                module.deactivate()
-
-
-def move_labware_to_hs(
-    protocol: ProtocolContext,
-    labware_to_move: Labware,
-    hs: HeaterShakerContext,
-    hs_adapter: Union[Labware, HeaterShakerContext],
-) -> None:
-    """Move labware to heatershaker."""
-    hs.open_labware_latch()
-    protocol.move_labware(labware_to_move, hs_adapter, use_gripper=True)
-    hs.close_labware_latch()
-
-
 def load_temp_adapter_and_labware(
     labware_str: str, temp_mod: TemperatureModuleContext, labware_name: str
 ) -> Tuple[Labware, Labware]:
@@ -444,46 +224,208 @@ def load_temp_adapter_and_labware(
     return labware_on_temp_mod, temp_adapter
 
 
+def deactivate_modules(protocol: ProtocolContext) -> None:
+    """Deactivate all loaded modules."""
+    from opentrons.protocol_api.module_contexts import (
+        HeaterShakerContext,
+        TemperatureModuleContext,
+        MagneticModuleContext,
+        ThermocyclerContext,
+    )
+
+    modules = protocol.loaded_modules
+    if modules:
+        for module in modules.values():
+            if isinstance(module, HeaterShakerContext):
+                module.deactivate_shaker()
+                module.deactivate_heater()
+            elif isinstance(module, TemperatureModuleContext):
+                module.deactivate()
+            elif isinstance(module, MagneticModuleContext):
+                module.disengage()
+            elif isinstance(module, ThermocyclerContext):
+                module.deactivate()
+
+
+def move_labware_from_hs_to_destination(
+    protocol: ProtocolContext,
+    labware_to_move: Labware,
+    hs: HeaterShakerContext,
+    new_module: Union[MagneticBlockContext, ThermocyclerContext],
+) -> None:
+    """Move labware from heatershaker to magnetic block."""
+    hs.open_labware_latch()
+    protocol.move_labware(labware_to_move, new_module, use_gripper=True)
+    hs.close_labware_latch()
+
+
+def move_labware_to_hs(
+    protocol: ProtocolContext,
+    labware_to_move: Labware,
+    hs: HeaterShakerContext,
+    hs_adapter: Union[Labware, HeaterShakerContext],
+) -> None:
+    """Move labware to heatershaker."""
+    hs.open_labware_latch()
+    protocol.move_labware(labware_to_move, hs_adapter, use_gripper=True)
+    hs.close_labware_latch()
+
+
+def set_hs_speed(
+    protocol: ProtocolContext,
+    hs: HeaterShakerContext,
+    hs_speed: int,
+    time_min: float,
+    deactivate: bool,
+) -> None:
+    """Set heatershaker for a speed and duration."""
+    hs.close_labware_latch()
+    hs.set_and_wait_for_shake_speed(hs_speed)
+    protocol.delay(
+        minutes=time_min,
+        msg=f"Shake at {hs_speed}  rpm for {time_min} minutes.",
+    )
+    if deactivate:
+        hs.deactivate_shaker()
+
+
+def use_disposable_lid_with_tc(
+    protocol: ProtocolContext,
+    lid_stack: Labware,
+    plate_in_thermocycler: Labware,
+    thermocycler: ThermocyclerContext,
+) -> None:
+    """Use disposable lid with thermocycler."""
+    thermocycler.open_lid()
+    protocol.move_lid(lid_stack, plate_in_thermocycler, use_gripper=True)
+    thermocycler.close_lid()
+
+
+def add_parameters(parameters: ParameterContext) -> None:
+    """Add parameters."""
+    parameters.add_int(
+        variable_name="heater_shaker_speed",
+        display_name="Heater Shaker Shake Speed",
+        description="Speed to set the heater shaker to",
+        default=2000,
+        minimum=200,
+        maximum=3000,
+        unit="rpm",
+    )
+    parameters.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
+    )
+    parameters.add_float(
+        variable_name="dot_bottom",
+        display_name=".bottom",
+        description="Lowest value pipette will go to.",
+        default=0.5,
+        choices=[
+            {"display_name": "0.0", "value": 0.0},
+            {"display_name": "0.1", "value": 0.1},
+            {"display_name": "0.2", "value": 0.2},
+            {"display_name": "0.3", "value": 0.3},
+            {"display_name": "0.4", "value": 0.4},
+            {"display_name": "0.5", "value": 0.5},
+            {"display_name": "0.6", "value": 0.6},
+            {"display_name": "0.7", "value": 0.7},
+            {"display_name": "0.8", "value": 0.8},
+            {"display_name": "0.9", "value": 0.9},
+            {"display_name": "1.0", "value": 1.0},
+        ],
+    )
+    parameters.add_bool(
+        variable_name="disposable_lid",
+        display_name="Disposable Lid",
+        description="True means use lid.",
+        default=True,
+    )
+    parameters.add_bool(
+        variable_name="deck_riser",
+        display_name="Deck Riser",
+        description="True means use deck riser.",
+        default=True,
+    )
+    parameters.add_bool(
+        variable_name="trash_lid",
+        display_name="Trash Disposable Lid",
+        description="True means trash lid, false means keep on deck.",
+        default=True,
+    )
+    parameters.add_bool(
+        variable_name="deactivate_modules",
+        display_name="Deactivate Modules",
+        description="deactivate all modules at end of run",
+        default=True,
+    )
+    parameters.add_bool(
+        variable_name="probe_liquid_height",
+        display_name="Probe Liquid Height",
+        description="True means probe liquid height at start of run.",
+        default=False,
+    )
+    parameters.add_bool(
+        variable_name="enable_camera",
+        display_name="Enable Camera",
+        description="Capture start- and end-of-run images.",
+        default=False,
+    )
+    parameters.add_float(
+        variable_name="meniscus_z",
+        display_name="Meniscus Z",
+        default=-0.5,
+        minimum=-10.0,
+        maximum=10.0,
+        description="Z offset for meniscus height. Default is -1.5mm.",
+    )
+
+
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    protocol.capture_image(filename="start_of_run")
+    enable_camera = protocol.params.enable_camera  # type: ignore[attr-defined]
+    if enable_camera:
+        protocol.capture_image(filename="start_of_run")
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
-    trash_lid = protocol.params.trash_lid  # type: ignore[attr-defined]
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    use_trash_bin = protocol.params.use_trash_bin  # type: ignore[attr-defined]
+    protocol.comment("Protocol Version: 05")
+
     global p200_tips
     global p50_tips
 
     protocol.comment("THIS IS A DRY RUN") if DRYRUN else protocol.comment(
         "THIS IS A REACTION RUN"
     )
-    protocol.comment(
-        "USED TIPS WILL GO IN TRASH"
-    ) if use_trash_bin else protocol.comment("USED TIPS WILL BE RE-RACKED")
+    protocol.comment("USED TIPS WILL BE RE-RACKED")
 
     # DECK SETUP AND LABWARE
     # ========== FIRST ROW ===========
     heatershaker: HeaterShakerContext = protocol.load_module(
-        hs_str, "1"
+        "heaterShakerModuleV1", "1"
     )  # type: ignore[assignment]
     sample_plate_2, hs_adapter = load_hs_adapter_and_labware(
         "nest_96_wellplate_2ml_deep", heatershaker, "Sample Plate 2"
     )
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "2", "Liquid Waste")
     temp_block: TemperatureModuleContext = protocol.load_module(
-        temp_str, "3"
+        "temperature module gen2", "3"
     )  # type: ignore[assignment]
     reagent_plate, temp_adapter = load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
-        mag_str, "C1"
+        "magneticBlockV1", "C1"
     )  # type: ignore[assignment]
     tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
     tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
@@ -492,7 +434,7 @@ def run(protocol: ProtocolContext) -> None:
         unused_lids = load_disposable_lids(protocol, 3, "C4", deck_riser)
     # ========== THIRD ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
-        tc_str
+        "thermocycler module gen2"
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt"
@@ -501,11 +443,15 @@ def run(protocol: ProtocolContext) -> None:
     tiprack_50_2 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "9")
     # ========== FOURTH ROW ==========
     tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
-    trash_bin = protocol.load_trash_bin("A3")
+    return_reservoir = protocol.load_labware(
+        "nest_1_reservoir_195ml", "A3", "Return Reservoir"
+    )
+    return_reservoir.load_empty(return_reservoir.wells())
     lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
     # reagent
     AMPure = reservoir["A1"]
     SMB = reservoir["A2"]
+
     EtOH = reservoir["A4"]
     RSB = reservoir["A5"]
     Liquid_trash_well_1 = reservoir["A9"]
@@ -514,6 +460,8 @@ def run(protocol: ProtocolContext) -> None:
     Liquid_trash_well_4 = reservoir["A12"]
     reservoir.load_empty(
         [
+            reservoir["A3"],
+            reservoir["A6"],
             Liquid_trash_well_1,
             Liquid_trash_well_2,
             Liquid_trash_well_3,
@@ -521,6 +469,8 @@ def run(protocol: ProtocolContext) -> None:
         ]
     )
     liquid_trash_list = {
+        reservoir["A3"]: 0.0,
+        reservoir["A6"]: 0.0,
         Liquid_trash_well_1: 0.0,
         Liquid_trash_well_2: 0.0,
         Liquid_trash_well_3: 0.0,
@@ -535,23 +485,29 @@ def run(protocol: ProtocolContext) -> None:
     ) -> None:
         """Determine which wells to use as liquid waste."""
         remaining_volume = vol_to_trash
-        max_capacity = 1200.0  # Maximum capacity of a well in µL
+        # Leave 200 uL headroom in each 2 mL well for blowout.
+        max_capacity = 1800.0
         for well, current_volume in liquid_trash_list.items():
             if remaining_volume <= 0 or pipette.current_volume == 0.0:
                 break
             available_capacity = max_capacity - current_volume
-            if available_capacity >= 0:
+            if available_capacity > 0:
                 dispense_volume = min(
                     remaining_volume, available_capacity
                 )  # Take the minimum of what's left and available space
                 pipette.dispense(dispense_volume, well.top())
-                protocol.delay(minutes=0.1)
-                pipette.blow_out(well.top())
-                pipette.touch_tip(well)
 
                 # Update the tracking dictionary
                 liquid_trash_list[well] += dispense_volume
                 remaining_volume -= dispense_volume  # Reduce the remaining volume
+                if remaining_volume <= 0:
+                    protocol.delay(minutes=0.1)
+                    pipette.blow_out(well.top())
+                    pipette.touch_tip(well)
+        if remaining_volume > 0 or pipette.current_volume > 0:
+            raise RuntimeError(
+                "Liquid-waste columns are full; refusing to return a tip with liquid."
+            )
 
     # Will Be distributed during the protocol
     EEW_1 = sample_plate_2.wells_by_name()["A9"]
@@ -599,14 +555,13 @@ def run(protocol: ProtocolContext) -> None:
     }
     wells_col_1_to_7 = [well for col in sample_plate_2.columns()[:7] for well in col]
     sample_plate_2.load_empty(wells_col_1_to_7)
-
-    protocol.move_lid(lid, reagent_plate, use_gripper=True)
     heatershaker.close_labware_latch()
     thermocycler.open_lid()
     if probe_liquid_height_bool:
         find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
     else:
         load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+    protocol.move_lid(lid, reagent_plate, use_gripper=True)
     # tip and sample tracking
     if COLUMNS == 1:
         column_1_list = ["A1"]  # Plate 1
@@ -643,12 +598,14 @@ def run(protocol: ProtocolContext) -> None:
 
     def tipcheck() -> None:
         """Tip tracking function."""
+        global p200_tips
+        global p50_tips
         if p200_tips >= 3 * 12:
             p1000.reset_tipracks()
-            p200_tips == 0
+            p200_tips = 0
         if p50_tips >= 2 * 12:
             p50.reset_tipracks()
-            p50_tips == 0
+            p50_tips = 0
 
     # commands
     for loop in range(RUN):
@@ -663,9 +620,9 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.wait_for_tasks([tc_block_task, tc_lid_task, temp_block_task])
             else:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                tc_block_task = thermocycler.start_set_block_temperature(58)
-                tc_lid_task = thermocycler.start_set_lid_temperature(58)
-                hs_task = heatershaker.set_target_temperature(58)
+                tc_block_task = thermocycler.start_set_block_temperature(37)
+                tc_lid_task = thermocycler.start_set_lid_temperature(37)
+                hs_task = heatershaker.set_target_temperature(37)
                 protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
         heatershaker.close_labware_latch()
 
@@ -692,7 +649,7 @@ def run(protocol: ProtocolContext) -> None:
                     NHB2Vol, sample_plate_1[X].meniscus(z=meniscus_z, target="end")
                 )  # original = ()
                 p50.touch_tip(sample_plate_1[X])
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -708,7 +665,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
                 p50.touch_tip(sample_plate_1[X])
                 # original = ()
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -731,7 +688,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.mix(EHB2MixRep, EHB2MixVol)
                 # checked
                 p1000.touch_tip(sample_plate_1[X])
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -775,10 +732,7 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.set_block_temperature(10)
                 thermocycler.open_lid()
                 if disposable_lid:
-                    if trash_lid:
-                        protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
-                    else:
-                        protocol.move_lid(sample_plate_1, deck_riser, use_gripper=True)
+                    protocol.move_lid(sample_plate_1, unused_lids, use_gripper=True)
             else:
                 protocol.comment("Hybridize off Deck")
 
@@ -790,9 +744,9 @@ def run(protocol: ProtocolContext) -> None:
 
             if DRYRUN is False:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                tc_block_task = thermocycler.start_set_block_temperature(58)
-                tc_lid_task = thermocycler.start_set_lid_temperature(58)
-                hs_task = heatershaker.set_target_temperature(58)
+                tc_block_task = thermocycler.start_set_block_temperature(37)
+                tc_lid_task = thermocycler.start_set_lid_temperature(37)
+                hs_task = heatershaker.set_target_temperature(37)
                 protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
 
             protocol.comment("--> Transfer Hybridization")
@@ -812,7 +766,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
                 p1000.touch_tip(sample_plate_2[column_2_list[loop]])
                 # checked
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
             if disposable_lid:
@@ -863,7 +817,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].top(z=0))
                 p1000.move_to(sample_plate_2[X].top(z=5))
                 p1000.touch_tip(sample_plate_2[X])
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
             # ==============================
@@ -876,10 +830,7 @@ def run(protocol: ProtocolContext) -> None:
 
             thermocycler.open_lid()
             if disposable_lid:
-                if trash_lid:
-                    protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
-                else:
-                    protocol.move_lid(sample_plate_1, "B4", use_gripper=True)
+                protocol.move_lid(sample_plate_1, unused_lids, use_gripper=True)
 
             if DRYRUN is False:
                 protocol.delay(minutes=2)
@@ -898,7 +849,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].bottom(0.5))
                 p1000.aspirate(200, rate=0.25)
                 trash_liquid(protocol, p1000, 200.0, liquid_trash_list)
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -920,7 +871,7 @@ def run(protocol: ProtocolContext) -> None:
                         EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                     )  # original = ()
                     p1000.touch_tip(sample_plate_2[X])
-                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                    p1000.return_tip()
                     p200_tips += 1
                     tipcheck()
                 set_hs_speed(
@@ -958,7 +909,7 @@ def run(protocol: ProtocolContext) -> None:
                         float(p1000.current_volume),
                         liquid_trash_list,
                     )
-                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                    p1000.return_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -978,7 +929,7 @@ def run(protocol: ProtocolContext) -> None:
                     EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
                 p1000.touch_tip(sample_plate_2[X])
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -998,7 +949,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     TransferSup, sample_plate_2[column_3_list[loop]].bottom(z=1)
                 )
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1025,7 +976,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1038,7 +989,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p50, float(p50.current_volume), liquid_trash_list
                 )
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1058,7 +1009,7 @@ def run(protocol: ProtocolContext) -> None:
                     EluteVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
                 p50.touch_tip(sample_plate_2[X])
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
             protocol.move_lid(lid, reagent_plate, use_gripper=True)
@@ -1089,7 +1040,7 @@ def run(protocol: ProtocolContext) -> None:
                     TransferSup + 1, sample_plate_1[column_4_list[loop]].bottom(z=1)
                 )
                 p50.touch_tip(sample_plate_1[column_4_list[loop]])
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1108,7 +1059,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(ET2MixRep, ET2MixVol)
                 p50.touch_tip(sample_plate_1[X])
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
         if STEP_PCR == 1:
@@ -1124,7 +1075,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     PPCVol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
             protocol.comment("--> Adding EPM")
@@ -1140,7 +1091,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.touch_tip(sample_plate_1[X])
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(EPMMixRep, EPMMixVol)
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
         protocol.move_lid(lid, reagent_plate, use_gripper=True)
@@ -1183,10 +1134,7 @@ def run(protocol: ProtocolContext) -> None:
 
                 thermocycler.open_lid()
                 if disposable_lid:
-                    if trash_lid:
-                        protocol.move_lid(sample_plate_1, trash_bin, use_gripper=True)
-                    else:
-                        protocol.move_lid(sample_plate_1, "B4", use_gripper=True)
+                    protocol.move_lid(sample_plate_1, unused_lids, use_gripper=True)
 
         if STEP_CLEANUP == 1:
             protocol.comment("==============================================")
@@ -1206,7 +1154,7 @@ def run(protocol: ProtocolContext) -> None:
                     TransferSup + 1, sample_plate_2[column_5_list[loop]].bottom(z=1)
                 )
                 p50.touch_tip(sample_plate_2[column_5_list[loop]])
-                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
+                p50.return_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1236,7 +1184,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].top(z=5))
                 p1000.move_to(sample_plate_2[X].top(z=0))
                 p1000.move_to(sample_plate_2[X].top(z=5))
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
             # ========NEW HS MIX=========================
@@ -1271,7 +1219,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1293,7 +1241,7 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.move_to(sample_plate_2[X].top(z=0))
                     p1000.move_to(sample_plate_2[X].top(z=5))
                     p1000.touch_tip(sample_plate_2[X])
-                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                    p1000.return_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -1317,7 +1265,7 @@ def run(protocol: ProtocolContext) -> None:
                         float(p1000.current_volume),
                         liquid_trash_list,
                     )
-                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                    p1000.return_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -1335,7 +1283,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1380,7 +1328,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=5))
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=0))
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=5))
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
                 if DRYRUN is False:
@@ -1416,7 +1364,7 @@ def run(protocol: ProtocolContext) -> None:
                     ),
                 )
                 p1000.touch_tip(sample_plate_1[column_6_list[loop]])
-                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
+                p1000.return_tip()
                 p200_tips += 1
                 tipcheck()
     liquids_to_probe_at_end = [
@@ -1426,7 +1374,42 @@ def run(protocol: ProtocolContext) -> None:
     protocol.move_lid(reagent_plate, lid, use_gripper=True)
     if probe_liquid_height_bool:
         find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
+
+    protocol.comment("Consolidating all water for the reverse protocol.")
+    p1000.reset_tipracks()
+    p1000.pick_up_tip()
+    p1000.liquid_presence_detection = False
+    cleanup_layout = [
+        (
+            reagent_plate,
+            [0, 0, 0, 200, 15, 20, 65, 0, 0, 0, 0, 0],
+        ),
+        (
+            reservoir,
+            [120, 750, 1800, 1000, 96, 1000, 0, 0, 1800, 1800, 1800, 1800],
+        ),
+        (sample_plate_1, [200] * 12),
+        (sample_plate_2, [500] * 8 + [2000] * 4),
+    ]
+    for labware, column_volumes in cleanup_layout:
+        for column, column_volume in zip(labware.columns(), column_volumes):
+            remaining = float(column_volume)
+            while remaining > 0:
+                chunk = min(remaining, 180.0)
+                p1000.aspirate(chunk, column[0].bottom(z=0.5))
+                p1000.dispense(chunk, return_reservoir["A1"].top())
+                remaining -= chunk
+    p1000.return_tip()
+    p1000.reset_tipracks()
+    p50.reset_tipracks()
+
     if deactivate_modules_bool:
         deactivate_modules(protocol)
 
-    protocol.capture_image(filename="end_of_run")
+    protocol.comment(
+        "\nEnd state for reverse protocol: Sample Plate 2 on magnetic block, "
+        "final library in Sample Plate 1 columns 9-12, universal lid on B4 stack, "
+        "and all water in the A3 Return Reservoir.\n"
+    )
+    if enable_camera:
+        protocol.capture_image(filename="end_of_run")

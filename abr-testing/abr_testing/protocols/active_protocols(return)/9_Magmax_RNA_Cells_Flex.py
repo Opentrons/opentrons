@@ -1,4 +1,7 @@
 """Thermo MagMax RNA Extraction: Cells Multi-Channel."""
+from typing import Tuple, Union
+from opentrons.protocol_api import Labware
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 import math
 from opentrons import types
 from opentrons.protocol_api import (
@@ -7,24 +10,48 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
 )
-from typing import List, Dict, TypedDict, cast
+from typing import List
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
     TemperatureModuleContext,
     AbsorbanceReaderContext,
 )
+
 import numpy as np
+from typing import Dict
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel + Plate Reader NOABRFOLDER",
+    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel + Plate Reader",
 }
 
 requirements = {
     "robotType": "Flex",
     "apiLevel": "2.28",
 }
+"""
+Slot A1: Tips 200
+Slot A2: Tips 200
+Slot A3: Temperature module (gen2) with 96 well PCR block and Armadillo 96 well PCR Plate
+** Plate gets 55 ul per well in each well of the entire plate
+Slot B1: Tips 200
+Slot B2: Tips 200
+Slot B3: Nest 1 Well Reservoir
+Slot C1: Magblock
+Slot C2:
+Slot C3:
+Slot D1: H-S with Nest 96 Well Deepwell and DW Adapter
+Slot D2: Nest 12 well 15 ml Reservoir
+Slot D3: Trash
+
+Reservoir 1:
+Well 1 - 8120 ul
+Well 2 - 8120 ul
+Well 3 - 12800 ul
+Well 4-12 - 9500 ul
+
+"""
 
 whichwash = 0
 tip_pick_up = 0
@@ -33,14 +60,288 @@ waste_vol = 0
 wash_volume_tracker = 0.0
 
 
-class LiquidWells(TypedDict):
-    """Wells and per-well volume for a defined liquid."""
-
-    well: Well | List[Well]
-    volume: float
-
-
 # Start protocol
+
+
+def comment_height_of_specific_labware(
+    protocol: ProtocolContext, labware_name: str, dict_of_labware_heights: Dict
+) -> None:
+    """Comment height found of specific labware."""
+    total_height = 0.0
+    for key in dict_of_labware_heights.keys():
+        if key[0] == labware_name:
+            height = dict_of_labware_heights[key]
+            total_height += height
+    protocol.comment(f"Liquid Waste Total Height: {total_height}")
+
+
+def load_wells_with_custom_liquids(
+    protocol: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+) -> None:
+    """Load custom liquids into wells."""
+    from opentrons.protocol_api import Well
+
+    liquid_colors = [
+        "#008000",
+        "#A52A2A",
+        "#00FFFF",
+        "#0000FF",
+        "#800080",
+        "#ADD8E6",
+        "#FF0000",
+        "#FFFF00",
+        "#FF00FF",
+        "#00008B",
+        "#7FFFD4",
+        "#FFC0CB",
+        "#FFA500",
+        "#00FF00",
+        "#C0C0C0",
+    ]
+    i = 0
+    volume = 0.0
+    for liquid_name, wells_info in liquid_vols_and_wells.items():
+        liquid = protocol.define_liquid(
+            liquid_name, display_color=liquid_colors[i % len(liquid_colors)]
+        )
+        for well_info in wells_info:
+            if isinstance(well_info["well"], list):
+                wells = well_info["well"]
+            elif isinstance(well_info["well"], Well):
+                wells = [well_info["well"]]
+            else:
+                wells = []
+            if isinstance(well_info["volume"], (float, int)):
+                volume = well_info["volume"]
+            for well in wells:
+                well.load_liquid(liquid, volume)
+
+
+def find_liquid_height_of_all_wells(
+    protocol: ProtocolContext, pipette: InstrumentContext, wells: List[Well]
+) -> Dict:
+    """Find the liquid height of all wells in protocol."""
+    dict_of_labware_heights = {}
+    pipette.pick_up_tip()
+    pip_channels = pipette.active_channels
+    for well in wells:
+        labware_name = well.parent.name
+        total_number_of_wells_in_plate = len(well.parent.wells())
+        if (
+            pip_channels > 1
+            and total_number_of_wells_in_plate > 12
+            and well.well_name.startswith("A")
+        ):
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
+        elif total_number_of_wells_in_plate <= 12:
+            height = pipette.measure_liquid_height(well)
+            dict_of_labware_heights[labware_name, well] = height
+    if pip_channels != pipette.channels:
+        pipette.drop_tip()
+    else:
+        pipette.return_tip()
+        pipette.reset_tipracks()
+    msg = f"result: {dict_of_labware_heights}"
+    protocol.comment(msg=msg)
+    comment_height_of_specific_labware(
+        protocol, "Liquid Waste", dict_of_labware_heights
+    )
+    return dict_of_labware_heights
+
+
+def find_liquid_height_of_loaded_liquids(
+    ctx: ProtocolContext,
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Union[Well, List[Well], float]]]],
+    pipette: InstrumentContext,
+) -> List[Well]:
+    """Find Liquid height of loaded liquids."""
+    from opentrons.protocol_api import Well
+
+    load_wells_with_custom_liquids(ctx, liquid_vols_and_wells)
+    wells = [
+        well
+        for items in liquid_vols_and_wells.values()
+        for entry in items
+        if isinstance(entry["well"], (Well, list)) and entry["volume"] != 0.0
+        for well in (
+            entry["well"] if isinstance(entry["well"], list) else [entry["well"]]
+        )
+    ]
+    if pipette.active_channels == 96:
+        wells = [well for well in wells if well.display_name.split(" ")[0] == "A1"]
+    find_liquid_height_of_all_wells(ctx, pipette, wells)
+    return wells
+
+
+def load_hs_adapter_and_labware(
+    labware_str: str, heatershaker: HeaterShakerContext, labware_name: str
+) -> Tuple[Labware, Labware]:
+    """Load appropriate adapter on heatershaker based off labware type."""
+    heatershaker_adapters = {
+        "nest_96_wellplate_2ml_deep": "opentrons_96_deep_well_adapter",
+        "armadillo_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_pcr_adapter",
+        "corning_96_wellplate_360ul_flat": "opentrons_96_flat_bottom_adapter",
+    }
+    hs_adapter_type = heatershaker_adapters.get(labware_str, "")
+    if hs_adapter_type:
+        hs_adapter = heatershaker.load_adapter(hs_adapter_type)
+        labware_on_hs = hs_adapter.load_labware(labware_str, labware_name)
+    else:
+        heatershaker.load_labware(labware_str, labware_name)
+    return labware_on_hs, hs_adapter
+
+
+def load_temp_adapter_and_labware(
+    labware_str: str, temp_mod: TemperatureModuleContext, labware_name: str
+) -> Tuple[Labware, Labware]:
+    """Load appropriate adapter on temperature module based off labware type."""
+    temp_mod_adapters = {
+        "nest_96_wellplate_2ml_deep": "opentrons_96_deep_well_temp_mod_adapter",
+        "armadillo_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_well_aluminum_block",
+        "opentrons_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_well_aluminum_block",
+    }
+    temp_adapter_type = temp_mod_adapters.get(labware_str, "")
+    if temp_adapter_type:
+        temp_adapter = temp_mod.load_adapter(temp_adapter_type)
+        labware_on_temp_mod = temp_adapter.load_labware(labware_str, labware_name)
+    else:
+        labware_on_temp_mod = temp_mod.load_labware(labware_str, labware_name)
+    return labware_on_temp_mod, temp_adapter
+
+
+def deactivate_modules(protocol: ProtocolContext) -> None:
+    """Deactivate all loaded modules."""
+    from opentrons.protocol_api.module_contexts import (
+        HeaterShakerContext,
+        TemperatureModuleContext,
+        MagneticModuleContext,
+        ThermocyclerContext,
+    )
+
+    modules = protocol.loaded_modules
+    if modules:
+        for module in modules.values():
+            if isinstance(module, HeaterShakerContext):
+                module.deactivate_shaker()
+                module.deactivate_heater()
+            elif isinstance(module, TemperatureModuleContext):
+                module.deactivate()
+            elif isinstance(module, MagneticModuleContext):
+                module.disengage()
+            elif isinstance(module, ThermocyclerContext):
+                module.deactivate()
+
+
+def plate_reader_actions(
+    protocol: ProtocolContext,
+    plate_reader: AbsorbanceReaderContext,
+    hellma_plate: Labware,
+    hellma_plate_name: str,
+) -> None:
+    """Plate reader single and multi wavelength readings."""
+    from datetime import datetime
+
+    wavelengths = [450, 650]
+    hellma_plate_slot = hellma_plate.parent
+    plate_reader.close_lid()
+    for wavelength in wavelengths:
+        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
+        plate_reader.open_lid()
+        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
+        plate_reader.close_lid()
+        result = plate_reader.read(str(datetime.now()))
+        msg = f"{hellma_plate_name} result: {result}"
+        protocol.comment(msg=msg)
+        plate_reader.open_lid()
+        protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
+        plate_reader.close_lid()
+    plate_reader.initialize("multi", [450, 650])
+    plate_reader.open_lid()
+    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
+    plate_reader.close_lid()
+    result = plate_reader.read(str(datetime.now()))
+    msg = f"{hellma_plate_name} result: {result}"
+    protocol.comment(msg=msg)
+    plate_reader.open_lid()
+    protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
+    plate_reader.close_lid()
+
+
+def move_labware_from_hs_to_destination(
+    protocol: ProtocolContext,
+    labware_to_move: Labware,
+    hs: HeaterShakerContext,
+    new_module: Union[MagneticBlockContext, ThermocyclerContext],
+) -> None:
+    """Move labware from heatershaker to magnetic block."""
+    hs.open_labware_latch()
+    protocol.move_labware(labware_to_move, new_module, use_gripper=True)
+    hs.close_labware_latch()
+
+
+def move_labware_to_hs(
+    protocol: ProtocolContext,
+    labware_to_move: Labware,
+    hs: HeaterShakerContext,
+    hs_adapter: Union[Labware, HeaterShakerContext],
+) -> None:
+    """Move labware to heatershaker."""
+    hs.open_labware_latch()
+    protocol.move_labware(labware_to_move, hs_adapter, use_gripper=True)
+    hs.close_labware_latch()
+
+
+def set_hs_speed(
+    protocol: ProtocolContext,
+    hs: HeaterShakerContext,
+    hs_speed: int,
+    time_min: float,
+    deactivate: bool,
+) -> None:
+    """Set heatershaker for a speed and duration."""
+    hs.close_labware_latch()
+    hs.set_and_wait_for_shake_speed(hs_speed)
+    protocol.delay(
+        minutes=time_min,
+        msg=f"Shake at {hs_speed}  rpm for {time_min} minutes.",
+    )
+    if deactivate:
+        hs.deactivate_shaker()
+
+
+def clean_up_plates(
+    protocol: ProtocolContext,
+    pipette: InstrumentContext,
+    list_of_labware: List[Labware],
+    liquid_waste: Well,
+) -> None:
+    """Aspirate liquid from labware and dispense into liquid waste."""
+    pipette.pick_up_tip()
+    pipette.liquid_presence_detection = False
+    num_of_active_channels = pipette.active_channels
+    for labware in list_of_labware:
+        if num_of_active_channels == 8:
+            list_of_wells = labware.rows()[0]
+        elif num_of_active_channels == 1:
+            list_of_wells = labware.wells()
+        elif num_of_active_channels == 96:
+            list_of_wells = [labware.wells()[0]]
+        for well in list_of_wells:
+            if protocol.is_simulating():
+                vol_transfer = well.max_volume
+            else:
+                vol_transfer = well.current_liquid_volume()  # type: ignore
+                pipette.transfer(
+                    vol_transfer, well, liquid_waste.top(), new_tip="never"
+                )
+    if pipette.channels != num_of_active_channels:
+        pipette.drop_tip()
+    else:
+        pipette.return_tip()
+
+
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
     parameters.add_float(
@@ -117,7 +418,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=-0.5,
         minimum=-10.0,
         maximum=10.0,
-        description="Z offset for meniscus height. Default is -0.5mm.",
+        description="Z offset for meniscus height. Default is -1.5mm.",
     )
     parameters.add_int(
         variable_name="error_capture_duration",
@@ -137,7 +438,6 @@ def run(protocol: ProtocolContext) -> None:
     dry_run = False
     inc_lysis = True
     res_type = "opentrons_tough_12_reservoir_22ml"
-    TIP_TRASH = False
     num_samples = 96
     wash_vol = 150.0
     lysis_vol = 140.0
@@ -149,6 +449,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
     plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
+    probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
 
     protocol.comment("Protocol Version: 05")
@@ -170,27 +471,23 @@ def run(protocol: ProtocolContext) -> None:
         bind_time = wash_time = dnase_time = stop_time = 0.25
     bead_vol = 20.0
 
-    # Modules and Labware
     h_s: HeaterShakerContext = protocol.load_module(
         "heaterShakerModuleV1", "D1"
     )  # type: ignore[assignment]
-    h_s_adapter = h_s.load_adapter("opentrons_96_deep_well_adapter")
-    sample_plate = h_s_adapter.load_labware(deepwell_type, "Sample Plate")
+    sample_plate, h_s_adapter = load_hs_adapter_and_labware(
+        deepwell_type, h_s, "Sample Plate"
+    )
     h_s.close_labware_latch()
-
     temp: TemperatureModuleContext = protocol.load_module(
         "temperature module gen2", "D3"
     )  # type: ignore[assignment]
-    temp_adapter = temp.load_adapter("opentrons_96_well_aluminum_block")
-    elutionplate = temp_adapter.load_labware(
-        "opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
+    elutionplate, temp_adapter = load_temp_adapter_and_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
     temp_task = temp.start_set_temperature(4)
-
     magblock: MagneticBlockContext = protocol.load_module(
         "magneticBlockV1", "C1"
     )  # type: ignore[assignment]
-
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C3", "Liquid Waste"
     )
@@ -234,11 +531,12 @@ def run(protocol: ProtocolContext) -> None:
     wash8 = res1.wells()[10]
     wash9 = res1.wells()[11]
     all_washes = res1.wells()[3:12]
-
+    """
+    Here is where you can define the locations of your reagents.
+    """
     samples_m = sample_plate.rows()[0][:num_cols]  # 20ul beads each well
     cells_m = sample_plate.rows()[0][:num_cols]
     elution_samples_m = elutionplate.rows()[0][:num_cols]
-
     # Do the same for color mapping
     beads_ = sample_plate.wells()[: (8 * num_cols)]
     elution_samps = elutionplate.wells()[: (8 * num_cols)]
@@ -253,8 +551,6 @@ def run(protocol: ProtocolContext) -> None:
         drop_count = drop_count + 8
         if drop_count >= 250:
             drop_count = 0
-            if TIP_TRASH:
-                protocol.pause("Empty Trash bin.")
         if tip_pick_up >= 59:
             pip.reset_tipracks()
 
@@ -277,17 +573,28 @@ def run(protocol: ProtocolContext) -> None:
                 m1000.blow_out(waste)
                 m1000.prepare_to_aspirate()
                 m1000.air_gap(20)
-            m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
         m1000.flow_rate.aspirate = 300
         # Move Plate From Magnet to H-S
-        h_s.open_labware_latch()
-        protocol.move_labware(sample_plate, h_s_adapter, use_gripper=True)
-        h_s.close_labware_latch()
+        move_labware_to_hs(protocol, sample_plate, h_s, h_s_adapter)
 
     def bead_mixing(
         well: Well, pip: InstrumentContext, mvol: float, reps: int = 8
     ) -> None:
-        """Bead Mixing."""
+        """Bead Mixing.
+
+        'mixing' will mix liquid that contains beads. This will be done by
+        aspirating from the bottom of the well and dispensing from the top as to
+        mix the beads with the other liquids as much as possible. Aspiration and
+        dispensing will also be reversed for a short to to ensure maximal mixing.
+        param well: The current well that the mixing will occur in.
+        param pip: The pipet that is currently attached/ being used.
+        param mvol: The volume that is transferred before the mixing steps.
+        param reps: The number of mix repetitions that should occur. Note~
+        During each mix rep, there are 2 cycles of aspirating from bottom,
+        dispensing at the top and 2 cycles of aspirating from middle,
+        dispensing at the bottom
+        """
         center = well.top().move(types.Point(x=0, y=0, z=5))
         aspbot = well.bottom().move(types.Point(x=0, y=0, z=1))
         asptop = well.bottom().move(types.Point(x=2, y=-2, z=1))
@@ -318,7 +625,20 @@ def run(protocol: ProtocolContext) -> None:
         pip.flow_rate.dispense = 300
 
     def mixing(well: Well, pip: InstrumentContext, mvol: float, reps: int = 8) -> None:
-        """Mixing."""
+        """Mixing.
+
+        'mixing' will mix liquid that contains beads. This will be done by
+        aspirating from the bottom of the well and dispensing from the top as to
+        mix the beads with the other liquids as much as possible. Aspiration and
+        dispensing will also be reversed for a short to to ensure maximal mixing.
+        param well: The current well that the mixing will occur in.
+        param pip: The pipet that is currently attached/ being used.
+        param mvol: The volume that is transferred before the mixing steps.
+        param reps: The number of mix repetitions that should occur. Note~
+        During each mix rep, there are 2 cycles of aspirating from bottom,
+        dispensing at the top and 2 cycles of aspirating from middle,
+        dispensing at the bottom
+        """
         center = well.top(5)
         asp = well.meniscus(z=meniscus_z, target="end")
         disp = well.top(-8)
@@ -388,14 +708,26 @@ def run(protocol: ProtocolContext) -> None:
                 if x == 3:
                     protocol.delay(minutes=0.0167)
                     m1000.blow_out(cells_m[i].meniscus(z=1, target="end"))
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=lysis_time)
-        h_s.deactivate_shaker()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, lysis_time, True)
 
     def bind() -> None:
-        """Bind."""
+        """Bind.
+
+        `bind` will perform magnetic bead binding on each sample in the
+        deepwell plate. Each channel of binding beads will be mixed before
+        transfer, and the samples will be mixed with the binding beads after
+        the transfer. The magnetic deck activates after the addition to all
+        samples, and the supernatant is removed after bead binding.
+        :param vol (float): The amount of volume to aspirate from the elution
+                            buffer source and dispense to each well containing
+                            beads.
+        :param park (boolean): Whether to save sample-corresponding tips
+                               between adding elution buffer and transferring
+                               supernatant to the final clean elutions PCR
+                               plate.
+        """
         protocol.comment("-----Beginning bind steps-----")
         for i, well in enumerate(samples_m):
             # Transfer cells+lysis/bind to wells with beads
@@ -412,16 +744,11 @@ def run(protocol: ProtocolContext) -> None:
             bead_mixing(well, m1000, 130, reps=5 if not dry_run else 1)
             m1000.prepare_to_aspirate()
             m1000.air_gap(10)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=bind_time)
-        h_s.deactivate_shaker()
+            m1000.return_tip()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, bind_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        h_s.open_labware_latch()
-        protocol.move_labware(sample_plate, magblock, use_gripper=True)
-        h_s.close_labware_latch()
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magblock)
 
         for bindi in np.arange(
             settling_time, 0, -0.5
@@ -436,7 +763,7 @@ def run(protocol: ProtocolContext) -> None:
 
     def wash(vol: float, source: List[Well]) -> None:
         """Wash Function."""
-        global whichwash
+        global whichwash  # Defines which wash the protocol is on to log on the app
         protocol.comment("-----Now starting Wash #" + str(whichwash) + "-----")
         global wash_volume_tracker
         tiptrack(m1000)
@@ -458,17 +785,13 @@ def run(protocol: ProtocolContext) -> None:
                     wash_volume_tracker = 0.0
             m1000.prepare_to_aspirate()
             m1000.air_gap(10)
-        m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+        m1000.return_tip()
 
         # Shake for 5 minutes to mix wash with beads
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=wash_time)
-        h_s.deactivate_shaker()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, wash_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        h_s.open_labware_latch()
-        protocol.move_labware(sample_plate, magblock, use_gripper=True)
-        h_s.close_labware_latch()
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magblock)
 
         for washi in np.arange(
             settling_time, 0, -0.5
@@ -516,12 +839,10 @@ def run(protocol: ProtocolContext) -> None:
             if i != 0:
                 tiptrack(m1000)
             mixing(samples_m[i], m1000, 45, reps=5 if not dry_run else 1)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
         # Shake for 10 minutes to mix DNAseI
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=dnase_time)
-        h_s.deactivate_shaker()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, dnase_time, True)
 
     def stop_reaction(vol: float, source: Well) -> None:
         """Adding stop solution."""
@@ -538,17 +859,13 @@ def run(protocol: ProtocolContext) -> None:
             m1000.blow_out(m.top(-3))
             m1000.prepare_to_aspirate()
             m1000.air_gap(20)
-        m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+        m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=stop_time)
-        h_s.deactivate_shaker()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, stop_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        h_s.open_labware_latch()
-        protocol.move_labware(sample_plate, magblock, use_gripper=True)
-        h_s.close_labware_latch()
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magblock)
 
         for stop in np.arange(settling_time, 0, -0.5):
             protocol.delay(
@@ -587,17 +904,13 @@ def run(protocol: ProtocolContext) -> None:
                     m1000.dispense(elution_vol - 10, samples_m[i].bottom(10))
                     m1000.flow_rate.dispense = 300
             m1000.dispense(m1000.current_volume, waste)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=elute_time)
-        h_s.deactivate_shaker()
+        set_hs_speed(protocol, h_s, heater_shaker_speed, elute_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        h_s.open_labware_latch()
-        protocol.move_labware(sample_plate, magblock, use_gripper=True)
-        h_s.close_labware_latch()
+        move_labware_from_hs_to_destination(protocol, sample_plate, h_s, magblock)
 
         for elutei in np.arange(settling_time, 0, -0.5):
             protocol.delay(
@@ -613,13 +926,13 @@ def run(protocol: ProtocolContext) -> None:
             m1000.blow_out(e.top(-2))
             m1000.prepare_to_aspirate()
             m1000.air_gap(20)
-            m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
+            m1000.return_tip()
 
     # Add liquids to non-reservoir labware
-    liquid_vols_and_wells: Dict[str, List[LiquidWells]] = {
+    liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Beads": [{"well": beads_, "volume": bead_vol}],
         "Sample": [{"well": sample_plate.wells(), "volume": 100.0}],
-        "DNAse": [{"well": dnase1_, "volume": 200.0}],
+        "DNAse": [{"well": dnase1_, "volume": 200}],
         "Elution Buffer": [{"well": elution_samps, "volume": elution_vol}],
         "Lysis": [{"well": lysis_, "volume": 8400.0}],
         "Stop": [{"well": stopreaction, "volume": 6400.0}],
@@ -633,54 +946,12 @@ def run(protocol: ProtocolContext) -> None:
         "Wash 8": [{"well": wash8, "volume": 9500.0}],
         "Wash 9": [{"well": wash9, "volume": 9500.0}],
     }
-
-    # Custom mapping of liquids without helpers
-    liquid_colors = [
-        "#008000",
-        "#A52A2A",
-        "#00FFFF",
-        "#0000FF",
-        "#800080",
-        "#ADD8E6",
-        "#FF0000",
-        "#FFFF00",
-        "#FF00FF",
-    ]
-    for i, (name, configurations) in enumerate(liquid_vols_and_wells.items()):
-        liquid = protocol.define_liquid(
-            name, display_color=liquid_colors[i % len(liquid_colors)]
-        )
-        for configuration in configurations:
-            target_wells = configuration["well"]
-            if isinstance(target_wells, list):
-                for w in target_wells:
-                    w.load_liquid(liquid, configuration["volume"])
-            else:
-                target_wells.load_liquid(liquid, configuration["volume"])
-
-    # Plate Reader setup
-    hellma_plate_slot = hellma_plate.parent
-    plate_reader.close_lid()
-    for wavelength in [450, 650]:
-        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-        plate_reader.close_lid()
-        result = plate_reader.read(str(wavelength))
-        protocol.comment(f"{plate_name_str} result: {result}")
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-        plate_reader.close_lid()
-
-    plate_reader.initialize("multi", [450, 650])
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-    plate_reader.close_lid()
-    result = plate_reader.read("multi")
-    protocol.comment(f"{plate_name_str} result: {result}")
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-    plate_reader.close_lid()
+    if probe_liquid_height_bool:
+        find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+    else:
+        load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+    # run plate reader
+    plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
 
     m1000.flow_rate.aspirate = 50
     m1000.flow_rate.dispense = 150
@@ -711,47 +982,13 @@ def run(protocol: ProtocolContext) -> None:
             msg="There are " + str(beaddry) + " minutes left in the drying step.",
         )
     elute(elution_vol)
-
-    # Clean up plates
-    m1000.pick_up_tip()
-    m1000.liquid_presence_detection = False
-    for labware in [elutionplate, sample_plate]:
-        for well in labware.rows()[0]:
-            if protocol.is_simulating():
-                vol_transfer = well.max_volume
-            else:
-                vol_transfer = cast(float, well.current_liquid_volume())
-            m1000.transfer(
-                vol_transfer, well, waste_reservoir["A1"].top(), new_tip="never"
-            )
-    m1000.return_tip()
-
-    # Final plate reader run
-    plate_reader.close_lid()
-    for wavelength in [450, 650]:
-        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-        plate_reader.close_lid()
-        result = plate_reader.read(str(wavelength))
-        protocol.comment(f"{plate_name_str} result: {result}")
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-        plate_reader.close_lid()
-
-    plate_reader.initialize("multi", [450, 650])
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-    plate_reader.close_lid()
-    result = plate_reader.read("multi")
-    protocol.comment(f"{plate_name_str} result: {result}")
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
-    plate_reader.close_lid()
-
+    end_list_of_wells_to_probe = [waste_reservoir["A1"]]
+    clean_up_plates(
+        protocol, m1000, [elutionplate, sample_plate], waste_reservoir["A1"]
+    )
+    find_liquid_height_of_all_wells(protocol, m1000, end_list_of_wells_to_probe)
+    # Run plate reader
+    plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
     protocol.capture_image(filename="end_of_run")
-
     if deactivate_modules_bool:
-        h_s.deactivate_shaker()
-        h_s.deactivate_heater()
-        temp.deactivate()
+        deactivate_modules(protocol)
