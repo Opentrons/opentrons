@@ -758,14 +758,15 @@ class RunStore:
                     run_command_table.c.run_id == run_id,
                     run_command_table.c.command_id == command.id,
                 )
+                index = commands_total + command_index
                 if existing_command is not None:
+                    index = existing_command.index_in_run
                     transaction.execute(delete_existing_command)
-
                 transaction.execute(
                     insert_command,
                     {
                         "run_id": run_id,
-                        "index_in_run": commands_total + command_index,
+                        "index_in_run": index,
                         "command_id": command.id,
                         "command": pydantic_to_json(command),
                         "command_intent": str(command.intent.value)

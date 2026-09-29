@@ -44,7 +44,6 @@ class CommandPersistenceInterface:
         self._teardown_signal = asyncio.Event()
         self._command_store_provider = command_store_provider
         self._command_queue: deque[CommandEntryJSON] = deque()
-        self._commands_total = 0
 
         # Set up the run store task
         self._command_store_interface_task = asyncio.create_task(
@@ -66,7 +65,7 @@ class CommandPersistenceInterface:
         ]
 
         await self._command_store_provider.insert_batch_commands(
-            self._commands_total, command_batch
+            command_json_batch[0].index - 1, command_batch
         )
 
     async def command_store_interface_task(self) -> None:
@@ -89,7 +88,6 @@ class CommandPersistenceInterface:
     def insert_command(self, command_entry: CommandEntryJSON) -> None:
         """Insert a command into the command queue for storage into persistence."""
         self._command_queue.appendleft(command_entry)
-        self._commands_total += 1
 
 
 @dataclass  # dataclass for __eq__() autogeneration.
