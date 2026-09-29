@@ -1,22 +1,34 @@
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
-import { uuid } from '../../utils'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { AbsorbanceReaderOpenLidCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  AbsorbanceReaderOpenLidStepGenArgs,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 
 export const absorbanceReaderOpenLid: CommandCreator<
-  AbsorbanceReaderOpenLidCreateCommand['params']
+  AbsorbanceReaderOpenLidStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
-  const { gripperEntities, moduleEntities } = invariantContext
+  const { gripperEntities, moduleEntities, runtimeParameters } =
+    invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
-    args.moduleId
+    moduleId
   )
   const hasGripperEntity = Object.keys(gripperEntities).length > 0
 
   const errors: CommandCreatorError[] = []
-  if (args.moduleId == null || absorbanceReaderState == null) {
+  if (absorbanceReaderState == null) {
     errors.push(errorCreators.missingModuleError())
   }
 
@@ -26,7 +38,7 @@ export const absorbanceReaderOpenLid: CommandCreator<
   if (errors.length > 0) {
     return { errors }
   }
-  const pythonName = moduleEntities[args.moduleId].pythonName
+  const pythonName = moduleEntities[moduleId].pythonName
 
   return {
     commands: [
@@ -34,7 +46,7 @@ export const absorbanceReaderOpenLid: CommandCreator<
         commandType: 'absorbanceReader/openLid',
         key: uuid(),
         params: {
-          moduleId: args.moduleId,
+          moduleId,
         },
       },
     ],
