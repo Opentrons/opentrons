@@ -1,15 +1,37 @@
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
-import { formatPyStr, uuid } from '../../utils'
+import { formatPyStr, resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { AbsorbanceReaderReadCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  AbsorbanceReaderReadStepGenArgs,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 
 export const absorbanceReaderRead: CommandCreator<
-  AbsorbanceReaderReadCreateCommand['params']
+  AbsorbanceReaderReadStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
-  const { moduleId, fileName } = args
+  const { fileName } = args
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedFileName =
+    fileName == null
+      ? undefined
+      : resolveStringRuntimeValue(fileName, runtimeParameters)
   const errors: CommandCreatorError[] = []
+  if (moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (fileName != null && resolvedFileName == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: fileName })
+    )
+  }
+  if (moduleId == null || errors.length > 0) {
+    return { errors }
+  }
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
     moduleId
@@ -25,8 +47,13 @@ export const absorbanceReaderRead: CommandCreator<
   }
 
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
+  // Keep variable names in Python; command params use resolved defaults.
   const pythonfileName =
-    fileName != null ? `export_filename=${formatPyStr(fileName)}` : ''
+    fileName != null
+      ? `export_filename=${
+          runtimeParameters[fileName] != null ? fileName : formatPyStr(fileName)
+        }`
+      : ''
 
   return errors.length > 0
     ? { errors }
@@ -37,7 +64,9 @@ export const absorbanceReaderRead: CommandCreator<
             key: uuid(),
             params: {
               moduleId,
-              ...(fileName != null ? { fileName } : {}),
+              ...(resolvedFileName != null
+                ? { fileName: resolvedFileName }
+                : {}),
             },
           },
         ],
