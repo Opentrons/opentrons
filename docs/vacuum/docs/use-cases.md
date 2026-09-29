@@ -27,8 +27,8 @@ See the [Deck Components section](specifications/deck-components.md#spacers) for
 From top to bottom, a filtrate collection stack uses the pieces shown below. Always check and test your stack to ensure that a selected combination of pieces is appropriate for a particular protocol.
 
 <figure markdown>
-  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="70%" }
-  <figcaption>Filtrate collection stack with spacers</figcaption>
+  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate2.svg){ width="70%" }
+  <figcaption>Filtrate collection stack with spacer</figcaption>
 </figure>
 
 ### Without spacers
