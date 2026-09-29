@@ -1219,3 +1219,12 @@ export type UnsafePipetteMovementReason =
 
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+
+export interface WaitForTasksStepGenArgs {
+  task_ids: string[]
+}
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
