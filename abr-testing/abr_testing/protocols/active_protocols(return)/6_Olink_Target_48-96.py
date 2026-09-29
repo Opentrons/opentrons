@@ -1,22 +1,36 @@
 """Olink Target 48/96 Protocol."""
+
 from opentrons.protocol_api import (
-    ProtocolContext,
-    Labware,
-    ParameterContext,
-    Well,
+    ALL,
+    COLUMN,
     SINGLE,
+    ParameterContext,
+    ProtocolContext,
+    Well,
+    Labware,
 )
-from opentrons.protocol_api import COLUMN, ALL
-from typing import Any, List
+from opentrons.types import Location
+from typing import List, Any, Literal
 
 metadata = {
-    "protocolName": "Olink Target 96/ 48 v3: NOABRFOLDER",
+    "protocolName": "Olink Target 96/ 48 v3 Deck Safe",
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
-open_location: Any = "A4"
+# Home slots of the empty racks that collect used tips. Only D2 can be pipetted
+# with a partial nozzle layout, so full racks are swapped out to the holding slots.
+USED_TIP_SLOTS = ["D2", "A4", "C4"]
+PARK_SLOT = "D2"
+# Staging source racks are gripped onto A1 to be pipetted.
+SOURCE_PIPETTING_SLOT = "A1"
+# Somewhere to set a rack down mid-swap. D3 leads because a rack there blocks
+# nothing: the idle nozzles overhang west, and D3 is the easternmost deck column.
+HOLDING_SLOTS = ("D3", "A4", "C4", "B4")
+# Closest the tips may get to a well floor. Meniscus targets are taken 1 mm below
+# the surface, which lands under the floor once a well is down to a few microliters.
+MIN_HANDLING_HEIGHT = 2.0
 
 
 def add_parameters(p: ParameterContext) -> None:
@@ -87,12 +101,19 @@ def add_parameters(p: ParameterContext) -> None:
         maximum=6000,
         unit="seconds",
     )
+    p.add_bool(
+        variable_name="enable_camera",
+        display_name="Enable Camera",
+        description="Capture start- and end-of-run images.",
+        default=False,
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
-    global open_location
-    protocol.capture_image(filename="start_of_run")
+    enable_camera = protocol.params.enable_camera  # type: ignore[attr-defined]
+    if enable_camera:
+        protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
@@ -101,12 +122,9 @@ def run(protocol: ProtocolContext) -> None:
     primer_to_chip = protocol.params.primer_to_chip  # type: ignore[attr-defined]
     sample_to_chip = protocol.params.sample_to_chip  # type: ignore[attr-defined]
     num_samples = protocol.params.num_samples  # type: ignore[attr-defined]
-    waste_chute = protocol.params.waste_chute  # type: ignore[attr-defined]
-
-    if not waste_chute:
-        open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
+    protocol.comment("Protocol Version: 03")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -120,6 +138,7 @@ def run(protocol: ProtocolContext) -> None:
         "opentrons_flex_96_filtertiprack_50ul", "B3", "Tips per Column #2"
     )
     col_tips = [col_tips_1, col_tips_2]
+    tip_rack_homes: dict[Labware, str] = {col_tips_1: "A1", col_tips_2: "B3"}
 
     if ninety_six:
         tip_adap = protocol.load_adapter("opentrons_flex_96_tiprack_adapter", "A3")
@@ -131,50 +150,129 @@ def run(protocol: ProtocolContext) -> None:
             "opentrons_flex_96_filtertiprack_50ul", "B4", "Tips per Column #3"
         )
         col_tips.append(col_tips_3)
+        tip_rack_homes[col_tips_3] = "B4"
 
-    # Start Tip Tracking Variables
+    # With COLUMN + start="A12" the idle nozzles hang to the LEFT of the active
+    # column, so column N is only reachable once columns 1..N-1 are empty. That
+    # rules out return_tip(): it refills those columns and the next pickup would
+    # drag them along. Instead every used column is dropped into a dedicated
+    # used-tip rack and left there; the reverse protocol moves them back to their
+    # origin wells so the next forward run starts from full source racks.
+    used_tip_racks = [
+        protocol.load_labware(
+            "opentrons_flex_96_filtertiprack_50ul", slot, f"Used Tips #{i + 1}"
+        )
+        for i, slot in enumerate(USED_TIP_SLOTS[: 3 if ninety_six else 2])
+    ]
+    for used_rack in used_tip_racks:
+        used_rack.set_empty()
+        tip_rack_homes[used_rack] = str(used_rack.parent).strip()
+
+    # Columns are consumed A1→A12 of each source rack in order and parked in the
+    # same order. The reverse protocol rebuilds this mapping from the parameters.
+    source_columns: List[Well] = []
+    for rack in col_tips:
+        source_columns.extend(rack.rows()[0])
+    park_columns: List[Well] = []
+    for used_rack in used_tip_racks:
+        park_columns.extend(used_rack.rows()[0])
+    parked_count = 0
+
+    def slot_of(rack: Labware) -> str:
+        return str(rack.parent).strip()
+
+    def free_holding_slot() -> str:
+        occupied = {slot_of(rack) for rack in tip_rack_homes}
+        for slot in HOLDING_SLOTS:
+            if slot not in occupied:
+                return slot
+        raise RuntimeError("No free holding slot available for a tip rack")
+
+    def place_on(rack: Labware, slot: str) -> None:
+        """Put a tip rack on a slot, moving whatever sits there out of the way."""
+        if slot_of(rack) == slot:
+            return
+        for other in tip_rack_homes:
+            if other is not rack and slot_of(other) == slot:
+                protocol.move_labware(other, free_holding_slot(), use_gripper=True)
+                break
+        protocol.move_labware(rack, slot, use_gripper=True)
+
+    def restore_tip_rack_slots() -> None:
+        """Return every tip rack to its home slot, breaking any move cycle."""
+        for _ in range(2 * len(tip_rack_homes) + 4):
+            misplaced = [r for r, home in tip_rack_homes.items() if slot_of(r) != home]
+            if not misplaced:
+                return
+            progressed = False
+            for rack in misplaced:
+                home = tip_rack_homes[rack]
+                if all(slot_of(o) != home for o in tip_rack_homes if o is not rack):
+                    protocol.move_labware(rack, home, use_gripper=True)
+                    progressed = True
+            if not progressed:
+                protocol.move_labware(
+                    misplaced[0], free_holding_slot(), use_gripper=True
+                )
+        raise RuntimeError("Could not restore tip racks to their home slots")
+
+    def pick_column_tip() -> None:
+        """Pick the next fresh column and stage the rack it will be parked in."""
+        origin = source_columns.pop(0)
+        # Both racks are positioned before pickup so nothing moves with tips on.
+        place_on(park_columns[parked_count].parent, PARK_SLOT)  # type: ignore[arg-type]
+        if slot_of(origin.parent).endswith("4"):  # type: ignore[arg-type]
+            place_on(origin.parent, SOURCE_PIPETTING_SLOT)  # type: ignore[arg-type]
+        pip.pick_up_tip(origin)
+
+    def park_column_tips() -> None:
+        """Leave the used tips in the used-tip rack staged during pickup."""
+        nonlocal parked_count
+        pip.drop_tip(park_columns[parked_count])
+        parked_count += 1
+
+    # Volumes
+    pcr_product_vol = 2.8
+
+    mm_vol = 9.1  # need to hit 7.2
+
+    ifc_vol = 5
+
+    # Speeds (from Hamilton Star settings as per Katie)
+
+    asp_default = 20
+
+    disp_default = 120
+
+    delay_time = 1  # second
+
+    pip.flow_rate.aspirate = asp_default
+    pip.flow_rate.dispense = disp_default
 
     # Load Labware
-    if waste_chute:
-        protocol.load_waste_chute()
-    else:
-        protocol.load_trash_bin("D3")
-
     primer_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "B1", "Primer Plate"
     )
-    # used to be "psomagenolink_96_wellplate_200ul"
     sample_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1", "Sample Plate"
     )
     sample_plate.load_empty(sample_plate.wells())
-    # used †ø be ab©ene_96_wellplate_200ul
     ifp_plate = protocol.load_labware(
         "biorad_384_wellplate_50ul" if ninety_six else "fluidigm_ifp_48.48",
         "C2",
         "IFP Chip",
     )
     ifp_plate.load_empty(ifp_plate.wells())
-    # used to be fluidigm_ifp_96.96
     product_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "C1", "Extension Product Plate"
-    )  # Would typically be semi-skirt plate with adapter
-    # used to be olinksemiskirt_96_wellplate_300ul
+    )
     mm_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "C3", "Mastermix Plate"
     )
-    # used to be ab©ene_96_wellplate_200ul
-    # Create Lists for distribution
     mastermix = mm_plate.wells()[8 * mm_col]  # 1 single column
-
-    # mm_dest = [sample_plate.rows()[0][:6],sample_plate.rows()[0][6:]]
     mm_dest = sample_plate.rows()[0][: 12 if ninety_six else 6]
-
-    # if ninety_six: # not using this difference - going to stamp whether it is 48 or 96
     extension_source = product_plate.wells()[0]
-    sample_dest = sample_plate.wells()[
-        0
-    ]  # for 96 channel transfer of extension product to sample plate
+    sample_dest = sample_plate.wells()[0]
 
     _source_list = (
         [0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11] if ninety_six else [0, 3, 1, 4, 2, 5]
@@ -202,38 +300,6 @@ def run(protocol: ProtocolContext) -> None:
     for well in samp_dest_list:
         ifp_samp_dests.append(ifp_plate.wells()[well])
 
-    # Need list of tips for IFP transfers (post 48 sample stamp)
-    if not ninety_six:
-        ifp_tips = [
-            col_tips[0].wells()[5 * 8],
-            col_tips[0].wells()[4 * 8],
-            col_tips[0].wells()[3 * 8],
-            col_tips[0].wells()[2 * 8],
-            col_tips[0].wells()[8],
-            col_tips[0].wells()[0],
-        ] + col_tips[1].rows()[0][-1::-1]
-        if mmx_to_sample_plate:
-            ifp_tips.pop(0)
-        protocol.comment(f"\nIFP Tips: {ifp_tips}")
-
-    # Volumes
-    pcr_product_vol = 2.8
-
-    mm_vol = 9.1  # need to hit 7.2
-
-    ifc_vol = 5
-
-    # Speeds (from Hamilton Star settings as per Katie)
-
-    asp_default = 20
-
-    disp_default = 120
-
-    delay_time = 1  # second
-
-    pip.flow_rate.aspirate = asp_default
-    pip.flow_rate.dispense = disp_default
-
     # Adding Liquids to Setup ##################################
     mm_liq_vol = 150 if ninety_six else 47
     ep_liq_vol = 100
@@ -258,15 +324,31 @@ def run(protocol: ProtocolContext) -> None:
     for x in range(96 if ninety_six else 48):
         primer_plate.wells()[x].load_liquid(liquid=prim_liq, volume=prim_liq_vol)
 
-    def is_in_staging_slot(labware: Labware) -> bool:
-        """Check if labware is in a staging slot."""
-        return str(labware.parent).strip().endswith("4")
+    def safe_meniscus(
+        well: Well,
+        z: float,
+        target: Literal["start", "end"],
+        volume: float = 0.0,
+    ) -> Location:
+        """Meniscus position, floored at MIN_HANDLING_HEIGHT above the well bottom.
+
+        `volume` is the volume the pending operation moves, negative to aspirate and
+        positive to dispense, and is only needed when targeting the end meniscus.
+        """
+        height = (
+            well.estimate_liquid_height_after_pipetting(pip.mount, volume)
+            if target == "end"
+            else well.current_liquid_height()
+        )
+        if isinstance(height, (int, float)) and height + z < MIN_HANDLING_HEIGHT:
+            return well.bottom(MIN_HANDLING_HEIGHT)
+        return well.meniscus(z=z, target=target)
 
     def mixing(well: Well, vol: float, blow_out: bool = True, reps: int = 8) -> None:
         """Mixing Function."""
         pip.aspirate(1, well.top(1))
         for m in range(reps):
-            pip.aspirate(vol, well.meniscus(z=-1, target="end"))
+            pip.aspirate(vol, safe_meniscus(well, -1, "end", -vol))
             pip.dispense(
                 vol if m != reps - 1 else pip.current_volume,
                 well.meniscus(z=1, target="end"),
@@ -284,25 +366,17 @@ def run(protocol: ProtocolContext) -> None:
         src: Well, destination: List[Any], volume: float, multi_disp: bool = False
     ) -> None:
         """Transfer Mastermix to Sample Plate."""
-        global open_location
         # Distribute is for mastermix multi-dispense to sample plate
 
-        pip.configure_nozzle_layout(style=COLUMN, start="A1", tip_racks=col_tips)
-        try:
-            pip.pick_up_tip()
-        except Exception:
-            new_location = col_tips[0].parent
-            new_open_location = col_tips[1].parent
-            protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
-            protocol.move_labware(col_tips[0], new_location, use_gripper=True)
-            open_location = new_open_location
-            pip.pick_up_tip()
+        pip.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=col_tips)
+        pick_column_tip()
         if multi_disp:
             for i in range(2 if ninety_six else 1):
+                asp_vol = 49 - pip.current_volume
                 pip.aspirate(
-                    49 - pip.current_volume,
-                    location=src.meniscus(z=-1, target="start"),
-                    end_location=src.meniscus(z=-1, target="end"),
+                    asp_vol,
+                    location=safe_meniscus(src, -1, "start"),
+                    end_location=safe_meniscus(src, -1, "end", -asp_vol),
                     rate=0.2,
                 )  # aspirate extra (backlash compensation)
                 protocol.delay(seconds=delay_time)
@@ -318,7 +392,7 @@ def run(protocol: ProtocolContext) -> None:
                     pip.touch_tip()
                     pip.move_to(well.top())
                 protocol.delay(seconds=delay_time)
-            pip.drop_tip()
+            park_column_tips()
 
         else:
             length = (
@@ -328,10 +402,11 @@ def run(protocol: ProtocolContext) -> None:
                 volume = 9.1 + i * 0.15
                 protocol.comment(f"\nVOLUME: {volume}")
                 pip.prepare_to_aspirate()
+                asp_vol = volume + 1.5 if i == 0 else volume
                 pip.aspirate(
-                    volume + 1.5 if i == 0 else volume,
-                    location=src.meniscus(z=-1, target="start"),
-                    end_location=src.meniscus(z=-1, target="end"),
+                    asp_vol,
+                    location=safe_meniscus(src, -1, "start"),
+                    end_location=safe_meniscus(src, -1, "end", -asp_vol),
                     rate=0.35,
                 )
                 protocol.delay(seconds=delay_time)
@@ -340,8 +415,8 @@ def run(protocol: ProtocolContext) -> None:
                 pip.move_to(destination[i].top(10))
                 pip.dispense(
                     volume,
-                    location=destination[i].meniscus(z=-1, target="start"),
-                    end_location=destination[i].meniscus(z=-1, target="end"),
+                    location=safe_meniscus(destination[i], -1, "start"),
+                    end_location=safe_meniscus(destination[i], -1, "end", volume),
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
@@ -350,12 +425,10 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.delay(seconds=delay_time)
                 pip.move_to(destination[i].top())
 
-            pip.drop_tip()
+            park_column_tips()
 
     def transfer_ep(src: Well, destination: Well, volume: float) -> None:
         """Transfer Extension Product to Sample Plate."""
-        global open_location
-
         if (
             ninety_six
         ):  # for transferring extension product to sample plate in one single asp/disp
@@ -364,12 +437,12 @@ def run(protocol: ProtocolContext) -> None:
             pip.pick_up_tip(full_tips)
             pip.aspirate(
                 volume,
-                location=src.meniscus(z=-1, target="start"),
-                end_location=src.meniscus(z=-1, target="end"),
+                location=safe_meniscus(src, -1, "start"),
+                end_location=safe_meniscus(src, -1, "end", -volume),
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
-                volume, destination.meniscus(z=-1, target="end")
+                volume, safe_meniscus(destination, -1, "end", volume)
             )  # reverse pipetting slightly more than actual volume
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tip
@@ -381,38 +454,35 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=col_tips)
 
             pip.configure_for_volume(volume)
-            pip.pick_up_tip(
-                col_tips[0].wells()[5 * 8 if mmx_to_sample_plate else 6 * 8]
-            )
+            # Borrow one tip from the next fresh column and put it straight back,
+            # so the column is still complete when it is picked with COLUMN later.
+            pip.pick_up_tip(source_columns[0])
             pip.aspirate(
                 volume,
-                location=src.meniscus(z=-1, target="start"),
-                end_location=src.meniscus(z=-1, target="end"),
+                location=safe_meniscus(src, -1, "start"),
+                end_location=safe_meniscus(src, -1, "end", -volume),
                 rate=0.2,
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
                 volume,
-                location=destination.meniscus(z=-1, target="start"),
-                end_location=destination.meniscus(z=-1, target="end"),
+                location=safe_meniscus(destination, -1, "start"),
+                end_location=safe_meniscus(destination, -1, "end", volume),
                 rate=0.2,
             )
             pip.blow_out(destination.meniscus(z=2, target="end"))
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
             pip.move_to(destination.top(-2))
-            pip.drop_tip()
+            pip.return_tip()
 
     def transfer_ifp(
         src: List[Well],
         destination: List[Well],
         volume: float,
         col_tips: List[Labware],
-        prim: bool = False,
     ) -> None:
         """Transfer Sample to IFP Chip."""
-        global open_location
-
         pip.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=col_tips)
 
         length = (
@@ -420,60 +490,24 @@ def run(protocol: ProtocolContext) -> None:
         )  # determines how many iterations should be run through
 
         for i in range(length):
-            if ninety_six:
-                try:
-                    if any(is_in_staging_slot(tip_rack) for tip_rack in pip.tip_racks):
-                        raise Exception("Tiprack in staging slot")  # Trigger move logic
-                    pip.pick_up_tip()
-                except Exception:
-                    current_tiprack = col_tips[0]
-                    next_tiprack = col_tips[1]
-
-                    current_slot = current_tiprack.parent
-                    next_slot = next_tiprack.parent
-
-                    protocol.move_labware(
-                        current_tiprack, open_location, use_gripper=True
-                    )
-                    protocol.move_labware(next_tiprack, current_slot, use_gripper=True)
-
-                    open_location = next_slot
-                    col_tips = col_tips[1:] + [col_tips[0]]
-                    pip.tip_racks = col_tips
-
-                    # Final safety check before picking up a tip
-                    if is_in_staging_slot(pip.tip_racks[0]):
-                        raise Exception(
-                            f"Cannot pick up tip from staging slot: {pip.tip_racks[0].parent}"
-                        )
-
-                    pip.pick_up_tip()
-            else:
-                if mmx_to_sample_plate:
-                    if i == 5 and prim:
-                        loc = col_tips[0].parent
-                        protocol.move_labware(
-                            col_tips.pop(0), open_location, use_gripper=True
-                        )
-                        protocol.move_labware(col_tips[0], loc, use_gripper=True)
-
-                pip.pick_up_tip(ifp_tips.pop(0))
+            pick_column_tip()
+            asp_vol = volume + 4
             pip.aspirate(
-                volume + 4,
-                location=src[i].meniscus(z=-1, target="start"),
-                end_location=src[i].meniscus(z=-1, target="end"),
+                asp_vol,
+                location=safe_meniscus(src[i], -1, "start"),
+                end_location=safe_meniscus(src[i], -1, "end", -asp_vol),
                 rate=0.2 if volume <= 5 else 1,
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
                 2,
-                location=src[i].meniscus(z=-1, target="start"),
-                end_location=src[i].meniscus(z=-1, target="end"),
+                location=safe_meniscus(src[i], -1, "start"),
+                end_location=safe_meniscus(src[i], -1, "end", 2),
             )  # compensate for backlash
             # Retract
             pip.dispense(
                 volume + 1,
-                destination[i].meniscus(z=-1, target="end"),
+                safe_meniscus(destination[i], -1, "end", volume + 1),
                 rate=0.2 if volume <= 5 else 1,
             )
             pip.blow_out(destination[i].meniscus(z=2, target="end"))
@@ -482,12 +516,7 @@ def run(protocol: ProtocolContext) -> None:
             pip.aspirate(
                 10
             )  # move liquid towards top of tip so that there is no splatter when dropping the tips
-            pip.drop_tip()
-
-        if not mmx_to_sample_plate and prim:
-            loc = col_tips[0].parent
-            protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
-            protocol.move_labware(col_tips[0], loc, use_gripper=True)
+            park_column_tips()
 
     if mmx_to_sample_plate:
         protocol.comment(
@@ -503,26 +532,29 @@ def run(protocol: ProtocolContext) -> None:
         transfer_ep(extension_source, sample_dest, pcr_product_vol)
     if primer_to_chip:
         protocol.comment("\n*****\nTransferring Primers to IFP Chip\n*****\n")
-        transfer_ifp(
-            primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips, prim=True
-        )
+        transfer_ifp(primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips)
     if sample_to_chip:
         protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
         transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
 
-    protocol.move_labware(col_tips[-1], "C4", use_gripper=True)
-    protocol.move_labware(col_tips[-2], "A1", use_gripper=True)
-    pip.configure_nozzle_layout(
-        style=SINGLE,
-        start="A1",
-        tip_racks=col_tips,
-    )  # Resetting to all tips for liquid tracking
-    liquid_heights = {}
-    pip.pick_up_tip()
-    for ifp_plate_well in ifp_plate.wells():
-        if ifp_plate_well.current_liquid_height() > 1:
-            pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
-        height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
-        liquid_heights[ifp_plate_well.well_name] = height
-    protocol.comment(str(liquid_heights))
-    protocol.capture_image(filename="end_of_run")
+    if parked_count:
+        # Probe with the last parked tip — the source racks are empty by now.
+        probe_tip = park_columns[parked_count - 1]
+        place_on(probe_tip.parent, PARK_SLOT)  # type: ignore[arg-type]
+        pip.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=used_tip_racks)
+        liquid_heights = {}
+        pip.pick_up_tip(probe_tip)
+        for ifp_plate_well in ifp_plate.wells():
+            if ifp_plate_well.current_liquid_height() > 1:
+                pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
+            height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
+            liquid_heights[ifp_plate_well.well_name] = height
+        protocol.comment(str(liquid_heights))
+        pip.return_tip()
+
+    protocol.comment(f"\nUsed columns left for the reverse protocol: {parked_count}\n")
+    restore_tip_rack_slots()
+
+    pip.reset_tipracks()
+    if enable_camera:
+        protocol.capture_image(filename="end_of_run")

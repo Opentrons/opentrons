@@ -1,7 +1,6 @@
 """IDT xGEn 1000ul 96x with Flex Stacker."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols.helpers import run_helpers, background_helpers
 from typing import List
 from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
@@ -12,7 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 metadata = {
-    "protocolName": "IDT xGen 96x v9 ",
+    "protocolName": "IDT xGen 96x v9 NOABRFOLDER",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
@@ -24,58 +23,23 @@ requirements = {
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Runtime parameters."""
-    run_helpers.create_deactivate_modules_parameter(parameters)
-    run_helpers.create_dry_run_parameter(parameters)
-    run_helpers.create_dot_bottom_parameter(parameters)
-    run_helpers.create_error_capture_duration_duration(parameters)
-    parameters.add_str(
-        display_name="Frag Mode",
-        variable_name="FRAG_MODE",
-        default="MC",
-        description="Frag Mode",
-        choices=[
-            {"display_name": "MC", "value": "MC"},
-            {"display_name": "EZ", "value": "EZ"},
-        ],
-    )
-    parameters.add_int(
-        display_name="Enz Frag Time (Min)",
-        variable_name="FRAGTIME",
-        default=20,
-        minimum=10,
-        maximum=60,
-        description="Length of Enz Frag Incubation. EZ only",
-    )
-    parameters.add_int(
-        display_name="PCR Cycles",
-        variable_name="PCRCYCLES",
-        default=4,
-        minimum=1,
-        maximum=20,
-        description="How many PCR Cycles to for amplification.",
-    )
+    pass
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
     protocol.capture_image(filename="start_of_run")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global COLUMNS  # Number of Columns of Samples
-    # =================== LOADING THE RUNTIME PARAMETERS ====================
-    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
-    DRYRUN = protocol.params.dry_run  # type: ignore[attr-defined]
-    FRAG_MODE = protocol.params.FRAG_MODE  # type: ignore[attr-defined]
-    FRAGTIME = protocol.params.FRAGTIME  # type: ignore[attr-defined]
-    PCRCYCLES = protocol.params.PCRCYCLES  # type: ignore[attr-defined]
-    DEACTIVATE_TEMP = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
-    if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
-        slack_bot.send_run_started_message(metadata["protocolName"])
+
+    # =================== RUNTIME PARAMETERS ====================
+    DRYRUN = False
+    FRAG_MODE = "MC"  # "MC" or "EZ"
+    FRAGTIME = 20
+    PCRCYCLES = 4
+    DEACTIVATE_TEMP = True
+    dot_bottom = 0.5
 
     #  ADVANCED PARAMETERS ======================================
     # -------PROTOCOL STEP-------
@@ -100,7 +64,8 @@ def run(protocol: ProtocolContext) -> None:
     TIP_MIX = True  # Default False   | Use Tip Mixing instead of Heatershaker
     ONDECK_THERMO = True  # Default True    | On Deck Thermocycler
     ONDECK_TEMP = True
-    run_helpers.comment_protocol_version(protocol, "03")
+
+    protocol.comment("Protocol Version: 03")
 
     # =============================== PIPETTE ===============================
     p1000 = protocol.load_instrument("flex_96channel_1000", "left")
@@ -132,7 +97,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # ========== FIRST ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
-        run_helpers.tc_str
+        "thermocycler module gen2"
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
@@ -159,7 +124,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
-        run_helpers.temp_str, "C1"
+        "temperature module gen2", "C1"
     )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Reagent Plate 1"
@@ -169,7 +134,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "C3", 4)
     mag_block: MagneticBlockContext = protocol.load_module(
-        run_helpers.mag_str, "D2"
+        "magneticBlockV1", "D2"
     )  # type: ignore[assignment]
     CleanupPlate_1 = mag_block.load_labware(
         "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
@@ -209,57 +174,53 @@ def run(protocol: ProtocolContext) -> None:
     # ======== DEFINING LIQUIDS =======
     Sample = protocol.define_liquid(
         name="Sample", description="Sample", display_color="#52AAFF"
-    )  # 52AAFF = 'Sample Blue'
+    )
     Reagent_CleanupBead = protocol.define_liquid(
         name="EtOH", description="CleanupBead Beads", display_color="#704848"
-    )  # 704848 = 'CleanupBead Brown'
+    )
     protocol.define_liquid(
         name="EtOH", description="80% Ethanol", display_color="#9ACECB"
-    )  # 9ACECB = 'Ethanol Blue'
+    )
     Reagent_RSB = protocol.define_liquid(
         name="RSB", description="Resuspension Buffer", display_color="#00FFF2"
-    )  # 00FFF2 = 'Base Light Blue'
+    )
     Reagent_PCR = protocol.define_liquid(
         name="PCR", description="PCR Mix", display_color="#FF0000"
-    )  # FF0000 = 'Base Red'
+    )
     Reagent_FRERAT = protocol.define_liquid(
         name="FRERAT",
         description="Fragmentation Enzymatic Prep",
         display_color="#FFA000",
-    )  # FFA000 = 'Base Orange'
+    )
     Reagent_ERAT = protocol.define_liquid(
         name="ERAT",
         description="End Repair Enzymatic Prep",
         display_color="#FFA000",
-    )  # FFA000 = 'Base Orange'
+    )
     Reagent_LIG = protocol.define_liquid(
         name="LIG", description="Ligation Mix", display_color="#0EFF00"
-    )  # 0EFF00 = 'Base Green'
+    )
     Reagent_Adapter = protocol.define_liquid(
         name="Adapter", description="Adapter", display_color="#0EFF00"
-    )  # 0EFF00 = 'Base Green'
-    protocol.define_liquid(
-        name="PRIMER", description="PRIMER", display_color="#0EFF00"
-    )  # 0EFF00 = 'Base Green'
+    )
+    protocol.define_liquid(name="PRIMER", description="PRIMER", display_color="#0EFF00")
     Reagent_Barcodes = protocol.define_liquid(
         name="Barcodes", description="Barcodes", display_color="#7DFFC4"
-    )  # 7DFFC4 = 'Barcode Green'
-    protocol.define_liquid(
-        name="H20", description="H20", display_color="#AABFBF"
-    )  # AABFBF = 'H20'
+    )
+    protocol.define_liquid(name="H20", description="H20", display_color="#AABFBF")
     Placeholder_Sample = protocol.define_liquid(
         name="Placeholder_Sample",
         description="Excess Sample",
         display_color="#82A9CF",
-    )  # 82A9CF = 'Placeholder Sample Blue'
+    )
     protocol.define_liquid(
         name="Final_Sample", description="Final Sample", display_color="#82A9CF"
-    )  # 82A9CF = 'Placeholder Blue'
+    )
     Liquid_trash_well = protocol.define_liquid(
         name="Liquid_trash_well",
         description="Liquid Trash",
         display_color="#9B9B9B",
-    )  # 9B9B9B = 'Liquid Trash Grey'
+    )
 
     # ======== LOADING LIQUIDS =======
     # ========================== REAGENT PLATE_1 ============================
@@ -418,7 +379,6 @@ def run(protocol: ProtocolContext) -> None:
                 source_location=sample_plate_1, new_location=lids, use_gripper=True
             )
 
-            # protocol.move_labware(labware=lids[0], new_location=lids[1], use_gripper=True)
             ###############################################################################
         if STEP_MC_ERAT:
             protocol.comment("==============================================")
@@ -478,11 +438,6 @@ def run(protocol: ProtocolContext) -> None:
                 source_location=sample_plate_1, new_location=TRASH, use_gripper=True
             )
 
-            # # protocol.move_labware(
-            # #     labware=lids[0],
-            #     new_location=TRASH,
-            #     use_gripper=True,
-            # )
             ##################################################################
         if STEP_LIG:
             protocol.comment("==============================================")
@@ -1372,8 +1327,6 @@ def run(protocol: ProtocolContext) -> None:
             p1000.aspirate(TransferSup / 2)
             protocol.delay(seconds=1)
             p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.1))
-            # p1000.aspirate(TransferSup / 2)
-            # p1000.dispense(TransferSup, sample_plate_3["A1"].bottom(z=1))
             p1000.return_tip()
             # ===============================================
 
@@ -1392,13 +1345,5 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment("==============================================")
         protocol.capture_image(filename="end_of_run")
 
-        if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
     except Exception as e:
-        if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
-            )
         raise (e)
