@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     log_level: str = "info"
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
+    # Production default: Sonnet 5.5 (`claude-sonnet-5-5`). Prefer over `claude-sonnet-5` for capability and cost.
     anthropic_model_name: str = "claude-sonnet-5-5"
     anthropic_max_tokens: str = "64000"
     model_helper: str = "claude-sonnet-5-5"

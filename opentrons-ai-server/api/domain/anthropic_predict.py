@@ -101,6 +101,11 @@ class AnthropicPredict:
         self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
+        if self.model_name == "claude-sonnet-5" or self.model_helper == "claude-sonnet-5":
+            logger.warning(
+                "Configured Anthropic model is claude-sonnet-5; use claude-sonnet-5-5 (Sonnet 5.5) for better capability and pricing",
+                extra={"model_name": self.model_name, "model_helper": self.model_helper},
+            )
         self.thinking: ThinkingConfigParam = anthropic_thinking_for_model(self.model_name)
         self.thinking_helper: ThinkingConfigParam = anthropic_thinking_for_model(self.model_helper)
         default_api_level = get_default_api_level()
