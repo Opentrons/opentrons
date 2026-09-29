@@ -140,7 +140,7 @@ All targets run from `opentrons-ai-server/`.
 
 ## Docker Build
 
-The image is a two-stage build. The dependency stage copies a digest-pinned `uv` binary and runs `uv sync --frozen --no-dev --no-install-project`, so packages come from `uv.lock` with their recorded hashes. The runtime stage copies only that virtualenv and `api/`; it does not contain `uv`.
+The image is a two-stage build. The dependency stage copies a digest-pinned `uv` binary at the same version as `required-version` in `[tool.uv]` and the repo-root `uv.toml` (currently 0.12.1) and runs `uv sync --frozen --no-dev --no-install-project`, so packages come from `uv.lock` with their recorded hashes. The runtime stage copies only that virtualenv and `api/`; it does not contain `uv`.
 
 `make build` syncs the Python API docs, then builds. The Docker build context is the **repo root** (not `opentrons-ai-server/`). Docs come from the pinned `DOCS_TAG` Makefile variable and must be present under `api/storage/api_docs/docs/v2`.
 

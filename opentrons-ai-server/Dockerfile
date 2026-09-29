@@ -1,7 +1,8 @@
 ARG PLATFORM=linux/amd64
 
-# uv 0.11.17 multi-arch index. The binary is only used in the dependency stage.
-FROM --platform=$PLATFORM ghcr.io/astral-sh/uv:0.11.17@sha256:03bdc89bb9798628846e60c3a9ad19006c8c3c724ccd2985a33145c039a0577b AS uv
+# uv 0.12.1 multi-arch index. Keep this in sync with required-version
+# in [tool.uv] and the repo-root uv.toml. Used only in the dependency stage.
+FROM --platform=$PLATFORM ghcr.io/astral-sh/uv:0.12.1@sha256:cf4eedcaa81655197f625739489effcbe71b61ceb1506f332c3facae5deceded AS uv
 
 # python:3.12-slim multi-arch index, pinned 2026-09-29.
 FROM --platform=$PLATFORM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f AS deps
