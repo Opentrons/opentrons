@@ -56,7 +56,7 @@ Sometimes different combinations of collars, spacers, and labware don't stack up
 
 - **Stack height:** The spacer and collection plate must fit inside the collar so all seals and gaskets seat flush against labware surfaces. If a stack is too tall, the bottom of the collar may not sit flush against the vacuum base gasket. If the internal stack is too short, the collection plate may not seal tightly against the collar's inner gasket.
 
-- **Seal integrity:** All mating surfaces must sit flush against each other and compress evenly to hold pressure.
+- **Seal integrity:** All mating surfaces must sit flush against each other and compress evenly to hold vacuum.
 
 ## Testing vacuum integrity
 
