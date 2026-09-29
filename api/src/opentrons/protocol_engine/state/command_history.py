@@ -80,8 +80,8 @@ class CommandPersistenceInterface:
                 ]
 
                 await self._send_batch_command_insert_request(command_entry_json_batch)
-
-            await asyncio.sleep(0.1)
+            if not self._teardown_signal.is_set():
+                await asyncio.sleep(0.1)
             if self._teardown_signal.is_set() and not self._command_queue:
                 break
 
