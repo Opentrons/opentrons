@@ -40,6 +40,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: vi.fn(() => ({ hostname: 'localhost', port: 31950 })),
+    useAuthSettingsQuery: vi.fn(() => ({ data: undefined })),
     useValidateSelfPasswordMutation: vi.fn(),
   }
 })
@@ -167,7 +168,7 @@ describe('LoginModal', () => {
     })
     vi.mocked(useValidateSelfPasswordMutation).mockReturnValue({
       validateSelfPassword: vi.fn().mockResolvedValue(null),
-    } as ReturnType<typeof useValidateSelfPasswordMutation>)
+    } as unknown as ReturnType<typeof useValidateSelfPasswordMutation>)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
