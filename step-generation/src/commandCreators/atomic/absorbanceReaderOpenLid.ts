@@ -3,14 +3,16 @@ import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
 import { resolveStringRuntimeValue, uuid } from '../../utils'
 
 import type {
-  AbsorbanceReaderOpenLidStepGenArgs,
   CommandCreator,
   CommandCreatorError,
+  ModuleStepGenArgs,
 } from '../../types'
 
-export const absorbanceReaderOpenLid: CommandCreator<
-  AbsorbanceReaderOpenLidStepGenArgs
-> = (args, invariantContext, prevRobotState) => {
+export const absorbanceReaderOpenLid: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const { gripperEntities, moduleEntities, runtimeParameters } =
     invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)

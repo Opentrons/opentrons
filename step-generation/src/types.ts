@@ -1220,11 +1220,7 @@ export type UnsafePipetteMovementReason =
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
 
-export interface AbsorbanceReaderCloseLidStepGenArgs {
-  moduleId: string
-}
-
-export interface AbsorbanceReaderOpenLidStepGenArgs {
+export interface ModuleStepGenArgs {
   moduleId: string
 }
 
