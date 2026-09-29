@@ -9,6 +9,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
+// @ts-ignore -- exported on chore_release-10.1.0; this PR's CI merges that in
+import { useValidateSelfPasswordMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
@@ -40,6 +42,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ...actual,
     useHost: vi.fn(() => ({ hostname: 'localhost', port: 31950 })),
     useAuthSettingsQuery: vi.fn(() => ({ data: undefined })),
+    useValidateSelfPasswordMutation: vi.fn(),
   }
 })
 
@@ -166,6 +169,9 @@ describe('LoginModal', () => {
       eatToast: vi.fn(),
       makeSnackbar: vi.fn(),
     })
+    vi.mocked(useValidateSelfPasswordMutation).mockReturnValue({
+      validateSelfPassword: vi.fn().mockResolvedValue(null),
+    } as unknown as ReturnType<typeof useValidateSelfPasswordMutation>)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
