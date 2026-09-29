@@ -1,5 +1,7 @@
 ARG PLATFORM=linux/amd64
-FROM --platform=$PLATFORM python:3.12-slim
+# Digest is the 3.12-slim multi-arch index, pinned 2026-09-29.
+# linux/amd64 image within that index: sha256:44ff437bba879d4941b710a369a8f19266aea34b29002807f0c487fabc9eec9b
+FROM --platform=$PLATFORM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
 
 ENV PYTHONUNBUFFERED=True
 ENV DOCKER_RUNNING=True
