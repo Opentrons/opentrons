@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { WARNING_TOAST } from '@opentrons/components'
+import { WARNING_TOAST, Z_INDEX } from '@opentrons/components'
 import {
   fetchSelfQuery,
   getSelfQueryKey,
@@ -32,9 +32,6 @@ import { isAdminEquivalentAccountType } from './utils'
 import type { QueryKey } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
-
-// Above typical login overlays so the toast remains visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export interface RequireAdminForUpdatesResult {
   isLoading: boolean
@@ -105,7 +102,7 @@ export function useRequireAdminForUpdates(
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         disableTimeout: true,
         heading: '' + t('admin_credentials_required'),
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       }
     )
   }, [eatToast, i18n, makeToast, t])

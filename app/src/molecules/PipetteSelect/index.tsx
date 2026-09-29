@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import groupBy from 'lodash/groupBy'
 
-import { Box, Flex } from '@opentrons/components'
+import { Box, Flex, Z_INDEX } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
   GEN1,
@@ -80,7 +80,7 @@ export function PipetteSelect(props: PipetteSelectProps): ReactNode {
       isSearchable={false}
       options={groupedOptions}
       menuPortalTarget={document.body}
-      styles={{ menuPortal: base => ({ ...base, zIndex: 10 }) }}
+      styles={{ menuPortal: base => ({ ...base, zIndex: Z_INDEX.MODALS }) }}
       value={value}
       defaultValue={defaultValue}
       width="15rem"

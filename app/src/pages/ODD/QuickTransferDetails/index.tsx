@@ -22,6 +22,7 @@ import {
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -113,7 +114,7 @@ const QuickTransferHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}

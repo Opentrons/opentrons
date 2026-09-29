@@ -14,7 +14,7 @@ import { useNetworkConnection } from '/app/resources/networking/hooks/useNetwork
 import styles from './navigation.module.css'
 import { NavigationMenu } from './NavigationMenu'
 
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { ReactNode } from 'react'
 import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
@@ -26,15 +26,7 @@ const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
 const CHAR_LIMIT_WITH_ICON = 12
 const CHAR_LIMIT_NO_ICON = 15
 
-interface NavigationProps {
-  //  optionalProps for setting the zIndex and position between multiple sticky elements
-  //  used for ProtocolDashboard
-  setNavMenuIsOpened?: Dispatch<SetStateAction<boolean>>
-  longPressModalIsOpened?: boolean
-}
-export function Navigation(props: NavigationProps): ReactNode {
-  const { setNavMenuIsOpened, longPressModalIsOpened } = props
-
+export function Navigation(): ReactNode {
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
@@ -55,9 +47,6 @@ export function Navigation(props: NavigationProps): ReactNode {
   const { icon: iconName } = networkConnection
 
   const handleMenu = (openMenu: boolean): void => {
-    if (setNavMenuIsOpened != null) {
-      setNavMenuIsOpened(openMenu)
-    }
     setShowNavMenu(openMenu)
   }
 
@@ -70,8 +59,6 @@ export function Navigation(props: NavigationProps): ReactNode {
       inline: 'center',
     })
   }, [])
-
-  const navMenuOrModalIsOpened = showNavMenu || Boolean(longPressModalIsOpened)
 
   function getPathDisplayName(path: (typeof NAV_LINKS)[number]): string {
     switch (path) {
@@ -93,9 +80,7 @@ export function Navigation(props: NavigationProps): ReactNode {
       <nav
         className={clsx(
           styles.nav_bar,
-          navMenuOrModalIsOpened
-            ? styles.nav_bar_static
-            : styles.nav_bar_sticky,
+          styles.nav_bar_sticky,
           isScrolled && styles.nav_bar_scrolled
         )}
       >

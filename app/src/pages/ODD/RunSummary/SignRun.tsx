@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { StyledText, WARNING_TOAST } from '@opentrons/components'
+import { StyledText, WARNING_TOAST, Z_INDEX } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -17,12 +17,6 @@ import styles from './signrun.module.css'
 
 import type { ReactNode } from 'react'
 import type { DocumentationState } from '@opentrons/react-api-client'
-
-// Above OnDeviceLogin overlay (z-index: 10001) so the toast is visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
-
-// Below the login (10001) and documentation (1002) modals, which layer above this one.
-const MODAL_Z_INDEX = 1000
 
 export function SignRun({
   runId,
@@ -52,7 +46,7 @@ export function SignRun({
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         disableTimeout: true,
         heading: '' + t('sign_protocol_run_permission_required') + '.',
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       }
     )
   }
@@ -101,7 +95,7 @@ export function SignRun({
   return (
     <OddModal
       header={{ title: t('sign_protocol_run') }}
-      modalZIndex={MODAL_Z_INDEX}
+      modalZIndex={Z_INDEX.BLOCKING_MODALS}
       key={name}
     >
       <div className={styles.content_container}>

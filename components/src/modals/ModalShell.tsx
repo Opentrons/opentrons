@@ -16,6 +16,7 @@ import {
   OVERFLOW_VISIBLE,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Z_INDEX,
 } from '../styles'
 import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
 
@@ -58,12 +59,12 @@ export interface ModalShellProps extends StyleProps {
 export function ModalShell(props: ModalShellProps): ReactNode {
   const {
     onOutsideClick,
-    zIndex = 10,
+    zIndex = Z_INDEX.MODALS,
     header,
     footer,
     fullPage = false,
     children,
-    zIndexOverlay = 1,
+    zIndexOverlay = Z_INDEX.BASE,
     position = 'center',
     showOverlay = true,
     noPadding = false,
