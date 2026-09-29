@@ -32,7 +32,7 @@ This project uses **uv** for Python dependency management (not pipenv, pip-tools
 | ------------------ | ----------------------------------------------------------- | --------------- |
 | `pyproject.toml`   | Single source of truth for dependencies AND all tool config | Yes             |
 | `uv.lock`          | Locked dependency graph                                     | Yes             |
-| `requirements.txt` | Generated pip-format file for Docker builds                 | No (gitignored) |
+| `requirements.txt` | Unused. Docker installs from `uv.lock` directly             | No (gitignored) |
 | `.venv/`           | Local virtual environment created by `uv sync`              | No (gitignored) |
 
 ### Key Commands
@@ -124,7 +124,7 @@ All targets run from `opentrons-ai-server/`.
 | Target             | Description                                                   |
 | ------------------ | ------------------------------------------------------------- |
 | `make local-run`   | Run FastAPI with uvicorn (hot reload, no Docker)              |
-| `make build`       | Generate requirements.txt, build Docker image                 |
+| `make build`       | Sync API docs, then build the Docker image                    |
 | `make run`         | Run the Docker container (requires `.env` file)               |
 | `make rebuild`     | `clean` + `build` + `run`                                     |
 | `make live-test`   | Run live tests against a running server (`ENV=local` default) |
@@ -134,21 +134,17 @@ All targets run from `opentrons-ai-server/`.
 
 | Target                        | Description                                                   |
 | ----------------------------- | ------------------------------------------------------------- |
-| `make gen-requirements`       | Export `uv.lock` to `requirements.txt` (production deps only) |
 | `make deploy ENV=staging`     | Build, push to ECR, update ECS service                        |
 | `make dry-deploy ENV=staging` | Retrieve AWS data but make no changes                         |
 | `make build-only ENV=staging` | Build Docker image only, no push/deploy                       |
 
 ## Docker Build
 
-The container does **not** use uv internally:
+The image is a two-stage build. The dependency stage copies a digest-pinned `uv` binary and runs `uv sync --frozen --no-dev --no-install-project`, so packages come from `uv.lock` with their recorded hashes. The runtime stage copies only that virtualenv and `api/`; it does not contain `uv`.
 
-1. `make build` calls `make gen-requirements` → `uv export --no-hashes --no-dev -o requirements.txt`
-2. Dockerfile installs with plain `pip`
-3. Copies `api/` source and Opentrons API docs synced under `api/storage/api_docs/docs/v2`
-4. Entrypoint: `uvicorn api.handler.fast:app` (3 workers, port 8000)
+`make build` syncs the Python API docs, then builds. The Docker build context is the **repo root** (not `opentrons-ai-server/`). Docs come from the pinned `DOCS_TAG` Makefile variable and must be present under `api/storage/api_docs/docs/v2`.
 
-Docker build context is the **repo root** (not `opentrons-ai-server/`). Run `make sync-api-docs` before building so Python API docs from the pinned `DOCS_TAG` Makefile variable are present under `api/storage/api_docs/docs/v2`.
+Entrypoint: `uvicorn api.handler.fast:app` (3 workers, port 8000).
 
 ## Python API docs curation
 
