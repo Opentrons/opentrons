@@ -3492,3 +3492,7 @@ class OT3API(
         expected_nodes: Optional[List[Axis]] = None,
     ) -> Dict[Axis, Dict[str, int]]:
         return await self._backend.get_motor_usage_data(expected_nodes)
+
+    async def debug_set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """This is a debug utility function- the protocol engine or anything user-facing shouldn't touch this!"""
+        await self._backend.set_active_current(axis_currents=axis_currents)

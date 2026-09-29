@@ -9,7 +9,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
-// @ts-ignore -- exported on chore_release-10.1.0; this PR's CI merges that in
 import { useValidateSelfPasswordMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
@@ -24,12 +23,12 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type * as ApiClient from '@opentrons/api-client'
-import type * as ReactApiClient from '@opentrons/react-api-client'
-import type * as Discovery from '/app/redux/discovery'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+
+vi.mock('/app/organisms/ToasterOven')
 
 vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof ApiClient>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getUserLoginStatus: vi.fn(),
@@ -37,7 +36,7 @@ vi.mock('@opentrons/api-client', async importOriginal => {
 })
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual = await importOriginal<typeof ReactApiClient>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     useHost: vi.fn(() => ({ hostname: 'localhost', port: 31950 })),
@@ -47,7 +46,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('/app/redux/discovery', async importOriginal => {
-  const actual = await importOriginal<typeof Discovery>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getLocalRobot: vi.fn(() => mockConnectableRobot),
@@ -55,23 +54,18 @@ vi.mock('/app/redux/discovery', async importOriginal => {
 })
 
 vi.mock('/app/resources/auth')
-vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
 
-const OAUTH_RESPONSE: ApiClient.OAuth2TokenResponse = {
+const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
   access_token: 'access-token',
   refresh_token: 'refresh-token',
   expires_in: 3600,
 }
 
-const mockMakeToast = vi.fn()
-
-function mockAuthUser(
-  overrides: Partial<ApiClient.AuthUser> = {}
-): ApiClient.AuthUser {
+function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   return {
     username: 'alice',
     fullName: 'Alice',
@@ -82,9 +76,11 @@ function mockAuthUser(
   }
 }
 
-function mockUserLoginStatus(resetPassword = false): void {
+function mockUserLoginStatus(
+  reason: 'temporaryPassword' | 'passwordExpired' | null = null
+): void {
   vi.mocked(getUserLoginStatus).mockResolvedValue({
-    data: { data: { resetPassword } },
+    data: { data: { reason } },
   } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 
@@ -161,11 +157,12 @@ async function advanceFromUsername(): Promise<void> {
 }
 
 describe('LoginModal', () => {
+  const makeToast = vi.fn()
+
   beforeEach(() => {
-    mockUserLoginStatus(false)
-    mockMakeToast.mockReset()
+    mockUserLoginStatus(null)
     vi.mocked(useToaster).mockReturnValue({
-      makeToast: mockMakeToast,
+      makeToast,
       eatToast: vi.fn(),
       makeSnackbar: vi.fn(),
     })
@@ -188,7 +185,7 @@ describe('LoginModal', () => {
 
   it('opens on the username step', async () => {
     const clickOpenLoginModal = setupLoginModalTrigger()
-    void clickOpenLoginModal()
+    clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     expect(screen.getByLabelText('Username')).toBeInTheDocument()
@@ -226,7 +223,7 @@ describe('LoginModal', () => {
     }))
 
     const clickOpenLoginModal = setupLoginModalTrigger()
-    void clickOpenLoginModal()
+    clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     await advanceFromUsername()
@@ -254,7 +251,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -288,7 +285,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -306,7 +303,7 @@ describe('LoginModal', () => {
     expect(modalResolved).toBe(false)
   })
 
-  it('signs in after setting a new password', async () => {
+  it('signs in automatically after setting a new password', async () => {
     let loginCallCount = 0
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
@@ -332,7 +329,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -342,12 +339,18 @@ describe('LoginModal', () => {
 
     fillField('New password', 'newpass123')
     clickPrimary('Next')
+    expect(await screen.findByLabelText('Confirm password')).toBeInTheDocument()
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
-    expect(mockMakeToast).toHaveBeenCalledWith('Password updated', 'success')
-  })
+    expect(loginCallCount).toBe(2)
+    expect(makeToast).toHaveBeenCalledWith(
+      'Password updated',
+      'success',
+      expect.objectContaining({ displayType: 'odd' })
+    )
+  }, 10000)
 
   it('returns to the new-password step with a policy error when setting a password fails', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
@@ -373,7 +376,7 @@ describe('LoginModal', () => {
     void clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus(true)
+    mockUserLoginStatus('temporaryPassword')
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -383,6 +386,7 @@ describe('LoginModal', () => {
 
     fillField('New password', 'newpass123')
     clickPrimary('Next')
+    expect(await screen.findByLabelText('Confirm password')).toBeInTheDocument()
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
