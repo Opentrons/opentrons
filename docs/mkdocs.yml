@@ -107,7 +107,7 @@ extra_css:
   - python-api.css
 
 extra:
-  apiLevel: 2.29
-  robot_stack_version: 9.1.1
+  apiLevel: 2.30
+  robot_stack_version: 10.0.0
 
 copyright: '© Opentrons 2026. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
