@@ -9,13 +9,13 @@ import structlog
 from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Query, Request, Response, Security, UploadFile, status
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, Response, Security, UploadFile, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
-from pydantic import BaseModel, Field, conint
+from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
@@ -171,10 +171,6 @@ class Status(BaseModel):
 
 class HealthResponse(BaseModel):
     status: Status
-
-
-class TimeoutResponse(BaseModel):
-    message: str
 
 
 class CorsHeadersResponse(BaseModel):
@@ -727,22 +723,6 @@ async def get_health(request: Request) -> Status:
     else:
         logger.info(f"{request.method} {request.url.path}", extra={"requestMethod": request.method, "requestPath": request.url.path})
     return Status(status="ok", version=settings.service_version)
-
-
-@app.get("/api/timeout", response_model=TimeoutResponse)
-async def timeout_endpoint(request: Request, seconds: conint(ge=1, le=300) = Query(..., description="Number of seconds to wait")):  # type: ignore # noqa: B008
-    """
-    Wait for the specified number of seconds and then respond.
-
-    - **seconds**: The number of seconds to wait (between 1 and 300).
-    """
-    # call me with http://localhost:8000/api/timeout?seconds=180
-    logger.info(f"{request.method} {request.url.path}")
-    try:
-        await asyncio.sleep(seconds)  # Asynchronously wait for the specified time
-        return TimeoutResponse(message=f"Waited for {seconds} seconds")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/api/redoc", include_in_schema=False)
