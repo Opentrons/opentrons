@@ -25,12 +25,13 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   const { pipetteEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
-  const entityId = prevRobotState.pipettes[pipetteId]?.entityId
-  const fixturePythonName =
-    entityId != null
-      ? (trashBinEntities[entityId]?.pythonName ??
-        wasteChuteEntities[entityId]?.pythonName)
-      : undefined
+  const entityId = prevRobotState.pipettes[pipetteId]?.entityId ?? ''
+  const trashBin = trashBinEntities[entityId]
+  const wasteChute = wasteChuteEntities[entityId]
+  const dropTipArgs =
+    trashBin != null
+      ? `${trashBin.pythonName}, alternate_drop_location=True`
+      : (wasteChute?.pythonName ?? '')
 
   const commands = [
     {
@@ -43,6 +44,6 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   ]
   return {
     commands,
-    python: `${pipettePythonName}.drop_tip(${fixturePythonName ?? ''})`,
+    python: `${pipettePythonName}.drop_tip(${dropTipArgs})`,
   }
 }
