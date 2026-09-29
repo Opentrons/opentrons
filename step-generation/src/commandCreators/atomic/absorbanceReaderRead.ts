@@ -48,12 +48,12 @@ export const absorbanceReaderRead: CommandCreator<
 
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   // Keep variable names in Python; command params use resolved defaults.
+  const pythonFileNameValue =
+    fileName == null || runtimeParameters[fileName] != null
+      ? fileName
+      : formatPyStr(fileName)
   const pythonfileName =
-    fileName != null
-      ? `export_filename=${
-          runtimeParameters[fileName] != null ? fileName : formatPyStr(fileName)
-        }`
-      : ''
+    pythonFileNameValue != null ? `export_filename=${pythonFileNameValue}` : ''
 
   return errors.length > 0
     ? { errors }
