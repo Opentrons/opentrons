@@ -87,6 +87,10 @@ Hardware items that replace standard *deck slots*. They let you customize the de
 
 A detachable panel on the deck area. Remove deck slots to install modules and for access to the space below the deck.
 
+##### Diagnostic files
+
+Records that Flex continuously writes during operation, capturing robot movements, system processes, communications among robot components, and software update activity. Opentrons Support may request diagnostic files when troubleshooting a malfunction. See the [Flex Diagnostic Files section](advanced-operation/diagnostic-files.md) in the Advanced Operations chapter.
+
 ##### Dynamic pipetting
 
 Simultaneously aspirating or dispensing while moving the pipette tip location. Dynamic pipetting can be combined with *liquid level detection* to continuously track the meniscus during a liquid transfer. See the [Dynamic pipetting section](protocols/python-api.md#dynamic-pipetting) in the Protocol Development chapter and the [Dynamic mix section](../python-api/building-block-commands/liquids.md#dynamic-mix) in the Python Protocol API documentation.
@@ -198,10 +202,6 @@ A set of pipetting parameters—such as flow rate, submerge depth, air gap, blow
 ##### Liquid level detection
 
 The ability of Flex pipette sensors to detect the presence or absence of liquid in a well, or to locate the liquid meniscus. See the [Detect liquids section](../python-api/building-block-commands/liquids.md#detect-liquids) and [Measure liquids section](../python-api/building-block-commands/liquids.md#measure-liquids) in the Python Protocol API documentation.
-
-##### Diagnostic files
-
-Records that Flex continuously writes during operation, capturing robot movements, system processes, communications among robot components, and software update activity. Opentrons Support may request diagnostic files when troubleshooting a malfunction. See the [Flex Diagnostic Files section](advanced-operation/diagnostic-files.md) in the Advanced Operations chapter.
 
 ##### Maintenance position
 
