@@ -55,7 +55,9 @@ describe('dropTipInPlace', () => {
         },
       },
     ])
-    expect(res.python).toBe('mock_pipette.drop_tip(trash_bin_1)')
+    expect(res.python).toBe(
+      'mock_pipette.drop_tip(trash_bin_1, alternate_drop_location=True)'
+    )
   })
 
   it('emits drop_tip() without a fixture when entityId is unset', () => {
