@@ -5,6 +5,7 @@ ARG PLATFORM=linux/amd64
 FROM --platform=$PLATFORM ghcr.io/astral-sh/uv:0.12.1@sha256:cf4eedcaa81655197f625739489effcbe71b61ceb1506f332c3facae5deceded AS uv
 
 # python:3.12-slim multi-arch index, pinned 2026-09-29.
+# linux/amd64 image within that index: sha256:44ff437bba879d4941b710a369a8f19266aea34b29002807f0c487fabc9eec9b
 FROM --platform=$PLATFORM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f AS deps
 
 COPY --from=uv /uv /usr/local/bin/uv
@@ -34,5 +35,9 @@ COPY --from=deps /code/.venv /code/.venv
 COPY opentrons-ai-server/api /code/api
 
 EXPOSE 8000
+
+RUN useradd --uid 10001 --create-home --home-dir /home/app --shell /usr/sbin/nologin app
+ENV HOME=/home/app
+USER app
 
 CMD ["uvicorn", "api.handler.fast:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "190", "--log-config", "/code/api/uvicorn_disable_logging.json", "--workers", "3"]
