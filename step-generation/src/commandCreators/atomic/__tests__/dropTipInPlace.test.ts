@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { dropTipInPlace } from '..'
+import { FIXED_TRASH_ID } from '../../../constants'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
@@ -34,7 +35,16 @@ describe('dropTipInPlace', () => {
     const params: DropTipInPlaceParams = {
       pipetteId: DEFAULT_PIPETTE,
     }
-    const result = dropTipInPlace(params, invariantContext, robotStateWithTip)
+    const result = dropTipInPlace(params, invariantContext, {
+      ...robotStateWithTip,
+      pipettes: {
+        ...robotStateWithTip.pipettes,
+        [DEFAULT_PIPETTE]: {
+          ...robotStateWithTip.pipettes[DEFAULT_PIPETTE],
+          entityId: FIXED_TRASH_ID,
+        },
+      },
+    })
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
@@ -45,5 +55,25 @@ describe('dropTipInPlace', () => {
         },
       },
     ])
+    expect(res.python).toBe('mock_pipette.drop_tip(trash_bin_1)')
+  })
+
+  it('emits drop_tip() without a fixture when entityId is unset', () => {
+    const params: DropTipInPlaceParams = {
+      pipetteId: DEFAULT_PIPETTE,
+    }
+    const result = dropTipInPlace(params, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.python).toBe('mock_pipette.drop_tip()')
+  })
+
+  it('should no-op if there is no tip', () => {
+    const params: DropTipInPlaceParams = {
+      pipetteId: DEFAULT_PIPETTE,
+    }
+    const result = dropTipInPlace(params, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([])
+    expect(res.python).toBeUndefined()
   })
 })
