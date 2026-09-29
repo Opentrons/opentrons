@@ -60,7 +60,7 @@ protocol.wait_for_tasks([heat_task])
 protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper="True")
 ```
 
-Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat and shake samples, and [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
+Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat samples to 75 °C and shake at 300 rpm, and [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
 
 ```python
 
@@ -72,14 +72,16 @@ hs_mod.set_shake_speed(300)
 protocol.wait_for_tasks([heat_task])
 
 # create timer for sample incubation
-hs_timer = create_timer(seconds=300)
+hs_timer = protocol.create_timer(seconds=300)
 
 # hold samples at target temperature
 protocol.wait_for_tasks([hs_timer])
 hs_mod.deactivate_heater()
 ```
 
-Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, `wait_for_tasks()` ensures the timer starts only after the target temperature is reached. 
+Because the Heater-Shaker Module could take longer than 5 minutes to reach 75 °C, the first `wait_for_tasks()` command ensures the timer starts only after the temperature is reached. 
+
+Then, the protocol waits for the 300 second timer to complete before proceeding with the protocol and deactivating the Heater-Shaker Module. You won't see a notification when a timer is complete, so it's best to use `wait_for_tasks()` to make sure your tasks happen in the order you intend.
 
 !!! note
     Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] twice: 
