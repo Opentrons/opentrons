@@ -1235,3 +1235,12 @@ export interface AbsorbanceReaderReadStepGenArgs {
   moduleId: string
   fileName?: string | null
 }
+
+export interface WaitForTasksStepGenArgs {
+  task_ids: string[]
+}
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
