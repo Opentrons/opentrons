@@ -11,7 +11,16 @@ import requests
 import structlog
 import weave
 from anthropic import Anthropic, AsyncAnthropic
-from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam, ToolParam
+from anthropic.types import (
+    ContentBlockParam,
+    DocumentBlockParam,
+    Message,
+    MessageParam,
+    TextBlockParam,
+    ThinkingConfigDisabledParam,
+    ThinkingConfigParam,
+    ToolParam,
+)
 from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
@@ -66,15 +75,17 @@ TOOL_ROUNDS_EXCEEDED_USER_MESSAGE = (
 )
 
 
-def anthropic_thinking_for_model(model: str) -> dict[str, str]:
+def anthropic_thinking_for_model(model: str) -> ThinkingConfigParam:
     """Pick thinking config for the target model (AUTH-3480 Sonnet 5.5 migration).
 
     Sonnet 5.5 requires ``between_tools`` instead of ``disabled`` when upfront thinking is off.
     Earlier models (e.g. ``claude-sonnet-5``) reject ``between_tools``.
     """
     if "5-5" in model:
-        return {"type": "between_tools"}
-    return {"type": "disabled"}
+        # Sonnet 5.5 API accepts between_tools; anthropic SDK stubs may not list it yet.
+        return cast(ThinkingConfigParam, {"type": "between_tools"})
+    disabled: ThinkingConfigDisabledParam = {"type": "disabled"}
+    return disabled
 
 
 class AnthropicPredict:
@@ -90,8 +101,8 @@ class AnthropicPredict:
         self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
-        self.thinking = anthropic_thinking_for_model(self.model_name)
-        self.thinking_helper = anthropic_thinking_for_model(self.model_helper)
+        self.thinking: ThinkingConfigParam = anthropic_thinking_for_model(self.model_name)
+        self.thinking_helper: ThinkingConfigParam = anthropic_thinking_for_model(self.model_helper)
         default_api_level = get_default_api_level()
         # System prompt is sent as a cacheable content block (not a plain string) so Anthropic's
         # prompt caching can reuse it across requests instead of re-billing the full text every turn.
