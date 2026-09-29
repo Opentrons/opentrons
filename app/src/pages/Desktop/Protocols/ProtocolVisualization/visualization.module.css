@@ -348,7 +348,7 @@
 
 .controls_overflow_menu {
   position: absolute;
-  z-index: 2;
+  z-index: var(--z-index-details);
   top: 3.4rem;
   right: 1.25rem;
   flex-direction: column;

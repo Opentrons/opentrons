@@ -98,4 +98,30 @@ module.exports = {
       },
     ],
   },
+
+  overrides: [
+    {
+      files: ['app/**/*.css'],
+      rules: {
+        'declaration-property-value-allowed-list': [
+          {
+            'z-index': [
+              /^var\(--z-index-[a-z0-9-]+\)$/,
+              /^calc\(var\(--z-index-[a-z0-9-]+\)\s*[+-]\s*\d+(?:\.\d+)?\)$/,
+              'auto',
+              'inherit',
+              'initial',
+              'unset',
+              'revert',
+              'revert-layer',
+            ],
+          },
+          {
+            message:
+              'Do not hardcode %s: %s. Use a var(--z-index-*) custom property.',
+          },
+        ],
+      },
+    },
+  ],
 }

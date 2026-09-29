@@ -60,7 +60,7 @@ export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
           return {
             ...toast,
             exitNow: true,
-            zIndex: 1,
+            zIndex: Z_INDEX.BASE,
             position: POSITION_FIXED,
           }
         })
@@ -69,7 +69,7 @@ export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
             id,
             message,
             type,
-            zIndex: 2,
+            zIndex: Z_INDEX.DETAILS,
             position: POSITION_FIXED,
             // Allow callers to override stacking
             ...options,
