@@ -132,11 +132,11 @@ All targets run from `opentrons-ai-server/`.
 
 ### Deployment
 
-| Target                        | Description                                                   |
-| ----------------------------- | ------------------------------------------------------------- |
-| `make deploy ENV=staging`     | Build, push to ECR, update ECS service                        |
-| `make dry-deploy ENV=staging` | Retrieve AWS data but make no changes                         |
-| `make build-only ENV=staging` | Build Docker image only, no push/deploy                       |
+| Target                        | Description                             |
+| ----------------------------- | --------------------------------------- |
+| `make deploy ENV=staging`     | Build, push to ECR, update ECS service  |
+| `make dry-deploy ENV=staging` | Retrieve AWS data but make no changes   |
+| `make build-only ENV=staging` | Build Docker image only, no push/deploy |
 
 ## Docker Build
 
