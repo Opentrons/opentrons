@@ -1,6 +1,6 @@
 ---
 title: "Python API: Vacuum Module Examples"
-description: An analysis of the Opentrons Python API code used by the Vacuum Module in a miniprep protocol.
+description: A use case demonstrating how the Vacuum Module uses API commands in a miniprep protocol.
 ---
 
 This use case is taken from a plasmid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules, and labware.
@@ -18,10 +18,9 @@ A plasmid miniprep is a technique used to isolate DNA. A typical protocol involv
 
 The code analysis starts below.
 
-
 ## Stage 1: Loading modules and labware
 
-During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, this code to tells the robot what's going to be used and where it can be found.
+During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, this code tells the robot what's going to be used and where it can be found.
 
 <table>
   <thead>
@@ -48,8 +47,8 @@ During this stage, the `run()` function initializes hardware, defines the deck l
       <td><strong>Internal manifold stack</strong></td>
       <td>
         <ul>
-          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.load_adapter"><code>load_adapter()</code></a> loads the short spacer on the vacuum base.</li>
-          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.load_labware"><code>load_labware()</code></a> loads the lysate collection plate on the short spacer.</li>
+          <li><a href="../../reference/vacuum/#opentrons.protocol_api.VacuumModuleContext.load_adapter"><code>load_adapter()</code></a> loads the 7.25 mm spacer on the vacuum base.</li>
+          <li><code>load_labware()</code> loads the lysate collection plate on the spacer.</li>
         </ul>
       </td>
     </tr>
@@ -64,6 +63,14 @@ During this stage, the `run()` function initializes hardware, defines the deck l
   </tbody>
 </table>
 
+<!--- Because we're using snippets from a long, complete protocol, might need to provide context --->
+<!--- about how filter plates are 'loaded' from a regular deck slot --->
+
+!!! note "Note: staging filter plates and spacers"
+    Filter plates have nozzle tips that extend past the bottom of the plate skirt. As a result, you cannot put a filter plate directly on deck slot without some risk of damage or contamination. Protocols typically stage filter plates nested into deep-well plates, which can then be loaded in software from a deck slot.
+
+    Spacers cannot be placed on standard deck slots or be manipulated by the Gripper. Spacers must be seated manually into the vacuum base and loaded in software via `vacuum.load_adapter()`.
+
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load modules and external waste chute
@@ -74,36 +81,49 @@ def run(protocol: protocol_api.ProtocolContext):
     # Stage the tall collar on the vacuum module dock (slot A4)
     collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_tall")
 
-    # Load an internal spacer and collection plate into the manifold base (slot A3)
-    short_spacer = protocol.load_adapter("opentrons_vacuum_manifold_spacer_short", "A1")
-    collection_plate = vacuum.load_labware(
-        "nunc_96_wellplate_450ul", label="Lysate Collection Plate"
+    # Load the 7.25 mm spacer into the vacuum base and seat the collection plate
+    spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_7.25mm")
+    collection_plate = spacer.load_labware(
+        "nunc_96_wellplate_450ul",
+        label="Lysate Collection Plate"
     )
 
-    # Stage the filter plates, reservoir, pipette, and tips
-    filter_plate = short_spacer.load_labware(
-        "cytiva_96_wellplate_1000ul_shorttip_filter", label="Clarification Plate"
+    # Stage the short-tip plate in a deep-well plate in slot A1
+    holding_plate = protocol.load_labware("nest_96_wellplate_2ml_deep", "A1")
+    filter_plate = holding_plate.load_labware(
+        "cytiva_96_wellplate_1000ul_shorttip_filter",
+        label="Clarification Plate"
     )
-    silica_plate = protocol.load_labware(
-        "cytiva_96_wellplate_1000ul_longtip_filter", "C1", label="Silica Plate"
+
+    # Stage the elution plate in slot C1 with nested long-tip silica plate
+    elution_plate = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "C1",
+        label="Elution Plate"
     )
+    silica_plate = elution_plate.load_labware(
+        "cytiva_96_wellplate_1000ul_longtip_filter",
+        label="Silica Plate"
+    )
+    
     reservoir = protocol.load_labware("opentrons_tough_12_reservoir_22ml", "A2")
     tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B2")
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
+
 ## Stage 2: Concurrent actions
-<!--- figure out something after new spacer info is available --->
-<font color="red">Needs some intro here. During this stage, the robot does all the things.</font>
+
+During this stage, the robot takes advantage of [non-blocking API commands](../modules/concurrent.md) to run filtration and pipetting actions simultaneously. Once parallel pipetting is complete, you can use `wait_for_tasks()` to pause protocol execution until the vacuum task finishes.
 
 ### Liquid collection
 
-During this stage, a gentle vacuum pulls clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates vacuum seal.
+Here the protocol calls for a gentle vacuum to pull clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates vacuum seal.
 
 <table>
   <thead>
     <tr>
-      <th style="text-align: left;">Action</th>
-      <th style="text-align: left;">API method and role</th>
+      <th">Action</th>
+      <th">API method and role</th>
     </tr>
   </thead>
   <tbody>
@@ -111,7 +131,7 @@ During this stage, a gentle vacuum pulls clarified lysate into a 96-well collect
       <td><strong>Stack assembly</strong></td>
       <td><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a>:
         <ul>
-          <li> uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
+          <li>uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
           <li>seats the tall collar over the base to seal the labware stack.</li>
         </ul>
       </td>
@@ -157,13 +177,13 @@ Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can c
 
 ## Stage 3: Direct-to-waste wash and dry
 
-In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying.
+In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. A full miniprep protocol includes intermediate wash pipetting steps, but these are omitted for brevity and to keep the focus on Vacuum Module API methods.
 
 <table>
   <thead>
     <tr>
-      <th style="text-align: left;">Action</th>
-      <th style="text-align: left;">API method and role</th>
+      <th>Action</th>
+      <th>API method and role</th>
     </tr>
   </thead>
   <tbody>
@@ -171,7 +191,7 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
       <td><strong>Stack reconfiguration</strong></td>
       <td>
         <ul>
-          <li><code>move_labware()</code></a> moves the lysate collection plate off the module to slot D2, preparing the vacuum base for direct-to-waste evacuation.</li>
+          <li><code>move_labware()</code> moves the lysate collection plate off the module to slot D2, preparing the vacuum base for direct-to-waste evacuation.</li>
           <li><code>move_labware()</code> seats the tall collar directly onto the vacuum base and places the long-tip silica plate on the collar.</li>
         </ul>
       </td>
@@ -180,7 +200,7 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
       <td><strong>Sample binding</strong></td>
       <td>
         <ul>
-          <li><code>start_set_vacuum_pressure()</code></a> applies <code>-500</code> mbar vacuum to draw sample liquid through the silica membrane directly to the waste carboy.</li>
+          <li><code>start_set_vacuum_pressure()</code> applies <code>-500</code> mbar vacuum to draw sample liquid through the silica membrane directly to the waste carboy.</li>
           <li><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.wait_for_tasks"><code>wait_for_tasks()</code></a> halts operations until the binding cycle finishes and pressure equalizes (<code>equalize_timeout_s=10</code>).</li>
         </ul>
       </td>
