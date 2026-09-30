@@ -141,7 +141,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('MOCK_RUN_PROGRESS_METER')
   })
 
-  it('renders a skeleton while the run query is loading', () => {
+  it('renders a skeleton while the run record is loading', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: undefined,
       isLoading: true,

@@ -355,7 +355,7 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Run setup loading')
   })
 
-  it('renders run loading info screen while the run query is loading', () => {
+  it('renders run loading info screen while the run record is loading', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: undefined,
       isLoading: true,

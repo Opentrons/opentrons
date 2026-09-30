@@ -50,11 +50,7 @@ import {
   updateRunSetupStepsComplete,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
-import {
-  useNotifyClientDataLPC,
-  useUpdateClientLPC,
-} from '/app/resources/client_data'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
@@ -80,6 +76,7 @@ import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
+import { useProtocolRunSetupLoadingState } from './useProtocolRunSetupLoadingState'
 
 import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -121,7 +118,7 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord, isLoading: isRunLoading } = useNotifyRunQuery(
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
     runId,
     {
       staleTime: Infinity,
@@ -144,24 +141,13 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
-  // Camera setup is Flex-only; wait for robot camera settings before showing accordions.
-  const { isLoading: isCameraLoading } = useNotifyCamera({
-    staleTime: Infinity,
-    enabled: isFlex,
-  })
-  // Client LPC data reports when finalized offsets were applied.
-  const { isLoading: isClientLPCLoading } = useNotifyClientDataLPC({
-    enabled: isFlex,
-  })
+  const { isSetupLoading } = useProtocolRunSetupLoadingState(
+    runId,
+    robotName,
+    lpcUtils.isFlexLPCInitializing,
+    isRunRecordLoading
+  )
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
-  // LPC is settled when init/client data are done and offsets are finalized.
-  const isFlexLPCSettled =
-    !lpcUtils.isFlexLPCInitializing && !isClientLPCLoading && flexOffsetsApplied
-  const showRunLoadingState =
-    isRunLoading ||
-    protocolAnalysis == null ||
-    (isFlex && !isFlexLPCSettled) ||
-    (isFlex && isCameraLoading)
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -476,7 +462,7 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {showRunLoadingState ? (
+      {isSetupLoading ? (
         <InfoScreen
           iconName="ot-spinner"
           content={t('run_setup_loading')}
