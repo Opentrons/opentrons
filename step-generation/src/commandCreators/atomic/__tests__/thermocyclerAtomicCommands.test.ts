@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSuccessResult } from '../../../fixtures'
+import { getErrorResult, getSuccessResult } from '../../../fixtures'
 import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../thermocyclerDeactivateLid'
@@ -43,6 +43,7 @@ invariantContext = {
       pythonName: 'mock_thermocycler',
     },
   } as ModuleEntities,
+  runtimeParameters: {},
 }
 describe('thermocycler atomic commands', () => {
   const testCases = [
@@ -132,4 +133,89 @@ describe('thermocycler atomic commands', () => {
   }
 
   testCases.forEach(testParams)
+})
+describe('thermocycler atomic commands with runtime parameters', () => {
+  const moduleOnlyTestCases = [
+    {
+      commandCreator: thermocyclerCloseLid,
+      expectedType: 'thermocycler/closeLid',
+      expectedPython: 'mock_thermocycler.close_lid()',
+    },
+    {
+      commandCreator: thermocyclerOpenLid,
+      expectedType: 'thermocycler/openLid',
+      expectedPython: 'mock_thermocycler.open_lid()',
+    },
+    {
+      commandCreator: thermocyclerDeactivateBlock,
+      expectedType: 'thermocycler/deactivateBlock',
+      expectedPython: 'mock_thermocycler.deactivate_block()',
+    },
+    {
+      commandCreator: thermocyclerDeactivateLid,
+      expectedType: 'thermocycler/deactivateLid',
+      expectedPython: 'mock_thermocycler.deactivate_lid()',
+    },
+  ]
+
+  moduleOnlyTestCases.forEach(
+    ({ commandCreator, expectedType, expectedPython }) => {
+      it(`resolves moduleId for "${expectedType}" when it is a string runtime parameter`, () => {
+        const result = commandCreator(
+          {
+            moduleId: 'selected_module',
+          },
+          {
+            ...invariantContext,
+            runtimeParameters: {
+              selected_module: {
+                variableName: 'selected_module',
+                displayName: 'Selected module',
+                type: 'string',
+                default: module,
+              },
+            },
+          },
+          { ...getRobotInitialState(), labware: {} }
+        )
+        expect(result).toEqual({
+          commands: [
+            {
+              commandType: expectedType,
+              key: expect.any(String),
+              params: {
+                moduleId: module,
+              },
+            },
+          ],
+          python: expectedPython,
+        })
+      })
+      it(`returns error for "${expectedType}" if moduleId is not a string runtime parameter`, () => {
+        const result = commandCreator(
+          {
+            moduleId: 'mock_rtp',
+          },
+          {
+            ...invariantContext,
+            runtimeParameters: {
+              mock_rtp: {
+                variableName: 'mock_rtp',
+                displayName: 'mock rtp',
+                type: 'boolean',
+                default: false,
+              },
+            },
+          },
+          { ...getRobotInitialState(), labware: {} }
+        )
+        expect(getErrorResult(result).errors).toEqual([
+          {
+            message: 'Runtime parameter "mock_rtp" is missing',
+            type: 'INVALID_RUNTIME_PARAMETER',
+          },
+        ])
+      })
+    }
+  )
 })
