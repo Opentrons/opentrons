@@ -18,6 +18,10 @@ const mockDispatch = vi.fn()
 const mockRemoveQueries = vi.fn()
 const mockPopToast = vi.fn()
 const mockUnsubscribe = vi.fn()
+const LOGGED_IN_STATE = {
+  robotAuth: { perRobotAuthStates: { otie: {} }, mostRecentRobotName: 'otie' },
+}
+let mockState: unknown = LOGGED_IN_STATE
 
 vi.mock('@opentrons/api-client', async importOriginal => {
   const actual = await importOriginal<Record<string, unknown>>()
@@ -32,7 +36,7 @@ vi.mock('react-redux', async importOriginal => {
   return {
     ...actual,
     useDispatch: () => mockDispatch,
-    useSelector: (selector: (state: unknown) => unknown) => selector({}),
+    useSelector: (selector: (state: unknown) => unknown) => selector(mockState),
   }
 })
 vi.mock('react-query', async importOriginal => {
@@ -75,6 +79,7 @@ function renderAndGetListener(): RequestErrorListener {
 describe('useHandleInsufficientPermissions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockState = LOGGED_IN_STATE
     vi.mocked(addRequestErrorListener).mockReturnValue(mockUnsubscribe)
     vi.mocked(useInsufficientPermissionsToast).mockReturnValue({
       popToast: mockPopToast,
@@ -138,6 +143,18 @@ describe('useHandleInsufficientPermissions', () => {
 
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockPopToast).not.toHaveBeenCalled()
+  })
+
+  it('does not register a listener when not logged in to any robot', () => {
+    mockState = {
+      robotAuth: { perRobotAuthStates: {}, mostRecentRobotName: null },
+    }
+
+    renderHook(() => {
+      useHandleInsufficientPermissions()
+    })
+
+    expect(addRequestErrorListener).not.toHaveBeenCalled()
   })
 
   it('unregisters the listener on unmount', () => {

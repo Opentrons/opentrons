@@ -413,6 +413,7 @@ function ProtocolReceiptToasts(): null {
 
 function InsufficientPermissionsToasts(): null {
   useHandleInsufficientPermissions()
+  
   return null
 }
 
