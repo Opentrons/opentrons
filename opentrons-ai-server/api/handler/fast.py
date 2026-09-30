@@ -9,13 +9,12 @@ import structlog
 from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Query, Request, Response, Security, UploadFile, status
-from fastapi.encoders import jsonable_encoder
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, Response, Security, UploadFile, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse
-from pydantic import BaseModel, Field, conint
+from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
@@ -23,6 +22,7 @@ from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, 
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
+from api.handler.http_errors import internal_server_http_exception
 from api.handler.utils_fast import (
     extract_message_index_from_filename,
     parse_tagged_content,
@@ -38,7 +38,6 @@ from api.models.empty_request_error import EmptyRequestError
 from api.models.error_response import ErrorResponse
 from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
-from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
 from api.models.timeout_error import TimeoutError as TimeoutErrorResponse
 from api.models.update_protocol import UpdateProtocol
@@ -171,10 +170,6 @@ class Status(BaseModel):
 
 class HealthResponse(BaseModel):
     status: Status
-
-
-class TimeoutResponse(BaseModel):
-    message: str
 
 
 class CorsHeadersResponse(BaseModel):
@@ -458,10 +453,7 @@ async def create_chat_completion(
     except anthropic.APIError:
         raise
     except Exception as e:
-        logger.exception("Error processing chat completion")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
-        ) from e
+        raise internal_server_http_exception("Error processing chat completion") from e
 
 
 @app.post(
@@ -529,10 +521,7 @@ async def create_chat_completion_multipart(
     except anthropic.APIError:
         raise
     except Exception as e:
-        logger.exception("Error processing multipart chat completion")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
-        ) from e
+        raise internal_server_http_exception("Error processing multipart chat completion") from e
 
 
 async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tuple[Dict[int, List[Dict[str, str]]], Optional[str]]:
@@ -632,29 +621,14 @@ async def create_protocol(
 
         # Special handling for Protocol Designer with null response
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER and response is None:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(by_alias=True),
-            )
+            raise RuntimeError("No response received from LLM for Protocol Designer create-protocol")
 
         return _format_response(response, protocol_format, bool(body.fake))
 
     except anthropic.APIError:
         raise
     except Exception as e:
-        logger.error(
-            f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
-        )
-
-        payload = {
-            "message": "Internal server error",
-            "exception_type": type(e).__name__,
-            "error": str(e),
-        }
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=jsonable_encoder(payload),
-        ) from e
+        raise internal_server_http_exception("Unhandled error in create_protocol") from e
 
 
 @app.post(
@@ -702,10 +676,7 @@ async def update_protocol(
     except anthropic.APIError:
         raise
     except Exception as e:
-        logger.exception("Error processing protocol update")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
-        ) from e
+        raise internal_server_http_exception("Error processing protocol update") from e
 
 
 @app.get(
@@ -727,22 +698,6 @@ async def get_health(request: Request) -> Status:
     else:
         logger.info(f"{request.method} {request.url.path}", extra={"requestMethod": request.method, "requestPath": request.url.path})
     return Status(status="ok", version=settings.service_version)
-
-
-@app.get("/api/timeout", response_model=TimeoutResponse)
-async def timeout_endpoint(request: Request, seconds: conint(ge=1, le=300) = Query(..., description="Number of seconds to wait")):  # type: ignore # noqa: B008
-    """
-    Wait for the specified number of seconds and then respond.
-
-    - **seconds**: The number of seconds to wait (between 1 and 300).
-    """
-    # call me with http://localhost:8000/api/timeout?seconds=180
-    logger.info(f"{request.method} {request.url.path}")
-    try:
-        await asyncio.sleep(seconds)  # Asynchronously wait for the specified time
-        return TimeoutResponse(message=f"Waited for {seconds} seconds")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/api/redoc", include_in_schema=False)
@@ -772,10 +727,7 @@ async def feedback(
         )
 
     except Exception as e:
-        logger.exception("Error processing feedback")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
-        ) from e
+        raise internal_server_http_exception("Error processing feedback") from e
 
 
 @app.get("/api/doc", include_in_schema=False)
@@ -861,6 +813,6 @@ async def catch_all_exceptions(request: Request, call_next: Any) -> JSONResponse
     """
     try:
         return await call_next(request)
-    except Exception as exc:
-        logger.error(f"Unhandled error for route {request.url.path}: {exc}")
+    except Exception:
+        logger.exception("Unhandled error for route %s", request.url.path)
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": "Internal server error"})
