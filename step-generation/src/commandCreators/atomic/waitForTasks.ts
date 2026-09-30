@@ -5,13 +5,10 @@ import {
   uuid,
 } from '../../utils'
 
-import type {
-  CommandCreator,
-  CommandCreatorError,
-  WaitForTasksStepGenArgs,
-} from '../../types'
+import type { WaitForTasksParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
-export const waitForTasks: CommandCreator<WaitForTasksStepGenArgs> = (
+export const waitForTasks: CommandCreator<WaitForTasksParams> = (
   args,
   invariantContext,
   prevRobotState
