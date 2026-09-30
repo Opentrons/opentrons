@@ -1,6 +1,5 @@
 import json
 import random
-import re
 from typing import Optional
 
 import gspread
@@ -9,6 +8,7 @@ from google.oauth2.service_account import Credentials
 from gspread import SpreadsheetNotFound  # type: ignore
 from gspread.client import Client as GspreadClient
 
+from api.integration.feedback_text_sanitize import sanitize_feedback_for_google_sheets
 from api.settings import Settings, get_settings
 
 
@@ -44,12 +44,8 @@ class GoogleSheetsClient:
 
     @staticmethod
     def sanitize_for_google_sheets(input_text: str) -> str:
-        """Sanitize input to remove JavaScript and HTML tags, and prevent formulas."""
-        script_pattern = re.compile(r'(javascript:[^"]*|<script.*?>.*?</script>|on\w+=".*?"|on\w+=\'.*?\')', re.IGNORECASE)
-        sanitized_text = re.sub(script_pattern, "", input_text)
-        sanitized_text = re.sub(r"(<.*?>|&lt;.*?&gt;)", "", sanitized_text)
-        sanitized_text = re.sub(r"^\s*=\s*", "", sanitized_text)
-        return sanitized_text.strip()
+        """Sanitize feedback text before storing in Google Sheets."""
+        return sanitize_feedback_for_google_sheets(input_text)
 
     def append_feedback_to_sheet(self, user_id: str, feedback: str) -> None:
         """Append a row of feedback to the Google Sheet."""
