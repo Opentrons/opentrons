@@ -20,6 +20,7 @@ import {
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Z_INDEX,
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
@@ -352,7 +353,7 @@ export function DropdownMenu(props: DropdownMenuProps): ReactNode {
               <Fragment key={`${option.name}-${index}`}>
                 <MenuItem
                   disabled={option.disabled}
-                  zIndex={3}
+                  zIndex={Z_INDEX.MENUS}
                   key={`${option.name}-${index}`}
                   onClick={e => {
                     onClick(option.value)
@@ -427,7 +428,7 @@ const MENU_ITEM_CONTAINER_STYLE = (
   dropdownPosition: Omit<MenuPlacement, 'auto'>
 ): FlattenSimpleInterpolation => css`
   position: ${POSITION_ABSOLUTE};
-  z-index: 3;
+  z-index: ${Z_INDEX.MENUS};
   width: ${width};
   flex-direction: ${DIRECTION_COLUMN};
   border-radius: ${BORDERS.borderRadius8};

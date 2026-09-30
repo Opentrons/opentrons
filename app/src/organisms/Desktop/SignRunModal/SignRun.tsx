@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
   WARNING_TOAST,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -26,9 +27,6 @@ import styles from './signrunmodal.module.css'
 
 import type { ReactNode } from 'react'
 import type { DocumentationState } from '@opentrons/react-api-client'
-
-// Above typical desktop modal overlays so the toast remains visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export interface SignRunModalProps {
   runId: string
@@ -61,7 +59,7 @@ export function SignRunModal({
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         disableTimeout: true,
         heading: '' + t('sign_protocol_run_permission_required'),
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       }
     )
   }
@@ -139,7 +137,7 @@ export function SignRunModal({
     <Modal
       title={t('sign_protocol_run')}
       closeOnOutsideClick={false}
-      zIndexOverlay={1000}
+      zIndexOverlay={Z_INDEX.LOGIN_MODAL}
       childrenPadding="var(--spacing-24)"
       footer={footer}
     >

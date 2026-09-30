@@ -182,6 +182,21 @@
   --font-weight-semi-bold: 600;
   --font-weight-regular: 400;
   --font-weight-light: 300;
+
+  /* z-index */
+  --z-index-base: 1;
+  --z-index-details: 2;
+  --z-index-menus: 5;
+  --z-index-modals: 10;
+  --z-index-modal-details: 15;
+  --z-index-blocking-modals: 20;
+  --z-index-blocking-modal-details: 25;
+  --z-index-compliance-modals: 30;
+  --z-index-compliance-modal-details: 35;
+  --z-index-toasts: 40;
+  --z-index-logged-out-overlay: 100;
+  --z-index-login-modal: 105;
+  --z-index-login-toasts: 106;
 }
 
 .enable_touchscreen_colors {

@@ -5,6 +5,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
+  Z_INDEX,
 } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
@@ -44,7 +45,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
     <Flex
       data-testid="MenuList" // todo (kk: 2026-08-25): replace data-testid with aria-label + role when refactoring this component
       borderRadius="4px 4px 0px 0px"
-      zIndex={10}
+      zIndex={Z_INDEX.MENUS}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}

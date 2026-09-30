@@ -57,7 +57,7 @@
 
 .card_overflow_menu_content_container {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-menus);
   top: 0;
   right: 0;
   display: flex;

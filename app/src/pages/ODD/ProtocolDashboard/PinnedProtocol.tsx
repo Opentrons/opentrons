@@ -65,7 +65,7 @@ const cardStyleBySize: {
 
 interface PinnedProtocolProps {
   protocol: ProtocolResource
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   cardSize?: CardSizeType
@@ -102,7 +102,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
   }
   useEffect(() => {
     if (longpress.isLongPressed) {
-      longPress(true)
+      longPress?.(true)
     }
   }, [longpress.isLongPressed, longPress])
 
