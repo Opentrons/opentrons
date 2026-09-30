@@ -41,7 +41,9 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
     }
     return resolvedValue
   }
-  const resolveStep = (step: ThermocyclerProfileStepStepGenArgs) => ({
+  const resolveStep = (
+    step: ThermocyclerProfileStepStepGenArgs
+  ): { celsius: number | null; holdSeconds: number | null } => ({
     celsius: resolveNumber(step.celsius),
     holdSeconds: resolveNumber(step.holdSeconds),
   })
