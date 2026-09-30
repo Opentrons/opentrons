@@ -1,18 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  getAuditLogDeleteErrorMessage,
   getProtocolOrRunCreationErrorMessage,
   isAdminEquivalentAccountType,
   isForbiddenError,
-  isProtocolWritePermissionError,
+  isInsufficientScopeError,
   isRunSignoffRequiredError,
   isUpdatesWritePermissionError,
 } from '../utils'
 
 const GENERAL_ERROR = 'Protocol run could not be created on the robot.'
-const PERMISSION_ERROR =
-  'Admin credentials are required to send protocols to this robot.'
 
 const permissionDeniedError = {
   isAxiosError: true,
@@ -51,29 +48,34 @@ describe('isForbiddenError', () => {
   })
 })
 
-describe('getAuditLogDeleteErrorMessage', () => {
-  const permissionMessage =
-    'Permission required to delete audit logs. Log in with an authorized account.'
-  const generalMessage = 'One or more logPeriods failed to delete'
-
-  it('returns the permission copy for a 403', () => {
-    expect(
-      getAuditLogDeleteErrorMessage(
-        permissionDeniedError,
-        permissionMessage,
-        generalMessage
-      )
-    ).toBe(permissionMessage)
+describe('isInsufficientScopeError', () => {
+  it('is true for a 403 with requiredScopes', () => {
+    expect(isInsufficientScopeError(permissionDeniedError)).toBe(true)
   })
 
-  it('returns the general copy for other errors', () => {
+  it('is false for a 403 without requiredScopes', () => {
     expect(
-      getAuditLogDeleteErrorMessage(
-        new Error(generalMessage),
-        permissionMessage,
-        generalMessage
-      )
-    ).toBe(generalMessage)
+      isInsufficientScopeError({
+        isAxiosError: true,
+        response: {
+          status: 403,
+          data: { errors: [{ id: 'ActionForbidden' }] },
+        },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for a non-403 with requiredScopes', () => {
+    expect(
+      isInsufficientScopeError({
+        isAxiosError: true,
+        response: { status: 401, data: { requiredScopes: [] } },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for non-axios errors', () => {
+    expect(isInsufficientScopeError(new Error('nope'))).toBe(false)
   })
 })
 
@@ -108,28 +110,6 @@ describe('isRunSignoffRequiredError', () => {
     expect(
       isRunSignoffRequiredError(new Error('One or more runs failed to delete'))
     ).toBe(false)
-  })
-})
-
-describe('isProtocolWritePermissionError', () => {
-  it('is true for a 403 missing protocols.write', () => {
-    expect(isProtocolWritePermissionError(permissionDeniedError)).toBe(true)
-  })
-
-  it('is false for other 403s', () => {
-    expect(
-      isProtocolWritePermissionError({
-        isAxiosError: true,
-        response: {
-          status: 403,
-          data: { requiredScopes: ['robot.settings.write'] },
-        },
-      })
-    ).toBe(false)
-  })
-
-  it('is false for non-axios errors', () => {
-    expect(isProtocolWritePermissionError(new Error('nope'))).toBe(false)
   })
 })
 
@@ -172,16 +152,6 @@ describe('isUpdatesWritePermissionError', () => {
 })
 
 describe('getProtocolOrRunCreationErrorMessage', () => {
-  it('returns the permission copy for a protocols.write 403', () => {
-    expect(
-      getProtocolOrRunCreationErrorMessage(
-        permissionDeniedError,
-        GENERAL_ERROR,
-        PERMISSION_ERROR
-      )
-    ).toBe(PERMISSION_ERROR)
-  })
-
   it('returns JSON API error detail when present', () => {
     expect(
       getProtocolOrRunCreationErrorMessage(
@@ -194,8 +164,7 @@ describe('getProtocolOrRunCreationErrorMessage', () => {
             },
           },
         },
-        GENERAL_ERROR,
-        PERMISSION_ERROR
+        GENERAL_ERROR
       )
     ).toBe('oh no')
   })
@@ -214,19 +183,14 @@ describe('getProtocolOrRunCreationErrorMessage', () => {
             },
           },
         },
-        GENERAL_ERROR,
-        PERMISSION_ERROR
+        GENERAL_ERROR
       )
     ).toBe(GENERAL_ERROR)
   })
 
   it('returns the general message for a non-axios error', () => {
     expect(
-      getProtocolOrRunCreationErrorMessage(
-        new Error('boom'),
-        GENERAL_ERROR,
-        PERMISSION_ERROR
-      )
+      getProtocolOrRunCreationErrorMessage(new Error('boom'), GENERAL_ERROR)
     ).toBe(GENERAL_ERROR)
   })
 })
