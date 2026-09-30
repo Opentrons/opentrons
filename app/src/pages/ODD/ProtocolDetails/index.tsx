@@ -396,7 +396,14 @@ export function ProtocolDetails(): JSX.Element | null {
     setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId })
+      : createRun(
+          { protocolId },
+          {
+            onError: () => {
+              setStartSetup(false)
+            },
+          }
+        )
   }
   const [showConfirmDeleteProtocol, setShowConfirmationDeleteProtocol] =
     useState<boolean>(false)
