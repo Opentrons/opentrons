@@ -1,15 +1,30 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
-import { getModuleHasLiveTask, uuid } from '../../utils'
+import {
+  getModuleHasLiveTask,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { VacuumModuleOpenVentCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, VacuumOpenVentStepGenArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumOpenVent: CommandCreator<
-  VacuumModuleOpenVentCreateCommand['params']
-> = (args, invariantContext, prevRobotState) => {
-  const { moduleId } = args
+export const vacuumOpenVent: CommandCreator<VacuumOpenVentStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const moduleId = resolveStringRuntimeValue(
+    args.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
   const module = invariantContext.moduleEntities[moduleId]
   const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
 

@@ -1,14 +1,25 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { VacuumModuleStopPumpCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, VacuumStopPumpStepGenArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumStopPump: CommandCreator<
-  VacuumModuleStopPumpCreateCommand['params']
-> = (args, invariantContext, prevRobotState) => {
-  const { moduleId } = args
+export const vacuumStopPump: CommandCreator<VacuumStopPumpStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const moduleId = resolveStringRuntimeValue(
+    args.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
   const module = invariantContext.moduleEntities[moduleId]
 
   if (module == null) {
