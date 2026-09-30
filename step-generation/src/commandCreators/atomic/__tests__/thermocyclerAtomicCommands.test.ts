@@ -218,4 +218,93 @@ describe('thermocycler atomic commands with runtime parameters', () => {
       })
     }
   )
+
+  const temperatureTestCases = [
+    {
+      commandCreator: thermocyclerSetTargetBlockTemperature,
+      expectedType: 'thermocycler/setTargetBlockTemperature',
+      expectedPython:
+        'mock_thermocycler.set_block_temperature(target_temperature)',
+    },
+    {
+      commandCreator: thermocyclerSetTargetLidTemperature,
+      expectedType: 'thermocycler/setTargetLidTemperature',
+      expectedPython:
+        'mock_thermocycler.set_lid_temperature(target_temperature)',
+    },
+  ]
+
+  temperatureTestCases.forEach(
+    ({ commandCreator, expectedType, expectedPython }) => {
+      it(`resolves moduleId and celsius for "${expectedType}" when they are runtime parameters`, () => {
+        const result = commandCreator(
+          {
+            moduleId: 'selected_module',
+            celsius: 'target_temperature',
+          },
+          {
+            ...invariantContext,
+            runtimeParameters: {
+              selected_module: {
+                variableName: 'selected_module',
+                displayName: 'Selected module',
+                type: 'string',
+                default: module,
+              },
+              target_temperature: {
+                variableName: 'target_temperature',
+                displayName: 'Target temperature',
+                type: 'float',
+                default: temperature,
+              },
+            },
+          },
+          { ...getRobotInitialState(), labware: {} }
+        )
+        expect(result).toEqual({
+          commands: [
+            {
+              commandType: expectedType,
+              key: expect.any(String),
+              params: {
+                moduleId: module,
+                celsius: temperature,
+              },
+            },
+          ],
+          python: expectedPython,
+        })
+      })
+      it(`returns errors for "${expectedType}" if runtime parameters are missing or invalid`, () => {
+        const result = commandCreator(
+          {
+            moduleId: 'mock_rtp',
+            celsius: 'missing_temperature',
+          },
+          {
+            ...invariantContext,
+            runtimeParameters: {
+              mock_rtp: {
+                variableName: 'mock_rtp',
+                displayName: 'mock rtp',
+                type: 'boolean',
+                default: false,
+              },
+            },
+          },
+          { ...getRobotInitialState(), labware: {} }
+        )
+        expect(getErrorResult(result).errors).toEqual([
+          {
+            message: 'Runtime parameter "mock_rtp" is missing',
+            type: 'INVALID_RUNTIME_PARAMETER',
+          },
+          {
+            message: 'Runtime parameter "missing_temperature" is missing',
+            type: 'INVALID_RUNTIME_PARAMETER',
+          },
+        ])
+      })
+    }
+  )
 })
