@@ -310,7 +310,7 @@ def navigate_and_configure(self) -> "NextPage":
 
 ### Local Server Issues
 
-1. Check Node.js version: `node --version` (should be >= 22.22.0)
+1. Check Node.js version: `node --version` (should be >= 24.17.0)
 2. Build manually: `cd ../protocol-designer && make build` or `cd ../labware-library && make build`
 3. Check memory: PD Makefile sets `NODE_OPTIONS=--max-old-space-size=8192`
 4. Kill conflicting processes: `pkill -9 node`

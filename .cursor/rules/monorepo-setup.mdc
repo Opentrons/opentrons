@@ -9,7 +9,7 @@ All commands run from the **monorepo root** unless noted otherwise.
 
 ## Node.js Version Management
 
-**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), pnpm 10.32.1.
+**Required:** Node.js >= 24.17.0 (`.nvmrc`: `24.17.0`), pnpm 10.32.1.
 
 Before running any `node`, `pnpm`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
 
@@ -172,7 +172,7 @@ For standalone uv projects, run `make teardown && make setup` from within that p
 ### Wrong Node Version
 
 ```bash
-node --version   # should show v22.22.0+
+node --version   # should show v24.17.0+
 ```
 
 If wrong, re-source the version manager (see Node.js section above) or install the correct version:

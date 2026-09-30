@@ -152,7 +152,7 @@ jobs:
           json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.17.0'
           registry-url: 'https://registry.npmjs.org'
       - name: 'publish to npm registry'
         env:

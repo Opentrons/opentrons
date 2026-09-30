@@ -32,7 +32,7 @@ import {
 
 Usage requirements for dependent projects:
 
-- Node v22.22.0+ and pnpm v10.32.1+
+- Node v24.17.0+ and pnpm v10.32.1+
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
   - `react`: `18.2.0`,
   - `react-router-dom`: `6.24.1`,
