@@ -51,7 +51,10 @@ import {
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
-import { useUpdateClientLPC } from '/app/resources/client_data'
+import {
+  useNotifyClientDataLPC,
+  useUpdateClientLPC,
+} from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
@@ -146,11 +149,18 @@ export function ProtocolRunSetup({
     staleTime: Infinity,
     enabled: isFlex,
   })
-  // Setup loading only when robot data is missing (run / LPC / camera).
+  // Client LPC data reports when finalized offsets were applied.
+  const { isLoading: isClientLPCLoading } = useNotifyClientDataLPC({
+    enabled: isFlex,
+  })
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  // LPC is settled when init/client data are done and offsets are finalized.
+  const isFlexLPCSettled =
+    !lpcUtils.isFlexLPCInitializing && !isClientLPCLoading && flexOffsetsApplied
   const showRunLoadingState =
     isRunLoading ||
     protocolAnalysis == null ||
-    (isFlex && lpcUtils.isFlexLPCInitializing) ||
+    (isFlex && !isFlexLPCSettled) ||
     (isFlex && isCameraLoading)
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
@@ -164,7 +174,6 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
-  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
 
