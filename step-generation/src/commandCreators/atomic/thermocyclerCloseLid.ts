@@ -1,16 +1,29 @@
 import * as errorCreators from '../../errorCreators'
-import { getTopLocationInStack, uuid } from '../../utils'
+import {
+  getTopLocationInStack,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  ThermocyclerCloseLidStepGenArgs,
+} from '../../types'
 
-export const thermocyclerCloseLid: CommandCreator<ModuleOnlyParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { moduleId } = args
-  const { moduleEntities, labwareEntities } = invariantContext
+export const thermocyclerCloseLid: CommandCreator<
+  ThermocyclerCloseLidStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { moduleEntities, labwareEntities, runtimeParameters } =
+    invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
   const errors: CommandCreatorError[] = []
 
   const pythonName = moduleEntities[moduleId].pythonName

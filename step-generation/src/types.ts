@@ -1235,3 +1235,40 @@ export interface AbsorbanceReaderReadStepGenArgs {
   moduleId: string
   fileName?: string | null
 }
+
+export type ThermocyclerCloseLidStepGenArgs = ModuleStepGenArgs
+
+export type ThermocyclerOpenLidStepGenArgs = ModuleStepGenArgs
+
+export type ThermocyclerDeactivateBlockStepGenArgs = ModuleStepGenArgs
+
+export type ThermocyclerDeactivateLidStepGenArgs = ModuleStepGenArgs
+
+export interface ThermocyclerSetTargetBlockTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerSetTargetLidTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerProfileStepStepGenArgs {
+  celsius: number | string
+  holdSeconds: number | string
+}
+
+export interface ThermocyclerProfileCycleStepGenArgs {
+  steps: ThermocyclerProfileStepStepGenArgs[]
+  repetitions: number | string
+}
+
+export interface ThermocyclerStartRunExtendedProfileStepGenArgs {
+  moduleId: string
+  profileElements: Array<
+    ThermocyclerProfileCycleStepGenArgs | ThermocyclerProfileStepStepGenArgs
+  >
+  blockMaxVolumeUl?: number | string
+  taskId?: string | null
+}
