@@ -60,6 +60,7 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
       deckConfig: mockDeckConfig,
+      onExit: vi.fn(),
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -191,10 +192,13 @@ describe('AttachProbe', () => {
       errorMessage: 'error shmerror',
     }
     render(props)
+    screen.getByText('Pipette attachment error')
     screen.getByText(
-      'Return the calibration probe to its storage location before exiting.'
+      'Remove the pipette, home the gantry, and then try attaching it again. Return the calibration probe to its storage location before exiting.'
     )
-    screen.getByText('error shmerror')
+    const exitBtn = screen.getByRole('button', { name: 'exit' })
+    fireEvent.click(exitBtn)
+    expect(props.onExit).toHaveBeenCalled()
   })
 
   it('renders the correct text when is on device', async () => {

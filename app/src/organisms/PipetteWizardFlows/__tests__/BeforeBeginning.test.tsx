@@ -70,6 +70,7 @@ describe('BeforeBeginning', () => {
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
       documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      onExit: vi.fn(),
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
@@ -150,8 +151,13 @@ describe('BeforeBeginning', () => {
         errorMessage: 'error shmerror',
       }
       render(props)
-      screen.getByText('Error encountered')
-      screen.getByText('error shmerror')
+      screen.getByText('Pipette attachment error')
+      screen.getByText(
+        'Remove the pipette, home the gantry, and then try attaching it again.'
+      )
+      const exitBtn = screen.getByRole('button', { name: 'exit' })
+      fireEvent.click(exitBtn)
+      expect(props.onExit).toHaveBeenCalled()
     })
   })
 

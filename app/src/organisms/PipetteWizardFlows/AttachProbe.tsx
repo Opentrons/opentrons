@@ -42,6 +42,7 @@ import type { PipetteWizardStepProps } from './types'
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
   deckConfig: UseQueryResult<DeckConfiguration>
+  onExit: () => void
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -69,6 +70,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     deckConfig,
     isDoorOpenError,
     dismissDoorOpenError,
+    onExit,
   } = props
 
   const handleOnClick = (): void => {
@@ -183,24 +185,17 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        subHeader={
-          <Trans
-            t={t}
-            i18nKey={'return_probe_error'}
-            values={{ error: errorMessage }}
-            components={{
-              block: <LegacyStyledText forwardedAs="p" />,
-              bold: (
-                <LegacyStyledText
-                  forwardedAs="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                />
-              ),
-            }}
-          />
-        }
-      />
+        header={t('pipette_attachment_error')}
+        subHeader={`${t('pipette_attachment_error_message')} ${t('return_probe_error')}`}
+      >
+        <PrimaryButton
+          variant="warning"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          onClick={onExit}
+        >
+          {t('shared:exit')}
+        </PrimaryButton>
+      </SimpleWizardBody>
     )
   ) : (
     <GenericWizardTile

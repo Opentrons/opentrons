@@ -9,6 +9,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -21,8 +22,12 @@ import { startCalibrationOnClick } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
 
+export interface RemoveWasteChuteProps extends PipetteWizardStepProps {
+  onExit: () => void
+}
+
 export const RemoveWasteChute = (
-  props: PipetteWizardStepProps
+  props: RemoveWasteChuteProps
 ): JSX.Element | null => {
   const {
     attachedPipettes,
@@ -32,6 +37,7 @@ export const RemoveWasteChute = (
     errorMessage,
     isDoorOpenError,
     dismissDoorOpenError,
+    onExit,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [, setShowUnableToDetect] = useState<boolean>(false)
@@ -76,12 +82,19 @@ export const RemoveWasteChute = (
       </SimpleWizardBody>
     ) : (
       <SimpleWizardBody
-        iconColor={COLORS.red50}
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        header={t('shared:error_encountered')}
         isSuccess={false}
-        subHeader={errorMessage}
-      />
+        iconColor={COLORS.red50}
+        header={t('pipette_attachment_error')}
+        subHeader={t('pipette_attachment_error_message')}
+      >
+        <PrimaryButton
+          variant="warning"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          onClick={onExit}
+        >
+          {t('shared:exit')}
+        </PrimaryButton>
+      </SimpleWizardBody>
     )
   ) : (
     <SimpleWizardBody

@@ -38,6 +38,7 @@ describe('RemoveWasteChute', () => {
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
       isOnDevice: false,
+      onExit: vi.fn(),
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', async () => {
@@ -86,5 +87,20 @@ describe('RemoveWasteChute', () => {
         false
       )
     })
+  })
+
+  it('renders the error modal screen when errorMessage is true', () => {
+    props = {
+      ...props,
+      errorMessage: 'error shmerror',
+    }
+    render(props)
+    screen.getByText('Pipette attachment error')
+    screen.getByText(
+      'Remove the pipette, home the gantry, and then try attaching it again.'
+    )
+    const exitBtn = screen.getByRole('button', { name: 'exit' })
+    fireEvent.click(exitBtn)
+    expect(props.onExit).toHaveBeenCalled()
   })
 })
