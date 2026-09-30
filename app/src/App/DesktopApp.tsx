@@ -202,7 +202,7 @@ export const DesktopApp = (): JSX.Element => {
 
 function InsufficientPermissionsToasts(): null {
   useHandleInsufficientPermissions()
-  
+
   return null
 }
 
