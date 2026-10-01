@@ -12,7 +12,6 @@ import {
   LegacyStyledText,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
@@ -69,7 +68,6 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
   documentationState: DocumentationState
-  onExit: () => void
 }
 export const BeforeBeginning = (
   props: BeforeBeginningProps
@@ -95,7 +93,6 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
     deckConfig,
     documentationState,
-    onExit,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -316,17 +313,9 @@ export const BeforeBeginning = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
-        header={t('pipette_attachment_error')}
-        subHeader={t('pipette_attachment_error_message')}
-      >
-        <PrimaryButton
-          variant="warning"
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={onExit}
-        >
-          {t('shared:exit')}
-        </PrimaryButton>
-      </SimpleWizardBody>
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
     )
   ) : (
     <GenericWizardTile

@@ -14,7 +14,6 @@ import {
   ModalShell,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
   useConditionalConfirm,
   WizardHeader,
 } from '@opentrons/components'
@@ -421,17 +420,9 @@ export const PipetteWizardFlows = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
-        header={t('pipette_attachment_error')}
-        subHeader={t('pipette_attachment_error_message')}
-      >
-        <PrimaryButton
-          variant="warning"
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={confirmExit}
-        >
-          {t('shared:exit')}
-        </PrimaryButton>
-      </SimpleWizardBody>
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage ?? undefined}
+      />
     )
   } else if (isDoorOpenError) {
     modalContent = (
@@ -472,7 +463,6 @@ export const PipetteWizardFlows = (
         deckConfig={deckConfig}
         requiredPipette={requiredPipette}
         documentationState={commandDocState}
-        onExit={onExit}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -485,7 +475,6 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         isExiting={isExiting}
         deckConfig={deckConfig}
-        onExit={onExit}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
@@ -572,11 +561,7 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <RemoveWasteChute
-        {...currentStep}
-        {...calibrateBaseProps}
-        onExit={onExit}
-      />
+      <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
     onExit = confirmExit
