@@ -24,9 +24,10 @@ with protocol.group_steps(name="Aspirate and Dispense Buffer", description="Tran
     pipette.transfer(
         volume=50,
         source=reservoir['A1'].bottom(z=1),
-        dest=plate['A1']
+        dest=plate['A1'],
+        new_tip="never"
     )
-    pipette.drop_tip
+    pipette.drop_tip()
 ```
 *New in version 2.29*
 
@@ -46,9 +47,10 @@ pipette.pick_up_tip()
 pipette.transfer(
         volume=50,
         source=reservoir['A1'].bottom(z=1),
-        dest=plate['A1']
+        dest=plate['A1'],
+        new_tip="never"
     )
-pipette.drop_tip
+pipette.drop_tip()
 
 step_group_1.end_group()
 ```

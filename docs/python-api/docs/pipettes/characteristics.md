@@ -49,7 +49,7 @@ def run(protocol: protocol_api.ProtocolContext):
     plate = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat", location="C1")
     # Load an 8-channel pipette on the right mount
-    right = protocol.load_instrument(
+    right_pipette = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
         tip_racks=[tiprack1])
@@ -58,7 +58,7 @@ def run(protocol: protocol_api.ProtocolContext):
 After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in `tiprack1`:
 
 ```python
-right.pick_up_tip()
+right_pipette.pick_up_tip()
 ```
 
 With the backmost pipette channel above location A1 on the tip rack, all eight channels are above the eight tip rack wells in column 1.
@@ -66,7 +66,7 @@ With the backmost pipette channel above location A1 on the tip rack, all eight c
 After picking up a tip, let’s tell the robot to aspirate 300 µL from the well plate at location A2:
 
 ```python
-right.aspirate(volume=300, location=plate["A2"])
+right_pipette.aspirate(volume=300, location=plate["A2"])
 ```
 
 With the backmost pipette tip above location A2 on the well plate, all eight channels are above the eight wells in column 2.
@@ -74,7 +74,7 @@ With the backmost pipette tip above location A2 on the well plate, all eight cha
 Finally, let’s tell the robot to dispense 300 µL into the well plate at location A3:
 
 ```python
-right.dispense(volume=300, location=plate["A3"].top())
+right_pipette.dispense(volume=300, location=plate["A3"].top())
 ```
 
 With the backmost pipette tip above location A3, all eight channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
@@ -94,7 +94,7 @@ def run(protocol: protocol_api.ProtocolContext):
     plate = protocol.load_labware(
         load_name="corning_384_wellplate_112ul_flat", location="D2")
     # Load an 8-channel pipette on the right mount
-    right = protocol.load_instrument(
+    right_pipette = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
         tip_racks=[tiprack1])
@@ -103,7 +103,7 @@ def run(protocol: protocol_api.ProtocolContext):
 After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in tiprack1:
 
 ```python
-right.pick_up_tip()
+right_pipette.pick_up_tip()
 ```
 
 With the backmost pipette channel above location A1 on the tip rack, all eight channels are above the eight tip rack wells in column 1.
@@ -111,14 +111,14 @@ With the backmost pipette channel above location A1 on the tip rack, all eight c
 After picking up a tip, let’s tell the robot to aspirate 100 µL from the well plate at location A1:
 
 ```python
-right.aspirate(volume=100, location=plate["A1"])
+right_pipette.aspirate(volume=100, location=plate["A1"])
 ```
 The eight pipette channels will only aspirate from every other well in the column: A1, C1, E1, G1, I1, K1, M1, and O1.
 
 Finally, let’s tell the robot to dispense 100 µL into the well plate at location B1:
 
 ```python
-right.dispense(volume=100, location=plate["B1"])
+right_pipette.dispense(volume=100, location=plate["B1"])
 ```
 
 The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.

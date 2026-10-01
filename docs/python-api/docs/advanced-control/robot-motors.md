@@ -82,10 +82,12 @@ Start by providing a method like [`axis_coordinates_for()`][opentrons.protocol_a
 Use the [`plunger_coordinates_for_volume()`][opentrons.protocol_api.RobotContext.plunger_coordinates_for_volume] method to change the position of a pipette plunger to aspirate, dispense, or blowout. To move the plunger to a known position like the bottom of a well or blowout location, use [`plunger_coordinates_for_named_position()`][opentrons.protocol_api.RobotContext.plunger_coordinates_for_named_position].
 
 ```python
+from opentrons.protocol_api import ASPIRATE_ACTION
+
 volume_position = protocol.robot.plunger_coordinates_for_volume(
     mount="left",
     volume=30,
-    action=PipetteActionTypes.ASPIRATE_ACTION
+    action=ASPIRATE_ACTION
 )
 
 protocol.robot.move_axes_to(

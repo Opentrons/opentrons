@@ -20,7 +20,7 @@ pipette.transfer(
 You could also use [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] to perform the transfer:
 
 ```python
-liquid_1 = protocol.define_liquid_class("glycerol_50")
+liquid_1 = protocol.get_liquid_class("glycerol_50")
 pipette.transfer_with_liquid_class(
     liquid_class=liquid_1,
     volume=100,
@@ -258,6 +258,7 @@ pipette.transfer(
 
 This is why the longer list must be evenly divisible by the shorter list. Changing the destination in this example to a column instead of a row will cause the API to raise an error, because 8 is not evenly divisible by 3:
 
+<!-- test: raises -->
 ```python
 pipette.transfer(
     volume=50,
@@ -305,6 +306,7 @@ Here the repeat index `i` picks out:
 
 Choosing the right complex command optimizes gantry movement and helps save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use `transfer_with_liquid_class()`, like this:
 
+<!-- test: syntax-only -->
 ```python
 liquid_1 = protocol.get_liquid_class("glycerol_50")
 pipette.transfer_with_liquid_class(

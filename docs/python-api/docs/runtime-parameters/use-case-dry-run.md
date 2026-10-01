@@ -17,6 +17,7 @@ To keep things as simple as possible, this use case only focuses on setting up a
 
 First, we need to set up the dry run parameter. We want to set up a simple yes/no choice for the technician running the protocol, so we’ll use a Boolean parameter:
 
+<!-- test: params-template -->
 ```python
 def add_parameters(parameters):
     parameters.add_bool(
@@ -105,6 +106,7 @@ def return_or_drop(pipette):
 
 Then call that function throughout your protocol:
 
+<!-- test: continue-previous -->
 ```python
 pipette.pick_up_tip()
 return_or_drop(pipette)

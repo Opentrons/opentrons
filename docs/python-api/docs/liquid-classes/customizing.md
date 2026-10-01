@@ -19,13 +19,14 @@ _Changed in version 2.26:_ The `version` parameter lets you apply a previous liq
 
 Next, edit individual liquid class properties based on your Flex pipette and tip combination.
 
+<!-- test: continue-previous -->
 ```python
 # edit aspirate submerge speed to 80 μL/sec
 custom_water_properties.aspirate.submerge.speed = 80
 
 # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
 
-for (custom_water_aspirate_volume, custom_water_flow_rate) in [[10.0, 40.0]], [[20.0, 30.0]]
+for (custom_water_aspirate_volume, custom_water_flow_rate) in [[10.0, 40.0], [20.0, 30.0]]:
     custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume(custom_water_aspirate_volume, custom_water_flow_rate)
 
 # edit to delay for 1 sec before retracting after an aspirate
@@ -105,7 +106,7 @@ custom_liquid_class_properties = {
                     "blowout": {
                         "enabled": True,
                         "location": "destination",
-                        "flowRate": 50,
+                        "flow_rate": 50,
                     },
                     "delay": {"enabled": False},
                     "end_position": {
@@ -131,6 +132,7 @@ custom_liquid_class_properties = {
 
 Then, use the defined properties and [`define_liquid_class()`][opentrons.protocol_api.ProtocolContext.define_liquid_class] to create your new liquid class:
 
+<!-- test: continue-previous -->
 ```python
 # create a new liquid class
 custom_viscous = protocol.define_liquid_class(

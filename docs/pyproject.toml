@@ -19,6 +19,13 @@ dependencies = [
     "opentrons-shared-data",
 ]
 
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
 [tool.uv]
 # cooldown time for security
 exclude-newer = "1 week"

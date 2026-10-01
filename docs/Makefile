@@ -10,8 +10,8 @@ build:
 
 .PHONY: setup
 setup:
-	uv sync --python 3.10 --frozen
-	uv run --python 3.10 playwright install --with-deps chromium
+	uv sync --python 3.12 --frozen
+	uv run --python 3.12 playwright install --with-deps chromium
 
 .PHONY: teardown
 teardown:
@@ -23,7 +23,7 @@ clean:
 
 .PHONY: serve
 serve:
-	uv run --python 3.10 mkdocs serve -f ./mkdocs.yml --livereload
+	uv run --python 3.12 mkdocs serve -f ./mkdocs.yml --livereload
 
 # Browser-viewable visual diff of the built docs between two refs.
 # No args compares the latest deployed (mkdocs-*) docs to HEAD. Refs can be given
@@ -87,8 +87,8 @@ pdf:
 	@case " $(PDF_PROJECTS) " in *" $(PROJECT) "*) ;; *) \
 		echo "Unknown PROJECT '$(PROJECT)'. Valid: $(PDF_PROJECTS)"; exit 1;; \
 	esac
-	uv run --python 3.10 mkdocs build -f ./$(PROJECT)/mkdocs.yml && \
-	uv run --python 3.10 python ./scripts/export_to_pdf.py \
+	uv run --python 3.12 mkdocs build -f ./$(PROJECT)/mkdocs.yml && \
+	uv run --python 3.12 python ./scripts/export_to_pdf.py \
 		$(PROJECT)/site/print_page/index.html \
 		site/$(pdf-file-$(PROJECT)) \
 		'$(pdf-title-$(PROJECT))'
@@ -100,10 +100,13 @@ pdf-all:
 lock:
 	uv lock
 
+# Snippet tests. TIER is cumulative: 1=syntax, 2=+complete-protocol simulation,
+# 3/all=+fragment simulation. `make test` runs everything; `make test TIER=1`
+# runs syntax checks only.
+TIER ?= all
 .PHONY: test
 test:
-# No tests in this project.
-# This target exists to support `make test-py` in the top-level Makefile.
+	uv run --python 3.12 pytest tests/ -q --tier=$(TIER)
 
 .PHONY: lint
 lint:

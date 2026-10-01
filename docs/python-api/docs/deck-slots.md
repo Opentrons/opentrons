@@ -113,6 +113,7 @@ protocol.move_labware(
 
 Since staging area slots also include a standard deck slot in column 3, they are physically incompatible with powered modules in the same row of column 3. For example, if you try to load a module in C3 and labware in C4, the API will raise an error:
 
+<!-- test: raises -->
 ```python
 temp_mod = protocol.load_module(
     module_name="temperature module gen2",
