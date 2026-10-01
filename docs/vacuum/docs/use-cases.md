@@ -65,5 +65,5 @@ A visual inspection and an active vacuum test can help determine if a combinatio
 | Test | Description |
 |:----|:----|
 | **Visual inspection** | Ensure stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious titling or easily rocking back and forth. |
-| **In App** | In the Opentrons App, go to <font color="red">App directions here</font> to run the pump and verify the system reaches the target pressure without audible hissing or air leaks. |
+| **In App** | In the Opentrons App, go to the Instruments and Modules section, click the three-button menu (⋮) <font color="red"><strong>NEED CONTROL HERE</strong></font> to run the pump and verify the system reaches the target pressure without audible hissing or air leaks. |
 | **API** | Run an automated test by calling `start_set_vacuum_pressure()` with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. |
