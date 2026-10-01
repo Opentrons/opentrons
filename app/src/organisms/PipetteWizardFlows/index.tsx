@@ -62,7 +62,7 @@ import { ProbeNotAttached } from './ProbeNotAttached'
 import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
-import { isWasteChuteOnDeck, startCalibrationOnClick } from './utils'
+import { startCalibrationOnClick } from './utils'
 
 import type { CommandData } from '@opentrons/api-client'
 import type {
@@ -461,7 +461,6 @@ export const PipetteWizardFlows = (
     mount,
   }
 
-  const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const startCalibration = startCalibrationOnClick(
     calibrateBaseProps,
     attachedPipettes[mount]?.serialNumber ?? ''
@@ -515,17 +514,10 @@ export const PipetteWizardFlows = (
       exitModal
     ) : (
       <ProbeNotAttached
-        handleOnClick={
-          is96Channel && isWasteChuteOnDeck(deckConfig)
-            ? () => {
-                dismissError()
-                proceed()
-              }
-            : () => {
-                dismissError()
-                startCalibration()
-              }
-        }
+        handleOnClick={() => {
+          dismissError()
+          startCalibration()
+        }}
         dismissError={dismissError}
         isOnDevice={isOnDevice ?? false}
       />
