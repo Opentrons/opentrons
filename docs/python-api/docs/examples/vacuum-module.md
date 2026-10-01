@@ -1,16 +1,16 @@
 ---
 title: "Python API: Vacuum Module Examples"
-description: A use case demonstrating how the Vacuum Module uses API commands in a miniprep protocol.
+description: An analysis of how the Vacuum Module uses API commands in a miniprep protocol.
 ---
 
-This use case is taken from a plasmid miniprep protocol. These excerpted code samples demonstrate how the Python API works with the Vacuum Module and other Flex instruments, modules, and labware.
+This use case is taken from a plasmid miniprep protocol. Several intermediate wash pipetting steps have been excluded to keep focus on those Python API commands relevant to Vacuum Module operations.
 
 !!! note
     The Vacuum Module is supported on Opentrons Flex only and requires Python API version 2.30 or higher.
 
 ## Workflow overview
 
-A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This use case focuses exclusively on the procedures that interact with API methods used by the Vacuum Module such as:
+A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This code analysis focuses mainly on those API methods used by the Vacuum Module such as:
 
 * **Filtrate collection:** The procedure begins with stacking a short-tip filter plate over an internal 96-well collection plate on the base of the manifold. The vacuum then draws clarified lysate into a collection plate.
 
@@ -177,7 +177,7 @@ Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can c
 
 ## Stage 3: Direct-to-waste wash and dry
 
-In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. Other intermediate wash pipetting steps are omitted from this excerpt for brevity.
+In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. 
 
 <table>
   <thead>
