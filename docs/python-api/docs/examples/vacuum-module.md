@@ -18,6 +18,8 @@ A plasmid miniprep is a technique used to isolate DNA. A typical protocol involv
 
 The code analysis starts below.
 
+<font color="red"><strong>REMOVE TABLES, REPLACE WITH PROSE SUMMARY & BETTER CODE COMMENTS</strong></font>
+
 ## Stage 1: Loading modules and labware
 
 During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, this code tells the robot what's going to be used and where it can be found.
@@ -63,9 +65,7 @@ During this stage, the `run()` function initializes hardware, defines the deck l
   </tbody>
 </table>
 
-<!--- Because we're using snippets from a long, complete protocol, might need to provide context --->
-<!--- about how filter plates are 'loaded' from a regular deck slot --->
-
+<font color="red">Put these in separate rows in table, not note</font>
 !!! note "Note: staging filter plates and spacers"
     Filter plates have nozzle tips that extend past the bottom of the plate skirt. As a result, you cannot put a filter plate directly on deck slot without some risk of damage or contamination. Protocols typically stage filter plates nested into deep-well plates, which can then be loaded in software from a deck slot.
 
@@ -117,13 +117,13 @@ During this stage, the robot takes advantage of [non-blocking API commands](../m
 
 ### Liquid collection
 
-Here the protocol calls for a gentle vacuum to pull clarified lysate into a 96-well collection plate. To prepare for this process, the Flex Gripper stacks a collection and filter plate on top of each other and places both on the manifold base. A collar placed over the well plates completes the stack and creates vacuum seal.
+To prepare for lysate extraction, the Flex Gripper moves the short-tip filter plate onto the collection plate already seated in the manifold base, then places the tall collar over both plates to create a vacuum seal.
 
 <table>
   <thead>
     <tr>
-      <th">Action</th>
-      <th">API method and role</th>
+      <th>Action</th>
+      <th>API method and role</th>
     </tr>
   </thead>
   <tbody>
@@ -131,8 +131,8 @@ Here the protocol calls for a gentle vacuum to pull clarified lysate into a 96-w
       <td><strong>Stack assembly</strong></td>
       <td><a href="../../reference/protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a>:
         <ul>
-          <li>uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
-          <li>seats the tall collar over the base to seal the labware stack.</li>
+          <li>Uses the Flex Gripper to place the short-tip filter plate over the collection plate inside the manifold base.</li>
+          <li>Seats the tall collar over the vacuum base to seal the labware stack.</li>
         </ul>
       </td>
     </tr>
@@ -177,7 +177,7 @@ Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can c
 
 ## Stage 3: Direct-to-waste wash and dry
 
-In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. A full miniprep protocol includes intermediate wash pipetting steps, but these are omitted for brevity and to keep the focus on Vacuum Module API methods.
+In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. Other intermediate wash pipetting steps are omitted from this excerpt for brevity.
 
 <table>
   <thead>
@@ -250,6 +250,8 @@ The miniprep protocol demonstrates several key operational principles of the Vac
 ### Dynamic stack configuration
 
 Using the Gripper, the Vacuum Module can adapt to changing filtration requirements mid-protocol. For example, this protocol alternates between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
+
+<font color="red">Nesting and staging?</font>
 
 ### Non-blocking operations and concurrency
 
