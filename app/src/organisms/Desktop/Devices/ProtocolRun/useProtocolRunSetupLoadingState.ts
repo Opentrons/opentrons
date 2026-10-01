@@ -1,7 +1,4 @@
-import { useSelector } from 'react-redux'
-
 import { useIsFlex } from '/app/redux-resources/robots'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useNotifyClientDataLPC } from '/app/resources/client_data'
@@ -16,8 +13,9 @@ export interface ProtocolRunSetupLoadingState {
 }
 
 /**
- * Loading gate for the protocol-run Setup tab only.
- * Header skeleton stays separate (isRunRecordLoading).
+ * Loading gate for the Setup tab (run record / analysis + Flex LPC + camera).
+ *
+ * LPC "settled" means client LPC data has finished loading
  */
 export function useProtocolRunSetupLoadingState(
   runId: string,
@@ -37,11 +35,8 @@ export function useProtocolRunSetupLoadingState(
   const { isLoading: isClientLPCLoading } = useNotifyClientDataLPC({
     enabled: isFlex,
   })
-  // is this an over kill?
-  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
 
-  const isFlexLPCSettled =
-    !isFlexLPCInitializing && !isClientLPCLoading && flexOffsetsApplied
+  const isFlexLPCSettled = !isFlexLPCInitializing && !isClientLPCLoading
 
   const isSetupLoading =
     isRunRecordLoading ||
