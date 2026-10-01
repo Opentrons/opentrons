@@ -1235,3 +1235,17 @@ export interface AbsorbanceReaderReadStepGenArgs {
   moduleId: string
   fileName?: string | null
 }
+
+export interface ConfigureForVolumeStepGenArgs {
+  pipetteId: string
+  volume: number | string
+}
+
+export interface ConfigureNozzleLayoutStepGenArgs {
+  pipetteId: string
+  configurationParams: {
+    style: string
+    primaryNozzle?: string
+    backLeftNozzle?: string
+  }
+}
