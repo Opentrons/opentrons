@@ -27,6 +27,8 @@ import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/Pr
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
+import { useProtocolRunSetupLoadingState } from '/app/organisms/Desktop/Devices/ProtocolRun/useProtocolRunSetupLoadingState'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -92,6 +94,7 @@ interface PageContentsProps {
 }
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
+  const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
@@ -101,6 +104,12 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
+  const { isRunOrAnalysisLoading } = useProtocolRunSetupLoadingState(
+    runId,
+    robotName,
+    false,
+    Boolean(run.isLoading)
+  )
 
   useToastOnErrorImage(runId)
 
@@ -194,6 +203,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     backToTop: null,
   }
   const { content, backToTop } = tabDetails
+  const loadingTabName = getProtocolRunDetailsTabName(protocolRunDetailsTab, t)
 
   return (
     <>
@@ -230,11 +240,34 @@ function PageContents(props: PageContentsProps): JSX.Element {
         {/* TODO(tz, 2026-10-01): keep tab panels mounted (or lift Setup LPC/camera
             queries) so switching away from Setup does not remount ProtocolRunSetup
             and flash isSetupLoading again. */}
-        {content}
+        {isRunOrAnalysisLoading ? (
+          <ProtocolRunTabLoading tabName={loadingTabName} />
+        ) : (
+          content
+        )}
       </Box>
-      {backToTop}
+      {isRunOrAnalysisLoading ? null : backToTop}
     </>
   )
+}
+
+function getProtocolRunDetailsTabName(
+  tab: ProtocolRunDetailsTab,
+  t: (key: string) => string
+): string {
+  switch (tab) {
+    case 'runtime-parameters':
+      return t('parameters')
+    case 'module-controls':
+      return t('module_controls')
+    case 'run-preview':
+      return t('run_preview')
+    case 'camera':
+      return t('camera')
+    case 'setup':
+    default:
+      return t('setup')
+  }
 }
 
 interface SetupTabProps {
