@@ -122,6 +122,7 @@ describe('ProtocolRunDetails', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: { createdAt: '123' } },
+      isLoading: false,
     } as any)
     vi.mocked(useQuickProtocolDetailsForRun).mockReturnValue({
       displayName: 'MOCK-PROTOCOL-NAME',
@@ -184,6 +185,7 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
     fireEvent.click(setupTab)
     screen.getByText('Mock ProtocolRunSetup')
+    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
   })
 
   it('renders module controls when the module controls tab is clicked', () => {
