@@ -1,20 +1,29 @@
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, DisengageMagnetStepGenArgs } from '../../types'
 
 /** Disengage magnet of specified magnetic module. */
-export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (
+export const disengageMagnet: CommandCreator<DisengageMagnetStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId } = args
-  const { moduleEntities } = invariantContext
+  const { moduleEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
   const commandType = 'magneticModule/disengage'
+
+  if (args.moduleId != null && moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.moduleId,
+        }),
+      ],
+    }
+  }
 
   if (moduleId === null) {
     return {
