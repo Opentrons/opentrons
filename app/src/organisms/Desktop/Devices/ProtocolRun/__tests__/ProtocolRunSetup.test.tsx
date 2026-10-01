@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
   getSimplestDeckConfigForProtocol,
   simple_v4 as noModulesProtocol,
@@ -25,6 +26,11 @@ import {
 } from '/app/redux/protocol-runs'
 import * as ReduxRuns from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
+import {
+  useNotifyClientDataLPC,
+  useUpdateClientLPC,
+} from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
@@ -47,6 +53,7 @@ import { SetupLabware } from '../SetupLabware'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '/app/redux/types'
 
@@ -62,6 +69,14 @@ vi.mock('/app/resources/runs/useRunHasStarted')
 vi.mock('/app/resources/runs/useUnmatchedModulesForProtocol')
 vi.mock('/app/resources/runs/useModuleCalibrationStatus')
 vi.mock('/app/resources/runs/useProtocolAnalysisErrors')
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useProtocolQuery: vi.fn(),
+    useInstrumentsQuery: vi.fn(() => ({ data: undefined })),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/protocol-runs')
@@ -72,6 +87,8 @@ vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck')
+vi.mock('/app/resources/camera/useNotifyCamera')
+vi.mock('/app/resources/client_data')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -185,7 +202,10 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
@@ -199,6 +219,21 @@ describe('ProtocolRunSetup', () => {
       isLaunchingLPC: false,
       isFlexLPCInitializing: false,
     })
+    vi.mocked(useNotifyCamera).mockReturnValue({
+      data: { cameraEnabled: false },
+      isLoading: false,
+    } as any)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
+    vi.mocked(useUpdateClientLPC).mockReturnValue({
+      updateWithRunId: vi.fn(),
+      clearClientData: vi.fn(),
+    } as any)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: undefined,
+    } as any)
     vi.mocked(selectIsAnyNecessaryDefaultOffsetMissing).mockImplementation(
       () => () => false
     )
@@ -217,7 +252,7 @@ describe('ProtocolRunSetup', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
+  it('renders run loading info screen while analysis is unavailable', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
@@ -239,7 +274,117 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Loading data...')
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while protocol is analyzing', () => {
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
+      },
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while analyzing even if Flex LPC is initializing', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
+      },
+    } as any)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: true,
+    })
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while Flex LPC offsets are not applied', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: false,
+    })
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('does not show run loading once Flex LPC offsets are finalized', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: false,
+    })
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
+    render()
+    expect(screen.queryByText('Run setup loading')).toBeNull()
+  })
+
+  it('renders run loading info screen while Flex client LPC finalized status is loading', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while the run record is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while Flex LPC is initializing', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useLPCFlows).mockReturnValue({
+      launchLPC: vi.fn(),
+      lpcProps: null,
+      showLPC: false,
+      isLaunchingLPC: false,
+      isFlexLPCInitializing: true,
+    })
+    render()
+    screen.getByText('Run setup loading')
+  })
+
+  it('renders run loading info screen while Flex camera settings are loading', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyCamera).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    render()
+    screen.getByText('Run setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
@@ -269,6 +414,7 @@ describe('ProtocolRunSetup', () => {
     })
     it('renders robot calibration setup for Flex', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       render()
 
       screen.getByText(
@@ -336,6 +482,7 @@ describe('ProtocolRunSetup', () => {
 
     it('renders proper copy if robot is Flex and modules are calibrated', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
@@ -346,6 +493,7 @@ describe('ProtocolRunSetup', () => {
 
     it('renders action needed if modules need to be calibrated, homed, etc.', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
@@ -370,6 +518,7 @@ describe('ProtocolRunSetup', () => {
           remainingAttachedModules: [],
         })
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
@@ -404,6 +553,7 @@ describe('ProtocolRunSetup', () => {
       ] as any)
       vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
@@ -471,6 +621,7 @@ describe('ProtocolRunSetup', () => {
 
     it('renders correct text contents for modules and fixtures', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
         .thenReturn({
