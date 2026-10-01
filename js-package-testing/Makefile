@@ -76,6 +76,12 @@ clean-local-packages:
 test:
 	pnpm playwright test --config=playwright.config.ts
 
+# Same as test, but do not fail Playwright on Eyes DiffsFoundError.
+# Use after intentional visual fixture changes: review/accept in Eyes UI, then re-run make test.
+.PHONY: test-ignore-diffs
+test-ignore-diffs:
+	APPLITOOLS_FAIL_ON_DIFF=false pnpm playwright test --config=playwright.config.ts
+
 # Install Playwright browser dependencies (run 'make setup' first)
 .PHONY: test-setup
 test-setup: setup
