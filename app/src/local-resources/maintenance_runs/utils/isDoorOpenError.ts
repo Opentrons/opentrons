@@ -17,5 +17,5 @@ export function isMovementError(error: Error): boolean {
 }
 
 export function isTipPresenceError(error: Error): boolean {
-  return error.cause === '2002'
+  return error.cause === '3005'
 }
