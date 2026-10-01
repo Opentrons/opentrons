@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 import sqlalchemy
-from decoy import Decoy
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource

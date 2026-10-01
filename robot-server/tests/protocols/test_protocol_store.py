@@ -91,7 +91,7 @@ def completed_analysis_store(
     sql_engine: SQLEngine,
 ) -> CompletedAnalysisStore:
     """Get a subject."""
-    return CompletedAnalysisStore(sql_engine,  "2")
+    return CompletedAnalysisStore(sql_engine, "2")
 
 
 async def test_insert_and_get_protocol(

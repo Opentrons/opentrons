@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import pytest
-from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons.protocol_reader import (
@@ -128,7 +127,6 @@ def _completed_analysis_resource(
             liquids=[],
         ),
     )
-
 
 
 async def test_get_by_analysis_id(

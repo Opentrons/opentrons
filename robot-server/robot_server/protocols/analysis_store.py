@@ -67,8 +67,6 @@ _log = getLogger(__name__)
 #     * Changed to "2" for version 7.0 from "initial"
 #     * Changed to "3" for the implementation of Command Preconditions
 _CURRENT_ANALYZER_VERSION: Final = "3"
-# We have a reasonable limit for a memory cache of analyses.
-_CACHE_MAX_SIZE: Final = 32
 
 
 class AnalysisNotFoundError(ValueError):
