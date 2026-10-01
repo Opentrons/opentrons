@@ -11,3 +11,11 @@ export function isMaintenanceDoorOpenError(error: unknown): boolean {
     error.response?.data?.errors?.[0]?.id === MAINTENANCE_COMMAND_DOOR_OPEN
   )
 }
+
+export function isMovementError(error: Error): boolean {
+  return error.cause === '2001'
+}
+
+export function isTipPresenceError(error: Error): boolean {
+  return error.cause === '2002'
+}

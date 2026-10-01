@@ -67,7 +67,11 @@ import type {
   LoadedPipette,
   PipetteMount,
 } from '@opentrons/shared-data'
-import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import type {
+  PipetteWizardFlow,
+  PipetteWizardStepProps,
+  SelectablePipettes,
+} from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -364,21 +368,7 @@ export const PipetteWizardFlows = (
     maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
-  const calibrateBaseProps = {
-    chainRunCommands: chainMaintenanceRunCommands,
-    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
-    proceed,
-    maintenanceRunId,
-    goBack,
-    attachedPipettes,
-    setShowErrorMessage,
-    errorMessage,
-    isDoorOpenError,
-    setIsDoorOpenError,
-    dismissDoorOpenError,
-    selectedPipette,
-    isOnDevice,
-  }
+
   const is96ChannelUnskippableStep =
     currentStep?.section === SECTIONS.CARRIAGE ||
     currentStep?.section === SECTIONS.MOUNTING_PLATE ||
@@ -406,11 +396,35 @@ export const PipetteWizardFlows = (
     return null
   }
 
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setIsDoorOpenError(true)
+      setShowErrorMessage(t('door_is_open') as string)
+    } else {
+      setShowErrorMessage(error.message)
+    }
+  }
+
   const isFatalError =
     !isDoorOpenError &&
     ((isExiting && errorMessage != null) ||
       maintenanceRunData?.data.status === RUN_STATUS_FAILED ||
       (errorMessage != null && createdMaintenanceRunId == null))
+
+  const calibrateBaseProps: PipetteWizardStepProps = {
+    chainRunCommands: chainMaintenanceRunCommands,
+    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
+    proceed,
+    maintenanceRunId,
+    goBack,
+    attachedPipettes,
+    errorMessage,
+    selectedPipette,
+    isOnDevice,
+    handleCommandError,
+    flowType,
+    mount,
+  }
 
   let onExit: () => void
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -450,6 +464,15 @@ export const PipetteWizardFlows = (
           )}
         </Flex>
       </SimpleWizardBody>
+    )
+  } else if (errorMessage != null) {
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
