@@ -317,7 +317,7 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Run setup loading')
   })
 
-  it('renders run loading info screen while Flex LPC offsets are not applied', () => {
+  it('does not show run loading once Flex LPC is done even if offsets are not applied', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useLPCFlows).mockReturnValue({
       launchLPC: vi.fn(),
@@ -328,10 +328,10 @@ describe('ProtocolRunSetup', () => {
     })
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
     render()
-    screen.getByText('Run setup loading')
+    expect(screen.queryByText('Run setup loading')).toBeNull()
   })
 
-  it('does not show run loading once Flex LPC offsets are finalized', () => {
+  it('does not show run loading once Flex LPC is settled', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useLPCFlows).mockReturnValue({
       launchLPC: vi.fn(),
