@@ -1,21 +1,31 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  HeaterShakerStopShakeStepGenArgs,
+} from '../../types'
 
-export const heaterShakerStopShake: CommandCreator<ModuleOnlyParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
+export const heaterShakerStopShake: CommandCreator<
+  HeaterShakerStopShakeStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   return {
     commands: [
       {
         commandType: 'heaterShaker/deactivateShaker',
         key: uuid(),
         params: {
-          moduleId: args.moduleId,
+          moduleId,
         },
       },
     ],
