@@ -95,7 +95,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'run_details'])
   const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -463,7 +463,7 @@ export function ProtocolRunSetup({
       margin={SPACING.spacing16}
     >
       {isSetupLoading ? (
-        <ProtocolRunTabLoading />
+        <ProtocolRunTabLoading tabName={t('run_details:setup')} />
       ) : (
         <>
           {runHasStarted ? (

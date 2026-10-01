@@ -196,6 +196,7 @@
   "step_number": "Step {{step_number}}:",
   "steps_total": "{{count}} steps total",
   "stored_labware_offset_data": "Stored Labware Offset data that applies to this protocol",
+  "tab_loading": "{{tab}} loading",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a",
   "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support",

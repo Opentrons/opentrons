@@ -227,6 +227,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
         // remove left upper corner border radius when first tab is active
         borderRadius={BORDERS.borderRadius8}
       >
+        {/* TODO(tz, 2026-10-01): keep tab panels mounted (or lift Setup LPC/camera
+            queries) so switching away from Setup does not remount ProtocolRunSetup
+            and flash isSetupLoading again. */}
         {content}
       </Box>
       {backToTop}
@@ -298,16 +301,28 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const { isLoading: isRunLoading } = useNotifyRunQuery(runId)
   const navigate = useNavigate()
   const disabled = mostRecentAnalysis == null
 
   useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'runtime-parameters') {
+    if (
+      !isRunLoading &&
+      disabled &&
+      protocolRunDetailsTab === 'runtime-parameters'
+    ) {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`, {
         replace: true,
       })
     }
-  }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
+  }, [
+    disabled,
+    isRunLoading,
+    navigate,
+    protocolRunDetailsTab,
+    robotName,
+    runId,
+  ])
 
   return (
     <RoundTab

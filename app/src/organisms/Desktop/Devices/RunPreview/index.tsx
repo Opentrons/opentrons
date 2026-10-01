@@ -26,6 +26,7 @@ import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { CommandIcon } from '/app/molecules/Command'
+import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
@@ -91,7 +92,7 @@ export const RunPreviewComponent = (
   )
 
   if (robotSideAnalysis == null) {
-    return null
+    return <ProtocolRunTabLoading tabName={t('run_preview')} />
   }
   const commands = isRunTerminal
     ? commandsFromQuery
@@ -116,13 +117,7 @@ export const RunPreviewComponent = (
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
   if (isRunCommandDataLoading || commands == null) {
-    return (
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('protocol_setup:loading_data')}
-        </LegacyStyledText>
-      </Flex>
-    )
+    return <ProtocolRunTabLoading tabName={t('run_preview')} />
   }
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>

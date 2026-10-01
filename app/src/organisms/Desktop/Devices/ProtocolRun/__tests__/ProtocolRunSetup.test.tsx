@@ -274,7 +274,7 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders run loading info screen while protocol is analyzing', () => {
@@ -290,7 +290,7 @@ describe('ProtocolRunSetup', () => {
       },
     } as any)
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders run loading info screen while analyzing even if Flex LPC is initializing', () => {
@@ -314,7 +314,7 @@ describe('ProtocolRunSetup', () => {
       isFlexLPCInitializing: true,
     })
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('does not show run loading once Flex LPC is done even if offsets are not applied', () => {
@@ -328,7 +328,7 @@ describe('ProtocolRunSetup', () => {
     })
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
     render()
-    expect(screen.queryByText('Run setup loading')).toBeNull()
+    expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
   it('does not show run loading once Flex LPC is settled', () => {
@@ -342,7 +342,7 @@ describe('ProtocolRunSetup', () => {
     })
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
     render()
-    expect(screen.queryByText('Run setup loading')).toBeNull()
+    expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
   it('renders run loading info screen while Flex client LPC finalized status is loading', () => {
@@ -352,7 +352,7 @@ describe('ProtocolRunSetup', () => {
       isLoading: true,
     } as any)
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders run loading info screen while the run record is loading', () => {
@@ -361,7 +361,7 @@ describe('ProtocolRunSetup', () => {
       isLoading: true,
     } as any)
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders run loading info screen while Flex LPC is initializing', () => {
@@ -374,7 +374,7 @@ describe('ProtocolRunSetup', () => {
       isFlexLPCInitializing: true,
     })
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders run loading info screen while Flex camera settings are loading', () => {
@@ -384,7 +384,7 @@ describe('ProtocolRunSetup', () => {
       isLoading: true,
     } as any)
     render()
-    screen.getByText('Run setup loading')
+    screen.getByText('Setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {

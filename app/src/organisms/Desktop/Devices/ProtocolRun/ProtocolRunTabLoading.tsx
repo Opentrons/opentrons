@@ -4,15 +4,21 @@ import { InfoScreen } from '@opentrons/components'
 
 import styles from './protocolruntabloading.module.css'
 
-/** Shared spinner + copy for protocol run details tabs while run/analysis load. */
-export function ProtocolRunTabLoading(): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+interface ProtocolRunTabLoadingProps {
+  tabName: string
+}
+
+/** Shared spinner for protocol run details tabs while tab data loads. */
+export function ProtocolRunTabLoading({
+  tabName,
+}: ProtocolRunTabLoadingProps): JSX.Element {
+  const { t } = useTranslation('run_details')
 
   return (
     <div className={styles.container}>
       <InfoScreen
         iconName="ot-spinner"
-        content={t('run_setup_loading')}
+        content={t('tab_loading', { tab: tabName })}
         height="auto"
       />
     </div>
