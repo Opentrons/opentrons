@@ -53,12 +53,16 @@ export function useCreateCommandMutation(
       },
       userNotes
     ).then(response => {
-      queryClient
-        .invalidateQueries(getQueryKey(host, 'runs'))
-        .catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
-      addActionToDocument(response.data.data)
+      // Jogs are high-frequency, so documenting each press fills the
+      // end-of-flow modal and refetches protocol runs on every tick.
+      if (command.commandType !== 'moveRelative') {
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
+        addActionToDocument(response.data.data)
+      }
       return response.data
     })
   })

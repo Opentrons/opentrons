@@ -13,6 +13,7 @@ import {
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import {
@@ -79,7 +80,9 @@ export function RecentProtocolRuns({
           makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
         .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)
@@ -124,10 +127,14 @@ export function RecentProtocolRuns({
             {t('run_history')}
           </StyledText>
           <div className={styles.header_actions}>
-            <BasicButton onClick={handleDownloadSelected} iconName="download">
+            <BasicButton
+              onClick={handleDownloadSelected}
+              iconName="download"
+              underLine
+            >
               {t('download_all')}
             </BasicButton>
-            <BasicButton onClick={handleClickDeleteAll}>
+            <BasicButton onClick={handleClickDeleteAll} underLine>
               {t('delete_all')}
             </BasicButton>
           </div>

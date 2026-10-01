@@ -33,6 +33,11 @@
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
   },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "18.2.51"
+    }
+  },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.582.0",
     "@aws-sdk/client-dynamodb": "^3.582.0",
@@ -80,7 +85,7 @@
     "decompress": "4.2.1",
     "download": "8.0.0",
     "electron": "39.1.2",
-    "electron-builder": "26.8.2",
+    "electron-builder": "26.16.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-config-standard": "^16.0.2",

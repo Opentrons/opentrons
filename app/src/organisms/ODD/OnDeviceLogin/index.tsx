@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
+import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getPasswordComplexityError } from '/app/resources/auth'
@@ -31,10 +33,14 @@ export interface OnDeviceLoginProps {
   onCancel: () => void
   /** New-password + confirm step after temporary-password login. */
   isPasswordResetRequired?: boolean
+  /** Drives the login password field label after username lookup. */
+  loginResetPassword?: boolean
   initialUsername?: string
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
+  /** When set, called before advancing from the username step to the password step. */
+  onUsernameSubmit?: (username: string) => Promise<void>
   /** Robot password policy for client-side validation on the new-password step. */
   passwordComplexity: PasswordComplexityRequirements | null
 }
@@ -46,9 +52,11 @@ export function OnDeviceLogin({
   isAuthLoading,
   onCancel,
   isPasswordResetRequired = false,
+  loginResetPassword = false,
   initialUsername,
   loginError = null,
   onClearLoginError,
+  onUsernameSubmit,
   passwordComplexity,
 }: OnDeviceLoginProps): ReactNode {
   const { t } = useTranslation(['shared', 'access_control'])
@@ -59,7 +67,7 @@ export function OnDeviceLogin({
     null
   )
   const [usernameError, setUsernameError] = useState<string | null>(null)
-  const { control, watch } = useForm<LoginFormValues>({
+  const { control, watch, resetField } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -91,7 +99,12 @@ export function OnDeviceLogin({
         )
         return
       }
-      onStepChange('password')
+      void (async (): Promise<void> => {
+        if (onUsernameSubmit != null) {
+          await onUsernameSubmit(username.trim())
+        }
+        onStepChange('password')
+      })()
       return
     }
     if (step === 'password') {
@@ -171,6 +184,7 @@ export function OnDeviceLogin({
     submitPassword,
     passwordComplexity,
     t,
+    onUsernameSubmit,
   ])
 
   const primaryDisabled = isAuthLoading
@@ -201,6 +215,8 @@ export function OnDeviceLogin({
     }
   }, [handleEnterPress])
 
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
+
   return (
     <>
       <div className={styles.container}>
@@ -216,6 +232,7 @@ export function OnDeviceLogin({
                 }
               : step === 'password' && !isPasswordResetRequired
                 ? () => {
+                    resetField('password')
                     onClearLoginError?.()
                     onStepChange('username')
                   }
@@ -232,7 +249,12 @@ export function OnDeviceLogin({
           }
           onClickButton={handleNext}
         />
-        <div className={styles.content_container}>
+        <div
+          className={clsx(
+            styles.content_container,
+            !isKeyboardOpen && styles.content_container_keyboard_closed
+          )}
+        >
           <div className={styles.form_inner_container}>
             <LoginFieldController
               ref={inputElementRef}
@@ -240,6 +262,7 @@ export function OnDeviceLogin({
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
+              loginResetPassword={loginResetPassword}
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               usernameError={usernameError}
@@ -249,10 +272,18 @@ export function OnDeviceLogin({
         </div>
       </div>
       <div className={styles.keyboard_container}>
-        <FullKeyboard
-          keyboardRef={keyboardRef}
-          inputElementRef={inputElementRef}
-        />
+        <AccordionKeyboard
+          inputRef={inputElementRef}
+          isOpen={isKeyboardOpen}
+          onToggle={() => {
+            setIsKeyboardOpen(prev => !prev)
+          }}
+        >
+          <FullKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
+          />
+        </AccordionKeyboard>
       </div>
     </>
   )

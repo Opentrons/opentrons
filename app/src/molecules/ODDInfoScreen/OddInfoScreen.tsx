@@ -104,6 +104,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): ReactNode {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing4}
+        textAlign={TYPOGRAPHY.textAlignCenter}
         width="100%"
       >
         <StyledText

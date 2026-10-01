@@ -445,29 +445,10 @@ async def get_hardware_resource(
     hardware_api = _hw_api_accessor.get_from(app_state)
     hardware_api_subprocess = _hw_subprocess_accessor.get_from(app_state)
 
-    if ff.hardware_subprocess_enabled():
-        if (
-            hardware_api_subprocess is None
-            or initialize_task is None
-            or not initialize_task.done()
-        ):
-            raise HardwareNotYetInitialized().as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            )
-
-    else:
-        if (
-            (
-                not ff.hardware_subprocess_enabled()
-                and hardware_api_subprocess is not None
-            )
-            or hardware_api is None
-            or initialize_task is None
-            or not initialize_task.done()
-        ):
-            raise HardwareNotYetInitialized().as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            )
+    # Use whichever backend this process actually initialized. The live feature
+    # flag can change before restart.
+    if initialize_task is None or not initialize_task.done():
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
     if initialize_task.cancelled():
         raise HardwareFailedToInitialize(
@@ -518,9 +499,9 @@ async def get_hardware(
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    if ff.hardware_subprocess_enabled():
-        return hardware_resource
-    return hardware_resource.wrapped()  # type: ignore
+    if isinstance(hardware_resource, ThreadManager):
+        return hardware_resource.wrapped()
+    return hardware_resource
 
 
 def get_ot3_hardware(
@@ -533,15 +514,14 @@ def get_ot3_hardware(
         raise NotSupportedOnOT2(detail=str(exception)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from exception
-    if ff.hardware_subprocess_enabled():
-        return cast(OT3API, hardware_resource)
-
     if isinstance(
         hardware_resource, ThreadManager
     ) and hardware_resource.wraps_instance(OT3API):
         return cast(OT3API, hardware_resource.wrapped())
     if isinstance(hardware_resource, OT3API):
         return hardware_resource
+    if ff.hardware_subprocess_enabled():
+        return cast(OT3API, hardware_resource)
 
     raise NotSupportedOnOT2(detail="This route is only available on a Flex.").as_error(
         status.HTTP_403_FORBIDDEN

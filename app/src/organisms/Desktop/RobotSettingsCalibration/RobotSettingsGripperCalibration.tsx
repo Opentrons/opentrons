@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
@@ -157,7 +158,7 @@ export function RobotSettingsGripperCalibration(
                     <Flex
                       ref={calsOverflowWrapperRef}
                       whiteSpace={NO_WRAP}
-                      zIndex={10}
+                      zIndex={Z_INDEX.MENUS}
                       borderRadius="4px 4px 0px 0px"
                       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
                       position={POSITION_ABSOLUTE}

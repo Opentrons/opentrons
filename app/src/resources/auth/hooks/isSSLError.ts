@@ -1,6 +1,13 @@
 import axios from 'axios'
 
-const LOCALHOST_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1'])
+import { OPENTRONS_USB } from '/app/redux/discovery/constants'
+
+const LOCAL_TRANSPORT_HOSTNAMES = new Set([
+  'localhost',
+  '127.0.0.1',
+  '::1',
+  OPENTRONS_USB,
+])
 
 // Chromium net::Error codes from net/base/net_error_list.h (Electron only).
 const SSL_ERROR_CODES = [
@@ -13,14 +20,15 @@ const SSL_ERROR_CODES = [
 ]
 
 function isLocalRobotHostname(hostname: string): boolean {
-  return LOCALHOST_HOSTNAMES.has(hostname)
+  return LOCAL_TRANSPORT_HOSTNAMES.has(hostname)
 }
 
 /**
  * True when login's HTTPS request failed at the transport layer because the
  * robot encryption key / cert has not been set up on this client.
  *
- * Only applies to non-localhost robots; ODD local login uses HTTP.
+ * Only applies to network robots. ODD local login and USB serial-bridge
+ * connections use HTTP, so a transport failure there is not a missing cert.
  */
 export function isSSLError(
   error: unknown,

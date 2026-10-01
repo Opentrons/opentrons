@@ -75,8 +75,10 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
+    commandDocState,
     deletionDocState,
     actionsToDocument,
+    addActionToDocument,
   })
 
   return {

@@ -1,6 +1,7 @@
 export * from './createUser'
 export * from './deleteUser'
 export * from './getSelf'
+export * from './getUserLoginStatus'
 export * from './getUsers'
 export * from './resetUserPassword'
 export * from './types'

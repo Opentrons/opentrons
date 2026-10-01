@@ -2,12 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { Chip, Flex, SPACING, StyledText } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ImageGalleryContainer } from './ImageGalleryContainer'
@@ -39,7 +37,6 @@ export function ProtocolRunCamera({
   runRecordCameraSettings,
 }: ProtocolRunCameraProps): ReactNode {
   const { t } = useTranslation('run_details')
-  const host = useHost()
   const { enabled: runCameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -48,8 +45,7 @@ export function ProtocolRunCamera({
   const isCameraEnabled =
     runRecordCameraSettings?.cameraEnabled ?? runCameraEnabled
 
-  const showLivestreamBtn =
-    host?.hostname !== OPENTRONS_USB && robotType !== OT2_ROBOT_TYPE
+  const showLivestreamBtn = robotType !== OT2_ROBOT_TYPE
 
   return (
     <div className={styles.content_container}>

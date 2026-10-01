@@ -12,6 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
@@ -21,7 +22,6 @@ import {
   getFieldValuesFromSettings,
   isValidLogoutIdleTime,
   isValidMaxNumberOfLoginAttempts,
-  isValidPasswordComplexityMinimumLength,
   isValidPasswordResetTime,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
@@ -119,6 +119,9 @@ export function ComplianceReadySoftwareSettings({
     id: AuthSettingFieldId,
     value: string
   ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
       try {
@@ -134,6 +137,9 @@ export function ComplianceReadySoftwareSettings({
     id: AuditServerSettingFieldId,
     value: string
   ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
     const auditPatch = getAuditInputPatch(id, value, fieldValues)
     if (auditPatch != null) {
       try {

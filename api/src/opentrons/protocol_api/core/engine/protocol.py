@@ -302,6 +302,7 @@ class ProtocolCore(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
             ModuleFixtureLocation,
@@ -311,7 +312,7 @@ class ProtocolCore(
         version: Optional[int],
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
-        load_location = self._get_non_stacked_location(location=location)
+        load_location = self._convert_labware_location(location=location)
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )

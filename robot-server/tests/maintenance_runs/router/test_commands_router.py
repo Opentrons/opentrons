@@ -17,6 +17,8 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from opentrons.protocol_engine.types import MovementAxis
+from server_utils.audit.audit_logger import AuditLogger
 from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, RequestModel
 
 from robot_server.errors.error_responses import ApiError
@@ -42,6 +44,12 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
+
+
+@pytest.fixture
+def mock_audit_logger(decoy: Decoy) -> AuditLogger:
+    """Get a fake AuditLogger dependency."""
+    return decoy.mock(cls=AuditLogger)
 
 
 async def test_get_current_run_from_url(
@@ -84,6 +92,7 @@ async def test_create_run_command(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     hardware_state_store: HardwareStateStore,
+    mock_audit_logger: AuditLogger,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -121,16 +130,19 @@ async def test_create_run_command(
         timeout=None,
         check_estop=True,
         hardware_state_store=hardware_state_store,
+        audit_logger=mock_audit_logger,
     )
 
     assert result.content.data == command_once_added
     assert result.status_code == 201
+    decoy.verify(mock_audit_logger.skip_persist(), times=0)
 
 
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     hardware_state_store: HardwareStateStore,
+    mock_audit_logger: AuditLogger,
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -165,6 +177,7 @@ async def test_create_run_command_blocking_completion(
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         check_estop=True,
         hardware_state_store=hardware_state_store,
+        audit_logger=mock_audit_logger,
     )
 
     assert result.content.data == command_once_completed
@@ -175,6 +188,7 @@ async def test_create_run_command_door_open_blocks_by_default(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     hardware_state_store: HardwareStateStore,
+    mock_audit_logger: AuditLogger,
 ) -> None:
     """It should return a 409 by default when the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
@@ -190,6 +204,7 @@ async def test_create_run_command_door_open_blocks_by_default(
             timeout=None,
             check_estop=True,
             hardware_state_store=hardware_state_store,
+            audit_logger=mock_audit_logger,
         )
 
     assert exc_info.value.status_code == 409
@@ -200,6 +215,7 @@ async def test_create_run_command_door_open_allows_when_opted_out(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     hardware_state_store: HardwareStateStore,
+    mock_audit_logger: AuditLogger,
 ) -> None:
     """It should allow commands through when requiresClosedDoor is False, even if the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
@@ -238,10 +254,72 @@ async def test_create_run_command_door_open_allows_when_opted_out(
         check_estop=True,
         hardware_state_store=hardware_state_store,
         requiresClosedDoor=False,
+        audit_logger=mock_audit_logger,
     )
 
     assert result.content.data == command_once_added
     assert result.status_code == 201
+
+
+async def test_create_run_command_skips_audit_for_move_relative(
+    decoy: Decoy,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    hardware_state_store: HardwareStateStore,
+    mock_audit_logger: AuditLogger,
+) -> None:
+    """It should skip audit persist for jog (moveRelative) commands."""
+    command_request = pe_commands.MoveRelativeCreate(
+        params=pe_commands.MoveRelativeParams(
+            pipetteId="pipette-id",
+            axis=MovementAxis.X,
+            distance=0.1,
+        )
+    )
+    command_once_added = pe_commands.MoveRelative(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.MoveRelativeParams(
+            pipetteId="pipette-id",
+            axis=MovementAxis.X,
+            distance=0.1,
+        ),
+    )
+
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
+            request=pe_commands.MoveRelativeCreate(
+                params=pe_commands.MoveRelativeParams(
+                    pipetteId="pipette-id",
+                    axis=MovementAxis.X,
+                    distance=0.1,
+                ),
+                intent=pe_commands.CommandIntent.SETUP,
+            ),
+            wait_until_complete=False,
+            timeout=None,
+        )
+    ).then_return(command_once_added)
+
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
+    ).then_return(command_once_added)
+
+    result = await create_run_command(
+        run_id="run-id",
+        request_body=RequestModel(data=command_request),
+        waitUntilComplete=False,
+        run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        timeout=None,
+        check_estop=True,
+        hardware_state_store=hardware_state_store,
+        audit_logger=mock_audit_logger,
+    )
+
+    assert result.content.data == command_once_added
+    assert result.status_code == 201
+    decoy.verify(mock_audit_logger.skip_persist())
 
 
 async def test_get_run_commands(

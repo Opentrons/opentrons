@@ -7,6 +7,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   POSITION_FIXED,
+  Z_INDEX,
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
@@ -56,7 +57,7 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_FIXED}
           bottom={SPACING.spacing16}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
         >
           <Toast
             {...args}

@@ -6,8 +6,11 @@ import type {
 } from '@opentrons/react-api-client'
 
 const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
+const UPDATES_WRITE_SCOPE = 'updates.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
+
+const RUN_SIGNOFF_REQUIRED = 'RunSignoffRequired'
 
 /** Admin and service accounts share the same privileged robot permissions. */
 export function isAdminEquivalentAccountType(
@@ -47,6 +50,16 @@ export function isForbiddenError(error: unknown): error is AxiosError {
   return isAxiosError(error) && error.response?.status === 403
 }
 
+export function isRunSignoffRequiredError(error: unknown): boolean {
+  if (!isAxiosError(error)) {
+    return false
+  }
+  const errorId = (
+    error.response?.data as { errors?: Array<{ id?: unknown }> } | undefined
+  )?.errors?.[0]?.id
+  return errorId === RUN_SIGNOFF_REQUIRED
+}
+
 export function getAuditLogDeleteErrorMessage(
   error: unknown,
   permissionErrorMessage: string,
@@ -59,16 +72,11 @@ export function getAuditLogDeleteErrorMessage(
 }
 
 export function isProtocolWritePermissionError(error: unknown): boolean {
-  if (!isForbiddenError(error)) {
-    return false
-  }
-  const requiredScopes = (
-    error.response?.data as { requiredScopes?: unknown } | undefined
-  )?.requiredScopes
-  return (
-    Array.isArray(requiredScopes) &&
-    requiredScopes.includes(PROTOCOLS_WRITE_SCOPE)
-  )
+  return isForbiddenMissingScope(error, PROTOCOLS_WRITE_SCOPE)
+}
+
+export function isUpdatesWritePermissionError(error: unknown): boolean {
+  return isForbiddenMissingScope(error, UPDATES_WRITE_SCOPE)
 }
 
 export function getProtocolOrRunCreationErrorMessage(
@@ -91,6 +99,16 @@ export function getProtocolOrRunCreationErrorMessage(
     }
   }
   return generalErrorMessage
+}
+
+function isForbiddenMissingScope(error: unknown, scope: string): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes) && requiredScopes.includes(scope)
 }
 
 function isAxiosError(error: unknown): error is AxiosError {

@@ -9,6 +9,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import (
     Annotated,
+    Awaitable,
     Callable,
     Dict,
     Final,
@@ -37,8 +38,13 @@ from server_utils.audit.audit_server import (
 )
 from server_utils.audit.audit_server import (
     NoCurrentLogPeriodError,
+    SubmitSupportingFileMessageData,
 )
-from server_utils.audit.fastapi import get_audit_client, get_audit_logger
+from server_utils.audit.fastapi import (
+    get_audit_client,
+    get_audit_logger,
+    get_supplied_user_notes,
+)
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
 )
@@ -50,6 +56,7 @@ from server_utils.auth.resource_server.fastapi import (
     require_scopes,
 )
 from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
     AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
@@ -96,6 +103,10 @@ from ..run_models import (
 )
 from ..run_orchestrator_store import RunConflictError
 from ..run_store import RunStore
+from robot_server.access_control.settings.store import (
+    AccessControlSettingStore,
+    get_access_control_setting_store,
+)
 from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
@@ -278,8 +289,13 @@ async def create_run(  # noqa: C901
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
-    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    notify_publishers: Annotated[
+        Callable[[], Awaitable[None]], Depends(get_pe_notify_publishers)
+    ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    access_control_setting_store: Annotated[
+        AccessControlSettingStore, Depends(get_access_control_setting_store)
+    ],
     audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
     request_body: Optional[RequestModel[RunCreate]] = None,
@@ -303,6 +319,8 @@ async def create_run(  # noqa: C901
         notify_publishers: Utilized by the engine to notify publishers of state changes.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
+        access_control_setting_store: Persistent CRS settings, including whether
+            to auto-delete old runs at the maximum.
         audit_client: Client to get log period info from
         disk_monitor: Disk monitor for checking if we have enough space.
     """
@@ -355,7 +373,11 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_auto_deleter.make_room_for_new_run()
+    if (
+        not access_control_status
+        or access_control_setting_store.get_all().deleteOverMaxOnDiskProtocols
+    ):
+        run_auto_deleter.make_room_for_new_run()
 
     if disk_monitor.is_disk_space_below_run_start_limit() and access_control_status:
         log_line = f"Disk free space is {disk_monitor.get_available_disk_space_mb()}MB which is below the limit for starting a run."
@@ -561,6 +583,7 @@ async def update_run(  # noqa: C901
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
     ],
+    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -575,6 +598,7 @@ async def update_run(  # noqa: C901
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
+        user_notes: The Opentrons-User-Notes data from the request, if any.
     """
     if request_body.data.signedBy is not None:
         _require_signoff_scope(authentication)
@@ -610,7 +634,24 @@ async def update_run(  # noqa: C901
                 if run_log_entry is not None:
                     file_path, _ = run_log_entry
                     with open(file_path, "r") as fh:
-                        await audit_client.store_robot_log(robot_log_file=fh)
+                        await audit_client.store_robot_log(
+                            robot_log_file=fh,
+                            message=SubmitSupportingFileMessageData(
+                                fileType="runrecord",
+                                serverId=runId,
+                                accountName=(
+                                    authentication.username
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                legalName=(
+                                    authentication.fullname
+                                    if isinstance(authentication, AuthenticatedResult)
+                                    else "system"
+                                ),
+                                reason=user_notes,
+                            ),
+                        )
                 staging_dir.cleanup()
 
         if run_data is None:
@@ -741,10 +782,14 @@ async def get_current_state(  # noqa: C901
     """
     try:
         run = await run_data_manager.get(run_id=runId)
+        active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
+        pipette_tip_states = run_data_manager.get_tip_attached(run_id=runId)
+        flex_stacker_substates = run_data_manager.get_flex_stacker_substate(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    active_nozzle_maps = run_data_manager.get_nozzle_maps(run_id=runId)
     nozzle_layouts = {
         pipetteId: ActiveNozzleLayout.model_construct(
             startingNozzle=nozzle_map.starting_nozzle,
@@ -756,9 +801,7 @@ async def get_current_state(  # noqa: C901
 
     tip_states = {
         pipette_id: TipState.model_construct(hasTip=has_tip)
-        for pipette_id, has_tip in run_data_manager.get_tip_attached(
-            run_id=runId
-        ).items()
+        for pipette_id, has_tip in pipette_tip_states.items()
     }
 
     current_command = run_data_manager.get_current_command(run_id=runId)
@@ -817,7 +860,6 @@ async def get_current_state(  # noqa: C901
                 if place_labware:
                     break
 
-    flex_stacker_substates = run_data_manager.get_flex_stacker_substate(run_id=runId)
     flex_stacker_states: Dict[str, FlexStackerState] | None
     if len(flex_stacker_substates) > 0:
         flex_stacker_states = {}

@@ -8,12 +8,12 @@ from robot_server.service.notifications import (
 )
 
 
-def test_notify_publishers() -> None:
+async def test_notify_publishers() -> None:
     """Invoke the change notifier's notify method."""
     change_notifier = MagicMock()
     publisher_notifier = PublisherNotifier(change_notifier)
 
-    publisher_notifier._notify_publishers()
+    await publisher_notifier._notify_publishers()
 
     change_notifier.notify.assert_called_once()
 

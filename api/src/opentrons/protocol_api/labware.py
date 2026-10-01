@@ -748,6 +748,46 @@ class Labware:
 
         return labware
 
+    @requires_version(2, 31)
+    def load_adapter(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a compatible adapter onto this labware.
+
+        Used to stack vacuum module spacers, for example:
+
+        ```python
+        s1 = vacuum_module.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
+        s2 = s1.load_adapter("opentrons_vacuum_manifold_spacer_12.8mm")
+        ```
+
+        The parameters of this function behave like those of
+        [`ProtocolContext.load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter].
+        Note that the parameter `name` here corresponds to `load_name` on the
+        `ProtocolContext` function.
+
+        Returns:
+            The initialized and loaded adapter object.
+        """
+        adapter_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        adapter = Labware(
+            core=adapter_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(adapter_core, adapter)
+        return adapter
+
     @requires_version(2, 15)
     def load_labware_from_definition(
         self, definition: LabwareDefinition, label: Optional[str] = None

@@ -1,5 +1,5 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -8,10 +8,12 @@ import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useCamera,
+  useCreateProtocolAnalysisMutation,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
+  useRestartMutation,
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -37,7 +39,6 @@ import {
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   getUnmatchedModulesForProtocol,
-  ProtocolSetupButtonsSkeleton,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
@@ -48,6 +49,7 @@ import {
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
+import { RUN_ERROR_TIMEOUT_DURATION_MS } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupLoadingTimeoutModal'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import {
   useProtocolHasRunTimeParameters,
@@ -75,6 +77,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
 import {
+  useCloseCurrentRun,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useNotifyRunQuery,
@@ -155,7 +158,6 @@ const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
 const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
 const MockProtocolSetupCamera = vi.mocked(ProtocolSetupCamera)
 const MockProtocolSetupTitleSkeleton = vi.mocked(ProtocolSetupTitleSkeleton)
-const MockProtocolSetupButtonsSkeleton = vi.mocked(ProtocolSetupButtonsSkeleton)
 const MockProtocolSetupStepSkeleton = vi.mocked(ProtocolSetupStepSkeleton)
 const MockConfirmSetupStepsCompleteModal = vi.mocked(
   ConfirmSetupStepsCompleteModal
@@ -192,6 +194,7 @@ const mockEmptyAnalysis = {
 } as unknown as SharedData.CompletedProtocolAnalysis
 
 const mockPlay = vi.fn()
+const mockCloseCurrentRun = vi.fn()
 const mockOffset = {
   id: 'fake_labware_offset',
   createdAt: 'timestamp',
@@ -301,11 +304,24 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
+    vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
+      createProtocolAnalysis: vi.fn(),
+    } as any)
+    const protocolRecord = {
+      data: {
+        metadata: { protocolName: PROTOCOL_NAME },
+        analysisSummaries: [{ id: 'fake-analysis-id', status: 'completed' }],
+      },
+    }
     when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .thenReturn({
-        data: { data: { metadata: { protocolName: PROTOCOL_NAME } } },
-      } as any)
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, undefined)
+      .thenReturn({ data: protocolRecord } as any)
     when(vi.mocked(useInstrumentsQuery))
       .calledWith()
       .thenReturn({
@@ -371,6 +387,19 @@ describe('ProtocolSetup', () => {
       addCameraSettingsToRun: vi.fn(),
     } as any)
     vi.mocked(getCameraUsageState).mockReturnValue({ enabled: true } as any)
+    mockCloseCurrentRun.mockImplementation(
+      (options?: { onSuccess?: () => void }) => {
+        options?.onSuccess?.()
+      }
+    )
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: false,
+    })
+    vi.mocked(useRestartMutation).mockReturnValue({
+      restart: vi.fn(),
+      isLoading: false,
+    } as any)
   })
 
   it('should render text, image, and buttons', () => {
@@ -545,10 +574,38 @@ describe('ProtocolSetup', () => {
       data: null,
     } as any)
     MockProtocolSetupTitleSkeleton.mockReturnValue(<div>SKELETON</div>)
-    MockProtocolSetupButtonsSkeleton.mockReturnValue(<div>SKELETON</div>)
     MockProtocolSetupStepSkeleton.mockReturnValue(<div>SKELETON</div>)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(3)
+    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(2)
+    screen.getByRole('button', { name: 'close' })
+    expect(
+      screen.queryByRole('button', { name: 'play' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows a timeout modal after 3 minutes of loading and dismisses the run when returning to the dashboard', () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+        data: null,
+      } as any)
+      render(`/runs/${RUN_ID}/setup/`)
+      expect(
+        screen.queryByText('Run is taking longer than usual to load')
+      ).not.toBeInTheDocument()
+      act(() => {
+        vi.advanceTimersByTime(RUN_ERROR_TIMEOUT_DURATION_MS)
+      })
+      screen.getByText('Run is taking longer than usual to load')
+      fireEvent.click(screen.getByText('Return to dashboard'))
+      expect(mockCloseCurrentRun).toHaveBeenCalledWith(
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+        })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('should render toast and make a button disabled when a robot door is open', async () => {
@@ -610,5 +667,32 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: false })
     render(`/runs/${RUN_ID}/setup/`)
     expect(screen.getByText('Action needed')).toBeInTheDocument()
+  })
+
+  it('starts protocol analysis when the protocol has no analysis summaries', () => {
+    const createProtocolAnalysis = vi.fn()
+    vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
+      createProtocolAnalysis,
+    } as any)
+    const protocolRecord = {
+      data: {
+        metadata: { protocolName: PROTOCOL_NAME },
+        analysisSummaries: [],
+      },
+    }
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .thenReturn({ data: protocolRecord } as any)
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
+      .thenReturn({ data: protocolRecord } as any)
+
+    render(`/runs/${RUN_ID}/setup/`)
+
+    expect(createProtocolAnalysis).toHaveBeenCalledTimes(1)
+    expect(createProtocolAnalysis).toHaveBeenCalledWith(
+      { protocolKey: PROTOCOL_ID, forceReAnalyze: false },
+      expect.objectContaining({ onError: expect.any(Function) })
+    )
   })
 })

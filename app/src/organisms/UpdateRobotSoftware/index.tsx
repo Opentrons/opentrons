@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
 import {
   downloadRobotUpdate,
   getRobotUpdateSession,
 } from '/app/redux/robot-update'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import { CheckUpdates } from './CheckUpdates'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
@@ -41,9 +41,10 @@ export function UpdateRobotSoftware(
     beforeCommittingSuccessfulUpdate,
     afterCancel,
   } = props
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const robotName =
+    typeof localRobot?.name === 'string' ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
-  const { startUpdate } = useRobotUpdateContext()
+  const { startUpdate, isLoading } = useGatedStartRobotUpdate(robotName)
 
   const session = useSelector(getRobotUpdateSession)
   const {
@@ -54,7 +55,7 @@ export function UpdateRobotSoftware(
     step: null,
     error: null,
   }
-  const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const didKickOffRef = useRef(false)
   const afterCancelRef = useRef(afterCancel)
   afterCancelRef.current = afterCancel
   const hadSessionRef = useRef(session != null)
@@ -65,13 +66,22 @@ export function UpdateRobotSoftware(
   }
 
   useEffect(() => {
-    // check isDownloading to avoid dispatching again
-    if (!isDownloading) {
-      setIsDownloading(true)
-      dispatch(downloadRobotUpdate())
-      startUpdate(robotName)
+    // Wait for auth queries so a loading false does not skip an allowed update.
+    if (isLoading || didKickOffRef.current) {
+      return
     }
-  }, [dispatch, startUpdate, robotName, isDownloading])
+
+    didKickOffRef.current = true
+
+    if (!startUpdate()) {
+      afterCancelRef.current()
+      return
+    }
+
+    if (session?.robotName == null) {
+      dispatch(downloadRobotUpdate())
+    }
+  }, [dispatch, startUpdate, isLoading, session?.robotName])
 
   useEffect(() => {
     if (session == null && hadSessionRef.current && !didCancelRef.current) {
@@ -80,12 +90,14 @@ export function UpdateRobotSoftware(
     }
   }, [session])
 
-  // Display Error screen
-  if (sessionError != null) {
-    afterError(sessionError)
-  }
-  let updateType:
-    'downloading' | 'validating' | 'sendingFile' | 'installing' | null = null
+  useEffect(() => {
+    if (sessionError != null) {
+      afterError(sessionError)
+    }
+  }, [afterError, sessionError])
+
+  let updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' =
+    'downloading'
   if (step === 'finished') {
     return <CompleteUpdateSoftware robotName={robotName} />
   } else {
@@ -98,8 +110,6 @@ export function UpdateRobotSoftware(
         updateType = 'installing'
         beforeCommittingSuccessfulUpdate && beforeCommittingSuccessfulUpdate()
       }
-    } else if (isDownloading) {
-      updateType = 'downloading'
     }
     return <UpdateSoftware updateType={updateType} />
   }

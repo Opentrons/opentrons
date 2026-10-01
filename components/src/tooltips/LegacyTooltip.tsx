@@ -57,7 +57,7 @@ export const LegacyTooltip = forwardRef(function TooltipComponent(
 
   const TOOLTIP_CSS = css`
     position: absolute;
-    z-index: 9001;
+    z-index: var(--z-index-toasts);
     padding: ${spacing8};
     color: ${COLORS.white};
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));

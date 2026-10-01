@@ -41,12 +41,15 @@ export function useDismissCurrentRunMutation(
     ['dismiss_run'],
     ({ userNotes, variables: runId }: DocumentedMutationParameters<string>) =>
       dismissCurrentRun(host!, runId, userNotes).then(response => {
-        queryClient.removeQueries(getQueryKey(host, 'runs', runId))
         queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
+          .invalidateQueries(getQueryKey(host, 'runs', 'details'))
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })
+        queryClient.setQueryData(
+          getQueryKey(host, 'runs', runId, 'details'),
+          response.data
+        )
         return response.data
       }),
     options

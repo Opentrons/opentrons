@@ -16,6 +16,8 @@ export const REMOVE_IP_ADDRESS: 'client:REMOVE_IP_ADDRESS' =
 
 export const REMOVE_ROBOT: 'client:REMOVE_ROBOT' = 'client:REMOVE_ROBOT'
 
+export const RENAME_ROBOT: 'client:RENAME_ROBOT' = 'client:RENAME_ROBOT'
+
 export const initializeState = (
   payload: Types.InitializeStateAction['payload']
 ): Types.InitializeStateAction => ({
@@ -40,4 +42,12 @@ export const healthPolled = (
 export const removeRobot = (name: string): Types.RemoveRobotAction => ({
   type: REMOVE_ROBOT,
   payload: { name },
+})
+
+export const renameRobot = (
+  prevName: string,
+  newName: string
+): Types.RenameRobotAction => ({
+  type: RENAME_ROBOT,
+  payload: { prevName, newName },
 })

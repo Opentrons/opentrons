@@ -46,10 +46,10 @@ def test_user_create_rejects_username_with_whitespace(username: str) -> None:
             accountType=AccountType.USER,
         )
 
-    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
+    assert exc_info.value.errors()[0]["type"] == "value_error"
 
 
-def test_user_create_accepts_letters_digits_and_password_punctuation() -> None:
+def test_user_create_accepts_letters_digits_and_keyboard_symbols() -> None:
     username = "Aa1" + string.punctuation[:17]
     assert len(username) <= USERNAME_MAX_LENGTH
     UserCreate(
@@ -59,15 +59,34 @@ def test_user_create_accepts_letters_digits_and_password_punctuation() -> None:
     )
 
 
+def test_user_create_accepts_candidate_hanzi_username() -> None:
+    UserCreate(
+        username="张伟",
+        fullName="张 Wei",
+        accountType=AccountType.USER,
+    )
+
+
+def test_user_create_rejects_username_backtick() -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        UserCreate(
+            username="user`name",
+            fullName="Backtick User",
+            accountType=AccountType.USER,
+        )
+
+    assert exc_info.value.errors()[0]["type"] == "value_error"
+
+
 def test_update_user_rejects_username_with_spaces() -> None:
     with pytest.raises(ValidationError) as exc_info:
         UpdateUser(username="test user")
 
-    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
+    assert exc_info.value.errors()[0]["type"] == "value_error"
 
 
 def test_update_self_rejects_username_with_spaces() -> None:
     with pytest.raises(ValidationError) as exc_info:
         UpdateSelf(username="test user")
 
-    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
+    assert exc_info.value.errors()[0]["type"] == "value_error"

@@ -35,6 +35,7 @@ import {
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
 import { useUSBRegistration } from './hooks'
+import styles from './notificationstack.module.css'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
@@ -99,58 +100,65 @@ export function RobotOverview({
             />
           </Flex>
           <Box padding={SPACING.spacing8} width="100%">
-            <Box marginBottom={SPACING.spacing8}>
-              <ReachableBanner robot={robot} />
-            </Box>
-            <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
-            <SignAndDownloadRunBanner robotName={robotName} />
-            {showRecoveryBanner ? (
-              <ErrorRecoveryBanner
-                recoveryIntent={recoveryIntent}
-                marginBottom={SPACING.spacing8}
-              />
-            ) : null}
-            {isRobotOutOfStorage ? (
-              <RobotOutOfStorageNotification robotName={robotName} />
-            ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-              <RobotStatusHeader
-                name={robot.name}
-                local={robot.local}
-                robotModel={robotModel}
-              />
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing16}
-                >
-                  <LegacyStyledText
-                    forwardedAs="h6"
-                    color={COLORS.grey60}
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    paddingBottom={SPACING.spacing4}
-                    textTransform={TYPOGRAPHY.textTransformUppercase}
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                className={styles.notification_stack}
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing8}
+                paddingRight={SPACING.spacing24}
+              >
+                <ReachableBanner robot={robot} />
+                <UpdateRobotBanner robot={robot} />
+                <SignAndDownloadRunBanner robotName={robotName} />
+                {showRecoveryBanner ? (
+                  <ErrorRecoveryBanner recoveryIntent={recoveryIntent} />
+                ) : null}
+                {isRobotOutOfStorage ? (
+                  <RobotOutOfStorageNotification robotName={robotName} />
+                ) : null}
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing16}
+              >
+                <RobotStatusHeader
+                  name={robot.name}
+                  local={robot.local}
+                  robotModel={robotModel}
+                />
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    paddingRight={SPACING.spacing16}
                   >
-                    {t('controls')}
-                  </LegacyStyledText>
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                    <Flex paddingBottom={SPACING.spacing4}>
-                      <ToggleButton
-                        label={t('lights')}
-                        toggledOn={lightsOn != null ? lightsOn : false}
-                        disabled={
-                          lightsOn === null || robot.status !== CONNECTABLE
-                        }
-                        onClick={toggleLights}
-                        height="0.813rem"
-                      />
-                    </Flex>
                     <LegacyStyledText
-                      forwardedAs="p"
-                      color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
+                      forwardedAs="h6"
+                      color={COLORS.grey60}
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      paddingBottom={SPACING.spacing4}
+                      textTransform={TYPOGRAPHY.textTransformUppercase}
                     >
-                      {t('lights')}
+                      {t('controls')}
                     </LegacyStyledText>
+                    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                      <Flex paddingBottom={SPACING.spacing4}>
+                        <ToggleButton
+                          label={t('lights')}
+                          toggledOn={lightsOn != null ? lightsOn : false}
+                          disabled={
+                            lightsOn === null || robot.status !== CONNECTABLE
+                          }
+                          onClick={toggleLights}
+                          height="0.813rem"
+                        />
+                      </Flex>
+                      <LegacyStyledText
+                        forwardedAs="p"
+                        color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
+                      >
+                        {t('lights')}
+                      </LegacyStyledText>
+                    </Flex>
                   </Flex>
                 </Flex>
               </Flex>

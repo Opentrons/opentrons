@@ -34,7 +34,14 @@ from server_utils.fastapi_utils.app_state import AppState, get_app_state
 from . import config, multipart, update_actions
 from .api_error import APIError, ErrorBody
 from .control import get_restart_lock, no_actions_set_error
-from .session import Stages, UpdateSession, get_current_session, set_current_session
+from .session import (
+    Stages,
+    UpdateCancelled,
+    UpdateSession,
+    get_current_session,
+    get_session_lock,
+    set_current_session,
+)
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
 VALID_UPDATE_PKG = UPDATE_PKG_OE
@@ -83,7 +90,6 @@ def require_session(
 async def begin(
     request: fastapi.Request,
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-    current_session: Annotated[Optional[UpdateSession], fastapi.Depends(get_session)],
     server_config: Annotated[config.Config, fastapi.Depends(config.get_config)],
 ) -> JSONResponse:
     """Begin (create) a session.
@@ -116,39 +122,37 @@ async def begin(
       auto_commit_and_restart?: boolean
     }
     """
-    if current_session is not None:
-        LOG.warning("begin: requested with active session")
-        raise APIError(
-            409,
-            ErrorBody(
-                error="session-already-active",
-                message="An update session is already active on this robot",
-            ),
+    async with get_session_lock(app_state):
+        if get_current_session(app_state) is not None:
+            LOG.warning("begin: requested with active session")
+            raise APIError(
+                409,
+                ErrorBody(
+                    error="session-already-active",
+                    message="An update session is already active on this robot",
+                ),
+            )
+
+        try:
+            options = await _BeginSessionOptions.parse_from_request(request)
+        except _BeginSessionOptions.ParseError as e:
+            raise APIError(
+                400,
+                ErrorBody(error="invalid-request", message=e.message_for_response),
+            ) from e
+
+        session = UpdateSession(
+            storage_path=server_config.download_storage_path,
+            auto_commit_and_restart=options.auto_commit_and_restart,
         )
-        # fixme(mm, 2026-07-06): There's a concurrency hazard here because we're checking
-        # for a preexisting session and setting the new session non-atomically. Two
-        # concurrent requests can result in two simultaneous active sessions.
-
-    try:
-        options = await _BeginSessionOptions.parse_from_request(request)
-    except _BeginSessionOptions.ParseError as e:
-        raise APIError(
-            400,
-            ErrorBody(error="invalid-request", message=e.message_for_response),
-        ) from e
-
-    session = UpdateSession(
-        storage_path=server_config.download_storage_path,
-        auto_commit_and_restart=options.auto_commit_and_restart,
-    )
-    set_current_session(app_state, session)
-    return JSONResponse(
-        status_code=201,
-        content={
-            "token": session.token,
-            "auto_commit_and_restart": session.auto_commit_and_restart,
-        },
-    )
+        set_current_session(app_state, session)
+        return JSONResponse(
+            status_code=201,
+            content={
+                "token": session.token,
+                "auto_commit_and_restart": session.auto_commit_and_restart,
+            },
+        )
 
 
 @router.get("/server/update/{session}/status", summary="Report an update's progress.")
@@ -251,11 +255,7 @@ async def commit(
     restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
 ) -> JSONResponse:
     """Serves /update/:session/commit"""
-    if session.stage != Stages.DONE:
-        # fixme(mm, 2026-07-07): This stage check is insufficient; it can allow
-        # multiple commits to run concurrently on a single session, because we
-        # non-atomically enforce Stages.DONE, do commit process, and then set
-        # Stages.READY_FOR_RESTART.
+    if not session.start_commit():
         raise APIError(
             409,
             ErrorBody(
@@ -283,16 +283,14 @@ async def commit(
 )
 async def cancel(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-    session: Annotated[Optional[UpdateSession], fastapi.Depends(get_session)],
 ) -> JSONResponse:
-    if session is not None:
-        # fixme(mm, 2026-07-06):
-        #   * This is a concurrency hazard: it might close a session and delete its
-        #     storage while a background task is still using it.
-        #   * session.close() currently only cleans up storage. We also need to clean
-        #     up background tasks.
-        session.close()
-        set_current_session(app_state, None)
+    async with get_session_lock(app_state):
+        session = get_current_session(app_state)
+        if session is not None:
+            session.request_cancel()
+            await session.wait_for_pipeline()
+            session.close()
+            set_current_session(app_state, None)
     return JSONResponse(status_code=200, content={"message": "Session cancelled"})
 
 
@@ -360,15 +358,19 @@ def _begin_validate_and_write(
             session.set_progress,
             cert_path,
         )
+        session.check_not_cancelled()
 
         session.set_progress(0)
         session.set_stage(Stages.WRITING)
         await asyncio.to_thread(actions.write_update, rootfs_file, session.set_progress)
+        session.check_not_cancelled()
 
         LOG.info(f"Finished update session {session}")
         session.set_stage(Stages.DONE)
 
         if not session.auto_commit_and_restart:
+            return
+        if not session.start_commit():
             return
         await _commit(
             restart_lock,
@@ -393,13 +395,15 @@ def _begin_validate_and_write(
     async def background_task_with_error_handling() -> None:
         try:
             await background_task()
-        except Exception as exc:
-            LOG.exception(
-                f"Error in background task for session {session.token}.", exc_info=exc
-            )
-            session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
+        except UpdateCancelled:
+            LOG.info(f"Update session {session.token} cancelled.")
+        except Exception as extra:
+            LOG.exception(f"Error in background task for session {session.token}.")
+            session.set_error(getattr(extra, "short", str(type(extra))), str(extra))
 
-    asyncio.create_task(background_task_with_error_handling())
+    session.set_pipeline_task(
+        asyncio.create_task(background_task_with_error_handling())
+    )
 
 
 async def _commit(

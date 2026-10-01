@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import (
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -218,7 +219,7 @@ class RunDataManager:
         camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         protocol: Optional[ProtocolResource],
         access_control_status: bool,
         log_period_id: Optional[str],
@@ -529,7 +530,10 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if run_id == self._run_orchestrator_store.current_run_id:
+        if (
+            run_id == self._run_orchestrator_store.current_run_id
+            and not await self._run_orchestrator_store.get_commands_deleted()
+        ):
             return await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
@@ -616,7 +620,10 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found.
             CommandNotFoundError: The given command identifier was not found.
         """
-        if self._run_orchestrator_store.current_run_id == run_id:
+        if (
+            self._run_orchestrator_store.current_run_id == run_id
+            and not await self._run_orchestrator_store.get_commands_deleted()
+        ):
             return await self._run_orchestrator_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)

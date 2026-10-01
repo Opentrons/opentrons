@@ -65,8 +65,9 @@ async def test_runner_with_modules_in_legacy_python(
     subject = await create_simulating_orchestrator(
         robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
-    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
-    commands_result = [c for c in result.commands]
+    await subject.run(deck_configuration=[], protocol_source=protocol_source)
+    commands_list = await subject.get_all_commands()
+    commands_result = [c for c in commands_list]
     await subject.finish()
 
     assert len(commands_result) == 6

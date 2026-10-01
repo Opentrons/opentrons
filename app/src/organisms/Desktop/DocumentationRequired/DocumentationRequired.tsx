@@ -7,13 +7,14 @@ import {
   SecondaryButton,
   StyledText,
   TextAreaField,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
-import type { ReactNode } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -48,7 +49,9 @@ export function DocumentationRequired({
   }
 
   const trimmedNote = inputText.trim()
-  const handleConfirm = (): void => {
+  const handleConfirm = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault()
+
     if (trimmedNote === '') {
       setError(t('documentation_is_required') as string)
       return
@@ -78,7 +81,7 @@ export function DocumentationRequired({
       title={t('documentation_required')}
       onClose={onClose}
       closeOnOutsideClick={false}
-      zIndexOverlay={10000}
+      zIndexOverlay={Z_INDEX.COMPLIANCE_MODALS}
       width="47rem"
       height="30rem"
       overflowY="hidden"

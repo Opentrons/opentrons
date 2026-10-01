@@ -18,7 +18,7 @@ export function ProtocolDetailsHeaderChipSkeleton(): ReactNode {
 export function ProtocolDetailsHeaderTitleSkeleton(): ReactNode {
   return (
     <Skeleton
-      width="42rem"
+      width="100%"
       height="3rem"
       backgroundSize="99rem"
       borderRadius={BORDERS.borderRadius12}

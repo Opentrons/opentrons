@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
@@ -33,6 +34,7 @@ import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import type { State } from '/app/redux/types'
 
 const RUN_RECORD_INTERVAL_MS = 1000 * 5
 
@@ -200,7 +202,11 @@ export function useLPCFlows({
     [maintenanceRunId]
   )
 
-  const isFlexLPCInitializing = flexOffsets == null
+  const hasLpcState = useSelector(
+    (state: State) => state?.protocolRuns[runId ?? '']?.lpc != null
+  )
+
+  const isFlexLPCInitializing = flexOffsets == null || !hasLpcState
   const isWaitingForDocumentation =
     promptForDocumentation && !isDocumentationProvided(commandDocState)
   const isLaunchBlocked =

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
@@ -10,6 +10,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
@@ -18,10 +19,13 @@ import {
   SecondaryButton,
   SPACING,
   Tooltip,
+  TOOLTIP_FIXED,
+  TOOLTIP_TOP,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
@@ -33,7 +37,6 @@ import {
   UPGRADE,
 } from '/app/redux/robot-update'
 import { useIsOEMMode } from '/app/resources/robot-settings'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { ReactNode } from 'react'
 import type { RobotSystemType } from '/app/redux/robot-update/types'
@@ -77,12 +80,16 @@ export function UpdateRobotModal({
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
   const isOEMMode = useIsOEMMode()
-  const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
+  const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+    strategy: TOOLTIP_FIXED,
+  })
   // TODO(jh 08-29-2023): revisit reasons that are/are not captured by this selector.
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
-  const { startUpdate } = useRobotUpdateContext()
+  const { startUpdate, isLoading } = useGatedStartRobotUpdate(robotName)
+  const [isStarting, setIsStarting] = useState(false)
   const robotUpdateVersion = useSelector((state: State) => {
     return getRobotUpdateVersion(state, robotName) ?? ''
   })
@@ -95,6 +102,28 @@ export function UpdateRobotModal({
     disabledReason = t(updateFromFileDisabledReason)
   } else if (isRobotBusy) {
     disabledReason = t('robot_busy_protocol')
+  }
+
+  useEffect(() => {
+    if (!isStarting || isLoading) {
+      return
+    }
+    const started = startUpdate()
+    if (!started) {
+      setIsStarting(false)
+    }
+  }, [isLoading, isStarting, startUpdate])
+
+  const handleUpdateNow = (): void => {
+    if (isStarting) {
+      return
+    }
+    dispatch(downloadRobotUpdate())
+    if (!isLoading) {
+      startUpdate()
+      return
+    }
+    setIsStarting(true)
   }
 
   useEffect(
@@ -138,22 +167,30 @@ export function UpdateRobotModal({
         <SecondaryButton onClick={closeModal} css={FOOTER_BUTTON_STYLE}>
           {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
         </SecondaryButton>
-        <PrimaryButton
-          onClick={() => {
-            dispatch(downloadRobotUpdate())
-            startUpdate(robotName)
-          }}
-          css={FOOTER_BUTTON_STYLE}
-          disabled={updateDisabled}
-          {...updateButtonProps}
-        >
-          {t('update_robot_now')}
-        </PrimaryButton>
-        {updateDisabled && (
-          <Tooltip tooltipProps={updateButtonTooltipProps}>
-            {disabledReason}
-          </Tooltip>
-        )}
+        <Flex {...updateButtonProps}>
+          <PrimaryButton
+            onClick={handleUpdateNow}
+            css={FOOTER_BUTTON_STYLE}
+            disabled={updateDisabled}
+          >
+            {t('update_robot_now')}
+            {isStarting ? (
+              <Icon
+                size="1rem"
+                name="ot-spinner"
+                spin
+                aria-label="ot-spinner"
+                marginLeft={SPACING.spacing8}
+                alignSelf="center"
+              />
+            ) : null}
+          </PrimaryButton>
+          {updateDisabled && disabledReason !== '' && (
+            <Tooltip tooltipProps={updateButtonTooltipProps}>
+              {disabledReason}
+            </Tooltip>
+          )}
+        </Flex>
       </Flex>
     </Flex>
   )

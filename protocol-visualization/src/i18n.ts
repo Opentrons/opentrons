@@ -12,7 +12,7 @@ export function registerProtocolVisualizationI18n(
   i18nInstance.addResourceBundle(
     'en',
     'protocol_visualization',
-    resources,
+    resources.en.protocol_visualization,
     true,
     false
   )

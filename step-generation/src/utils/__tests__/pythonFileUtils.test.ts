@@ -38,6 +38,7 @@ import {
   getLoadPipettes,
   getLoadTrashBins,
   getLoadWasteChute,
+  getRunTimeParameters,
   getSetStoredLabware,
   PAPI_VERSION,
   pythonMetadata,
@@ -53,6 +54,7 @@ import type {
   LiquidEntities,
   ModuleEntities,
   PipetteEntities,
+  RuntimeParameter,
   TimelineFrame,
   TrashBinEntities,
   WasteChuteEntities,
@@ -885,5 +887,163 @@ describe('formatChangeTipArg', () => {
   })
   it('should not alter never', () => {
     expect(formatChangeTipArg('never')).toBe('never')
+  })
+})
+
+describe('getRunTimeParameters', () => {
+  const getPython = (parameter: RuntimeParameter): string =>
+    getRunTimeParameters({ [parameter.variableName]: parameter })
+
+  it('should return an empty string with no parameters', () => {
+    expect(getRunTimeParameters({})).toBe('')
+  })
+  it('should generate a boolean parameter', () => {
+    expect(
+      getPython({
+        type: 'boolean',
+        variableName: 'dry_run',
+        displayName: 'Dry Run',
+        description: 'Skip delays',
+        default: false,
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_bool(
+        variable_name="dry_run",
+        display_name="Dry Run",
+        description="Skip delays",
+        default=False,
+    )`.trimStart()
+    )
+  })
+  it('should generate a string parameter with choices', () => {
+    expect(
+      getPython({
+        type: 'string',
+        variableName: 'mode',
+        displayName: 'Mode',
+        default: 'fast',
+        choices: ['fast', 'slow'],
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_str(
+        variable_name="mode",
+        display_name="Mode",
+        default="fast",
+        choices=[{"display_name": "fast", "value": "fast"}, {"display_name": "slow", "value": "slow"}],
+    )`.trimStart()
+    )
+  })
+  it('should generate an int parameter with a range and unit', () => {
+    expect(
+      getPython({
+        type: 'int',
+        variableName: 'volume',
+        displayName: 'Volume',
+        default: 20,
+        minimum: 10,
+        maximum: 100,
+        unit: 'µL',
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_int(
+        variable_name="volume",
+        display_name="Volume",
+        default=20,
+        minimum=10,
+        maximum=100,
+        unit="µL",
+    )`.trimStart()
+    )
+  })
+  it('should generate a float parameter with choices and drop unit', () => {
+    expect(
+      getPython({
+        type: 'float',
+        variableName: 'height',
+        displayName: 'Height',
+        default: 2.5,
+        choices: [2.5, 5],
+        unit: 'mm',
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_float(
+        variable_name="height",
+        display_name="Height",
+        default=2.5,
+        choices=[{"display_name": "2.5", "value": 2.5}, {"display_name": "5", "value": 5}],
+    )`.trimStart()
+    )
+  })
+  it('should generate a csv parameter without a default', () => {
+    expect(
+      getPython({
+        type: 'csv',
+        variableName: 'wells',
+        displayName: 'Wells',
+        default: '',
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_csv_file(
+        variable_name="wells",
+        display_name="Wells",
+    )`.trimStart()
+    )
+  })
+  it('should generate multiple parameters in order', () => {
+    expect(
+      getRunTimeParameters({
+        dry_run: {
+          type: 'boolean',
+          variableName: 'dry_run',
+          displayName: 'Dry Run',
+          default: true,
+        },
+        volume: {
+          type: 'int',
+          variableName: 'volume',
+          displayName: 'Volume',
+          default: 20,
+          minimum: 10,
+          maximum: 100,
+          unit: 'µL',
+        },
+        wells: {
+          type: 'csv',
+          variableName: 'wells',
+          displayName: 'Wells',
+          default: '',
+        },
+      })
+    ).toBe(
+      `
+def add_parameters(parameters: protocol_api.ParameterContext) -> None:
+    parameters.add_bool(
+        variable_name="dry_run",
+        display_name="Dry Run",
+        default=True,
+    )
+    parameters.add_int(
+        variable_name="volume",
+        display_name="Volume",
+        default=20,
+        minimum=10,
+        maximum=100,
+        unit="µL",
+    )
+    parameters.add_csv_file(
+        variable_name="wells",
+        display_name="Wells",
+    )`.trimStart()
+    )
   })
 })
