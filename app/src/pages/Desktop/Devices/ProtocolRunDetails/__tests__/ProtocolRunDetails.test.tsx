@@ -13,8 +13,11 @@ import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/Protoc
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
-import { useRobot } from '/app/redux-resources/robots'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
+import { useNotifyClientDataLPC } from '/app/resources/client_data'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
@@ -35,6 +38,10 @@ vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('/app/organisms/Desktop/Devices/RunPreview')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/analysis')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/camera/useNotifyCamera')
+vi.mock('/app/resources/client_data')
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
@@ -80,6 +87,15 @@ const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useNotifyCamera).mockReturnValue({
+      data: { cameraEnabled: false },
+      isLoading: false,
+    } as any)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: true,
@@ -119,6 +135,7 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
       mockRobotSideAnalysis
     )
+    vi.mocked(useStoredProtocolAnalysis).mockReturnValue(null)
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: { createdAt: '123' } },
@@ -234,13 +251,33 @@ describe('ProtocolRunDetails', () => {
 
   it('disables run  tab if robot-analyzed protocol data is null', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
+    vi.mocked(useStoredProtocolAnalysis).mockReturnValue(null)
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const runTab = screen.getByText('Run Preview')
-    screen.getByText('Mock ProtocolRunSetup')
+    // SetupTab may redirect to run-preview when status is not idle; either way
+    // analysis is missing so the shared tab loading spinner is shown.
+    expect(
+      screen.getByText(/Setup loading|Run Preview loading/)
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
     fireEvent.click(runTab)
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
+  })
+
+  it('shows tab loading while the run record or analysis is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
+    vi.mocked(useStoredProtocolAnalysis).mockReturnValue(null)
+
+    render(`/devices/otie/protocol-runs/${RUN_ID}/camera`)
+
+    screen.getByText('Camera loading')
+    expect(screen.queryByText('Mock ProtocolRunCamera')).toBeFalsy()
   })
 
   it('redirects to the run tab when the run is started by ODD or another Desktop app', () => {

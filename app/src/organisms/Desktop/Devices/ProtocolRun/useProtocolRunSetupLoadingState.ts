@@ -5,6 +5,8 @@ import { useNotifyClientDataLPC } from '/app/resources/client_data'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 export interface ProtocolRunSetupLoadingState {
+  /** Shared gate for all run-details tabs. */
+  isRunOrAnalysisLoading: boolean
   /** Setup tab spinner until analysis + Flex LPC/camera substates settle. */
   isSetupLoading: boolean
   isRunRecordLoading: boolean
@@ -13,9 +15,11 @@ export interface ProtocolRunSetupLoadingState {
 }
 
 /**
- * Loading gate for the Setup tab (run record / analysis + Flex LPC + camera).
+ * Loading gates for protocol run details.
+ * - isRunOrAnalysisLoading: all tabs (run record / analysis)
+ * - isSetupLoading: Setup tab only (also Flex LPC + camera)
  *
- * LPC "settled" means client LPC data has finished loading
+ * LPC "settled" means client LPC data has finished loading.
  */
 export function useProtocolRunSetupLoadingState(
   runId: string,
@@ -38,13 +42,15 @@ export function useProtocolRunSetupLoadingState(
 
   const isFlexLPCSettled = !isFlexLPCInitializing && !isClientLPCLoading
 
+  const isRunOrAnalysisLoading = isRunRecordLoading || protocolAnalysis == null
+
   const isSetupLoading =
-    isRunRecordLoading ||
-    protocolAnalysis == null ||
+    isRunOrAnalysisLoading ||
     (isFlex && !isFlexLPCSettled) ||
     (isFlex && isCameraLoading)
 
   return {
+    isRunOrAnalysisLoading,
     isSetupLoading,
     isRunRecordLoading,
     isFlexLPCSettled,

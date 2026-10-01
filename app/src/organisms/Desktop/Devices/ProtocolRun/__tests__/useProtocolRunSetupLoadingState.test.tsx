@@ -53,6 +53,7 @@ describe('useProtocolRunSetupLoadingState', () => {
       { wrapper }
     )
 
+    expect(result.current.isRunOrAnalysisLoading).toBe(true)
     expect(result.current.isSetupLoading).toBe(true)
     expect(result.current.isRunRecordLoading).toBe(true)
   })
@@ -70,6 +71,7 @@ describe('useProtocolRunSetupLoadingState', () => {
       { wrapper }
     )
 
+    expect(result.current.isRunOrAnalysisLoading).toBe(true)
     expect(result.current.isSetupLoading).toBe(true)
   })
 
@@ -82,6 +84,7 @@ describe('useProtocolRunSetupLoadingState', () => {
     )
 
     expect(result.current.isFlexLPCSettled).toBe(false)
+    expect(result.current.isRunOrAnalysisLoading).toBe(false)
     expect(result.current.isSetupLoading).toBe(true)
   })
 
@@ -94,6 +97,7 @@ describe('useProtocolRunSetupLoadingState', () => {
     )
 
     expect(result.current.isFlexLPCSettled).toBe(true)
+    expect(result.current.isRunOrAnalysisLoading).toBe(false)
     expect(result.current.isSetupLoading).toBe(false)
   })
 
