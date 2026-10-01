@@ -3,37 +3,32 @@ title: "Python API: Vacuum Module Examples"
 description: An analysis of how the Vacuum Module uses API commands in a miniprep protocol.
 ---
 
-This use case is taken from a plasmid miniprep protocol. Several intermediate steps have been excluded to keep focus on those Python API commands relevant to Vacuum Module operations.
+This use case is based on a plasmid miniprep protocol. It excludes some intermediate steps to focus on those Python API commands that control the Vacuum Module.
 
 !!! note
-    The Vacuum Module is supported on Opentrons Flex only and requires Python API version 2.30 or higher.
-
-## Workflow overview
-
-A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This code analysis examines processes that involve the Vacuum Module, such as:
-
-* **Filtrate collection:** The procedure begins with nesting a short-tip filter plate in an internal 96-well collection plate on the base of the manifold. The vacuum then draws clarified lysate into a collection plate.
-
-* **Sample binding and waste disposal:** The Gripper reconfigures the stack so the module pulls waste through the manifold into an external carboy. The module then applies different vacuum pressures to collect and dispose of material.
+    The Vacuum Module is supported only on Opentrons Flex and requires Python API version 2.30 or higher.
 
 The code analysis starts below.
 
+## Workflow overview
+
+A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This analysis examines processes that involve the Vacuum Module, such as:
+
+* **Loading labware:** The procedure begins by defining what kinds of modules and labware are used in the protocol and where these items are located on the deck or mounted on the gantry.
+
+* **Filtrate collection:** This middle part provides an example of Gripper movement and controlling vacuum pressure with concurrent commands.
+
+* **Sample binding and waste disposal:** This examination ends with additional Gripper operations, module stack configurations and waste extraction at medium and high vacuum pressure.
+
 ## Stage 1: Loading modules and labware
 
-During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any steps in the miniprep protocol, this code tells the robot what's going to be used and where it can be found.
-
-!!! tip "Staging filter plates and spacers"
-    * Filter plates have nozzle tips that extend past the bottom of the plate skirt. As a result, you cannot put a filter plate directly on a deck slot or the API will raise an error.
-    
-    * To stage filter plates on a regular deck slot, nest it inside a deep-well plate, which can then be loaded in software from a deck slot.
-
-    * Spacers cannot be placed on standard deck slots or be manipulated by the Gripper. Spacers must be seated manually into the vacuum base and loaded in software via `vacuum.load_adapter()`.
+During this stage, the `run()` function initializes hardware, defines the deck layout, and loads the starting labware. Before executing any miniprep protocol steps, this specifies what the robot will use and where to find it on the deck.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
-    # Load modules and the external waste chute.
-    # The Vacuum Module requires slots A3 and A4, displacing the trash bin from its default location.
-    # Waste collection is handled by the external waste chute, which replaces the trash bin.
+    # Load modules and external waste chute.
+    # The Vacuum Module adapter occupies slots A3 and A4, displacing the trash bin.
+    # The external waste chute replaces the trash bin for waste handling.
     vacuum = protocol.load_module("vacuumModuleV1", "A3")
     heater_shaker = protocol.load_module("heaterShakerModuleV1", "D1")
     waste_chute = protocol.load_waste_chute()
@@ -42,15 +37,15 @@ def run(protocol: protocol_api.ProtocolContext):
     collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_tall")
 
     # Stage the spacer and collection plate.
-    spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_7.25mm")
+    spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
     collection_plate = spacer.load_labware(
         "nunc_96_wellplate_450ul",
         label="Lysate Collection Plate"
     )
 
-    # Stage the filter plate and a deep well plate.
-    # Note plate nesting to stage a filter plate on a regular deck slot.
-    # The Gripper can pickup and move the nested plate.
+    # Stage the clarification filter plate nested in a deep-well plate.
+    # Nesting allows for staging filer plates in a deck location.
+    # The Gripper can grab and move the plate from this deck location.
     holding_plate = protocol.load_labware(
       "nest_96_wellplate_2ml_deep",
       "A1"
@@ -60,7 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
         label="Clarification Plate"
     )
 
-    # Staging and nesting another filter plate.
+    # Stage the silica filter plate nested in an elution plate.
     elution_plate = protocol.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "C1",
@@ -71,28 +66,44 @@ def run(protocol: protocol_api.ProtocolContext):
         label="Silica Plate"
     )
     
-    # Staging typical labware used in this miniprep protocol
+    # Stage other labware and instruments used in the protocol.
     reservoir = protocol.load_labware("opentrons_tough_12_reservoir_22ml", "A2")
     tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B2")
     pipette = protocol.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
 ```
 
+### Staging filter plates and spacers
+
+Filter plates have nozzle tips that extend past the bottom of the plate skirt. Placing a filter plate directly on a deck slot causes the API to raise an error. To stage filter plates on a regular deck slot, nest it inside a deep-well plate, which can then be loaded in software from that slot.
+
+Spacers cannot be placed on standard deck slots or moved by the Gripper. Spacers must be seated manually into the vacuum base and loaded in software via `vacuum.load_adapter()`.
+
+### Stacking manifold spacers
+
+Although this use case requires only one spacer, you can accommodate shallow collection labware by stacking spacers directly on a loaded spacer with `load_adapter()` like this:
+
+```python
+spacer1 = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
+spacer2 = spacer1.load_adapter("opentrons_vacuum_manifold_spacer_12.8mm")
+plate = spacer2.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt")
+```
+
 ## Stage 2: Concurrent actions
 
-During this stage, the robot takes advantage of [non-blocking API commands](../modules/concurrent.md) to run filtration and pipetting actions simultaneously. Once parallel pipetting is complete, you can use `wait_for_tasks()` to pause protocol execution until the vacuum task finishes.
+During this stage, the robot uses [non-blocking API commands](../modules/concurrent.md) to run filtration and pipetting tasks simultaneously. After parallel pipetting is finished, calling `wait_for_tasks()` pauses protocol execution until the vacuum task completes.
 
 ### Liquid collection
 
-To prepare for lysate extraction, the Flex Gripper moves the short-tip filter plate onto the collection plate, which is already seated in the manifold base. The Gripper then places the tall collar over both plates to create a vacuum seal.
+To prepare for lysate extraction, the Flex Gripper moves the short-tip filter plate onto the collection plate seated on the manifold base. The Gripper then places the tall collar over both plates to form a vacuum seal.
 
-Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can carry out other operations while the Vacuum Module operates.
+Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can perform other operations while the Vacuum Module runs.
 
 ```python
-    # The Gripper moves well plates onto the manifold and adds a collar to seal the stack.
+    # Using the Gripper, assemble the filtration stack. The collar seals the stack.
     protocol.move_labware(filter_plate, collection_plate, use_gripper=True)
     protocol.move_labware(collar, vacuum, use_gripper=True)
 
-    # Concurrent method sets a -330 mbar vacuum to extract clarified liquid.
+    # Call the non-blocking pressure command at -330 mbar to extract lysate.
     clarify_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-330,
         duration_s=60,
@@ -103,39 +114,35 @@ Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can c
 
 ### Liquid handling
 
-Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to serial operation preventing other commands from executing until the system depressurizes. Returning the stack to atmospheric pressure allows the Gripper to move labware off the module.
+Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to serial operation, preventing other commands from running until the system depressurizes. Allowing time for system pressure to equalize allows the Gripper to move labware off the module.
 
 ```python
-# Pipetting liquids concurrently with Vacuum Module operations.
+    # Pipette concurrently while the Vacuum Module runs.
     pipette.pick_up_tip()
     pipette.aspirate(400, reservoir["A5"])
     pipette.drop_tip()
 
-    # Wait for other operations to finish and equalize pressure before using the Gripper.
+    # Wait for filtration to complete and system pressure to equalize.
     protocol.wait_for_tasks([clarify_task])
 
-    # The Gripper returns the collar to the dock.
-    # The Gripper picks up and discards the used clarification filter in the waste chute.
+    # Using the Gripper, return the collar to the dock and discard the clarification plate.
     vacuum.move_to_dock(collar, use_gripper=True)
     protocol.move_labware(filter_plate, waste_chute, use_gripper=True)
 ```
 
 ## Stage 3: Direct-to-waste wash and dry
 
-In this stage, additional Gripper movements reconfigure the stack to prepare the sample for washing and plate drying. 
+In this stage, the Gripper reconfigures the stack to prepare the sample for washing and plate drying.
 
 ```python
     #The Gripper moves the lysate collection plate to slot D2.
-    #This is a standard well plate and can be placed in a deck slot.
     protocol.move_labware(collection_plate, "D2", use_gripper=True)
 
-    # The Gripper seats the collar on the vacuum base and sets the silica filter plate on top of it.
-    # The Gripper moves the collar and silica plate stack onto the vacuum base.
+    # The Gripper seats the collar on the vacuum base and places the silica plate on top.
     protocol.move_labware(collar, vacuum, use_gripper=True)
     protocol.move_labware(silica_plate, collar, use_gripper=True)
 
-    # The module executes direct-to-carboy waste extraction procedure.
-    # Other tasks pause during this task.
+    # Extract waste directly to the carboy at -500 mbar and wait for system pressure to equalize.
     bind_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-500,
         duration_s=60,
@@ -144,8 +151,7 @@ In this stage, additional Gripper movements reconfigure the stack to prepare the
     )
     protocol.wait_for_tasks([bind_task])
 
-    # The module executes another waste exctraction procedure using a deep vacuum.
-    # Other tasks pause during this task.
+    # Dry the silica plate at -800 mbar and wait for system pressure to equalize.
     dry_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-800,
         duration_s=60,
@@ -161,18 +167,25 @@ The miniprep protocol demonstrates several key operational principles of the Vac
 
 ### Dynamic stack configuration
 
-Using the Gripper, the Vacuum Module can adapt to changing filtration requirements mid-protocol. For example, this protocol alternates between collecting filtrate into an internal well plate, clearing large volumes of wash buffer directly into the base waste line, and recovering purified product into a final PCR plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack these components.
+Using the Gripper, the Vacuum Module adapts to changing filtration requirements mid-protocol. For example, the sample protocol alternates between collecting filtrate into an internal well plate, clearing wash buffer directly into the base waste line, and recovering purified product into a an elution plate. Staging collars on the dock (slot A4) allows the Gripper to autonomously assemble, seal, and unstack module components.
 
-<font color="red">Nesting and staging?</font>
+!!! tip "Stacking manifold spacers"
+    Although this use case didn't require it, you can account for shallow collection labware by stacking a spacer directly on a loaded spacer with `load_adapter()`. For example:
+
+
+To adjust manifold height for shallow collection labware (such as PCR plates), call `load_adapter()` directly on a loaded spacer to stack another spacer on top:
+
+You can stack multiple spacers inside the vacuum base by calling `load_adapter()` on an existing spacer:
+
 
 ### Non-blocking operations and concurrency
 
-Operational commands like `start_set_vacuum_pressure()` run asynchronously and return a `Task` object. Because these commands do not pause the protocol, the robot can perform independent liquid handling actions (e.g., aspirating and dispensing buffers) or control other deck modules and pipetting while the Vacuum Module operates on its own.
+Commands like `start_set_vacuum_pressure()` run asynchronously and return a `Task` object. Because these commands do not pause protocol execution, the robot can perform independent liquid handling actions (e.g., pipetting buffers) or control other deck modules while the Vacuum Module operates on its own.
 
 ### Pressure profiles
 
-Pressure sensors in the Control Box allows the module to apply multiple vacuum pressures based on liquid volumes and membrane porosities at different protocol stages. As shown in the examples, the protocol starts with a vacuum at -330 mbar, then uses a -500 mbar vacuum to quickly clear washes, and ends by running the module at -800 mbar to dry the silica membrane for elution.
+Pressure sensors in the Control Box allows the module to change vacuum pressures based on liquid volumes and membrane porosities. For example, the sample protocol applies -330 mbar for lysate clarification, then uses -500 mbar to quickly clear waste, and ends at -800 mbar to dry the silica membrane.
 
 ### Depressurization and Gripper safety
 
-Attempting to move labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with an `equalize_timeout_s` delay lets the module return to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing background tasks with `wait_for_tasks()` guarantees the system is fully depressurized before the Flex Gripper attempts to unstack collars or labware.
+Moving labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with`equalize_timeout_s` lets the module return to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing tasks with `wait_for_tasks()` ensures the system is depressurized before the Gripper attempts to move collars and labware.
