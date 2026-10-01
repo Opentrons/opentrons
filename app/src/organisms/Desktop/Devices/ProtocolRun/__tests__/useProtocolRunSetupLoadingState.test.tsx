@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useNotifyClientDataLPC } from '/app/resources/client_data'
@@ -17,9 +16,6 @@ vi.mock('react-redux', () => ({
   useSelector: (selector: (state: unknown) => unknown) => selector({}),
 }))
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/protocol-runs', () => ({
-  selectAreOffsetsApplied: vi.fn(),
-}))
 vi.mock('/app/resources/analysis')
 vi.mock('/app/resources/camera/useNotifyCamera')
 vi.mock('/app/resources/client_data')
@@ -49,7 +45,6 @@ describe('useProtocolRunSetupLoadingState', () => {
       data: undefined,
       isLoading: false,
     } as any)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
   })
 
   it('is loading while the run record is loading', () => {
@@ -78,12 +73,11 @@ describe('useProtocolRunSetupLoadingState', () => {
     expect(result.current.isSetupLoading).toBe(true)
   })
 
-  it('marks Flex setup loading until LPC is settled', () => {
+  it('marks Flex setup loading while LPC is initializing', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
 
     const { result } = renderHook(
-      () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false, false),
+      () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, true, false),
       { wrapper }
     )
 
@@ -91,9 +85,8 @@ describe('useProtocolRunSetupLoadingState', () => {
     expect(result.current.isSetupLoading).toBe(true)
   })
 
-  it('settles Flex LPC when client data is loaded and offsets applied', () => {
+  it('settles Flex LPC once init and client data are done, even if offsets are not applied', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
 
     const { result } = renderHook(
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false, false),
@@ -104,9 +97,24 @@ describe('useProtocolRunSetupLoadingState', () => {
     expect(result.current.isSetupLoading).toBe(false)
   })
 
+  it('marks Flex setup loading while client LPC data is loading', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+
+    const { result } = renderHook(
+      () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false, false),
+      { wrapper }
+    )
+
+    expect(result.current.isFlexLPCSettled).toBe(false)
+    expect(result.current.isSetupLoading).toBe(true)
+  })
+
   it('marks Flex setup loading while camera settings load', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
     vi.mocked(useNotifyCamera).mockReturnValue({
       data: undefined,
       isLoading: true,
