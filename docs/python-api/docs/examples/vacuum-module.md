@@ -3,7 +3,7 @@ title: "Python API: Vacuum Module Examples"
 description: An analysis of how the Vacuum Module uses API commands in a miniprep protocol.
 ---
 
-This use case is based on a plasmid miniprep protocol. It excludes some intermediate steps to focus on those Python API commands that control the Vacuum Module.
+This use case is based on a plasmid miniprep protocol. It excludes some intermediate steps to focus on those Python API commands that control the Vacuum Module. 
 
 !!! note
     The Vacuum Module is supported only on Opentrons Flex and requires Python API version 2.30 or higher.
@@ -12,13 +12,13 @@ The code analysis starts below.
 
 ## Workflow overview
 
-A plasmid miniprep is a technique used to isolate DNA. A typical protocol involves multiple steps and many lines of code. This analysis examines processes that involve the Vacuum Module, such as:
+A plasmid miniprep is a technique used to isolate DNA. Rather than covering the complete protocol this analysis examines key operations that involve the Vacuum Module, such as:
 
-* **Loading labware:** The procedure begins by defining what kinds of modules and labware are used in the protocol and where these items are located on the deck or mounted on the gantry.
+* **Loading modules and labware:** Specifies the modules, labware, adapters, and deck or gantry locations required for the protocol. 
 
-* **Filtrate collection:** This middle part provides an example of Gripper movement and controlling vacuum pressure with concurrent commands.
+* **Filtrate collection:** Provides an example of Gripper movement, collar sealing, and concurrent vacuum and pipetting actions.
 
-* **Sample binding and waste disposal:** This examination ends with additional Gripper operations, module stack configurations and waste extraction at medium and high vacuum pressure.
+* **Sample binding and waste disposal:** Concludes with module stack reconfigurations, waste extraction, membrane drying, and multiple vacuum pressure profiles.
 
 ## Stage 1: Loading modules and labware
 
