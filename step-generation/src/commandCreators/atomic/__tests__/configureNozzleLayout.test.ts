@@ -30,6 +30,7 @@ const invariantContext: any = {
       pythonName: 'mock_tiprack',
     },
   },
+  runtimeParameters: {},
 }
 const robotInitialState = getRobotInitialState()
 
