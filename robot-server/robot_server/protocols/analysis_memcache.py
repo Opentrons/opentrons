@@ -1,4 +1,14 @@
-"""A simple size-limited memory cache used for large resources."""
+"""A simple size-limited memory cache used for large resources.
+
+This was used from Robot version 7.0.0 up until 10.1.0 where it was removed from
+the completed analysis store. It was put in to save time getting analyses from the
+database since converting the JSON that was stored in the database to pydantic took
+significant time and impacted frontend performance. Since that change we have moved
+to the frontend grabbing the JSON directly without converting it and using an MQTT
+callback system instead of polling, while the memory this was taking up was leading
+to performance issues. This is left here now for potential future use or refactoring
+to be limited by memory size rather than count.
+"""
 
 from collections import deque
 from logging import getLogger
