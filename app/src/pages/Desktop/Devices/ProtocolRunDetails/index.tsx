@@ -11,6 +11,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_BLOCK,
+  DISPLAY_NONE,
   Flex,
   JUSTIFY_SPACE_AROUND,
   OVERFLOW_SCROLL,
@@ -27,8 +29,6 @@ import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/Pr
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
-import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
-import { useProtocolRunSetupLoadingState } from '/app/organisms/Desktop/Devices/ProtocolRun/useProtocolRunSetupLoadingState'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -94,7 +94,6 @@ interface PageContentsProps {
 }
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
-  const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
@@ -104,13 +103,20 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
-  const { isRunOrAnalysisLoading } = useProtocolRunSetupLoadingState(
-    runId,
-    robotName,
-    Boolean(run.isLoading)
+  // Keep Setup mounted after first visit so returning to the tab does not
+  // remount
+  const [hasVisitedSetup, setHasVisitedSetup] = useState(
+    protocolRunDetailsTab === 'setup'
   )
+  const isSetupTab = protocolRunDetailsTab === 'setup'
 
   useToastOnErrorImage(runId)
+
+  useEffect(() => {
+    if (isSetupTab) {
+      setHasVisitedSetup(true)
+    }
+  }, [isSetupTab])
 
   useEffect(() => {
     if (jumpedIndex != null) {
@@ -127,6 +133,21 @@ function PageContents(props: PageContentsProps): JSX.Element {
     makeHandleScrollToStep(i)()
     setJumpedIndex(i)
   }
+  const setupBackToTop = (
+    <Flex
+      width="100%"
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_SPACE_AROUND}
+      marginTop={SPACING.spacing16}
+    >
+      <BackToTopButton
+        protocolRunHeaderRef={protocolRunHeaderRef}
+        robotName={robotName}
+        runId={runId}
+        sourceLocation=""
+      />
+    </Flex>
+  )
   const protocolRunDetailsContentByTab: {
     [K in ProtocolRunDetailsTab]: {
       content: JSX.Element | null
@@ -134,28 +155,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
     }
   } = {
     setup: {
-      content: (
-        <ProtocolRunSetup
-          protocolRunHeaderRef={protocolRunHeaderRef}
-          robotName={robotName}
-          runId={runId}
-        />
-      ),
-      backToTop: (
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_AROUND}
-          marginTop={SPACING.spacing16}
-        >
-          <BackToTopButton
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robotName}
-            runId={runId}
-            sourceLocation=""
-          />
-        </Flex>
-      ),
+      // Rendered separately below so the panel can stay mounted across tab switches.
+      content: null,
+      backToTop: setupBackToTop,
     },
     'runtime-parameters': {
       content: <ProtocolRunRuntimeParameters runId={runId} />,
@@ -202,7 +204,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
     backToTop: null,
   }
   const { content, backToTop } = tabDetails
-  const loadingTabName = getProtocolRunDetailsTabName(protocolRunDetailsTab, t)
 
   return (
     <>
@@ -236,37 +237,20 @@ function PageContents(props: PageContentsProps): JSX.Element {
         // remove left upper corner border radius when first tab is active
         borderRadius={BORDERS.borderRadius8}
       >
-        {/* TODO(tz, 2026-10-01): keep tab panels mounted (or lift Setup LPC/camera
-            queries) so switching away from Setup does not remount ProtocolRunSetup
-            and flash isSetupLoading again. */}
-        {isRunOrAnalysisLoading ? (
-          <ProtocolRunTabLoading tabName={loadingTabName} />
-        ) : (
-          content
-        )}
+        {hasVisitedSetup ? (
+          <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
+            <ProtocolRunSetup
+              protocolRunHeaderRef={protocolRunHeaderRef}
+              robotName={robotName}
+              runId={runId}
+            />
+          </Box>
+        ) : null}
+        {isSetupTab ? null : content}
       </Box>
-      {isRunOrAnalysisLoading ? null : backToTop}
+      {backToTop}
     </>
   )
-}
-
-function getProtocolRunDetailsTabName(
-  tab: ProtocolRunDetailsTab,
-  t: (key: string) => string
-): string {
-  switch (tab) {
-    case 'runtime-parameters':
-      return t('parameters')
-    case 'module-controls':
-      return t('module_controls')
-    case 'run-preview':
-      return t('run_preview')
-    case 'camera':
-      return t('camera')
-    case 'setup':
-    default:
-      return t('setup')
-  }
 }
 
 interface SetupTabProps {
