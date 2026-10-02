@@ -3,24 +3,32 @@ title: "Vacuum Module: Use Cases"
 description: "Stacking deck pieces for filtrate collection and filter-to-waste applications."
 ---
 
-The Vacuum Module uses a modular deck stack that supports a variety of filtration protocols. By combining specific collars, spacers, and support grids, you can configure the module to either collect samples or extract liquids directly to waste. Selecting the correct stack configuration ensures a reliable, airtight seal across different labware types and protocols.
+The Vacuum Module uses a modular deck stack system that supports a variety of filtration protocols. By combining specific collars and spacers, you can configure the system to either collect filtrate into standard labware or evacuate liquids directly to waste. Selecting the correct stack configuration ensures a reliable, airtight seal across different labware types and protocols.
 
 ## Stacking configurations
 
-Each stack configuration helps you control the vertical distance between the sample filter plate and the lower collection plate (or waste manifold). Minimizing the clearance between well plates helps prevents cross-contamination, aerosol/droplet spraying, and ensures clean liquid transfer into target wells.
+Each stack configuration helps you control the vertical clearance between the filter plate and collection plate seated over the vacuum base. Maintaining a tight, precise clearance between well plates helps ensure that extracted fluid drops directly into receiving wells..
 
 ### With spacers
 
-This stack inserts a short or tall spacer between the vacuum base and collection plate to maintain a uniform gap between the filter and collection well plates. Reducing the vertical distance between the two well plates ensures fluid droplets fall cleanly into the receiving wells. A narrower gap between the plates also prevents negative vacuum pressure from pulling liquid sideways, eliminating cross-contamination between adjacent wells. The short and tall spacers can be paired with either collar.
+This configuration uses internal spacers seated on the vacuum base to elevate a collection plate beneath the filter plate . Reducing the vertical distance between the two well plates ensures fluid droplets fall cleanly into the receiving wells. Adding modular spacers can help compensate for short plate skirts or shallow wells, closing the clearance gap so filtered material transfers cleanly with minimum loss.
 
-* **Short spacer (27 mm):** Elevates deep-well collection plates to match standard filter plate heights.
-* **Tall spacer (34 mm):** Elevates standard microliter collection plates to bring shallow wells directly under the filter plate nozzles.
+!!! note
+    Spacers are not gripper-compatible. You must place spacers onto the vacuum base manually during deck setup. During automated protocol runs, the Flex Gripper can move collars and well plates, but it cannot grasp the spacers.
+
+Depending on your collection plate's skirt geometry and well depth, you can configure and control plate gaps by using the modular spacer system:
+
+* **Available heights:** You get three flat shims (3.2 mm, 5.2 mm, and 7.25 mm) and a 12.8 mm spacer equipped with locating clips.
+* **Stack limits:** Up to three spacers total per stack, using at most one of each height (no duplicate spacers).
+* **Hierarchy:** Flat shims sit on the vacuum base or stack atop one another in any sequence. When used, the 12.8 mm spacer must always sit at the very top of the stack because its alignment clips secure the filter or collection well plate. You cannot place the other spacers on top of the 12.8 mm spacer.
+
+See the [Deck Components section](specifications/deck-components.md#spacers) for more information about the spacers and stacking rules.
 
 From top to bottom, a filtrate collection stack uses the pieces shown below. Always check and test your stack to ensure that a selected combination of pieces is appropriate for a particular protocol.
 
 <figure markdown>
-  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="70%" }
-  <figcaption>Filtrate collection stack with spacers</figcaption>
+  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate2.svg){ width="70%" }
+  <figcaption>Filtrate collection stack with spacer</figcaption>
 </figure>
 
 ### Without spacers
@@ -41,37 +49,21 @@ This stack omits both the spacers and the collection well plate. Instead, the fi
   <figcaption>Waste disposal stack</figcaption>
 </figure>
 
-<!--- 
+
 ## Stacking advice
 
 Sometimes different combinations of collars, spacers, and labware don't stack up well or hold vacuum. A successful operation often depends on two physical characteristics that allow stacked pieces to create and maintain a good vacuum seal:
 
-- **Stack height:** The spacer and collection plate must fit inside the collar so the collection plate seals against collar's internal gasket. If the internal stack is too tall, the bottom of the collar cannot sit flush against the vacuum base gasket. If the internal stack is too short, the collection plate cannot seal tightly against the collar's inner gasket.
+- **Stack height:** The spacer and collection plate must fit inside the collar so all seals and gaskets seat flush against labware surfaces. If a stack is too tall, the bottom of the collar may not sit flush against the vacuum base gasket. If the internal stack is too short, the collection plate may not seal tightly against the collar's inner gasket.
 
-- **Seal integrity:** All mating surfaces must sit flush against each other and compress evenly to hold pressure.
+- **Seal integrity:** All mating surfaces must sit flush against each other and compress evenly to hold vacuum.
 
-## Testing a vacuum stack
+## Testing vacuum integrity
 
-A visual inspection and an active vacuum test help determine if a combination of collars, spacers, and well plates can hold vacuum.
+A visual inspection and an active vacuum test can help determine if a combination of collars, spacers, and well plates will hold vacuum.
 
 | Test | Description |
 |:----|:----|
-| **Visual inspection** | Check if stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious titling or easily rocking back and forth. |
-| **In App** | In the Opentrons App, go to <font color="red">App directions here</font> to run the pump and verify the system reaches the target pressure without audible hissing or air leaks. |
-| **API** | Run an automated test by calling `start_set_vacuum_pressure()` <font color="red">merge and link to reference</font> with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. |
-
-
-<font color="red">commented code in source</font>
-
-include here or refer to API docs?
-
-```python
-test_task = vacuum.start_set_vacuum_pressure(
-    gauge_pressure_mbar=-200,
-    duration_s=5,
-    timeout_s=10,
-    vent_after=True,
-    equalize_timeout_s=5
-)
-```
---->
+| **Visual inspection** | Ensure stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious titling or easily rocking back and forth. |
+| **In App** | In the Opentrons App, go to the Devices tab and click your robot. From the Instruments and Modules section, find the tile for the Vacuum Module and click the three-button menu (⋮). Click **Pressure** or **Power** to start/stop the pump and listen for audible air leaks. |
+| **API** | Run an automated test by calling `start_set_vacuum_pressure()` with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. You may also hear audible air leaks. |
