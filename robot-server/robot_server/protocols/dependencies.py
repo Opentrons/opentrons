@@ -31,6 +31,9 @@ from robot_server.persistence.fastapi_dependencies import (
 from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.runs.dependencies import get_run_process_pyro_provider
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
+from robot_server.service.pyro_utils.resource_utilities import (
+    register_analysis_store_provider_to_pyro_resource,
+)
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
 
@@ -105,6 +108,9 @@ async def get_analysis_store(
     if analysis_store is None:
         analysis_store = AnalysisStore(
             sql_engine=sql_engine, access_control_status=access_control_status
+        )
+        register_analysis_store_provider_to_pyro_resource(
+            app_state, analysis_store.get_analysis_store_provider()
         )
         _analysis_store_accessor.set_on(app_state, analysis_store)
 

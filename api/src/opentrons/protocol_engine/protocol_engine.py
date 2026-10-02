@@ -44,11 +44,11 @@ from .execution import (
     DoorWatcher,
     HardwareStopper,
     QueueWorker,
-    create_queue_worker,
 )
 from .execution.associated_command_error_recovery import (
     AssociatedCommandErrorRecoveryOrchestrator,
 )
+from .execution.create_queue_worker import create_queue_worker
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
@@ -610,6 +610,11 @@ class ProtocolEngine:
             drop_tips_after_run=drop_tips_after_run,
         )
         exit_stack.callback(self._door_watcher.stop)
+
+        # Teardown the command history persistence interface
+        exit_stack.push_async_callback(
+            self._state_store.commands.teardown_command_history
+        )
 
         disengage_before_stopping = (
             False

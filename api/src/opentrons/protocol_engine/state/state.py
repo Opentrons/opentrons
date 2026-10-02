@@ -59,6 +59,9 @@ from .tasks import TaskState, TaskStore, TaskView
 from .tips import TipState, TipStore, TipView
 from .wells import WellState, WellStore, WellView
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
@@ -273,6 +276,7 @@ class StateStore(StateView, ActionHandler):
         robot_definition: RobotDefinition,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        command_store_provider: Optional[CommandStoreProvider] = None,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
@@ -291,6 +295,7 @@ class StateStore(StateView, ActionHandler):
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
             error_recovery_policy: The run's initial error recovery policy.
+            command_store_provider: Provider interface for the presistence Run Store.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
@@ -307,6 +312,7 @@ class StateStore(StateView, ActionHandler):
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
             updates_callback=self._append_update_events,
+            command_store_provider=command_store_provider,
         )
         self._pipette_store = PipetteStore(updates_callback=self._append_update_events)
         if deck_configuration is None:

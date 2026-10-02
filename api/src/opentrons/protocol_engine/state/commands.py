@@ -69,6 +69,9 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.state import update_types
 
 
@@ -298,6 +301,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        command_store_provider: Optional[CommandStoreProvider] = None,
         updates_callback: Optional[
             Callable[
                 [CurrentCommandNotification | FinalizedCommandNotification | Any], None
@@ -307,7 +311,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
-            command_history=CommandHistory(),
+            command_history=CommandHistory(
+                command_store_provider=command_store_provider
+            ),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
@@ -1430,3 +1436,7 @@ class CommandView:
         # todo(mm, 2024-10-04): Instead of allowlisting command types, maybe we should
         # add a `mayRunWithDoorOpen: bool` field to command requests.
         return fixit_command.commandType in allowed_command_types
+
+    async def teardown_command_history(self) -> None:
+        """Teardown the interface with the persistence command store."""
+        await self._state.command_history.teardown_command_manager()

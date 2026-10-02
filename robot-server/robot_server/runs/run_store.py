@@ -21,6 +21,9 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
@@ -139,12 +142,20 @@ class RunStore:
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._run_store_provider = CommandStoreProvider(
+            run_id=None,
+            store_insert_batch_commands=self.insert_batch_commands,
+        )
+
+    def get_run_store_provider(self) -> CommandStoreProvider:
+        """Get the CommandStoreProvider created by the RunStore."""
+        return self._run_store_provider
 
     def update_run_state(
         self,
         run_id: str,
         summary: StateSummary,
-        commands: List[Command],
+        commands: Optional[List[Command]],
         command_annotations: List[CommandAnnotation],
         run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
@@ -204,8 +215,9 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
             transaction.execute(update_run)
-            transaction.execute(delete_existing_command_annotations_mapping)
-            transaction.execute(delete_existing_commands)
+            if commands is not None:
+                transaction.execute(delete_existing_command_annotations_mapping)
+                transaction.execute(delete_existing_commands)
             transaction.execute(delete_existing_command_annotations)
             for command_annotation in command_annotations:
                 transaction.execute(
@@ -214,34 +226,35 @@ class RunStore:
                         run_id, command_annotation
                     ),
                 )
-            for command_index, command in enumerate(commands):
-                transaction.execute(
-                    insert_command,
-                    {
-                        "run_id": run_id,
-                        "index_in_run": command_index,
-                        "command_id": command.id,
-                        "command": pydantic_to_json(command),
-                        "command_intent": str(command.intent.value)
-                        if command.intent
-                        else CommandIntent.PROTOCOL,
-                        "command_error": pydantic_to_json(command.error)
-                        if command.error
-                        else None,
-                        "command_status": _convert_commands_status_to_sql_command_status(
-                            command.status
-                        ),
-                    },
-                )
-                for annotation_id in command.commandAnnotationIds:
+            if commands is not None:
+                for command_index, command in enumerate(commands):
                     transaction.execute(
-                        insert_command_annotation_mapping,
+                        insert_command,
                         {
                             "run_id": run_id,
+                            "index_in_run": command_index,
                             "command_id": command.id,
-                            "annotation_id": annotation_id,
+                            "command": pydantic_to_json(command),
+                            "command_intent": str(command.intent.value)
+                            if command.intent
+                            else CommandIntent.PROTOCOL,
+                            "command_error": pydantic_to_json(command.error)
+                            if command.error
+                            else None,
+                            "command_status": _convert_commands_status_to_sql_command_status(
+                                command.status
+                            ),
                         },
                     )
+                    for annotation_id in command.commandAnnotationIds:
+                        transaction.execute(
+                            insert_command_annotation_mapping,
+                            {
+                                "run_id": run_id,
+                                "command_id": command.id,
+                                "annotation_id": annotation_id,
+                            },
+                        )
 
             run_row = transaction.execute(select_run_resource).one()
             action_rows = transaction.execute(select_actions).all()
@@ -724,6 +737,49 @@ class RunStore:
             total_length=count_result,
             commands_errors=sliced_commands,
         )
+
+    async def insert_batch_commands(
+        self, run_id: str, commands_total: int, batch_commands: list[Command]
+    ) -> None:
+        """Insert or update a command on the run command table."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            for command_index, command in enumerate(batch_commands):
+                select_command = sqlalchemy.select(run_command_table.c.command).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command.id,
+                )
+                insert_command = sqlalchemy.insert(run_command_table)
+                existing_command = transaction.execute(
+                    select_command
+                ).scalar_one_or_none()
+                delete_existing_command = sqlalchemy.delete(run_command_table).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command.id,
+                )
+                index = commands_total + command_index
+                if existing_command is not None:
+                    index = existing_command.index_in_run
+                    transaction.execute(delete_existing_command)
+                transaction.execute(
+                    insert_command,
+                    {
+                        "run_id": run_id,
+                        "index_in_run": index,
+                        "command_id": command.id,
+                        "command": pydantic_to_json(command),
+                        "command_intent": str(command.intent.value)
+                        if command.intent
+                        else CommandIntent.PROTOCOL,
+                        "command_error": pydantic_to_json(command.error)
+                        if command.error
+                        else None,
+                        "command_status": _convert_commands_status_to_sql_command_status(
+                            command.status
+                        ),
+                    },
+                )
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
