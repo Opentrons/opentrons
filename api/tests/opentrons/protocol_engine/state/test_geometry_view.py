@@ -4527,6 +4527,73 @@ def test_get_predicted_location_sequence_with_pending_labware(
 
 
 @pytest.mark.parametrize("use_mocks", [False])
+def test_predicted_location_sequence_staging_slot_not_on_magnetic_block(
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    mag_block_v1_def: ModuleDefinition,
+    subject: GeometryView,
+) -> None:
+    """Labware in A4 is not on a magnetic block loaded in A3.
+
+    Combo fixture stagingAreaSlotWithMagneticBlockV1 provides both AAs, but they
+    are adjacent slots rather than a parent/child stack.
+    """
+    load_module = load_module_action(
+        module_id="mag-block-id",
+        module_def=mag_block_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="magneticBlockV1A3",
+    )
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+
+    location_sequence = subject.get_predicted_location_sequence(
+        AddressableAreaLocation(addressableAreaName="A4")
+    )
+
+    assert location_sequence == [
+        OnAddressableAreaLocationSequenceComponent(addressableAreaName="A4"),
+        OnCutoutFixtureLocationSequenceComponent(
+            cutoutId="cutoutA3",
+            possibleCutoutFixtureIds=["stagingAreaSlotWithMagneticBlockV1"],
+        ),
+    ]
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_predicted_location_sequence_vacuum_dock_is_on_module(
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    vacuum_module_v1_def: ModuleDefinition,
+    subject: GeometryView,
+) -> None:
+    """The vacuum module dock in A4 belongs to the vacuum module in A3."""
+    load_module = load_module_action(
+        module_id="vacuum-id",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+
+    location_sequence = subject.get_predicted_location_sequence(
+        AddressableAreaLocation(addressableAreaName="vacuumModuleV1DockA4")
+    )
+
+    assert location_sequence == [
+        OnAddressableAreaLocationSequenceComponent(
+            addressableAreaName="vacuumModuleV1DockA4"
+        ),
+        OnModuleLocationSequenceComponent(moduleId="vacuum-id"),
+        OnCutoutFixtureLocationSequenceComponent(
+            cutoutId="cutoutA3",
+            possibleCutoutFixtureIds=["vacuumModuleV1"],
+        ),
+    ]
+
+
+@pytest.mark.parametrize("use_mocks", [False])
 @pytest.mark.parametrize(
     "definition_list,height",
     [
