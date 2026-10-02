@@ -83,6 +83,8 @@ export interface PipetteTemporalProperties {
   tipWell?: string
   // primary nozzle to use
   primaryNozzle?: PrimaryNozzleConfigurationStyle
+  // back-left nozzle for QUADRANT partial-column configurations
+  backLeftNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
