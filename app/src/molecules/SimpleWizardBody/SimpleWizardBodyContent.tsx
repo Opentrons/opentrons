@@ -155,6 +155,7 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
                 size={isOnDevice ? '3.75rem' : '2.5rem'}
                 color={iconColor}
                 aria-label="ot-alert"
+                marginBottom={SPACING.spacing24}
               />
             )}
             <LegacyStyledText css={HEADER_STYLE}>{header}</LegacyStyledText>

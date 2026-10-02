@@ -14,6 +14,7 @@ interface WizardHeaderProps {
   currentStep?: number | null
   exitDisabled?: boolean
   hideStepText?: boolean
+  isExiting?: boolean
 }
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
