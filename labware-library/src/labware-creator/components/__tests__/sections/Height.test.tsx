@@ -25,7 +25,7 @@ describe('Height Section', () => {
   beforeEach(() => {
     when(vi.mocked(isEveryFieldHidden))
       .calledWith(
-        ['labwareType', 'labwareZDimension'],
+        ['labwareType', 'labwareZDimension', 'skirtHeight'],
         formikConfig.initialValues
       )
       .thenReturn(false)
@@ -56,6 +56,17 @@ describe('Height Section', () => {
     formikConfig.initialValues.labwareType = 'aluminumBlock'
     render(wrapInFormik(<Height />, formikConfig))
     expect(screen.getByText('Put your labware on top of the aluminum block.'))
+  })
+
+  it('should ask for total extents height for a filter plate', () => {
+    formikConfig.initialValues.labwareType = 'filterPlate'
+    render(wrapInFormik(<Height />, formikConfig))
+    expect(
+      screen.getByText(
+        'Measure the total height of the labware: from the highest point on top down to the lowest point. Include any well tips or nozzles that hang below the skirt.'
+      )
+    ).toBeInTheDocument()
+    screen.getByRole('textbox', { name: /Skirt height/i })
   })
 
   it('should update instructions when tipRack is selected', () => {
@@ -90,7 +101,7 @@ describe('Height Section', () => {
   it('should not render when all fields are hidden', () => {
     when(vi.mocked(isEveryFieldHidden))
       .calledWith(
-        ['labwareType', 'labwareZDimension'],
+        ['labwareType', 'labwareZDimension', 'skirtHeight'],
         formikConfig.initialValues
       )
       .thenReturn(true)

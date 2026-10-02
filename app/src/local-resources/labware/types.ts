@@ -15,6 +15,7 @@ export interface LabwareDefAndDate {
 export type LabwareFilter =
   | 'all'
   | 'wellPlate'
+  | 'filterPlate'
   | 'tipRack'
   | 'tubeRack'
   | 'reservoir'

@@ -55,6 +55,22 @@ describe('Regularity', () => {
     expect(radioElements).toHaveLength(4)
   })
 
+  it('does not ask about labware position check for a filter plate', () => {
+    formikConfig.initialValues.labwareType = 'filterPlate'
+    when(vi.mocked(getLabwareName))
+      .calledWith(formikConfig.initialValues, true)
+      .thenReturn('wells')
+
+    render(wrapInFormik(<Regularity />, formikConfig))
+
+    expect(
+      screen.queryByText(
+        'Do you want to exclude this labware from Labware Position Check?'
+      )
+    ).toBeNull()
+    expect(screen.getAllByRole('radio')).toHaveLength(2)
+  })
+
   it('should render alert when error is present', () => {
     const FAKE_ERROR = 'ahh'
     formikConfig.initialErrors = {

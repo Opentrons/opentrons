@@ -180,6 +180,30 @@ export const labwareFormSchemaBaseObject = Yup.object({
     MAX_Z_DIMENSION,
     IRREGULAR_LABWARE_ERROR
   ),
+  skirtHeight: Yup.number()
+    .transform((value, originalValue) =>
+      originalValue === '' || originalValue == null ? 0 : value
+    )
+    .label(LABELS.skirtHeight)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
+    .min(0)
+    .test(
+      'below-labware-height',
+      'Skirt height must be less than the labware height',
+      function (value) {
+        const height = Number(
+          (this.parent as { labwareZDimension?: number | string | null })
+            .labwareZDimension
+        )
+        if (value == null || value === 0 || Number.isNaN(height)) {
+          return true
+        }
+        return value < height
+      }
+    )
+    .nullable()
+    .notRequired()
+    .default(0),
   stackedLabwareZDimension: Yup.number()
     .label(LABELS.labwareZDimension)
     .max(MAX_SUGGESTED_GRIPPER_Z, IRREGULAR_LABWARE_ERROR)
@@ -235,16 +259,10 @@ export const labwareFormSchemaBaseObject = Yup.object({
         'Tip Length cannot exceed labware height'
       )
       .required(),
-    otherwise: Yup.number()
-      .transform(nanToUndefined)
-      .label(LABELS.wellDepth)
-      .typeError(MUST_BE_A_NUMBER_ERROR)
-      .moreThan(0)
-      .max(
-        Yup.ref('labwareZDimension'),
-        'Well depth cannot exceed labware height'
-      )
-      .required(),
+    otherwise: requiredPositiveNumber(LABELS.wellDepth).max(
+      Yup.ref('labwareZDimension'),
+      'Well depth cannot exceed labware height'
+    ),
   }),
   wellShape: requiredString(LABELS.wellShape).oneOf(
     wellShapeOptions.map(o => o.value)

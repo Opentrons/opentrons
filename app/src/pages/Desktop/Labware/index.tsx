@@ -64,6 +64,7 @@ const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'tipRack',
   'tubeRack',
   'wellPlate',
+  'filterPlate',
 ]
 
 // note: we've decided not to translate these categories

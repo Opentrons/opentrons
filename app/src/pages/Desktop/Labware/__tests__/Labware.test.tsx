@@ -119,6 +119,7 @@ describe('Labware', () => {
     fireEvent.click(filter)
     screen.getByRole('button', { name: 'All' })
     screen.getByRole('button', { name: 'Well Plate' })
+    screen.getByRole('button', { name: 'Filter Plate' })
     screen.getByRole('button', { name: 'Tip Rack' })
     screen.getByRole('button', { name: 'Tube Rack' })
     screen.getByRole('button', { name: 'Reservoir' })
