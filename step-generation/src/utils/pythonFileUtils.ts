@@ -130,6 +130,19 @@ export function getLoadAdapters(
     lw.def.allowedRoles?.includes('adapter')
   )
   const pythonAdapters = Object.values(adapterEntities)
+    // Parent adapters must load before children stacked on them.
+    // Independent adapters keep insertion order.
+    .toSorted((a, b) => {
+      const aStack = labwareRobotState[a.id].stack
+      const bStack = labwareRobotState[b.id].stack
+      if (aStack.includes(b.id)) {
+        return 1
+      }
+      if (bStack.includes(a.id)) {
+        return -1
+      }
+      return 0
+    })
     .map(adapter => {
       const { id, def, pythonName } = adapter
       const { parameters, namespace, version } = def
@@ -141,10 +154,18 @@ export function getLoadAdapters(
       const isOnVacuumDock = labwareRobotState[id].stack.some(
         element => element === VACUUM_DOCK_ADDRESSABLE_AREA
       )
+      // Vacuum spacers can sit on another spacer. stack[1] is then that
+      // parent adapter, so we emit parent.load_adapter() instead of
+      // module/slot load_adapter().
+      const parentAdapter =
+        adapterSlot in labwareEntities ? labwareEntities[adapterSlot] : null
 
       let parentName: string
       let locationArg: string | null = null
-      if (adapterModuleId != null) {
+      if (parentAdapter != null) {
+        parentName = parentAdapter.pythonName
+        locationArg = null
+      } else if (adapterModuleId != null) {
         const adapterModule = moduleEntities[adapterModuleId]
         ;[parentName, locationArg] = isOnVacuumDock
           ? [
