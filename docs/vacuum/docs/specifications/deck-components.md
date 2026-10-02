@@ -91,14 +91,14 @@ Each Vacuum Module comes with three flat shim spacers (3.2 mm, 5.2 mm, and 7.25 
 
 Special definition files set the spacer display names that appear in Opentrons software and on the Flex touchscreen. These files also include API `loadName` strings for each spacer.
 
-<!--- Including 2 items in 1 column to avoid line breaks --->
+<!--- Line break "space space" includes 2 items in 1 column to avoid text wrapping --->
 
 | Spacer height | Display and API load name |
 | :--- | :--- |
-| **3.2 mm** | Opentrons Vacuum Manifold Spacer 3.2 mm<br>`opentrons_vacuum_manifold_spacer_3.2mm` |
-| **5.2 mm** | Opentrons Vacuum Manifold Spacer 5.2 mm<br>`opentrons_vacuum_manifold_spacer_5.2mm` |
-| **7.25 mm** | Opentrons Vacuum Manifold Spacer 7.25 mm<br>`opentrons_vacuum_manifold_spacer_7.25mm` |
-| **12.8 mm** | Opentrons Vacuum Manifold Spacer 12.8 mm<br>`opentrons_vacuum_manifold_spacer_12.8mm` |
+| **3.2 mm** | Opentrons Vacuum Manifold Spacer 3.2 mm  `opentrons_vacuum_manifold_spacer_3.2mm` |
+| **5.2 mm** | Opentrons Vacuum Manifold Spacer 5.2 mm  `opentrons_vacuum_manifold_spacer_5.2mm` |
+| **7.25 mm** | Opentrons Vacuum Manifold Spacer 7.25 mm  `opentrons_vacuum_manifold_spacer_7.25mm` |
+| **12.8 mm** | Opentrons Vacuum Manifold Spacer 12.8 mm  `opentrons_vacuum_manifold_spacer_12.8mm` |
 
 ### Stacking rules
 
