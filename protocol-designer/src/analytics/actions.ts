@@ -1,4 +1,5 @@
 import { OLDEST_MIGRATEABLE_VERSION } from '../load-file/migration'
+import { setSentryTracking } from '../resources/sentry'
 import { setMixpanelTracking } from './mixpanel'
 
 import type { AnalyticsEvent } from './mixpanel'
@@ -10,11 +11,8 @@ export interface SetOptIn {
 
 const _setOptIn = (payload: SetOptIn['payload']): SetOptIn => {
   // side effects
-  if (payload) {
-    setMixpanelTracking(true)
-  } else {
-    setMixpanelTracking(false)
-  }
+  setMixpanelTracking(payload.hasOptedIn)
+  setSentryTracking(payload.hasOptedIn)
 
   return {
     type: 'SET_OPT_IN',
