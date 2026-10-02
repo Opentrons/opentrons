@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 import sqlalchemy
-from decoy import Decoy
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource
@@ -26,7 +25,6 @@ from robot_server.data_files.models import (
 )
 from robot_server.deletion_planner import FileUsageInfo
 from robot_server.persistence.tables import run_table
-from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -71,11 +69,10 @@ def subject(
 
 @pytest.fixture
 def completed_analysis_store(
-    decoy: Decoy,
     sql_engine: SQLEngine,
 ) -> CompletedAnalysisStore:
     """Get a `CompletedAnalysisStore` linked to the same database as the subject under test."""
-    return CompletedAnalysisStore(sql_engine, decoy.mock(cls=MemoryCache), "2")
+    return CompletedAnalysisStore(sql_engine, "2")
 
 
 @pytest.fixture
