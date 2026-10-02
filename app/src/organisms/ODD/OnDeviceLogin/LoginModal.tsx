@@ -15,7 +15,7 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { useLogout, useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
@@ -59,6 +59,8 @@ const LoginModalImpl = NiceModal.create(
       (state: State) => getLocalRobot(state)?.name ?? null
     )
     const loggedInUsername = useUsernameForRobot(localRobotName)
+
+    const logout = useLogout()
 
     const isChoosingNewPassword = phase === 'chooseNewPassword'
 
@@ -179,6 +181,9 @@ const LoginModalImpl = NiceModal.create(
         : null
 
     const handleCancel = (): void => {
+      if (!!loggedInUsername) {
+        logout()
+      }
       dismissModal()
     }
 
