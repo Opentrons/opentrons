@@ -108,7 +108,6 @@ function PageContents(props: PageContentsProps): ReactNode {
   const { isRunOrAnalysisLoading } = useProtocolRunSetupLoadingState(
     runId,
     robotName,
-    false,
     Boolean(run.isLoading)
   )
 

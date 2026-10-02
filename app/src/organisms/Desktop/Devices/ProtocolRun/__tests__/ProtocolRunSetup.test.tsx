@@ -224,7 +224,7 @@ describe('ProtocolRunSetup', () => {
       isLoading: false,
     } as any)
     vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: undefined,
+      data: { data: { userId: null, runId: null } },
       isLoading: false,
     } as any)
     vi.mocked(useUpdateClientLPC).mockReturnValue({
@@ -293,7 +293,7 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Setup loading')
   })
 
-  it('renders run loading info screen while analyzing even if Flex LPC is initializing', () => {
+  it('renders run loading info screen while analyzing', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -306,43 +306,8 @@ describe('ProtocolRunSetup', () => {
         data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
       },
     } as any)
-    vi.mocked(useLPCFlows).mockReturnValue({
-      launchLPC: vi.fn(),
-      lpcProps: null,
-      showLPC: false,
-      isLaunchingLPC: false,
-      isFlexLPCInitializing: true,
-    })
     render()
     screen.getByText('Setup loading')
-  })
-
-  it('does not show run loading once Flex LPC is done even if offsets are not applied', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useLPCFlows).mockReturnValue({
-      launchLPC: vi.fn(),
-      lpcProps: null,
-      showLPC: false,
-      isLaunchingLPC: false,
-      isFlexLPCInitializing: false,
-    })
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
-    render()
-    expect(screen.queryByText('Setup loading')).toBeNull()
-  })
-
-  it('does not show run loading once Flex LPC is settled', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useLPCFlows).mockReturnValue({
-      launchLPC: vi.fn(),
-      lpcProps: null,
-      showLPC: false,
-      isLaunchingLPC: false,
-      isFlexLPCInitializing: false,
-    })
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-    render()
-    expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
   it('renders run loading info screen while Flex client LPC finalized status is loading', () => {
@@ -355,6 +320,28 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Setup loading')
   })
 
+  it('renders run loading while another app finalized LPC but Redux has not caught up', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: { data: { userId: 'other-user', runId: RUN_ID } },
+      isLoading: false,
+    } as any)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
+    render()
+    screen.getByText('Setup loading')
+  })
+
+  it('does not show run loading when another app finalized LPC and Redux caught up', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
+      data: { data: { userId: 'other-user', runId: RUN_ID } },
+      isLoading: false,
+    } as any)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
+    render()
+    expect(screen.queryByText('Setup loading')).toBeNull()
+  })
+
   it('renders run loading info screen while the run record is loading', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: undefined,
@@ -364,7 +351,7 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Setup loading')
   })
 
-  it('renders run loading info screen while Flex LPC is initializing', () => {
+  it('does not show run loading while Flex LPC is only initializing', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useLPCFlows).mockReturnValue({
       launchLPC: vi.fn(),
@@ -374,7 +361,14 @@ describe('ProtocolRunSetup', () => {
       isFlexLPCInitializing: true,
     })
     render()
-    screen.getByText('Setup loading')
+    expect(screen.queryByText('Setup loading')).toBeNull()
+  })
+
+  it('does not show run loading when offsets are not yet applied locally', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
+    render()
+    expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
   it('renders run loading info screen while Flex camera settings are loading', () => {
