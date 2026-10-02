@@ -16,8 +16,6 @@ import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
-import { useNotifyClientDataLPC } from '/app/resources/client_data'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
@@ -40,12 +38,9 @@ vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/resources/camera/useNotifyCamera')
-vi.mock('/app/resources/client_data')
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
-vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera')
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -88,14 +83,6 @@ describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useIsFlex).mockReturnValue(false)
-    vi.mocked(useNotifyCamera).mockReturnValue({
-      data: { cameraEnabled: false },
-      isLoading: false,
-    } as any)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-    } as any)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: true,
@@ -190,6 +177,8 @@ describe('ProtocolRunDetails', () => {
     const runTab = screen.getByText('Run Preview')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
+    // Setup stays mounted (hidden) after the first visit.
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('renders protocol run setup when the setup tab is clicked', () => {
@@ -199,7 +188,7 @@ describe('ProtocolRunDetails', () => {
     const runTab = screen.getByText('Run Preview')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
-    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    screen.getByText('Mock ProtocolRunSetup')
     fireEvent.click(setupTab)
     screen.getByText('Mock ProtocolRunSetup')
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
@@ -213,7 +202,8 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
     fireEvent.click(moduleTab)
     screen.getByText('Mock ProtocolRunModuleControls')
-    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    // Setup stays mounted after the first visit.
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('renders camera info when the camera tab is clicked', () => {
@@ -224,7 +214,8 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunCamera')).toBeFalsy()
     fireEvent.click(cameraTab)
     screen.getByText('Mock ProtocolRunCamera')
-    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    // Setup stays mounted after the first visit.
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('should NOT render module controls when there are no modules', () => {
@@ -249,24 +240,15 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
   })
 
-  it('disables run  tab if robot-analyzed protocol data is null', () => {
+  it('renders setup tab content while analysis is null (setup handles its own loading)', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
     vi.mocked(useStoredProtocolAnalysis).mockReturnValue(null)
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    const runTab = screen.getByText('Run Preview')
-    // SetupTab may redirect to run-preview when status is not idle; either way
-    // analysis is missing so the shared tab loading spinner is shown.
-    expect(
-      screen.getByText(/Setup loading|Run Preview loading/)
-    ).toBeInTheDocument()
-    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
-    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
-    fireEvent.click(runTab)
-    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
-  it('shows tab loading while the run record or analysis is loading', () => {
+  it('renders camera tab without a page-level loading gate', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: undefined,
       isLoading: true,
@@ -276,8 +258,7 @@ describe('ProtocolRunDetails', () => {
 
     render(`/devices/otie/protocol-runs/${RUN_ID}/camera`)
 
-    screen.getByText('Camera loading')
-    expect(screen.queryByText('Mock ProtocolRunCamera')).toBeFalsy()
+    screen.getByText('Mock ProtocolRunCamera')
   })
 
   it('redirects to the run tab when the run is started by ODD or another Desktop app', () => {
@@ -285,7 +266,8 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
     screen.getByText('Mock RunPreview')
-    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    // Setup was visited first, so it stays mounted while hidden on run-preview.
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('renders Parameters tab when runtime parameters ff is on', () => {

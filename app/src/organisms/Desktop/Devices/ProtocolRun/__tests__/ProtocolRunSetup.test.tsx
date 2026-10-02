@@ -26,11 +26,7 @@ import {
 } from '/app/redux/protocol-runs'
 import * as ReduxRuns from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
-import {
-  useNotifyClientDataLPC,
-  useUpdateClientLPC,
-} from '/app/resources/client_data'
+import { useUpdateClientLPC } from '/app/resources/client_data'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
   getIsFixtureMismatch,
@@ -87,7 +83,6 @@ vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck')
-vi.mock('/app/resources/camera/useNotifyCamera')
 vi.mock('/app/resources/client_data')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -103,7 +98,11 @@ vi.mock('/app/redux/protocol-runs')
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
-const render = () => {
+const FLEX_LPC_READY_STATE = {
+  protocolRuns: { [RUN_ID]: { lpc: {} } },
+} as State
+
+const render = (initialState: State = {} as State) => {
   return renderWithProviders<State>(
     <ProtocolRunSetup
       protocolRunHeaderRef={null}
@@ -111,7 +110,7 @@ const render = () => {
       runId={RUN_ID}
     />,
     {
-      initialState: {} as State,
+      initialState,
       i18nInstance: i18n,
     }
   )[0]
@@ -219,14 +218,6 @@ describe('ProtocolRunSetup', () => {
       isLaunchingLPC: false,
       isFlexLPCInitializing: false,
     })
-    vi.mocked(useNotifyCamera).mockReturnValue({
-      data: { cameraEnabled: false },
-      isLoading: false,
-    } as any)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: { data: { userId: null, runId: null } },
-      isLoading: false,
-    } as any)
     vi.mocked(useUpdateClientLPC).mockReturnValue({
       updateWithRunId: vi.fn(),
       clearClientData: vi.fn(),
@@ -310,35 +301,15 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Setup loading')
   })
 
-  it('renders run loading info screen while Flex client LPC finalized status is loading', () => {
+  it('shows setup loading when LPC Redux state is missing', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    } as any)
     render()
     screen.getByText('Setup loading')
   })
 
-  it('renders run loading while another app finalized LPC but Redux has not caught up', () => {
+  it('does not show setup loading when Flex LPC state exists', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: { data: { userId: 'other-user', runId: RUN_ID } },
-      isLoading: false,
-    } as any)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
-    render()
-    screen.getByText('Setup loading')
-  })
-
-  it('does not show run loading when another app finalized LPC and Redux caught up', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: { data: { userId: 'other-user', runId: RUN_ID } },
-      isLoading: false,
-    } as any)
-    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-    render()
+    render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
@@ -360,25 +331,15 @@ describe('ProtocolRunSetup', () => {
       isLaunchingLPC: false,
       isFlexLPCInitializing: true,
     })
-    render()
+    render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()
   })
 
   it('does not show run loading when offsets are not yet applied locally', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
-    render()
+    render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()
-  })
-
-  it('renders run loading info screen while Flex camera settings are loading', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyCamera).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    } as any)
-    render()
-    screen.getByText('Setup loading')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
@@ -409,7 +370,7 @@ describe('ProtocolRunSetup', () => {
     it('renders robot calibration setup for Flex', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      render()
+      render(FLEX_LPC_READY_STATE)
 
       screen.getByText(
         'Review required instruments and calibrations for this protocol.'
@@ -481,7 +442,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
 
-      render()
+      render(FLEX_LPC_READY_STATE)
       expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
@@ -492,7 +453,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
-      render()
+      render(FLEX_LPC_READY_STATE)
       screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
@@ -517,7 +478,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
-      render()
+      render(FLEX_LPC_READY_STATE)
       screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
@@ -552,7 +513,7 @@ describe('ProtocolRunSetup', () => {
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
-      render()
+      render(FLEX_LPC_READY_STATE)
       screen.getByText('Deck Hardware')
       screen.getByText('Action needed')
     })
@@ -632,7 +593,7 @@ describe('ProtocolRunSetup', () => {
       vi.mocked(parseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
       ])
-      render()
+      render(FLEX_LPC_READY_STATE)
 
       screen.getByText('Deck Hardware')
       screen.getByText(

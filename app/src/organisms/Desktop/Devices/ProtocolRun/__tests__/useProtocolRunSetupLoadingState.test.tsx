@@ -4,32 +4,39 @@ import { when } from 'vitest-when'
 
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
-import { useNotifyClientDataLPC } from '/app/resources/client_data'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import { useProtocolRunSetupLoadingState } from '../useProtocolRunSetupLoadingState'
 
 import type { FunctionComponent, ReactNode } from 'react'
 
+const mockUseSelector = vi.fn()
+
 vi.mock('react-redux', () => ({
-  useSelector: (selector: (state: unknown) => unknown) => selector({}),
+  useSelector: (selector: (state: unknown) => unknown) =>
+    mockUseSelector(selector),
 }))
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/analysis')
-vi.mock('/app/resources/camera/useNotifyCamera')
-vi.mock('/app/resources/client_data')
 vi.mock('/app/resources/runs')
 
 const RUN_ID = 'run-id'
 const ROBOT_NAME = 'otie'
+const FLEX_LPC_STATE = { protocolRuns: { [RUN_ID]: { lpc: {} } } }
 
 const wrapper: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
   <>{children}</>
 )
 
+function mockLpcState(state: unknown = {}): void {
+  mockUseSelector.mockImplementation((selector: (state: unknown) => unknown) =>
+    selector(state)
+  )
+}
+
 describe('useProtocolRunSetupLoadingState', () => {
   beforeEach(() => {
+    mockLpcState()
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
@@ -37,14 +44,6 @@ describe('useProtocolRunSetupLoadingState', () => {
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
-    vi.mocked(useNotifyCamera).mockReturnValue({
-      data: { cameraEnabled: false },
-      isLoading: false,
-    } as any)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: { data: { userId: null, runId: null } },
-      isLoading: false,
-    } as any)
   })
 
   it('is loading while the run record is loading', () => {
@@ -52,17 +51,11 @@ describe('useProtocolRunSetupLoadingState', () => {
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, true),
       { wrapper }
     )
-
-    expect(result.current.isRunOrAnalysisLoading).toBe(true)
     expect(result.current.isSetupLoading).toBe(true)
-    expect(result.current.isRunRecordLoading).toBe(true)
   })
 
   it('is loading while analysis is missing', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
-      .calledWith(RUN_ID)
-      .thenReturn(null)
-    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
 
@@ -70,8 +63,6 @@ describe('useProtocolRunSetupLoadingState', () => {
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
       { wrapper }
     )
-
-    expect(result.current.isRunOrAnalysisLoading).toBe(true)
     expect(result.current.isSetupLoading).toBe(true)
   })
 
@@ -80,8 +71,6 @@ describe('useProtocolRunSetupLoadingState', () => {
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
       { wrapper }
     )
-
-    expect(result.current.isRunOrAnalysisLoading).toBe(false)
     expect(result.current.isSetupLoading).toBe(false)
   })
 
@@ -92,38 +81,17 @@ describe('useProtocolRunSetupLoadingState', () => {
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
       { wrapper }
     )
-
     expect(result.current.isSetupLoading).toBe(true)
   })
 
-  it('marks Flex setup loading while client LPC data is loading', () => {
+  it('is not loading on Flex when LPC store exists', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyClientDataLPC).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    } as any)
+    mockLpcState(FLEX_LPC_STATE)
 
     const { result } = renderHook(
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
       { wrapper }
     )
-
-    expect(result.current.isSetupLoading).toBe(true)
-  })
-
-  it('marks Flex setup loading while camera settings load', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useNotifyCamera).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    } as any)
-
-    const { result } = renderHook(
-      () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
-      { wrapper }
-    )
-
-    expect(result.current.isSetupLoading).toBe(true)
-    expect(result.current.isCameraLoading).toBe(true)
+    expect(result.current.isSetupLoading).toBe(false)
   })
 })
