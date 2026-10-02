@@ -13,7 +13,22 @@ export function isMaintenanceDoorOpenError(error: unknown): boolean {
 }
 
 export function isMovementError(error: Error): boolean {
-  return error.cause === '2001'
+  return (
+    // robotics control error
+    error.cause === '2000' ||
+    // motion failed
+    error.cause === '2001' ||
+    // homing failed
+    error.cause === '2002' ||
+    // motion planning failure
+    error.cause === '2004' ||
+    // position estimation invalid
+    error.cause === '2005' ||
+    // move condition not met
+    error.cause === '2006' ||
+    // motor driver error
+    error.cause === '2016'
+  )
 }
 
 export function isTipPresenceError(error: Error): boolean {
