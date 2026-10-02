@@ -100,7 +100,7 @@ const RUN_ID = '1'
 const MOCK_PROTOCOL_LIQUID_KEY = { liquids: [] }
 const FLEX_LPC_READY_STATE = {
   protocolRuns: { [RUN_ID]: { lpc: {} } },
-} as State
+} as unknown as State
 
 const render = (initialState: State = {} as State) => {
   return renderWithProviders<State>(
