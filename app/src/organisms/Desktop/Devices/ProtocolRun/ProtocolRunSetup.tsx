@@ -144,7 +144,6 @@ export function ProtocolRunSetup({
   const { isSetupLoading } = useProtocolRunSetupLoadingState(
     runId,
     robotName,
-    lpcUtils.isFlexLPCInitializing,
     isRunRecordLoading
   )
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))

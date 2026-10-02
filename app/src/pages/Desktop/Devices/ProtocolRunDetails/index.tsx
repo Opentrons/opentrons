@@ -107,7 +107,6 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const { isRunOrAnalysisLoading } = useProtocolRunSetupLoadingState(
     runId,
     robotName,
-    false,
     Boolean(run.isLoading)
   )
 
