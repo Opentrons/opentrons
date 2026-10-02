@@ -104,20 +104,9 @@ function PageContents(props: PageContentsProps): ReactNode {
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
-  // Keep Setup mounted after first visit so returning to the tab does not
-  // remount
-  const [hasVisitedSetup, setHasVisitedSetup] = useState(
-    protocolRunDetailsTab === 'setup'
-  )
   const isSetupTab = protocolRunDetailsTab === 'setup'
 
   useToastOnErrorImage(runId)
-
-  useEffect(() => {
-    if (isSetupTab) {
-      setHasVisitedSetup(true)
-    }
-  }, [isSetupTab])
 
   useEffect(() => {
     if (jumpedIndex != null) {
@@ -156,7 +145,7 @@ function PageContents(props: PageContentsProps): ReactNode {
     }
   } = {
     setup: {
-      // Rendered separately below so the panel can stay mounted across tab switches.
+      // Rendered separately below; Setup stays mounted and is shown/hidden.
       content: null,
       backToTop: setupBackToTop,
     },
@@ -238,15 +227,13 @@ function PageContents(props: PageContentsProps): ReactNode {
         // remove left upper corner border radius when first tab is active
         borderRadius={BORDERS.borderRadius8}
       >
-        {hasVisitedSetup ? (
-          <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
-            <ProtocolRunSetup
-              protocolRunHeaderRef={protocolRunHeaderRef}
-              robotName={robotName}
-              runId={runId}
-            />
-          </Box>
-        ) : null}
+        <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
+          <ProtocolRunSetup
+            protocolRunHeaderRef={protocolRunHeaderRef}
+            robotName={robotName}
+            runId={runId}
+          />
+        </Box>
         {isSetupTab ? null : content}
       </Box>
       {backToTop}
@@ -279,13 +266,14 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     () => {
       // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
       if (
+        currentRunStatus != null &&
         currentRunStatus !== RUN_STATUS_IDLE &&
         protocolRunDetailsTab !== 'run-preview' &&
         protocolRunDetailsTab !== 'camera'
       ) {
         navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
       }
-      // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
+      // On a clone run, navigate to "run setup" if the run hasn't started.
       else if (
         currentRunStatus === RUN_STATUS_IDLE &&
         protocolRunDetailsTab !== 'setup'

@@ -1,7 +1,8 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
+
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -22,7 +23,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useQuickProtocolDetailsForRun,
-  useRunHasStarted,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -123,9 +123,8 @@ describe('ProtocolRunDetails', () => {
       mockRobotSideAnalysis
     )
     vi.mocked(useStoredProtocolAnalysis).mockReturnValue(null)
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { createdAt: '123' } },
+      data: { data: { createdAt: '123', status: RUN_STATUS_IDLE } },
       isLoading: false,
     } as any)
     vi.mocked(useQuickProtocolDetailsForRun).mockReturnValue({
@@ -177,7 +176,7 @@ describe('ProtocolRunDetails', () => {
     const runTab = screen.getByText('Run Preview')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
-    // Setup stays mounted (hidden) after the first visit.
+    // Setup stays mounted (hidden) on other tabs.
     screen.getByText('Mock ProtocolRunSetup')
   })
 
@@ -202,7 +201,7 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
     fireEvent.click(moduleTab)
     screen.getByText('Mock ProtocolRunModuleControls')
-    // Setup stays mounted after the first visit.
+    // Setup stays mounted (hidden) on other tabs.
     screen.getByText('Mock ProtocolRunSetup')
   })
 
@@ -214,7 +213,7 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunCamera')).toBeFalsy()
     fireEvent.click(cameraTab)
     screen.getByText('Mock ProtocolRunCamera')
-    // Setup stays mounted after the first visit.
+    // Setup stays mounted (hidden) on other tabs.
     screen.getByText('Mock ProtocolRunSetup')
   })
 
@@ -259,14 +258,19 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}/camera`)
 
     screen.getByText('Mock ProtocolRunCamera')
+    // Setup is always mounted, even when opening a non-setup tab first.
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('redirects to the run tab when the run is started by ODD or another Desktop app', () => {
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: { data: { createdAt: '123', status: RUN_STATUS_RUNNING } },
+      isLoading: false,
+    } as any)
     render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
     screen.getByText('Mock RunPreview')
-    // Setup was visited first, so it stays mounted while hidden on run-preview.
+    // Setup stays mounted (hidden) while on run-preview.
     screen.getByText('Mock ProtocolRunSetup')
   })
 
