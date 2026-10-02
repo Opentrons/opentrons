@@ -16,6 +16,8 @@ The vacuum base sits directly on its own deck plate. It is the foundation for th
 
 When connected to the waste carboy, negative pressure from the vacuum pump draws liquid down cleanly through the module assembly. The vacuum base collects this fluid, routing it into an internal collection plate or out to the external carboy via the attached 6 mm hose.
 
+The vacuum base includes an integrated, passive bleeder valve that gradually returns the system to atmospheric pressure (0 mbar) when the pump is off.
+
 ## Collars
 
 Collars sit directly on the vacuum base. They support filter plates used during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the vacuum base seals it to the collar. The short and tall collars are fully compatible with the Flex Gripper.
