@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
@@ -11,13 +11,12 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
-  WARNING_TOAST,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
 import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
@@ -25,9 +24,6 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 import styles from './signrunmodal.module.css'
 
 import type { DocumentationState } from '@opentrons/react-api-client'
-
-// Above typical desktop modal overlays so the toast remains visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export interface SignRunModalProps {
   runId: string
@@ -42,35 +38,12 @@ export function SignRunModal({
   documentationState,
   onSigned,
 }: SignRunModalProps): JSX.Element {
-  const { t, i18n } = useTranslation(['access_control', 'shared'])
-
-  const permissionToastIdRef = useRef<string | null>(null)
+  const { t } = useTranslation('access_control')
 
   const [signed, setSigned] = useState(false)
   const [signError, setSignError] = useState(false)
 
-  const { makeToast, eatToast: eatToasterToast } = useToaster()
-
-  const popToast = (): void => {
-    permissionToastIdRef.current = makeToast(
-      '' + t('sign_protocol_run_permission_required_description'),
-      WARNING_TOAST,
-      {
-        closeButton: true,
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        disableTimeout: true,
-        heading: '' + t('sign_protocol_run_permission_required'),
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
-      }
-    )
-  }
-
-  const eatToast = (): void => {
-    if (permissionToastIdRef.current != null) {
-      eatToasterToast(permissionToastIdRef.current)
-      permissionToastIdRef.current = null
-    }
-  }
+  const { popToast, eatToast } = useInsufficientPermissionsToast()
 
   const { signRun, isLoading, loginGate, name, logout, isSigned } =
     useSignRunFlow(

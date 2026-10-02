@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GET, POST, request } from '../request'
+import { addRequestErrorListener, GET, POST, request } from '../request'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { HostConfig } from '../types'
@@ -138,5 +138,37 @@ describe('request', () => {
     expect(config.headers).toMatchObject({
       'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
     })
+  })
+
+  it('notifies error listeners and still rejects when a request fails', async () => {
+    const error = new Error('oh no')
+    requestor.mockRejectedValue(error)
+    const listener = vi.fn()
+    const removeListener = addRequestErrorListener(listener)
+
+    await expect(request(POST, '/runs', hostConfig)).rejects.toBe(error)
+    expect(listener).toHaveBeenCalledWith(error, POST, hostConfig)
+
+    removeListener()
+  })
+
+  it('does not notify error listeners when a request succeeds', async () => {
+    const listener = vi.fn()
+    const removeListener = addRequestErrorListener(listener)
+
+    await request(GET, '/runs', hostConfig)
+    expect(listener).not.toHaveBeenCalled()
+
+    removeListener()
+  })
+
+  it('stops notifying a listener after it is removed', async () => {
+    requestor.mockRejectedValue(new Error('oh no'))
+    const listener = vi.fn()
+    const removeListener = addRequestErrorListener(listener)
+    removeListener()
+
+    await expect(request(POST, '/runs', hostConfig)).rejects.toThrow()
+    expect(listener).not.toHaveBeenCalled()
   })
 })

@@ -18,7 +18,7 @@ import {
 
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { getAuditLogDeleteErrorMessage } from '/app/local-resources/access-control/utils'
+import { isInsufficientScopeError } from '/app/local-resources/access-control/utils'
 import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
@@ -50,7 +50,7 @@ interface ComplianceReadySoftwareFilesProps {
 export function ComplianceReadySoftwareFiles({
   robotName,
 }: ComplianceReadySoftwareFilesProps): ReactNode {
-  const { t } = useTranslation(['device_details', 'access_control'])
+  const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
     useLogPeriodSummariesQuery()
   const { documentationState } = useLinkedDocumentationState(
@@ -236,23 +236,14 @@ export function ComplianceReadySoftwareFiles({
           setDownloadModalDismissed(true)
         })
         .catch((e: unknown) => {
-          if (!isDocumentedMutationError(e)) {
+          if (isDocumentedMutationError(e)) {
+            restoreDeleteModal()
+          } else if (!isInsufficientScopeError(e)) {
             const fallbackMessage =
               e instanceof Error && e.message.length > 0
                 ? e.message
                 : t('some_logs_not_deleted')
-            makeToast(
-              getAuditLogDeleteErrorMessage(
-                e,
-                t(
-                  'access_control:delete_audit_logs_permission_required'
-                ) as string,
-                fallbackMessage as string
-              ),
-              ERROR_TOAST
-            )
-          } else {
-            restoreDeleteModal()
+            makeToast(fallbackMessage as string, ERROR_TOAST)
           }
         })
         .finally(() => {

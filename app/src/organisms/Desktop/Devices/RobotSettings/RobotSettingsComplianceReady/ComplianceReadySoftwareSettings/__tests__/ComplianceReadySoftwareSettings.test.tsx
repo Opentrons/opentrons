@@ -239,7 +239,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     screen.getByText('Require password complexity?')
     screen.getByText('Users will need to reset their passwords')
     screen.getByText(
-      'Updating this setting will sign out all users and require them to reset their passwords the next time they sign in.'
+      'Enabling this setting will require users to reset their passwords to meet the new requirements the next time they sign in.'
     )
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
 
@@ -342,7 +342,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).toHaveAttribute('aria-checked', 'false')
     expect(
       screen.getByRole('switch', {
-        name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
+        name: 'Automatically delete the oldest protocol run record when the robot reaches the maximum of 20 saved records',
       })
     ).toHaveAttribute('aria-checked', 'true')
   })

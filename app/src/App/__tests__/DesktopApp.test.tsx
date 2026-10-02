@@ -48,6 +48,7 @@ vi.mock('/app/organisms/IncompatibleModule')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks/useSoftwareUpdatePoll')
+vi.mock('/app/local-resources/access-control/useHandleInsufficientPermissions')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
 vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
   useTrackRobotRestarts: vi.fn(),

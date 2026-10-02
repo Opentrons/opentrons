@@ -49,6 +49,10 @@ export function OddModal(props: OddModalProps): JSX.Element {
       modalWidth = '32.375rem'
       break
     }
+    case 'smallMedium': {
+      modalWidth = '38rem'
+      break
+    }
     case 'large': {
       modalWidth = '60rem'
       break

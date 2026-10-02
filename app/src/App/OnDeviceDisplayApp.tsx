@@ -30,7 +30,6 @@ import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
-import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -63,11 +62,13 @@ import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobo
 import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { useHandleInsufficientPermissions } from '../local-resources/access-control/useHandleInsufficientPermissions'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { AdminHub } from '../pages/ODD/AdminHub'
 import { RunLoading } from '../pages/ODD/RunLoading/RunLoading'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -124,7 +125,7 @@ function getPathComponent(
 ): JSX.Element {
   switch (path) {
     case '/account':
-      return <Account />
+      return <AdminHub />
     case '/choose-language':
       return <ChooseLanguage />
     case '/dashboard':
@@ -292,6 +293,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             ) : null}
                             <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
+                              <InsufficientPermissionsToasts />
                               {!showModuleSetupModal ? (
                                 <ModuleAttachedToasts
                                   openFlow={(open: boolean) => {
@@ -406,6 +408,12 @@ export function OnDeviceDisplayAppRoutes({
 
 function ProtocolReceiptToasts(): null {
   useProtocolReceiptToast()
+  return null
+}
+
+function InsufficientPermissionsToasts(): null {
+  useHandleInsufficientPermissions()
+
   return null
 }
 

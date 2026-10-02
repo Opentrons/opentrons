@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 
+import { useRef, useState } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
@@ -16,10 +17,14 @@ import { robotAuthReducer } from '/app/redux/robot-auth'
 import { PersonalAccountSettings } from '..'
 
 import type { RenderResult } from '@testing-library/react'
+import type { JSX } from 'react'
 import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
 import type { RobotAuthState } from '/app/redux/robot-auth/slice'
 
 const ROBOT_NAME = 'flex-1'
+
+const ADMIN_WARNING_BANNER_TEXT =
+  'Admins cannot delete, reset the password, lock, or change the role of their own account.'
 
 const MOCK_AUTH_STATE = {
   user: {
@@ -50,8 +55,29 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 
 const mockUpdateSelf = vi.fn()
 
-const renderComponent = (robotAuth?: RobotAuthState): RenderResult => {
-  const store = configureStore({
+// The parent owns edit state and the scroll target ref, so the tests stand in
+// for it to keep exercising the view/edit toggle.
+function PersonalAccountSettingsParent({
+  showAdminWarningBanner = false,
+}: {
+  showAdminWarningBanner?: boolean
+}): JSX.Element {
+  const [isEditing, setIsEditing] = useState(false)
+  const viewRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <PersonalAccountSettings
+      robotName={ROBOT_NAME}
+      isEditing={isEditing}
+      setIsEditing={setIsEditing}
+      viewRef={viewRef}
+      showAdminWarningBanner={showAdminWarningBanner}
+    />
+  )
+}
+
+const createTestStore = (robotAuth?: RobotAuthState) =>
+  configureStore({
     reducer: { robotAuth: robotAuthReducer },
     preloadedState: {
       robotAuth: robotAuth ?? {
@@ -63,16 +89,26 @@ const renderComponent = (robotAuth?: RobotAuthState): RenderResult => {
     },
   })
 
-  return render(
-    <QueryClientProvider client={new QueryClient()}>
-      <I18nextProvider i18n={i18n}>
-        <Provider store={store}>
-          <PersonalAccountSettings robotName={ROBOT_NAME} />
-        </Provider>
-      </I18nextProvider>
-    </QueryClientProvider>
-  )
-}
+const buildTree = (
+  store: ReturnType<typeof createTestStore>,
+  showAdminWarningBanner = false
+): JSX.Element => (
+  <QueryClientProvider client={new QueryClient()}>
+    <I18nextProvider i18n={i18n}>
+      <Provider store={store}>
+        <PersonalAccountSettingsParent
+          showAdminWarningBanner={showAdminWarningBanner}
+        />
+      </Provider>
+    </I18nextProvider>
+  </QueryClientProvider>
+)
+
+const renderComponent = (
+  robotAuth?: RobotAuthState,
+  showAdminWarningBanner = false
+): RenderResult =>
+  render(buildTree(createTestStore(robotAuth), showAdminWarningBanner))
 
 function openEditForm(): void {
   fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
@@ -130,6 +166,9 @@ describe('PersonalAccountSettings', () => {
     screen.getByText('Alice Example')
     screen.getByText('************************')
     screen.getByRole('button', { name: 'Edit' })
+    expect(
+      screen.queryByText(ADMIN_WARNING_BANNER_TEXT)
+    ).not.toBeInTheDocument()
 
     openEditForm()
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
@@ -144,6 +183,12 @@ describe('PersonalAccountSettings', () => {
     expect(
       screen.queryByRole('button', { name: 'Save' })
     ).not.toBeInTheDocument()
+  })
+
+  it('shows the admin warning banner when the parent requests it', () => {
+    renderComponent(undefined, true)
+    screen.getByText(ADMIN_WARNING_BANNER_TEXT)
+    screen.getByText('Personal account settings')
   })
 
   it('shows the logged out message when the user is not logged in', () => {
@@ -164,27 +209,8 @@ describe('PersonalAccountSettings', () => {
   })
 
   it('shows the logged out message after the session expires', () => {
-    const store = configureStore({
-      reducer: { robotAuth: robotAuthReducer },
-      preloadedState: {
-        robotAuth: {
-          perRobotAuthStates: {
-            [ROBOT_NAME]: MOCK_AUTH_STATE,
-          },
-          mostRecentRobotName: ROBOT_NAME,
-        },
-      },
-    })
-
-    const { rerender } = render(
-      <QueryClientProvider client={new QueryClient()}>
-        <I18nextProvider i18n={i18n}>
-          <Provider store={store}>
-            <PersonalAccountSettings robotName={ROBOT_NAME} />
-          </Provider>
-        </I18nextProvider>
-      </QueryClientProvider>
-    )
+    const store = createTestStore()
+    const { rerender } = render(buildTree(store))
 
     screen.getByText('alice')
 
@@ -193,15 +219,7 @@ describe('PersonalAccountSettings', () => {
       payload: { robotName: ROBOT_NAME },
     })
 
-    rerender(
-      <QueryClientProvider client={new QueryClient()}>
-        <I18nextProvider i18n={i18n}>
-          <Provider store={store}>
-            <PersonalAccountSettings robotName={ROBOT_NAME} />
-          </Provider>
-        </I18nextProvider>
-      </QueryClientProvider>
-    )
+    rerender(buildTree(store))
 
     screen.getByTestId('InfoScreen')
     screen.getByLabelText('alert')
