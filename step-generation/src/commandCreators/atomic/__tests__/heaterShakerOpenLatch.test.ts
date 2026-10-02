@@ -137,4 +137,61 @@ describe('heaterShakerOpenLatch', () => {
       python: 'mock_heater_shaker_1.open_labware_latch()',
     })
   })
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    when(getIsTallLabwareEastWestOfHeaterShaker)
+      .calledWith(
+        robotState.labware,
+        invariantContext.labwareEntities,
+        HEATER_SHAKER_SLOT
+      )
+      .thenReturn(false)
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: HEATER_SHAKER_ID,
+      },
+    }
+    const result = heaterShakerOpenLatch(
+      {
+        moduleId: 'selected_module',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          key: expect.any(String),
+          params: { moduleId: 'heaterShakerId' },
+        },
+      ],
+      python: 'mock_heater_shaker_1.open_labware_latch()',
+    })
+  })
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = heaterShakerOpenLatch(
+      {
+        moduleId: 'mock_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

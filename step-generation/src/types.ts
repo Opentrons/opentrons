@@ -1240,3 +1240,24 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
+
+export interface HeaterShakerCloseLatchStepGenArgs {
+  moduleId: string
+}
+
+export interface HeaterShakerDeactivateHeaterStepGenArgs {
+  moduleId: string
+}
+
+export interface HeaterShakerOpenLatchStepGenArgs {
+  moduleId: string
+}
+
+export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
+  moduleId: string
+  rpm: number | string
+}
+
+export interface HeaterShakerStopShakeStepGenArgs {
+  moduleId: string
+}
