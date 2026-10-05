@@ -4,7 +4,10 @@ import { when } from 'vitest-when'
 
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+import {
+  useMostRecentCompletedAnalysis,
+  useRunHasStarted,
+} from '/app/resources/runs'
 
 import { useProtocolRunSetupLoadingState } from '../useProtocolRunSetupLoadingState'
 
@@ -38,6 +41,7 @@ describe('useProtocolRunSetupLoadingState', () => {
   beforeEach(() => {
     mockLpcState()
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({ id: 'analysis' } as any)
@@ -87,6 +91,17 @@ describe('useProtocolRunSetupLoadingState', () => {
   it('is not loading on Flex when LPC store exists', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     mockLpcState(FLEX_LPC_STATE)
+
+    const { result } = renderHook(
+      () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
+      { wrapper }
+    )
+    expect(result.current.isSetupLoading).toBe(false)
+  })
+
+  it('is not loading on Flex without LPC once the run has started', () => {
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
     const { result } = renderHook(
       () => useProtocolRunSetupLoadingState(RUN_ID, ROBOT_NAME, false),
