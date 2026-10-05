@@ -5,6 +5,10 @@ import { StyledText } from '@opentrons/components'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
+import {
+  MAX_PASSWORD_RESET_TIME_DAYS,
+  MIN_PASSWORD_RESET_TIME_DAYS,
+} from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
@@ -39,8 +43,8 @@ export function PasswordChange({
           })
           setShowLengthOfTime(false)
         }}
-        min={1}
-        max={3000}
+        min={MIN_PASSWORD_RESET_TIME_DAYS}
+        max={MAX_PASSWORD_RESET_TIME_DAYS}
       />
     )
   }

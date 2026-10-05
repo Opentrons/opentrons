@@ -4,6 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './compliance_ready_settings.module.css'
+import {
+  MAX_IDLE_LOGOUT_MINUTES,
+  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+  MIN_IDLE_LOGOUT_MINUTES,
+  MIN_NUMBER_OF_LOGIN_ATTEMPTS,
+} from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { PasswordChange } from './PasswordChange'
 import { PasswordComplexity } from './PasswordComplexity'
@@ -76,8 +82,8 @@ export function LoginSettings({
             patchAuthSettings({ maxNumberOfLoginAttempts: value })
             setCurrentPage(null)
           }}
-          min={1}
-          max={5}
+          min={MIN_NUMBER_OF_LOGIN_ATTEMPTS}
+          max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
         />
       )
     case 'password_reset_time':
@@ -101,8 +107,8 @@ export function LoginSettings({
             patchAuthSettings({ idleLogout: value ? value * 60 : undefined })
             setCurrentPage(null)
           }}
-          min={1}
-          max={30000000}
+          min={MIN_IDLE_LOGOUT_MINUTES}
+          max={MAX_IDLE_LOGOUT_MINUTES}
         />
       )
     case 'password_complexity':

@@ -37,6 +37,7 @@ _SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 _RUN_PROCESS_TIMEOUT = 60  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
+_RUN_PROXY_READY_TIMEOUT = 180  # seconds
 
 
 class _ProcessStatus(enum.Enum):
@@ -237,19 +238,28 @@ class RunProcessPyroProvider:
     ) -> DirectedRunProcess:
         """Returns a proxy for the run process or simulating run process.
 
-        Depending on how recently the desired process started, this may take up to around 25 seconds to resolve.
+        After a process is recycled, the replacement child must import and
+        register with the nameserver before this returns. That can take up to
+        `_RUN_PROXY_READY_TIMEOUT` seconds.
         """
         process_regisry = await self._validate_process_registry_ready(
             simulator=simulator
         )
         run_process = self._get_active_run_process(process_registry=process_regisry)
+        claimed_unused = False
         if run_process is None:
             run_process = await self._set_active_process(
                 process_registry=process_regisry
             )
+            claimed_unused = True
 
-        run_proxy = await wait_for_proxy(proxy_name=run_process.pyroname)
+        run_proxy = await wait_for_proxy(
+            proxy_name=run_process.pyroname,
+            timeout=_RUN_PROXY_READY_TIMEOUT,
+        )
         if run_proxy is None:
+            if claimed_unused:
+                run_process.status = _ProcessStatus.UNUSED
             raise RuntimeError(f"Can't resolve pyro proxy '{run_process.pyroname}'")
         return cast(DirectedRunProcess, cast(object, run_proxy))
 

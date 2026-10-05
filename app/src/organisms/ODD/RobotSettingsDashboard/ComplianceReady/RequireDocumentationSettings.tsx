@@ -5,6 +5,7 @@ import { StyledText } from '@opentrons/components'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
+import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
@@ -25,13 +26,16 @@ export function RequireDocumentationSettings({
   const [showMinLength, setShowMinLength] = useState(false)
 
   const documentationEnabled = !!auditSettings?.requireReasonForInteraction
+  const minLength =
+    auditSettings?.minLengthOfReasonForInteraction ??
+    MIN_LENGTH_OF_REASON_FOR_INTERACTION
 
   if (showMinLength) {
     return (
       <NumericSettingPage
         title={t('odd_minimum_length_for_documentation')}
         description={t('odd_minimum_length_for_documentation_description')}
-        value={auditSettings?.minLengthOfReasonForInteraction ?? 0}
+        value={minLength}
         label={t('odd_number_of_characters')}
         onBack={value => {
           patchAuditSettings({
@@ -39,7 +43,7 @@ export function RequireDocumentationSettings({
           })
           setShowMinLength(false)
         }}
-        min={1}
+        min={MIN_LENGTH_OF_REASON_FOR_INTERACTION}
       />
     )
   }
@@ -73,7 +77,11 @@ export function RequireDocumentationSettings({
               <SettingsListButton
                 key={t('odd_minimum_length_for_documentation')}
                 title={t('odd_minimum_length_for_documentation_description')}
-                value={`${auditSettings?.minLengthOfReasonForInteraction ?? 0} ${t('odd_characters')}`}
+                value={
+                  minLength > MIN_LENGTH_OF_REASON_FOR_INTERACTION
+                    ? `${minLength} ${t('odd_characters')}`
+                    : `${minLength} ${t('odd_character')}`
+                }
                 onClick={() => {
                   setShowMinLength(true)
                 }}

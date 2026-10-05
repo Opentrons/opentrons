@@ -462,3 +462,9 @@ class FlexBackend(Protocol):
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         ...
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[List[Axis]] = None
+    ) -> Dict[Axis, Dict[str, int]]:
+        """Request and return motor usage data."""
+        ...

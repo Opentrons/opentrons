@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
 import { TouchInputField } from '@opentrons/components'
 
@@ -54,7 +55,7 @@ export function EditLegalName({
   return (
     <div className={styles.container}>
       <ChildNavigation
-        header={t('odd_add_legal_name_title')}
+        header={t('odd_edit_legal_name_title')}
         onClickButton={handleConfirm}
         buttonText={t('odd_create_user_continue_button')}
         buttonType="primary"
@@ -67,8 +68,14 @@ export function EditLegalName({
         buttonIsDisabled={isLoading}
         onClickBack={onCancel}
       />
-      <div className={styles.odd_create_user_content}>
-        <div className={styles.odd_create_user_input_container}>
+      <div className={styles.create_user_content}>
+        <div
+          className={clsx(
+            styles.create_user_input_container,
+            !isKeyboardOpen &&
+              styles.create_user_input_container_keyboard_closed
+          )}
+        >
           <TouchInputField
             type="text"
             label={t('odd_add_legal_name_label')}
@@ -79,17 +86,20 @@ export function EditLegalName({
             autoFocus
           />
         </div>
-        <AccordionKeyboard
-          isOpen={isKeyboardOpen}
-          onToggle={() => {
-            setIsKeyboardOpen(!isKeyboardOpen)
-          }}
-        >
-          <FullKeyboard
-            keyboardRef={keyboardRef}
-            inputElementRef={inputElementRef}
-          />
-        </AccordionKeyboard>
+        <div className={styles.keyboard_container}>
+          <AccordionKeyboard
+            inputRef={inputElementRef}
+            isOpen={isKeyboardOpen}
+            onToggle={() => {
+              setIsKeyboardOpen(!isKeyboardOpen)
+            }}
+          >
+            <FullKeyboard
+              keyboardRef={keyboardRef}
+              inputElementRef={inputElementRef}
+            />
+          </AccordionKeyboard>
+        </div>
       </div>
     </div>
   )

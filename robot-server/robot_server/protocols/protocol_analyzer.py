@@ -52,7 +52,8 @@ class ProtocolAnalyzer:
 
     async def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the validated RTPs with values set by the client."""
-        assert self._coordinator is not None
+        if self._coordinator is None:
+            return []
         return await self._coordinator.get_run_time_parameters()
 
     async def load_orchestrator(

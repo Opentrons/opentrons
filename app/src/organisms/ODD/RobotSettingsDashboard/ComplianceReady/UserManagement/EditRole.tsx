@@ -46,8 +46,8 @@ export function EditRole({
         iconName={isLoading ? 'ot-spinner' : undefined}
         buttonIsDisabled={isLoading}
       />
-      <div className={styles.odd_create_user_content}>
-        <div className={styles.odd_choose_role_buttons}>
+      <div className={styles.create_user_content}>
+        <div className={styles.choose_role_buttons}>
           <ModalContentOneColSimpleButtons
             headline={t('odd_choose_role_headline')}
             buttons={[

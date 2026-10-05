@@ -5,10 +5,15 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
+import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth/getPasswordComplexityError'
+import {
+  isValidPasswordComplexityMinimumLength,
+  MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+} from '/app/resources/auth/helpers'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
+import { MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH } from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
@@ -37,7 +42,10 @@ export function PasswordComplexity({
     return (
       <NumericSettingPage
         title={t('odd_minimum_password_length')}
-        value={authSettings?.passwordComplexityMinimumLength ?? 1}
+        value={
+          authSettings?.passwordComplexityMinimumLength ??
+          MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH
+        }
         label={t('odd_number_of_characters')}
         caption={t('odd_input_range')}
         onBack={value => {
@@ -49,8 +57,8 @@ export function PasswordComplexity({
           }
           setShowMinLength(false)
         }}
-        min={1}
-        max={256}
+        min={MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
+        max={MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
       />
     )
   }
@@ -82,7 +90,7 @@ export function PasswordComplexity({
             onClick={() => {
               patchAuthSettings({
                 passwordComplexitySpecialCharacters: true,
-                passwordComplexityMinimumLength: 8,
+                passwordComplexityMinimumLength: DEFAULT_MIN_PASSWORD_LENGTH,
               })
               setShowWarningModal(false)
             }}
@@ -137,7 +145,7 @@ export function PasswordComplexity({
                 <SettingsListButton
                   key={t('odd_minimum_password_length')}
                   title={t('odd_minimum_password_length')}
-                  value={`${authSettings?.passwordComplexityMinimumLength ?? 1} ${t('odd_characters')}`}
+                  value={`${authSettings?.passwordComplexityMinimumLength ?? MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH} ${t('odd_characters')}`}
                   onClick={() => {
                     setShowMinLength(true)
                   }}

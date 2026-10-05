@@ -79,7 +79,7 @@ describe('NumericSettingPage', () => {
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
 
-    screen.getByText('Must be greater than 1')
+    screen.getByText('Must be greater than 0')
     expect(props.onBack).not.toHaveBeenCalled()
   })
 
@@ -91,7 +91,7 @@ describe('NumericSettingPage', () => {
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
 
-    screen.getByText('Must be less than 5')
+    screen.getByText('Must be less than 6')
     expect(props.onBack).not.toHaveBeenCalled()
   })
 
@@ -115,11 +115,11 @@ describe('NumericSettingPage', () => {
       target: { value: '0' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
-    screen.getByText('Must be greater than 1')
+    screen.getByText('Must be greater than 0')
 
     fireEvent.change(screen.getByLabelText('Number of logins'), {
       target: { value: '2' },
     })
-    expect(screen.queryByText('Must be greater than 1')).not.toBeInTheDocument()
+    expect(screen.queryByText('Must be greater than 0')).not.toBeInTheDocument()
   })
 })
