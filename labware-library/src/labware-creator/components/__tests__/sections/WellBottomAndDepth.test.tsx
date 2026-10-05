@@ -53,7 +53,7 @@ describe('WellBottomAndDepth', () => {
       )
 
       screen.getByText(
-        'Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR.'
+        /Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR/i
       )
       const radioElements = screen.getAllByRole('radio')
       expect(radioElements).toHaveLength(3)

@@ -177,6 +177,37 @@
   display: none;
 }
 
+.preview_views {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.preview_view {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.preview_view_label {
+  margin: 0;
+  color: var(--grey-60);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.preview_canvas {
+  width: 100%;
+  height: 14rem;
+}
+
+.preview_canvas > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .pipette_field_wrapper {
   width: 13rem;
 }
@@ -222,8 +253,17 @@
     padding-left: var(--spacing-7);
   }
 
+  .preview_views {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .preview_view {
+    flex: 1;
+  }
+
   .preview_labware {
-    max-width: var(--size-60p);
+    max-width: 100%;
     margin: 0 auto;
   }
 

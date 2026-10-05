@@ -82,6 +82,16 @@ describe('getLabwareName', () => {
     { values: { labwareType: 'tubeRack' }, plural: true, expected: 'tubes' },
     { values: { labwareType: 'wellPlate' }, plural: false, expected: 'well' },
     { values: { labwareType: 'wellPlate' }, plural: true, expected: 'wells' },
+    {
+      values: { labwareType: 'filterPlate' },
+      plural: false,
+      expected: 'well',
+    },
+    {
+      values: { labwareType: 'filterPlate' },
+      plural: true,
+      expected: 'wells',
+    },
     { values: { labwareType: 'reservoir' }, plural: false, expected: 'well' },
     { values: { labwareType: 'reservoir' }, plural: true, expected: 'wells' },
   ]

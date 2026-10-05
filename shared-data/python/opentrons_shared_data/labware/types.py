@@ -21,6 +21,7 @@ LabwareDisplayCategory = Literal[
     "reservoir",
     "trash",
     "wellPlate",
+    "filterPlate",
     "aluminumBlock",
     "adapter",
     "other",
@@ -243,6 +244,7 @@ class LabwareDefinition2(TypedDict):
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
     gripHeightFromLabwareBottom: NotRequired[float]
+    skirtHeight: NotRequired[float]
     stackLimit: NotRequired[int]
     compatibleParentLabware: NotRequired[list[str]]
     # The innerLabwareGeometry dict values are not currently modeled in these
@@ -279,6 +281,7 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
     gripHeightFromLabwareOrigin: NotRequired[float]
+    skirtHeight: NotRequired[float]
     stackLimit: NotRequired[int]
     compatibleParentLabware: NotRequired[list[str]]
     # The innerLabwareGeometry dict values are not currently modeled in these
