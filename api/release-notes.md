@@ -6,6 +6,10 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons Robot Software Changes in 10.1.0
+
+Welcome to the v10.1.0 release of the Opentrons Flex robot software! This release includes feature improvements and bug fixes for the Opentrons App.
+
 ## Opentrons Robot Software Changes in 10.0.0
 
 Welcome to the v10.0.0 release of the Opentrons Flex robot software! This release introduces Opentrons Flex Compliance Ready Software.
