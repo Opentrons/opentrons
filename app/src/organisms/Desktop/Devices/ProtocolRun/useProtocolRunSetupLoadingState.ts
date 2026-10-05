@@ -12,8 +12,9 @@ export interface ProtocolRunSetupLoadingState {
 
 /**
  * Setup tab loading gate:
- * - run record / protocol analysis missing
- * - Redux LPC store not initialized yet for this run
+ * - run record still on first fetch
+ * - protocol analysis missing
+ * - Flex: Redux LPC store not initialized yet for this run
  */
 export function useProtocolRunSetupLoadingState(
   runId: string,

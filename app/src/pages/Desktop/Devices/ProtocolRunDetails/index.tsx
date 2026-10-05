@@ -273,7 +273,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       ) {
         navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
       }
-      // On a clone run, navigate to "run setup" if the run hasn't started.
+      // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
       else if (
         currentRunStatus === RUN_STATUS_IDLE &&
         protocolRunDetailsTab !== 'setup'
