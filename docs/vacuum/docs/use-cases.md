@@ -7,7 +7,7 @@ The Vacuum Module uses a modular deck stack system that supports a variety of fi
 
 ## Stacking configurations
 
-Each stack configuration helps you control the vertical clearance between the filter plate and collection plate seated over the vacuum base. Maintaining a tight, precise clearance between well plates helps ensure that extracted fluid drops directly into receiving wells..
+Each stack configuration helps you control the vertical clearance between the filter plate and collection plate seated over the vacuum base. Maintaining a tight, precise clearance between well plates helps ensure that extracted fluid drops directly into receiving wells.
 
 ### With spacers
 
@@ -64,6 +64,6 @@ A visual inspection and an active vacuum test can help determine if a combinatio
 
 | Test | Description |
 |:----|:----|
-| **Visual inspection** | Ensure stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious titling or easily rocking back and forth. |
+| **Visual inspection** | Ensure stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious tilting or easily rocking back and forth. |
 | **In App** | In the Opentrons App, go to the Devices tab and click your robot. From the Instruments and Modules section, find the tile for the Vacuum Module and click the three-button menu (⋮). Click **Pressure** or **Power** to start/stop the pump and listen for audible air leaks. |
 | **API** | Run an automated test by calling `start_set_vacuum_pressure()` with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. You may also hear audible air leaks. |
