@@ -205,13 +205,14 @@ async def test_run_process_create(
         ot3_hardware_api, mock_app_state
     )
 
+    command_store_provider = CommandStoreProvider()
     run_store = RunOrchestratorStore(
         hardware_api=ot3_async,
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
-        command_store_provider=CommandStoreProvider(),
+        command_store_provider=command_store_provider,
     )
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
         mock_app_state, run_store
@@ -232,6 +233,12 @@ async def test_run_process_create(
     resource_utilities.register_notify_publishers_to_pyro_resource(
         mock_app_state,
         lambda: [],  # type: ignore
+    )
+    resource_utilities.register_run_store_provider_to_pyro_resource(
+        mock_app_state, command_store_provider
+    )
+    resource_utilities.register_analysis_store_provider_to_pyro_resource(
+        mock_app_state, command_store_provider
     )
 
     # Proceed with Pyro process testing
