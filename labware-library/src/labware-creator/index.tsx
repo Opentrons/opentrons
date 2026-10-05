@@ -741,8 +741,7 @@ function CreateForm(props: CreateFileFormProps): JSX.Element {
                 proceed(1)
               }}
               disabled={
-                errors.labwareZDimension != null ||
-                errors.skirtHeight != null
+                errors.labwareZDimension != null || errors.skirtHeight != null
               }
             >
               Next

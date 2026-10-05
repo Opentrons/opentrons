@@ -3,9 +3,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 /** Vacuum collars (not spacers) that a filter plate can sit on. */
 export function isVacuumCollar(definition: LabwareDefinition2): boolean {
   const quirks = definition.parameters.quirks ?? []
-  return (
-    quirks.includes('vacuumModuleDock') && !quirks.includes('vacuumSpacer')
-  )
+  return quirks.includes('vacuumModuleDock') && !quirks.includes('vacuumSpacer')
 }
 
 /**

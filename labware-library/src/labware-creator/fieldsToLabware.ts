@@ -226,10 +226,7 @@ export function fieldsToLabware(
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
     const skirtHeight = fields.skirtHeight ?? 0
-    if (
-      labwareAllowsProtrudingWells(fields.labwareType) &&
-      skirtHeight > 0
-    ) {
+    if (labwareAllowsProtrudingWells(fields.labwareType) && skirtHeight > 0) {
       def.skirtHeight = skirtHeight
     }
     if (isFilterPlate) {

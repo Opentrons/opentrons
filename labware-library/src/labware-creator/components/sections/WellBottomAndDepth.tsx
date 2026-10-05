@@ -76,10 +76,7 @@ const Content = (props: Props): JSX.Element => {
 }
 
 export const WellBottomAndDepth = (): JSX.Element | null => {
-  const fieldList: Array<keyof LabwareFields> = [
-    'wellBottomShape',
-    'wellDepth',
-  ]
+  const fieldList: Array<keyof LabwareFields> = ['wellBottomShape', 'wellDepth']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   const label =
     values.labwareType === 'tipRack'
