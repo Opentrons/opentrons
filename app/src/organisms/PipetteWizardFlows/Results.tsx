@@ -3,12 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
   COLORS,
-  Flex,
-  JUSTIFY_FLEX_END,
   LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
@@ -20,7 +17,6 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -62,12 +58,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
-    errorMessage,
-    setShowErrorMessage,
-    isDoorOpenError,
-    setIsDoorOpenError,
-    dismissDoorOpenError,
     nextMount,
+    handleCommandError,
   } = props
   const { t, i18n } = useTranslation([
     'pipette_wizard_flows',
@@ -75,14 +67,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     'branded',
   ])
 
-  const handleCommandError = (error: Error): void => {
-    if (isMaintenanceDoorOpenError(error)) {
-      setIsDoorOpenError(true)
-      setShowErrorMessage(t('door_is_open') as string)
-    } else {
-      setShowErrorMessage(error.message)
-    }
-  }
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
 
@@ -321,41 +305,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
-  if (errorMessage != null) {
-    return isDoorOpenError ? (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('door_is_open')}
-        subHeader={t('close_door_and_try_again')}
-      >
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          {Boolean(isOnDevice) ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              onClick={dismissDoorOpenError}
-            />
-          ) : (
-            <PrimaryButton onClick={dismissDoorOpenError}>
-              {t('try_again')}
-            </PrimaryButton>
-          )}
-        </Flex>
-      </SimpleWizardBody>
-    ) : (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        subHeader={errorMessage}
-      />
-    )
-  }
+
   return (
     <SimpleWizardBody
       iconColor={iconColor}

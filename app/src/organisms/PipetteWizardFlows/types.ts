@@ -1,4 +1,3 @@
-import type { Dispatch, SetStateAction } from 'react'
 import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -84,11 +83,8 @@ export interface PipetteWizardStepProps {
   isRobotMoving: boolean
   maintenanceRunId?: string
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
-  setShowErrorMessage: Dispatch<SetStateAction<string | null>>
+  handleCommandError: (error: Error) => void
   errorMessage: string | null
-  isDoorOpenError: boolean
-  setIsDoorOpenError: Dispatch<SetStateAction<boolean>>
-  dismissDoorOpenError: () => void
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
 }
