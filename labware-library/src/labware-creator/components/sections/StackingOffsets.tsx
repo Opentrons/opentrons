@@ -166,6 +166,10 @@ export function StackingOffsets(): JSX.Element | null {
   }
 
   const vacuumCollars = modifiedAdapterDefinitions.filter(isVacuumCollar)
+  const vacuumCollarLoadNames = vacuumCollars
+    .map(definition => definition.parameters.loadName)
+    .sort()
+    .join(',')
   const checkedCollarLoadNames = Object.keys(values.compatibleAdapters)
     .filter(loadName =>
       vacuumCollars.some(
@@ -175,27 +179,39 @@ export function StackingOffsets(): JSX.Element | null {
     .sort()
     .join(',')
   const didPreselectCollarsRef = useRef(false)
+  // Collar definitions and adapter values are new objects every render.
+  // The effects read the latest ones here and rerun only when the stable
+  // fields below change, so a typed measurement is not overwritten.
+  const collarSyncRef = useRef({
+    vacuumCollars,
+    compatibleAdapters: values.compatibleAdapters,
+  })
+  collarSyncRef.current = {
+    vacuumCollars,
+    compatibleAdapters: values.compatibleAdapters,
+  }
 
   // Pre-select both vacuum collars for filter plates (once per filter-plate session).
   useEffect(() => {
+    const { vacuumCollars: collars, compatibleAdapters } = collarSyncRef.current
     if (!isFilterPlate) {
       didPreselectCollarsRef.current = false
       return
     }
-    if (didPreselectCollarsRef.current || vacuumCollars.length === 0) {
+    if (didPreselectCollarsRef.current || collars.length === 0) {
       return
     }
-    const anyCollarChecked = vacuumCollars.some(
+    const anyCollarChecked = collars.some(
       definition =>
-        values.compatibleAdapters[definition.parameters.loadName] !== undefined
+        compatibleAdapters[definition.parameters.loadName] !== undefined
     )
     if (anyCollarChecked) {
       didPreselectCollarsRef.current = true
       return
     }
 
-    const nextAdapters = { ...values.compatibleAdapters }
-    vacuumCollars.forEach(definition => {
+    const nextAdapters = { ...compatibleAdapters }
+    collars.forEach(definition => {
       nextAdapters[definition.parameters.loadName] = canDeriveCollarStacking
         ? getVacuumCollarStackingMeasurement(
             definition.dimensions.zDimension,
@@ -211,20 +227,18 @@ export function StackingOffsets(): JSX.Element | null {
     isFilterPlate,
     setFieldValue,
     skirtHeightMm,
-    vacuumCollars
-      .map(definition => definition.parameters.loadName)
-      .sort()
-      .join(','),
+    vacuumCollarLoadNames,
   ])
 
   // Keep checked collar measurements in sync when skirt height changes.
   useEffect(() => {
+    const { vacuumCollars: collars, compatibleAdapters } = collarSyncRef.current
     if (!canDeriveCollarStacking || checkedCollarLoadNames === '') {
       return
     }
     let changed = false
-    const nextAdapters = { ...values.compatibleAdapters }
-    vacuumCollars.forEach(definition => {
+    const nextAdapters = { ...compatibleAdapters }
+    collars.forEach(definition => {
       const loadName = definition.parameters.loadName
       if (nextAdapters[loadName] === undefined) {
         return
