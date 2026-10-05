@@ -1236,14 +1236,6 @@ export interface AbsorbanceReaderReadStepGenArgs {
   fileName?: string | null
 }
 
-export interface VacuumCloseVentStepGenArgs {
-  moduleId: string
-}
-
-export interface VacuumOpenVentStepGenArgs {
-  moduleId: string
-}
-
 export interface VacuumSetPumpPowerStepGenArgs {
   moduleId: string
   percentPower: number | string
@@ -1262,8 +1254,4 @@ export interface VacuumStartRunProfileStepGenArgs {
   moduleId: string
   profile: VacuumRunProfileParams['steps']
   ventAfter: boolean | string
-}
-
-export interface VacuumStopPumpStepGenArgs {
-  moduleId: string
 }

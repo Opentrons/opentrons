@@ -1,10 +1,10 @@
 import * as errorCreators from '../../errorCreators'
 import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { CommandCreator, VacuumStopPumpStepGenArgs } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumStopPump: CommandCreator<VacuumStopPumpStepGenArgs> = (
+export const vacuumStopPump: CommandCreator<ModuleStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState

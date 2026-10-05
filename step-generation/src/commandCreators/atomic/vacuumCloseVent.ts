@@ -6,10 +6,10 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CommandCreator, VacuumCloseVentStepGenArgs } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumCloseVent: CommandCreator<VacuumCloseVentStepGenArgs> = (
+export const vacuumCloseVent: CommandCreator<ModuleStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
