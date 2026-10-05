@@ -76,6 +76,28 @@ export interface RequestConfig<
   requiresSecureTransport?: boolean
 }
 
+export type RequestErrorListener = (
+  error: unknown,
+  method: Method,
+  hostConfig: HostConfig
+) => void
+
+const requestErrorListeners = new Set<RequestErrorListener>()
+
+/**
+ * Registers a listener that is called whenever a request rejects.
+ * The rejection still propagates to the caller.
+ * Returns a function that unregisters the listener.
+ */
+export function addRequestErrorListener(
+  listener: RequestErrorListener
+): () => void {
+  requestErrorListeners.add(listener)
+  return () => {
+    requestErrorListeners.delete(listener)
+  }
+}
+
 export function request<
   ResponseBodyT,
   RequestBodyT extends AxiosRequestConfig['data'] = never,
@@ -147,6 +169,11 @@ export function request<
     data: urlEncodedBody ?? body,
     headers,
     responseType: requestConfig?.responseType,
+  }).catch((error: unknown) => {
+    requestErrorListeners.forEach(listener => {
+      listener(error, method, hostConfig)
+    })
+    throw error
   })
 }
 

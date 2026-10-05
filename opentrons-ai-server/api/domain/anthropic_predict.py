@@ -11,7 +11,16 @@ import requests
 import structlog
 import weave
 from anthropic import Anthropic, AsyncAnthropic
-from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam, ToolParam
+from anthropic.types import (
+    ContentBlockParam,
+    DocumentBlockParam,
+    Message,
+    MessageParam,
+    TextBlockParam,
+    ThinkingConfigDisabledParam,
+    ThinkingConfigParam,
+    ToolParam,
+)
 from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
@@ -66,8 +75,21 @@ TOOL_ROUNDS_EXCEEDED_USER_MESSAGE = (
 )
 
 
+def anthropic_thinking_for_model(model: str) -> ThinkingConfigParam:
+    """Pick thinking config for the target model (AUTH-3480 Sonnet 5.5 migration).
+
+    Sonnet 5.5 requires ``between_tools`` instead of ``disabled`` when upfront thinking is off.
+    Earlier models (e.g. ``claude-sonnet-5``) reject ``between_tools``.
+    """
+    if "5-5" in model:
+        # Sonnet 5.5 API accepts between_tools; anthropic SDK stubs may not list it yet.
+        return cast(ThinkingConfigParam, {"type": "between_tools"})
+    disabled: ThinkingConfigDisabledParam = {"type": "disabled"}
+    return disabled
+
+
 class AnthropicPredict:
-    # Safety cap on tool-call round trips per turn. Sonnet 5 is materially more agentic than
+    # Safety cap on tool-call round trips per turn. Sonnet 5+ is materially more agentic than
     # earlier models and will readily chain tool calls (e.g. call get_relevant_api_docs more than
     # once, or call it and then simulate_protocol). See AUTH-3347.
     MAX_TOOL_ROUNDS: int = 8
@@ -79,6 +101,13 @@ class AnthropicPredict:
         self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
+        if self.model_name == "claude-sonnet-5" or self.model_helper == "claude-sonnet-5":
+            logger.warning(
+                "Configured Anthropic model is claude-sonnet-5; use claude-sonnet-5-5 (Sonnet 5.5) for better capability and pricing",
+                extra={"model_name": self.model_name, "model_helper": self.model_helper},
+            )
+        self.thinking: ThinkingConfigParam = anthropic_thinking_for_model(self.model_name)
+        self.thinking_helper: ThinkingConfigParam = anthropic_thinking_for_model(self.model_helper)
         default_api_level = get_default_api_level()
         # System prompt is sent as a cacheable content block (not a plain string) so Anthropic's
         # prompt caching can reuse it across requests instead of re-billing the full text every turn.
@@ -296,7 +325,7 @@ class AnthropicPredict:
             max_tokens=1024,
             system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
-            thinking={"type": "disabled"},
+            thinking=self.thinking_helper,
         )
 
         files_content = response.content[0].text.strip()
@@ -319,7 +348,7 @@ class AnthropicPredict:
             system=self.system_prompt,
             tools=self.tools,
             metadata={"user_id": user_id},
-            thinking={"type": "disabled"},
+            thinking=self.thinking,
         ) as stream:
             response: Message = await stream.get_final_message()
 
@@ -533,7 +562,7 @@ class AnthropicPredict:
         Handle the response from the AI model, executing tool calls in a loop until the model
         returns a final text response (or MAX_TOOL_ROUNDS is exhausted).
 
-        Sonnet 5 is materially more agentic than earlier models: it readily chains tool calls
+        Sonnet 5+ is materially more agentic than earlier models: it readily chains tool calls
         (e.g. calling get_relevant_api_docs more than once, or calling it and then
         simulate_protocol) and may issue more than one tool_use block in a single turn. A prior
         version of this method assumed exactly one tool-call round and only ever inspected a
@@ -652,7 +681,7 @@ class AnthropicPredict:
                 model=self.model_name,
                 system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
-                thinking={"type": "disabled"},
+                thinking=self.thinking,
             ) as stream:
                 response: Message = await stream.get_final_message()
             if response.content and response.content[0].type == "text":

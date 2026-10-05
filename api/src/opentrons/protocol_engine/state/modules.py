@@ -37,7 +37,11 @@ from ..commands import (
     temperature_module,
     thermocycler,
 )
-from ..errors import AreaNotInDeckConfigurationError, ModuleNotConnectedError
+from ..errors import (
+    AreaNotInDeckConfigurationError,
+    FixtureDoesNotExistError,
+    ModuleNotConnectedError,
+)
 from ..resources import DeckFixedLabware, deck_configuration_provider
 from ..types import (
     AddressableAreaLocation,
@@ -771,15 +775,34 @@ class ModuleView:
     def get_by_addressable_area(
         self, addressable_area_name: str, deck_definition: DeckDefinitionV5
     ) -> Optional[LoadedModule]:
-        """Get the module associated with this addressable area, if any."""
+        """Get the module associated with this addressable area, if any.
+
+        A module owns its provided addressable area, plus any extra areas on
+        that module's dedicated cutout fixture (for example the vacuum module
+        dock).
+        """
         for module_id in self._state.load_location_by_module_id.keys():
+            module = self.get(module_id)
             module_addressable_area = self.get_provided_addressable_area(module_id)
-            cutout_fixtures = deck_configuration_provider.get_potential_cutout_fixtures(
+
+            if addressable_area_name == module_addressable_area:
+                return module
+
+            try:
+                module_fixture = deck_configuration_provider.get_cutout_fixture(
+                    module.model.value, deck_definition
+                )
+            except FixtureDoesNotExistError:
+                continue
+
+            cutout_id, _ = deck_configuration_provider.get_potential_cutout_fixtures(
                 module_addressable_area, deck_definition
             )
-            for fixture in cutout_fixtures[1]:
-                if addressable_area_name in fixture.provided_addressable_areas:
-                    return self.get(module_id)
+            provided_areas = module_fixture["providesAddressableAreas"].get(
+                cutout_id, []
+            )
+            if addressable_area_name in provided_areas:
+                return module
 
         return None
 

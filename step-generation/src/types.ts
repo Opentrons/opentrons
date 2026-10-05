@@ -1255,3 +1255,8 @@ export interface VacuumStartRunProfileStepGenArgs {
   profile: VacuumRunProfileParams['steps']
   ventAfter: boolean | string
 }
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
