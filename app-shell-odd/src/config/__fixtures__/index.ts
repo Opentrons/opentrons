@@ -42,7 +42,7 @@ export const MOCK_CONFIG_V12: ConfigV12 = {
     seenOptIn: true,
   },
   support: {
-    userId: 'mock-intercom-id',
+    userId: 'mock-user-id',
     createdAt: 1589744281,
     name: 'Unknown User',
     email: null,
