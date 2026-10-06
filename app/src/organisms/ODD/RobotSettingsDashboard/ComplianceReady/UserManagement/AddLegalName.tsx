@@ -28,6 +28,7 @@ export function AddLegalName({
   savedLegalName?: string
 }): ReactNode {
   const [legalName, setLegalName] = useState<string | undefined>(savedLegalName)
+  const [error, setError] = useState<string | undefined>(undefined)
   const { t } = useTranslation('device_settings')
   const keyboardRef = useRef(null)
   const inputElementRef = useRef(null)
@@ -35,13 +36,16 @@ export function AddLegalName({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setLegalName(e.target.value)
+    setError(undefined)
   }
 
   const handleConfirm = useCallback((): void => {
     if (!!legalName?.trim()) {
       onContinue(legalName.trim())
+    } else {
+      setError('' + t('odd_legal_name_required'))
     }
-  }, [legalName, onContinue])
+  }, [legalName, onContinue, t])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
@@ -92,6 +96,7 @@ export function AddLegalName({
             ref={inputElementRef}
             borderRadius="8px"
             autoFocus
+            error={error}
           />
         </div>
         <div className={styles.keyboard_container}>
