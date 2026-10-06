@@ -256,14 +256,16 @@ class AnalysisStore:
             completed_analysis
         )
         csv_rtp_resources = self._extract_csv_run_time_params(completed_analysis)
-        await self._completed_store.make_room_and_add(
-            completed_analysis_resource=completed_analysis_resource,
-            primitive_rtp_resources=primitive_rtp_resources,
-            csv_rtp_resources=csv_rtp_resources,
-        )
+        try:
+            await self._completed_store.make_room_and_add(
+                completed_analysis_resource=completed_analysis_resource,
+                primitive_rtp_resources=primitive_rtp_resources,
+                csv_rtp_resources=csv_rtp_resources,
+            )
 
-        self._pending_store.remove(analysis_id=analysis_id)
-        self._commands_dict_list.clear()
+            self._pending_store.remove(analysis_id=analysis_id)
+        finally:
+            self._commands_dict_list.clear()
 
     async def save_initialization_failed_analysis(
         self,
