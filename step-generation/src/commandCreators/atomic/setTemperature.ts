@@ -5,18 +5,41 @@ import {
 } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { TemperatureParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  SetTemperatureStepGenArgs,
+} from '../../types'
 
 /** Set temperature target for specified module. */
-export const setTemperature: CommandCreator<TemperatureParams> = (
+export const setTemperature: CommandCreator<SetTemperatureStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId, celsius } = args
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(args.celsius, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (args.moduleId != null && moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (typeof args.celsius === 'string' && celsius == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.celsius })
+    )
+  }
+  if (errors.length > 0 || celsius == null) {
+    return { errors }
+  }
   if (moduleId === null) {
     return {
       errors: [errorCreators.missingModuleError()],
@@ -37,7 +60,7 @@ export const setTemperature: CommandCreator<TemperatureParams> = (
           },
         },
       ],
-      python: `${module?.pythonName}.start_set_temperature(${celsius})`,
+      python: `${module?.pythonName}.start_set_temperature(${args.celsius})`,
     }
   } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     // TODO: Ian 2019-01-24 implement setting thermocycler temp: block vs lid
@@ -57,7 +80,7 @@ export const setTemperature: CommandCreator<TemperatureParams> = (
           },
         },
       ],
-      python: `${module?.pythonName}.set_target_temperature(${celsius})`,
+      python: `${module?.pythonName}.set_target_temperature(${args.celsius})`,
     }
   } else {
     console.error(
