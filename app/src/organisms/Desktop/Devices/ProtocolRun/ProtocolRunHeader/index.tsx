@@ -52,12 +52,7 @@ export interface ProtocolRunHeaderProps {
 export function ProtocolRunHeader(
   props: ProtocolRunHeaderProps
 ): JSX.Element | null {
-  const {
-    protocolRunHeaderRef,
-    robotName,
-    runId,
-    isCloning = false,
-  } = props
+  const { protocolRunHeaderRef, robotName, runId, isCloning = false } = props
 
   const navigate = useNavigate()
 

@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -38,8 +33,8 @@ import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/Pro
 import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import {
