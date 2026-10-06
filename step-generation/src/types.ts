@@ -1240,3 +1240,7 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
+
+export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
+  celsius: number | string
+}
