@@ -1,4 +1,5 @@
-# UV is required for Python dependency management
+# UV is required for Python dependency management.
+# The uv tool version is pinned in the repo-root uv.toml (required-version).
 UV ?= uv
 UV_PYTHON = 3.12
 # todo(mm, 2026-04-03): This export will implicitly affect uv behavior in any Makefile
