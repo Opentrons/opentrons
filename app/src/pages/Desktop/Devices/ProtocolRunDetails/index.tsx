@@ -286,7 +286,9 @@ function PageContents(props: PageContentsProps): ReactNode {
         borderRadius={BORDERS.borderRadius8}
       >
         {isPendingRerunLoading ? (
-          <ProtocolRunTabLoading tabName={t('setup')} />
+          <Box margin={SPACING.spacing16}>
+            <ProtocolRunTabLoading tabName={t('setup')} />
+          </Box>
         ) : (
           <>
             <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
