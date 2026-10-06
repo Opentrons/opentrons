@@ -85,6 +85,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
             width="100%"
           >
             <PageContents
+              key={runId}
               runId={runId}
               robotName={robotName}
               protocolRunDetailsTab={protocolRunDetailsTab}
@@ -133,6 +134,7 @@ function PageContents(props: PageContentsProps): ReactNode {
       clearPendingRerun()
       return
     }
+    hasStartedCloneRef.current = false
     makeToast(t('shared:error_encountered'), ERROR_TOAST)
     navigate(`/devices/${robotName}`, { replace: true })
   }
@@ -140,6 +142,7 @@ function PageContents(props: PageContentsProps): ReactNode {
   const { cloneRun, isCloning, isLoadingRun } = useCloneRun(runId, {
     triggerAnalysis: true,
     onSuccess: createRunResponse => {
+      hasStartedCloneRef.current = false
       navigate(
         `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/setup`,
         { replace: true }
@@ -163,12 +166,12 @@ function PageContents(props: PageContentsProps): ReactNode {
     ) {
       return
     }
-    hasStartedCloneRef.current = true
     if (run.data == null) {
       makeToast(t('shared:error_encountered'), ERROR_TOAST)
       navigate(`/devices/${robotName}`, { replace: true })
       return
     }
+    hasStartedCloneRef.current = true
     cloneRun({ onError: handleCloneError })
     // handleCloneError / clearPendingRerun close over navigate/makeToast; intentionally omitted.
     // eslint-disable-next-line react-hooks/exhaustive-deps
