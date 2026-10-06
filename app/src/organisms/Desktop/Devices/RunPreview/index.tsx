@@ -26,7 +26,6 @@ import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { CommandIcon } from '/app/molecules/Command'
-import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
@@ -92,7 +91,13 @@ export const RunPreviewComponent = (
   )
 
   if (robotSideAnalysis == null) {
-    return <ProtocolRunTabLoading tabName={t('run_preview')} />
+    return (
+      <InfoScreen
+        iconName="ot-spinner"
+        content={t('run_preview_loading')}
+        height="auto"
+      />
+    )
   }
   const commands = isRunTerminal
     ? commandsFromQuery
@@ -117,7 +122,13 @@ export const RunPreviewComponent = (
       ? commands.findIndex(c => c.key === currentRunCommandKey)
       : 0
   if (isRunCommandDataLoading || commands == null) {
-    return <ProtocolRunTabLoading tabName={t('run_preview')} />
+    return (
+      <InfoScreen
+        iconName="ot-spinner"
+        content={t('run_preview_loading')}
+        height="auto"
+      />
+    )
   }
   return commands.length === 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>

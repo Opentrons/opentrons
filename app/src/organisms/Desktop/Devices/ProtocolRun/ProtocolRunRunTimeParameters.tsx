@@ -32,7 +32,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
-import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
@@ -87,7 +86,13 @@ export function ProtocolRunRuntimeParameters({
   const sortedRunTimeParameters = sortRuntimeParameters(runTimeParameters)
 
   if (!isRunTerminal && mostRecentAnalysis == null) {
-    return <ProtocolRunTabLoading tabName={t('run_details:parameters')} />
+    return (
+      <InfoScreen
+        iconName="ot-spinner"
+        content={t('run_details:parameters_loading')}
+        height="auto"
+      />
+    )
   }
 
   return (

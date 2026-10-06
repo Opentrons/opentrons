@@ -11,6 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -70,7 +71,6 @@ import { INCOMPATIBLE, INEXACT_MATCH } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
-import { ProtocolRunTabLoading } from './ProtocolRunTabLoading'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
@@ -462,7 +462,11 @@ export function ProtocolRunSetup({
       margin={SPACING.spacing16}
     >
       {isSetupLoading ? (
-        <ProtocolRunTabLoading tabName={t('run_details:setup')} />
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_details:setup_loading')}
+          height="auto"
+        />
       ) : (
         <>
           {runHasStarted ? (

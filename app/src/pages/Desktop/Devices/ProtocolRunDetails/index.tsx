@@ -15,6 +15,7 @@ import {
   DISPLAY_NONE,
   ERROR_TOAST,
   Flex,
+  InfoScreen,
   JUSTIFY_SPACE_AROUND,
   OVERFLOW_SCROLL,
   SPACING,
@@ -31,7 +32,6 @@ import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/Pr
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
-import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -297,7 +297,11 @@ function PageContents(props: PageContentsProps): ReactNode {
       >
         {isPendingRerunLoading ? (
           <Box margin={SPACING.spacing16}>
-            <ProtocolRunTabLoading tabName={t('setup')} />
+            <InfoScreen
+              iconName="ot-spinner"
+              content={t('setup_loading')}
+              height="auto"
+            />
           </Box>
         ) : (
           <>
