@@ -13,6 +13,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ComplianceReadySettings } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/ComplianceReadySettings'
 import { SettingsListButton } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/SettingsListButton'
 import { UserManagement } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/UserManagement'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import {
   updateLoggedInUserProfile,
@@ -26,7 +27,7 @@ import { useAccountInfo } from '../Account/hooks'
 import styles from './adminhub.module.css'
 
 import type { ReactNode } from 'react'
-import type { UpdateSelfRequest } from '@opentrons/api-client'
+import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
 
 type AdminHubPages =
   'user_management' | 'crs_settings' | 'personal_account_settings'
@@ -42,6 +43,8 @@ export function AdminHub(): ReactNode {
   const documentationState = useDocumentationState()
   const { updateSelf } = useUpdateSelfMutation(documentationState)
 
+  const { makeToast } = useToaster()
+
   const logout = useLogout()
 
   const { data: users } = useUsersQuery()
@@ -52,32 +55,41 @@ export function AdminHub(): ReactNode {
   const { passwordComplexity } = usePasswordComplexity()
   const { isLoggedIn, username, fullName } = useAccountInfo()
 
+  const logOut = useLogout()
+
   const saveSelfAccountChanges = (
-    data: UpdateSelfRequest['data']
+    data: UpdateSelfRequest['data'],
+    onSuccess: (newSelf: AuthUserResponse) => void
   ): Promise<void> => {
-    return updateSelf({ data }).then(updatedSelf => {
+    return updateSelf({ data }).then(onSuccess)
+  }
+
+  const onSaveNewPassword = (password: string): Promise<void> => {
+    return saveSelfAccountChanges({ password }, () => {
+      logOut()
+      makeToast(t('odd_password_updated_login') as string, 'success')
+    })
+  }
+
+  const onSaveNewUsername = (newUsername: string): Promise<void> => {
+    return saveSelfAccountChanges({ username: newUsername }, () => {
+      logOut()
+      makeToast(t('odd_username_updated_login') as string, 'success')
+    })
+  }
+
+  const onSaveNewLegalName = (legalName: string): Promise<void> => {
+    return saveSelfAccountChanges({ fullName: legalName }, newSelf => {
       if (robotName != null) {
         dispatch(
           updateLoggedInUserProfile({
             robotName,
-            username: updatedSelf.data.username,
-            fullName: updatedSelf.data.fullName,
+            username: newSelf.data.username,
+            fullName: newSelf.data.fullName,
           })
         )
       }
     })
-  }
-
-  const onSaveNewPassword = (password: string): Promise<void> => {
-    return saveSelfAccountChanges({ password })
-  }
-
-  const onSaveNewUsername = (newUsername: string): Promise<void> => {
-    return saveSelfAccountChanges({ username: newUsername })
-  }
-
-  const onSaveNewLegalName = (legalName: string): Promise<void> => {
-    return saveSelfAccountChanges({ fullName: legalName })
   }
 
   useEffect(() => {
