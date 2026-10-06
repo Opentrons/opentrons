@@ -46,11 +46,11 @@ def run(protocol: protocol_api.ProtocolContext):
     # Nest the clarification filter plate in a deep-well plate.
     # Nesting allows for staging filer plates in a regular deck slot.
     # The Gripper can manipulate the filter plate from this location.
-    holding_plate = protocol.load_labware(
+    mixing_plate = protocol.load_labware(
       "nest_96_wellplate_2ml_deep",
       "A1"
     )
-    filter_plate = holding_plate.load_labware(
+    filter_plate = mixing_plate.load_labware(
         "cytiva_96_wellplate_1000ul_shorttip_filter",
         label="Clarification Plate"
     )
@@ -128,6 +128,7 @@ Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to ser
     # Pipette concurrently while the Vacuum Module runs.
     pipette.pick_up_tip()
     pipette.aspirate(400, reservoir["A5"])
+    pipette.dispense(400, mixing_plate["A1"])
     pipette.drop_tip()
 
     # Wait for filtration to complete and system pressure to equalize.
