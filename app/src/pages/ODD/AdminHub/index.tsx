@@ -138,6 +138,11 @@ export function AdminHub(): ReactNode {
         }}
         users={usersData}
         loggedInUser={username ?? ''}
+        editSelfHandlers={{
+          onSaveNewUsername,
+          onSaveNewPassword,
+          onSaveNewLegalName,
+        }}
       />
     )
   }
