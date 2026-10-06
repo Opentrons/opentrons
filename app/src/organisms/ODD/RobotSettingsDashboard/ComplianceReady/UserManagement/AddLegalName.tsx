@@ -43,7 +43,7 @@ export function AddLegalName({
     if (!!legalName?.trim()) {
       onContinue(legalName.trim())
     } else {
-      setError('' + t('odd_legal_name_required'))
+      setError(t('odd_legal_name_required') as string)
     }
   }, [legalName, onContinue, t])
 
