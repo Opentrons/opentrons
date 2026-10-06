@@ -45,12 +45,19 @@ export interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
+  /** True while a rerun clone is in flight and the new run id does not exist yet. */
+  isCloning?: boolean
 }
 
 export function ProtocolRunHeader(
   props: ProtocolRunHeaderProps
 ): JSX.Element | null {
-  const { protocolRunHeaderRef, robotName, runId } = props
+  const {
+    protocolRunHeaderRef,
+    robotName,
+    runId,
+    isCloning = false,
+  } = props
 
   const navigate = useNavigate()
 
@@ -59,8 +66,11 @@ export function ProtocolRunHeader(
     {
       staleTime: Infinity,
       refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      // Avoid treating the source run as "ready" while the new run is created.
+      enabled: !isCloning,
     }
   )
+  const showSkeleton = isCloning || isRunLoading
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
@@ -144,7 +154,7 @@ export function ProtocolRunHeader(
         runErrors={runErrors}
         {...props}
       />
-      {isRunLoading ? (
+      {showSkeleton ? (
         <div
           ref={protocolRunHeaderRef}
           className={styles.skeleton}

@@ -9,7 +9,6 @@ import { useDeleteRunImages } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { useRunControls } from '/app/organisms/RunTimeControl'
 import {
   useCameraAnalytics,
   useTrackProtocolRunEvent,
@@ -24,6 +23,7 @@ import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useDownloadRunRecord,
   useIsEstopNotDisengaged,
+  useIsRobotOutOfStorage,
 } from '/app/resources/devices'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
@@ -34,11 +34,19 @@ import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { CommandsData, RunData } from '@opentrons/api-client'
 
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof import('react-router-dom')>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../../hooks')
-vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/devices')
@@ -75,10 +83,12 @@ const mockDownloadRunRecord = vi.fn()
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
+    mockNavigate.mockClear()
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
+    vi.mocked(useIsRobotOutOfStorage).mockReturnValue(false)
     vi.mocked(useDownloadRunRecord).mockReturnValue({
       downloadRunRecord: mockDownloadRunRecord,
       isDownloading: false,
@@ -87,21 +97,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    when(useRunControls)
-      .calledWith(RUN_ID, expect.anything())
-      .thenReturn({
-        play: () => {},
-        pause: () => {},
-        stop: () => {},
-        reset: () => {},
-        resumeFromRecovery: () => {},
-        isPlayRunActionLoading: false,
-        isPauseRunActionLoading: false,
-        isStopRunActionLoading: false,
-        isResetRunLoading: false,
-        isResumeRunFromRecoveryActionLoading: false,
-        isRunControlLoading: false,
-      })
     when(useNotifyAllCommandsQuery)
       .calledWith(
         RUN_ID,
@@ -156,39 +151,16 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         sourceLocation: 'HistoricalProtocolRun',
       },
     })
-    expect(useRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}/setup`,
+      { state: { pendingRerun: true } }
+    )
     fireEvent.click(deleteBtn)
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {
     vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(true)
-    render(props)
-    const btn = screen.getByRole('button')
-    fireEvent.click(btn)
-    screen.getByRole('button', {
-      name: 'View protocol run record',
-    })
-    const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
-    expect(rerunBtn).toBeDisabled()
-  })
-
-  it('disables the rerun protocol menu item if run data is loading', () => {
-    when(useRunControls)
-      .calledWith(RUN_ID, expect.anything())
-      .thenReturn({
-        play: () => {},
-        pause: () => {},
-        stop: () => {},
-        reset: () => {},
-        resumeFromRecovery: () => {},
-        isPlayRunActionLoading: false,
-        isPauseRunActionLoading: false,
-        isStopRunActionLoading: false,
-        isResetRunLoading: false,
-        isResumeRunFromRecoveryActionLoading: false,
-        isRunControlLoading: true,
-      })
     render(props)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)
@@ -218,6 +190,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     const modalDeleteBtn = screen.getByText('Clear images')
     fireEvent.click(modalDeleteBtn)
 
-    expect(mockDeleteRunImages).toHaveBeenCalled()
+    expect(mockDeleteRunImages).toHaveBeenCalledWith(RUN_ID)
   })
 })

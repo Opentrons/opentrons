@@ -154,6 +154,21 @@ describe('ProtocolRunHeader', () => {
     expect(screen.queryByText('MOCK_RUN_HEADER_CONTENT')).toBeNull()
   })
 
+  it('renders a skeleton while awaiting a rerun clone before the new run exists', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
+
+    render({ ...props, isCloning: true })
+
+    screen.getByText('MOCK_PROTOCOL_RUN_HEADER_SKELETON')
+    expect(useNotifyRunQuery).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      expect.objectContaining({ enabled: false })
+    )
+  })
+
   it('navigates to /devices if robot is not viewable and protocolData is not null', () => {
     vi.mocked(useIsRobotViewable).mockReturnValue(false)
     vi.mocked(useProtocolDetailsForRun).mockReturnValue({

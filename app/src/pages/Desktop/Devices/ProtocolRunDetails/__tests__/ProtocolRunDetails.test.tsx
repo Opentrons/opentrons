@@ -18,6 +18,7 @@ import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
+  useCloneRun,
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
@@ -130,6 +131,11 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(useQuickProtocolDetailsForRun).mockReturnValue({
       displayName: 'MOCK-PROTOCOL-NAME',
     } as any)
+    vi.mocked(useCloneRun).mockReturnValue({
+      cloneRun: vi.fn(),
+      isCloning: false,
+      isLoadingRun: false,
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()

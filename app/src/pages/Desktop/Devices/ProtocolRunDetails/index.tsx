@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -13,6 +18,7 @@ import {
   DIRECTION_ROW,
   DISPLAY_BLOCK,
   DISPLAY_NONE,
+  ERROR_TOAST,
   Flex,
   JUSTIFY_SPACE_AROUND,
   OVERFLOW_SCROLL,
@@ -29,12 +35,15 @@ import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/Pr
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
+import { ProtocolRunTabLoading } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunTabLoading'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import {
+  useCloneRun,
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
@@ -47,6 +56,10 @@ import type { ReactNode } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
+
+interface ProtocolRunDetailsLocationState {
+  pendingRerun?: boolean
+}
 
 const JUMP_OFFSET_FROM_TOP_PX = 20
 
@@ -95,6 +108,10 @@ interface PageContentsProps {
 }
 function PageContents(props: PageContentsProps): ReactNode {
   const { runId, robotName, protocolRunDetailsTab } = props
+  const { t } = useTranslation(['run_details', 'shared'])
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { makeToast } = useToaster()
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
@@ -105,8 +122,52 @@ function PageContents(props: PageContentsProps): ReactNode {
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
   const isSetupTab = protocolRunDetailsTab === 'setup'
+  const pendingRerun = Boolean(
+    (location.state as ProtocolRunDetailsLocationState | null)?.pendingRerun
+  )
+  const hasStartedCloneRef = useRef(false)
+
+  const handleCloneError = (): void => {
+    makeToast(t('shared:error_encountered'), ERROR_TOAST)
+    navigate(`/devices/${robotName}`, { replace: true })
+  }
+
+  const { cloneRun, isCloning, isLoadingRun } = useCloneRun(runId, {
+    triggerAnalysis: true,
+    onSuccess: createRunResponse => {
+      navigate(
+        `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/setup`,
+        { replace: true }
+      )
+    },
+    onError: handleCloneError,
+  })
+
+  // pendingRerun: loading before/while clone starts on the source run.
+  // isCloning: useCreateRunMutation in flight.
+  // After navigate to the new run id, header/setup use useNotifyRunQuery.
+  const isPendingRerunLoading = pendingRerun || isCloning
 
   useToastOnErrorImage(runId)
+
+  useEffect(() => {
+    if (
+      !pendingRerun ||
+      isLoadingRun ||
+      hasStartedCloneRef.current ||
+      isCloning
+    ) {
+      return
+    }
+    hasStartedCloneRef.current = true
+    if (run.data == null) {
+      handleCloneError()
+      return
+    }
+    cloneRun()
+    // handleCloneError closes over navigate/makeToast; intentionally omitted.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingRerun, isLoadingRun, isCloning, cloneRun, run.data])
 
   useEffect(() => {
     if (jumpedIndex != null) {
@@ -202,12 +263,14 @@ function PageContents(props: PageContentsProps): ReactNode {
         robotName={robotName}
         runId={runId}
         makeHandleJumpToStep={makeHandleJumpToStep}
+        isCloning={isPendingRerunLoading}
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab
           robotName={robotName}
           runId={runId}
           protocolRunDetailsTab={protocolRunDetailsTab}
+          suppressAutoNavigate={isPendingRerunLoading}
         />
         <ParametersTab
           robotName={robotName}
@@ -227,16 +290,22 @@ function PageContents(props: PageContentsProps): ReactNode {
         // remove left upper corner border radius when first tab is active
         borderRadius={BORDERS.borderRadius8}
       >
-        <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
-          <ProtocolRunSetup
-            protocolRunHeaderRef={protocolRunHeaderRef}
-            robotName={robotName}
-            runId={runId}
-          />
-        </Box>
-        {isSetupTab ? null : content}
+        {isPendingRerunLoading ? (
+          <ProtocolRunTabLoading tabName={t('setup')} />
+        ) : (
+          <>
+            <Box display={isSetupTab ? DISPLAY_BLOCK : DISPLAY_NONE}>
+              <ProtocolRunSetup
+                protocolRunHeaderRef={protocolRunHeaderRef}
+                robotName={robotName}
+                runId={runId}
+              />
+            </Box>
+            {isSetupTab ? null : content}
+          </>
+        )}
       </Box>
-      {backToTop}
+      {isPendingRerunLoading ? null : backToTop}
     </>
   )
 }
@@ -245,12 +314,18 @@ interface SetupTabProps {
   robotName: string
   runId: string
   protocolRunDetailsTab?: ProtocolRunDetailsTab
+  suppressAutoNavigate?: boolean
 }
 
 const RUN_STATUS_POLL_MS = 5000
 
 const SetupTab = (props: SetupTabProps): JSX.Element | null => {
-  const { robotName, runId, protocolRunDetailsTab } = props
+  const {
+    robotName,
+    runId,
+    protocolRunDetailsTab,
+    suppressAutoNavigate = false,
+  } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus({
@@ -264,6 +339,9 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
 
   useEffect(
     () => {
+      if (suppressAutoNavigate) {
+        return
+      }
       // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
       if (
         currentRunStatus != null &&
@@ -283,7 +361,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentRunStatus]
+    [currentRunStatus, suppressAutoNavigate]
   )
 
   return (
