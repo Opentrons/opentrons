@@ -15,7 +15,7 @@ class CommandStoreProvider:
         self,
         run_id: Optional[str] = None,
         store_insert_batch_commands: Optional[
-            Callable[[str, int, list["Command"]], Awaitable[None]]
+            Callable[[str, list[tuple[int, "Command"]]], Awaitable[None]]
         ] = None,
     ) -> None:
         """Initialize a provider to access the RunStore or AnalysisStore."""
@@ -27,12 +27,11 @@ class CommandStoreProvider:
         self._run_id = run_id
 
     async def insert_batch_commands(
-        self, commands_total: int, commands_batch: list["Command"]
+        self, commands_batch: list[tuple[int, "Command"]]
     ) -> None:
         """Insert or update a batch of commands."""
         if self._run_id and self._store_insert_batch_commands:
             await self._store_insert_batch_commands(
                 self._run_id,
-                commands_total,
                 commands_batch,
             )

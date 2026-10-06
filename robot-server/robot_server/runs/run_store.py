@@ -739,13 +739,18 @@ class RunStore:
         )
 
     async def insert_batch_commands(
-        self, run_id: str, commands_total: int, batch_commands: list[Command]
+        self, run_id: str, batch_commands: list[tuple[int, Command]]
     ) -> None:
-        """Insert or update a command on the run command table."""
+        """Insert or update commands on the run command table.
+
+        Args:
+            run_id: The run id these commands belong to.
+            batch_commands: Commands to insert into persistence, paired by index and Command.
+        """
         with self._sql_engine.begin() as transaction:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
-            for command_index, command in enumerate(batch_commands):
+            for index, command in batch_commands:
                 select_existing_index = sqlalchemy.select(
                     run_command_table.c.index_in_run
                 ).where(
@@ -760,7 +765,6 @@ class RunStore:
                     run_command_table.c.run_id == run_id,
                     run_command_table.c.command_id == command.id,
                 )
-                index = commands_total + command_index
                 if existing_index is not None:
                     index = existing_index
                     transaction.execute(delete_existing_command)

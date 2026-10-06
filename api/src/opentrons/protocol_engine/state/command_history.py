@@ -60,13 +60,14 @@ class CommandPersistenceInterface:
     ) -> None:
         """Send insert command request to the CommandStoreProvider."""
         command_batch = [
-            command_json.command_type.model_validate_json(command_json.command)
+            (
+                command_json.index,
+                command_json.command_type.model_validate_json(command_json.command),
+            )
             for command_json in command_json_batch
         ]
 
-        await self._command_store_provider.insert_batch_commands(
-            command_json_batch[0].index, command_batch
-        )
+        await self._command_store_provider.insert_batch_commands(command_batch)
 
     async def command_store_interface_task(self) -> None:
         """Handle interactions with the CommandStoreProvider."""
