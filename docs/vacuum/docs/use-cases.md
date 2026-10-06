@@ -3,7 +3,7 @@ title: "Vacuum Module: Use Cases"
 description: "Stacking deck pieces for filtrate collection and filter-to-waste applications."
 ---
 
-The Vacuum Module uses a modular deck stack system that supports a variety of filtration protocols. By combining specific collars and spacers, you can configure the system to either collect filtrate into standard labware or evacuate liquids directly to waste. Selecting the correct stack configuration ensures a reliable, airtight seal across different labware types and protocols.
+The Vacuum Module uses a modular deck stack system that supports a variety of filtration protocols. By combining specific spacers, collars, and plates, you can assemble a stack that either collects filtrate into standard labware or evacuates liquids directly to waste. Selecting the correct stack configuration ensures a reliable, airtight seal across different labware types and protocols.
 
 ## Stacking configurations
 
@@ -18,7 +18,7 @@ This configuration uses internal spacers seated on the vacuum base to elevate a 
 
 Depending on your collection plate's skirt geometry and well depth, you can configure and control plate gaps by using the modular spacer system:
 
-* **Available heights:** You get three flat shims (3.2 mm, 5.2 mm, and 7.25 mm) and a 12.8 mm spacer equipped with locating clips.
+* **Available heights:** You get three flat spacers or shims (3.2 mm, 5.2 mm, and 7.25 mm) and a 12.8 mm spacer equipped with locating clips.
 * **Stack limits:** Up to three spacers total per stack, using at most one of each height (no duplicate spacers).
 * **Hierarchy:** Flat shims sit on the vacuum base or stack atop one another in any sequence. When used, the 12.8 mm spacer must always sit at the very top of the stack because its alignment clips secure the filter or collection well plate. You cannot place the other spacers on top of the 12.8 mm spacer.
 
@@ -65,5 +65,5 @@ A visual inspection and an active vacuum test can help determine if a combinatio
 | Test | Description |
 |:----|:----|
 | **Visual inspection** | Ensure stacked components sit flush against all sealing gaskets. The stack should rest firmly on the vacuum base without obvious tilting or easily rocking back and forth. |
-| **In App** | In the Opentrons App, go to the Devices tab and click your robot. From the Instruments and Modules section, find the tile for the Vacuum Module and click the three-button menu (⋮). Click **Pressure** or **Power** to start/stop the pump and listen for audible air leaks. |
+| **In App** | In the Opentrons App: <ol><li>Go to the Devices tab and click your robot.</li><li>From the Instruments and Modules section, find the tile for the Vacuum Module and click the three-button menu (⋮).</li><li>Click **Pressure** or **Power** to start/stop the pump and listen for audible air leaks.</li></ol> |
 | **API** | Run an automated test by calling `start_set_vacuum_pressure()` with specific pressure, duration, and timeout arguments. If the system fails to reach the target pressure within the timeout interval, the API will raise an error. You may also hear audible air leaks. |
