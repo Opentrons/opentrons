@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import axios from 'axios'
 import clsx from 'clsx'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
@@ -127,6 +128,16 @@ const LoginModalImpl = NiceModal.create(
         await validateSelfPassword({ data: { password } })
         return null
       } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            return (
+              '' +
+              t('set_new_password_error_session_expired', {
+                ns: 'access_control',
+              })
+            )
+          }
+        }
         return mapSetNewPasswordError(error, t)
       } finally {
         setIsValidatingNewPassword(false)
