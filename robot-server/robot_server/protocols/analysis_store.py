@@ -132,9 +132,9 @@ class AnalysisStore:
     async def insert_batch_analysis_command(
         self, run_id: str, batch_commands: list[tuple[int, Command]]
     ) -> None:
-        """Store a command from analysis as a command JSON string locally."""
+        """Store analysis commands as JSON dicts locally."""
         for _index, command in batch_commands:
-            command_json = command.model_dump(by_alias=True)
+            command_json = command.model_dump(by_alias=True, exclude_none=True)
             self._commands_dict_list.append(command_json)
 
     def set_analysis_provider_id(self, analysis_id: str) -> None:
