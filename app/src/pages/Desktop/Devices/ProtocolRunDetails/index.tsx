@@ -19,6 +19,7 @@ import {
   OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
@@ -122,7 +123,16 @@ function PageContents(props: PageContentsProps): ReactNode {
   )
   const hasStartedCloneRef = useRef(false)
 
-  const handleCloneError = (): void => {
+  const clearPendingRerun = (): void => {
+    hasStartedCloneRef.current = false
+    navigate(location.pathname, { replace: true, state: {} })
+  }
+
+  const handleCloneError = (error: unknown): void => {
+    if (isDocumentedMutationError(error)) {
+      clearPendingRerun()
+      return
+    }
     makeToast(t('shared:error_encountered'), ERROR_TOAST)
     navigate(`/devices/${robotName}`, { replace: true })
   }
@@ -135,7 +145,6 @@ function PageContents(props: PageContentsProps): ReactNode {
         { replace: true }
       )
     },
-    onError: handleCloneError,
   })
 
   // pendingRerun: loading before/while clone starts on the source run.
@@ -156,11 +165,12 @@ function PageContents(props: PageContentsProps): ReactNode {
     }
     hasStartedCloneRef.current = true
     if (run.data == null) {
-      handleCloneError()
+      makeToast(t('shared:error_encountered'), ERROR_TOAST)
+      navigate(`/devices/${robotName}`, { replace: true })
       return
     }
-    cloneRun()
-    // handleCloneError closes over navigate/makeToast; intentionally omitted.
+    cloneRun({ onError: handleCloneError })
+    // handleCloneError / clearPendingRerun close over navigate/makeToast; intentionally omitted.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingRerun, isLoadingRun, isCloning, cloneRun, run.data])
 
