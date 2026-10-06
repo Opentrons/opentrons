@@ -6,7 +6,7 @@ description: An analysis of how the Vacuum Module uses API commands in a minipre
 This use case is based on a plasmid miniprep protocol. It excludes intermediate steps to focus on those Python API commands that control the Vacuum Module. 
 
 !!! note
-    The Vacuum Module is supported only on Opentrons Flex and requires Python API version 2.30 or higher.
+    The Vacuum Module is supported only on Opentrons Flex and requires Python API version 2.31 or higher.
 
 The code analysis starts below.
 
@@ -39,7 +39,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # Load a spacer and collection plate.
     spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
     collection_plate = spacer.load_labware(
-        "nunc_96_wellplate_450ul",
+        name="nunc_96_wellplate_450ul",
         label="Lysate Collection Plate"
     )
 
@@ -74,9 +74,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ### Loading filter plates and spacers
 
-Filter plates have wells that extend past the bottom of the plate skirt and cannot be staged directly on a deck slot. If you try to load a filter plate on a deck slot, the API will raise an error. To stage filter plates on a regular deck slot, nest them inside a deep-well plate, which can then be loaded in software from that deck location.
+Filter plates have wells that extend past the bottom of the plate skirt and cannot be placed directly on a deck slot. If you try to load a filter plate on a deck slot, the API will raise an error. To placed filter plates on a regular deck slot, nest them inside a deep-well plate, which can then be loaded in software from that deck location.
 
-Spacers cannot be placed on standard deck slots or moved by the Gripper. Spacers must be seated manually into the vacuum base and loaded in software via `vacuum.load_adapter()`.
+Spacers cannot be placed on standard deck slots or moved by the Gripper. Spacers must be seated manually into the vacuum base and loaded in software via `load_adapter()`.
 
 <!--- Stacking spacers might work better in Spacers section in instruction manual --->
 <!--- Great heads up and code sample from Brayan --->
