@@ -418,6 +418,7 @@
   "odd_header_username": "Username",
   "odd_input_range": "Input range 1-256",
   "odd_just_length_of_time": "Length of time",
+  "odd_legal_name_required": "Legal name is required",
   "odd_length_of_time_before_password_change": "Length of time before password change",
   "odd_length_of_time_before_password_change_description": "Length of time before requiring users to change their password",
   "odd_lock_account_button": "Lock account",
