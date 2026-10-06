@@ -183,7 +183,7 @@ function StorageAlmostFullNotification({
   const navigate = useNavigate()
 
   const onLinkClick = (): void => {
-    navigate(`/devices/${robotName}/#recent-protocol-runs`)
+    navigate(`/devices/${robotName}/run-history`)
   }
 
   return (
