@@ -1,0 +1,4332 @@
+{
+  "createdAt": "2026-09-25T14:52:53.838919Z",
+  "files": [
+    {
+      "name": "Reagent-transfer-23-v2.py",
+      "role": "main"
+    }
+  ],
+  "config": {
+    "protocolType": "python",
+    "apiVersion": [
+      2,
+      28
+    ]
+  },
+  "metadata": {
+    "protocolName": "Reagent-transfer-23-v2",
+    "author": "Bob",
+    "description": "Transfer"
+  },
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [],
+  "commands": [
+    {
+      "id": "90ad6668-17a3-4017-95a4-33b283976ef1",
+      "createdAt": "2026-09-25T14:52:53.773808Z",
+      "commandType": "home",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "status": "succeeded",
+      "params": {},
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.774040Z",
+      "completedAt": "2026-09-25T14:52:53.774154Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "d0c7e2f5-6161-4891-9def-c1f485589aa3",
+      "createdAt": "2026-09-25T14:52:53.774853Z",
+      "commandType": "loadLabware",
+      "key": "73d9d4d55ae8466f3a793ceb70545fa5",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "C1"
+        },
+        "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 4
+      },
+      "result": {
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "C1"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ],
+            "cutoutId": "cutoutC1"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 4,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Tough 96 Well Plate 200 \u00b5L PCR Full Skirt",
+            "displayCategory": "wellPlate",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": [
+              "991-00076"
+            ],
+            "links": [
+              "https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"
+            ]
+          },
+          "parameters": {
+            "format": "96Standard",
+            "isTiprack": false,
+            "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            "isMagneticModuleCompatible": true
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.48,
+            "zDimension": 16.0,
+            "xDimension": 127.76
+          },
+          "wells": {
+            "A1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H1": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 14.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H2": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 23.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H3": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 32.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H4": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 41.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H5": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 50.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H6": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 59.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H7": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 68.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H8": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 77.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H9": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 86.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H10": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 95.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H11": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 104.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            },
+            "A12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 74.24
+            },
+            "B12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 65.24
+            },
+            "C12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 56.24
+            },
+            "D12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 47.24
+            },
+            "E12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 38.24
+            },
+            "F12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 29.24
+            },
+            "G12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 20.24
+            },
+            "H12": {
+              "shape": "circular",
+              "diameter": 5.5,
+              "depth": 14.95,
+              "totalLiquidVolume": 200,
+              "x": 113.38,
+              "z": 1.05,
+              "geometryDefinitionId": "conicalWell",
+              "y": 11.24
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "E1",
+                "F1",
+                "G1",
+                "H1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "E2",
+                "F2",
+                "G2",
+                "H2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+                "E3",
+                "F3",
+                "G3",
+                "H3",
+                "A4",
+                "B4",
+                "C4",
+                "D4",
+                "E4",
+                "F4",
+                "G4",
+                "H4",
+                "A5",
+                "B5",
+                "C5",
+                "D5",
+                "E5",
+                "F5",
+                "G5",
+                "H5",
+                "A6",
+                "B6",
+                "C6",
+                "D6",
+                "E6",
+                "F6",
+                "G6",
+                "H6",
+                "A7",
+                "B7",
+                "C7",
+                "D7",
+                "E7",
+                "F7",
+                "G7",
+                "H7",
+                "A8",
+                "B8",
+                "C8",
+                "D8",
+                "E8",
+                "F8",
+                "G8",
+                "H8",
+                "A9",
+                "B9",
+                "C9",
+                "D9",
+                "E9",
+                "F9",
+                "G9",
+                "H9",
+                "A10",
+                "B10",
+                "C10",
+                "D10",
+                "E10",
+                "F10",
+                "G10",
+                "H10",
+                "A11",
+                "B11",
+                "C11",
+                "D11",
+                "E11",
+                "F11",
+                "G11",
+                "H11",
+                "A12",
+                "B12",
+                "C12",
+                "D12",
+                "E12",
+                "F12",
+                "G12",
+                "H12"
+              ],
+              "metadata": {
+                "wellBottomShape": "v"
+              }
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "opentrons_96_pcr_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 10.95
+            },
+            "opentrons_96_well_aluminum_block": {
+              "x": 0,
+              "y": 0,
+              "z": 11.91
+            },
+            "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+              "x": 0,
+              "y": 0,
+              "z": 3.68
+            }
+          },
+          "stackingOffsetWithModule": {
+            "magneticBlockV1": {
+              "x": 0,
+              "y": 0,
+              "z": 3.54
+            },
+            "thermocyclerModuleV2": {
+              "x": 0,
+              "y": 0,
+              "z": 10.7
+            }
+          },
+          "allowedRoles": [],
+          "gripperOffsets": {},
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 10.0,
+          "stackLimit": 4,
+          "compatibleParentLabware": [
+            "opentrons_96_wellplate_200ul_pcr_full_skirt"
+          ],
+          "innerLabwareGeometry": {
+            "conicalWell": {
+              "sections": [
+                {
+                  "shape": "conical",
+                  "bottomDiameter": 5.5,
+                  "topDiameter": 5.5,
+                  "topHeight": 14.95,
+                  "bottomHeight": 11.35,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "shape": "conical",
+                  "bottomDiameter": 2.33,
+                  "topDiameter": 5.5,
+                  "topHeight": 11.35,
+                  "bottomHeight": 0.8,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "shape": "spherical",
+                  "radiusOfCurvature": 1.25,
+                  "topHeight": 0.8,
+                  "bottomHeight": 0.0,
+                  "xCount": 1,
+                  "yCount": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-25T14:52:53.775028Z",
+      "completedAt": "2026-09-25T14:52:53.777003Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "68adacd8-6987-4483-8560-a4b3c5fbbfb7",
+      "createdAt": "2026-09-25T14:52:53.778215Z",
+      "commandType": "loadLabware",
+      "key": "50de88d471ad3910c29207fb6df4502e",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "B3"
+        },
+        "loadName": "nest_96_wellplate_2ml_deep",
+        "namespace": "opentrons",
+        "version": 5
+      },
+      "result": {
+        "labwareId": "0f21d891-3686-4169-90ff-6e57beba9a60",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "B3"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ],
+            "cutoutId": "cutoutB3"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 5,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "NEST 96 Deep Well Plate 2 mL",
+            "displayCategory": "wellPlate",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "503001",
+              "503501"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/deep-well-plates/59253726.html"
+            ]
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": false,
+            "loadName": "nest_96_wellplate_2ml_deep",
+            "isMagneticModuleCompatible": true,
+            "magneticModuleEngageHeight": 6.8
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.3,
+            "zDimension": 41,
+            "xDimension": 127.6
+          },
+          "wells": {
+            "A1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H1": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 14.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H2": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 23.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H3": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 32.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H4": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 41.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H5": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 50.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H6": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 59.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H7": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 68.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H8": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 77.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H9": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 86.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H10": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 95.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H11": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 104.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            },
+            "A12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 74.15
+            },
+            "B12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 65.15
+            },
+            "C12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 56.15
+            },
+            "D12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 47.15
+            },
+            "E12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 38.15
+            },
+            "F12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 29.15
+            },
+            "G12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 20.15
+            },
+            "H12": {
+              "shape": "rectangular",
+              "xDimension": 8.2,
+              "yDimension": 8.2,
+              "depth": 38.05,
+              "totalLiquidVolume": 2000,
+              "x": 113.3,
+              "z": 2.95,
+              "geometryDefinitionId": "cuboidalWell",
+              "y": 11.15
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "E1",
+                "F1",
+                "G1",
+                "H1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "E2",
+                "F2",
+                "G2",
+                "H2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+                "E3",
+                "F3",
+                "G3",
+                "H3",
+                "A4",
+                "B4",
+                "C4",
+                "D4",
+                "E4",
+                "F4",
+                "G4",
+                "H4",
+                "A5",
+                "B5",
+                "C5",
+                "D5",
+                "E5",
+                "F5",
+                "G5",
+                "H5",
+                "A6",
+                "B6",
+                "C6",
+                "D6",
+                "E6",
+                "F6",
+                "G6",
+                "H6",
+                "A7",
+                "B7",
+                "C7",
+                "D7",
+                "E7",
+                "F7",
+                "G7",
+                "H7",
+                "A8",
+                "B8",
+                "C8",
+                "D8",
+                "E8",
+                "F8",
+                "G8",
+                "H8",
+                "A9",
+                "B9",
+                "C9",
+                "D9",
+                "E9",
+                "F9",
+                "G9",
+                "H9",
+                "A10",
+                "B10",
+                "C10",
+                "D10",
+                "E10",
+                "F10",
+                "G10",
+                "H10",
+                "A11",
+                "B11",
+                "C11",
+                "D11",
+                "E11",
+                "F11",
+                "G11",
+                "H11",
+                "A12",
+                "B12",
+                "C12",
+                "D12",
+                "E12",
+                "F12",
+                "G12",
+                "H12"
+              ],
+              "metadata": {
+                "wellBottomShape": "v"
+              }
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "opentrons_96_deep_well_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.3
+            },
+            "opentrons_96_deep_well_temp_mod_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 16.1
+            },
+            "nest_96_wellplate_2ml_deep": {
+              "x": 0,
+              "y": 0,
+              "z": 2.75
+            }
+          },
+          "stackingOffsetWithModule": {
+            "magneticBlockV1": {
+              "x": 0,
+              "y": 0,
+              "z": 2.66
+            }
+          },
+          "allowedRoles": [],
+          "gripperOffsets": {},
+          "gripForce": 15.0,
+          "gripHeightFromLabwareBottom": 21.9,
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "shape": "cuboidal",
+                  "bottomXDimension": 7.4,
+                  "bottomYDimension": 7.4,
+                  "topXDimension": 8.2,
+                  "topYDimension": 8.2,
+                  "topHeight": 38.05,
+                  "bottomHeight": 1.67,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "shape": "cuboidal",
+                  "bottomXDimension": 2.63,
+                  "bottomYDimension": 2.63,
+                  "topXDimension": 7.4,
+                  "topYDimension": 7.4,
+                  "topHeight": 1.67,
+                  "bottomHeight": 0.0,
+                  "xCount": 1,
+                  "yCount": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-25T14:52:53.778358Z",
+      "completedAt": "2026-09-25T14:52:53.780050Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "fc4b974a-7eaa-41d4-98a2-251b2e0b8e16",
+      "createdAt": "2026-09-25T14:52:53.781131Z",
+      "commandType": "loadLabware",
+      "key": "a83392f86baf8cd5b4f0157c89d31dbd",
+      "status": "succeeded",
+      "params": {
+        "location": {
+          "slotName": "D1"
+        },
+        "loadName": "opentrons_flex_96_filtertiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "labwareId": "70046573-d03a-4fdd-86cb-82c46fbd96af",
+        "locationSequence": [
+          {
+            "kind": "onAddressableArea",
+            "addressableAreaName": "D1"
+          },
+          {
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ],
+            "cutoutId": "cutoutD1"
+          }
+        ],
+        "definition": {
+          "schemaVersion": 2,
+          "version": 1,
+          "namespace": "opentrons",
+          "metadata": {
+            "displayName": "Opentrons Flex 96 Filter Tip Rack 1000 \u00b5L",
+            "displayCategory": "tipRack",
+            "displayVolumeUnits": "\u00b5L",
+            "tags": []
+          },
+          "brand": {
+            "brand": "Opentrons",
+            "brandId": []
+          },
+          "parameters": {
+            "format": "96Standard",
+            "quirks": [],
+            "isTiprack": true,
+            "tipLength": 95.6,
+            "tipOverlap": 10.5,
+            "loadName": "opentrons_flex_96_filtertiprack_1000ul",
+            "isMagneticModuleCompatible": false
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "ordering": [
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ]
+          ],
+          "dimensions": {
+            "yDimension": 85.75,
+            "zDimension": 99,
+            "xDimension": 127.75
+          },
+          "wells": {
+            "A1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H1": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 14.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H2": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 23.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H3": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 32.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H4": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 41.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H5": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 50.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H6": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 59.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H7": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 68.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H8": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 77.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H9": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 86.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H10": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 95.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H11": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 104.38,
+              "z": 1.5,
+              "y": 11.38
+            },
+            "A12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 74.38
+            },
+            "B12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 65.38
+            },
+            "C12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 56.38
+            },
+            "D12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 47.38
+            },
+            "E12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 38.38
+            },
+            "F12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 29.38
+            },
+            "G12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 20.38
+            },
+            "H12": {
+              "shape": "circular",
+              "diameter": 5.47,
+              "depth": 97.5,
+              "totalLiquidVolume": 1000,
+              "x": 113.38,
+              "z": 1.5,
+              "y": 11.38
+            }
+          },
+          "groups": [
+            {
+              "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "E1",
+                "F1",
+                "G1",
+                "H1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "E2",
+                "F2",
+                "G2",
+                "H2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+                "E3",
+                "F3",
+                "G3",
+                "H3",
+                "A4",
+                "B4",
+                "C4",
+                "D4",
+                "E4",
+                "F4",
+                "G4",
+                "H4",
+                "A5",
+                "B5",
+                "C5",
+                "D5",
+                "E5",
+                "F5",
+                "G5",
+                "H5",
+                "A6",
+                "B6",
+                "C6",
+                "D6",
+                "E6",
+                "F6",
+                "G6",
+                "H6",
+                "A7",
+                "B7",
+                "C7",
+                "D7",
+                "E7",
+                "F7",
+                "G7",
+                "H7",
+                "A8",
+                "B8",
+                "C8",
+                "D8",
+                "E8",
+                "F8",
+                "G8",
+                "H8",
+                "A9",
+                "B9",
+                "C9",
+                "D9",
+                "E9",
+                "F9",
+                "G9",
+                "H9",
+                "A10",
+                "B10",
+                "C10",
+                "D10",
+                "E10",
+                "F10",
+                "G10",
+                "H10",
+                "A11",
+                "B11",
+                "C11",
+                "D11",
+                "E11",
+                "F11",
+                "G11",
+                "H11",
+                "A12",
+                "B12",
+                "C12",
+                "D12",
+                "E12",
+                "F12",
+                "G12",
+                "H12"
+              ],
+              "metadata": {}
+            }
+          ],
+          "stackingOffsetWithLabware": {
+            "opentrons_flex_96_tiprack_adapter": {
+              "x": 0,
+              "y": 0,
+              "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
+            }
+          },
+          "stackingOffsetWithModule": {},
+          "allowedRoles": [],
+          "gripperOffsets": {},
+          "gripForce": 16.0,
+          "gripHeightFromLabwareBottom": 23.9
+        }
+      },
+      "startedAt": "2026-09-25T14:52:53.781264Z",
+      "completedAt": "2026-09-25T14:52:53.790675Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "3364a401-0952-4192-a259-a7a36d7b90bf",
+      "createdAt": "2026-09-25T14:52:53.791853Z",
+      "commandType": "loadPipette",
+      "key": "7d6a90a14623439c6f8429028cf86ee9",
+      "status": "succeeded",
+      "params": {
+        "pipetteName": "p1000_multi_flex",
+        "mount": "right",
+        "tipOverlapNotAfterVersion": "v3",
+        "liquidPresenceDetection": false
+      },
+      "result": {
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b"
+      },
+      "startedAt": "2026-09-25T14:52:53.792010Z",
+      "completedAt": "2026-09-25T14:52:53.793685Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "411f0f41-de7d-4ef4-925d-565e7dfc6324",
+      "createdAt": "2026-09-25T14:52:53.795066Z",
+      "commandType": "loadLiquid",
+      "key": "1e63b07344b2a6e558c75a5d3a124692",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "A1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.795200Z",
+      "completedAt": "2026-09-25T14:52:53.795296Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "5fb9c7fd-9eea-4179-be61-2eb5c62ceddd",
+      "createdAt": "2026-09-25T14:52:53.795567Z",
+      "commandType": "loadLiquid",
+      "key": "3729ea3c30b0937cc8178887941763b7",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "B1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.795680Z",
+      "completedAt": "2026-09-25T14:52:53.795754Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "b20da46a-d8e7-445e-9ac3-a3592575fef7",
+      "createdAt": "2026-09-25T14:52:53.795998Z",
+      "commandType": "loadLiquid",
+      "key": "12f63906ddeccf40c2243d908e2aa5f1",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "C1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.796106Z",
+      "completedAt": "2026-09-25T14:52:53.796173Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "a616bb05-9292-4efd-855f-110db2275050",
+      "createdAt": "2026-09-25T14:52:53.796404Z",
+      "commandType": "loadLiquid",
+      "key": "4dedbb52284633b78f97643b772977c6",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "D1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.796511Z",
+      "completedAt": "2026-09-25T14:52:53.796578Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "ca91e6ac-8e08-496c-9a65-6091cd05e36a",
+      "createdAt": "2026-09-25T14:52:53.796843Z",
+      "commandType": "loadLiquid",
+      "key": "3124b8de0e2f009389204dc8d9e44cd3",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "E1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.796949Z",
+      "completedAt": "2026-09-25T14:52:53.797016Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "2d084f4e-7855-4e9c-bd60-3050cf788b39",
+      "createdAt": "2026-09-25T14:52:53.797249Z",
+      "commandType": "loadLiquid",
+      "key": "57671e574437552f6a76099f8b0af0dc",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "F1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.797355Z",
+      "completedAt": "2026-09-25T14:52:53.797421Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "c78b3c8b-6787-43f2-b424-fe492a663994",
+      "createdAt": "2026-09-25T14:52:53.797697Z",
+      "commandType": "loadLiquid",
+      "key": "07ad701603db190ab06971673d1564d2",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "G1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.797809Z",
+      "completedAt": "2026-09-25T14:52:53.797878Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "d2661826-e228-43cd-a771-6c4ba547a9b8",
+      "createdAt": "2026-09-25T14:52:53.798114Z",
+      "commandType": "loadLiquid",
+      "key": "30149ba6cd9ee33298d723c09c457919",
+      "status": "succeeded",
+      "params": {
+        "liquidId": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "volumeByWell": {
+          "H1": 80.0
+        }
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.798220Z",
+      "completedAt": "2026-09-25T14:52:53.798286Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "3b03e80b-51ee-46ad-8325-f55d68bb7eff",
+      "createdAt": "2026-09-25T14:52:53.830296Z",
+      "commandType": "pickUpTip",
+      "key": "d3af87f027623ea44baa575581b449eb",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b",
+        "labwareId": "70046573-d03a-4fdd-86cb-82c46fbd96af",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 74.38,
+          "z": 99.0
+        },
+        "tipVolume": 1000.0,
+        "tipLength": 85.92999999999999,
+        "tipDiameter": 5.47
+      },
+      "startedAt": "2026-09-25T14:52:53.830539Z",
+      "completedAt": "2026-09-25T14:52:53.831245Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "6a69a72a-3bbf-4e14-a768-fa99276c7df3",
+      "createdAt": "2026-09-25T14:52:53.832034Z",
+      "commandType": "aspirate",
+      "key": "cb0d2a92e45e89b68921954a4da2a4fc",
+      "status": "succeeded",
+      "params": {
+        "labwareId": "c45c171a-1a18-4999-932a-343ff09934cf",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "volumeOffset": 0.0
+        },
+        "flowRate": 716.0,
+        "volume": 80.0,
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 181.24,
+          "z": 2.05
+        },
+        "volume": 80.0
+      },
+      "startedAt": "2026-09-25T14:52:53.832187Z",
+      "completedAt": "2026-09-25T14:52:53.832777Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "2ec6d7b9-5d0d-4297-8ad8-8390b6462c5c",
+      "createdAt": "2026-09-25T14:52:53.833470Z",
+      "commandType": "dispense",
+      "key": "bd786d89c8a8375e52ccdca900a875a0",
+      "status": "succeeded",
+      "params": {
+        "labwareId": "0f21d891-3686-4169-90ff-6e57beba9a60",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "top",
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.05
+          },
+          "volumeOffset": 0.0
+        },
+        "flowRate": 716.0,
+        "volume": 80.0,
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b"
+      },
+      "result": {
+        "position": {
+          "x": 342.3,
+          "y": 288.15,
+          "z": 3.95
+        },
+        "volume": 80.0
+      },
+      "startedAt": "2026-09-25T14:52:53.833616Z",
+      "completedAt": "2026-09-25T14:52:53.834370Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "23c72014-305d-4779-b8f5-9ef28fdade52",
+      "createdAt": "2026-09-25T14:52:53.834841Z",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "fb51752eeb1e5ae3c48deebcb5b224b3",
+      "status": "succeeded",
+      "params": {
+        "forceDirect": false,
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b",
+        "addressableAreaName": "movableTrashA3",
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "alternateDropLocation": true,
+        "ignoreTipConfiguration": true
+      },
+      "result": {
+        "position": {
+          "x": 509.25,
+          "y": 364.0,
+          "z": 40.0
+        }
+      },
+      "startedAt": "2026-09-25T14:52:53.834979Z",
+      "completedAt": "2026-09-25T14:52:53.835435Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "6eb9da40-331e-4b35-adbd-609c7303c3fd",
+      "createdAt": "2026-09-25T14:52:53.835730Z",
+      "commandType": "dropTipInPlace",
+      "key": "76f63d1c9dc2dd29fb4fe6810ad9474c",
+      "status": "succeeded",
+      "params": {
+        "pipetteId": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b"
+      },
+      "result": {},
+      "startedAt": "2026-09-25T14:52:53.835862Z",
+      "completedAt": "2026-09-25T14:52:53.835946Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    }
+  ],
+  "labware": [
+    {
+      "id": "c45c171a-1a18-4999-932a-343ff09934cf",
+      "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "location": {
+        "slotName": "C1"
+      }
+    },
+    {
+      "id": "0f21d891-3686-4169-90ff-6e57beba9a60",
+      "loadName": "nest_96_wellplate_2ml_deep",
+      "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/5",
+      "location": {
+        "slotName": "B3"
+      }
+    },
+    {
+      "id": "70046573-d03a-4fdd-86cb-82c46fbd96af",
+      "loadName": "opentrons_flex_96_filtertiprack_1000ul",
+      "definitionUri": "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "location": {
+        "slotName": "D1"
+      }
+    }
+  ],
+  "pipettes": [
+    {
+      "id": "26ce4c96-3ff3-4e98-9e1d-d97182f19c5b",
+      "pipetteName": "p1000_multi_flex",
+      "mount": "right"
+    }
+  ],
+  "modules": [],
+  "liquids": [
+    {
+      "id": "e1bbcaf9-76e4-4f04-aec6-c6a3cf7297c9",
+      "displayName": "Sample",
+      "description": "Sample liquid transferred from source plate to destination plate",
+      "displayColor": "#FF0000"
+    }
+  ],
+  "liquidClasses": [],
+  "errors": [],
+  "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
+  "labwareOffsets": []
+}
