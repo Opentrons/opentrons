@@ -746,21 +746,23 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
             for command_index, command in enumerate(batch_commands):
-                select_command = sqlalchemy.select(run_command_table.c.command).where(
+                select_existing_index = sqlalchemy.select(
+                    run_command_table.c.index_in_run
+                ).where(
                     run_command_table.c.run_id == run_id,
                     run_command_table.c.command_id == command.id,
                 )
                 insert_command = sqlalchemy.insert(run_command_table)
-                existing_command = transaction.execute(
-                    select_command
+                existing_index = transaction.execute(
+                    select_existing_index
                 ).scalar_one_or_none()
                 delete_existing_command = sqlalchemy.delete(run_command_table).where(
                     run_command_table.c.run_id == run_id,
                     run_command_table.c.command_id == command.id,
                 )
                 index = commands_total + command_index
-                if existing_command is not None:
-                    index = existing_command.index_in_run
+                if existing_index is not None:
+                    index = existing_index
                     transaction.execute(delete_existing_command)
                 transaction.execute(
                     insert_command,

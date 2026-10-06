@@ -65,7 +65,7 @@ class CommandPersistenceInterface:
         ]
 
         await self._command_store_provider.insert_batch_commands(
-            max(1, command_json_batch[0].index - 1), command_batch
+            command_json_batch[0].index, command_batch
         )
 
     async def command_store_interface_task(self) -> None:
