@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import last from 'lodash/last'
 
 import {
@@ -24,11 +25,13 @@ export function useMostRecentCompletedAnalysis(
     { enabled: protocolData != null && analysisId != null }
   )
 
-  return analysis != null
-    ? {
-        ...analysis,
-        // NOTE: this is accounting for pre 7.1 robot-side protocol analysis that may not include the robotType key
-        robotType: analysis.robotType ?? protocolData?.data.robotType,
-      }
-    : null
+  return useMemo(() => {
+    return analysis != null
+      ? {
+          ...analysis,
+          // NOTE: this is accounting for pre 7.1 robot-side protocol analysis that may not include the robotType key
+          robotType: analysis.robotType ?? protocolData?.data.robotType,
+        }
+      : null
+  }, [analysis, protocolData])
 }
