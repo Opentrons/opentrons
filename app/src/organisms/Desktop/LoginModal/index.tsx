@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { getUserLoginStatus } from '@opentrons/api-client'
 import {
   BasicButton,
   COLORS,
@@ -36,7 +37,18 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
-import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
+import type {
+  ComponentProps,
+  Dispatch,
+  FormEvent,
+  ReactNode,
+  SetStateAction,
+} from 'react'
+import type {
+  HostConfig,
+  UserLoginStatus,
+  UserLoginStatusReason,
+} from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -61,7 +73,11 @@ type LoginModalScreen =
       passwordResetSuccess?: boolean
     }
   | { kind: 'forgotPassword'; formData: LoginFormState }
-  | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
+  | {
+      kind: 'setNewPassword'
+      formData: SetNewPasswordFormState
+      reason: UserLoginStatusReason | null
+    }
 
 const INITIAL_LOGIN_FORM: LoginFormState = {
   username: '',
@@ -78,6 +94,21 @@ function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
     confirmPassword: '',
     confirmPasswordError: null,
     error: null,
+  }
+}
+
+async function fetchLoginStatus(
+  host: HostConfig | null,
+  username: string
+): Promise<UserLoginStatus | null> {
+  if (host == null || username.trim() === '') {
+    return null
+  }
+  try {
+    const response = await getUserLoginStatus(host, username.trim())
+    return response.data.data
+  } catch {
+    return null
   }
 }
 
@@ -99,6 +130,7 @@ function updateSetNewPasswordFormData(
     if (prev.kind !== 'setNewPassword') return prev
     return {
       kind: 'setNewPassword',
+      reason: prev.reason,
       formData: { ...prev.formData, ...updates },
     }
   })
@@ -140,6 +172,7 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
     kind: 'login',
     formData: INITIAL_LOGIN_FORM,
   })
+  const [loginStatus, setLoginStatus] = useState<UserLoginStatus | null>(null)
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
@@ -170,6 +203,7 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
+          reason: user.passwordResetReason ?? null,
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -202,7 +236,9 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
       },
     })
 
-  const handleLoginSubmit: ComponentProps<'form'>['onSubmit'] = event => {
+  const handleLoginSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     event.preventDefault()
     if (screen.kind !== 'login') return
     const { username, logInPassword } = screen.formData
@@ -230,6 +266,10 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
       usernameRequiredError: null,
       passwordRequiredError: null,
     })
+
+    if (loginStatus == null) {
+      setLoginStatus(await fetchLoginStatus(host, trimmedUsername))
+    }
     submitPassword(trimmedUsername, trimmedPassword)
   }
 
@@ -324,12 +364,17 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
             <LoginView
               formId={loginFormId}
               formData={screen.formData}
+              reason={loginStatus?.reason ?? null}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
+                setLoginStatus(null)
                 updateLoginFormData(setScreen, {
                   username: value,
                   usernameRequiredError: null,
                 })
+              }}
+              onUsernameBlur={username => {
+                void fetchLoginStatus(host, username).then(setLoginStatus)
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {
@@ -347,6 +392,7 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
           ) : (
             <SetNewPasswordView
               formData={screen.formData}
+              reason={screen.reason}
               onNewPasswordChange={value => {
                 updateSetNewPasswordFormData(setScreen, {
                   newPassword: value,
@@ -402,8 +448,10 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
 interface LoginViewProps {
   formId: string
   formData: LoginFormState
+  reason: UserLoginStatusReason | null
   onSubmit: ComponentProps<'form'>['onSubmit']
   onUsernameChange: (value: string) => void
+  onUsernameBlur: (username: string) => void
   onLogInPasswordChange: (value: string) => void
   onForgotPasswordClick: () => void
 }
@@ -412,8 +460,10 @@ function LoginView(props: LoginViewProps): ReactNode {
   const {
     formId,
     formData,
+    reason,
     onSubmit,
     onUsernameChange,
+    onUsernameBlur,
     onLogInPasswordChange,
     onForgotPasswordClick,
   } = props
@@ -426,6 +476,11 @@ function LoginView(props: LoginViewProps): ReactNode {
   const handleTogglePasswordVisibility = (): void => {
     setShowPassword(current => !current)
   }
+
+  const passwordFieldTitle =
+    reason === 'temporaryPassword'
+      ? t('access_control:on_device_login_one_time_password')
+      : t('access_control:login_form_password_field')
 
   return (
     <>
@@ -449,11 +504,14 @@ function LoginView(props: LoginViewProps): ReactNode {
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
+          onBlur={() => {
+            onUsernameBlur(formData.username)
+          }}
         />
         <InputField
           ref={passwordInputRef}
           name="password"
-          title={t('access_control:login_form_password_field')}
+          title={passwordFieldTitle}
           type={showPassword ? 'text' : 'password'}
           value={formData.logInPassword}
           error={formData.passwordRequiredError ?? formData.error ?? undefined}
@@ -495,6 +553,7 @@ function ForgotPasswordView(): ReactNode {
 
 interface SetNewPasswordViewProps {
   formData: SetNewPasswordFormState
+  reason: UserLoginStatusReason | null
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   onPasswordFieldBlur: () => void
@@ -503,6 +562,7 @@ interface SetNewPasswordViewProps {
 function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
   const {
     formData,
+    reason,
     onNewPasswordChange,
     onConfirmPasswordChange,
     onPasswordFieldBlur,
@@ -524,14 +584,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
     setShowConfirmPassword(current => !current)
   }
 
+  const heading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_heading')
+      : t('access_control:desktop_set_new_password_heading')
+  const subheading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_subheading')
+      : t('access_control:desktop_set_new_password_subheading')
+
   return (
     <>
       <div className={styles.text_container}>
-        <StyledText desktopStyle="headingSmallBold">
-          {t('access_control:desktop_password_expired_heading')}
-        </StyledText>
+        <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
         <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-          {t('access_control:desktop_password_expired_subheading')}
+          {subheading}
         </StyledText>
       </div>
 

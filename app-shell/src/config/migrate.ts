@@ -90,7 +90,7 @@ export const DEFAULTS_V0: ConfigV0 = {
     seenOptIn: false,
   },
 
-  // user support (intercom)
+  // legacy support profile (migrated to userInfo in v24)
   support: {
     userId: uuid(),
     createdAt: Math.floor(Date.now() / 1000),

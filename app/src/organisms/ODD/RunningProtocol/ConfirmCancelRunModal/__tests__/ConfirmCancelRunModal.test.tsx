@@ -109,7 +109,7 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('mock CancelingRunModal')
   })
 
-  it('when tapping cancel run with error, should remain in canceling state', () => {
+  it('when tapping cancel run with error, should return to the confirm cancel modal', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onError()
     })
@@ -118,7 +118,9 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    screen.getByText('mock CancelingRunModal')
+    expect(screen.queryByText('mock CancelingRunModal')).toBeNull()
+    screen.getByText('Are you sure you want to cancel?')
+    screen.getByText('Cancel run')
   })
 
   it('when stop run succeeds, tracks cancel and does not navigate', () => {

@@ -13,7 +13,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 from anthropic.types import Message, MessageParam, TextBlock, ToolUseBlock, Usage
-from api.domain.anthropic_predict import TOOL_ROUNDS_EXCEEDED_USER_MESSAGE, AnthropicPredict
+from api.domain.anthropic_predict import (
+    TOOL_ROUNDS_EXCEEDED_USER_MESSAGE,
+    AnthropicPredict,
+    anthropic_thinking_for_model,
+)
 from api.settings import get_settings
 
 
@@ -21,11 +25,17 @@ def _usage() -> Usage:
     return Usage(input_tokens=1, output_tokens=1)
 
 
+@pytest.mark.unit
+def test_anthropic_thinking_for_model() -> None:
+    assert anthropic_thinking_for_model("claude-sonnet-5-5") == {"type": "between_tools"}
+    assert anthropic_thinking_for_model("claude-sonnet-5") == {"type": "disabled"}
+
+
 def _message(content: List[Any]) -> Message:
     return Message(
         id="msg_test",
         content=content,
-        model="claude-sonnet-5",
+        model="claude-sonnet-5-5",
         role="assistant",
         stop_reason="tool_use",
         type="message",

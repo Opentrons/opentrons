@@ -45,7 +45,7 @@ const USER_NOTE =
 
 /**
  * Create initial accounts, flip the switch to enable Compliance Ready Software,
- * clear run history, and restart the robot.
+ * reset robot-server data and hardware calibrations, and restart the robot.
  *
  * We do this all in one batch at the end of the wizard to reduce the chances of it
  * getting interrupted and leaving the robot in a half-set-up state. Though it's still
@@ -119,8 +119,9 @@ export function useEnableCRSMutation(): UseMutationResult<
       token: tokenResponse.data.access_token,
     }
 
-    // Clear the run history, send the restart request, start tracking the restart
-    // progress through Redux, and wait for the robot to come back online.
+    // Reset robot-server data, pipette/gripper/module calibrations, and SSH keys,
+    // then send the restart request, start tracking the restart progress through
+    // Redux, and wait for the robot to come back online.
     //
     // Note: We can't use useResetRobotConfigMutation / useRestartRobotMutation
     // because those hooks capture HostConfig at render time, whereas we modify
@@ -128,7 +129,13 @@ export function useEnableCRSMutation(): UseMutationResult<
     // admin account.
     await postResetConfig(
       hostConfigWithAccessToken,
-      { runsHistory: true },
+      {
+        runsHistory: true,
+        pipetteOffsetCalibrations: true,
+        gripperOffsetCalibrations: true,
+        moduleCalibration: true,
+        authorizedKeys: true,
+      },
       USER_NOTE
     )
     await restart(hostConfigWithAccessToken, USER_NOTE)

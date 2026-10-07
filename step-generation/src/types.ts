@@ -1219,3 +1219,24 @@ export type UnsafePipetteMovementReason =
 
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+
+export interface ModuleStepGenArgs {
+  moduleId: string
+}
+
+export interface AbsorbanceReaderInitializeStepGenArgs {
+  moduleId: string
+  measureMode: string
+  sampleWavelengths: Array<number | string>
+  referenceWavelength?: number | string
+}
+
+export interface AbsorbanceReaderReadStepGenArgs {
+  moduleId: string
+  fileName?: string | null
+}
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}

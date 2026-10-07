@@ -8,10 +8,12 @@ from server_utils.persistence.persistence_directory import (
     PersistenceResetter,
 )
 
+from auth_server.persistence._migrations.up_to_v01 import MigrationUpTo1
 from auth_server.persistence.database import sql_engine_ctx
 from auth_server.persistence.file_and_directory_names import (
     DB_FILE,
     LATEST_VERSION_DIRECTORY,
+    V01_VERSION_DIRECTORY,
 )
 from auth_server.persistence.persistence_directory import (
     make_migration_orchestrator,
@@ -105,8 +107,9 @@ def test_make_migration_orchestrator(tmp_path: Path) -> None:
     orchestrator = make_migration_orchestrator(tmp_path)
 
     assert orchestrator._root == tmp_path
-    assert len(orchestrator._migrations) == 1
-    assert orchestrator._migrations[0].subdirectory == LATEST_VERSION_DIRECTORY
+    assert len(orchestrator._migrations) == 2
+    assert orchestrator._migrations[0].subdirectory == V01_VERSION_DIRECTORY
+    assert orchestrator._migrations[1].subdirectory == LATEST_VERSION_DIRECTORY
 
 
 # -- prepare_active_subdirectory --
@@ -132,6 +135,7 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
             "id",
             "username",
             "hashed_password",
+            "temporary_hashed_password",
             "full_name",
             "account_type",
             "password_set_at",
@@ -147,6 +151,92 @@ async def test_prepare_active_subdirectory_is_created_once(tmp_path: Path) -> No
 
     assert first == second
     assert (second / DB_FILE).exists()
+
+
+async def test_prepare_active_subdirectory_copies_v01_users_and_crs(
+    tmp_path: Path,
+) -> None:
+    """An existing 1_b8c4e2f1a903 database must be copied, not replaced, on upgrade."""
+    v01_dir = tmp_path / V01_VERSION_DIRECTORY
+    v01_dir.mkdir()
+    MigrationUpTo1(subdirectory=V01_VERSION_DIRECTORY).migrate(
+        source_dir=tmp_path, dest_dir=v01_dir
+    )
+
+    with sql_engine_ctx(v01_dir / DB_FILE) as engine:
+        v01_columns = {
+            col["name"] for col in sqlalchemy.inspect(engine).get_columns("user")
+        }
+        assert "temporary_hashed_password" not in v01_columns
+        with engine.begin() as connection:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO user (
+                        username,
+                        hashed_password,
+                        full_name,
+                        account_type,
+                        password_set_at
+                    )
+                    VALUES (
+                        :username,
+                        :hashed_password,
+                        :full_name,
+                        :account_type,
+                        :password_set_at
+                    )
+                    """
+                ),
+                {
+                    "username": "testadmin",
+                    "hashed_password": "existing-hash",
+                    "full_name": "Test Admin",
+                    "account_type": "admin",
+                    "password_set_at": "2026-01-01 00:00:00.000000",
+                },
+            )
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO access_control_enabled (id, enabled)
+                    VALUES (1, 1)
+                    """
+                )
+            )
+
+    subdirectory = await prepare_active_subdirectory(tmp_path)
+
+    assert subdirectory == tmp_path / LATEST_VERSION_DIRECTORY
+    assert v01_dir.exists()
+
+    with sql_engine_ctx(subdirectory / DB_FILE) as engine:
+        inspector = sqlalchemy.inspect(engine)
+        columns = {col["name"] for col in inspector.get_columns("user")}
+        assert "temporary_hashed_password" in columns
+        with engine.begin() as connection:
+            user = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT username, hashed_password, temporary_hashed_password
+                    FROM user
+                    """
+                )
+            ).one()
+            crs = connection.execute(
+                sqlalchemy.text(
+                    "SELECT enabled FROM access_control_enabled WHERE id = 1"
+                )
+            ).scalar_one()
+            alembic_revision = connection.execute(
+                sqlalchemy.text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+
+    assert user.username == "testadmin"
+    assert user.hashed_password == "existing-hash"
+    assert user.temporary_hashed_password is None
+    assert crs == 1
+    assert alembic_revision == "c3a91d4e2b70"
 
 
 async def test_prepare_active_subdirectory_cleans_stray_temp_files(

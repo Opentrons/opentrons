@@ -3491,3 +3491,7 @@ class OT3API(
                 message=f"No stored firmware for {module.name} {module.serial_number}"
             )
         return await modules.update_firmware(module, bundled_fw.path)
+
+    async def debug_set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """This is a debug utility function- the protocol engine or anything user-facing shouldn't touch this!"""
+        await self._backend.set_active_current(axis_currents=axis_currents)
