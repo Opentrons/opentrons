@@ -65,7 +65,12 @@ import {
 
 import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal.tsx'
 
-import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  MouseEventHandler,
+  ReactNode,
+  SetStateAction,
+} from 'react'
 import type { RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { UseDeleteRunMutationResult } from '@opentrons/react-api-client'
