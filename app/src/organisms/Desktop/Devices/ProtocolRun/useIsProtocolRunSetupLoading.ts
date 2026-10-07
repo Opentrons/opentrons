@@ -9,11 +9,9 @@ import type { State } from '/app/redux/types'
 
 /**
  * Setup tab loading gate:
- * - run record still on first fetch
+ * - run record still on fetch
  * - protocol analysis missing
- * - Flex: wait for LPC Redux OR previous-run offsets on the run record
- *   (clone/rerun can proceed without waiting on stored-offset search)
- *   Skipped once the run has started.
+ * - Flex: wait for LPC Redux OR settled run-record offsets.
  */
 export function useIsProtocolRunSetupLoading(
   runId: string,
@@ -27,14 +25,11 @@ export function useIsProtocolRunSetupLoading(
   const hasLpcState = useSelector(
     (state: State) => state.protocolRuns?.[runId]?.lpc != null
   )
-  const { offsets: runRecordOffsets, isReady: isRunRecordOffsetsReady } =
-    useRunRecordLabwareOffsets(runId)
-  const hasPrevRunOffsets =
-    isRunRecordOffsetsReady && runRecordOffsets.length > 0
+  const { isReady: isRunRecordOffsetsReady } = useRunRecordLabwareOffsets(runId)
 
   return (
     isRunRecordLoading ||
     protocolAnalysis == null ||
-    (isFlex && !runHasStarted && !hasLpcState && !hasPrevRunOffsets)
+    (isFlex && !runHasStarted && !hasLpcState && !isRunRecordOffsetsReady)
   )
 }

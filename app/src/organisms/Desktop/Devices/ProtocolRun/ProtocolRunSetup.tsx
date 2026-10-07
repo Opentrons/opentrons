@@ -160,7 +160,6 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
-  // Avoid treating pre-init LPC store (count 0) as "no offsets in run".
   const hasLpcState = useSelector(
     (state: State) => state.protocolRuns?.[runId]?.lpc != null
   )

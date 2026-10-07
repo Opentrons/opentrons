@@ -70,8 +70,12 @@ describe('useIsProtocolRunSetupLoading', () => {
     expect(result.current).toBe(true)
   })
 
-  it('is loading on Flex while LPC state and previous-run offsets are missing', () => {
+  it('is loading on Flex while LPC state is missing and run-record offsets are not ready', () => {
     mockState = { protocolRuns: { [RUN_ID]: {} } }
+    vi.mocked(useRunRecordLabwareOffsets).mockReturnValue({
+      offsets: [],
+      isReady: false,
+    })
 
     const { result } = renderHook(
       () => useIsProtocolRunSetupLoading(RUN_ID, false, true, false),
@@ -88,10 +92,10 @@ describe('useIsProtocolRunSetupLoading', () => {
     expect(result.current).toBe(false)
   })
 
-  it('is not loading on Flex once previous-run offsets are on the run record', () => {
+  it('is not loading on Flex once run-record offsets are settled, even when empty', () => {
     mockState = { protocolRuns: { [RUN_ID]: {} } }
     vi.mocked(useRunRecordLabwareOffsets).mockReturnValue({
-      offsets: [{ id: 'offset-1' } as any],
+      offsets: [],
       isReady: true,
     })
 
@@ -104,6 +108,10 @@ describe('useIsProtocolRunSetupLoading', () => {
 
   it('skips the LPC gate once the run has started', () => {
     mockState = { protocolRuns: { [RUN_ID]: {} } }
+    vi.mocked(useRunRecordLabwareOffsets).mockReturnValue({
+      offsets: [],
+      isReady: false,
+    })
 
     const { result } = renderHook(
       () => useIsProtocolRunSetupLoading(RUN_ID, false, true, true),
