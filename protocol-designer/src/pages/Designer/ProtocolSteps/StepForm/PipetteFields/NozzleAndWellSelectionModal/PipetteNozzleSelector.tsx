@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -70,8 +70,12 @@ export function PipetteNozzleSelector(
     value: nozzle as PartialPrimaryNozzles,
   }))
 
-  const wellOrdering = Object.values(pipetteSpecs.orderedColumns).map(
-    column => column.orderedNozzles
+  const wellOrdering = useMemo(
+    () =>
+      Object.values(pipetteSpecs.orderedColumns).map(
+        column => column.orderedNozzles
+      ),
+    [pipetteSpecs.orderedColumns]
   )
 
   const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
