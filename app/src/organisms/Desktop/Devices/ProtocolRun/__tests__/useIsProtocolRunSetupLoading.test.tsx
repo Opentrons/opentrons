@@ -9,12 +9,13 @@ import { useRunRecordLabwareOffsets } from '../SetupLabwarePositionCheck/FlexSet
 import { useIsProtocolRunSetupLoading } from '../useIsProtocolRunSetupLoading'
 
 import type { FunctionComponent, ReactNode } from 'react'
+import type * as ReactRedux from 'react-redux'
 
 vi.mock('/app/resources/analysis')
 vi.mock('/app/resources/runs')
 vi.mock('../SetupLabwarePositionCheck/FlexSetupLPC/useRunRecordLabwareOffsets')
 vi.mock('react-redux', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-redux')>()
+  const actual = await importOriginal<typeof ReactRedux>()
   return {
     ...actual,
     useSelector: (selector: (state: unknown) => unknown) => selector(mockState),

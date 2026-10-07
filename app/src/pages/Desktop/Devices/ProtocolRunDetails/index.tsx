@@ -135,7 +135,7 @@ function PageContents(props: PageContentsProps): ReactNode {
       return
     }
     hasStartedCloneRef.current = false
-    makeToast(t('shared:error_encountered'), ERROR_TOAST)
+    makeToast(t('shared:error_encountered') as string, ERROR_TOAST)
     navigate(`/devices/${robotName}`, { replace: true })
   }
 
@@ -167,7 +167,7 @@ function PageContents(props: PageContentsProps): ReactNode {
       return
     }
     if (run.data == null) {
-      makeToast(t('shared:error_encountered'), ERROR_TOAST)
+      makeToast(t('shared:error_encountered') as string, ERROR_TOAST)
       navigate(`/devices/${robotName}`, { replace: true })
       return
     }

@@ -32,12 +32,13 @@ import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverf
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
+import type * as ReactRouterDom from 'react-router-dom'
 import type { CommandsData, RunData } from '@opentrons/api-client'
 
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-router-dom')>()
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,
