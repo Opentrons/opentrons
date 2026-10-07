@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
@@ -28,6 +28,7 @@ export function ProtocolSetupLoadingTimeoutModal({
   const { restart, isLoading: isRestarting } =
     useRestartMutation(documentationState)
   const [isTimedOut, setIsTimedOut] = useState(false)
+  const [isReturningToDashboard, setIsReturningToDashboard] = useState(false)
 
   useEffect(() => {
     if (!enabled) {
@@ -41,6 +42,11 @@ export function ProtocolSetupLoadingTimeoutModal({
       clearTimeout(timeout)
     }
   }, [enabled])
+
+  const handleReturnToDashboard = useCallback(() => {
+    setIsReturningToDashboard(true)
+    onReturnToDashboard()
+  }, [onReturnToDashboard])
 
   if (!isTimedOut) {
     return null
@@ -61,10 +67,13 @@ export function ProtocolSetupLoadingTimeoutModal({
         </StyledText>
         <div className={styles.button_row}>
           <SmallButton
-            onClick={onReturnToDashboard}
+            onClick={handleReturnToDashboard}
             buttonType="primary"
             buttonText={t('return_to_dashboard')}
             className={styles.button}
+            iconName={isReturningToDashboard ? 'ot-spinner' : null}
+            iconPlacement="startIcon"
+            disabled={isReturningToDashboard}
           />
           <SmallButton
             onClick={() => {
