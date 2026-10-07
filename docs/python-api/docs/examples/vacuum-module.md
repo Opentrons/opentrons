@@ -24,7 +24,7 @@ The protocol begins by defining what the robot will use and where to find it. Du
 
 * **Modules and waste chute:** The Vacuum Module requires deck slots A3–A4 which displaces the trash bin from its default location in slot A3. To dispose of waste generated during the miniprep, this protocol calls [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute] to load the external waste chute in slot D3.
 
-* **Collas and spacers:** The tall manifold collar is staged on the dock, which is the raised part of the deck adapter that occupies slot A4. A 3.2 mm spacer is loaded on the manifold base, in the recessed part of the deck adapter that occupies slot A3. Because the Gripper cannot pickup a spacer, you must place it on the vacuum base manually.
+* **Collars and spacers:** The tall manifold collar is staged on the dock, which is the raised part of the deck adapter that occupies slot A4. A 3.2 mm spacer is loaded on the manifold base, in the recessed part of the deck adapter that occupies slot A3. Because the Gripper cannot pickup a spacer, you must place it on the vacuum base manually.
 
 * **Filter plates:** Because filter plates cannot sit directly on a deck slot you have to nest them inside a deeper well plate. This protocol loads nested filter plates in slots A1 and C1 where they can be picked up by the Gripper.
 
@@ -93,7 +93,7 @@ To prepare for lysate extraction, the Flex Gripper moves the short-tip filter pl
 
 * **Stack assembly:** The Gripper stacks the short tip filter plate over the collection plate that's seated in the vacuum base. Then the Gripper positions the tall collar over the filter plates to create a vacuum seal.
 
-* **Asynchronous operation:** Calling Calling [start_set_vacuum_pressure()][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] applies -330 mbar for 60 seconds and returns a [Task][opentrons.protocol_api.Task] object. Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can perform other operations while the Vacuum Module runs.
+* **Asynchronous operation:** Calling [start_set_vacuum_pressure()][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] applies -330 mbar for 60 seconds and returns a [Task][opentrons.protocol_api.Task] object. Because `start_set_vacuum_pressure()` is a non-blocking command, the robot can perform other operations while the Vacuum Module runs.
 
 * **Equalizing pressure:** Setting `vent_after=True` and `equalize_timeout_s=20` tells the module to open its vent and wait 20 seconds for the system to return to atmospheric pressure (0 mbar).
 
