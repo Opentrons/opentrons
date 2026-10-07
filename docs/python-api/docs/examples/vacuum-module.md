@@ -8,8 +8,6 @@ This use case is based on a plasmid miniprep protocol. It excludes intermediate 
 !!! note
     The Vacuum Module is supported only on Opentrons Flex and requires Python API version 2.31 or higher.
 
-The code analysis starts below.
-
 ## Workflow overview
 
 A plasmid miniprep is a technique used to isolate DNA. This analysis examines key API methods and operations that involve the Vacuum Module, such as:
@@ -22,7 +20,7 @@ A plasmid miniprep is a technique used to isolate DNA. This analysis examines ke
 
 ## Stage 1: Loading modules and labware
 
-During this stage, the `run()` function initializes hardware, defines the starting deck layout, initializes modules and instruments, and stages labware for our miniprep protocol. Simply put, this section of our protocol code defines what the robot will use and where to find it.
+The protocol begins by defining what the robot will use and where to find it. During this stage, the `run()` function initializes modules, maps the starting deck layout, and stages labware for our miniprep protocol. 
 
 * **Modules and waste chute:** The Vacuum Module requires deck slots A3–A4 which displaces the trash bin from its default location in slot A3. To dispose of waste generated during the miniprep, this protocol calls [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute] to load the external waste chute in slot D3.
 
@@ -115,7 +113,7 @@ To prepare for lysate extraction, the Flex Gripper moves the short-tip filter pl
 
 ### Liquid handling
 
-Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to serial operation, preventing other commands from running until the system depressurizes. Allowing time for system pressure to equalize allows the Gripper to move labware off the module.
+Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to serial operation, preventing other commands from running until the system depressurizes. Waiting for the system to return to atmospheric pressure allows the Gripper to move labware off the module.
 
 ```python
     # Pipette concurrently while the Vacuum Module runs.
@@ -134,17 +132,23 @@ Calling `protocol.wait_for_tasks([clarify_task])` switches the robot back to ser
 
 ## Stage 3: Direct-to-waste wash and dry
 
-In this stage, the Gripper reconfigures the module stack to transition from filtrate collection to waste collection and membrane drying.
+In this stage, the Gripper moves plates and collars to change the stack from filtrate collection to sample binding, washing, and membrane drying procedures.
+
+* **Stack configuration:** The Gripper picks up and moves the collection plate from the module to deck slot D2. It then moves the tall collar from the dock, places it on vacuum base, and sets the silica plate on top. This configuration extracts waste through the vacuum base and into the carboy.
+
+* **Wash and dry:** Calling `start_set_vacuum_pressure()` applies -500 mbar for 60 seconds to extract the wash buffer from the sample. This method also incudes `equalize_timeout=10`, which gives the system a chance to return to atmospheric pressure before executing other tasks. Another call to `start_set_vacuum_pressure()` applies a deep -800 mbar vacuum for 60 seconds. This process dries the membrane in the silica plate.
+
+<!--- trying to make a comparison here, not sure if useful --->
+!!! note "Serial vs concurrent operations"
+    In Stage 2, note that pipetting actions run concurrently before calling `wait_for_tasks()`. In Stage 3, `wait_for_tasks()` is called after each vacuum step. This makes the robot execute wash and dry operations serially.
 
 ```python
-    #The Gripper moves the lysate collection plate to slot D2.
+    # Configure the stack for waste extraction to the carboy
     protocol.move_labware(collection_plate, "D2", use_gripper=True)
-
-    # The Gripper seats the collar on the vacuum base and places the silica plate on top.
     protocol.move_labware(collar, vacuum, use_gripper=True)
     protocol.move_labware(silica_plate, collar, use_gripper=True)
 
-    # Extract waste directly to the carboy at -500 mbar and wait for system pressure to equalize.
+    # Extract wash buffer to carboy
     bind_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-500,
         duration_s=60,
@@ -153,7 +157,7 @@ In this stage, the Gripper reconfigures the module stack to transition from filt
     )
     protocol.wait_for_tasks([bind_task])
 
-    # Dry the silica plate at -800 mbar and wait for system pressure to equalize.
+    # Dry the silica filter plate
     dry_task = vacuum.start_set_vacuum_pressure(
         gauge_pressure_mbar=-800,
         duration_s=60,
@@ -165,7 +169,7 @@ In this stage, the Gripper reconfigures the module stack to transition from filt
 
 ## Protocol takeaways
 
-The miniprep protocol demonstrates several key operational principles of the Vacuum Module API and hardware operations.
+The miniprep protocol demonstrates several key operational principles of the Vacuum Module API.
 
 ### Dynamic stack configuration
 
