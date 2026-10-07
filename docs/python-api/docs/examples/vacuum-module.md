@@ -1,6 +1,6 @@
 ---
 title: "Python API: Vacuum Module Examples"
-description: An analysis of how the Vacuum Module uses API commands in a miniprep protocol.
+description: How the Vacuum Module uses API commands in a miniprep protocol.
 ---
 
 This use case is based on a plasmid miniprep protocol. It excludes intermediate steps to focus on those Python API commands that control the Vacuum Module. 
@@ -83,9 +83,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
 For more information on spacer stacking, see the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual.
 
-## Stage 2: Concurrent actions
+## Stage 2: Filtrate collection and liquid handling
 
-During this stage, the robot uses [non-blocking API commands](../modules/concurrent.md) to run filtration and pipetting tasks simultaneously. After parallel pipetting is finished, calling `wait_for_tasks()` pauses protocol execution until the vacuum task completes.
+During this stage, the robot uses [concurrent module commands](../modules/concurrent.md) to run filtration and pipetting tasks simultaneously. After parallel pipetting is finished, calling `wait_for_tasks()` pauses protocol execution until the vacuum task completes.
 
 ### Liquid collection
 
