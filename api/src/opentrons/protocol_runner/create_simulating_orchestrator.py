@@ -18,6 +18,9 @@ from opentrons.protocol_engine import (
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -48,7 +51,9 @@ class SimulatingRunOrchestrator(RunOrchestrator):
 
 
 async def create_simulating_orchestrator(
-    robot_type: RobotType, protocol_config: ProtocolConfig
+    robot_type: RobotType,
+    protocol_config: ProtocolConfig,
+    analysis_store_provider: CommandStoreProvider | None = None,
 ) -> SimulatingRunOrchestrator:
     """Create a RunOrchestrator wired to a simulating HardwareControlAPI.
 
@@ -96,6 +101,7 @@ async def create_simulating_orchestrator(
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=should_load_fixed_trash(protocol_config),
+        command_store_provider=analysis_store_provider,
     )
 
     simulating_context_creator = SimulatingContextCreator(
