@@ -76,7 +76,7 @@ import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
-import { useProtocolRunSetupLoadingState } from './useProtocolRunSetupLoadingState'
+import { useIsProtocolRunSetupLoading } from './useIsProtocolRunSetupLoading'
 
 import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -141,10 +141,11 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
-  const { isSetupLoading } = useProtocolRunSetupLoadingState(
+  const isSetupLoading = useIsProtocolRunSetupLoading(
     runId,
-    robotName,
-    isRunRecordLoading
+    isRunRecordLoading,
+    isFlex,
+    runHasStarted
   )
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
@@ -159,8 +160,15 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
+  // Avoid treating pre-init LPC store (count 0) as "no offsets in run".
+  const hasLpcState = useSelector(
+    (state: State) => state.protocolRuns?.[runId]?.lpc != null
+  )
+  const locationSpecificOffsetCount = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const noLwOffsetsInRun =
-    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
+    isFlex && hasLpcState && locationSpecificOffsetCount === 0
 
   // A separate app can apply offsets. We need to update the missing steps as a side effect.
   useEffect(() => {
