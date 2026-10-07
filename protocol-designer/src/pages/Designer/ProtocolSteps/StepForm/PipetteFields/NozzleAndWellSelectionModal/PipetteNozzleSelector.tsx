@@ -102,7 +102,14 @@ export function PipetteNozzleSelector(
       updatedNozzles = col.slice(col.length - numNozzles, col.length)
     }
     setSelectedNozzle(updatedNozzles)
-  }, [primaryNozzle, nozzleConfiguration, channels, wellOrdering, isPartialNozzle])
+  }, [
+    primaryNozzle,
+    nozzleConfiguration,
+    channels,
+    wellOrdering,
+    isPartialNozzle,
+    propsForFields.primaryNozzle.value,
+  ])
 
   let subText = ''
 
