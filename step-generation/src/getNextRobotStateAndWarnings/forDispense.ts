@@ -29,6 +29,8 @@ export function forDispense(
   const airGapVolume = firstTipState?.[AIR]?.volume ?? 0
   const primaryNozzle =
     robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+  const backLeftNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].backLeftNozzle
 
   // NOTE: (ja, 1/10/26): if airGapVolume is not null, assume that the dispense command
   // is for dispensing the air gap - NOTE: this is only used for PV right now
@@ -49,6 +51,7 @@ export function forDispense(
       pipetteSpec,
       nozzles,
       primaryNozzle,
+      backLeftNozzle,
     })
     const tipKeys = Object.keys(pipetteState).slice(0, activeChannels)
     tipKeys.forEach((tipIndex): void => {
