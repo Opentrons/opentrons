@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import * as sharedData from '@opentrons/shared-data'
 import {
   fixtureP10SingleV2Specs,
+  getFlexNameConversion,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import {
@@ -430,6 +432,45 @@ describe('move liquid step form -> command creator args', () => {
         disposalVolume: null,
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       })
+    })
+  })
+
+  it('spreads 1:N wells when multiDispense is downgraded to single transfer', () => {
+    const dispenseWells = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1']
+    vi.spyOn(sharedData, 'getAllLiquidClassDefs').mockReturnValue({
+      water: {
+        byPipette: [
+          {
+            pipetteModel: getFlexNameConversion(fixtureP10SingleV2Specs),
+            byTipType: [
+              {
+                tiprack: 'tiprack1Id',
+                aspirate: {
+                  retract: {
+                    airGapByVolume: [[0, 0]],
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    } as ReturnType<typeof sharedData.getAllLiquidClassDefs>)
+
+    const result = moveLiquidFormToArgs(
+      {
+        ...castForm,
+        path: 'multiDispense',
+        aspirate_wells: [ASPIRATE_WELL],
+        dispense_wells: dispenseWells,
+      },
+      invariantContext
+    )
+
+    expect(result).toMatchObject({
+      commandCreatorFnName: 'transfer',
+      sourceWells: Array(dispenseWells.length).fill(ASPIRATE_WELL),
+      destWells: dispenseWells,
     })
   })
 })
