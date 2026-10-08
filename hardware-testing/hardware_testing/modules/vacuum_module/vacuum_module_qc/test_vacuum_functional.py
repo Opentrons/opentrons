@@ -3,8 +3,8 @@
 import math
 import asyncio
 import time
-from typing import List, Union
-from statistics import mean, stdev
+from typing import List, NamedTuple, Optional, Union
+from statistics import mean
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -18,35 +18,151 @@ from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.drivers.vacuum_module.types import VentState
 
 
-# Test parameters
-TARGET_PRESSURES = [0, -100, -200, -300, -400, -500, -600, -700, -800, -900]
+# 200 samples at 0.45 s = 90 s hold; last 50 samples = 30 s steady window.
 PRESSURE_SAMPLES = 200
-STABILIZE_SAMPLES = 50  # samples used for std dev and settling analysis
-PRESSURE_TOLERANCE = 8  # mbar to consider "reached" and "settled"
+HOLD_DURATION_S = 90
+SAMPLE_PERIOD_S = HOLD_DURATION_S / PRESSURE_SAMPLES
+TARGET_PRESSURES = [0, -100, -200, -300, -400, -500, -600, -700, -800, -900]
+STABILIZE_SAMPLES = 50
+SETTLE_WINDOW_S = 10
+SETTLE_WINDOW_SAMPLES = max(2, round(SETTLE_WINDOW_S / SAMPLE_PERIOD_S))
+TIMEOUT_S = HOLD_DURATION_S + 60
+PRESSURE_TOLERANCE = 8  # mbar to consider "reached"
+MEAN_ABS_ERR_LIMIT = 2.0
+P95_ABS_ERR_LIMIT = 4.0
+# -100 is noisier than -200 and below (mean abs up to 2.6, p95 up to 5.5).
+SHALLOW_TARGET = -100
+SHALLOW_MEAN_ABS_ERR_LIMIT = 3.0
+SHALLOW_P95_ABS_ERR_LIMIT = 6.0
+REACH_TIME_LIMIT_S = 45.0
+SETTLE_TIME_LIMIT_S = 60.0
+# Target 0 is a sensor offset, not regulation. These units sit 2.5 to 5.4 mbar
+# below atmosphere with p2p under 0.2 mbar. Mean and p95 match that offset.
+ZERO_MEAN_ABS_ERR_LIMIT = 8.0
+ZERO_P95_ABS_ERR_LIMIT = 8.0
+ZERO_SETTLE_TIME_LIMIT_S = 20.0
+ZERO_DEEPEST_LIMIT_MBAR = -50.0
+# Target -900 must not reach, but the pump must still pull to its ceiling.
+UNREACHABLE_TARGETS = [-900]
+UNREACHABLE_MIN_MEAN_MBAR = -850.0
+UNREACHABLE_MAX_MEAN_MBAR = -700.0
+UNREACHABLE_P2P_LIMIT = 8.0
+
+
+class HoldStats(NamedTuple):
+    """Window hold statistics in mbar."""
+
+    mean_p: float
+    mean_abs_err: float
+    p2p: float
+    p95_abs_err: float
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV lines with enhanced metrics."""
-    lines: List[Union[CSVLine, CSVLineRepeating]] = []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = [
+        CSVLine(
+            "vacuum-functional-hold",
+            [
+                float,  # duration_s
+                float,  # sample_period_s
+                int,  # n samples per target
+            ],
+        )
+    ]
     for p in TARGET_PRESSURES:
         lines.append(
             CSVLine(
                 f"vacuum-target-pressure-{p}",
                 [
                     CSVResult,  # Pass/Fail
-                    float,  # time_to_reach: seconds to first enter tolerance
-                    float,  # settling_time: seconds from reach to stable
-                    float,  # total_time:  total test duration
-                    float,  # mean_pressure: during stable phase
-                    float,  # std_dev: stability metric
-                    float,  # max_deviation: worst deviation from target
-                    float,  # min_pressure: during stable phase
-                    float,  # max_pressure: during stable phase
+                    float,  # time_to_reach: seconds until first in ±8 mbar
+                    float,  # settling_time: seconds from 0 until stably on target
+                    float,  # mean_pressure: last 30s
+                    float,  # mean_abs_err: last 30s mean |error|
+                    float,  # p2p: last 30s peak-to-peak
+                    float,  # p95_abs_err: last 30s 95th percentile |error|
                     *([float] * PRESSURE_SAMPLES),  # raw pressure samples
                 ],
             )
         )
     return lines
+
+
+def _window_stats(window: List[float], target_pressure: float) -> HoldStats:
+    """Compute hold stats for a pressure window."""
+    abs_errs = [abs(p - target_pressure) for p in window]
+    return HoldStats(
+        mean_p=mean(window),
+        mean_abs_err=mean(abs_errs),
+        p2p=max(window) - min(window),
+        p95_abs_err=sorted(abs_errs)[int(0.95 * (len(abs_errs) - 1))],
+    )
+
+
+def _regulation_limits(target_pressure: int) -> tuple[float, float]:
+    """Return the mean |error| and p95 limits for a regulation target."""
+    if target_pressure == SHALLOW_TARGET:
+        return SHALLOW_MEAN_ABS_ERR_LIMIT, SHALLOW_P95_ABS_ERR_LIMIT
+    return MEAN_ABS_ERR_LIMIT, P95_ABS_ERR_LIMIT
+
+
+def _is_settled(window: List[float], target_pressure: int) -> bool:
+    """Return True when the trailing settle window is holding the target.
+
+    -900 never settles. Other targets use their own mean|err| / p95 limits.
+    """
+    if target_pressure in UNREACHABLE_TARGETS:
+        return False
+    if len(window) < SETTLE_WINDOW_SAMPLES:
+        return False
+    stats = _window_stats(window, float(target_pressure))
+    if target_pressure == 0:
+        return (
+            stats.mean_abs_err <= ZERO_MEAN_ABS_ERR_LIMIT
+            and stats.p95_abs_err <= ZERO_P95_ABS_ERR_LIMIT
+        )
+    mean_limit, p95_limit = _regulation_limits(target_pressure)
+    return stats.mean_abs_err <= mean_limit and stats.p95_abs_err <= p95_limit
+
+
+def _target_passed(
+    target_pressure: int,
+    reached_time: Optional[float],
+    settling_time: Optional[float],
+    stats: HoldStats,
+    pressures: List[float],
+) -> bool:
+    """Return whether one functional target met its pass/fail signature.
+
+    0 must stay near atmosphere and never pull vacuum. -900 must not reach and
+    must sit at pump max. Remaining targets must reach, lock, and hold.
+    """
+    if target_pressure in UNREACHABLE_TARGETS:
+        return (
+            reached_time is None
+            and settling_time is None
+            and UNREACHABLE_MIN_MEAN_MBAR <= stats.mean_p <= UNREACHABLE_MAX_MEAN_MBAR
+            and stats.p2p <= UNREACHABLE_P2P_LIMIT
+        )
+    if target_pressure == 0:
+        return (
+            settling_time is not None
+            and settling_time <= ZERO_SETTLE_TIME_LIMIT_S
+            and stats.mean_abs_err <= ZERO_MEAN_ABS_ERR_LIMIT
+            and stats.p95_abs_err <= ZERO_P95_ABS_ERR_LIMIT
+            and bool(pressures)
+            and min(pressures) > ZERO_DEEPEST_LIMIT_MBAR
+        )
+    mean_limit, p95_limit = _regulation_limits(target_pressure)
+    return (
+        reached_time is not None
+        and reached_time <= REACH_TIME_LIMIT_S
+        and settling_time is not None
+        and settling_time <= SETTLE_TIME_LIMIT_S
+        and stats.mean_abs_err <= mean_limit
+        and stats.p95_abs_err <= p95_limit
+    )
 
 
 async def test_vacuum_regulation(
@@ -84,13 +200,17 @@ async def test_vacuum_regulation(
     # Set the target pressure
     print(f"Set Target Pressure: {target_pressure} mbar")
     test_start_time = time.monotonic()
-    await vacuum.set_vacuum_state(True, target_pressure)
+    await vacuum.set_vacuum_state(
+        True,
+        target_pressure,
+        duration_s=HOLD_DURATION_S,
+        timeout_s=TIMEOUT_S,
+    )
 
     pressures: List[float] = []
-    stable_window: List[float] = []
-    reached_time = None
-    settling_time = None
-    max_deviation = 0.0
+    reached_time: Optional[float] = None
+    settling_time: Optional[float] = None
+    sample_period = 0.0 if vacuum.is_simulated else SAMPLE_PERIOD_S
 
     for i in range(PRESSURE_SAMPLES):
         await vacuum._reader.update_vacuum_state()
@@ -98,12 +218,6 @@ async def test_vacuum_regulation(
         pressures.append(current)
         print(f"Sample {i:3d}: {current:6.1f} mbar")
 
-        # Track max deviation
-        deviation = abs(current - target_pressure)
-        if deviation > max_deviation:
-            max_deviation = deviation
-
-        # Check if we reached target tolerance
         if (
             reached_time is None
             and abs(current - target_pressure) <= PRESSURE_TOLERANCE
@@ -111,63 +225,44 @@ async def test_vacuum_regulation(
             reached_time = time.monotonic() - test_start_time
             print(f"Reached target in {reached_time:.2f} seconds")
 
-        # Settling time calculation (live rolling window)
-        stable_window.append(current)
-        if len(stable_window) > STABILIZE_SAMPLES:
-            stable_window.pop(0)
+        if settling_time is None and _is_settled(
+            pressures[-SETTLE_WINDOW_SAMPLES:], target_pressure
+        ):
+            settling_time = time.monotonic() - test_start_time
+            print(f"Settled on target in {settling_time:.2f} seconds")
+        if sample_period > 0:
+            remaining = test_start_time + (i + 1) * sample_period - time.monotonic()
+            if remaining > 0:
+                await asyncio.sleep(remaining)
 
-        if reached_time is not None and len(stable_window) == STABILIZE_SAMPLES:
-            current_std = stdev(stable_window) if len(stable_window) > 1 else 0.0
-            if current_std <= PRESSURE_TOLERANCE and settling_time is None:
-                settling_time = (time.monotonic() - test_start_time) - reached_time
-                print(
-                    f"Settled in {settling_time:.2f} seconds (stddev = {current_std:.3f} mbar)"
-                )
-        await asyncio.sleep(0.2)
-
-    # Final reading
-    await vacuum._reader.update_vacuum_state()
-    final_pressure = vacuum.vacuum_state.current_gauge_pressure
-
-    # Determine pass/fail
-    expected = target_pressure > -50 or target_pressure < -800
-    passed = (
-        expected
-        or (reached_time is not None)
-        and (abs(final_pressure - target_pressure) <= PRESSURE_TOLERANCE * 1.5)
+    stats = _window_stats(pressures[-STABILIZE_SAMPLES:], float(target_pressure))
+    passed = _target_passed(
+        target_pressure, reached_time, settling_time, stats, pressures
     )
 
-    # Use last stable window for metrics
-    reached_time = reached_time or -1.0
-    settling_time = settling_time or -1.0
-    total_time = time.monotonic() - test_start_time
-    stable_pressures = pressures[-STABILIZE_SAMPLES:]
-    mean_p = mean(stable_pressures)
-    std_dev = stdev(stable_pressures) if len(stable_pressures) > 1 else 0.0
-    min_p = min(stable_pressures)
-    max_p = max(stable_pressures)
+    reached_out = reached_time if reached_time is not None else -1.0
+    settling_out = settling_time if settling_time is not None else -1.0
 
-    # Print summary
     print(
-        f"Reached Target: {reached_time:6.2f}s | "
-        f"Settling: {settling_time:5.2f}s | StdDev: {std_dev:5.3f} | "
-        f"MaxDev: {max_deviation:5.2f}"
+        f"Reached Target: {reached_out:6.2f}s | "
+        f"Settled from 0: {settling_out:5.2f}s | "
+        f"mean|err|={stats.mean_abs_err:5.2f} | "
+        f"p95={stats.p95_abs_err:5.2f} | "
+        f"p2p={stats.p2p:5.2f} | "
+        f"PASS={passed}"
     )
 
-    # Log to CSV
     report(
         section,
         f"vacuum-target-pressure-{target_pressure}",
         [
             CSVResult.from_bool(passed),
-            reached_time,
-            settling_time,
-            round(total_time, 2),
-            round(mean_p, 2),
-            round(std_dev, 3),
-            round(max_deviation, 2),
-            round(min_p, 2),
-            round(max_p, 2),
+            reached_out,
+            settling_out,
+            round(stats.mean_p, 2),
+            round(stats.mean_abs_err, 2),
+            round(stats.p2p, 2),
+            round(stats.p95_abs_err, 2),
             *pressures,
         ],
     )
@@ -175,9 +270,19 @@ async def test_vacuum_regulation(
 
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
+    ui.get_user_ready(
+        "Make sure the hose is connected to the module and there is a filter "
+        "plate with liquid on the manifold"
+    )
+
     print("Set Vacuum State")
     # Disable waste detection for now
     await vacuum._driver.set_waste_configs(enable_waste_full_detection=False)
+    report(
+        section,
+        "vacuum-functional-hold",
+        [float(HOLD_DURATION_S), float(SAMPLE_PERIOD_S), PRESSURE_SAMPLES],
+    )
 
     try:
         for pressure in TARGET_PRESSURES:

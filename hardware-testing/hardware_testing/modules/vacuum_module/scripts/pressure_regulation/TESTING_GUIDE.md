@@ -24,7 +24,7 @@ Uses `VacuumModuleDriver` (asyncio). Waste detection is **off by default**.
 | File | Purpose |
 |------|---------|
 | `run_hold_test.py` | Hold sweep via `VacuumModuleDriver`; writes live JSON and/or CSV |
-| `hold_results.py` | Shared JSON/CSV load/save used by the runner, reports, and converter |
+| `hold_results.py` | Shared JSON/CSV load/save used by the runner, reports, and converter. Also imports `vacuum_module_qc` CSVReport files. |
 | `reports.py` | Single-run and multi-run HTML/PDF report builders |
 | `cli.py` | Host CLI: `report`, `compare`, `convert` |
 | `flash_dfu_flex.sh` | DFU flash over Flex USB (**prefer ST-Link**) |
@@ -105,7 +105,7 @@ python3 cli.py report [--input PATH] [--output PATH] [--format html|pdf|both] [-
 
 | Arg | Default | Meaning |
 |-----|---------|---------|
-| `--input` | `results.json` | Hold-test `.json`, `.csv`, or a run directory |
+| `--input` | `results.json` | Hold-test `.json`, `.csv`, `vacuum_module_qc` CSVReport, or a run directory |
 | `--output` | `index.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
 | `--format` | from `--output` suffix, else `html` | `html` (Chart.js), `pdf` (matplotlib), or `both` |
 | `--refresh` | off | Embed an HTML auto-refresh tag (3 s while running, 30 s when done) |
@@ -117,6 +117,7 @@ PDF needs matplotlib on the host (`hardware-testing` dev extra).
 python3 cli.py report --input results.json --output index.html
 python3 cli.py report --input results.json --output index.pdf
 python3 cli.py report --input results.json --output index.html --format both
+python3 cli.py report --input vacuum-module-qc_CSVReport-SERIAL.csv --output qc.html
 ```
 
 ### `cli.py compare`

@@ -25,7 +25,7 @@ async def test_gcode(vacuum: VacuumModule, report: CSVReport) -> None:
     """Send and receive response for GCODE M115."""
     success = True
     info = await vacuum._driver.get_device_info()
-    target_rev = HardwareRevision.DVT
+    target_rev = HardwareRevision.DVT  # TODO: change to PVT
     hw = info["model"]
     fw = info["version"]
     sn = info["serial"]

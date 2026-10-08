@@ -79,7 +79,10 @@ def add_report_arguments(parser: argparse.ArgumentParser) -> None:
         "--input",
         type=Path,
         default=Path("results.json"),
-        help="Input results path (.json, .csv, or a run directory; default: results.json)",
+        help=(
+            "Input results path (.json, hold-test .csv, vacuum_module_qc "
+            "CSVReport, or a run directory; default: results.json)"
+        ),
     )
     _add_output_format_args(parser, Path("index.html"))
 

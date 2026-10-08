@@ -62,7 +62,8 @@ def build_parser(prog: Optional[str] = None) -> argparse.ArgumentParser:
             "Convert hold-test results between JSON and CSV. "
             "JSON -> CSV writes samples plus a sibling *_summary.csv. "
             "CSV -> JSON rebuilds the nested document (stats from the "
-            "summary file, or recomputed from samples)."
+            "summary file, or recomputed from samples). "
+            "A vacuum_module_qc CSVReport is accepted as CSV input."
         ),
     )
     convert.add_argument(
