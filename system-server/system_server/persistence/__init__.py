@@ -18,7 +18,7 @@ from server_utils.fastapi_utils.app_state import (
 from .database import create_sql_engine
 from .persistent_directory import create_persistent_directory
 from .system_uuid import get_system_uuid
-from .tables import migration_table, registration_table
+from .tables import SettingKey, migration_table, registration_table, settings_table
 from system_server.connection import AuthorizationTracker
 from system_server.settings import get_settings
 
@@ -122,4 +122,6 @@ __all__ = [
     "get_authorization_tracker",
     "registration_table",
     "migration_table",
+    "settings_table",
+    "SettingKey",
 ]
