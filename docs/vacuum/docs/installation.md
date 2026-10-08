@@ -6,7 +6,10 @@ description: "Installation instructions for attaching the module to a Flex robot
 The Vacuum Module ships in multiple boxes containing all the components required for assembly and operation.
 
 !!! warning "Before you begin"
-    Turn off the power and unplug Flex before installing the Vacuum Module. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
+    Turn off the power and unplug Flex before installing the Vacuum Module. This helps reduce the chance of electric shock, prevents the robot from operating unexpectedly during setup, and allows the gantry to move freely.
+
+!!! note "Reduced row clearance"
+    Do not place other modules adjacent to the Vacuum Module. Once installed, limited row clearance between deck slots A3–A4 and B3–B4 may cause Gripper collisions when it attempts to manipulate labware on the Vacuum Module.
 
 <div class="instruction-list" markdown>
 
