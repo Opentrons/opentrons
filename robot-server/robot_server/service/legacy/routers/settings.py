@@ -4,12 +4,12 @@ from typing import Annotated, Any, Dict, List, Optional, Union, cast
 
 import aiohttp
 from fastapi import APIRouter, Depends, Header
+from fastapi.responses import RedirectResponse
 from starlette import status
 
 from opentrons.config import (
     advanced_settings,
     get_opentrons_path,
-    robot_configs,
 )
 from opentrons.config import (
     feature_flags as ff,
@@ -250,36 +250,16 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
 @router.post(
     path="/settings/log_level/local",
     summary="Set the local log level",
-    description="Set the minimum level of logs saved locally",
-    response_model=V1BasicResponse,
-    responses={
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": LegacyErrorResponse},
-    },
-    dependencies=[
-        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
-        Depends(get_audit_logger("change log level")),
-    ],
+    description="Permanently moved to `POST /system/settings/log_level/local`.",
+    status_code=status.HTTP_308_PERMANENT_REDIRECT,
+    response_class=RedirectResponse,
 )
-async def post_log_level_local(
-    log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
-) -> V1BasicResponse:
-    """Update local log level"""
-    level = log_level.log_level
-    if not level:
-        raise LegacyErrorResponse(
-            message="log_level must be set",
-            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    # Level name is upper case
-    level_name = level.value.upper()
-    # Set the log levels
-    for logger_name in ("opentrons", "robot_server", "uvicorn"):
-        logging.getLogger(logger_name).setLevel(level.level_id)
-    # Update and save settings
-    new_config = await hardware.update_config(log_level=level_name)
-    robot_configs.save_robot_settings(new_config)
-
-    return V1BasicResponse(message=f"log_level set to {level}")
+async def post_log_level_local() -> RedirectResponse:
+    """Redirect to the system-server log level endpoint."""
+    return RedirectResponse(
+        url="/system/settings/log_level/local",
+        status_code=status.HTTP_308_PERMANENT_REDIRECT,
+    )
 
 
 @router.post(

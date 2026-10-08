@@ -1,11 +1,10 @@
-import logging
 from dataclasses import make_dataclass
 from pathlib import Path
 from typing import Generator, Optional
 
 import pytest
 from decoy import Decoy
-from mock import MagicMock, call, patch
+from mock import MagicMock, patch
 
 from opentrons.config import advanced_settings
 from opentrons.config.reset import ResetOptionId
@@ -628,30 +627,14 @@ def test_reset_invalid_option(
     assert "Input should be" in body["message"]
 
 
-@pytest.fixture()
-def mock_robot_configs():
-    with patch("robot_server.service.legacy.routers.settings.robot_configs") as m:
-        yield m
-
-
-@pytest.fixture()
-def mock_logging_set_level():
-    with patch("logging.Logger.setLevel") as m:
-        yield m
-
-
-@pytest.mark.parametrize(
-    argnames=["body"],
-    argvalues=[[{}], [{"log_level": None}], [{"log_level": "oafajhshda"}]],
-)
-def test_set_log_level_invalid(
-    api_client, body, hardware, mock_logging_set_level, mock_robot_configs
-):
-    resp = api_client.post("/settings/log_level/local", json=body)
-    assert resp.status_code == 422
-    mock_logging_set_level.assert_not_called()
-    hardware.update_config.assert_not_called()
-    mock_robot_configs.save_robot_settings.assert_not_called()
+def test_set_log_level_redirects(api_client):
+    resp = api_client.post(
+        "/settings/log_level/local",
+        json={"log_level": "debug"},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 308
+    assert resp.headers["location"] == "/system/settings/log_level/local"
 
 
 @pytest.mark.parametrize(argnames=["disabled"], argvalues=[[True], [False]])
@@ -662,38 +645,6 @@ def test_set_status_bar_disabled(api_client, hardware, disabled):
     )
     assert resp.status_code == 200
     hardware.set_status_bar_enabled.assert_called_once_with(not disabled)
-
-
-@pytest.mark.parametrize(
-    argnames=["body", "expected_log_level", "expected_log_level_name"],
-    argvalues=[
-        [{"log_level": "debug"}, logging.DEBUG, "DEBUG"],
-        [{"log_level": "deBug"}, logging.DEBUG, "DEBUG"],
-        [{"log_level": "info"}, logging.INFO, "INFO"],
-        [{"log_level": "INFO"}, logging.INFO, "INFO"],
-        [{"log_level": "warning"}, logging.WARNING, "WARNING"],
-        [{"log_level": "warninG"}, logging.WARNING, "WARNING"],
-        [{"log_level": "error"}, logging.ERROR, "ERROR"],
-        [{"log_level": "ERROR"}, logging.ERROR, "ERROR"],
-    ],
-)
-def test_set_log_level(
-    api_client,
-    hardware,
-    mock_robot_configs,
-    mock_logging_set_level,
-    body,
-    expected_log_level,
-    expected_log_level_name,
-):
-    resp = api_client.post("/settings/log_level/local", json=body)
-    assert resp.status_code == 200
-    # Three calls for opentrons, robot_server, and uvicorn loggers
-    mock_logging_set_level.assert_has_calls(
-        [call(expected_log_level), call(expected_log_level), call(expected_log_level)]
-    )
-    hardware.update_config.assert_called_once_with(log_level=expected_log_level_name)
-    mock_robot_configs.save_robot_settings.assert_called_once()
 
 
 @pytest.fixture
