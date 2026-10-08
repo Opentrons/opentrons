@@ -2,14 +2,14 @@
 
 from typing import Annotated, Dict
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
-from . import log_control
-from .models import LogFormat, LogIdentifier, LogLevel
+from . import journald, log_control
+from .models import LogFormat, LogIdentifier, LogLevel, SetLogLevelResponse
 
 logs_router = APIRouter()
 
@@ -71,15 +71,45 @@ async def get_logs(
 @logs_router.post(
     path="/system/settings/log_level/local",
     summary="Set the local log level",
-    description="Set the minimum level of logs saved locally",
-    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+    description=(
+        "Set the minimum level of logs saved locally by writing"
+        " `MaxLevelStore` to journald's runtime configuration and"
+        " signaling journald to reload."
+    ),
+    response_model=SetLogLevelResponse,
+    responses={
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "description": "log_level was missing or invalid",
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "Failed to update or reload journald configuration",
+        },
+    },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
         Depends(get_audit_logger("change log level")),
     ],
 )
-async def post_log_level_local(log_level: LogLevel) -> None:
-    """Update local log level.
+async def post_log_level_local(log_level: LogLevel) -> SetLogLevelResponse:
+    """Update journald's local MaxLevelStore and reload the daemon."""
+    level = log_level.log_level
+    if level is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="log_level must be set",
+        )
 
-    Not yet implemented on system-server.
-    """
+    try:
+        journald.set_max_level_store(level)
+    except OSError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to write journald configuration: {e}",
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to reload journald: {e}",
+        ) from e
+
+    return SetLogLevelResponse(message=f"log_level set to {level.value}")

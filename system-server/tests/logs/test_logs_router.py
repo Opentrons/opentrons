@@ -1,9 +1,9 @@
 """Tests for system-server log routes."""
 
 from collections.abc import Iterator
-from unittest.mock import AsyncMock, patch
 
 import pytest
+from decoy import Decoy
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -19,7 +19,9 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from system_server.app_setup import app
+from system_server.logs import router as logs_router_module
 from system_server.logs.log_control import DEFAULT_RECORDS, MAX_RECORDS
+from system_server.logs.models import LogLevels
 
 
 @pytest.fixture
@@ -48,20 +50,24 @@ def api_client() -> Iterator[TestClient]:
     app.dependency_overrides.pop(get_audit_client, None)
 
 
-def test_get_serial_log_with_defaults(api_client: TestClient) -> None:
+async def test_get_serial_log_with_defaults(
+    api_client: TestClient, decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """It should return serial logs with default format and record count."""
     logs = '{"serial": "serial logs"}'
     res_bytes = logs.encode("utf-8")
+    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
+    monkeypatch.setattr(
+        logs_router_module.log_control, "get_records_dumb", mock_get_records
+    )
 
-    with patch(
-        "system_server.logs.router.log_control.get_records_dumb",
-        new_callable=AsyncMock,
-    ) as m:
-        m.return_value = res_bytes
-        response = api_client.get("/system/logs/serial.log")
-        assert response.status_code == status.HTTP_200_OK
-        assert response.text == logs
-        m.assert_called_once_with("ALL_SERIAL", DEFAULT_RECORDS, "short-precise")
+    decoy.when(
+        await mock_get_records("ALL_SERIAL", DEFAULT_RECORDS, "short-precise")
+    ).then_return(res_bytes)
+
+    response = api_client.get("/system/logs/serial.log")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.text == logs
 
 
 @pytest.mark.parametrize(
@@ -73,8 +79,10 @@ def test_get_serial_log_with_defaults(api_client: TestClient) -> None:
         ("text", 1, "short-precise"),
     ],
 )
-def test_get_serial_log_with_params(
+async def test_get_serial_log_with_params(
     api_client: TestClient,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
     format_param: str,
     records_param: int,
     mode_param: str,
@@ -82,17 +90,19 @@ def test_get_serial_log_with_params(
     """It should honor format and records query params."""
     logs = '{"serial": "serial logs"}'
     res_bytes = logs.encode("utf-8")
+    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
+    monkeypatch.setattr(
+        logs_router_module.log_control, "get_records_dumb", mock_get_records
+    )
 
-    with patch(
-        "system_server.logs.router.log_control.get_records_dumb",
-        new_callable=AsyncMock,
-    ) as m:
-        m.return_value = res_bytes
-        response = api_client.get(
-            f"/system/logs/serial.log?format={format_param}&records={records_param}"
-        )
-        assert response.status_code == status.HTTP_200_OK
-        m.assert_called_once_with("ALL_SERIAL", records_param, mode_param)
+    decoy.when(
+        await mock_get_records("ALL_SERIAL", records_param, mode_param)
+    ).then_return(res_bytes)
+
+    response = api_client.get(
+        f"/system/logs/serial.log?format={format_param}&records={records_param}"
+    )
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.parametrize(
@@ -100,23 +110,79 @@ def test_get_serial_log_with_params(
     [("json", 0), ("text", MAX_RECORDS + 1), ("invalid", MAX_RECORDS - 1)],
 )
 def test_get_serial_log_with_invalid_params(
-    api_client: TestClient, format_param: str, records_param: int
+    api_client: TestClient,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    format_param: str,
+    records_param: int,
 ) -> None:
     """It should reject invalid format or records values."""
-    with patch(
-        "system_server.logs.router.log_control.get_records_dumb",
-        new_callable=AsyncMock,
-    ) as m:
-        response = api_client.get(
-            f"/system/logs/serial.log?format={format_param}&records={records_param}"
-        )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        m.assert_not_called()
-
-
-def test_post_log_level_local_not_implemented(api_client: TestClient) -> None:
-    """It should expose the log level route as not implemented."""
-    response = api_client.post(
-        "/system/settings/log_level/local", json={"log_level": "debug"}
+    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
+    monkeypatch.setattr(
+        logs_router_module.log_control, "get_records_dumb", mock_get_records
     )
-    assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+
+    response = api_client.get(
+        f"/system/logs/serial.log?format={format_param}&records={records_param}"
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.parametrize(
+    "body_level",
+    ["debug", "info", "warning", "error", "deBug", "ERROR"],
+)
+def test_post_log_level_local(
+    api_client: TestClient,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    body_level: str,
+) -> None:
+    """It should accept a log level and configure journald."""
+    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
+    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+    expected_level = LogLevels(body_level.lower())  # type: ignore[call-arg]
+
+    decoy.when(mock_set(expected_level)).then_return(expected_level.value)
+
+    response = api_client.post(
+        "/system/settings/log_level/local", json={"log_level": body_level}
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {"message": f"log_level set to {body_level.lower()}"}
+
+
+@pytest.mark.parametrize(
+    "body",
+    [{}, {"log_level": None}, {"log_level": "not-a-level"}],
+)
+def test_post_log_level_local_invalid(
+    api_client: TestClient,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    body: dict[str, object],
+) -> None:
+    """It should reject missing or invalid log levels."""
+    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
+    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+
+    response = api_client.post("/system/settings/log_level/local", json=body)
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_post_log_level_local_journald_failure(
+    api_client: TestClient, decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """It should return 500 when journald configuration fails."""
+    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
+    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+
+    decoy.when(mock_set(LogLevels.info)).then_raise(OSError("permission denied"))
+
+    response = api_client.post(
+        "/system/settings/log_level/local", json={"log_level": "info"}
+    )
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR

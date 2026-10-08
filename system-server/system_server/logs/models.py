@@ -75,3 +75,9 @@ class LogLevel(BaseModel):
                 # the value is a str before calling .lower() on it.
                 value.lower(),  # type: ignore[attr-defined]
             )
+
+
+class SetLogLevelResponse(BaseModel):
+    """Response for setting the local log level."""
+
+    message: str = Field(..., description="A human-readable message")
