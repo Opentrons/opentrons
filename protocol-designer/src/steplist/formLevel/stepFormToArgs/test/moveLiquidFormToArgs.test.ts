@@ -455,7 +455,7 @@ describe('move liquid step form -> command creator args', () => {
           },
         ],
       },
-    } as ReturnType<typeof sharedData.getAllLiquidClassDefs>)
+    } as unknown as ReturnType<typeof sharedData.getAllLiquidClassDefs>)
 
     const result = moveLiquidFormToArgs(
       {
