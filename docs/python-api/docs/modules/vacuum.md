@@ -9,6 +9,8 @@ The module is represented in code by a [`VacuumModuleContext`][opentrons.protoco
 
 For hardware-related information, see the [Opentrons Vacuum Module GEN1 Instruction Manual](../../vacuum/index.md).
 
+_New in version 2.31_
+
 ## Filter plate load names
 
 See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter plate and well plate API load names. You can also find the `loadName` for filter plates in the [labware definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on Github. When searching, note that all filter plate load names end with `_filter`.
@@ -68,18 +70,29 @@ filter_plate = collar.load_labware(
 
 ### Staging spacers
 
-Spacers fit inside collars (and the vacuum base). Spacers are used to raise a collection well plate so it's closer to a filter plate.
+Spacers (or shims) sit inside the vacuum manifold base (slot A3). They raise the collection plate closer to the filter plate above it. Minimizing the gap between plates ensures fluid droplets fall cleanly into receiving wells.
 
-| Spacer | Height | Load Name |
-|:----|:----|:----|
-| **Short** | 27 mm | `opentrons_vacuum_manifold_spacer_short` |
-| **Tall** | 34 mm | `opentrons_vacuum_manifold_spacer_tall` |
+!!! note
+    * **Gripper compatibility:** Spacers are not compatible with the Flex Gripper. You must manually place them on, and remove them from, the vacuum manifold base.
+    
+    * **Stacking:** Spacers can be stacked on one another (API v2.31+). See the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual for more information.
+
+    * **Definition files:** See the [spacer JSON definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
+
+The following table lists the spacer API load names.
+
+| Spacer height | Load name |
+|----|----|
+| **3.2 mm** | `opentrons_vacuum_manifold_spacer_3.2mm` |
+| **5.2 mm** | `opentrons_vacuum_manifold_spacer_5.2mm` |
+| **7.25 mm** | `opentrons_vacuum_manifold_spacer_7.25mm` |
+| **12.8 mm** | `opentrons_vacuum_manifold_spacer_12.8mm` |
 
 Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [`VacuumModuleContext.load_adapter()`][opentrons.protocol_api.VacuumModuleContext.load_adapter]:
 
 ```python
-# Load a short spacer on the manifold base
-spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_short")
+# Load a 3.2 mm spacer on the vacuum base
+spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
 
 # Load a collection plate on top of the spacer
 collection_plate = spacer.load_labware(
