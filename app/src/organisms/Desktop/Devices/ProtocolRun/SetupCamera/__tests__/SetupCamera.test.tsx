@@ -226,6 +226,8 @@ describe('SetupCamera', () => {
     const link = screen.getByText('View Recent Runs')
     fireEvent.click(link)
 
-    expect(mockNavigate).toHaveBeenCalledWith('/devices/test-robot/run-history')
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/devices/test-robot/#recent-protocol-runs'
+    )
   })
 })
