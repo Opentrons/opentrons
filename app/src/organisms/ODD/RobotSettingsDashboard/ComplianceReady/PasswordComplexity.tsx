@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth/getPasswordComplexityError'
+import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth'
 import {
   isValidPasswordComplexityMinimumLength,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
@@ -13,13 +13,22 @@ import {
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
-import { MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH } from './constants'
+import {
+  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
+  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
+  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+} from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
 
 import type { ReactNode } from 'react'
 import type { AuthSettingsData } from '@opentrons/api-client'
+
+type PasswordComplexitySettings = Pick<
+  AuthSettingsData,
+  'passwordComplexityMinimumLength' | 'passwordComplexitySpecialCharacters'
+>
 
 export function PasswordComplexity({
   onClickBack,
@@ -34,16 +43,47 @@ export function PasswordComplexity({
   const [showMinLength, setShowMinLength] = useState(false)
   const [showWarningModal, setShowWarningModal] = useState(false)
 
+  const passwordComplexitySettings: PasswordComplexitySettings = useMemo(
+    () => ({
+      passwordComplexityMinimumLength:
+        authSettings?.passwordComplexityMinimumLength ?? null,
+      passwordComplexitySpecialCharacters:
+        authSettings?.passwordComplexitySpecialCharacters ?? false,
+    }),
+    [authSettings]
+  )
+
+  const [tempAuthSettings, setTempAuthSettings] =
+    useState<PasswordComplexitySettings>(passwordComplexitySettings)
+
+  const isEditing = !settingsAreEqual(
+    passwordComplexitySettings,
+    tempAuthSettings
+  )
+
   const passwordComplexityEnabled =
-    authSettings?.passwordComplexityMinimumLength != null ||
-    !!authSettings?.passwordComplexitySpecialCharacters
+    tempAuthSettings.passwordComplexityMinimumLength != null ||
+    !!tempAuthSettings.passwordComplexitySpecialCharacters
+
+  const handleConfirm = useCallback(() => {
+    if (
+      hasPasswordComplexityIncreased(
+        passwordComplexitySettings,
+        tempAuthSettings
+      )
+    ) {
+      setShowWarningModal(true)
+    } else {
+      patchAuthSettings(tempAuthSettings)
+    }
+  }, [passwordComplexitySettings, tempAuthSettings, patchAuthSettings])
 
   if (showMinLength) {
     return (
       <NumericSettingPage
         title={t('odd_minimum_password_length')}
         value={
-          authSettings?.passwordComplexityMinimumLength ??
+          tempAuthSettings?.passwordComplexityMinimumLength ??
           MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH
         }
         label={t('odd_number_of_characters')}
@@ -53,7 +93,10 @@ export function PasswordComplexity({
             value != null &&
             isValidPasswordComplexityMinimumLength(String(value))
           ) {
-            patchAuthSettings({ passwordComplexityMinimumLength: value })
+            setTempAuthSettings(prev => ({
+              ...prev,
+              passwordComplexityMinimumLength: value,
+            }))
           }
           setShowMinLength(false)
         }}
@@ -88,10 +131,7 @@ export function PasswordComplexity({
           <SmallButton
             buttonText={t('confirm')}
             onClick={() => {
-              patchAuthSettings({
-                passwordComplexitySpecialCharacters: true,
-                passwordComplexityMinimumLength: DEFAULT_MIN_PASSWORD_LENGTH,
-              })
+              patchAuthSettings(tempAuthSettings)
               setShowWarningModal(false)
             }}
             width="50%"
@@ -108,6 +148,20 @@ export function PasswordComplexity({
         <ChildNavigation
           header={t('odd_password_complexity_requirements')}
           onClickBack={onClickBack}
+          onClickButton={isEditing ? handleConfirm : undefined}
+          buttonText={isEditing ? t('confirm') : undefined}
+          buttonType="primary"
+          // secondaryButtonProps={
+          //   isEditing
+          //     ? {
+          //         buttonText: '' + t('odd_password_cancel_button'),
+          //         buttonType: 'tertiaryLowLight',
+          //         onClick: () => {
+          //           setTempAuthSettings(authSettings)
+          //         },
+          //       }
+          //     : undefined
+          // }
         />
         <div className={styles.password_complexity_content}>
           <ToggleSetting
@@ -115,12 +169,11 @@ export function PasswordComplexity({
             value={passwordComplexityEnabled}
             onClick={() => {
               if (!passwordComplexityEnabled) {
-                setShowWarningModal(true)
+                setTempAuthSettings(DEFAULT_PASSWORD_COMPLEXITY_SETTINGS)
               } else {
-                patchAuthSettings({
-                  passwordComplexitySpecialCharacters: false,
-                  passwordComplexityMinimumLength: null,
-                })
+                setTempAuthSettings(
+                  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS
+                )
               }
             }}
           />
@@ -133,19 +186,21 @@ export function PasswordComplexity({
                 <ToggleSetting
                   title={t('odd_require_special_characters')}
                   value={
-                    authSettings?.passwordComplexitySpecialCharacters ?? false
+                    tempAuthSettings.passwordComplexitySpecialCharacters ??
+                    false
                   }
                   onClick={() => {
-                    patchAuthSettings({
+                    setTempAuthSettings(prev => ({
+                      ...prev,
                       passwordComplexitySpecialCharacters:
-                        !authSettings?.passwordComplexitySpecialCharacters,
-                    })
+                        !prev.passwordComplexitySpecialCharacters,
+                    }))
                   }}
                 />
                 <SettingsListButton
                   key={t('odd_minimum_password_length')}
                   title={t('odd_minimum_password_length')}
-                  value={`${authSettings?.passwordComplexityMinimumLength ?? MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH} ${t('odd_characters')}`}
+                  value={`${tempAuthSettings?.passwordComplexityMinimumLength ?? DEFAULT_MIN_PASSWORD_LENGTH} ${t('odd_characters')}`}
                   onClick={() => {
                     setShowMinLength(true)
                   }}
@@ -157,5 +212,33 @@ export function PasswordComplexity({
         </div>
       </div>
     </>
+  )
+}
+
+function hasPasswordComplexityIncreased(
+  oldSettings: PasswordComplexitySettings,
+  newSettings: PasswordComplexitySettings
+): boolean {
+  const settingsEqual = settingsAreEqual(oldSettings, newSettings)
+  const newSettingsEnabled =
+    (!oldSettings.passwordComplexityMinimumLength &&
+      !!newSettings.passwordComplexityMinimumLength) ||
+    (!oldSettings.passwordComplexitySpecialCharacters &&
+      !!newSettings.passwordComplexitySpecialCharacters)
+  const lengthIncreased =
+    (oldSettings.passwordComplexityMinimumLength ?? 0) <
+    (newSettings.passwordComplexityMinimumLength ?? 0)
+  return !settingsEqual && (newSettingsEnabled || lengthIncreased)
+}
+
+function settingsAreEqual(
+  oldSettings: PasswordComplexitySettings,
+  newSettings: PasswordComplexitySettings
+): boolean {
+  return (
+    oldSettings.passwordComplexityMinimumLength ===
+      newSettings.passwordComplexityMinimumLength &&
+    oldSettings.passwordComplexitySpecialCharacters ===
+      newSettings.passwordComplexitySpecialCharacters
   )
 }
