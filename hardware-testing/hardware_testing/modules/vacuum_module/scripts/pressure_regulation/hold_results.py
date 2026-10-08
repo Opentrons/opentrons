@@ -2,7 +2,9 @@
 
 JSON is the canonical nested document used by the live HTML reports.
 CSV is a long-form sidecar (one row per sample) plus a per-target summary,
-matching the other vacuum-module bench scripts.
+matching the other vacuum-module bench scripts. ``load_results`` also accepts
+a ``vacuum_module_qc`` ``CSVReport`` and expands its wide target rows into
+that same nested document.
 
 CSV files are rewritten atomically from the in-memory result (same as JSON).
 Metadata lives in ``# key=value`` comments at the top of the samples file so
@@ -99,6 +101,13 @@ _PREFERRED_RUN_FILES = (
     "results.csv",
     "vacuum_pressure_hold_results.csv",
 )
+
+_QC_HOLD_TAG = "vacuum-functional-hold"
+_QC_TARGET_PREFIX = "vacuum-target-pressure-"
+_QC_NEW_SUMMARY_COUNT = 6
+_QC_DEFAULT_DURATION_S = 120
+_QC_DEFAULT_SAMPLE_PERIOD_S = 0.6
+_QC_DEFAULT_N = 200
 
 
 def summary_path_for(csv_path: Path) -> Path:
@@ -243,9 +252,11 @@ def load_csv(path: Path, summary_path: Optional[Path] = None) -> dict[str, Any]:
     """Load a hold-test document from a samples CSV (and optional summary).
 
     Args:
-        path: Samples CSV path (``# key=value`` comments + header + rows).
+        path: Samples CSV path (``# key=value`` comments + header + rows),
+            or a ``vacuum_module_qc`` ``CSVReport``.
         summary_path: Optional summary CSV. Defaults to the sibling
             ``*_summary.csv``. If missing, stats are recomputed from samples.
+            Ignored for QC CSVReport input.
 
     Returns:
         Nested result document matching the JSON schema.
@@ -254,6 +265,8 @@ def load_csv(path: Path, summary_path: Optional[Path] = None) -> dict[str, Any]:
         candidate = summary_path_for(path)
         summary_path = candidate if candidate.exists() else None
     text = path.read_text()
+    if _is_qc_report_csv(text):
+        return _qc_report_to_result(text)
     meta = _parse_meta_comments(text)
     samples_by_target = _read_sample_rows(text)
     summary_by_target = _read_summary_rows(summary_path) if summary_path else {}
@@ -264,7 +277,8 @@ def load_results(path: Path) -> dict[str, Any]:
     """Load a hold-test document from a JSON file, CSV file, or run directory.
 
     Directories prefer ``results.json``, then the longer JSON name, then the
-    matching CSV names.
+    matching CSV names. A ``vacuum_module_qc`` ``CSVReport`` is accepted as
+    CSV input and expanded into the same nested document.
 
     Raises:
         FileNotFoundError: If ``path`` does not exist or a directory has no
@@ -618,3 +632,191 @@ def _assemble_result(
         result["targets"] = [run["target_mbar"] for run in runs]
     result["runs"] = runs
     return result
+
+
+def _is_qc_report_csv(text: str) -> bool:
+    """Return True if ``text`` looks like a vacuum_module_qc CSVReport."""
+    for line in text.splitlines()[:40]:
+        stripped = line.strip()
+        if stripped.startswith("copy,"):
+            return True
+        if "VACUUM_FUNCTIONAL_START" in stripped:
+            return True
+        if f",{_QC_HOLD_TAG}" in stripped:
+            return True
+        if f",{_QC_TARGET_PREFIX}" in stripped:
+            return True
+    return False
+
+
+def _qc_cell(value: str) -> str:
+    """Return a CSVReport cell, treating None-like tokens as empty."""
+    if value in ("", "None", "none", "null"):
+        return ""
+    return value
+
+
+def _qc_parse_pass(raw: str) -> Optional[bool]:
+    """Parse a CSVResult PASS/FAIL cell."""
+    lowered = _qc_cell(raw).casefold()
+    if lowered == "pass":
+        return True
+    if lowered == "fail":
+        return False
+    return None
+
+
+def _qc_floats(values: list[str]) -> list[float]:
+    """Parse numeric CSVReport cells, skipping blanks."""
+    parsed: list[float] = []
+    for value in values:
+        cell = _qc_cell(value)
+        if cell == "":
+            continue
+        parsed.append(float(cell))
+    return parsed
+
+
+def _qc_hold_meta(fields: list[str]) -> dict[str, Any]:
+    """Parse duration_s, sample_period_s, n from a vacuum-functional-hold row."""
+    numbers = _qc_floats(fields)
+    meta: dict[str, Any] = {}
+    if len(numbers) >= 1:
+        meta["duration_s"] = int(numbers[0])
+    if len(numbers) >= 2:
+        meta["sample_period_s"] = float(numbers[1])
+    if len(numbers) >= 3:
+        meta["n"] = int(numbers[2])
+    return meta
+
+
+def _qc_split_target_row(
+    fields: list[str], n_samples: Optional[int]
+) -> tuple[Optional[bool], list[float], list[float]]:
+    """Split a target row into pass flag, summary metrics, and samples."""
+    passed = _qc_parse_pass(fields[0]) if fields else None
+    rest = _qc_floats(fields[1:] if fields else [])
+    if n_samples is None and len(rest) >= _QC_DEFAULT_N + _QC_NEW_SUMMARY_COUNT:
+        n_samples = _QC_DEFAULT_N
+    if n_samples is not None and n_samples > 0 and len(rest) >= n_samples:
+        return passed, rest[:-n_samples], rest[-n_samples:]
+    if len(rest) > _QC_NEW_SUMMARY_COUNT:
+        return passed, rest[:_QC_NEW_SUMMARY_COUNT], rest[_QC_NEW_SUMMARY_COUNT:]
+    return passed, rest, []
+
+
+def _qc_samples(
+    pressures: list[float], target: float, period_s: float, duration_s: int
+) -> list[dict[str, Any]]:
+    """Build hold-test samples from QC gauge-pressure values."""
+    samples: list[dict[str, Any]] = []
+    for index, current in enumerate(pressures):
+        t_s = index * period_s
+        remaining = max(0, int(duration_s - t_s))
+        samples.append(
+            {
+                "t_s": t_s,
+                "current_mbar": current,
+                "target_mbar": target,
+                "error_mbar": current - target,
+                "enabled": 1,
+                "duration_remaining_s": remaining,
+            }
+        )
+    return samples
+
+
+def _qc_store_meta(meta: dict[str, Any], tag: str, fields: list[str]) -> bool:
+    """Copy a known META_DATA tag into ``meta``. Return True if handled."""
+    if not fields:
+        return False
+    value = _qc_cell(fields[0])
+    mapping = {
+        "test_name": "test_name",
+        "test_tag": "run_name",
+        "test_run_id": "test_run_id",
+        "firmware": "firmware",
+        "test_time_utc": "timestamp",
+        "test_operator": "operator",
+    }
+    key = mapping.get(tag)
+    if key is None:
+        return False
+    if value or key in ("test_name", "run_name", "test_run_id"):
+        meta[key] = value
+    return True
+
+
+def _qc_target_run(
+    tag: str, fields: list[str], hold: dict[str, Any]
+) -> Optional[dict[str, Any]]:
+    """Build one hold-test run from a vacuum-target-pressure row."""
+    target = float(tag[len(_QC_TARGET_PREFIX) :])
+    n_raw = hold.get("n")
+    n_samples = int(n_raw) if n_raw is not None else None
+    passed, summary, pressures = _qc_split_target_row(fields, n_samples)
+    if not pressures:
+        return None
+    duration_s = int(hold.get("duration_s") or _QC_DEFAULT_DURATION_S)
+    period_s = float(hold.get("sample_period_s") or _QC_DEFAULT_SAMPLE_PERIOD_S)
+    if "n" not in hold:
+        duration_s = max(duration_s, int(round(len(pressures) * period_s)))
+    samples = _qc_samples(pressures, target, period_s, duration_s)
+    run: dict[str, Any] = {
+        "target_mbar": target,
+        "duration_s": duration_s,
+        "bottle": None,
+        "expect_trip": False,
+        "tripped": False,
+        "trip_t_s": None,
+        "pass": passed,
+        "stats": steady_stats(samples, duration_s),
+        "samples": samples,
+        "status": "complete",
+    }
+    if summary:
+        run["time_to_reach_s"] = summary[0]
+    if len(summary) > 1:
+        run["settling_time_s"] = summary[1]
+    return run
+
+
+def _qc_report_to_result(text: str) -> dict[str, Any]:
+    """Expand a vacuum_module_qc CSVReport into a hold-test document."""
+    meta: dict[str, Any] = {
+        "waste_detection": False,
+        "waste_detection_enabled": False,
+        "expect_trip": False,
+    }
+    hold: dict[str, Any] = {}
+    runs: list[dict[str, Any]] = []
+    for row in csv.reader(io.StringIO(text)):
+        if len(row) < 2:
+            continue
+        tag = row[1]
+        fields = row[2:]
+        if _qc_store_meta(meta, tag, fields):
+            continue
+        if tag == _QC_HOLD_TAG:
+            hold = _qc_hold_meta(fields)
+            continue
+        if tag.startswith(_QC_TARGET_PREFIX):
+            run = _qc_target_run(tag, fields, hold)
+            if run is not None:
+                runs.append(run)
+
+    if hold.get("duration_s") is not None:
+        meta["duration_s"] = int(hold["duration_s"])
+    elif runs:
+        meta["duration_s"] = int(runs[0]["duration_s"])
+    else:
+        meta["duration_s"] = _QC_DEFAULT_DURATION_S
+    if hold.get("sample_period_s") is not None:
+        meta["sample_period_s"] = float(hold["sample_period_s"])
+    else:
+        meta["sample_period_s"] = _QC_DEFAULT_SAMPLE_PERIOD_S
+    if not meta.get("run_name"):
+        meta["run_name"] = meta.get("test_run_id") or meta.get("test_name") or "qc"
+    meta["targets"] = [run["target_mbar"] for run in runs]
+    meta["runs"] = runs
+    return meta
