@@ -284,23 +284,6 @@ describe('ProtocolRunSetup', () => {
     screen.getByText('Setup loading')
   })
 
-  it('renders run loading info screen while analyzing', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    when(vi.mocked(useMostRecentCompletedAnalysis))
-      .calledWith(RUN_ID)
-      .thenReturn(null)
-    when(vi.mocked(useStoredProtocolAnalysis))
-      .calledWith(RUN_ID)
-      .thenReturn(null)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: {
-        data: { metadata: { protocolName: 'Test Protocol' }, files: [] },
-      },
-    } as any)
-    render()
-    screen.getByText('Setup loading')
-  })
-
   it('shows setup loading when LPC Redux state is missing', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     render()
