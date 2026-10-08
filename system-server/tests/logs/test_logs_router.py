@@ -19,7 +19,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from system_server.app_setup import app
-from system_server.logs import router as logs_router_module
+from system_server.logs import journald, log_control
 from system_server.logs.log_control import DEFAULT_RECORDS, MAX_RECORDS
 from system_server.logs.models import LogLevels
 
@@ -56,10 +56,8 @@ async def test_get_serial_log_with_defaults(
     """It should return serial logs with default format and record count."""
     logs = '{"serial": "serial logs"}'
     res_bytes = logs.encode("utf-8")
-    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
-    monkeypatch.setattr(
-        logs_router_module.log_control, "get_records_dumb", mock_get_records
-    )
+    mock_get_records = decoy.mock(func=log_control.get_records_dumb)
+    monkeypatch.setattr(log_control, "get_records_dumb", mock_get_records)
 
     decoy.when(
         await mock_get_records("ALL_SERIAL", DEFAULT_RECORDS, "short-precise")
@@ -90,10 +88,8 @@ async def test_get_serial_log_with_params(
     """It should honor format and records query params."""
     logs = '{"serial": "serial logs"}'
     res_bytes = logs.encode("utf-8")
-    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
-    monkeypatch.setattr(
-        logs_router_module.log_control, "get_records_dumb", mock_get_records
-    )
+    mock_get_records = decoy.mock(func=log_control.get_records_dumb)
+    monkeypatch.setattr(log_control, "get_records_dumb", mock_get_records)
 
     decoy.when(
         await mock_get_records("ALL_SERIAL", records_param, mode_param)
@@ -117,10 +113,8 @@ def test_get_serial_log_with_invalid_params(
     records_param: int,
 ) -> None:
     """It should reject invalid format or records values."""
-    mock_get_records = decoy.mock(func=logs_router_module.log_control.get_records_dumb)
-    monkeypatch.setattr(
-        logs_router_module.log_control, "get_records_dumb", mock_get_records
-    )
+    mock_get_records = decoy.mock(func=log_control.get_records_dumb)
+    monkeypatch.setattr(log_control, "get_records_dumb", mock_get_records)
 
     response = api_client.get(
         f"/system/logs/serial.log?format={format_param}&records={records_param}"
@@ -139,8 +133,8 @@ def test_post_log_level_local(
     body_level: str,
 ) -> None:
     """It should accept a log level and configure journald."""
-    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
-    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+    mock_set = decoy.mock(func=journald.set_max_level_store)
+    monkeypatch.setattr(journald, "set_max_level_store", mock_set)
     expected_level = LogLevels(body_level.lower())  # type: ignore[call-arg]
 
     decoy.when(mock_set(expected_level)).then_return(expected_level.value)
@@ -164,8 +158,8 @@ def test_post_log_level_local_invalid(
     body: dict[str, object],
 ) -> None:
     """It should reject missing or invalid log levels."""
-    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
-    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+    mock_set = decoy.mock(func=journald.set_max_level_store)
+    monkeypatch.setattr(journald, "set_max_level_store", mock_set)
 
     response = api_client.post("/system/settings/log_level/local", json=body)
 
@@ -176,8 +170,8 @@ def test_post_log_level_local_journald_failure(
     api_client: TestClient, decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """It should return 500 when journald configuration fails."""
-    mock_set = decoy.mock(func=logs_router_module.journald.set_max_level_store)
-    monkeypatch.setattr(logs_router_module.journald, "set_max_level_store", mock_set)
+    mock_set = decoy.mock(func=journald.set_max_level_store)
+    monkeypatch.setattr(journald, "set_max_level_store", mock_set)
 
     decoy.when(mock_set(LogLevels.info)).then_raise(OSError("permission denied"))
 

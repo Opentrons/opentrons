@@ -77,7 +77,7 @@ def test_migration(subject: sqlalchemy.engine.Engine) -> None:
 
         settings = connection.execute(sqlalchemy.select(settings_table)).all()
         assert [(row.key, row.value) for row in settings] == [
-            (SettingKey.LOG_LEVEL, "info")
+            (SettingKey.LOG_LEVEL, "warning")
         ]
 
 
@@ -91,7 +91,7 @@ def test_fresh_database_seeds_default_settings(tmp_path: Path) -> None:
 
         assert [m.version for m in migrations] == [1]
         assert [(row.key, row.value) for row in settings] == [
-            (SettingKey.LOG_LEVEL, "info")
+            (SettingKey.LOG_LEVEL, "warning")
         ]
     finally:
         engine.dispose()

@@ -1,11 +1,11 @@
 """Tests for journald configuration helpers."""
 
+import subprocess
 from pathlib import Path
 
 import pytest
 from decoy import Decoy
 
-from system_server.logs import journald
 from system_server.logs.journald import set_max_level_store
 from system_server.logs.models import LogLevels
 
@@ -28,8 +28,8 @@ def test_set_max_level_store_writes_conf_and_sighups(
 ) -> None:
     """It should write MaxLevelStore and SIGHUP journald."""
     conf_path = tmp_path / "journald.conf"
-    mock_run = decoy.mock(func=journald.subprocess.run)
-    monkeypatch.setattr(journald.subprocess, "run", mock_run)
+    mock_run = decoy.mock(func=subprocess.run)
+    monkeypatch.setattr(subprocess, "run", mock_run)
 
     decoy.when(
         mock_run(
@@ -42,7 +42,7 @@ def test_set_max_level_store_writes_conf_and_sighups(
             ],
             check=True,
         )
-    ).then_return(None)
+    ).then_return(subprocess.CompletedProcess(args=[], returncode=0))
 
     result = set_max_level_store(level, conf_path=conf_path)
 
