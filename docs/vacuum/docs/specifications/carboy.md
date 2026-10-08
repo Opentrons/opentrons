@@ -77,7 +77,7 @@ The carboy cap includes two important liquid control features:
     - Shuts off automatically when operating at a set vacuum pressure (e.g., –400 mbar). Detection takes about 30 seconds.
     - Does not shut off automatically when operating at a set power rating (e.g., 60% power).
 
-    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../../python-api/modules/vacuum/#controlling-vacuum-operations) in the Python Protocol API documentation.
+    For more information on overflow conditions and pump behavior, see [Controlling vacuum operations](../../python-api/modules/vacuum.md#controlling-vacuum-operations) in the Python Protocol API documentation.
 
 ## Accessories
 
@@ -92,6 +92,9 @@ A large cap wrench (or ring spanner) is included with the carboy. This tool slip
 
 ### Hose clip
 
-The magnetic hose clip mounts to the top of the Control Box. It's designed to keep the end of a disconnected hose upright so trapped liquid does not drip onto workspace surfaces. Two circular cutouts on one end of the clip are sized for 6 mm and 9 mm vacuum hoses. To use the clip, press the free end of a vacuum hose into its corresponding cutout.
+The hose clip holds one end of a disconnected hose upright so trapped liquid does not drip onto workspace surfaces. Magnets on the clip hold it to the top of the control box. Two circular cutouts on the clip are sized for 6 mm and 9 mm vacuum hoses. To use the clip, press the free end of a vacuum hose into its corresponding cutout.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+<figure markdown>
+![Magnetic hose clip](../images/hose-clip.svg){ width="60%" }
+<figcaption>Magnetic hose clip</figcaption>
+</figure>
