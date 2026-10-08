@@ -1,22 +1,59 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
 import {
-  formatPyValue,
+  formatPyRuntimeValue,
   getModuleHasLiveTask,
   indentPyLines,
+  resolveBooleanRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
-import type { CommandCreator, VacuumPumpPowerArgs } from '../../types'
+import type { CommandCreator, VacuumSetPumpPowerStepGenArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { moduleId, percentPower, duration, ventAfter } = args
+export const vacuumSetPumpPower: CommandCreator<
+  VacuumSetPumpPowerStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { percentPower, duration, ventAfter } = args
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedPercentPower = resolveNumericRuntimeValue(
+    percentPower,
+    runtimeParameters
+  )
+  const resolvedDuration =
+    duration == null
+      ? undefined
+      : resolveNumericRuntimeValue(duration, runtimeParameters)
+  const resolvedVentAfter =
+    ventAfter == null
+      ? undefined
+      : resolveBooleanRuntimeValue(ventAfter, runtimeParameters)
+
+  const rawValues = [args.moduleId, percentPower, duration, ventAfter]
+  const resolvedValues = [
+    moduleId,
+    resolvedPercentPower,
+    resolvedDuration,
+    resolvedVentAfter,
+  ]
+  const errors = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] === null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (
+    errors.length > 0 ||
+    moduleId == null ||
+    resolvedPercentPower == null ||
+    resolvedDuration === null ||
+    resolvedVentAfter === null
+  ) {
+    return { errors }
+  }
   const module = invariantContext.moduleEntities[moduleId]
 
   const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
@@ -40,13 +77,13 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
 
   const holdArgs = isTimedHold
     ? {
-        duration,
-        ventAfter,
+        duration: resolvedDuration,
+        ventAfter: resolvedVentAfter,
         taskId,
       }
     : null
 
-  const percentPowerArg = `percent_power=${formatPyValue(percentPower)}`
+  const percentPowerArg = `percent_power=${formatPyRuntimeValue(percentPower)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
@@ -60,7 +97,7 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          percentPower,
+          percentPower: resolvedPercentPower,
           ...(holdArgs != null ? holdArgs : {}),
         },
       },

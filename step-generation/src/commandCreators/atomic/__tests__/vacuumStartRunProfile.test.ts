@@ -158,7 +158,6 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     }
     const result = vacuumStartRunProfile(
       {
-        commandCreatorFnName: 'vacuumStartRunProfile',
         moduleId: vacuumModuleId,
         ventAfter: false,
         profile: [
@@ -196,7 +195,6 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     })
     const result = vacuumStartRunProfile(
       {
-        commandCreatorFnName: 'vacuumStartRunProfile',
         moduleId: vacuumModuleId,
         ventAfter: false,
         profile: [
@@ -212,5 +210,103 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
       busyRobot
     )
     expect(getErrorResult(result)).toEqual(liveTaskError)
+  })
+
+  it('resolves moduleId and ventAfter when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: true,
+      },
+    }
+    const profile = [
+      {
+        enablePump: true,
+        holdSeconds: 12,
+        gaugePressureMbar: 55,
+        ventAfter: false,
+      },
+    ]
+    const result = vacuumStartRunProfile(
+      {
+        moduleId: 'selected_module',
+        ventAfter: 'vent_after',
+        profile,
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result)).toEqual({
+      commands: [
+        {
+          commandType: 'vacuumModule/startRunProfile',
+          key: expect.any(String),
+          params: {
+            moduleId: vacuumModuleId,
+            steps: [{ ...profile[0], ventAfter: true }],
+            taskId: 'mock_vacuum_module_task_1',
+            ventAfter: true,
+          },
+        },
+      ],
+      python: `
+mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
+    steps=[
+        {
+            "gauge_pressure_mbar": 55,
+            "enable_pump": True,
+            "hold_time_seconds": 12,
+            "vent_after": False,
+        }
+    ],
+    repetitions=1,
+    vent_after=vent_after
+)`.trim(),
+    })
+  })
+
+  it('returns errors if runtime parameters are missing or invalid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = vacuumStartRunProfile(
+      {
+        moduleId: 'mock_rtp',
+        ventAfter: 'missing_vent',
+        profile: [
+          {
+            enablePump: true,
+            holdSeconds: 1,
+            gaugePressureMbar: 1,
+            ventAfter: false,
+          },
+        ],
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_vent" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })
