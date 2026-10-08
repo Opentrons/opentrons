@@ -24,11 +24,12 @@ Depending on your collection plate's skirt geometry and well depth, you can conf
 
 See the [Deck Components section](specifications/deck-components.md#spacers) for more information about the spacers and stacking rules.
 
-From top to bottom, a filtrate collection stack uses the pieces shown below. Always check and test your stack to ensure that a selected combination of pieces is appropriate for a particular protocol.
+From top to bottom, a filtrate collection stack uses the components shown below, with or without spacers. Always test your stack to ensure that a selected combination of pieces is appropriate for a particular protocol.
 
-<figure markdown>
-  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate2.svg){ width="70%" }
-  <figcaption>Filtrate collection stack with spacer</figcaption>
+<figure class="side-by-side" markdown>
+  ![Waste collection stack showing labeled parts and one optional spacer](images/stack-filter-to-plate.svg)
+  ![Waste collection stack showing labeled parts and 2 optional spacers](images/stack-filter-to-plate2.svg)
+  <figcaption>Filtrate collection stacks, with optional spacers</figcaption>
 </figure>
 
 ### Without spacers
