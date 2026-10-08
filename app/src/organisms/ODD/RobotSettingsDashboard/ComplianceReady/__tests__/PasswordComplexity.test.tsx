@@ -46,6 +46,10 @@ const clickModalConfirm = (): void => {
   )
 }
 
+const clickHeaderCancel = (): void => {
+  fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+}
+
 describe('PasswordComplexity', () => {
   let props: ComponentProps<typeof PasswordComplexity>
 
@@ -73,6 +77,9 @@ describe('PasswordComplexity', () => {
     screen.getByText('8 chars')
     expect(
       screen.queryByTestId('ChildNavigation_Primary_Button')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ChildNavigation_Secondary_Button')
     ).not.toBeInTheDocument()
   })
 
@@ -112,11 +119,33 @@ describe('PasswordComplexity', () => {
     )
     expect(props.patchAuthSettings).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByText('Cancel'))
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' })
+    )
     expect(
       screen.queryByText('Require password complexity?')
     ).not.toBeInTheDocument()
     expect(props.patchAuthSettings).not.toHaveBeenCalled()
+  })
+
+  it('discards staged changes when the header cancel button is clicked', () => {
+    render(props)
+
+    fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
+    expect(screen.queryByText('Preferences')).not.toBeInTheDocument()
+    screen.getByTestId('ChildNavigation_Secondary_Button')
+
+    clickHeaderCancel()
+
+    screen.getByText('Preferences')
+    screen.getByText('8 chars')
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+    expect(
+      screen.queryByTestId('ChildNavigation_Secondary_Button')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ChildNavigation_Primary_Button')
+    ).not.toBeInTheDocument()
   })
 
   it('patches staged complexity settings when the warning is confirmed', () => {

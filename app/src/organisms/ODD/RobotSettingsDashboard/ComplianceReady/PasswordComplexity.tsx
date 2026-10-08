@@ -147,21 +147,26 @@ export function PasswordComplexity({
       <div className={styles.container}>
         <ChildNavigation
           header={t('odd_password_complexity_requirements')}
+          headerStyleProps={{
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}
           onClickBack={onClickBack}
           onClickButton={isEditing ? handleConfirm : undefined}
           buttonText={isEditing ? t('confirm') : undefined}
           buttonType="primary"
-          // secondaryButtonProps={
-          //   isEditing
-          //     ? {
-          //         buttonText: '' + t('odd_password_cancel_button'),
-          //         buttonType: 'tertiaryLowLight',
-          //         onClick: () => {
-          //           setTempAuthSettings(authSettings)
-          //         },
-          //       }
-          //     : undefined
-          // }
+          secondaryButtonProps={
+            isEditing
+              ? {
+                  buttonText: '' + t('odd_password_cancel_button'),
+                  buttonType: 'tertiaryLowLight',
+                  onClick: () => {
+                    setTempAuthSettings(passwordComplexitySettings)
+                  },
+                }
+              : undefined
+          }
         />
         <div className={styles.password_complexity_content}>
           <ToggleSetting
