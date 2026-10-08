@@ -92,11 +92,13 @@ export const RunPreviewComponent = (
 
   if (robotSideAnalysis == null) {
     return (
-      <InfoScreen
-        iconName="ot-spinner"
-        content={t('run_preview_loading')}
-        height="auto"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_preview_loading')}
+          height="auto"
+        />
+      </Flex>
     )
   }
   const commands = isRunTerminal
@@ -123,11 +125,13 @@ export const RunPreviewComponent = (
       : 0
   if (isRunCommandDataLoading || commands == null) {
     return (
-      <InfoScreen
-        iconName="ot-spinner"
-        content={t('run_preview_loading')}
-        height="auto"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_preview_loading')}
+          height="auto"
+        />
+      </Flex>
     )
   }
   return commands.length === 0 ? (
