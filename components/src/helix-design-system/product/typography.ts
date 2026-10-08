@@ -141,7 +141,7 @@ export const fontStyleCaptionRegular = `${fontWeightCaptionRegular} ${fontSizeCa
 // Code
 const fontSizeCode = '0.8125rem' // 13px
 const lineHeightCode = '1.25rem' // 20px
-const fontFamilyCode = 'Reddit Mono'
+const fontFamilyCode = 'Reddit Mono Variable'
 
 // Code-Regular
 export const fontSizeCodeRegular = fontSizeCode
