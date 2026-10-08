@@ -24,11 +24,11 @@ The protocol begins by defining what the robot will use and where to find it. Du
 
 * **Modules and waste chute:** The Vacuum Module requires deck slots A3–A4 which displaces the trash bin from its default location in slot A3. To dispose of waste generated during the miniprep, this protocol calls [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute] to load the external waste chute in slot D3.
 
-* **Collars and spacers:** The tall manifold collar is staged on the dock, which is the raised part of the deck adapter that occupies slot A4. A 3.2 mm spacer is loaded on the manifold base, in the recessed part of the deck adapter that occupies slot A3. Because the gripper cannot pickup a spacer, you must place it on the vacuum base manually.
+* **Collars and spacers:** The tall manifold collar is staged on the dock, which is the raised part of the deck adapter that occupies slot A4. A 3.2 mm spacer is loaded on the manifold base, in the recessed part of the deck adapter that occupies slot A3. Because the gripper cannot pick up a spacer, you must place it on the vacuum base manually.
 
 * **Filter plates:** Because filter plates cannot sit directly on a deck slot you have to nest them inside a deeper well plate. This protocol loads nested filter plates in slots A1 and C1 where they can be picked up by the gripper.
 
-* **Reagents and pipettes:** A 12 well reservoir loaded in slot A2 and 1000 μL tip rack loaded in slot B2 supply the attached 96-channel pipette.
+* **Reagents and pipettes:** A 12-well reservoir loaded in slot A2 and 1000 μL tip rack loaded in slot B2 supply the attached 96-channel pipette.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
@@ -136,7 +136,7 @@ In this stage, the gripper moves plates and collars to change the stack from fil
 
 * **Stack configuration:** The gripper picks up and moves the collection plate from the module to deck slot D2. It then moves the tall collar from the dock, places it on vacuum base, and sets the silica plate on top. This configuration extracts waste through the vacuum base and into the carboy.
 
-* **Wash and dry:** Calling `start_set_vacuum_pressure()` applies -500 mbar for 60 seconds to extract the wash buffer from the sample. This method also incudes `equalize_timeout=10`, which gives the system a chance to return to atmospheric pressure before executing other tasks. Another call to `start_set_vacuum_pressure()` applies a deep -800 mbar vacuum for 60 seconds. This process dries the membrane in the silica plate.
+* **Wash and dry:** Calling `start_set_vacuum_pressure()` applies -500 mbar for 60 seconds to extract the wash buffer from the sample. This method also includes `equalize_timeout_s=10`, which gives the system a chance to return to atmospheric pressure before executing other tasks. Another call to `start_set_vacuum_pressure()` applies a deep -800 mbar vacuum for 60 seconds. This process dries the membrane in the silica plate.
 
 <!--- trying to make a comparison here, not sure if useful --->
 !!! note "Serial vs concurrent operations"
@@ -173,7 +173,7 @@ The miniprep protocol demonstrates several key operational principles of the Vac
 
 ### Dynamic stack configuration
 
-Using the gripper, the Vacuum Module adapts to changing filtration requirements mid-protocol. For example, the sample protocol alternates between collecting filtrate into an internal well plate, clearing wash buffer directly into the base waste line, and recovering purified product into a an elution plate. Staging collars on the dock (slot A4) allows the gripper to autonomously assemble, seal, and unstack module components.
+Using the gripper, the Vacuum Module adapts to changing filtration requirements mid-protocol. For example, the sample protocol alternates between collecting filtrate into an internal well plate, clearing wash buffer directly into the base waste line, and recovering purified product into an elution plate. Staging collars on the dock (slot A4) allows the gripper to autonomously assemble, seal, and unstack module components.
 
 ### Non-blocking operations and concurrency
 
@@ -181,8 +181,8 @@ Commands like `start_set_vacuum_pressure()` run asynchronously and return a `Tas
 
 ### Pressure profiles
 
-Pressure sensors in the Control Box allows the module to change and maintain vacuum pressures based on liquid volumes and membrane porosities. For example, the sample protocol applies -330 mbar for lysate clarification, then uses -500 mbar to quickly clear waste, and ends at -800 mbar to dry the silica membrane.
+Pressure sensors in the Control Box allow the module to change and maintain vacuum pressures based on liquid volumes and membrane porosities. For example, the sample protocol applies -330 mbar for lysate clarification, then uses -500 mbar to quickly clear waste, and ends at -800 mbar to dry the silica membrane.
 
 ### Depressurization and gripper safety
 
-Moving labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with`equalize_timeout_s` lets the module return to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing tasks with `wait_for_tasks()` ensures the system is depressurized before the gripper attempts to move collars and labware.
+Moving labware while the manifold remains under vacuum raises an API error. Setting `vent_after=True` with `equalize_timeout_s` lets the module return to atmospheric pressure (`0` mbar) at the end of a cycle. Synchronizing tasks with `wait_for_tasks()` ensures the system is depressurized before the gripper attempts to move collars and labware.
