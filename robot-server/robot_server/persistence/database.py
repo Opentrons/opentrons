@@ -32,7 +32,7 @@ def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     If the file does not already exist, it will be created, empty.
     You must separately set up any tables you're expecting.
     """
-    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
+    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path), echo=False)
 
     try:
         sql_utils.enable_foreign_key_constraints(sql_engine)

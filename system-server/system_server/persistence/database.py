@@ -26,7 +26,7 @@ sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     """Create a SQL engine with tables and migrations."""
-    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
+    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path), echo=False)
 
     try:
         sql_utils.enable_foreign_key_constraints(sql_engine)

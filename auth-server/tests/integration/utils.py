@@ -51,7 +51,7 @@ def backdate_password_set_at(
     db_path: str,
 ) -> None:
     """Move a user's password_set_at into the past so expiration can be tested."""
-    engine = create_engine(sql_utils.get_connection_url(Path(db_path)))
+    engine = create_engine(sql_utils.get_connection_url(Path(db_path)), echo=False)
     try:
         with engine.begin() as connection:
             result = connection.execute(
