@@ -29,6 +29,8 @@ async def test_gcode(vacuum: VacuumModule, report: CSVReport) -> None:
     hw = info["model"]
     fw = info["version"]
     sn = info["serial"]
+    print(f"sn: {sn} fw: {fw} hw: {hw}\n")
+
     if hw != target_rev.value:
         ui.print_warning(f"Hardware Revision is {hw}, expected {target_rev.value}")
     report(
