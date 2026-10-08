@@ -11,6 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -75,6 +76,7 @@ import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
+import { useIsProtocolRunSetupLoading } from './useIsProtocolRunSetupLoading'
 
 import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -93,7 +95,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'run_details'])
   const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -116,10 +118,13 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -136,6 +141,13 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  const isSetupLoading = useIsProtocolRunSetupLoading(
+    runId,
+    isRunRecordLoading,
+    isFlex,
+    runHasStarted
+  )
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -148,9 +160,14 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
-  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const hasLpcState = useSelector(
+    (state: State) => state.protocolRuns?.[runId]?.lpc != null
+  )
+  const locationSpecificOffsetCount = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const noLwOffsetsInRun =
-    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
+    isFlex && hasLpcState && locationSpecificOffsetCount === 0
 
   // A separate app can apply offsets. We need to update the missing steps as a side effect.
   useEffect(() => {
@@ -451,7 +468,13 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolAnalysis != null ? (
+      {isSetupLoading ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_details:setup_loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
@@ -510,10 +533,6 @@ export function ProtocolRunSetup({
             })
           )}
         </>
-      ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
       )}
     </Flex>
   )

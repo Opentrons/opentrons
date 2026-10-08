@@ -91,7 +91,15 @@ export const RunPreviewComponent = (
   )
 
   if (robotSideAnalysis == null) {
-    return null
+    return (
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_preview_loading')}
+          height="auto"
+        />
+      </Flex>
+    )
   }
   const commands = isRunTerminal
     ? commandsFromQuery
@@ -118,9 +126,11 @@ export const RunPreviewComponent = (
   if (isRunCommandDataLoading || commands == null) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('protocol_setup:loading_data')}
-        </LegacyStyledText>
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_preview_loading')}
+          height="auto"
+        />
       </Flex>
     )
   }
