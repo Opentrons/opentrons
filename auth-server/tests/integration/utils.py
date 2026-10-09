@@ -4,6 +4,7 @@ https://tavern.readthedocs.io/en/latest/basics.html#calling-external-functions
 """
 
 import datetime
+import logging
 from pathlib import Path
 
 from requests import Response
@@ -52,6 +53,7 @@ def backdate_password_set_at(
 ) -> None:
     """Move a user's password_set_at into the past so expiration can be tested."""
     engine = create_engine(sql_utils.get_connection_url(Path(db_path)))
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
     try:
         with engine.begin() as connection:
             result = connection.execute(
