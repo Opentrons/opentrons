@@ -46,6 +46,7 @@ export interface ChildNavigationProps extends StyleProps {
   iconPlacement?: IconPlacement
   secondaryButtonProps?: ComponentProps<typeof SmallButton>
   ariaDisabled?: boolean
+  headerStyleProps?: StyleProps
 }
 
 export function ChildNavigation({
@@ -62,6 +63,7 @@ export function ChildNavigation({
   secondaryButtonProps,
   buttonIsDisabled,
   ariaDisabled = false,
+  headerStyleProps,
   ...styleProps
 }: ChildNavigationProps): JSX.Element {
   return (
@@ -96,6 +98,7 @@ export function ChildNavigation({
         <LegacyStyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
+          {...headerStyleProps}
         >
           {header}
         </LegacyStyledText>

@@ -173,15 +173,28 @@ export function useCreateTargetedMaintenanceRunMutation(
 
   return {
     ...createMaintenanceRunMutation,
-    createTargetedMaintenanceRun: (variables, ...options) =>
-      createMaintenanceRunMutation
+    createTargetedMaintenanceRun: (variables, ...options) => {
+      setOddRunIds(prev => {
+        return { ...prev, oddRunPending: true }
+      })
+      return createMaintenanceRunMutation
         .createMaintenanceRun(variables, ...options)
         .then(res => {
           if (isOnDevice) {
-            setOddRunIds({ currentRunId: res.data.id, oddRunId: res.data.id })
+            setOddRunIds({
+              currentRunId: res.data.id,
+              oddRunId: res.data.id,
+              oddRunPending: false,
+            })
           }
           return Promise.resolve(res)
         })
-        .catch(error => error),
+        .catch(error => {
+          setOddRunIds(prev => {
+            return { ...prev, oddRunPending: false }
+          })
+          return error
+        })
+    },
   }
 }

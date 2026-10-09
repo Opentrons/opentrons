@@ -21,11 +21,9 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import zAxisAttach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
 import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 
 import { FLOWS, SECTIONS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type {
   CreateCommand,
@@ -52,17 +50,9 @@ interface PipetteAnimationProps {
 
 export function startCalibrationOnClick(
   props: PipetteWizardStepProps,
-  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
-  pipetteId: string,
-  doorOpenHeader: string
+  pipetteId: string
 ): () => void {
-  const {
-    chainRunCommands,
-    proceed,
-    setShowErrorMessage,
-    setIsDoorOpenError,
-    mount,
-  } = props
+  const { chainRunCommands, proceed, handleCommandError, mount } = props
   return () => {
     const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
     const verifyCommands: CreateCommand[] = [
@@ -100,23 +90,9 @@ export function startCalibrationOnClick(
           .then(() => {
             proceed()
           })
-          .catch(error => {
-            if (isMaintenanceDoorOpenError(error)) {
-              setIsDoorOpenError(true)
-              setShowErrorMessage(doorOpenHeader)
-            } else {
-              setShowErrorMessage(error.message as string)
-            }
-          })
+          .catch(handleCommandError)
       })
-      .catch(error => {
-        if (isMaintenanceDoorOpenError(error)) {
-          setIsDoorOpenError(true)
-          setShowErrorMessage(doorOpenHeader)
-        } else {
-          setShowUnableToDetect?.(true)
-        }
-      })
+      .catch(handleCommandError)
   }
 }
 

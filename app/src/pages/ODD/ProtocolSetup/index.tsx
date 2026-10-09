@@ -27,6 +27,7 @@ import {
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -34,6 +35,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
@@ -102,7 +104,6 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
 import { useEnsureProtocolAnalysis } from '/app/resources/protocols'
 import {
-  useCloseCurrentRun,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -189,8 +190,9 @@ function PrepareToRun({
     'shared',
     'deck_configuration',
   ])
+  const documentationState = useDocumentationState()
+  const { stopRun } = useStopRunMutation(documentationState)
   const navigate = useNavigate()
-  const { closeCurrentRun } = useCloseCurrentRun()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -764,8 +766,9 @@ function PrepareToRun({
       <ProtocolSetupLoadingTimeoutModal
         enabled={isLoading}
         onReturnToDashboard={() => {
-          closeCurrentRun({
-            onSuccess: () => {
+          stopRun(runId, {
+            onError: error => {
+              console.error('Error stopping run: ', error)
               navigate('/dashboard')
             },
           })
@@ -895,7 +898,6 @@ export function ProtocolSetup(): JSX.Element {
       !offsetsConfirmed ? 'apply_offsets' : null,
       'play_run',
     ].filter((action): action is AuditLogAction => action != null)
-    console.log('actionsToDocument', actions)
     return actions
   }, [cameraSettingsApplied, offsetsConfirmed])
 

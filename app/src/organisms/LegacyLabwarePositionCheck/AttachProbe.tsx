@@ -170,7 +170,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     return (
       <ProbeNotAttached
         handleOnClick={handleProbeAttached}
-        setShowUnableToDetect={setShowUnableToDetect}
+        dismissError={() => {
+          setShowUnableToDetect(false)
+        }}
         isOnDevice={isOnDevice}
       />
     )

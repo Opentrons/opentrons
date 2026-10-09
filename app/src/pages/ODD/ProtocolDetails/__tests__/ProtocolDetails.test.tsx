@@ -318,6 +318,33 @@ describe('ODDProtocolDetails', () => {
   it('creates a run when start setup is clicked and analysis is complete', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
-    expect(mockCreateRun).toHaveBeenCalledWith({ protocolId: 'fakeProtocolId' })
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      { protocolId: 'fakeProtocolId' },
+      expect.objectContaining({ onError: expect.any(Function) })
+    )
+  })
+
+  it('shows a spinner while creating a run from start setup', () => {
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    screen.getByLabelText('loading indicator')
+  })
+
+  it('clears the start setup spinner if creating a run fails', async () => {
+    let onError: ((error: unknown) => void) | undefined
+    mockCreateRun.mockImplementation(
+      (_vars: unknown, options?: { onError?: (error: unknown) => void }) => {
+        onError = options?.onError
+      }
+    )
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    screen.getByLabelText('loading indicator')
+    onError?.(new Error('failed'))
+    await waitFor(() => {
+      expect(
+        screen.queryByLabelText('loading indicator')
+      ).not.toBeInTheDocument()
+    })
   })
 })

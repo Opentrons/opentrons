@@ -1,3 +1,5 @@
+import { useQueryClient } from 'react-query'
+
 import { createRunAction, RUN_ACTION_TYPE_STOP } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../accessControl'
@@ -33,6 +35,7 @@ export const useStopRunMutation = (
 ): UseStopRunMutationResult => {
   const host = useHost()
   const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'stop_run']
+  const queryClient = useQueryClient()
   const mutation = useDocumentedMutation<RunAction, unknown, string>(
     documentationState,
     actions,
@@ -45,7 +48,12 @@ export const useStopRunMutation = (
           actionType: RUN_ACTION_TYPE_STOP,
         },
         userNotes
-      ).then(response => response.data),
+      ).then(response => {
+        void queryClient.invalidateQueries(
+          getQueryKey(host, 'runs', runId, 'details')
+        )
+        return response.data
+      }),
     options
   )
   return {
