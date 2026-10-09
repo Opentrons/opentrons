@@ -15,7 +15,7 @@ In total, your compliance ready Flex generates three types of files:
 
 | **Type** | **Description** | 
 | :--------|---------------- |
-| **Audit logs** | <ul><li>Contain user actions and documentation.</li></li><li>Grouped together for download by a period.</li></ul> |
+| **Audit logs** | <ul><li>Contain user actions and documentation.</li></li><li>Grouped together for download by a period.</li><li>View in the Opentrons [log verifier](#log-verifier).</ul></li> |
 | **Diagnostic files** | <ul><li>Includes troubleshooting logs and calibration logs.</li><li>May be needed when working with Opentrons Support.</li></ul> |
 | **Protocol run records** | <ul><li>Contain the name, date, and status (completed, canceled, or failed) for each protocol run.</li><li>By default, automatically deleted when the maximum of 20 run records are stored on the Flex.</li></ul> |
 
@@ -123,3 +123,7 @@ Like the Opentrons App, the Flex touchscreen includes a reminder to make sure yo
   ![Delete audit logs.](../images/delete-crs-logs.png)
   <figcaption>Make sure all files are downloaded and safely stored before deleting.</figcaption>
 </figure> 
+
+## Log verifier 
+
+The compliance ready audit logs 
