@@ -7,9 +7,7 @@ The Vacuum Module is an automated filtration system for the Opentrons Flex liqui
 
 The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, labware loading, and vacuum control.
 
-For hardware-related information, see the [Opentrons Vacuum Module GEN1 Instruction Manual](../../vacuum/index.md).
-
-_New in version 2.31_
+For hardware and installation information, see the [Opentrons Vacuum Module GEN1 Instruction Manual](../../vacuum/index.md).
 
 ## Filter plate load names
 
@@ -42,6 +40,8 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
+_New in version 2.31_
+
 ## Collars and spacers
 
 Collars and spacers are modular components that you use to create deck stacks for different types of vacuum filtration protocols. 
@@ -70,16 +70,7 @@ filter_plate = collar.load_labware(
 
 ### Staging spacers
 
-Spacers (or shims) sit inside the vacuum manifold base (slot A3). They raise the collection plate closer to the filter plate above it. Minimizing the gap between plates ensures fluid droplets fall cleanly into receiving wells.
-
-!!! note
-    * **Gripper compatibility:** Spacers are not compatible with the Flex Gripper. You must manually place them on, and remove them from, the vacuum manifold base.
-    
-    * **Stacking:** Spacers can be stacked on one another (API v2.31+). See the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual for more information.
-
-    * **Definition files:** See the [spacer JSON definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
-
-The following table lists the spacer API load names.
+Spacers (or shims) sit inside the vacuum manifold base (slot A3). They raise the collection plate closer to the filter plate above it. Minimizing the gap between plates ensures fluid droplets fall cleanly into receiving wells. The following table lists the spacer heights and their API load names.
 
 | Spacer height | Load name |
 |----|----|
@@ -87,6 +78,13 @@ The following table lists the spacer API load names.
 | **5.2 mm** | `opentrons_vacuum_manifold_spacer_5.2mm` |
 | **7.25 mm** | `opentrons_vacuum_manifold_spacer_7.25mm` |
 | **12.8 mm** | `opentrons_vacuum_manifold_spacer_12.8mm` |
+
+For complete JSON definitions and dimensions, see the [spacer JSON definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
+
+!!! note
+    * **Gripper compatibility:** Spacers are not compatible with the Flex Gripper. You must manually place them on, and remove them from, the vacuum manifold base.
+    
+    * **Stacking:** Spacers can be stacked on one another. See the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual for more information.
 
 Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [`VacuumModuleContext.load_adapter()`][opentrons.protocol_api.VacuumModuleContext.load_adapter]:
 
@@ -103,13 +101,13 @@ collection_plate = spacer.load_labware(
 
 ## Moving labware
 
-Vacuum Module collars, spacers, and filter plates are compatible with the Flex Gripper. You can call [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] and use the Gripper to move collars and well plates between the dock (slot A4), the vacuum base (slot A3), and other deck locations or modules.
+Vacuum Module collars and filter plates are compatible with the Flex Gripper. You can call [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] and use the Gripper to move collars and plates between the dock (slot A4), the vacuum base (slot A3), and other deck locations or modules.
 
 Keep in mind these best practices and limitations when including Gripper movements in your vacuum protocol:
 
 | Activity | Description |
 |:----|:----|
-| **Deck placement** | You cannot place a filter plate directly in an empty deck slot. If you do this, the API will raise a `LabwareIsNotAllowedInLocationError`. Filter plates must sit on an adapter like a collar (slot A4) or the vacuum base (slot A3). |
+| **Deck placement** | You cannot place a filter plate by itself directly in an empty deck slot. If you do, the API will raise a `LabwareIsNotAllowedInLocationError`.<br><br>Filter plates must sit on an adapter like a collar (slot A4), the vacuum base (slot A3), or nested inside a deeper well plate on a regular deck slot. For a demonstration, see [Vacuum Module Examples](../examples/vacuum-module.md#stage-1-loading-modules-and-labware). |
 | **Returning to dock** | Use [`vacuum.move_to_dock(collar, use_gripper=True)`][opentrons.protocol_api.VacuumModuleContext.move_to_dock] to move a collar stack from the vacuum base to the dock. |
 | **Stacking** | Including a `collar` in `move_labware()` automatically moves the collar and any filter or well plate placed on top of it. |
 | **Targeting locations** | Set `new_location=vacuum` to place collars or spacers on the vacuum base (slot A3), or `collar` to put well plates onto a collar staged on the dock (slot A4). |
