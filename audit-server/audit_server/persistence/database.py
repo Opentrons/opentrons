@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
@@ -24,6 +25,7 @@ def sql_engine_ctx(db_path: Path) -> Generator[sqlalchemy.engine.Engine, None, N
     * use write-ahead logging (WAL) for the database journal.
     """
     engine = sqlalchemy.create_engine(sql_utils.get_connection_url(db_path))
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
     try:
         sql_utils.enable_foreign_key_constraints(engine)
         sql_utils.fix_transactions(engine)

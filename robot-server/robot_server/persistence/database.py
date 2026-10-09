@@ -1,5 +1,6 @@
 """SQLite database initialization and utilities."""
 
+import logging
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
@@ -33,6 +34,7 @@ def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     You must separately set up any tables you're expecting.
     """
     sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
 
     try:
         sql_utils.enable_foreign_key_constraints(sql_engine)
