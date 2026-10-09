@@ -5,7 +5,7 @@ description: "Load and control Temperature, Heater-Shaker, Thermocycler, and oth
 
 Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
 
-Powered modules include the Absorbance Plate Reader Module, Heater-Shaker Module, Magnetic Module, Temperature Module, and Thermocycler Module. The 96-well Magnetic Block is an unpowered module.
+Powered modules include the Absorbance Plate Reader Module, Heater-Shaker Module, Magnetic Module, Temperature Module, and Thermocycler Module, and Vacuum Module. The 96-well Magnetic Block is an unpowered module.
 
 Pages in this section of the documentation cover:
 
@@ -18,6 +18,7 @@ Pages in this section of the documentation cover:
     - [Magnetic Module](magnetic-module.md)
     - [Temperature Module](temperature-module.md)
     - [Thermocycler Module](thermocycler.md)
+    - [Vacuum Module](vacuum.md)
 - Using [concurrent module actions](concurrent.md) to run modules while the robot performs other protocol steps, like pipetting, gripper, and other module actions. 
 - Loading [multiple modules of the same type](multiple-same-type.md) in a single protocol.
 
