@@ -22,7 +22,12 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.pipette.types import PipetteModel
 
 from opentrons import execute, types
-from opentrons.hardware_control import Controller, api
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
+from opentrons.hardware_control import ot3api
+from opentrons.protocols.api_support.definitions import (
+    MIN_SUPPORTED_VERSION_FOR_FLEX,
+    MAX_SUPPORTED_VERSION,
+)
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocols.api_support.types import APIVersion
@@ -36,6 +41,17 @@ HERE = Path(__file__).parent
 
 
 @pytest.fixture(autouse=True)
+def force_simulator_override() -> Iterator[None]:
+    """You can't run a real controller and simulated hardware on Flex like on OT-2."""
+    with mock.patch.object(
+        ot3api.OT3API,
+        "build_hardware_controller",
+        ot3api.OT3API.build_hardware_simulator,
+    ):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def clean_up_hw() -> Iterator[None]:
     """Make sure hardware objects are cleaned up."""
     yield
@@ -45,7 +61,7 @@ def clean_up_hw() -> Iterator[None]:
         execute._THREAD_MANAGED_HW = None
 
 
-@pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
+@pytest.fixture(params=[MIN_SUPPORTED_VERSION_FOR_FLEX, MAX_SUPPORTED_VERSION])
 def api_version(request: SubRequest) -> APIVersion:
     """Return an API version to test with.
 
@@ -58,15 +74,15 @@ def api_version(request: SubRequest) -> APIVersion:
 @pytest.fixture
 def mock_get_attached_instr(  # noqa: D103
     monkeypatch: pytest.MonkeyPatch,
-    virtual_smoothie_env: None,
+    enable_ot3_hardware_controller: None,
 ) -> mock.AsyncMock:
     gai_mock = mock.AsyncMock()
 
     async def dummy_delay(self: Any, duration_s: float) -> None:
         pass
 
-    monkeypatch.setattr(Controller, "get_attached_instruments", gai_mock)
-    monkeypatch.setattr(api.API, "delay", dummy_delay)
+    monkeypatch.setattr(OT3Controller, "get_attached_instruments", gai_mock)
+    monkeypatch.setattr(ot3api.OT3API, "delay", dummy_delay)
     gai_mock.return_value = {
         types.Mount.RIGHT: {"model": None, "id": None},
         types.Mount.LEFT: {"model": None, "id": None},
@@ -82,260 +98,23 @@ def mock_deck_configuration(
 
     def mock_get_deck_configuration() -> DeckConfigurationType:
         return [
-            ("cutout1", "singleStandardSlot", None),
-            ("cutout2", "singleStandardSlot", None),
-            ("cutout3", "singleStandardSlot", None),
-            ("cutout4", "singleStandardSlot", None),
-            ("cutout5", "singleStandardSlot", None),
-            ("cutout6", "singleStandardSlot", None),
-            ("cutout7", "singleStandardSlot", None),
-            ("cutout8", "singleStandardSlot", None),
-            ("cutout9", "singleStandardSlot", None),
-            ("cutout10", "singleStandardSlot", None),
-            ("cutout11", "singleStandardSlot", None),
-            ("cutout12", "fixedTrashSlot", None),
+            ("cutoutA1", "singleLeftSlot", None),
+            ("cutoutB1", "singleLeftSlot", None),
+            ("cutoutC1", "singleLeftSlot", None),
+            ("cutoutD1", "singleLeftSlot", None),
+            ("cutoutA2", "singleCenterSlot", None),
+            ("cutoutB2", "singleCenterSlot", None),
+            ("cutoutC2", "singleCenterSlot", None),
+            ("cutoutD2", "singleCenterSlot", None),
+            ("cutoutA3", "singleRightSlot", None),
+            ("cutoutB3", "singleRightSlot", None),
+            ("cutoutC3", "singleRightSlot", None),
+            ("cutoutD3", "singleRightSlot", None),
         ]
 
     monkeypatch.setattr(
         entrypoint_util, "get_deck_configuration", mock_get_deck_configuration
     )
-
-
-@pytest.mark.parametrize(
-    ("protocol_file", "expected_entries"),
-    [
-        (
-            "testosaur_v2.py",
-            [
-                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
-                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
-            ],
-        ),
-        (
-            "testosaur_v2_14.py",
-            [
-                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
-                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
-                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
-                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
-            ],
-        ),
-    ],
-)
-def test_execute_function_apiv2(
-    protocol: Protocol,
-    protocol_file: str,
-    expected_entries: List[str],
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    """Test `execute()` with a Python file."""
-    converted_model_v15 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1.5")
-    )
-    converted_model_v1 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p1000_single_v1")
-    )
-
-    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v15.pipette_type,
-            converted_model_v15.pipette_channels,
-            converted_model_v15.pipette_version,
-            converted_model_v15.oem_type,
-        ),
-        "id": "testid",
-    }
-    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v1.pipette_type,
-            converted_model_v1.pipette_channels,
-            converted_model_v1.pipette_version,
-            converted_model_v1.oem_type,
-        ),
-        "id": "testid2",
-    }
-    entries = []
-
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
-
-    execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
-
-    assert [
-        item["payload"]["text"] for item in entries if item["$"] == "before"
-    ] == expected_entries
-
-
-def test_execute_function_json_v3(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    """Test `execute()` with a JSONv3 file."""
-    jp = get_json_protocol_fixture("3", "simple", False)
-    filelike = io.StringIO(jp)
-    entries = []
-
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
-
-    converted_model_v15 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1.5")
-    )
-    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v15.pipette_type,
-            converted_model_v15.pipette_channels,
-            converted_model_v15.pipette_version,
-            converted_model_v15.oem_type,
-        ),
-        "id": "testid",
-    }
-    execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
-        "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
-        "Delaying for 0 minutes and 42.0 seconds",
-        "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
-        "Touching tip",
-        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
-        "Moving to 5",
-        "Dropping tip into A1 of Trash on 12",
-    ]
-
-
-def test_execute_function_json_v4(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    """Test `execute()` with a JSONv4 file."""
-    jp = get_json_protocol_fixture("4", "simpleV4", False)
-    filelike = io.StringIO(jp)
-    entries = []
-
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
-
-    converted_model_v15 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1.5")
-    )
-    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v15.pipette_type,
-            converted_model_v15.pipette_channels,
-            converted_model_v15.pipette_version,
-            converted_model_v15.oem_type,
-        ),
-        "id": "testid",
-    }
-    execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
-        "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
-        "Delaying for 0 minutes and 42.0 seconds",
-        "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
-        "Touching tip",
-        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
-        "Moving to 5",
-        "Dropping tip into A1 of Trash on 12",
-    ]
-
-
-def test_execute_function_json_v5(
-    get_json_protocol_fixture: Callable[[str, str, bool], str],
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    """Test `execute()` with a JSONv5 file."""
-    jp = get_json_protocol_fixture("5", "simpleV5", False)
-    filelike = io.StringIO(jp)
-    entries = []
-
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
-
-    converted_model_v15 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1.5")
-    )
-    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v15.pipette_type,
-            converted_model_v15.pipette_channels,
-            converted_model_v15.pipette_version,
-            converted_model_v15.oem_type,
-        ),
-        "id": "testid",
-    }
-    execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
-        "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
-        "Delaying for 0 minutes and 42.0 seconds",
-        "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
-        "Touching tip",
-        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
-        "Moving to 5",
-        "Moving to B2 of Dest Plate on 3",
-        "Moving to B2 of Dest Plate on 3",
-        "Dropping tip into A1 of Trash on 12",
-    ]
-
-
-def test_execute_function_bundle_apiv2(
-    get_bundle_fixture: Callable[[str], Bundle],
-    virtual_smoothie_env: None,
-    mock_get_attached_instr: mock.AsyncMock,
-) -> None:
-    """Test `execute()` with a .zip bundle."""
-    bundle = get_bundle_fixture("simple_bundle")
-    entries = []
-
-    def emit_runlog(entry: Any) -> None:
-        nonlocal entries
-        entries.append(entry)
-
-    converted_model_v15 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1.5")
-    )
-    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load_pipette_data.load_definition(
-            converted_model_v15.pipette_type,
-            converted_model_v15.pipette_channels,
-            converted_model_v15.pipette_version,
-            converted_model_v15.oem_type,
-        ),
-        "id": "testid",
-    }
-    execute.execute(
-        cast(TextIO, bundle["filelike"]),
-        "simple_bundle.zip",
-        emit_runlog=emit_runlog,
-    )
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
-        "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
-        "Dropping tip into A1 of Opentrons Fixed Trash on 12",
-        "Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
-        "Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
-        "Dropping tip into A1 of Opentrons Fixed Trash on 12",
-        "Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
-        "Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
-        "Dropping tip into A1 of Opentrons Fixed Trash on 12",
-    ]
 
 
 class TestExecutePythonLabware:
@@ -346,8 +125,10 @@ class TestExecutePythonLabware:
     LW_NAMESPACE = "fixture"
 
     @pytest.fixture(autouse=True)
-    def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
-        """Automatically enable the virtual_smoothie_env fixture for every test."""
+    def use_enable_ot3_hardware_controller(
+        self, enable_ot3_hardware_controller: None
+    ) -> None:
+        """Automatically enable the enable_ot3_hardware_controller fixture for every test."""
         pass
 
     @pytest.fixture
@@ -356,7 +137,7 @@ class TestExecutePythonLabware:
         path = tmp_path / "protocol.py"
         protocol_source = textwrap.dedent(
             f"""\
-            metadata = {{"apiLevel": "{api_version}"}}
+            requirements = {{"robotType": "Flex", "apiLevel": "{api_version}"}}
             def run(protocol):
                 protocol.load_labware(
                     load_name="{self.LW_LOAD_NAME}",
@@ -464,8 +245,10 @@ class TestGetProtocolAPILabware:
     LW_NAMESPACE = "fixture"
 
     @pytest.fixture(autouse=True)
-    def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
-        """Automatically enable the virtual_smoothie_env fixture for every test."""
+    def use_enable_ot3_hardware_controller(
+        self, enable_ot3_hardware_controller: None
+    ) -> None:
+        """Automatically enable the enable_ot3_hardware_controller fixture for every test."""
         pass
 
     def test_default_no_extra_labware(

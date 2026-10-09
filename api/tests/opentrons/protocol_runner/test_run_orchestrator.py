@@ -9,10 +9,10 @@ from decoy import Decoy
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons import protocol_runner
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel as HardwareTemperatureModuleModel,
 )
+from opentrons.hardware_control.ot3api import OT3API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy

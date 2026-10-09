@@ -5,8 +5,8 @@ from typing import NoReturn, Optional
 
 import pytest
 
-from opentrons.hardware_control.api import API
 from opentrons.hardware_control.modules import ModuleAtPort, SimulatingModule
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.thread_manager import (
     ThreadManager,
     ThreadManagerException,
@@ -33,7 +33,7 @@ def test_module_cache_add_entry() -> None:
         "tempdeck": [SimulatingModule(serial_number="111", model="temperatureModuleV2")]
     }
     thread_manager = ThreadManager(
-        API.build_hardware_simulator, attached_modules=mod_names
+        OT3API.build_hardware_simulator, attached_modules=mod_names
     )
 
     # Test that module gets added to the cache
@@ -59,7 +59,7 @@ async def test_module_cache_remove_entry() -> None:
         "magdeck": [SimulatingModule(serial_number="222", model="magneticModuleV1")],
     }
     thread_manager = ThreadManager(
-        API.build_hardware_simulator, attached_modules=mod_names
+        OT3API.build_hardware_simulator, attached_modules=mod_names
     )
 
     mods_before = thread_manager.attached_modules
@@ -86,8 +86,8 @@ async def test_module_cache_remove_entry() -> None:
 
 async def test_wraps_instance() -> None:
     """It should expose the underlying type."""
-    thread_manager = ThreadManager(API.build_hardware_simulator)
-    assert thread_manager.wraps_instance(API)
+    thread_manager = ThreadManager(OT3API.build_hardware_simulator)
+    assert thread_manager.wraps_instance(OT3API)
 
 
 class Blocker:

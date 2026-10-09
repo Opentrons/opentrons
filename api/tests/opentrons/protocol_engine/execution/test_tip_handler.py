@@ -16,9 +16,8 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.hardware_control.types import (
     InstrumentProbeType,
     TipScrapeType,
@@ -37,11 +36,9 @@ from opentrons.types import Mount, MountType, NozzleConfigurationType, Point
 
 
 @pytest.fixture
-def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    mock = decoy.mock(cls=HardwareAPI)
-    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
-    return mock
+def mock_hardware_api(hardware_api: HardwareControlAPI) -> HardwareControlAPI:
+    """Passthrough to limit diff.."""
+    return hardware_api
 
 
 @pytest.fixture
@@ -82,7 +79,7 @@ MOCK_MAP = NozzleMap.build(
 async def test_create_tip_handler(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should return virtual or real tip handlers depending on config."""
     decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
@@ -111,7 +108,7 @@ async def test_flex_pick_up_tip_state(
     mock_labware_data_provider: LabwareDataProvider,
     tip_rack_definition: LabwareDefinition,
     tip_state: TipStateType,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """Test the protocol engine's pick_up_tip logic."""
     subject = HardwareTipHandler(
@@ -181,7 +178,7 @@ async def test_flex_pick_up_tip_state(
 async def test_pick_up_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
     tip_rack_definition: LabwareDefinition,
 ) -> None:
@@ -252,7 +249,7 @@ async def test_pick_up_tip(
 async def test_drop_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should use the hardware API to drop a tip."""
@@ -290,7 +287,7 @@ async def test_drop_tip(
 def test_add_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should add a tip manually to the hardware API."""
@@ -325,7 +322,7 @@ def test_add_tip(
 def test_remove_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should remove a tip manually from the hardware API."""
@@ -418,7 +415,7 @@ def test_remove_tip(
 async def test_available_nozzle_layout(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
     test_channels: int,
     style: str,
@@ -503,11 +500,13 @@ async def test_virtual_drop_tip(decoy: Decoy, mock_state_view: StateView) -> Non
     )
 
 
-async def test_get_tip_presence_on_ot2(
+@pytest.mark.parametrize("hw_tip_state", [TipStateType.ABSENT, TipStateType.PRESENT])
+async def test_get_tip_presence_on_ot3(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
     mock_labware_data_provider: LabwareDataProvider,
+    hw_tip_state: TipStateType,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should use the hardware API to  up a tip."""
     subject = HardwareTipHandler(
@@ -516,41 +515,14 @@ async def test_get_tip_presence_on_ot2(
         labware_data_provider=mock_labware_data_provider,
     )
 
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
+    decoy.when(await mock_hardware_api.get_tip_presence_status(Mount.LEFT)).then_return(
+        hw_tip_state
+    )
     result = await subject.get_tip_presence(pipette_id="pipette-id")
-    assert result == TipPresenceStatus.UNKNOWN
-
-
-@pytest.mark.parametrize("hw_tip_state", [TipStateType.ABSENT, TipStateType.PRESENT])
-async def test_get_tip_presence_on_ot3(
-    decoy: Decoy,
-    mock_state_view: StateView,
-    mock_labware_data_provider: LabwareDataProvider,
-    hw_tip_state: TipStateType,
-) -> None:
-    """It should use the hardware API to  up a tip."""
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        ot3_hardware_api = decoy.mock(cls=OT3API)
-        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
-
-        subject = HardwareTipHandler(
-            state_view=mock_state_view,
-            hardware_api=ot3_hardware_api,
-            labware_data_provider=mock_labware_data_provider,
-        )
-
-        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
-            MountType.LEFT
-        )
-        decoy.when(
-            await ot3_hardware_api.get_tip_presence_status(Mount.LEFT)
-        ).then_return(hw_tip_state)
-        result = await subject.get_tip_presence(pipette_id="pipette-id")
-        assert result == TipPresenceStatus.from_hw_state(hw_tip_state)
-
-    except ImportError:
-        pass
+    assert result == TipPresenceStatus.from_hw_state(hw_tip_state)
 
 
 @pytest.mark.parametrize(
@@ -561,37 +533,29 @@ async def test_verify_tip_presence_on_ot3(
     mock_state_view: StateView,
     mock_labware_data_provider: LabwareDataProvider,
     expected: TipPresenceStatus,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should use the hardware API to  up a tip."""
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
+    subject = HardwareTipHandler(
+        state_view=mock_state_view,
+        hardware_api=mock_hardware_api,
+        labware_data_provider=mock_labware_data_provider,
+    )
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
 
-        ot3_hardware_api = decoy.mock(cls=OT3API)
-        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
+    ).then_return(MOCK_MAP)
 
-        subject = HardwareTipHandler(
-            state_view=mock_state_view,
-            hardware_api=ot3_hardware_api,
-            labware_data_provider=mock_labware_data_provider,
+    await subject.verify_tip_presence("pipette-id", expected, None)
+
+    decoy.verify(
+        await mock_hardware_api.verify_tip_presence(
+            Mount.LEFT, expected.to_hw_state(), None
         )
-        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
-            MountType.LEFT
-        )
-
-        decoy.when(
-            mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
-        ).then_return(MOCK_MAP)
-
-        await subject.verify_tip_presence("pipette-id", expected, None)
-
-        decoy.verify(
-            await ot3_hardware_api.verify_tip_presence(
-                Mount.LEFT, expected.to_hw_state(), None
-            )
-        )
-
-    except ImportError:
-        pass
+    )
 
 
 @pytest.mark.parametrize(
@@ -745,39 +709,32 @@ async def test_tip_presence_config(
     front_right_nozzle: str,
     expected_tip_presence_supported: bool,
     expected_follow_singular_sensor: Optional[InstrumentProbeType],
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should check for tip presence when supported and use only one sensor in certain configs."""
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
+    subject = HardwareTipHandler(
+        state_view=mock_state_view,
+        hardware_api=mock_hardware_api,
+        labware_data_provider=mock_labware_data_provider,
+    )
+    decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+        MountType.LEFT
+    )
 
-        ot3_hardware_api = decoy.mock(cls=OT3API)
-        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(
+        pipette_channels
+    )
+    decoy.when(mock_nozzle_map.tip_count).then_return(channels_in_nozzle_map)
+    decoy.when(mock_nozzle_map.configuration).then_return(style)
+    decoy.when(mock_nozzle_map.back_left).then_return(back_left_nozzle)
+    decoy.when(mock_nozzle_map.front_right).then_return(front_right_nozzle)
 
-        subject = HardwareTipHandler(
-            state_view=mock_state_view,
-            hardware_api=ot3_hardware_api,
-            labware_data_provider=mock_labware_data_provider,
-        )
-        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
-            MountType.LEFT
-        )
-
-        decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(
-            pipette_channels
-        )
-        decoy.when(mock_nozzle_map.tip_count).then_return(channels_in_nozzle_map)
-        decoy.when(mock_nozzle_map.configuration).then_return(style)
-        decoy.when(mock_nozzle_map.back_left).then_return(back_left_nozzle)
-        decoy.when(mock_nozzle_map.front_right).then_return(front_right_nozzle)
-
-        decoy.when(
-            mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
-        ).then_return(mock_nozzle_map)
-        (
-            tip_presence_supported,
-            follow_singular_sensor,
-        ) = subject.get_tip_presence_config("pipette-id")
-        assert tip_presence_supported == expected_tip_presence_supported
-        assert follow_singular_sensor == expected_follow_singular_sensor
-    except ImportError:
-        pass
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
+    ).then_return(mock_nozzle_map)
+    (
+        tip_presence_supported,
+        follow_singular_sensor,
+    ) = subject.get_tip_presence_config("pipette-id")
+    assert tip_presence_supported == expected_tip_presence_supported
+    assert follow_singular_sensor == expected_follow_singular_sensor

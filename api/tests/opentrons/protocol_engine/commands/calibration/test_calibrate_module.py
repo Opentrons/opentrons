@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING
 
 import pytest
 from decoy import Decoy
 
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
-from opentrons.hardware_control.api import API as OT2API
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleImplementation,
@@ -17,7 +16,6 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -25,9 +23,6 @@ from opentrons.protocol_engine.types import (
     ModuleOffsetVector,
 )
 from opentrons.types import DeckSlotName, MountType, Point
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture(autouse=True)
@@ -38,10 +33,10 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 @pytest.mark.ot3_only
 async def test_calibrate_module_implementation(
-    decoy: Decoy, ot3_hardware_api: OT3API, state_view: StateView
+    decoy: Decoy, hardware_api: HardwareControlAPI, state_view: StateView
 ) -> None:
     """Test Calibration command execution."""
-    subject = CalibrateModuleImplementation(state_view, ot3_hardware_api)
+    subject = CalibrateModuleImplementation(state_view, hardware_api)
 
     location = DeckSlotLocation(slotName=DeckSlotName("D3"))
     module_id = "module123"
@@ -69,7 +64,7 @@ async def test_calibrate_module_implementation(
     ).then_return(Point(x=3, y=2, z=1))
     decoy.when(
         await calibration.calibrate_module(
-            hcapi=ot3_hardware_api,
+            hcapi=hardware_api,
             mount=OT3Mount.LEFT,
             slot=location.slotName.id,
             module_id=module_serial,
@@ -89,22 +84,3 @@ async def test_calibrate_module_implementation(
             location=location,
         ),
     )
-
-
-@pytest.mark.ot3_only
-async def test_calibrate_module_implementation_wrong_hardware(
-    decoy: Decoy, ot2_hardware_api: OT2API, state_view: StateView
-) -> None:
-    """Should raise an unsupported hardware error."""
-    subject = CalibrateModuleImplementation(
-        state_view=state_view, hardware_api=ot2_hardware_api
-    )
-
-    params = CalibrateModuleParams(
-        moduleId="Test1234",
-        labwareId="Test1234",
-        mount=MountType.LEFT,
-    )
-
-    with pytest.raises(HardwareNotSupportedError):
-        await subject.execute(params)

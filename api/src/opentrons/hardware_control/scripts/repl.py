@@ -1,4 +1,4 @@
-"""opentrons.hardware_control.scripts.repl - cli for hc api
+"""Opentrons.hardware_control.scripts.repl - cli for hc api
 
 Running this script will create and spin up a hardware controller
 and expose it to a python commandline.
@@ -10,7 +10,8 @@ import os
 from functools import wraps
 from logging.config import dictConfig
 
-from opentrons.hardware_control.api import API
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
+
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
@@ -20,13 +21,9 @@ if os.environ.get("OPENTRONS_SIMULATION"):
     print("Running with simulators")
     has_robot_server = False
 if os.environ.get("OT2", None):
-    print(
-        '"OT2" env var detected, running with OT2 HC. '
-        "If you dont want this, remove the OT2 env var"
-    )
-    os.environ["OT_API_FF_enableOT3HardwareController"] = "false"
+    raise UnsupportedHardwareCommand(message="Doesnt work on OT-2 anymore")
 else:
-    print("Running with OT3 HC. If you dont want this, set an env var named 'OT2'")
+    print("Running with OT3 HC")
     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
     if os.environ.get("OT3_DISABLE_FW_UPDATES"):
         update_firmware = False
@@ -34,7 +31,7 @@ else:
 
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
-from typing import Any, Type, Union  # noqa: E402
+from typing import Any  # noqa: E402
 
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
@@ -87,9 +84,9 @@ LOG_CONFIG = {
 }
 
 if ff.enable_ot3_hardware_controller():
-    HCApi: Union[Type[OT3API], Type[API]] = OT3API
+    HCApi = OT3API
 
-    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
+    def build_thread_manager() -> ThreadManager[OT3API]:
         return ThreadManager(
             OT3API.build_hardware_controller,
             update_firmware=update_firmware,
@@ -106,13 +103,7 @@ if ff.enable_ot3_hardware_controller():
         return synchronizer
 
 else:
-    HCApi = API
-
-    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
-        return ThreadManager(
-            API.build_hardware_controller,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
+    raise UnsupportedHardwareCommand(message="Doesnt work on OT-2 anymore")
 
 
 logging.basicConfig(level=logging.INFO)
@@ -122,7 +113,7 @@ def stop_server() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_api() -> ThreadManager[Union[API, OT3API]]:
+def build_api() -> ThreadManager[OT3API]:
     # NOTE: We are using StreamHandler so when the hw controller is
     # being built we can log firmware update progress to stdout.
     stream_handler = logging.StreamHandler()
@@ -143,7 +134,7 @@ def build_api() -> ThreadManager[Union[API, OT3API]]:
     return tm
 
 
-def do_interact(api: ThreadManager[Union[API, OT3API]]) -> None:
+def do_interact(api: ThreadManager[OT3API]) -> None:
     interact(
         banner=(
             "Hardware Control API REPL\nCall methods on api like "

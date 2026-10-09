@@ -18,8 +18,12 @@ from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
 
+from opentrons.protocols.api_support.definitions import (
+    MIN_SUPPORTED_VERSION_FOR_FLEX,
+    MAX_SUPPORTED_VERSION,
+)
 from opentrons import protocol_reader
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.ot3api import OT3API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_engine import (
@@ -180,9 +184,15 @@ def live_runner_subject(
     [
         (JsonProtocolConfig(schema_version=6), JsonRunner),
         (JsonProtocolConfig(schema_version=7), JsonRunner),
-        (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
+        (
+            PythonProtocolConfig(api_version=MIN_SUPPORTED_VERSION_FOR_FLEX),
+            PythonAndLegacyRunner,
+        ),
         (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
-        (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
+        (
+            PythonProtocolConfig(api_version=MAX_SUPPORTED_VERSION),
+            PythonAndLegacyRunner,
+        ),
     ],
 )
 def test_create_protocol_runner(
@@ -612,96 +622,6 @@ async def test_load_json_runner(
     )
 
 
-async def test_load_legacy_python(
-    decoy: Decoy,
-    python_and_legacy_file_reader: PythonAndLegacyFileReader,
-    protocol_context_creator: ProtocolContextCreator,
-    python_protocol_executor: PythonProtocolExecutor,
-    task_queue: TaskQueue,
-    protocol_engine: ProtocolEngine,
-    python_runner_subject: PythonAndLegacyRunner,
-) -> None:
-    """It should load a legacy context-based Python protocol."""
-    labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
-
-    legacy_protocol_source = ProtocolSource(
-        directory=Path("/dev/null"),
-        main_file=Path("/dev/null/abc.py"),
-        files=[],
-        metadata={},
-        robot_type="OT-2 Standard",
-        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
-        content_hash="abc123",
-    )
-
-    extra_labware = {"definition-uri": cast(LabwareDefinitionTypedDict, {})}
-
-    legacy_protocol = PythonProtocol(
-        text="",
-        contents="",
-        filename="protocol.py",
-        api_level=APIVersion(2, 11),
-        robot_type="OT-3 Standard",
-        metadata={"foo": "bar"},
-        bundled_labware=None,
-        bundled_data=None,
-        bundled_python=None,
-        extra_labware=extra_labware,
-    )
-
-    protocol_context = decoy.mock(cls=ProtocolContext)
-
-    decoy.when(
-        await protocol_reader.extract_labware_definitions(legacy_protocol_source)
-    ).then_return([labware_definition])
-    decoy.when(
-        python_and_legacy_file_reader.read(
-            protocol_source=legacy_protocol_source,
-            labware_definitions=[labware_definition],
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-        )
-    ).then_return(legacy_protocol)
-    broker_captor = matchers.Captor()
-    decoy.when(
-        protocol_context_creator.create(
-            protocol=legacy_protocol,
-            broker=broker_captor,
-            equipment_broker=matchers.IsA(Broker),
-        )
-    ).then_return(protocol_context)
-
-    await python_runner_subject.load(
-        legacy_protocol_source,
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-        run_time_param_values=None,
-        run_time_param_paths=None,
-    )
-
-    run_func_captor = matchers.Captor()
-
-    decoy.verify(
-        protocol_engine.add_labware_definition(labware_definition),
-        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.set_run_func(run_func_captor),
-    )
-
-    assert broker_captor.value is python_runner_subject.broker
-
-    # Verify that the run func calls the right things:
-    run_func = run_func_captor.value
-    await run_func()
-    decoy.verify(
-        await protocol_engine.add_and_execute_command(
-            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
-        ),
-        await python_protocol_executor.execute(
-            protocol=legacy_protocol,
-            context=protocol_context,
-            run_time_parameters_with_overrides=None,
-        ),
-    )
-
-
 async def test_load_python_with_pe_papi_core(
     decoy: Decoy,
     python_and_legacy_file_reader: PythonAndLegacyFileReader,
@@ -715,8 +635,8 @@ async def test_load_python_with_pe_papi_core(
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
-        robot_type="OT-2 Standard",
-        config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+        robot_type="OT-3 Standard",
+        config=PythonProtocolConfig(api_version=APIVersion(2, 15)),
         content_hash="abc123",
     )
 
@@ -725,7 +645,7 @@ async def test_load_python_with_pe_papi_core(
         contents="",
         filename="protocol.py",
         robot_type="OT-3 Standard",
-        api_level=APIVersion(2, 14),
+        api_level=APIVersion(2, 15),
         metadata={"foo": "bar"},
         bundled_labware=None,
         bundled_data=None,
@@ -780,7 +700,7 @@ async def test_load_legacy_json(
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
-        robot_type="OT-2 Standard",
+        robot_type="OT-3 Standard",
         config=JsonProtocolConfig(schema_version=5),
         content_hash="abc123",
     )

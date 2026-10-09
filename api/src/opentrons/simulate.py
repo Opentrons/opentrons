@@ -30,6 +30,7 @@ from typing import (
 
 from typing_extensions import Literal
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
@@ -39,9 +40,6 @@ import opentrons
 from .util import entrypoint_util
 from opentrons import protocol_api, should_use_ot3
 from opentrons.config import IS_ROBOT
-from opentrons.hardware_control import (
-    API as OT2API,
-)
 from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
@@ -271,7 +269,7 @@ def get_protocol_api(
             it's a hardware simulator instance to reuse instead of creating a fresh one.
         robot_type: The type of robot to simulate: either `"Flex"` or `"OT-2"`.
             If you're running this function on a robot, the default is the type of that
-            robot. Otherwise, the default is `"OT-2"`, for backwards compatibility.
+            robot. Otherwise, the default is `"Flex"`.
         use_virtual_hardware: This is only for internal use by Opentrons.
             If `True`, use the Protocol Engine's virtual hardware. If `False`, use the
             lower level hardware simulator.
@@ -289,7 +287,7 @@ def get_protocol_api(
     current_robot_type = _get_current_robot_type()
     if robot_type is None:
         if current_robot_type is None:
-            parsed_robot_type: RobotType = "OT-2 Standard"
+            parsed_robot_type: RobotType = "OT-3 Standard"
         else:
             parsed_robot_type = current_robot_type
     else:
@@ -367,10 +365,7 @@ def _make_hardware_simulator(
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
     elif robot_type == "OT-2 Standard":
-        return ThreadManager(
-            OT2API.build_hardware_simulator,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
+        raise UnsupportedHardwareCommand(message="simulate is not supported for OT-2")
 
 
 @contextmanager

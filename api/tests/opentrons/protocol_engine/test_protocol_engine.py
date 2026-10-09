@@ -12,7 +12,7 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine import (
@@ -107,12 +107,6 @@ def queue_worker(decoy: Decoy) -> QueueWorker:
 def model_utils(decoy: Decoy) -> ModelUtils:
     """Get mock ModelUtils."""
     return decoy.mock(cls=ModelUtils)
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock HardwareControlAPI."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture

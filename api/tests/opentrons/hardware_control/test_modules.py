@@ -7,7 +7,7 @@ import pytest
 from packaging.version import Version
 
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import ExecutionManager
+from opentrons.hardware_control import ExecutionManager, modules, ot3api
 from opentrons.hardware_control.modules import (
     AbsorbanceReader,
     AbstractModule,
@@ -41,8 +41,6 @@ from opentrons.hardware_control.modules.types import (
 
 
 async def test_get_modules_simulating() -> None:
-    import opentrons.hardware_control as hardware_control
-
     mods = {
         "tempdeck": [
             SimulatingModule(serial_number="111", model="temperatureModuleV1")
@@ -61,7 +59,7 @@ async def test_get_modules_simulating() -> None:
             SimulatingModule(serial_number="656", model="flexStackerModuleV1")
         ],
     }
-    api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
+    api = await ot3api.OT3API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)
@@ -70,14 +68,10 @@ async def test_get_modules_simulating() -> None:
 
 
 async def test_module_caching() -> None:
-    import opentrons.hardware_control as hardware_control
-
     mod_names = {
         "tempdeck": [SimulatingModule(serial_number="111", model="temperatureModuleV1")]
     }
-    api = await hardware_control.API.build_hardware_simulator(
-        attached_modules=mod_names
-    )
+    api = await ot3api.OT3API.build_hardware_simulator(attached_modules=mod_names)
     await asyncio.sleep(0.05)
 
     # Check that we can add and remove modules and the caching keeps up
@@ -134,9 +128,8 @@ async def test_create_simulating_module(
     ],
 ) -> None:
     """It should create simulating module instance for specified module."""
-    import opentrons.hardware_control as hardware_control
 
-    api = await hardware_control.API.build_hardware_simulator(attached_modules={})
+    api = await ot3api.OT3API.build_hardware_simulator(attached_modules={})
     await asyncio.sleep(0.05)
 
     simulating_module = await api.create_simulating_module(module_model)
@@ -374,8 +367,6 @@ async def test_module_update_integration(  # noqa: C901
     mod_flexstacker: AbstractModule,
     mod_vacuummodule: AbstractModule,
 ) -> None:
-    from opentrons.hardware_control import modules
-
     T = TypeVar("T")
 
     def async_return(result: T) -> "asyncio.Future[T]":
@@ -539,8 +530,6 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
     monkeypatch.setattr(modules.mod_abc, "ROBOT_FIRMWARE_DIR", Path(tmpdir))
     monkeypatch.setattr(modules.mod_abc, "IS_ROBOT", True)
 
-    from opentrons.hardware_control import API
-
     mods = {
         "tempdeck": [
             SimulatingModule(serial_number="111", model="temperatureModuleV1")
@@ -561,7 +550,7 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
         "vacuummodule": [SimulatingModule(serial_number="657", model="vacuumModuleV1")],
     }
 
-    api = await API.build_hardware_simulator(attached_modules=mods)
+    api = await ot3api.OT3API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
     assert api.attached_modules[0].bundled_fw == BundledFirmware(
@@ -595,8 +584,6 @@ async def test_get_thermocycler_bundled_fw(
     monkeypatch: pytest.MonkeyPatch,
     tmpdir: Path,
 ) -> None:
-    from opentrons.hardware_control import modules
-
     dummy_tc_file = Path(tmpdir) / "thermocycler@v0.1.2.bin"
     dummy_tc_file.write_text("hello")
     dummy_tc2_file = Path(tmpdir) / "thermocycler-gen2@v1.9.9.bin"

@@ -17,9 +17,8 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.pipette import pipette_definition
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
-from opentrons.hardware_control.api import API
-from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
+from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
@@ -36,15 +35,7 @@ if TYPE_CHECKING:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI of unspecified robot type."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
-
-
-@pytest.fixture
-def ot2_hardware_api(decoy: Decoy) -> API:
-    """Get a mocked out OT-2 hardware API."""
-    mock = decoy.mock(cls=API)
-    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
-    return mock
+    return decoy.mock(cls=OT3HardwareControlAPI)
 
 
 @pytest.fixture
