@@ -1,9 +1,9 @@
 ---
 Title: "Python API: Vacuum Module"
-description: How to use the Vacuum Module in a Python protocol.
+description: How to use Vacuum Module API commands.
 ---
 
-The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all in an enclosed system that includes waste collection.
+The Vacuum Module is an automated filtration system for Opentrons Flex. It enables vacuum-based protocols for protein and peptide cleanup, solid-phase extraction, and nucleic acid extraction, within an enclosed system that includes waste collection.
 
 The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, labware loading, and vacuum control.
 
@@ -22,8 +22,8 @@ The Vacuum Module requires a physical deck adapter to hold module components, la
 <figcaption>Vacuum Module deck adapter</figcaption>
 </figure>
 
-* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose. See the instruction manual (linked above) for installation steps.
-* **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It is a staging area for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates on the dock.
+* **Slot A3:** This is the recessed part of the deck adapter that holds the vacuum base piece and its attached 6 mm hose. See the instruction manual (linked above) for installation steps.
+* **Slot A4:** Known as "the dock," this raised part of the deck adapter stages area for collars when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates directly on the dock.
 
 ## Loading deck slots
 
@@ -48,12 +48,14 @@ Collars and spacers are modular components that you use to create deck stacks fo
 
 ### Staging collars
 
-Collars support filter plates during vacuum extraction. The Vacuum Module includes a short and tall collar to match different labware profiles. Collar types and load names are shown below.
+Collars support filter plates during vacuum extraction. The Vacuum Module includes a short and tall collar to match different labware profiles. The following table lists the collars by height and their API load names.
 
-| Collar | Height | Load Name |
-|:----|:----|:----|
-| **Short** | 42 mm | `opentrons_vacuum_manifold_collar_short` |
-| **Tall** |72 mm | `opentrons_vacuum_manifold_collar_tall` |
+| Collar height | Load name |
+|:----|:----|
+| 42 mm | `opentrons_vacuum_manifold_collar_short` |
+| 72 mm | `opentrons_vacuum_manifold_collar_tall` |
+
+For complete JSON definitions and dimensions, see the [collar definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
 
 Stage a collar on the manifold dock (slot A4) using [`VacuumModuleContext.load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock], then load your filter plate directly onto the staged collar:
 
@@ -70,7 +72,11 @@ filter_plate = collar.load_labware(
 
 ### Staging spacers
 
-Spacers (or shims) sit inside the vacuum manifold base (slot A3). They raise the collection plate closer to the filter plate above it. Minimizing the gap between plates ensures fluid droplets fall cleanly into receiving wells. The following table lists the spacer heights and their API load names.
+Spacers (or shims) sit inside the vacuum manifold base (slot A3). They elevate the collection plate closer to the filter plate which helps ensure fluid droplets fall cleanly into receiving wells.
+
+Spacers can be stacked on one another. See the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual for more information.
+
+The following table lists the spacers by height and their API load names.
 
 | Spacer height | Load name |
 |----|----|
@@ -79,23 +85,24 @@ Spacers (or shims) sit inside the vacuum manifold base (slot A3). They raise the
 | **7.25 mm** | `opentrons_vacuum_manifold_spacer_7.25mm` |
 | **12.8 mm** | `opentrons_vacuum_manifold_spacer_12.8mm` |
 
-For complete JSON definitions and dimensions, see the [spacer JSON definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
+For complete JSON definitions and dimensions, see the [spacer definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
 
 !!! note
     * **Gripper compatibility:** Spacers are not compatible with the Flex Gripper. You must manually place them on, and remove them from, the vacuum manifold base.
-    
-    * **Stacking:** Spacers can be stacked on one another. See the [Spacers section](../../vacuum/specifications/deck-components.md#spacers) in the Vacuum Module Instruction Manual for more information.
 
 Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [`VacuumModuleContext.load_adapter()`][opentrons.protocol_api.VacuumModuleContext.load_adapter]:
 
 ```python
-# Load a 3.2 mm spacer on the vacuum base
-spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
+# Load the base spacer
+spacer1 = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
 
-# Load a collection plate on top of the spacer
-collection_plate = spacer.load_labware(
-    load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
-    label="Collection Wellplate"
+# Stack a second spacer onto the first
+spacer2 = spacer1.load_adapter("opentrons_vacuum_manifold_spacer_12.8mm")
+
+# Load labware on the top spacer
+collection_plate = spacer2.load_labware(
+    name="opentrons_96_wellplate_200ul_pcr_full_skirt",
+    label="Collection Wellplate",
 )
 ```
 
