@@ -3,16 +3,23 @@ title: "Compliance Ready Software: Administrator settings"
 description: "An overview of the Flex's compliance-ready setings, and who has permission to update them."
 ---
 
-Administrators can customize compliance ready settings in the Opentrons App.
+Administrators can customize compliance ready settings on the Flex touchscreen or in the Opentrons App.
 
 See the Flex Instruction Manual for a [complete list of Flex robot settings](../../flex/touchscreen/settings.md#).
 
 ## Accessing settings
 
+On the Flex touchscreen, tap **Settings** at the top of the screen, then choose **. 
+
+<figure class="screenshot" markdown>
+  ![Image showing Compliance Ready Software Settings on the Flex touchscreen.]
+  <figcaption></figcaption>
+<figure>
+
 In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
 
 <figure class="screenshot" markdown>
-  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/crs-settings-app.png)
+  ![Image showing available Compliance Ready Software settings in the Opentrons App.](../images/crs-settings-app.png)
   <figcaption>Access Compliance Ready Software settings in the Opentrons App.</figcaption>
 </figure>
 
