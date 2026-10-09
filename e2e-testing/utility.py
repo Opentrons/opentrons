@@ -1,6 +1,5 @@
 import functools
 import re
-from pathlib import Path
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
@@ -10,77 +9,86 @@ from automation.pd_pages import DeckConfigPage, LandingPage, ProtocolEditorPage
 # Todo add from eyes import eyes_check
 
 
-def _find_page_in_args(*args, **kwargs) -> Page | None:
-    """Helper function to find the Playwright Page object in function arguments."""
-    # Check positional arguments
-    for arg in args:
-        if isinstance(arg, Page):
-            return arg
-    # Check keyword arguments
-    for val in kwargs.values():
-        if isinstance(val, Page):
-            return val
+def _page_from_value(value: object) -> Page | None:
+    """Return a Playwright Page from a test arg or a page object that exposes ``.page``."""
+    if isinstance(value, Page):
+        return value
+    page = getattr(value, "page", None)
+    if isinstance(page, Page):
+        return page
     return None
+
+
+def _find_page(*args: object, item: object | None = None, **kwargs: object) -> Page | None:
+    """Find a Playwright Page from test/fixture args or a pytest item."""
+    for arg in args:
+        if (found := _page_from_value(arg)) is not None:
+            return found
+    for val in kwargs.values():
+        if (found := _page_from_value(val)) is not None:
+            return found
+
+    if item is not None:
+        funcargs = getattr(item, "funcargs", None)
+        if isinstance(funcargs, dict):
+            for key in ("run_local_app", "page"):
+                val = funcargs.get(key)
+                if isinstance(val, Page):
+                    return val
+            for val in funcargs.values():
+                if (found := _page_from_value(val)) is not None:
+                    return found
+        session = getattr(item, "session", None)
+        stashed = getattr(session, "playwright_debug_page", None)
+        if isinstance(stashed, Page):
+            return stashed
+
+    return None
+
+
+def _pause_for_debugging(
+    where: str,
+    error: BaseException | None,
+    *args: object,
+    item: object | None = None,
+    **kwargs: object,
+) -> None:
+    """Print failure context and open Playwright Inspector (shared by decorator + setup hook)."""
+    if error is not None:
+        print(f"\n🛑 '{where}' failed due to: {type(error).__name__} - {error}")
+    else:
+        print(f"\n🛑 '{where}' failed")
+    print("Pausing execution for debugging...")
+
+    page = _find_page(*args, item=item, **kwargs)
+    if page is not None:
+        page.pause()
+        return
+
+    print("⚠️  Could not find a Playwright page to pause.")
+    print("    You can still debug the console state.")
 
 
 def troubleshoot_and_pause(func):
     """
-    A decorator that wraps a function in a try...except block.
+    Wrap a test (or any callable) so failures call ``page.pause()`` in headed runs.
 
-    On failure, it prints the error, attempts to find the Playwright
-    'page' object to call 'page.pause()' for debugging, and then re-raises
-    the exception.
+    Pytest fixture setup is not wrapped automatically — root ``conftest.py`` calls
+    ``_pause_for_debugging`` from ``pytest_runtest_makereport`` on setup failures.
     """
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            # Execute the decorated function
             return func(*args, **kwargs)
         except (AssertionError, TimeoutError, PlaywrightError, Exception) as e:
-            print(f"\n🛑 Test '{func.__name__}' failed due to: {type(e).__name__} - {e}")
-            print("Pausing execution for debugging...")
-
-            # Try to find the page object to pause
-            page = _find_page_in_args(*args, **kwargs)
-
-            if page:
-                page.pause()
-            else:
-                print("⚠️  Could not find 'page' object in arguments to pause.")
-                print("    You can still debug the console state.")
-                # As a fallback, you could use pdb to pause the script itself
-                # import pdb; pdb.set_trace()
-
-            raise  # Re-raise the exception after pausing
+            _pause_for_debugging(func.__name__, e, *args, **kwargs)
+            raise
 
     return wrapper
 
 
-def assert_export_downloads_clean_protocol(
-    page: Page,
-    editor: ProtocolEditorPage,
-    exports_dir: Path,
-    *,
-    filename: str,
-    export_timeout: int = 60000,
-) -> Path:
-    """Export the open protocol and assert the timeline stays error-free."""
-    expect(page.get_by_text("Protocol has timeline errors", exact=False)).to_have_count(0, timeout=5000)
-    destination = exports_dir / filename
-    editor.export_protocol(destination, timeout=export_timeout)
-    assert destination.exists(), f"Export did not create {destination}"
-    assert destination.stat().st_size > 0, f"Export file is empty: {destination}"
-    return destination
-
-
-def import_protocol_and_open_editor(
-    page: Page,
-    PROTOCOL_PATH: str,
-    migration: bool,
-    *,
-    migration_timeout: int = 15000,
-) -> None:
+def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
@@ -96,8 +104,8 @@ def import_protocol_and_open_editor(
     landing.upload_protocol_file(PROTOCOL_PATH)
 
     if migration:
-        _dismiss_migration_modal(page, timeout=migration_timeout)
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=migration_timeout)
+        _dismiss_migration_modal(page)
+    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
     return ProtocolEditorPage(page)
@@ -108,17 +116,15 @@ def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> N
     # Todo add eyes_check(page, test_name, checkpoint_name)
 
 
-def _dismiss_migration_modal(page: Page, *, timeout: int = 15000) -> None:
-    """Dismiss the migration modal if it appears; otherwise continue to metadata."""
-    migration_prompt = page.get_by_text("Your protocol was made in an older version of Protocol Designer")
-    metadata_heading = page.get_by_text("Protocol Metadata")
-    expect(migration_prompt.or_(metadata_heading).first).to_be_visible(timeout=timeout)
-
-    if migration_prompt.is_visible():
+def _dismiss_migration_modal(page: Page) -> None:
+    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    overlay.wait_for(state="visible", timeout=5000)
+    if overlay.is_visible():
         page.get_by_role("button", name="Import", exact=True).click()
-        expect(metadata_heading).to_be_visible(timeout=timeout)
+        expect(overlay).not_to_be_visible()
     else:
         print("Migration modal did not appear, proceeding with test.")
+        pass
 
 
 def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
