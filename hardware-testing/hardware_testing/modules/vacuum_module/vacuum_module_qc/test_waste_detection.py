@@ -49,11 +49,6 @@ def _empty_tag(target: int) -> str:
     return f"waste-empty-no-trip-{target}"
 
 
-def _wet_tag(target: int) -> str:
-    """CSV tag for a wet-plate no-trip hold."""
-    return f"waste-wet-no-trip-{target}"
-
-
 def _full_tag(target: int) -> str:
     """CSV tag for a full-bottle hold."""
     return f"waste-full-trip-{target}"
@@ -78,11 +73,8 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             ],
         ),
     ]
-    wet_fields = list(hold_fields) + [float]  # on_target_s
     for target in TARGET_PRESSURES:
         lines.append(CSVLine(_empty_tag(target), list(hold_fields)))
-    for target in TARGET_PRESSURES:
-        lines.append(CSVLine(_wet_tag(target), wet_fields))
     for target in TARGET_PRESSURES:
         lines.append(CSVLine(_full_tag(target), list(hold_fields)))
     return lines
@@ -105,15 +97,6 @@ def _reader_waste_tripped(vacuum: VacuumModule) -> bool:
 def _empty_passed(result: WasteHoldResult, simulated: bool) -> bool:
     """Empty bottle must equalize, pull vacuum, and not trip."""
     return result.equalized and (not result.tripped) and (simulated or result.pulled)
-
-
-def _wet_passed(result: WasteHoldResult, simulated: bool) -> bool:
-    """Wet plate must sit on target long enough for a false trip, and not trip."""
-    if not result.equalized or result.tripped:
-        return False
-    if simulated:
-        return True
-    return result.on_target_s >= WET_ON_TARGET_MIN_S
 
 
 def _update_on_target(
