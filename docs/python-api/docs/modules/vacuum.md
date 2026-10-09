@@ -23,7 +23,7 @@ The Vacuum Module requires a physical deck adapter to hold module components, la
 </figure>
 
 * **Slot A3:** This is the recessed part of the deck adapter that holds the vacuum base piece and its attached 6 mm hose. See the instruction manual (linked above) for installation steps.
-* **Slot A4:** Known as "the dock," this raised part of the deck adapter stages area for collars when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates directly on the dock.
+* **Slot A4:** Known as "the dock," this raised part of the deck adapter that stages collars when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates directly on the dock.
 
 ## Loading deck slots
 
