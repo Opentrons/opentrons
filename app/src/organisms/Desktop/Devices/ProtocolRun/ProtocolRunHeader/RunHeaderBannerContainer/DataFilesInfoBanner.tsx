@@ -70,7 +70,7 @@ export function DataFilesInfoBanner({
         <Link
           textDecoration={TEXT_DECORATION_UNDERLINE}
           onClick={() => {
-            navigate(`/devices/${robotName}/#recent-protocol-runs`)
+            navigate(`/devices/${robotName}/run-history`)
           }}
         >
           {t('view_recent_runs')}
