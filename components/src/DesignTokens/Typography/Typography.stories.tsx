@@ -24,6 +24,7 @@ const fontStyles = {
     ['Caption', 'SemiBold'],
     ['Caption', 'Regular'],
     ['Code', 'Regular'],
+    ['Code', 'Bold'],
   ],
   ODD: [
     ['level1Header', ''],
