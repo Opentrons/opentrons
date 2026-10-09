@@ -150,7 +150,7 @@ const helixProductStyleMap = {
     style: css`
       @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
         font: ${HELIX_TYPOGRAPHY.fontStyleCodeBold};
-        color: var(--black-90, #16212d);
+        color: var(--black-90);
       }
     `,
   },
