@@ -42,7 +42,12 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses,
+    PipetteModelType,
+    PipetteName,
+    PipetteTipType,
+)
 
 from . import modules, peripherals
 from .backends.errors import SubsystemUpdating
@@ -786,7 +791,7 @@ class OT3API(
         req_instr: Optional[PipetteName],
     ) -> bool:
         """Set up pipette based on scanned information."""
-        config = instrument_data.get("config")
+        config  # = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
 
@@ -3495,3 +3500,23 @@ class OT3API(
     async def debug_set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """This is a debug utility function- the protocol engine or anything user-facing shouldn't touch this!"""
         await self._backend.set_active_current(axis_currents=axis_currents)
+
+    async def send_pipetting_function_to_eeprom(self, mount: top_types.Mount) -> None:
+        """Send pipette's pipetting function to the eeprom."""
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        if realmount not in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            raise ValueError(f"Mount {realmount} not a pipette mount.")
+        if not self._pipette_handler.has_pipette(OT3Mount.LEFT):
+            raise ValueError(
+                f"No pipette present on mount {realmount}. Maybe cache instruments."
+            )
+        pip = self._pipette_handler.get_pipette(realmount)
+
+        # reformat the pipetting function to send over CAN
+        formatted_dict: Dict[str, List[Tuple(float)]] = {}
+        supported_tip_def = pip.config.liquid_properties[
+            LiquidClasses.default
+        ].supported_tips
+        await self._backend.send_pipetting_function_to_eeprom(supported_tip_def)

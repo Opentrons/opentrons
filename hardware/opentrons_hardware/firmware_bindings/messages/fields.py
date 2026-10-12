@@ -213,6 +213,11 @@ class BatchSensorDataField(utils.BinaryFieldBase[bytes]):
     FORMAT = f"{NUM_BYTES}s"
 
 
+class PipetteFunctionDataField(utils.BinaryFieldBase[bytes]):
+    NUM_BYTES = 48
+    FORMAT = f"{NUM_BYTES}s"
+
+
 class ErrorSeverityField(utils.UInt16Field):
     """A field for error severity."""
 
