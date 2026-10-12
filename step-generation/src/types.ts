@@ -1274,3 +1274,14 @@ export interface MoveToWellStepGenArgs {
   forceDirect?: boolean | string
   speed?: number | string
 }
+
+export interface MoveLabwareStepGenArgs {
+  labwareId: string
+  strategy: string
+  newLocation:
+    | string
+    | { slotName: string }
+    | { moduleId: string }
+    | { labwareId: string }
+    | { addressableAreaName: string }
+}
