@@ -92,6 +92,7 @@ All parameter definitions are contained in a Python function, which must be name
 
 The examples on this page assume the following definition, which uses the argument name parameters. The type specification of the argument is optional.
 
+<!-- test: skip -->
 ```python
 def add_parameters(parameters: protocol_api.ParameterContext):
 ```

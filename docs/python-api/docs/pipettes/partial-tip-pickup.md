@@ -317,7 +317,10 @@ full_tip_racks = [tips_3, tips_4]
 
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of `tip_racks`:
 
+<!-- test: continue-previous -->
 ```python
+from opentrons.protocol_api import COLUMN
+
 pipette.configure_nozzle_layout(
     style=COLUMN,
     start="A12",
@@ -375,6 +378,8 @@ Additionally, column A of plates loaded on a Thermocycler Module is inaccessible
 For column pickup, Opentrons recommends using the nozzles in column 12 of the pipette:
 
 ```python
+from opentrons.protocol_api import COLUMN
+
 pipette.configure_nozzle_layout(
     style=COLUMN,
     start="A12",
