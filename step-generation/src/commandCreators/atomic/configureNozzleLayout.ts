@@ -1,26 +1,16 @@
-import {
-  A12_NOZZLE,
-  A1_NOZZLE,
-  ALL,
-  B1_NOZZLE,
-  C1_NOZZLE,
-  COLUMN,
-  D1_NOZZLE,
-  E1_NOZZLE,
-  F1_NOZZLE,
-  G1_NOZZLE,
-  H12_NOZZLE,
-  H1_NOZZLE,
-  PARTIAL_COLUMN,
-  QUADRANT,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { H1_NOZZLE, PARTIAL_COLUMN } from '@opentrons/shared-data'
 
+import {
+  BACK_LEFT_NOZZLES,
+  NOZZLE_STYLES,
+  PRIMARY_NOZZLES,
+} from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   formatPyStr,
   indentPyLines,
+  pythonRuntimeString,
+  resolveAllowedRuntimeValue,
   resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
@@ -34,60 +24,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
   ConfigureNozzleLayoutStepGenArgs,
-  RuntimeParameters,
 } from '../../types'
-
-const NOZZLE_STYLES: readonly string[] = [
-  ALL,
-  COLUMN,
-  SINGLE,
-  ROW,
-  QUADRANT,
-  PARTIAL_COLUMN,
-]
-const PRIMARY_NOZZLES: readonly string[] = [
-  A1_NOZZLE,
-  A12_NOZZLE,
-  B1_NOZZLE,
-  C1_NOZZLE,
-  D1_NOZZLE,
-  E1_NOZZLE,
-  F1_NOZZLE,
-  G1_NOZZLE,
-  H1_NOZZLE,
-  H12_NOZZLE,
-]
-const BACK_LEFT_NOZZLES: readonly string[] = [
-  B1_NOZZLE,
-  C1_NOZZLE,
-  D1_NOZZLE,
-  E1_NOZZLE,
-  F1_NOZZLE,
-  G1_NOZZLE,
-]
-
-function resolveAllowedRuntimeValue(
-  value: string,
-  allowed: readonly string[],
-  runtimeParameters: RuntimeParameters
-): string | null {
-  const resolved = resolveStringRuntimeValue(value, runtimeParameters)
-  if (resolved == null || !allowed.includes(resolved)) {
-    return null
-  }
-  return resolved
-}
-
-function pythonRuntimeString(
-  raw: string,
-  resolved: string,
-  runtimeParameters: RuntimeParameters
-): string {
-  if (runtimeParameters[raw] != null) {
-    return raw
-  }
-  return formatPyStr(resolved)
-}
 
 export const configureNozzleLayout: CommandCreator<
   ConfigureNozzleLayoutStepGenArgs
@@ -127,9 +64,7 @@ export const configureNozzleLayout: CommandCreator<
     )
   }
   if (resolvedStyle == null) {
-    errors.push(
-      errorCreators.invalidRuntimeParameter({ parameterName: style })
-    )
+    errors.push(errorCreators.invalidRuntimeParameter({ parameterName: style }))
   }
   if (primaryNozzle != null && resolvedPrimaryNozzle == null) {
     errors.push(
