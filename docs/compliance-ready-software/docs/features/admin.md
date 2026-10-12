@@ -9,11 +9,11 @@ See the Flex Instruction Manual for a [complete list of Flex robot settings](../
 
 ## Accessing settings
 
-On the Flex touchscreen, tap **Settings** at the top of the screen, then choose **. 
+On the Flex touchscreen, tap your user icon at the top right of the screen.
 
 <figure class="screenshot" markdown>
-  ![Image showing Compliance Ready Software Settings on the Flex touchscreen.]
-  <figcaption></figcaption>
+  ![Image showing Compliance Ready Software Settings on the Flex touchscreen.](../images/crs-settings-odd.png)
+  <figcaption>Adminstrators can access their personal account and Compliance Ready Software settings, or manage user accounts.</figcaption>
 <figure>
 
 In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
@@ -23,11 +23,11 @@ In the Opentrons App, click the **Devices** page on the left side, then choose *
   <figcaption>Access Compliance Ready Software settings in the Opentrons App.</figcaption>
 </figure>
 
-The administrator view shown above includes personal account settings, user managament, and Compliance Ready Software settings. When logged in, users will only be able to manage their [personal account settings](#personal-account-settings).
+Administrators can view the settings shown above, like personal account settings, user managament, and Compliance Ready Software settings. When logged in, users will only be able to manage their [personal account settings](#personal-account-settings).
 
 ## Changing settings
 
-The sections below cover every Compliance Ready Software setting administrators can customize in the Opentrons App.
+The sections below cover every Compliance Ready Software setting administrators can customize in the Opentrons App or on the Flex touchscreen.
 
 ### Personal account settings 
 
