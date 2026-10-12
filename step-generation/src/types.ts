@@ -1246,3 +1246,14 @@ export interface MoveRelativeStepGenArgs {
   axis: string
   distance: number | string
 }
+
+export interface MoveToCoordinatesStepGenArgs {
+  pipetteId: string
+  coordinates: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+}
