@@ -66,6 +66,7 @@
   "retry_action": "Retrying step",
   "right_mount": "right mount",
   "set_lights": "Toggling lights",
+  "set_log_level": "Setting log level",
   "shutdown_robot": "Shutting down robot",
   "sign_run": "Signing protocol run",
   "single_channel_and_8_channel": "single channel or 8 channel",
