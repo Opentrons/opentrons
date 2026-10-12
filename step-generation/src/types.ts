@@ -1236,6 +1236,26 @@ export interface AbsorbanceReaderReadStepGenArgs {
   fileName?: string | null
 }
 
+export interface VacuumSetPumpPowerStepGenArgs {
+  moduleId: string
+  percentPower: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumSetPumpPressureStepGenArgs {
+  moduleId: string
+  gaugePressure: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumStartRunProfileStepGenArgs {
+  moduleId: string
+  profile: VacuumRunProfileParams['steps']
+  ventAfter: boolean | string
+}
+
 export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
