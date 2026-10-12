@@ -1240,3 +1240,19 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
+
+export interface LiquidProbeStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: {
+    origin?: string
+    offset?: {
+      x?: number | string
+      y?: number | string
+      z?: number | string
+    }
+  }
+}
+
+export type TryLiquidProbeStepGenArgs = LiquidProbeStepGenArgs
