@@ -3,11 +3,11 @@ import { resolveStringRuntimeValue, uuid } from '../../utils'
 
 import type {
   CommandCreator,
-  HeaterShakerStopShakeStepGenArgs,
+  ModuleStepGenArgs,
 } from '../../types'
 
 export const heaterShakerStopShake: CommandCreator<
-  HeaterShakerStopShakeStepGenArgs
+  ModuleStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)

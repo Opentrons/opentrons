@@ -7,12 +7,12 @@ import {
 
 import type {
   CommandCreator,
-  HeaterShakerOpenLatchStepGenArgs,
+  ModuleStepGenArgs,
 } from '../../types'
 
 const LEFT_SLOTS = ['1', '4', '7', '10']
 export const heaterShakerOpenLatch: CommandCreator<
-  HeaterShakerOpenLatchStepGenArgs
+  ModuleStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
   const {
     pipetteEntities,
