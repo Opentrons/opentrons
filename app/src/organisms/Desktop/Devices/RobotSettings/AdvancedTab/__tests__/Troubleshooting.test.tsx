@@ -89,7 +89,7 @@ describe('RobotSettings Troubleshooting', () => {
   it('should render title, description, and button', () => {
     render(props)
     screen.getByText('Troubleshooting')
-    screen.getByTestId('RobotSettings_Troubleshooting')
+    screen.getByTestId('RobotSettings_Troubleshooting_Download')
     screen.getByRole('button', { name: 'Download logs' })
   })
 
