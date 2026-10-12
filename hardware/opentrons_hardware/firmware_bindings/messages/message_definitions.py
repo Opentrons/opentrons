@@ -499,6 +499,51 @@ class FirmwareUpdateEraseAppResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class PipetteFunctionUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pip_func_update_initiate] = (
+        MessageId.pip_func_update_initiate
+    )
+
+
+@dataclass
+class PipetteFunctionData(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionData
+    payload_type: Type[payloads.PipetteFunctionData] = payloads.PipetteFunctionData
+    message_id: Literal[MessageId.pip_func_data] = MessageId.pip_func_data
+
+
+@dataclass
+class PipetteFunctionDataAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionDataAcknowledge
+    payload_type: Type[payloads.PipetteFunctionDataAcknowledge] = (
+        payloads.PipetteFunctionDataAcknowledge
+    )
+    message_id: Literal[MessageId.pip_func_data_ack] = MessageId.pip_func_data_ack
+
+
+@dataclass
+class PipetteFunctionDataComplete(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionDataComplete
+    payload_type: Type[payloads.PipetteFunctionDataComplete] = (
+        payloads.PipetteFunctionDataComplete
+    )
+    message_id: Literal[MessageId.pip_func_update_complete] = (
+        MessageId.pip_func_update_complete
+    )
+
+
+@dataclass
+class PipetteFunctionDataCompleteAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionDataAcknowledge
+    payload_type: Type[payloads.PipetteFunctionDataAcknowledge] = (
+        payloads.PipetteFunctionDataAcknowledge
+    )
+    message_id: Literal[MessageId.pip_func_update_complete_ack] = (
+        MessageId.pip_func_update_complete_ack
+    )
+
+
+@dataclass
 class HomeRequest(BaseMessage):  # noqa: D101
     payload: payloads.HomeRequestPayload
     payload_type: Type[payloads.HomeRequestPayload] = payloads.HomeRequestPayload
@@ -659,6 +704,12 @@ class PipetteInfoResponse(BaseMessage):  # noqa: D101
     message_id: Literal[MessageId.pipette_info_response] = (
         MessageId.pipette_info_response
     )
+
+
+@dataclass
+class PipetteFunctionEEPROMMessage(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionData
+    payload_type: Type[payloads.PipetteFunctionData] = payloads.PipetteFunctionData
 
 
 @dataclass
