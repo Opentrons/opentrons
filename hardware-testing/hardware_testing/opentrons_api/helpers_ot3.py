@@ -4,12 +4,13 @@ import atexit
 import logging
 import struct
 
+from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from math import pi
 from subprocess import run, Popen
-from time import time
+from time import monotonic, time
 from typing import (
     Callable,
     Coroutine,
@@ -63,6 +64,11 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
 )
 from opentrons.types import Point
+from hardware_testing.drivers.liquid_calibration_keyboard import YesNoKeyboard
+from hardware_testing.opentrons_api.liquid_calibration_input import (
+    LiquidCalibrationInput,
+    read_liquid_calibration_input,
+)
 
 
 # Supress logging.exception messages as they can be confusing when running scripts.
@@ -369,7 +375,13 @@ def _get_serial_for_dut(
 
 
 async def _scan_barcode(self) -> Optional[str]:  # noqa: ANN001
-    scanner = self.attached_peripherals[0]
+    scanners = self.attached_peripherals
+    if not scanners:
+        raise RuntimeError(
+            "No barcode scanner detected. "
+            "Connect a supported scanner to the robot and try again."
+        )
+    scanner = scanners[0]
     return await scanner.scan_barcode()
 
 
@@ -378,20 +390,55 @@ def get_device_barcode(
     api: SyncHardwareAPI,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
 ) -> str:
-    """Have the user scan a devices barcode."""
+    """Retry pipette IDs for ten minutes, then return the last scan for reporting."""
+    is_pipette = dut in (DeviceUnderTest.PIPETTE_LEFT, DeviceUnderTest.PIPETTE_RIGHT)
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
-    for i in range(3):
-        ctx.pause(
+    barcode = ""
+    deadline = monotonic() + 600
+    i = 0
+    while (is_pipette and monotonic() < deadline) or (not is_pipette and i < 3):
+        i += 1
+        ctx.comment(
             f"将扫描仪对准 {dut.value} 条形码"
             if LOCALIZE
             else f"Point scanner at {dut.value} barcode"
         )
         result = api._scan_barcode()
-        if result:
-            return result
-        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+        barcode = result.strip() if isinstance(result, str) else ""
+        if is_pipette:
+            ctx.comment(
+                f"第 {i} 次扫码内容：{result!r}"
+                if LOCALIZE
+                else f"Barcode scan attempt {i}: {result!r}"
+            )
+        if is_pipette and monotonic() >= deadline:
+            break
+        if barcode and (not is_pipette or barcode.startswith("P")):
+            return barcode
+        if barcode:
+            ctx.comment(
+                "条码类型无效，请扫描以大写 P 开头的移液器编号条码。"
+                if LOCALIZE
+                else "Invalid barcode type. Scan a pipette ID starting with uppercase P."
+            )
+        else:
+            ctx.comment("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+        if is_pipette:
+            api.delay(0.1)
 
-    raise RuntimeError("Error scanning barcode.")
+    if is_pipette:
+        ctx.comment(
+            "10 分钟内未成功扫码，记录 FAIL 和最后一次扫码内容，继续测试。"
+            if LOCALIZE
+            else "Barcode verification timed out after 10 minutes. "
+            "Record FAIL and the last scan, then continue QC."
+        )
+        return barcode
+
+    raise RuntimeError(
+        "Barcode verification failed after 3 attempts. "
+        "QC cannot continue without a valid device barcode."
+    )
 
 
 def set_csv_report_meta_data_ot3(
@@ -1606,20 +1653,82 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
 
 
 def get_user_answer(ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str) -> bool:
-    """Have the user answer a yes/no question."""
+    """Answer Yes/No by scan or USB keyboard; Escape is No, not cancellation."""
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
-    for i in range(3):
-        ctx.pause(
+    with ExitStack() as cleanup:
+        keyboard = YesNoKeyboard.open(ctx.comment)
+        inputs = None
+        if keyboard is not None:
+            inputs = LiquidCalibrationInput(keyboard, ctx.comment, YesNoKeyboard)
+            cleanup.callback(inputs.close_keyboard)
+            OT3API._liquid_calibration_input = read_liquid_calibration_input  # type: ignore[attr-defined]
+            cleanup.callback(api._liquid_calibration_input, inputs, close=True)
+        return _wait_for_yes_no(ctx, api, prompt, inputs)
+
+
+def _wait_for_yes_no(
+    ctx: ProtocolContext,
+    api: SyncHardwareAPI,
+    prompt: str,
+    inputs: Optional[LiquidCalibrationInput],
+) -> bool:
+    """Keep pause/cancel checks active while waiting for a fresh explicit answer."""
+    if inputs is not None:
+        ctx.comment(
+            f"{prompt}：扫描 Yes / No，或按 Enter = Yes（是）、Esc = No（否）（Y/N 也可）。"
+            if LOCALIZE
+            else f"{prompt}: Scan Yes / No, or press Enter = Yes, Esc = No (Y/N also work)."
+        )
+        inputs.discard_pending()
+    else:
+        ctx.comment(
             f"将扫描仪对准“是”或“否”： {prompt}"
             if LOCALIZE
             else f"Point Scanner at Yes or No: {prompt}"
         )
-        result = api._scan_barcode()
-        if result:
-            return "yes" in result.lower()
-        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+    deadline = monotonic() + 600
+    failed_scans = 0
+    while failed_scans < 3 and monotonic() < deadline:
+        api.delay(0.1)
+        if inputs is None:
+            result = api._scan_barcode()
+            received_at = monotonic()
+        else:
+            result, received_at = api._liquid_calibration_input(inputs)
+            inputs.report_disconnect()
+        api.delay(0.1)
+        if monotonic() >= deadline:
+            break
+        if monotonic() - received_at > 3:
+            if inputs is not None:
+                inputs.discard_pending()
+            ctx.comment(
+                "回答已过期，请重新扫码或按键。"
+                if LOCALIZE
+                else "Answer expired. Scan or press a key again."
+            )
+            continue
+        answer = result.strip().lower() if isinstance(result, str) else ""
+        if answer in ("yes", "no"):
+            ctx.comment(f"{prompt}: {answer.title()}")
+            return answer == "yes"
+        # Polling or scanner timeouts must not exhaust retries before a key is
+        # pressed. Non-empty invalid scans retain the three-attempt limit.
+        if inputs is not None and not answer:
+            continue
+        failed_scans += 1
+        if answer:
+            ctx.comment(
+                "回答无效，请扫描 Yes 或 No 条形码。"
+                if LOCALIZE
+                else "Invalid answer. Scan a Yes or No barcode."
+            )
+        else:
+            ctx.comment("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
 
-    raise RuntimeError("Error scanning barcode.")
+    if failed_scans >= 3:
+        raise RuntimeError("Error scanning barcode.")
+    raise RuntimeError("Yes/No confirmation timed out without an answer.")
 
 
 def get_input_number(
@@ -1643,7 +1752,7 @@ def get_input_number(
             return False
 
     for i in range(3):
-        ctx.pause(
+        ctx.comment(
             f"将扫描仪对准数字：{prompt}" if LOCALIZE else f"Point Scanner at number: {prompt}"
         )
         result = api._scan_barcode()
@@ -1652,11 +1761,11 @@ def get_input_number(
                 return int(result)
             elif _is_float(result):
                 return float(result)
-            ctx.pause(
+            ctx.comment(
                 f"{result} 不是数字，请重试"
                 if LOCALIZE
                 else f"{result} is not a number, try again."
             )
         else:
-            ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+            ctx.comment("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
     return default

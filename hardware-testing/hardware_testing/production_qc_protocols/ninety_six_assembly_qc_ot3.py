@@ -1,5 +1,6 @@
 """Production QC protocol for 96channel pipettes."""
 import asyncio
+import csv
 from dataclasses import dataclass
 import enum
 from time import sleep, monotonic
@@ -350,7 +351,7 @@ def test_jaws(
     default_current = settings.run_current
     default_speed = settings.max_speed
 
-    async def _save_result(tag: str, led_check: bool, jaws_aligned: bool) -> bool:
+    def _save_result(tag: str, led_check: bool, jaws_aligned: bool) -> bool:
         if led_check and jaws_aligned:
             no_hit = _check_if_jaw_is_aligned_with_endstop(ctx, api)
         else:
@@ -1238,6 +1239,10 @@ def test_droplets(
 # ----------- TestSection.ENCODER -----------
 
 STALL_THRESHOLD = 0.25
+MOTOR_MM_PER_REV = 2
+ENCODER_TICKS_PER_REV = 1000
+# The encoder reports four pulses per tick.
+PULSE_PER_MM = (4 * ENCODER_TICKS_PER_REV) / MOTOR_MM_PER_REV
 
 
 def build_encoder_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -1246,20 +1251,32 @@ def build_encoder_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     cycles = [CSVLine("encoder-96-cycles", [int, CSVResult])]
     cumulative_error = [CSVLine("encoder-96-cumulative-error", [float, CSVResult])]
     abs_avg_error = [CSVLine("encoder-96-abs-avg-error", [float, CSVResult])]
+    max_error_mm = [CSVLine("encoder-96-max-error-mm-error", [float])]
+    max_error_pulses = [CSVLine("encoder-96-max-error-pulses-error", [float])]
+    max_error_ticks = [CSVLine("encoder-96-max-error-ticks-error", [float])]
 
-    return pass_fail + cycles + cumulative_error + abs_avg_error  # type: ignore [return-value]
+    return (  # type: ignore [return-value]
+        pass_fail
+        + cycles
+        + cumulative_error
+        + abs_avg_error
+        + max_error_mm
+        + max_error_pulses
+        + max_error_ticks
+    )
 
 
 def _plunger_alignment(
     api: SyncHardwareAPI, mount: OT3Mount
-) -> Tuple[float, float, float]:
+) -> Tuple[float, float, float, bool]:
     pipette_ax = Axis.of_main_tool_actuator(mount)
     current_pos = api.current_position_ot3(mount, refresh=True)
     est = current_pos[pipette_ax]
     encoder_pos = api.encoder_current_position_ot3(mount, refresh=True)
     enc = encoder_pos[pipette_ax]
     stalled_mm = est - enc
-    return est, enc, stalled_mm
+    stall_detected = abs(stalled_mm) >= STALL_THRESHOLD
+    return est, enc, stalled_mm, stall_detected
 
 
 def test_encoder(
@@ -1271,43 +1288,102 @@ def test_encoder(
 ) -> None:
     """Test Encoder."""
     ctx.comment("测试编码器" if LOCALIZE else "Test Encoder")
-    cycles = 100
+    cycles = 5
     mount = OT3Mount.LEFT
-    api.cache_instruments()
     api.home()
     api.home_plunger(mount)
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, bottom_pos)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
 
     cumulative_error = 0.0
     abs_error = 0.0
     completed_moves = 0
     cycle_count = 0
     stall = False
+    max_error_mm = 0.0
+    max_error_pulses = 0.0
+    max_error_ticks = 0.0
+    with open(report.parent / "encoder_debug.csv", "w") as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(
+            [
+                "cycle",
+                "revolution",
+                "direction",
+                "encoder position",
+                "motor position",
+                "encoder_pulses",
+                "encoder ticks",
+                "diff mm",
+                "diff pulses",
+                "diff ticks",
+            ]
+        )
+        for cycle in range(cycles):
+            helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, 0)
+            api.current_position_ot3(mount, refresh=True)
+            initial_encoder_pos = api.encoder_current_position_ot3(mount, refresh=True)
+            previous_encoder_tick = (
+                initial_encoder_pos[pipette_ax]
+                / MOTOR_MM_PER_REV
+                * ENCODER_TICKS_PER_REV
+            )
+            previous_encoder_pulse = initial_encoder_pos[pipette_ax] * PULSE_PER_MM
+            for revolution in range(int((bottom_pos - top_pos) / MOTOR_MM_PER_REV)):
+                try:
+                    target = (revolution + 1) * MOTOR_MM_PER_REV
+                    helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, target)
+                    (
+                        motor_pos,
+                        encoder_pos,
+                        diff,
+                        stalled_this_move,
+                    ) = _plunger_alignment(api, mount)
+                    next_encoder_tick = (
+                        encoder_pos / MOTOR_MM_PER_REV * ENCODER_TICKS_PER_REV
+                    )
+                    next_encoder_pulse = encoder_pos * PULSE_PER_MM
+                    pulse_error = int(
+                        abs(next_encoder_pulse - previous_encoder_pulse)
+                    ) - (ENCODER_TICKS_PER_REV * 4)
+                    tick_error = (
+                        int(abs(next_encoder_tick - previous_encoder_tick))
+                        - ENCODER_TICKS_PER_REV
+                    )
+                    previous_encoder_pulse = next_encoder_pulse
+                    previous_encoder_tick = next_encoder_tick
+                    cumulative_error += diff
+                    abs_error += abs(diff)
+                    max_error_mm = max(abs(diff), max_error_mm)
+                    max_error_pulses = max(abs(pulse_error), max_error_pulses)
+                    max_error_ticks = max(abs(tick_error), max_error_ticks)
+                    completed_moves += 1
+                    csv_writer.writerow(
+                        [
+                            cycle,
+                            revolution + 1,
+                            "down",
+                            encoder_pos,
+                            motor_pos,
+                            next_encoder_pulse,
+                            next_encoder_tick,
+                            diff,
+                            pulse_error,
+                            tick_error,
+                        ]
+                    )
+                    if stalled_this_move:
+                        stall = True
+                        break
+                except StallOrCollisionDetectedError:
+                    stall = True
+                    break
+            cycle_count += 1
+            if stall:
+                break
 
-    for cycle in range(cycles):
-
-        try:
-            helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, top_pos)
-            top_est, top_enc, top_diff = _plunger_alignment(api, mount)
-            cumulative_error += top_diff
-            abs_error += abs(top_diff)
-            completed_moves += 1
-        except StallOrCollisionDetectedError:
-            stall = True
-            break
-
-        try:
-            helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, bottom_pos)
-            bot_est, bot_enc, bot_diff = _plunger_alignment(api, mount)
-            cumulative_error += bot_diff
-            abs_error += abs(bot_diff)
-            completed_moves += 1
-        except StallOrCollisionDetectedError:
-            stall = True
-            break
-        cycle_count += 1
+    average_error = abs_error / completed_moves if completed_moves else float("inf")
 
     report(section, "encoder-96-stall", [stall, CSVResult.from_bool(not stall)])
     report(
@@ -1324,9 +1400,20 @@ def test_encoder(
         section,
         "encoder-96-abs-avg-error",
         [
-            abs_error / completed_moves,
-            CSVResult.from_bool((abs_error / completed_moves) < STALL_THRESHOLD),
+            average_error,
+            CSVResult.from_bool(average_error < STALL_THRESHOLD),
         ],
+    )
+    report(section, "encoder-96-max-error-mm-error", [max_error_mm])
+    report(
+        section,
+        "encoder-96-max-error-pulses-error",
+        [max_error_pulses],
+    )
+    report(
+        section,
+        "encoder-96-max-error-ticks-error",
+        [max_error_ticks],
     )
 
 
@@ -1444,8 +1531,18 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "1000", "value": "1000"},
             {"display_name": "200", "value": "200"},
         ],
-        description="Which pipette size this is.",
+        description=(
+            "Size of the P200 or P1000 96-channel pipette installed on the left mount."
+        ),
     )
+
+
+def _load_analysis_pipette(ctx: ProtocolContext, pipette_size: int) -> None:
+    """Declare the selected 96-channel pipette during protocol analysis."""
+    pipette_name = (
+        "flex_96channel_1000" if pipette_size == 1000 else "flex_96channel_200"
+    )
+    ctx.load_instrument(pipette_name, "left")
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -1453,9 +1550,14 @@ def run(ctx: ProtocolContext) -> None:
     # apply monkey patch
     OT3API._partial_pick_up_z_motion = _partial_pick_up_z_motion_patch  # type: ignore[attr-defined]
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
-    OT3API._capactive_probe = _cap_probe_patch  # type: ignore[attr-defined]
+    OT3API._capacitive_probe = _cap_probe_patch  # type: ignore[attr-defined]
     api = ctx._core.get_hardware()
+    selected_size = int(ctx.params.pip_size)  # type: ignore[attr-defined]
+    if selected_size not in (200, 1000):
+        raise ValueError("Pipette Size must be 200 or 1000 uL.")
+    _load_analysis_pipette(ctx, selected_size)
 
+    pipette_size = cast(Literal[200, 1000], selected_size)
     if ctx.is_simulating():
         sim_backend = api._backend
         if ctx.params.pip_size == "1000":  # type: ignore[attr-defined]
@@ -1483,12 +1585,20 @@ def run(ctx: ProtocolContext) -> None:
         s: f for s, f in TESTS if not args[f"skip_{s.value.lower().replace('-', '_')}"]
     }
     config = TestConfig(
-        simulate=ctx.is_simulating(), tests=t_sections, pipette=int(ctx.params.pip_size)  # type: ignore[arg-type, attr-defined]
+        simulate=ctx.is_simulating(), tests=t_sections, pipette=pipette_size
     )
     for section, test_run in config.tests.items():
-        test_run(api, report, section.value, ctx, pipette=int(ctx.params.pip_size))  # type: ignore[arg-type, attr-defined]
+        test_run(api, report, section.value, ctx, pipette=pipette_size)
 
     # SAVE REPORT
     report.save_to_disk()
-    if not report.all_succeded():
-        raise RuntimeError("Error during QC run.")
+    # Placeholder sensor readings during analysis are not hardware QC results.
+    if ctx.is_simulating():
+        return
+    failed_items = report.get_failed_results()
+    if failed_items:
+        ctx.comment("QC failed items:\n" + "\n".join(f"- {item}" for item in failed_items))
+    else:
+        ctx.comment("QC failed items: none")
+    if failed_items:
+        raise RuntimeError("QC failed items: " + ", ".join(failed_items))

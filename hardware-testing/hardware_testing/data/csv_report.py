@@ -1,9 +1,10 @@
 """CSV Report."""
+from contextlib import contextmanager
 from datetime import datetime
 import enum
 from pathlib import Path
 from time import time
-from typing import Any, List, Union, Optional, overload
+from typing import Any, Iterator, List, Union, Optional, overload
 from hardware_testing import data as data_io
 
 
@@ -63,6 +64,18 @@ class CSVLine:
         self._elapsed_time: Optional[float] = None
         self._start_time: Optional[float] = None
         self._stored = False
+        # Display-only explanations must never add columns to the saved report.
+        self._failure_reasons: List[str] = []
+
+    @property
+    def failure_reasons(self) -> List[str]:
+        """Return explanations associated with this measurement's failure."""
+        return list(self._failure_reasons)
+
+    def add_failure_reason(self, reason: str) -> None:
+        """Remember a display-only explanation without changing CSV data."""
+        if reason not in self._failure_reasons:
+            self._failure_reasons.append(reason)
 
     def __str__(self) -> str:
         """CSV Line string."""
@@ -144,6 +157,8 @@ class CSVLine:
                         f'with value "{data[i]}" at index {i}'
                     )
         self._stored = bool(None not in self._data)
+        if self.result_passed is not False:
+            self._failure_reasons.clear()
         if self._stored and print_results and CSVResult in self._data_types:
             print_csv_result(self.tag, CSVResult.from_bool(self.result_passed))
 
@@ -333,6 +348,9 @@ class CSVReport:
         self._validate_meta_data = validate_meta_data
         self._tag: Optional[str] = None
         self._file_name: Optional[str] = None
+        self._dont_write_to_disk = dont_write_to_disk
+        self._batch_depth = 0
+        self._batch_dirty = False
         _section_meta = _generate_meta_data_section(validate_meta_data)
         _section_titles = [META_DATA_TITLE] + [s.title for s in sections]
         _section_results = _generate_results_overview_section(_section_titles)
@@ -342,7 +360,6 @@ class CSVReport:
         self(META_DATA_TITLE, META_DATA_TEST_RUN_ID, [self._run_id])
         _now = datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")
         self(META_DATA_TITLE, META_DATA_TEST_TIME_UTC, [_now])
-        self._dont_write_to_disk = dont_write_to_disk
 
     @overload
     def __call__(self, section: str, tag: str, line_data: List[Any]) -> None:
@@ -368,11 +385,33 @@ class CSVReport:
                     f'line "{tag}" is not a repeating line and cannot be indexed'
                 )
             r_line[ind].store(line_data)
-        # set the results of each section based on current
+        self._batch_dirty = True
+        if self._batch_depth == 0:
+            self._flush_pending_updates()
+
+    @contextmanager
+    def batch_update(self) -> Iterator[None]:
+        """Defer overview updates and automatic saves until the outermost exit.
+
+        Individual line values and timestamps are still stored immediately.
+        Successful updates are flushed even if the context exits with an exception.
+        Empty batches do not refresh the overview or write to disk.
+        """
+        self._batch_depth += 1
+        try:
+            yield
+        finally:
+            self._batch_depth -= 1
+            if self._batch_depth == 0:
+                self._flush_pending_updates()
+
+    def _flush_pending_updates(self) -> None:
+        if not self._batch_dirty:
+            return
         self._refresh_results_overview_values()
-        # save to disk after storing new values
         if self._file_name and not self._dont_write_to_disk:
             self.save_to_disk()
+        self._batch_dirty = False
 
     def __getitem__(self, item: str) -> CSVSection:
         """CSV Report get item."""
@@ -452,7 +491,7 @@ class CSVReport:
         self._file_name = data_io.create_file_name(
             self._test_name, self._run_id, self.tag
         )
-        if not self._dont_write_to_disk:
+        if not self._dont_write_to_disk and self._batch_depth == 0:
             self.save_to_disk()
 
     def set_device_id(self, device_id: str, barcode_id: Optional[str] = None) -> None:
@@ -499,10 +538,10 @@ class CSVReport:
 
     def all_succeded(self) -> bool:
         """Return True if all results are pass or None."""
-        results = [
-            line.result_passed or True for line in self[RESULTS_OVERVIEW_TITLE].lines
-        ]
-        return all(results)
+        return all(
+            line.result_passed is not False
+            for line in self[RESULTS_OVERVIEW_TITLE].lines
+        )
 
     def print_results(self) -> None:
         """Print overall results."""
@@ -511,3 +550,23 @@ class CSVReport:
         print("Overall Results:")
         for line in self[RESULTS_OVERVIEW_TITLE].lines:
             print(f" - {line.tag}: {line.result}")
+
+    def get_failed_results(self) -> List[str]:
+        """Return individual test items that explicitly failed."""
+        return [
+            f"{section.title}/{line.tag}"
+            for section in self._sections
+            if section.title not in (META_DATA_TITLE, RESULTS_OVERVIEW_TITLE)
+            for line in section.lines
+            if line.result_passed is False
+        ]
+
+    def print_failed_results(self) -> None:
+        """Print the individual test items that explicitly failed."""
+        failed = self.get_failed_results()
+        if failed:
+            print("Failed QC items:")
+            for item in failed:
+                print(f" - {item}")
+        else:
+            print("Failed QC items: none")
