@@ -7,6 +7,7 @@ relative humidity that is recorded onto the pipette results.
 import abc
 import codecs
 import logging
+import math
 import time
 from typing import Tuple, Optional
 from abc import ABC
@@ -77,11 +78,22 @@ class AsairSensorBase(ABC):
 
 
 def BuildAsairSensor(
-    simulate: bool, autosearch: bool = True, port_substr: str = ""
+    simulate: bool,
+    autosearch: bool = True,
+    port_substr: str = "",
+    *,
+    strict: bool = False,
 ) -> AsairSensorBase:
-    """Try to find and return an Asair sensor, if not found return a simulator."""
+    """Find an Asair sensor, optionally without prompts or simulator fallback.
+
+    Strict mode overrides autosearch and probes only matching USB devices.
+    A successful connection remains open for the caller to use and close.
+    """
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
+        if strict:
+            sensor, _ = _connect_strict_asair_sensor(port_substr)
+            return sensor
         if not autosearch:
             port = list_ports_and_select(
                 device_name="Asair environmental sensor", port_substr=port_substr
@@ -113,11 +125,17 @@ def BuildAsairSensor(
 
 
 def BuildAsairSensorWithPort(
-    simulate: bool, autosearch: bool = True, port_substr: str = ""
+    simulate: bool,
+    autosearch: bool = True,
+    port_substr: str = "",
+    *,
+    strict: bool = False,
 ) -> Tuple[AsairSensorBase, Optional[str]]:
-    """Try to find and return an Asair sensor with its port, if not found return a simulator."""
+    """Find a sensor and its port, with the same strict mode as BuildAsairSensor."""
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
+        if strict:
+            return _connect_strict_asair_sensor(port_substr)
         if not autosearch:
             port = list_ports_and_select(
                 device_name="Asair environmental sensor", port_substr=port_substr
@@ -146,6 +164,51 @@ def BuildAsairSensorWithPort(
                 raise SerialException("No sensor found")
     ui.print_info("no sensor found returning simulator")
     return SimAsairSensor(), None
+
+
+def _connect_strict_asair_sensor(port_substr: str) -> Tuple["AsairSensor", str]:
+    """Validate matching devices and close every unsuccessful connection."""
+    failures = []
+    for port_info in comports():
+        if (
+            port_info.vid != USB_VID
+            or port_info.pid != USB_PID
+            or port_substr not in port_info.device
+        ):
+            continue
+        port = port_info.device
+        sensor: Optional[AsairSensor] = None
+        accepted = False
+        try:
+            sensor = AsairSensor.connect(port)
+            serial_id = sensor.get_serial()
+            if len(serial_id) != 8 or any(
+                char not in "0123456789abcdefABCDEF" for char in serial_id
+            ):
+                raise AsairSensorError("Invalid sensor serial response")
+            reading = sensor.get_reading(retries=0)
+            if (
+                not math.isfinite(reading.temperature)
+                or not math.isfinite(reading.relative_humidity)
+                or not 0 <= reading.relative_humidity <= 100
+            ):
+                raise AsairSensorError("Invalid temperature or humidity reading")
+            ui.print_info(f"Found env sensor {serial_id} on port {port}")
+            accepted = True
+            return sensor, port
+        except Exception as error:
+            failures.append(f"{port}: {error}")
+        finally:
+            if sensor is not None and not accepted:
+                try:
+                    sensor.close()
+                except Exception:
+                    log.exception(f"Unable to close rejected Asair sensor on {port}")
+    details = "; ".join(failures) or "No matching USB serial ports"
+    raise AsairSensorError(
+        f"Unable to connect to Asair environmental sensor "
+        f"(USB {USB_VID:04x}:{USB_PID:04x}, port filter {port_substr!r}): {details}"
+    )
 
 
 class AsairSensor(AsairSensorBase):

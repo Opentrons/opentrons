@@ -1,7 +1,6 @@
 """Pipette Current/Speed Test."""
 import argparse
 import asyncio
-from typing import List
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.config.defaults_ot3 import (
@@ -17,27 +16,40 @@ from hardware_testing.data.csv_report import (
     CSVSection,
     CSVLine,
 )
-from opentrons.hardware_control.types import Axis, OT3Mount, OT3AxisKind, CriticalPoint
+from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
+from hardware_testing.scripts.data_center_client import upload_data_to_google_drive
+
+
 
 DEFAULT_TRIALS = 5
 STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
-DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.P]
-DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.P]
-DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P]
+DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
+DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
+DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
 TEST_SPEEDS = [
-    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] - 20,
-    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P],
-    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] + 10,
-    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] + 20,
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
+    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 ]
+PLUNGER_CURRENTS_SPEED_PEEK = {
+    MUST_PASS_CURRENT - 0.45: TEST_SPEEDS, #0.3
+    MUST_PASS_CURRENT - 0.35: TEST_SPEEDS, #0.4
+    MUST_PASS_CURRENT - 0.3: TEST_SPEEDS, #0.45
+    MUST_PASS_CURRENT - 0.25: TEST_SPEEDS, #0.5
+    MUST_PASS_CURRENT - 0.2: TEST_SPEEDS, #0.55
+    MUST_PASS_CURRENT: TEST_SPEEDS, #0.75
+    DEFAULT_CURRENT: TEST_SPEEDS,
+}
+
 PLUNGER_CURRENTS_SPEED = {
     MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
     MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
@@ -47,7 +59,7 @@ PLUNGER_CURRENTS_SPEED = {
 }
 
 MUST_PASS_CURRENT_TURE = 0.4
-PASS_PRINT_LIST: List[str] = []
+PASS_PRINT_LIST = []
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -71,34 +83,57 @@ def _includes_result(current: float, speed: float) -> bool:
     return current >= MUST_PASS_CURRENT_TURE
 
 
-def _build_csv_report(trials: int) -> CSVReport:
-    _report = CSVReport(
-        test_name="pipette-current-speed-qc-ot3",
-        sections=[
-            CSVSection(
-                title=_get_section_tag(current),
-                lines=[
-                    CSVLine(
-                        _get_test_tag(current, speed, trial, direction, pos),
-                        [float, float, float, float, CSVResult]
-                        if _includes_result(current, speed)
-                        else [float, float, float, float],
-                    )
-                    for speed in sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
-                    for trial in range(trials)
-                    for direction in ["down", "up"]
-                    for pos in ["start", "end"]
-                ],
-            )
-            for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
-        ],
-    )
+def _build_csv_report(trials: int,testtype:str) -> CSVReport:
+    if testtype != "peek":
+        _report = CSVReport(
+            test_name="pipette-current-speed-qc-ot3",
+            sections=[
+                CSVSection(
+                    title=_get_section_tag(current),
+                    lines=[
+                        CSVLine(
+                            _get_test_tag(current, speed, trial, direction, pos),
+                            [float, float, float, float, CSVResult]
+                            if _includes_result(current, speed)
+                            else [float, float, float, float],
+                        )
+                        for speed in sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
+                        for trial in range(trials)
+                        for direction in ["down", "up"]
+                        for pos in ["start", "end"]
+                    ],
+                )
+                for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
+            ],
+        )
+    elif testtype == "peek":
+        _report = CSVReport(
+            test_name="pipette-current-speed-qc-ot3",
+            sections=[
+                CSVSection(
+                    title=_get_section_tag(current),
+                    lines=[
+                        CSVLine(
+                            _get_test_tag(current, speed, trial, direction, pos),
+                            [float, float, float, float, CSVResult]
+                            if _includes_result(current, speed)
+                            else [float, float, float, float],
+                        )
+                        for speed in sorted(PLUNGER_CURRENTS_SPEED_PEEK[current], reverse=False)
+                        for trial in range(trials)
+                        for direction in ["down", "up"]
+                        for pos in ["start", "end"]
+                    ],
+                )
+                for current in sorted(list(PLUNGER_CURRENTS_SPEED_PEEK.keys()), reverse=False)
+            ],
+        )
     return _report
 
 
-async def _home_plunger(api: OT3API, mount: OT3Mount) -> None:
+async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
     # restore default current/speed before homing
-    pipette_ax = Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=1.0
     )
@@ -113,14 +148,14 @@ async def _home_plunger(api: OT3API, mount: OT3Mount) -> None:
 
 async def _move_plunger(
     api: OT3API,
-    mount: OT3Mount,
+    mount: types.OT3Mount,
     p: float,
     s: float,
     c: float,
     a: float,
 ) -> None:
     # set max currents/speeds, to make sure we're not accidentally limiting ourselves
-    pipette_ax = Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=c
     )
@@ -138,7 +173,7 @@ async def _move_plunger(
 
 async def _record_plunger_alignment(
     api: OT3API,
-    mount: OT3Mount,
+    mount: types.OT3Mount,
     report: CSVReport,
     trial: int,
     current: float,
@@ -146,7 +181,7 @@ async def _record_plunger_alignment(
     direction: str,
     position: str,
 ) -> bool:
-    pipette_ax = Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     _current_pos = await api.current_position_ot3(mount)
     est = _current_pos[pipette_ax]
     if not api.is_simulator:
@@ -171,7 +206,7 @@ async def _record_plunger_alignment(
 
 async def _test_direction(
     api: OT3API,
-    mount: OT3Mount,
+    mount: types.OT3Mount,
     report: CSVReport,
     trial: int,
     current: float,
@@ -205,18 +240,27 @@ async def _test_direction(
 
 async def _test_plunger(
     api: OT3API,
-    mount: OT3Mount,
+    mount: types.OT3Mount,
     report: CSVReport,
     trials: int,
     continue_after_stall: bool,
+    testtype:str
 ) -> float:
     # start at HIGHEST (easiest) current
-    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
+    if testtype == "peek":
+        currents = sorted(list(PLUNGER_CURRENTS_SPEED_PEEK.keys()), reverse=False)
+    else:
+        currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
+    global PASS_PRINT_LIST
+    PASS_PRINT_LIST = []
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
-        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
+        if testtype == "peek":
+            speeds = sorted(PLUNGER_CURRENTS_SPEED_PEEK[current], reverse=False)
+        else:
+            speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
         for speed in speeds:
             for trial in range(trials):
                 ui.print_header(
@@ -240,7 +284,7 @@ async def _test_plunger(
                         ui.print_error(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
-                        if _includes_result(current, speed):
+                        if  _includes_result(current,speed):
                             failval = f"向{direction}移动时,在电流 {current} amps 速度 {speed} mm/sec 不通过"
                             PASS_PRINT_LIST.append(failval)
 
@@ -252,12 +296,14 @@ async def _test_plunger(
     return max_failed_current
 
 
-async def _get_next_pipette_mount(api: OT3API) -> OT3Mount:
+async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
     if not api.is_simulator:
         ui.get_user_ready("attach a pipette")
     await helpers_ot3.update_firmware(api)
     await api.cache_instruments()
-    found = [OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p]
+    found = [
+        types.OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p
+    ]
     if not found:
         return await _get_next_pipette_mount(api)
     return found[0]
@@ -266,19 +312,23 @@ async def _get_next_pipette_mount(api: OT3API) -> OT3Mount:
 async def _reset_gantry(api: OT3API) -> None:
     await api.home(
         [
-            Axis.Z_L,
-            Axis.Z_R,
-            Axis.X,
-            Axis.Y,
+            types.Axis.Z_L,
+            types.Axis.Z_R,
+            types.Axis.X,
+            types.Axis.Y,
         ]
     )
-    home_pos = await api.gantry_position(OT3Mount.RIGHT, CriticalPoint.MOUNT)
+    home_pos = await api.gantry_position(
+        types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
+    )
     test_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     test_pos = test_pos._replace(z=home_pos.z)
-    await api.move_to(OT3Mount.RIGHT, test_pos, critical_point=CriticalPoint.MOUNT)
+    await api.move_to(
+        types.OT3Mount.RIGHT, test_pos, critical_point=types.CriticalPoint.MOUNT
+    )
 
 
-async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) -> None:
+async def _main(is_simulating: bool, trials: int, continue_after_stall: bool,testtype:str) -> None:
     try:
         api = await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
@@ -287,64 +337,60 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
         )
         # home and move to a safe position
         await _reset_gantry(api)
-        pipptype = api.attached_pipettes
-        left_mount_inst = pipptype[OT3Mount.LEFT.to_mount()]
-        assert left_mount_inst is not None
-        pip_name = left_mount_inst["name"]
-        print(f"pipette type: {pip_name}")
+        pipptype = api.get_all_attached_instr()
+        print(f"pipette type: {pipptype[types.OT3Mount.LEFT]['name']}")
         global MUST_PASS_CURRENT_TURE
-        if "single" in pip_name:
+        if "single" in pipptype[types.OT3Mount.LEFT]['name']:
 
             MUST_PASS_CURRENT_TURE = 0.5
-        elif "multi" in pip_name:
+        elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
             MUST_PASS_CURRENT_TURE = 0.75
+            if testtype == "peek":
+                MUST_PASS_CURRENT_TURE = 0.45
+
 
         # test each attached pipette
         while True:
             mount = await _get_next_pipette_mount(api)
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
             dut_str = helpers_ot3._get_serial_for_dut(api, dut)
-            print("dut_str:", dut_str)
-            if "multi" in pip_name and str(dut_str).count("P") >= 2:
+            print("dut_str:",dut_str)
+            if "multi" in pipptype[types.OT3Mount.LEFT]['name'] and str(dut_str).count("P") >=2:
                 MUST_PASS_CURRENT_TURE = 0.5
+                if testtype == "peek":
+                    MUST_PASS_CURRENT_TURE = 0.45
 
-            if not api.is_simulator and not ui.get_user_answer(
-                f"QC {mount.name} pipette"
-            ):
+
+            if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
                 continue
 
-            report = _build_csv_report(trials=trials)
+            report = _build_csv_report(trials=trials,testtype=testtype)
 
-            operator = (
-                "simulating" if api.is_simulator else input("enter OPERATOR name: ")
-            )
-            helpers_ot3.set_csv_report_meta_data_ot3(
-                api, report, operator=operator, dut=dut
-            )
+            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
             await _test_plunger(
-                api,
-                mount,
-                report,
-                trials=trials,
-                continue_after_stall=continue_after_stall,
+                api, mount, report, trials=trials, continue_after_stall=continue_after_stall,testtype=testtype
             )
             ui.print_title("DONE")
             report.save_to_disk()
             report.print_results()
 
+
             if len(PASS_PRINT_LIST) > 0:
-                ui.print_results(set(PASS_PRINT_LIST), False)
+                ui.print_results(set(PASS_PRINT_LIST),False)
             else:
-                ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)", True)
-                # ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+                ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)",True)
+                #ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
 
             if api.is_simulator:
                 break
+            upload_data_to_google_drive(report.file_path)
     except Exception as errrrr:
-        # print(f"system-error {errrrr}")
+        #print(f"system-error {errrrr}")
         printsig = f"08-01-current-system-error:系统错误,日志:{errrrr}"
         ui.print_fail(printsig)
+
+
 
 
 if __name__ == "__main__":
@@ -352,5 +398,6 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
     parser.add_argument("--continue-after-stall", action="store_true")
+    parser.add_argument("--test_type", type=str, default=None)
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate, args.trials, args.continue_after_stall))
+    asyncio.run(_main(args.simulate, args.trials, args.continue_after_stall,args.test_type))
