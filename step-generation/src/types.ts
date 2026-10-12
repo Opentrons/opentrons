@@ -1240,3 +1240,9 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
+
+export interface MoveRelativeStepGenArgs {
+  pipetteId: string
+  axis: string
+  distance: number | string
+}
