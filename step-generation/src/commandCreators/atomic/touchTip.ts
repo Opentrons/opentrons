@@ -116,6 +116,21 @@ export const touchTip: CommandCreator<TouchTipStepGenArgs> = (
 
   const python = `${pipettePythonName}.touch_tip(${pythonArgs.join(', ')})`
 
+  if (args.speed != null && speed == null) {
+    console.error(
+      `touchTip: expected speed to resolve but got undefined (raw: ${String(
+        args.speed
+      )})`
+    )
+  }
+  if (args.mmFromEdge != null && mmFromEdge == null) {
+    console.error(
+      `touchTip: expected mmFromEdge to resolve but got undefined (raw: ${String(
+        args.mmFromEdge
+      )})`
+    )
+  }
+
   const commands: CreateCommand[] = [
     {
       commandType: 'touchTip',
