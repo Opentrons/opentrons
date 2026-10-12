@@ -10,16 +10,14 @@ _ROOT_HANDLER_KEY = "root_handler"
 _ROOT_FORMATTER_KEY = "root_formatter"
 
 
-def _get_logger_config(
-    log_level: str | int, include_sqlalchemy_echo: bool
-) -> dict[str, Any]:
+def _get_logger_config(include_sqlalchemy_echo: bool) -> dict[str, Any]:
     if include_sqlalchemy_echo:
         return {
             "uvicorn": {"propagate": True},
             "uvicorn.access": {"propagate": True},
             # sqlalchemy by default only propagates logs of level WARN and above.
-            # This changes it to follow the same level filtering as everything else.
-            "sqlalchemy": {"level": log_level},
+            # This changes it to only propagate logs of level ERROR and above.
+            "sqlalchemy": {"level": "ERROR"},
         }
     else:
         return {
@@ -53,7 +51,7 @@ def get_dict_config(
         "disable_existing_loggers": False,
         # Fix up 3rd-party packages to make sure their logs propagate up to our root
         # handler. Most packages don't need this.
-        "loggers": _get_logger_config(log_level, include_sqlalchemy_echo),
+        "loggers": _get_logger_config(include_sqlalchemy_echo),
         "root": {
             "handlers": [_ROOT_HANDLER_KEY],
             "level": log_level,
