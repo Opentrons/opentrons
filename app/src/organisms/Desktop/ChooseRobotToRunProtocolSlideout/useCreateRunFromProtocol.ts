@@ -8,7 +8,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { getProtocolOrRunCreationErrorMessage } from '/app/local-resources/access-control/utils'
+import {
+  getProtocolOrRunCreationErrorMessage,
+  isInsufficientScopeError,
+} from '/app/local-resources/access-control/utils'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -44,7 +47,7 @@ export function useCreateRunFromProtocol(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const { t } = useTranslation(['shared', 'access_control'])
+  const { t } = useTranslation('shared')
 
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
@@ -101,11 +104,10 @@ export function useCreateRunFromProtocol(
     console.error(mutationError)
   }
   const error =
-    mutationError != null
+    mutationError != null && !isInsufficientScopeError(mutationError)
       ? getProtocolOrRunCreationErrorMessage(
           mutationError,
-          t('protocol_run_general_error_msg') as string,
-          t('access_control:send_protocol_admin_credentials_required') as string
+          t('protocol_run_general_error_msg') as string
         )
       : null
 

@@ -3,10 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
-import {
-  isDocumentedMutationError,
-  useStopRunMutation,
-} from '@opentrons/react-api-client'
+import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
@@ -54,10 +51,8 @@ export function ConfirmCancelRunModal({
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       },
-      onError: (error: unknown) => {
-        if (isDocumentedMutationError(error)) {
-          setIsCanceling(false)
-        }
+      onError: () => {
+        setIsCanceling(false)
       },
     })
   }

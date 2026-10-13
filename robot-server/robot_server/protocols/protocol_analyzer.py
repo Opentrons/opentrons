@@ -75,6 +75,7 @@ class ProtocolAnalyzer:
             self._coordinator = await simulating_runner.create_simulating_orchestrator(
                 robot_type=self._protocol_resource.source.robot_type,
                 protocol_config=self._protocol_resource.source.config,
+                analysis_store_provider=self._analysis_store.get_analysis_store_provider(),
             )
         await self._coordinator.load(
             protocol_source=self._protocol_resource.source,
@@ -114,7 +115,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 robot_type=self._protocol_resource.source.robot_type,
                 run_time_parameters=result.parameters,
-                commands=result.commands,
+                commands=None,
                 labware=result.state_summary.labware,
                 modules=result.state_summary.modules,
                 pipettes=result.state_summary.pipettes,
@@ -125,6 +126,7 @@ class ProtocolAnalyzer:
                 command_preconditions=result.command_preconditions,
                 labware_offsets=result.state_summary.labwareOffsets,
             )
+
         finally:
             await self.clean_up()
 

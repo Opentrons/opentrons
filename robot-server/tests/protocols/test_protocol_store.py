@@ -24,7 +24,6 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
-from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -89,11 +88,10 @@ def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
 
 @pytest.fixture
 def completed_analysis_store(
-    decoy: Decoy,
     sql_engine: SQLEngine,
 ) -> CompletedAnalysisStore:
     """Get a subject."""
-    return CompletedAnalysisStore(sql_engine, decoy.mock(cls=MemoryCache), "2")
+    return CompletedAnalysisStore(sql_engine, "2")
 
 
 async def test_insert_and_get_protocol(

@@ -87,6 +87,7 @@ vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks/useModuleAttachedToast')
 vi.mock('../hooks/useProtocolReceiptToast')
 vi.mock('../hooks/useSoftwareUpdatePoll')
+vi.mock('/app/local-resources/access-control/useHandleInsufficientPermissions')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
 vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({

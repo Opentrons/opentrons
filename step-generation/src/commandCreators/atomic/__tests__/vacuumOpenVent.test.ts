@@ -106,4 +106,52 @@ describe('vacuumOpenVent', () => {
     )
     expect(getErrorResult(result)).toEqual(liveTaskError)
   })
+
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const result = vacuumOpenVent(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result)).toEqual({
+      commands: [
+        {
+          commandType: 'vacuumModule/openVent',
+          key: expect.any(String),
+          params: { moduleId: vacuumModuleId },
+        },
+      ],
+      python: 'mock_vacuum_module.open_vent()',
+    })
+  })
+
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = vacuumOpenVent(
+      { moduleId: 'mock_rtp' },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

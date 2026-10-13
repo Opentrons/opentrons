@@ -49,6 +49,10 @@ export function formatPyValue(value: any): string {
   }
 }
 
+export function formatPyRuntimeValue(value: number | boolean | string): string {
+  return typeof value === 'string' ? value : formatPyValue(value)
+}
+
 /** Render the string value to Python. */
 export function formatPyStr(str: string): string {
   // Later, we can do something more elegant like outputting 'single-quoted' if str contains
