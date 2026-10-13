@@ -1,14 +1,13 @@
 import * as errorCreators from '../../errorCreators'
 import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type {
-  CommandCreator,
-  ModuleStepGenArgs,
-} from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
-export const heaterShakerCloseLatch: CommandCreator<
-  ModuleStepGenArgs
-> = (args, invariantContext, prevRobotState) => {
+export const heaterShakerCloseLatch: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
   if (moduleId == null) {

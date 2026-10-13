@@ -5,15 +5,14 @@ import {
   uuid,
 } from '../../utils'
 
-import type {
-  CommandCreator,
-  ModuleStepGenArgs,
-} from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
 const LEFT_SLOTS = ['1', '4', '7', '10']
-export const heaterShakerOpenLatch: CommandCreator<
-  ModuleStepGenArgs
-> = (args, invariantContext, prevRobotState) => {
+export const heaterShakerOpenLatch: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const {
     pipetteEntities,
     labwareEntities,
