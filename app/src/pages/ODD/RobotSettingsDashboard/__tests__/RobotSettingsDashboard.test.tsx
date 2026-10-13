@@ -2,9 +2,12 @@ import { useDispatch } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useAccessControlEnabledQuery,
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
@@ -50,7 +53,7 @@ import {
 import { RobotSettingsDashboard } from '../'
 
 import type { UseQueryResult } from 'react-query'
-import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { LogLevels, RobotSettingsResponse } from '@opentrons/api-client'
 import type { Config } from '/app/redux/config'
 
 vi.mock('react-redux', async () => {
@@ -126,7 +129,20 @@ const mockDispatch = vi.fn()
 
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
+  let logLevel: LogLevels = 'warning'
+  const mockChangeLogLevel: ReturnType<
+    typeof usePostLogLevelMutation
+  >['postLogLevel'] = async newLevel => {
+    logLevel = newLevel
+    return newLevel
+  }
   beforeEach(() => {
+    when(useLogLevelQuery)
+      .calledWith()
+      .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
+    when(usePostLogLevelMutation)
+      .calledWith(expect.anything())
+      .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: false } },
