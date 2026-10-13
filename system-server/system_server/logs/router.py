@@ -10,7 +10,7 @@ from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from . import journald, log_control, settings
-from .models import LogFormat, LogIdentifier, LogLevel, SetLogLevelResponse
+from .models import LogFormat, LogIdentifier, LogLevel
 from system_server.persistence import get_sql_engine
 
 logs_router = APIRouter()
@@ -91,7 +91,7 @@ async def get_log_level_local(
         " `MaxLevelStore` to journald's runtime configuration and"
         " signaling journald to reload."
     ),
-    response_model=SetLogLevelResponse,
+    response_model=LogLevel,
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "log_level was missing or invalid",
@@ -105,7 +105,7 @@ async def get_log_level_local(
         Depends(get_audit_logger("change log level")),
     ],
 )
-async def post_log_level_local(log_level: LogLevel) -> SetLogLevelResponse:
+async def post_log_level_local(log_level: LogLevel) -> LogLevel:
     """Update journald's local MaxLevelStore and reload the daemon."""
     level = log_level.log_level
     if level is None:
@@ -127,4 +127,4 @@ async def post_log_level_local(log_level: LogLevel) -> SetLogLevelResponse:
             detail=f"Failed to reload journald: {e}",
         ) from e
 
-    return SetLogLevelResponse(message=f"log_level set to {level.value}")
+    return LogLevel(log_level=level)

@@ -159,7 +159,7 @@ def test_post_log_level_local(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"message": f"log_level set to {body_level.lower()}"}
+    assert response.json() == {"log_level": body_level.lower()}
 
 
 @pytest.mark.parametrize(
