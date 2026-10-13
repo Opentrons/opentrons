@@ -1,109 +1,79 @@
-import styled, { css } from 'styled-components'
+import { createElement } from 'react'
+import clsx from 'clsx'
 
-import { Text } from '../../primitives'
-import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
+import { isntStyleProp, styleProps } from '../../primitives/style-props'
+import { resolveLegacyTextStyle } from './legacyTextStyles'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ComponentProps, ReactNode } from 'react'
+import type { StyleProps } from '../../primitives/types'
+import type { LegacyTextStyle } from './legacyTextStyles'
 
-export interface LegacyProps extends Omit<ComponentProps<typeof Text>, 'as'> {
+export interface LegacyProps
+  extends StyleProps, Omit<ComponentProps<'p'>, 'color' | 'as'> {
   children?: ReactNode
-  as?: keyof JSX.IntrinsicElements | React.ComponentType<any> // Note this would be temporary
-  forwardedAs?: keyof JSX.IntrinsicElements | React.ComponentType<any> // to avoid stopping apply the color style
-}
-
-const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
-  h1: css`
-    ${TYPOGRAPHY.h1Default};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level1Header};
-    }
-  `,
-  h2: css`
-    ${TYPOGRAPHY.h2Regular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level2HeaderRegular};
-    }
-  `,
-  h3: css`
-    ${TYPOGRAPHY.h3Regular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level3HeaderRegular};
-    }
-  `,
-  h4: css`
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level4HeaderRegular};
-    }
-  `,
-  h6: TYPOGRAPHY.h6Default,
-  p: css`
-    ${TYPOGRAPHY.pRegular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.bodyTextRegular}
-    }
-  `,
-  label: css`
-    ${TYPOGRAPHY.labelRegular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.smallBodyTextRegular}
-    }
-  `,
-  h2SemiBold: css`
-    ${TYPOGRAPHY.h2SemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level2HeaderSemiBold}
-    }
-  `,
-  h3SemiBold: css`
-    ${TYPOGRAPHY.h3SemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.level3HeaderSemiBold}
-    }
-  `,
-  h4SemiBold: TYPOGRAPHY.level4HeaderSemiBold,
-  h6SemiBold: TYPOGRAPHY.h6SemiBold,
-  pSemiBold: css`
-    ${TYPOGRAPHY.pSemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.bodyTextSemiBold}
-    }
-  `,
-  labelSemiBold: css`
-    ${TYPOGRAPHY.labelSemiBold}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      font-size: ${TYPOGRAPHY.fontSize20};
-      line-height: ${TYPOGRAPHY.lineHeight24};
-    }
-  `,
-  h2Bold: TYPOGRAPHY.level2HeaderBold,
-  h3Bold: TYPOGRAPHY.level3HeaderBold,
-  h4Bold: TYPOGRAPHY.level4HeaderBold,
-  pBold: TYPOGRAPHY.bodyTextBold,
-  labelBold: TYPOGRAPHY.smallBodyTextBold,
+  /** kebab-case legacy style key, e.g. `legacy-h3-bold`. */
+  textStyle?: LegacyTextStyle
+  as?: keyof JSX.IntrinsicElements
+  /** @deprecated Prefer `as`. Kept for older callsites. */
+  forwardedAs?: keyof JSX.IntrinsicElements
 }
 
 /**
  * LegacyStyledText
  *
- * @component
- *
  * @deprecated LegacyStyledText has been deprecated. Regarding text, all components should use
  * StyledText with a proper style that the design uses.
  * The existing LegacyStyledText should be replaced with StyledText,
- *
+ * Existing callsites may use `as` + `fontWeight`, or the new `textStyle`
+ * string API (`legacy-h3-bold`, `legacy-caption-regular`, …).
  */
-export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
-  Text
-)<LegacyProps>`
-  ${props => {
-    let fontWeight = ''
-    if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
-      fontWeight = 'SemiBold'
-    } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
-      fontWeight = 'Bold'
-    }
-    const tag = props.forwardedAs ?? props.as
-    return styleMap[`${tag}${fontWeight}`]
-  }}
-`
+export function LegacyStyledText({
+  textStyle,
+  as,
+  forwardedAs,
+  fontWeight,
+  className,
+  children,
+  style,
+  ...props
+}: LegacyProps): JSX.Element {
+  const { as: defaultAs, className: styleClassName } = resolveLegacyTextStyle({
+    textStyle,
+    as,
+    forwardedAs,
+    fontWeight,
+  })
+  const tagProp = forwardedAs ?? as
+  const tag = typeof tagProp === 'string' ? tagProp : defaultAs
+
+  // fontWeight selects the legacy class when textStyle is omitted
+  const stylePropsStyles = styleProps({
+    ...props,
+    ...(textStyle != null ? { fontWeight } : {}),
+  })
+
+  const forwardedProps = Object.entries(props).reduce<Record<string, unknown>>(
+    (acc, [prop, value]) => {
+      if (isntStyleProp(prop)) {
+        acc[prop] = value
+      }
+      return acc
+    },
+    {}
+  )
+
+  return createElement(
+    tag,
+    {
+      ...forwardedProps,
+      className: clsx(styleClassName, className),
+      style: {
+        marginTop: 0,
+        marginBottom: 0,
+        ...stylePropsStyles,
+        ...style,
+      },
+    },
+    children
+  )
+}

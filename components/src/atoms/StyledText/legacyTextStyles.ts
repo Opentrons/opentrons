@@ -1,5 +1,4 @@
 import { TYPOGRAPHY } from '../../ui-style-constants'
-
 import styles from './legacystyledtext.module.css'
 
 type LegacyFontWeightKey = 'regular' | 'semi-bold' | 'bold'
@@ -12,7 +11,7 @@ interface LegacyTextStyleDefinition {
   className: string
 }
 
-const legacyTextStyleMap = {
+export const legacyTextStyleMap = {
   'legacy-h1': {
     as: 'h1',
     weight: 'regular',

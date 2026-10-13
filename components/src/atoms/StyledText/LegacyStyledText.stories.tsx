@@ -82,6 +82,20 @@ export const h3SemiBold: Story = {
   },
 }
 
+export const textStyleLegacyH3Bold: Story = {
+  args: {
+    textStyle: 'legacy-h3-bold',
+    children: dummyText,
+  },
+}
+
+export const textStyleLegacyCaptionRegular: Story = {
+  args: {
+    textStyle: 'legacy-caption-regular',
+    children: dummyText,
+  },
+}
+
 export const h6SemiBold: Story = {
   args: {
     as: 'h6',

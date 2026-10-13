@@ -1,36 +1,39 @@
 import { describe, expect, it } from 'vitest'
 
 import { TYPOGRAPHY } from '../../../ui-style-constants'
-
+import { isLegacyTextStyle, resolveLegacyTextStyle } from '../legacyTextStyles'
 import {
-  isLegacyTextStyle,
-  resolveLegacyTextStyle,
-} from '../legacyTextStyles'
+  OLD_API_TRANSLATIONS,
+  TEXT_STYLE_TRANSLATIONS,
+} from './legacyTextStyleFixtures'
 
 describe('legacyTextStyles', () => {
-  it('resolves from textStyle when provided', () => {
-    expect(resolveLegacyTextStyle({ textStyle: 'legacy-h3-bold' }).as).toBe(
-      'h3'
-    )
-  })
+  it.each(TEXT_STYLE_TRANSLATIONS)(
+    'maps $textStyle to $as with the expected CSS module class',
+    ({ textStyle, as, className }) => {
+      expect(resolveLegacyTextStyle({ textStyle })).toEqual({ as, className })
+    }
+  )
 
-  it('resolves from as + fontWeight when textStyle is omitted', () => {
-    expect(
-      resolveLegacyTextStyle({
-        as: 'h3',
-        fontWeight: TYPOGRAPHY.fontWeightBold,
-      }).as
-    ).toBe('h3')
-    expect(
-      resolveLegacyTextStyle({
-        forwardedAs: 'h2',
-        fontWeight: TYPOGRAPHY.fontWeightSemiBold,
-      }).className
-    ).toBe(
-      resolveLegacyTextStyle({ textStyle: 'legacy-h2-semi-bold' }).className
+  it.each(OLD_API_TRANSLATIONS)(
+    'maps old API as=$as + fontWeight to the same class as $textStyle',
+    ({ textStyle, as, fontWeight }) => {
+      expect(resolveLegacyTextStyle({ as, fontWeight })).toEqual(
+        resolveLegacyTextStyle({ textStyle })
+      )
+    }
+  )
+
+  it('defaults to legacy-p when as/fontWeight do not match a style', () => {
+    expect(resolveLegacyTextStyle({})).toEqual(
+      resolveLegacyTextStyle({ textStyle: 'legacy-p' })
     )
-    expect(resolveLegacyTextStyle({ as: 'label' }).as).toBe('label')
-    expect(resolveLegacyTextStyle({}).as).toBe('p')
+    expect(
+      resolveLegacyTextStyle({
+        as: 'h1',
+        fontWeight: TYPOGRAPHY.fontWeightBold,
+      })
+    ).toEqual(resolveLegacyTextStyle({ textStyle: 'legacy-p' }))
   })
 
   it('identifies legacy text style names', () => {
