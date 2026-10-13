@@ -64,6 +64,27 @@ function buildRootLogger(): OTLogger {
   return _rootLog
 }
 
+const levelPrefix = (level: string): string => {
+  switch (level.toLowerCase()) {
+    case 'emerg':
+      return '<0>'
+    case 'alert':
+      return '<1>'
+    case 'crit':
+      return '<2>'
+    case 'error':
+      return '<3>'
+    case 'warning':
+      return '<4>'
+    case 'notice':
+      return '<5>'
+    case 'info':
+      return '<6>'
+    default:
+      return '<7>'
+  }
+}
+
 function createTransports(config: Config['log']): Transport[] {
   const timeFromStamp = (ts: string): string =>
     dateFormat(new Date(ts), 'HH:MM:ss.l')
@@ -80,9 +101,12 @@ function createTransports(config: Config['log']): Transport[] {
           const print = `${time} [${label}] ${level}: ${message}`
           const meta = inspect(info.meta, { depth: 6 })
 
-          if (meta !== '{}') return `${print} ${meta}`
+          const body = meta !== '{}' ? `${print} ${meta}` : print
 
-          return print
+          return body
+            .split('\n')
+            .map(line => `${levelPrefix(level)}${line}`)
+            .join('\n')
         })
       ),
     }),

@@ -144,7 +144,7 @@ function startUp(): void {
   registerInternalApiListener()
 
   mainWindow = createUi(dispatch)
-  rendererLogger = createRendererLogger()
+  rendererLogger = createRendererLogger(mainWindow)
   void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
@@ -200,11 +200,33 @@ function startUp(): void {
   })
 }
 
-function createRendererLogger(): OTLogger {
+function createRendererLogger(window: BrowserWindow): OTLogger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')
-  ipcMain.on('log', (_, info) => logger.log(info as LogEntry))
+
+  window.webContents.session.webRequest.onResponseStarted(details => {
+    const level =
+      details.statusCode >= 400
+        ? 'error'
+        : details.method === 'GET'
+          ? 'debug'
+          : 'info'
+    logger.log(
+      level,
+      `network request: ${details.method} ${details.url} returned ${details.statusLine}`
+    )
+  })
+
+  window.webContents.on('console-message', event => {
+    const { level, message } = event
+    const levelToUse = level === 'warning' ? 'warn' : level
+    logger.log(levelToUse, message)
+  })
+
+  ipcMain.on('log', (_, info: LogEntry) =>
+    logger.log(info.level, info.message, info.meta)
+  )
 
   return logger
 }
