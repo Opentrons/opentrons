@@ -3,10 +3,10 @@ import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { CommandCreator, DisengageMagnetStepGenArgs } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
 /** Disengage magnet of specified magnetic module. */
-export const disengageMagnet: CommandCreator<DisengageMagnetStepGenArgs> = (
+export const disengageMagnet: CommandCreator<ModuleStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState

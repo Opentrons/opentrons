@@ -1245,7 +1245,3 @@ export interface EngageMagnetStepGenArgs {
   moduleId: string
   height: number | string
 }
-
-export interface DisengageMagnetStepGenArgs {
-  moduleId: string
-}
