@@ -1,0 +1,179 @@
+/* Desktop / default — values match ui-style-constants TYPOGRAPHY */
+.legacy_h1 {
+  font-size: var(--font-size-19);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-24);
+}
+
+.legacy_h2 {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+}
+
+.legacy_h2_semi_bold {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+}
+
+.legacy_h3 {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+}
+
+.legacy_h3_semi_bold {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+}
+
+.legacy_h6 {
+  font-size: var(--font-size-9);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-12);
+  text-transform: uppercase;
+}
+
+.legacy_h6_semi_bold {
+  font-size: var(--font-size-9);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-12);
+}
+
+.legacy_p {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+}
+
+.legacy_p_semi_bold {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+}
+
+.legacy_label,
+.legacy_caption_regular {
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-12);
+}
+
+.legacy_label_semi_bold {
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-12);
+}
+
+/* Bold variants historically used touchscreen token sizes on all viewports */
+.legacy_h2_bold {
+  font-size: var(--font-size-38);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-48);
+}
+
+.legacy_h3_bold {
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-42);
+}
+
+.legacy_h4,
+.legacy_h4_semi_bold,
+.legacy_h4_bold {
+  font-size: var(--font-size-28);
+  line-height: var(--line-height-36);
+}
+
+.legacy_h4 {
+  font-weight: var(--font-weight-regular);
+}
+
+.legacy_h4_semi_bold {
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.legacy_h4_bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.legacy_p_bold {
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-28);
+}
+
+.legacy_label_bold {
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-24);
+}
+
+/* Touchscreen (ODD) overrides — (height: 600px) and (width: 1024px) */
+@media (height = 600px) and (width = 1024px) {
+  .legacy_h1 {
+    font-size: var(--font-size-80);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-96);
+  }
+
+  .legacy_h2,
+  .legacy_h2_semi_bold {
+    font-size: var(--font-size-38);
+    line-height: var(--line-height-48);
+  }
+
+  .legacy_h2 {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .legacy_h2_semi_bold {
+    font-weight: var(--font-weight-semi-bold);
+  }
+
+  .legacy_h3,
+  .legacy_h3_semi_bold {
+    font-size: var(--font-size-32);
+    line-height: var(--line-height-42);
+  }
+
+  .legacy_h3 {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .legacy_h3_semi_bold {
+    font-weight: var(--font-weight-semi-bold);
+  }
+
+  .legacy_p,
+  .legacy_p_semi_bold {
+    font-size: var(--font-size-22);
+    line-height: var(--line-height-28);
+  }
+
+  .legacy_p {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .legacy_p_semi_bold {
+    font-weight: var(--font-weight-semi-bold);
+  }
+
+  .legacy_label,
+  .legacy_caption_regular,
+  .legacy_label_semi_bold {
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-24);
+  }
+
+  .legacy_label,
+  .legacy_caption_regular {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .legacy_label_semi_bold {
+    font-weight: var(--font-weight-semi-bold);
+  }
+}
