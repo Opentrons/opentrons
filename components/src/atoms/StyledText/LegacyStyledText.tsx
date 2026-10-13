@@ -6,13 +6,10 @@ import { resolveLegacyTextStyle } from './legacyTextStyles'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '../../primitives/types'
-import type { LegacyTextStyle } from './legacyTextStyles'
 
 export interface LegacyProps
   extends StyleProps, Omit<ComponentProps<'p'>, 'color' | 'as'> {
   children?: ReactNode
-  /** kebab-case legacy style key, e.g. `legacy-h3-bold`. */
-  textStyle?: LegacyTextStyle
   as?: keyof JSX.IntrinsicElements
   /** @deprecated Prefer `as`. Kept for older callsites. */
   forwardedAs?: keyof JSX.IntrinsicElements
@@ -23,12 +20,10 @@ export interface LegacyProps
  *
  * @deprecated LegacyStyledText has been deprecated. Regarding text, all components should use
  * StyledText with a proper style that the design uses.
- * The existing LegacyStyledText should be replaced with StyledText,
- * Existing callsites may use `as` + `fontWeight`, or the new `textStyle`
- * string API (`legacy-h3-bold`, `legacy-caption-regular`, …).
+ * The existing LegacyStyledText should be replaced with StyledText.
+ * Callsites continue to use `as` / `forwardedAs` + `fontWeight`.
  */
 export function LegacyStyledText({
-  textStyle,
   as,
   forwardedAs,
   fontWeight,
@@ -38,7 +33,6 @@ export function LegacyStyledText({
   ...props
 }: LegacyProps): JSX.Element {
   const { as: defaultAs, className: styleClassName } = resolveLegacyTextStyle({
-    textStyle,
     as,
     forwardedAs,
     fontWeight,

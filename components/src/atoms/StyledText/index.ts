@@ -1,5 +1,3 @@
 export * from './StyledText'
 export * from './LegacyStyledText'
-export type { LegacyTextStyle } from './legacyTextStyles'
-export { isLegacyTextStyle, resolveLegacyTextStyle } from './legacyTextStyles'
 export * from './PlaceholderStyledText'

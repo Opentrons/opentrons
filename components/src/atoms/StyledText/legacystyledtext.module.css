@@ -1,6 +1,6 @@
 /* Desktop / default — values match ui-style-constants TYPOGRAPHY */
 .legacy_h1 {
-  font-size: var(--font-size-19);
+  font-size: 1.188rem;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-24);
 }
@@ -30,14 +30,14 @@
 }
 
 .legacy_h6 {
-  font-size: var(--font-size-9);
+  font-size: 0.563rem;
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-12);
   text-transform: uppercase;
 }
 
 .legacy_h6_semi_bold {
-  font-size: var(--font-size-9);
+  font-size: 0.563rem;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-12);
 }
@@ -54,8 +54,7 @@
   line-height: var(--line-height-20);
 }
 
-.legacy_label,
-.legacy_caption_regular {
+.legacy_label {
   font-size: var(--font-size-11);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-12);
@@ -80,15 +79,10 @@
   line-height: var(--line-height-42);
 }
 
-.legacy_h4,
 .legacy_h4_semi_bold,
 .legacy_h4_bold {
   font-size: var(--font-size-28);
   line-height: var(--line-height-36);
-}
-
-.legacy_h4 {
-  font-weight: var(--font-weight-regular);
 }
 
 .legacy_h4_semi_bold {
@@ -117,6 +111,12 @@
     font-size: var(--font-size-80);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-96);
+  }
+
+  .legacy_h4 {
+    font-size: var(--font-size-28);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-36);
   }
 
   .legacy_h2,
@@ -162,14 +162,12 @@
   }
 
   .legacy_label,
-  .legacy_caption_regular,
   .legacy_label_semi_bold {
     font-size: var(--font-size-20);
     line-height: var(--line-height-24);
   }
 
-  .legacy_label,
-  .legacy_caption_regular {
+  .legacy_label {
     font-weight: var(--font-weight-regular);
   }
 

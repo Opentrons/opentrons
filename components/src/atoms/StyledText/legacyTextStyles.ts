@@ -5,13 +5,11 @@ type LegacyFontWeightKey = 'regular' | 'semi-bold' | 'bold'
 
 interface LegacyTextStyleDefinition {
   as: keyof JSX.IntrinsicElements
-  /** Tag used for as/forwardedAs lookup. Defaults to `as`. */
-  tag?: string
   weight: LegacyFontWeightKey
   className: string
 }
 
-export const legacyTextStyleMap = {
+const legacyTextStyleMap = {
   'legacy-h1': {
     as: 'h1',
     weight: 'regular',
@@ -102,27 +100,20 @@ export const legacyTextStyleMap = {
     weight: 'bold',
     className: styles.legacy_label_bold,
   },
-  'legacy-caption-regular': {
-    as: 'label',
-    tag: 'caption',
-    weight: 'regular',
-    className: styles.legacy_caption_regular,
-  },
 } as const satisfies Record<string, LegacyTextStyleDefinition>
 
-export type LegacyTextStyle = keyof typeof legacyTextStyleMap
+type LegacyTextStyle = keyof typeof legacyTextStyleMap
 
 const legacyTextStyleByTagAndWeight: Partial<
   Record<string, Partial<Record<LegacyFontWeightKey, LegacyTextStyle>>>
 > = {}
 
-for (const [textStyle, definition] of Object.entries(legacyTextStyleMap) as Array<
-  [LegacyTextStyle, LegacyTextStyleDefinition]
->) {
-  const tag = definition.tag ?? definition.as
-  const byWeight = legacyTextStyleByTagAndWeight[tag] ?? {}
-  byWeight[definition.weight] = textStyle
-  legacyTextStyleByTagAndWeight[tag] = byWeight
+for (const [styleKey, definition] of Object.entries(
+  legacyTextStyleMap
+) as Array<[LegacyTextStyle, LegacyTextStyleDefinition]>) {
+  const byWeight = legacyTextStyleByTagAndWeight[definition.as] ?? {}
+  byWeight[definition.weight] = styleKey
+  legacyTextStyleByTagAndWeight[definition.as] = byWeight
 }
 
 function fontWeightToKey(fontWeight?: string | number): LegacyFontWeightKey {
@@ -135,31 +126,19 @@ function fontWeightToKey(fontWeight?: string | number): LegacyFontWeightKey {
   return 'regular'
 }
 
-/** Resolve a legacy text style from textStyle and/or as/forwardedAs + fontWeight. */
+/** Resolve a legacy text style from as/forwardedAs + fontWeight. */
 export function resolveLegacyTextStyle({
-  textStyle,
   as,
   forwardedAs,
   fontWeight,
 }: {
-  textStyle?: LegacyTextStyle
   as?: string
   forwardedAs?: string
   fontWeight?: string | number
-}): { as: keyof JSX.IntrinsicElements; className: string } {
-  if (textStyle != null) {
-    const { as: tagAs, className } = legacyTextStyleMap[textStyle]
-    return { as: tagAs, className }
-  }
-
+}): (typeof legacyTextStyleMap)[LegacyTextStyle] {
   const tag = forwardedAs ?? as ?? 'p'
   const weight = fontWeightToKey(fontWeight)
   const resolved =
     legacyTextStyleByTagAndWeight[tag]?.[weight] ?? ('legacy-p' as const)
-  const { as: tagAs, className } = legacyTextStyleMap[resolved]
-  return { as: tagAs, className }
-}
-
-export function isLegacyTextStyle(styleName: string | undefined): boolean {
-  return styleName != null && styleName in legacyTextStyleMap
+  return legacyTextStyleMap[resolved]
 }
