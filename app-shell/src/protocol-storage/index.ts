@@ -89,7 +89,7 @@ export function preParityMigrateProtocolsFrom(
           })
         })
         .catch(e => {
-          console.log(
+          console.error(
             `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
           )
           resolve()

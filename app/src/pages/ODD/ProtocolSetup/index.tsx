@@ -895,7 +895,6 @@ export function ProtocolSetup(): ReactNode {
       !offsetsConfirmed ? 'apply_offsets' : null,
       'play_run',
     ].filter((action): action is AuditLogAction => action != null)
-    console.log('actionsToDocument', actions)
     return actions
   }, [cameraSettingsApplied, offsetsConfirmed])
 
