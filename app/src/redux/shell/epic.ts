@@ -20,7 +20,7 @@ import type { Action, Epic } from '../types'
 
 const { ipcRenderer } = remote
 
-const log = createLogger(new URL('', import.meta.url).pathname)
+const log = createLogger('redux/shell/epic.ts')
 
 const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(

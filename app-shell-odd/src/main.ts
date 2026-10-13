@@ -38,7 +38,6 @@ import { registerSystemInfo, registerUsbDeviceHandlers } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
-import type { LogEntry } from 'winston'
 import type { OTLogger } from './log'
 import type { Action, Dispatch, Logger } from './types'
 
@@ -223,10 +222,6 @@ function createRendererLogger(window: BrowserWindow): OTLogger {
     const levelToUse = level === 'warning' ? 'warn' : level
     logger.log(levelToUse, message)
   })
-
-  ipcMain.on('log', (_, info: LogEntry) =>
-    logger.log(info.level, info.message, info.meta)
-  )
 
   return logger
 }
