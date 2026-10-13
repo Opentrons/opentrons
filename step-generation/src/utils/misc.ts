@@ -1824,3 +1824,59 @@ export function resolveBooleanRuntimeValue(
 
   return null
 }
+
+export function resolveRuntimeWellLocation(
+  location:
+    | {
+        origin?: string
+        offset?: {
+          x?: number | string
+          y?: number | string
+          z?: number | string
+        }
+      }
+    | undefined,
+  runtimeParameters: RuntimeParameters
+): {
+  location:
+    | {
+        origin?: string
+        offset?: { x?: number; y?: number; z?: number }
+      }
+    | undefined
+  invalidParameterNames: string[]
+} {
+  if (location == null) {
+    return { location: undefined, invalidParameterNames: [] }
+  }
+  const invalidParameterNames: string[] = []
+  const resolvedOrigin =
+    location.origin == null
+      ? undefined
+      : resolveStringRuntimeValue(location.origin, runtimeParameters)
+  if (location.origin != null && resolvedOrigin == null) {
+    invalidParameterNames.push(location.origin)
+  }
+  const offset: { x?: number; y?: number; z?: number } = {}
+  if (location.offset != null) {
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const value = location.offset[axis]
+      if (value == null) {
+        continue
+      }
+      const resolved = resolveNumericRuntimeValue(value, runtimeParameters)
+      if (resolved == null) {
+        invalidParameterNames.push(String(value))
+      } else {
+        offset[axis] = resolved
+      }
+    }
+  }
+  return {
+    location: {
+      ...(resolvedOrigin != null ? { origin: resolvedOrigin } : {}),
+      ...(location.offset != null ? { offset } : {}),
+    },
+    invalidParameterNames,
+  }
+}
