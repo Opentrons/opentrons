@@ -31,7 +31,7 @@ Load the module using [`ProtocolContext.load_module()`][opentrons.protocol_api.P
 
 ```python
 from opentrons import protocol_api
-requirements = {"robotType": "Flex", "apiLevel": "2.30"}
+requirements = {"robotType": "Flex", "apiLevel": "2.31"}
 
 def run(protocol: protocol_api.ProtocolContext):
     vacuum = protocol.load_module(
