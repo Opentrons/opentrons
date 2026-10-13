@@ -45,11 +45,9 @@ export function LegacyStyledText({
   })
   const tagProp = forwardedAs ?? as
   const tag = typeof tagProp === 'string' ? tagProp : defaultAs
-
-  // fontWeight selects the legacy class when textStyle is omitted
   const stylePropsStyles = styleProps({
     ...props,
-    ...(textStyle != null ? { fontWeight } : {}),
+    fontWeight,
   })
 
   const forwardedProps = Object.entries(props).reduce<Record<string, unknown>>(

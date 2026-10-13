@@ -116,10 +116,9 @@ const legacyTextStyleByTagAndWeight: Partial<
   Record<string, Partial<Record<LegacyFontWeightKey, LegacyTextStyle>>>
 > = {}
 
-for (const [textStyle, definition] of Object.entries(legacyTextStyleMap) as [
-  LegacyTextStyle,
-  LegacyTextStyleDefinition,
-][]) {
+for (const [textStyle, definition] of Object.entries(legacyTextStyleMap) as Array<
+  [LegacyTextStyle, LegacyTextStyleDefinition]
+>) {
   const tag = definition.tag ?? definition.as
   const byWeight = legacyTextStyleByTagAndWeight[tag] ?? {}
   byWeight[definition.weight] = textStyle
