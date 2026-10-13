@@ -1236,6 +1236,20 @@ export interface AbsorbanceReaderReadStepGenArgs {
   fileName?: string | null
 }
 
+export interface ConfigureForVolumeStepGenArgs {
+  pipetteId: string
+  volume: number | string
+}
+
+export interface ConfigureNozzleLayoutStepGenArgs {
+  pipetteId: string
+  configurationParams: {
+    style: string
+    primaryNozzle?: string
+    backLeftNozzle?: string
+  }
+}
+
 export interface VacuumSetPumpPowerStepGenArgs {
   moduleId: string
   percentPower: number | string

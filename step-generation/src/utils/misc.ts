@@ -60,6 +60,7 @@ import {
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { OFF_DECK, reduceCommandCreators, uuid } from './index'
+import { formatPyStr } from './pythonFormat'
 
 import type {
   ActiveNozzleNumber,
@@ -1823,6 +1824,29 @@ export function resolveBooleanRuntimeValue(
   }
 
   return null
+}
+
+export function resolveAllowedRuntimeValue(
+  value: string,
+  allowed: readonly string[],
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const resolved = resolveStringRuntimeValue(value, runtimeParameters)
+  if (resolved == null || !allowed.includes(resolved)) {
+    return null
+  }
+  return resolved
+}
+
+export function pythonRuntimeString(
+  raw: string,
+  resolved: string,
+  runtimeParameters: RuntimeParameters
+): string {
+  if (runtimeParameters[raw] != null) {
+    return raw
+  }
+  return formatPyStr(resolved)
 }
 
 export function resolveRuntimeWellLocation(
