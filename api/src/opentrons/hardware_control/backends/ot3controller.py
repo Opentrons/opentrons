@@ -186,7 +186,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
-from opentrons_shared_data.pipette.types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName, PipetteTipType
 
 from .. import modules
 from ..dev_types import (
@@ -2005,8 +2005,15 @@ class OT3Controller(FlexBackend):
         return sensor_data.to_float() if sensor_data else None
 
     async def send_pipetting_function_to_eeprom(
-        support_tips_def: SupportedTipsDefinition,
+        self,
+        mount: OT3Mount,
+        supported_tips_def: Dict[PipetteTipType, SupportedTipsDefinition],
     ) -> None:
+        """Process and send a pipetting function to the pipette's EEPROM over CAN."""
+        node = sensor_node_for_mount(mount)
         pip_function_processor = PipetteFunctionProcessor(
-            can_messenger=self._messenger, supported_tip_def=supported_tips_def
+            can_messenger=self._messenger,
+            node_id=node,
+            supported_tips_def=supported_tips_def,
         )
+        await pip_function_processor.run_update_pipette_function()
