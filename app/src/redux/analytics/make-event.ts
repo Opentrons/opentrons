@@ -155,8 +155,8 @@ export function makeEvent(
           ? {
               superProperties: {
                 ...systemInfoProps,
-                // anonymize IP address so analytics profile can't be mapped to more
-                // specific Intercom support profile
+                // anonymize IP address so analytics profile can't be mapped to a
+                // specific user/install
                 'U2E IPv4 Address': Boolean(
                   systemInfoProps['U2E IPv4 Address']
                 ),

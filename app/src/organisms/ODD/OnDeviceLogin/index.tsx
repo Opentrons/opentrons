@@ -41,6 +41,8 @@ export interface OnDeviceLoginProps {
   onClearLoginError?: () => void
   /** When set, called before advancing from the username step to the password step. */
   onUsernameSubmit?: (username: string) => Promise<void>
+  /** When set during password reset, called after client-side complexity checks. */
+  onValidateNewPassword?: (password: string) => Promise<string | null>
   /** Robot password policy for client-side validation on the new-password step. */
   passwordComplexity: PasswordComplexityRequirements | null
 }
@@ -57,6 +59,7 @@ export function OnDeviceLogin({
   loginError = null,
   onClearLoginError,
   onUsernameSubmit,
+  onValidateNewPassword,
   passwordComplexity,
 }: OnDeviceLoginProps): ReactNode {
   const { t } = useTranslation(['shared', 'access_control'])
@@ -150,6 +153,17 @@ export function OnDeviceLogin({
         }
         setConfirmPasswordError(null)
         setPasswordPolicyError(null)
+        if (onValidateNewPassword != null) {
+          void (async () => {
+            const validationError = await onValidateNewPassword(password)
+            if (validationError != null) {
+              setPasswordPolicyError(validationError)
+              return
+            }
+            onStepChange('confirmPassword')
+          })()
+          return
+        }
         onStepChange('confirmPassword')
         return
       }
@@ -185,6 +199,7 @@ export function OnDeviceLogin({
     passwordComplexity,
     t,
     onUsernameSubmit,
+    onValidateNewPassword,
   ])
 
   const primaryDisabled = isAuthLoading

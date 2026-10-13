@@ -24,6 +24,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.error_recovery_policy import never_recover
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons.types import DeckSlotName
@@ -67,6 +70,7 @@ async def subject(
         deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
 
@@ -140,6 +144,7 @@ async def test_create_engine_uses_robot_type(
         deck_type=deck_type,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     await subject.create(
@@ -396,6 +401,7 @@ async def test_get_default_orchestrator_robot_type(
         deck_type=deck_type,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     result = await subject.get_default_orchestrator()

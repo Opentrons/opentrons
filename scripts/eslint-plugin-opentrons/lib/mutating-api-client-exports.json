@@ -74,6 +74,7 @@
     "updateSelf",
     "updateSubsystem",
     "updateUser",
-    "uploadCsvFile"
+    "uploadCsvFile",
+    "validateSelfPassword"
   ]
 }
