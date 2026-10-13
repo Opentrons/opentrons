@@ -1826,6 +1826,7 @@ export function resolveBooleanRuntimeValue(
   return null
 }
 
+<<<<<<< HEAD
 export function resolveAllowedRuntimeValue(
   value: string,
   allowed: readonly string[],
@@ -1847,4 +1848,60 @@ export function pythonRuntimeString(
     return raw
   }
   return formatPyStr(resolved)
+=======
+export function resolveRuntimeWellLocation(
+  location:
+    | {
+        origin?: string
+        offset?: {
+          x?: number | string
+          y?: number | string
+          z?: number | string
+        }
+      }
+    | undefined,
+  runtimeParameters: RuntimeParameters
+): {
+  location:
+    | {
+        origin?: string
+        offset?: { x?: number; y?: number; z?: number }
+      }
+    | undefined
+  invalidParameterNames: string[]
+} {
+  if (location == null) {
+    return { location: undefined, invalidParameterNames: [] }
+  }
+  const invalidParameterNames: string[] = []
+  const resolvedOrigin =
+    location.origin == null
+      ? undefined
+      : resolveStringRuntimeValue(location.origin, runtimeParameters)
+  if (location.origin != null && resolvedOrigin == null) {
+    invalidParameterNames.push(location.origin)
+  }
+  const offset: { x?: number; y?: number; z?: number } = {}
+  if (location.offset != null) {
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const value = location.offset[axis]
+      if (value == null) {
+        continue
+      }
+      const resolved = resolveNumericRuntimeValue(value, runtimeParameters)
+      if (resolved == null) {
+        invalidParameterNames.push(String(value))
+      } else {
+        offset[axis] = resolved
+      }
+    }
+  }
+  return {
+    location: {
+      ...(resolvedOrigin != null ? { origin: resolvedOrigin } : {}),
+      ...(location.offset != null ? { offset } : {}),
+    },
+    invalidParameterNames,
+  }
+>>>>>>> 1d7da2b1a4 (feat(step-generation): add RTP support to various pipetting commands (#22603))
 }

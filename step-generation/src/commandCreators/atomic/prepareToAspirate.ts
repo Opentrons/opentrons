@@ -1,14 +1,24 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { PrepareToAspirateParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, PrepareToAspirateStepGenArgs } from '../../types'
 
-export const prepareToAspirate: CommandCreator<PrepareToAspirateParams> = (
+export const prepareToAspirate: CommandCreator<PrepareToAspirateStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId } = args
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  if (pipetteId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.pipetteId,
+        }),
+      ],
+    }
+  }
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
 

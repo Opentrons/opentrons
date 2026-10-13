@@ -1274,6 +1274,98 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
+<<<<<<< HEAD
+=======
+
+interface RuntimeWellLocation {
+  origin?: string
+  offset?: {
+    x?: number | string
+    y?: number | string
+    z?: number | string
+  }
+}
+
+export interface TouchTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  zOffsetFromTop: number | string
+  speed?: number | string
+  mmFromEdge?: number | string
+}
+
+export interface PrepareToAspirateStepGenArgs {
+  pipetteId: string
+}
+
+export interface PickUpTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
+  tipTrackingOption?: TipTrackingOption
+}
+
+export interface DropTipStepGenArgs {
+  pipette: string
+  wellName?: string
+  dropTipLocation?: string
+  isReturnTip?: boolean
+}
+
+export interface DispenseWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+  pushOut?: number | string
+}
+
+export interface DispenseInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  pushOut?: number | string
+  correctionVolume?: number | string
+  isAirGap?: boolean
+}
+
+export interface BlowOutInWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  flowRate: number | string
+  wellLocation?: RuntimeWellLocation
+}
+
+export interface BlowOutInPlaceStepGenArgs {
+  pipetteId: string
+  flowRate: number | string
+}
+
+export interface AspirateWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+}
+
+export interface AspirateInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  correctionVolume?: number | string
+}
+
+>>>>>>> 1d7da2b1a4 (feat(step-generation): add RTP support to various pipetting commands (#22603))
 export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
   celsius: number | string
 }

@@ -1,7 +1,5 @@
 /** Utility functions for Python code generation. */
 
-import type { WellLocation } from '@opentrons/shared-data/command/types/support'
-
 /** The variable name for the ProtocolContext object in the run() function.
  * Our docs call it `protocol`, which is slightly misleading since the object is not
  * the protocol itself, but we'll try to stay consistent with the docs.
@@ -113,7 +111,14 @@ export function formatPyDict(dict: Record<string, any>): string {
 /** Render a WellLocation to Python.
  * Append the returned string to a Python well reference to get the wellLocation relative to the well.
  */
-export function formatPyWellLocation(wellLocation?: WellLocation): string {
+export function formatPyWellLocation(wellLocation?: {
+  origin?: string
+  offset?: {
+    x?: number | string
+    y?: number | string
+    z?: number | string
+  }
+}): string {
   const { x, y, z } = wellLocation?.offset || {}
   // Generating Python for well location is a bit annoying because the PAPI is not
   // homogenous. Here, emitZ is a flag that indicates if we still need to emit code
@@ -129,7 +134,6 @@ export function formatPyWellLocation(wellLocation?: WellLocation): string {
   let python = ''
   if (origin) {
     python += ((): string => {
-      // TypeScript checks that we've handled all the cases
       switch (origin) {
         case 'top':
           emitZ = false
@@ -142,6 +146,8 @@ export function formatPyWellLocation(wellLocation?: WellLocation): string {
         case 'meniscus':
           emitZ = false
           return `.meniscus(${z ? `z=${z}` : ''})`
+        default:
+          return ''
       }
     })()
   }

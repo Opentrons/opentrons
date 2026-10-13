@@ -258,4 +258,99 @@ describe('dropTip', () => {
       expect(res.errors[0].type).toEqual('RETURN_TIP_UNAVAILABLE')
     })
   })
+  it('resolves pipette, dropTipLocation, and wellName when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+      drop_location: {
+        variableName: 'drop_location',
+        displayName: 'Drop location',
+        type: 'string',
+        default: mockDropTipLocation,
+      },
+      selected_well: {
+        variableName: 'selected_well',
+        displayName: 'Selected well',
+        type: 'string',
+        default: 'A1',
+      },
+    }
+    const result = dropTip(
+      {
+        pipette: 'selected_pipette',
+        dropTipLocation: 'drop_location',
+        wellName: 'selected_well',
+      },
+      invariantContext,
+      makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+            labwareId: mockDropTipLocation,
+            wellName: 'A1',
+          },
+        },
+      ],
+    })
+  })
+  it('returns errors if pipette, dropTipLocation, and wellName are not string runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      mock_pipette: {
+        variableName: 'mock_pipette',
+        displayName: 'mock pipette',
+        type: 'boolean',
+        default: false,
+      },
+      mock_location: {
+        variableName: 'mock_location',
+        displayName: 'mock location',
+        type: 'int',
+        default: 1,
+      },
+      mock_well: {
+        variableName: 'mock_well',
+        displayName: 'mock well',
+        type: 'float',
+        default: 1.5,
+      },
+    }
+    const result = dropTip(
+      {
+        pipette: 'mock_pipette',
+        dropTipLocation: 'mock_location',
+        wellName: 'mock_well',
+      },
+      invariantContext,
+      makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_pipette" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_location" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_well" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })
