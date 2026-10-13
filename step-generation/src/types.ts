@@ -1261,6 +1261,11 @@ export interface WaitForTemperatureStepGenArgs {
   celsius: number | string
 }
 
+export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
+  moduleId: string
+  rpm: number | string
+}
+
 interface RuntimeWellLocation {
   origin?: string
   offset?: {
