@@ -126,7 +126,7 @@ function fontWeightToKey(fontWeight?: string | number): LegacyFontWeightKey {
   return 'regular'
 }
 
-/** Resolve a legacy text style from as/forwardedAs + fontWeight. */
+/** Resolve the CSS module class for as/forwardedAs + fontWeight. */
 export function resolveLegacyTextStyle({
   as,
   forwardedAs,
@@ -135,10 +135,10 @@ export function resolveLegacyTextStyle({
   as?: string
   forwardedAs?: string
   fontWeight?: string | number
-}): (typeof legacyTextStyleMap)[LegacyTextStyle] {
+}): string {
   const tag = forwardedAs ?? as ?? 'p'
   const weight = fontWeightToKey(fontWeight)
   const resolved =
     legacyTextStyleByTagAndWeight[tag]?.[weight] ?? ('legacy-p' as const)
-  return legacyTextStyleMap[resolved]
+  return legacyTextStyleMap[resolved].className
 }

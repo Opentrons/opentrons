@@ -9,26 +9,17 @@ describe('legacyTextStyles', () => {
   it.each(OLD_API_TRANSLATIONS)(
     'maps as=$as + fontWeight to $label',
     ({ as, fontWeight, className }) => {
-      expect(resolveLegacyTextStyle({ as, fontWeight })).toMatchObject({
-        as,
-        className,
-      })
+      expect(resolveLegacyTextStyle({ as, fontWeight })).toBe(className)
     }
   )
 
   it('defaults to legacy-p when as/fontWeight do not match a style', () => {
-    expect(resolveLegacyTextStyle({})).toMatchObject({
-      as: 'p',
-      className: styles.legacy_p,
-    })
+    expect(resolveLegacyTextStyle({})).toBe(styles.legacy_p)
     expect(
       resolveLegacyTextStyle({
         as: 'h1',
         fontWeight: TYPOGRAPHY.fontWeightBold,
       })
-    ).toMatchObject({
-      as: 'p',
-      className: styles.legacy_p,
-    })
+    ).toBe(styles.legacy_p)
   })
 })

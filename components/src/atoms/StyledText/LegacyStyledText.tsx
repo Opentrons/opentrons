@@ -32,13 +32,12 @@ export function LegacyStyledText({
   style,
   ...props
 }: LegacyProps): JSX.Element {
-  const { as: defaultAs, className: styleClassName } = resolveLegacyTextStyle({
+  const styleClassName = resolveLegacyTextStyle({
     as,
     forwardedAs,
     fontWeight,
   })
-  const tagProp = forwardedAs ?? as
-  const tag = typeof tagProp === 'string' ? tagProp : defaultAs
+  const tag = forwardedAs ?? as ?? 'p'
   const stylePropsStyles = styleProps({
     ...props,
     fontWeight,
