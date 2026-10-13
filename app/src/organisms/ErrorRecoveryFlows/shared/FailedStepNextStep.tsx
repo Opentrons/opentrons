@@ -23,27 +23,16 @@ export function FailedStepNextStep({
 >): ReactNode {
   const { t } = useTranslation('error_recovery')
   const failedCommandByAnalysis = failedCommand?.byAnalysis ?? null
-
-  const nthStepAfter = (n: number): number | undefined =>
+  const nextCommand = commandsAfterFailedCommand?.[0] ?? null
+  const nextStepNumber =
     stepCounts.currentStepNumber == null
       ? undefined
-      : stepCounts.currentStepNumber + n
-  const nthCommand = (n: number): typeof failedCommandByAnalysis =>
-    commandsAfterFailedCommand != null
-      ? n < commandsAfterFailedCommand.length
-        ? commandsAfterFailedCommand[n]
-        : null
-      : null
-
-  const commandsAfter = [nthCommand(0), nthCommand(1)] as const
-
+      : stepCounts.currentStepNumber + 1
   const indexedCommandsAfter = [
-    commandsAfter[0] != null
-      ? { command: commandsAfter[0], index: nthStepAfter(1) }
+    nextCommand != null
+      ? { command: nextCommand, index: nextStepNumber }
       : null,
-    commandsAfter[1] != null
-      ? { command: commandsAfter[1], index: nthStepAfter(2) }
-      : null,
+    null,
   ] as const
 
   return (

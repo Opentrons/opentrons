@@ -2948,10 +2948,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -3196,10 +3192,6 @@
               "kind": "onAddressableArea"
             },
             {
-              "kind": "onModule",
-              "moduleId": "UUID"
-            },
-            {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
@@ -3224,10 +3216,6 @@
             {
               "addressableAreaName": "A4",
               "kind": "onAddressableArea"
-            },
-            {
-              "kind": "onModule",
-              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3258,10 +3246,6 @@
             {
               "addressableAreaName": "A4",
               "kind": "onAddressableArea"
-            },
-            {
-              "kind": "onModule",
-              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3296,10 +3280,6 @@
             {
               "addressableAreaName": "A4",
               "kind": "onAddressableArea"
-            },
-            {
-              "kind": "onModule",
-              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3338,10 +3318,6 @@
             {
               "addressableAreaName": "A4",
               "kind": "onAddressableArea"
-            },
-            {
-              "kind": "onModule",
-              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3362,10 +3338,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -9547,10 +9519,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -9825,10 +9793,6 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -10908,10 +10872,6 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -13635,10 +13595,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -13777,10 +13733,6 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -14674,10 +14626,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -14808,10 +14756,6 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -15020,10 +14964,6 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",

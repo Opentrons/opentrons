@@ -192,6 +192,12 @@ export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'
 export const VACUUM_SPACER_LOAD_NAMES: string[] = [
   'opentrons_vacuum_manifold_spacer_short',
   'opentrons_vacuum_manifold_spacer_tall',
+  'opentrons_vacuum_manifold_spacer_3.2mm',
+  'opentrons_vacuum_manifold_spacer_5.2mm',
+  'opentrons_vacuum_manifold_spacer_7.25mm',
+  'opentrons_vacuum_manifold_spacer_12.8mm',
 ]
+
+export const MAX_STACKABLE_VACUUM_SPACERS = 3
 
 export const VACUUM_DOCK_DISPLAY_LOCATION: 'A4' = 'A4'

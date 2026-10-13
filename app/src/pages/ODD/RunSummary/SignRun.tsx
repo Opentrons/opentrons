@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { StyledText, WARNING_TOAST, Z_INDEX } from '@opentrons/components'
+import { StyledText, Z_INDEX } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
 import { OddModal } from '/app/molecules/OddModal'
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
 import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
@@ -27,36 +27,13 @@ export function SignRun({
   documentationState: DocumentationState
   onSigned?: () => void
 }): ReactNode {
-  const { t, i18n } = useTranslation(['access_control', 'shared'])
-
-  const permissionToastIdRef = useRef<string | null>(null)
+  const { t } = useTranslation('access_control')
 
   const robotName = useLocalRobotName() ?? 'no name'
-  const { makeToast, eatToast: eatToasterToast } = useToaster()
+  const { popToast, eatToast } = useInsufficientPermissionsToast()
 
   const [signed, setSigned] = useState(false)
   const [signError, setSignError] = useState(false)
-
-  const popToast = (): void => {
-    permissionToastIdRef.current = makeToast(
-      '' + t('sign_protocol_run_permission_required_description'),
-      WARNING_TOAST,
-      {
-        closeButton: true,
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        disableTimeout: true,
-        heading: '' + t('sign_protocol_run_permission_required') + '.',
-        zIndex: Z_INDEX.LOGIN_TOASTS,
-      }
-    )
-  }
-
-  const eatToast = (): void => {
-    if (permissionToastIdRef.current != null) {
-      eatToasterToast(permissionToastIdRef.current)
-      permissionToastIdRef.current = null
-    }
-  }
 
   const { signRun, isSigned, isLoading, loginGate, name } = useSignRunFlow(
     runId,

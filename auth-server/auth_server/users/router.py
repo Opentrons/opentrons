@@ -40,6 +40,7 @@ from auth_server.users.models import (
     UserLoginStatus,
     UsernameContainsInvalidCharactersErrorDetails,
     UserResponse,
+    ValidateSelfPassword,
 )
 from auth_server.users.user_data_manager import (
     InvalidInputError,
@@ -50,6 +51,7 @@ from auth_server.users.user_data_manager import (
     UserAlreadyExistsError,
     UserDataManager,
     UsernameContainsInvalidCharactersError,
+    UserNotFoundError,
 )
 
 router = fastapi.APIRouter()
@@ -197,7 +199,8 @@ async def get_user(
     path="/auth/users/byUsername/{username}/loginStatus",
     summary="Get user login status",
     description=(
-        "Return whether a user must reset their password before full robot access."
+        "Return a pre-authentication login hint for the user, if any"
+        " (temporary password or expired password)."
         " This endpoint is unauthenticated so clients can adjust the login UI."
     ),
     responses={
@@ -206,14 +209,22 @@ async def get_user(
     },
 )
 async def get_user_login_status(
-    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
+    username: str,
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
 ) -> PydanticResponse[SimpleBody[UserLoginStatus]]:
     """Get login status for a user by username."""
+    try:
+        login_status = user_data_manager.get_login_status(username)
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
-        content=SimpleBody(
-            data=UserLoginStatus(resetPassword=user.resetPassword),
-        ),
+        content=SimpleBody(data=login_status),
     )
 
 
@@ -560,6 +571,80 @@ async def update_self(  # noqa: C901
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.post,
+    path="/auth/users/self/validatePassword",
+    summary="Validate a new password for the current user",
+    description=(
+        "Check that a prospective password meets complexity and reuse rules "
+        "without changing the stored password."
+    ),
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))],
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorBody[
+                PasswordTooShortErrorDetails
+                | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordContainsInvalidCharactersErrorDetails
+                | PasswordPreviouslyUsedErrorDetails
+            ]
+        },
+        fastapi.status.HTTP_401_UNAUTHORIZED: {},
+    },
+)
+async def validate_self_password(
+    request_body: RequestModel[ValidateSelfPassword],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Validate a password for the current user without persisting it."""
+    if not isinstance(authentication, AuthenticatedResult):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="This endpoint needs an access token to determine the current user.",
+        )
+
+    try:
+        user_data_manager.validate_new_password(
+            authentication.username,
+            request_body.data.password.get_secret_value(),
+        )
+    except PasswordTooShortError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
+        ) from e
+    except PasswordMissingSpecialCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_missing_special_characters_error(e),
+        ) from e
+    except PasswordContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_contains_invalid_characters_error(),
+        ) from e
+    except PasswordPreviouslyUsedError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_previously_used_error(e),
+        ) from e
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
+
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleEmptyBody.model_construct(),
     )
 
 

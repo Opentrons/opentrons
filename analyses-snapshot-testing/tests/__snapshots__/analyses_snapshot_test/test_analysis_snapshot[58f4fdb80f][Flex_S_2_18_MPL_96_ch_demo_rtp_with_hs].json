@@ -12486,10 +12486,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
