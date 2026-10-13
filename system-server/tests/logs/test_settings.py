@@ -7,7 +7,11 @@ from sqlalchemy.engine import Engine as SQLEngine
 
 from system_server.logs import journald
 from system_server.logs.models import LogLevels
-from system_server.logs.settings import apply_persisted_log_level, get_log_level_setting
+from system_server.logs.settings import (
+    apply_persisted_log_level,
+    get_log_level_setting,
+    set_log_level_setting,
+)
 from system_server.persistence.tables import SettingKey, settings_table
 
 
@@ -16,16 +20,18 @@ def test_get_log_level_setting(sql_engine: SQLEngine) -> None:
     assert get_log_level_setting(sql_engine) == LogLevels.warning
 
 
-def test_get_log_level_setting_reads_updated_value(sql_engine: SQLEngine) -> None:
-    """It should return the current persisted value."""
-    with sql_engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.update(settings_table)
-            .where(settings_table.c.key == SettingKey.LOG_LEVEL)
-            .values(value="debug")
-        )
+def test_set_log_level_setting(sql_engine: SQLEngine) -> None:
+    """It should persist the log level in the database."""
+    set_log_level_setting(sql_engine, LogLevels.debug)
 
     assert get_log_level_setting(sql_engine) == LogLevels.debug
+    with sql_engine.begin() as connection:
+        value = connection.execute(
+            sqlalchemy.select(settings_table.c.value).where(
+                settings_table.c.key == SettingKey.LOG_LEVEL
+            )
+        ).scalar_one()
+    assert value == "debug"
 
 
 def test_apply_persisted_log_level(

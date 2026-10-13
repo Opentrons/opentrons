@@ -30,6 +30,19 @@ def get_log_level_setting(sql_engine: sqlalchemy.engine.Engine) -> LogLevels:
     return LogLevels(value.lower())  # type: ignore[call-arg]
 
 
+def set_log_level_setting(
+    sql_engine: sqlalchemy.engine.Engine, level: LogLevels
+) -> None:
+    """Persist the local log level in the settings table."""
+    with sql_engine.begin() as transaction:
+        transaction.execute(
+            sqlalchemy.update(settings_table)
+            .where(settings_table.c.key == SettingKey.LOG_LEVEL)
+            .values(value=level.value)
+        )
+    LOG.info("Persisted log level setting %s", level.value)
+
+
 def apply_persisted_log_level(sql_engine: sqlalchemy.engine.Engine) -> None:
     """Apply the persisted log level to journald.
 

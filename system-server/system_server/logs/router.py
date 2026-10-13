@@ -87,9 +87,10 @@ async def get_log_level_local(
     path="/system/settings/log_level/local",
     summary="Set the local log level",
     description=(
-        "Set the minimum level of logs saved locally by writing"
-        " `MaxLevelStore` to journald's runtime configuration and"
-        " signaling journald to reload."
+        "Set the minimum level of logs saved. A lower minimum level means more logs "
+        "saved, which can be useful for debugging but increases wear on the robot's "
+        "storage devices. In general, keep the minimum level at 'warning' unless you're "
+        "actively debugging something."
     ),
     response_model=LogLevel,
     responses={
@@ -105,8 +106,11 @@ async def get_log_level_local(
         Depends(get_audit_logger("change log level")),
     ],
 )
-async def post_log_level_local(log_level: LogLevel) -> LogLevel:
-    """Update journald's local MaxLevelStore and reload the daemon."""
+async def post_log_level_local(
+    log_level: LogLevel,
+    sql_engine: Annotated[sqlalchemy.engine.Engine, Depends(get_sql_engine)],
+) -> LogLevel:
+    """Persist the local log level and apply it to journald."""
     level = log_level.log_level
     if level is None:
         raise HTTPException(
@@ -126,5 +130,6 @@ async def post_log_level_local(log_level: LogLevel) -> LogLevel:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to reload journald: {e}",
         ) from e
+    settings.set_log_level_setting(sql_engine, level)
 
     return LogLevel(log_level=level)

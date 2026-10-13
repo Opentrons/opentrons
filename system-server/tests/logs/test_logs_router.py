@@ -23,6 +23,7 @@ from system_server.app_setup import app
 from system_server.logs import journald, log_control
 from system_server.logs.log_control import DEFAULT_RECORDS, MAX_RECORDS
 from system_server.logs.models import LogLevels
+from system_server.logs.settings import get_log_level_setting
 from system_server.persistence import get_sql_engine
 
 
@@ -143,11 +144,12 @@ def test_get_log_level_local(api_client: TestClient) -> None:
 )
 def test_post_log_level_local(
     api_client: TestClient,
+    sql_engine: SQLEngine,
     decoy: Decoy,
     monkeypatch: pytest.MonkeyPatch,
     body_level: str,
 ) -> None:
-    """It should accept a log level and configure journald."""
+    """It should persist the log level and configure journald."""
     mock_set = decoy.mock(func=journald.set_max_level_store)
     monkeypatch.setattr(journald, "set_max_level_store", mock_set)
     expected_level = LogLevels(body_level.lower())  # type: ignore[call-arg]
@@ -160,6 +162,7 @@ def test_post_log_level_local(
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"log_level": body_level.lower()}
+    assert get_log_level_setting(sql_engine) == expected_level
 
 
 @pytest.mark.parametrize(
@@ -181,10 +184,15 @@ def test_post_log_level_local_invalid(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_post_log_level_local_journald_failure(
-    api_client: TestClient, decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+def test_post_log_level_local_journald_failure_does_not_persist(
+    api_client: TestClient,
+    sql_engine: SQLEngine,
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """It should return 500 when journald configuration fails."""
+    """It should not persist the setting when journald reconfiguration fails."""
+    assert get_log_level_setting(sql_engine) == LogLevels.warning
+
     mock_set = decoy.mock(func=journald.set_max_level_store)
     monkeypatch.setattr(journald, "set_max_level_store", mock_set)
 
@@ -195,3 +203,4 @@ def test_post_log_level_local_journald_failure(
     )
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert get_log_level_setting(sql_engine) == LogLevels.warning
