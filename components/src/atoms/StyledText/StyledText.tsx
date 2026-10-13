@@ -145,6 +145,15 @@ const helixProductStyleMap = {
       }
     `,
   },
+  codeBold: {
+    as: 'p',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleCodeBold};
+        color: var(--black-90);
+      }
+    `,
+  },
   hidden: {
     as: 'none',
     style: css`

@@ -60,6 +60,7 @@ import {
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { OFF_DECK, reduceCommandCreators, uuid } from './index'
+import { formatPyStr } from './pythonFormat'
 
 import type {
   ActiveNozzleNumber,
@@ -1823,4 +1824,83 @@ export function resolveBooleanRuntimeValue(
   }
 
   return null
+}
+
+export function resolveAllowedRuntimeValue(
+  value: string,
+  allowed: readonly string[],
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const resolved = resolveStringRuntimeValue(value, runtimeParameters)
+  if (resolved == null || !allowed.includes(resolved)) {
+    return null
+  }
+  return resolved
+}
+
+export function pythonRuntimeString(
+  raw: string,
+  resolved: string,
+  runtimeParameters: RuntimeParameters
+): string {
+  if (runtimeParameters[raw] != null) {
+    return raw
+  }
+  return formatPyStr(resolved)
+}
+
+export function resolveRuntimeWellLocation(
+  location:
+    | {
+        origin?: string
+        offset?: {
+          x?: number | string
+          y?: number | string
+          z?: number | string
+        }
+      }
+    | undefined,
+  runtimeParameters: RuntimeParameters
+): {
+  location:
+    | {
+        origin?: string
+        offset?: { x?: number; y?: number; z?: number }
+      }
+    | undefined
+  invalidParameterNames: string[]
+} {
+  if (location == null) {
+    return { location: undefined, invalidParameterNames: [] }
+  }
+  const invalidParameterNames: string[] = []
+  const resolvedOrigin =
+    location.origin == null
+      ? undefined
+      : resolveStringRuntimeValue(location.origin, runtimeParameters)
+  if (location.origin != null && resolvedOrigin == null) {
+    invalidParameterNames.push(location.origin)
+  }
+  const offset: { x?: number; y?: number; z?: number } = {}
+  if (location.offset != null) {
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const value = location.offset[axis]
+      if (value == null) {
+        continue
+      }
+      const resolved = resolveNumericRuntimeValue(value, runtimeParameters)
+      if (resolved == null) {
+        invalidParameterNames.push(String(value))
+      } else {
+        offset[axis] = resolved
+      }
+    }
+  }
+  return {
+    location: {
+      ...(resolvedOrigin != null ? { origin: resolvedOrigin } : {}),
+      ...(location.offset != null ? { offset } : {}),
+    },
+    invalidParameterNames,
+  }
 }
