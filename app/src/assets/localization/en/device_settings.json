@@ -249,6 +249,7 @@
   "edit_settings": "Edit settings",
   "enable_camera_to_run": "Enable the camera to start the run.",
   "enable_debug_logging": "Enable debug logging",
+  "enable_debug_logging_description": "Debug logging saves more information but fills up rapidly",
   "enable_status_light": "Enable status light",
   "enable_status_light_description": "Turn on or off the strip of color LEDs on the front of the robot.",
   "enabled": "Enabled",
