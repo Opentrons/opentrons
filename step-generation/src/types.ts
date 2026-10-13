@@ -1274,8 +1274,6 @@ export interface WaitForTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string
 }
-<<<<<<< HEAD
-=======
 
 interface RuntimeWellLocation {
   origin?: string
@@ -1365,7 +1363,6 @@ export interface AspirateInPlaceStepGenArgs {
   correctionVolume?: number | string
 }
 
->>>>>>> 1d7da2b1a4 (feat(step-generation): add RTP support to various pipetting commands (#22603))
 export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
   celsius: number | string
 }

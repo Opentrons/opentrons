@@ -1826,7 +1826,6 @@ export function resolveBooleanRuntimeValue(
   return null
 }
 
-<<<<<<< HEAD
 export function resolveAllowedRuntimeValue(
   value: string,
   allowed: readonly string[],
@@ -1848,7 +1847,8 @@ export function pythonRuntimeString(
     return raw
   }
   return formatPyStr(resolved)
-=======
+}
+
 export function resolveRuntimeWellLocation(
   location:
     | {
@@ -1903,5 +1903,4 @@ export function resolveRuntimeWellLocation(
     },
     invalidParameterNames,
   }
->>>>>>> 1d7da2b1a4 (feat(step-generation): add RTP support to various pipetting commands (#22603))
 }
