@@ -24,7 +24,7 @@ import type {
   ThermocyclerModuleState,
 } from '../types'
 
-type RuntimeProfileStep = {
+interface RuntimeProfileStep {
   celsius: number | string
   holdSeconds: number | string
 }
