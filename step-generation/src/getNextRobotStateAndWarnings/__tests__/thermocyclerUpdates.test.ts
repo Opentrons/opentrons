@@ -31,13 +31,12 @@ import type {
 import type {
   ModuleOnlyParams,
   TCProfileParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   InvariantContext,
   RobotState,
+  SetTemperatureStepGenArgs,
   ThermocyclerModuleState,
   WarningType,
 } from '../../types'
@@ -111,30 +110,63 @@ interface TestCase<P> {
 }
 type TestCases<P> = Array<TestCase<P>>
 describe('thermocycler state updaters', () => {
-  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> =
-    [
-      {
-        params: {
-          moduleId,
-          celsius: 42,
-        },
-        moduleStateBefore: {
-          currentBlockActivity: {
-            type: 'blockDeactivated',
-          },
-        },
-        expectedUpdate: {
-          currentBlockActivity: {
-            type: 'blockTargetTemp',
-            blockTargetTemp: 42,
-          },
-        },
-        fn: forThermocyclerSetTargetBlockTemperature,
-        testName:
-          'forThermocyclerSetBlockTemperature should update the block temp',
+  const blockTempTestCase: TestCases<SetTemperatureStepGenArgs> = [
+    {
+      params: {
+        moduleId,
+        celsius: 42,
       },
-    ]
-  const temperatureParamsCases: TestCases<TemperatureParams> = [
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
+      },
+      fn: forThermocyclerSetTargetBlockTemperature,
+      testName:
+        'forThermocyclerSetBlockTemperature should update the block temp',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 42,
+        },
+      },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
+      },
+      fn: forThermocyclerSetTargetBlockTemperature,
+      testName:
+        'forThermocyclerSetBlockTemperature should resolve runtime parameter module id and celsius',
+    },
+  ]
+  const temperatureParamsCases: TestCases<SetTemperatureStepGenArgs> = [
     {
       params: {
         moduleId,
@@ -149,6 +181,35 @@ describe('thermocycler state updaters', () => {
       fn: forThermocyclerSetTargetLidTemperature,
       testName:
         'forThermocyclerSetTargetLidTemperature should update the lid temp',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 42,
+        },
+      },
+      moduleStateBefore: {
+        lidTargetTemp: null,
+      },
+      expectedUpdate: {
+        lidTargetTemp: 42,
+      },
+      fn: forThermocyclerSetTargetLidTemperature,
+      testName:
+        'forThermocyclerSetTargetLidTemperature should resolve runtime parameter module id and celsius',
     },
     {
       params: {
@@ -221,6 +282,33 @@ describe('thermocycler state updaters', () => {
     },
     {
       params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
+      },
+      fn: forThermocyclerDeactivateBlock,
+      testName:
+        'forThermocyclerDeactivateBlock should resolve a string runtime parameter module id',
+    },
+    {
+      params: {
         moduleId,
       },
       moduleStateBefore: {
@@ -231,6 +319,28 @@ describe('thermocycler state updaters', () => {
       },
       fn: forThermocyclerDeactivateLid,
       testName: 'forThermocyclerDeactivateLid should set lidTargetTemp to null',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        lidTargetTemp: 42,
+      },
+      expectedUpdate: {
+        lidTargetTemp: null,
+      },
+      fn: forThermocyclerDeactivateLid,
+      testName:
+        'forThermocyclerDeactivateLid should resolve a string runtime parameter module id',
     },
     {
       params: {
@@ -247,6 +357,28 @@ describe('thermocycler state updaters', () => {
     },
     {
       params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        lidOpen: true,
+      },
+      expectedUpdate: {
+        lidOpen: false,
+      },
+      fn: forThermocyclerCloseLid,
+      testName:
+        'forThermocyclerCloseLid should resolve a string runtime parameter module id',
+    },
+    {
+      params: {
         moduleId,
       },
       moduleStateBefore: {
@@ -257,6 +389,28 @@ describe('thermocycler state updaters', () => {
       },
       fn: forThermocyclerOpenLid,
       testName: 'forThermocyclerOpenLid should set lidOpen to true',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        lidOpen: false,
+      },
+      expectedUpdate: {
+        lidOpen: true,
+      },
+      fn: forThermocyclerOpenLid,
+      testName:
+        'forThermocyclerOpenLid should resolve a string runtime parameter module id',
     },
   ]
   const runProfileCases: TestCases<TCProfileParams> = [
@@ -271,6 +425,26 @@ describe('thermocycler state updaters', () => {
       fn: forThermocyclerRunProfile,
       testName:
         'forThermocyclerRunProfile should not make any block or lid updates',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        profile: [],
+        blockMaxVolumeUl: 10,
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {},
+      expectedUpdate: { numProfilesStarted: 1 },
+      fn: forThermocyclerRunProfile,
+      testName:
+        'forThermocyclerRunProfile should resolve a string runtime parameter module id',
     },
     {
       params: {
@@ -321,6 +495,26 @@ describe('thermocycler state updaters', () => {
       fn: forThermocyclerRunExtendedProfile,
       testName:
         'forThermocyclerRunExtendedProfile should not make any block or lid updates',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        profileElements: [],
+        blockMaxVolumeUl: 10,
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {},
+      expectedUpdate: { numProfilesStarted: 1 },
+      fn: forThermocyclerRunExtendedProfile,
+      testName:
+        'forThermocyclerRunExtendedProfile should resolve a string runtime parameter module id',
     },
     {
       params: {
@@ -395,6 +589,50 @@ describe('thermocycler state updaters', () => {
         fn: forThermocyclerStartRunExtendedProfile,
         testName:
           'forThermocyclerStartRunExtendedProfile should populate currentBlockActivity with information about the profile',
+      },
+      {
+        params: {
+          moduleId: 'selected_module',
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 20,
+            },
+          ],
+          blockMaxVolumeUl: 10,
+          taskId: 'selected_task',
+        },
+        runtimeParameters: {
+          selected_module: {
+            variableName: 'selected_module',
+            displayName: 'Selected module',
+            type: 'string',
+            default: moduleId,
+          },
+          selected_task: {
+            variableName: 'selected_task',
+            displayName: 'Selected task',
+            type: 'string',
+            default: 'test-task-id',
+          },
+        },
+        moduleStateBefore: {},
+        expectedUpdate: {
+          currentBlockActivity: {
+            type: 'profile',
+            profileElements: [
+              {
+                holdSeconds: 10,
+                celsius: 20,
+              },
+            ],
+            taskId: 'test-task-id',
+          },
+          numProfilesStarted: 1,
+        },
+        fn: forThermocyclerStartRunExtendedProfile,
+        testName:
+          'forThermocyclerStartRunExtendedProfile should resolve runtime parameter module id and task id',
       },
     ]
   const waitForTasksCases: TestCases<WaitForTasksParams> = [
