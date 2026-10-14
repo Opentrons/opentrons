@@ -74,6 +74,7 @@ const levelPrefix = (level: string): string => {
       return '<2>'
     case 'error':
       return '<3>'
+    case 'warn':
     case 'warning':
       return '<4>'
     case 'notice':
