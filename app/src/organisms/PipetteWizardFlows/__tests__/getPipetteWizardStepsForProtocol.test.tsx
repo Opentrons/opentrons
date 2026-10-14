@@ -57,8 +57,8 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
+        mount: RIGHT,
+        flowType: FLOWS.CALIBRATE,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.CALIBRATE },
     ] as PipetteWizardStep[]
@@ -98,17 +98,17 @@ describe('getPipetteWizardStepsForProtocol', () => {
       {
         section: SECTIONS.REMOVE_WASTE_CHUTE,
         mount: LEFT,
-        flowType: FLOWS.DETACH,
+        flowType: FLOWS.CALIBRATE,
       },
       {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
-        flowType: FLOWS.ATTACH,
+        flowType: FLOWS.CALIBRATE,
       },
       {
         section: SECTIONS.ATTACH_WASTE_CHUTE,
         mount: LEFT,
-        flowType: FLOWS.DETACH,
+        flowType: FLOWS.CALIBRATE,
       },
       {
         section: SECTIONS.RESULTS,

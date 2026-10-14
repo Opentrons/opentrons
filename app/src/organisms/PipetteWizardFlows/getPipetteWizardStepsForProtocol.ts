@@ -28,21 +28,21 @@ const calibrateAlreadyAttachedPipetteOn = (
         {
           section: SECTIONS.REMOVE_WASTE_CHUTE,
           mount: LEFT,
-          flowType: FLOWS.DETACH,
+          flowType: FLOWS.CALIBRATE,
         },
       ]
     : []),
   {
     section: SECTIONS.DETACH_PROBE,
-    mount: LEFT,
-    flowType: FLOWS.ATTACH,
+    mount,
+    flowType: FLOWS.CALIBRATE,
   },
   ...(attaching96andWasteChute
     ? [
         {
           section: SECTIONS.ATTACH_WASTE_CHUTE,
           mount: LEFT,
-          flowType: FLOWS.DETACH,
+          flowType: FLOWS.CALIBRATE,
         },
       ]
     : []),
