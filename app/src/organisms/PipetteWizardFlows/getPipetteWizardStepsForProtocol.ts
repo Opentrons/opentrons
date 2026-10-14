@@ -27,7 +27,7 @@ const calibrateAlreadyAttachedPipetteOn = (
     ? [
         {
           section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount: LEFT,
+          mount,
           flowType: FLOWS.CALIBRATE,
         },
       ]
@@ -41,7 +41,7 @@ const calibrateAlreadyAttachedPipetteOn = (
     ? [
         {
           section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount: LEFT,
+          mount,
           flowType: FLOWS.CALIBRATE,
         },
       ]
