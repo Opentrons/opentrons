@@ -57,8 +57,8 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.DETACH_PROBE,
-        mount: RIGHT,
-        flowType: FLOWS.CALIBRATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.CALIBRATE },
     ] as PipetteWizardStep[]
@@ -72,6 +72,57 @@ describe('getPipetteWizardStepsForProtocol', () => {
         },
         [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
         RIGHT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
+  it('returns waste chute steps when the attached 96-channel pipette needs calibration', () => {
+    const mockDeckConfig = {
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any as UseQueryResult<DeckConfiguration>
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: mock96ChannelAttachedPipetteInformation, right: null },
+        mockPipetteInfo,
+        LEFT,
+        mockDeckConfig
       )
     ).toStrictEqual(mockFlowSteps)
   })
