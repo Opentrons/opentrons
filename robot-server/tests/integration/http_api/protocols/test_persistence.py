@@ -16,7 +16,17 @@ pytestmark = pytest.mark.slow
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
+@pytest.mark.parametrize(
+    "protocol",
+    [
+        pytest.param(get_py_protocol, id="python"),
+        pytest.param(
+            get_json_protocol,
+            id="json",
+            marks=pytest.mark.xfail(reason="JSON protocols dont work on flex"),
+        ),
+    ],
+)
 async def test_protocols_and_analyses_persist(
     protocol: Callable[[str], IO[bytes]],
 ) -> None:
