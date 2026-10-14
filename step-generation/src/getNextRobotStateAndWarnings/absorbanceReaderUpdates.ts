@@ -1,10 +1,13 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { resolveStringRuntimeValue } from '../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
-import type { AbsorbanceReaderInitializeParams } from '@opentrons/shared-data'
 import type {
+  AbsorbanceReaderInitializeStepGenArgs,
   AbsorbanceReaderState,
   InvariantContext,
   ModuleStepGenArgs,
@@ -65,20 +68,44 @@ export const forAbsorbanceReaderCloseLid = (
 }
 
 export const forAbsorbanceReaderInitialize = (
-  params: AbsorbanceReaderInitializeParams,
+  params: AbsorbanceReaderInitializeStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, measureMode, sampleWavelengths, referenceWavelength } =
-    params
+  const { runtimeParameters } = invariantContext
+  const { measureMode, sampleWavelengths, referenceWavelength } = params
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const measureModeValue = resolveStringRuntimeValue(
+    measureMode,
+    runtimeParameters
+  )
+  const resolvedMeasureMode =
+    measureModeValue === 'single' || measureModeValue === 'multi'
+      ? measureModeValue
+      : null
+  const resolvedSampleWavelengths = sampleWavelengths.map(wavelength =>
+    resolveNumericRuntimeValue(wavelength, runtimeParameters)
+  )
+  const resolvedReferenceWavelength =
+    referenceWavelength == null
+      ? undefined
+      : resolveNumericRuntimeValue(referenceWavelength, runtimeParameters)
+  if (
+    moduleId == null ||
+    resolvedMeasureMode == null ||
+    resolvedSampleWavelengths.some(wavelength => wavelength == null) ||
+    resolvedReferenceWavelength === null
+  ) {
+    return
+  }
 
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
   if (moduleState != null) {
     moduleState.initialization = {
-      mode: measureMode,
-      wavelengths: sampleWavelengths,
-      referenceWavelength,
+      mode: resolvedMeasureMode,
+      wavelengths: resolvedSampleWavelengths as number[],
+      referenceWavelength: resolvedReferenceWavelength,
     }
     moduleState.lidOpen = false
   }
