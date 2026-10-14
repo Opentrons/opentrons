@@ -7,19 +7,18 @@ import {
   VACUUM_VENT_OPEN,
 } from '../constants'
 import { vacuumModuleStateGetter } from '../robotStateSelectors'
-import { getFullStackFromLabwares } from '../utils'
+import { getFullStackFromLabwares, resolveStringRuntimeValue } from '../utils'
 
 import type {
   LabwareDefinition,
-  VacuumModuleOpenVentCreateCommand,
   VacuumModuleSetTargetPowerCreateCommand,
   VacuumModuleSetTargetPressureCreateCommand,
   VacuumModuleStartRunProfileCreateCommand,
-  VacuumModuleStopPumpCreateCommand,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
+  ModuleStepGenArgs,
   RobotStateAndWarnings,
   TimelineFrame,
   VacuumModuleState,
@@ -97,11 +96,17 @@ const vacuumMergeLiquid = (
 }
 
 export const forVacuumOpenVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -110,11 +115,17 @@ export const forVacuumOpenVent = (
 }
 
 export const forVacuumCloseVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -199,11 +210,17 @@ export const forVacuumSetPumpPower = (
 }
 
 export const forVacuumStopPump = (
-  params: VacuumModuleStopPumpCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
