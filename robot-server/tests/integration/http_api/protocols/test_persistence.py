@@ -30,7 +30,7 @@ async def test_protocols_and_analyses_persist(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(port=port, is_ot3=True) as server:
             server.start()
             await robot_client.wait_until_ready()
 
@@ -91,7 +91,7 @@ async def test_protocol_labware_files_persist() -> None:
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(port=port, is_ot3=True) as server:
             server.start()
             await robot_client.wait_until_ready()
 
