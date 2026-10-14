@@ -16,7 +16,6 @@ import {
 
 import type {
   LabwareDefinition,
-  VacuumModuleSetTargetPressureCreateCommand,
   VacuumModuleStartRunProfileCreateCommand,
 } from '@opentrons/shared-data'
 import type {
@@ -27,6 +26,7 @@ import type {
   TimelineFrame,
   VacuumModuleState,
   VacuumSetPumpPowerStepGenArgs,
+  VacuumSetPumpPressureStepGenArgs,
 } from '../types'
 
 const getLabwareDimensionsEqual = (
@@ -139,13 +139,34 @@ export const forVacuumCloseVent = (
 }
 
 export const forVacuumSetPumpPressure = (
-  params: VacuumModuleSetTargetPressureCreateCommand['params'],
+  params: VacuumSetPumpPressureStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, gaugePressure, duration, ventAfter = true, taskId } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const gaugePressure = resolveNumericRuntimeValue(
+    params.gaugePressure,
+    runtimeParameters
+  )
+  const duration =
+    params.duration == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.duration, runtimeParameters)
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  if (
+    moduleId == null ||
+    gaugePressure == null ||
+    duration === null ||
+    ventAfter == null
+  ) {
+    return
+  }
+  const { taskId } = params
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
     return
@@ -153,8 +174,6 @@ export const forVacuumSetPumpPressure = (
 
   vacuumMergeLiquid(moduleId, robotState, labwareEntities)
 
-  // if holding indefinitely or not venting after the pressure is reached for a duration, the pressure is held
-  // taskId should not be null, but this is to satisfy type checks
   if (duration == null || taskId == null) {
     moduleState.currentPumpActivity = {
       type: 'indefiniteHold',
@@ -172,7 +191,6 @@ export const forVacuumSetPumpPressure = (
     }
     moduleState.numPumpActivitiesStarted++
   }
-  // vent status is always closed for timed holds. Opening will be handled by the wait for task updates
   moduleState.ventStatus = VACUUM_VENT_CLOSED
 }
 
