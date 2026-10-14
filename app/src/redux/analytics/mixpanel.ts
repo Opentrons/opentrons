@@ -7,7 +7,7 @@ import { CURRENT_VERSION } from '../shell'
 import type { Config as MixpanelConfig } from 'mixpanel-browser'
 import type { AnalyticsConfig, AnalyticsEvent } from './types'
 
-const log = createLogger(new URL('', import.meta.url).pathname)
+const log = createLogger('app/src/redux/analytics/mixpanel.ts')
 
 // pulled in from environment at build time
 const MIXPANEL_ID = _OT_APP_MIXPANEL_ID_
@@ -45,8 +45,10 @@ export function trackEvent(
   config: AnalyticsConfig
 ): void {
   const { optedIn } = config
+  const name =
+    'name' in event && event.name != null ? event.name : 'unknown event'
 
-  log.debug('Trackable event', { event, optedIn })
+  log.debug(`Trackable event: ${name}`, { event, optedIn })
   if (MIXPANEL_ID != null && optedIn) {
     try {
       if (event.superProperties != null) {

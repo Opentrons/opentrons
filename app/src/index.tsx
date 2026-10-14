@@ -22,7 +22,7 @@ export * from './redux/types'
 
 // component tree
 
-const log = createLogger(new URL('', import.meta.url).pathname)
+const log = createLogger('app/src/index.tsx')
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())

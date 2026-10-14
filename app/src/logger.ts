@@ -53,33 +53,38 @@ export function createLogger(filename: string): Logger {
   }
 }
 
-function log(level: LogLevel, message: string, label: string, meta?: {}): void {
+function log(
+  level: LogLevel,
+  message: string,
+  label: string,
+  meta?: Record<string, unknown>
+): void {
   const print = `[${label}]: ${message}`
 
+  let logfn = console.log
   // log to web console, too
   switch (level) {
     case 'error':
-      console.error(print)
+      logfn = console.error
       break
     case 'warn':
-      console.warn(print)
+      logfn = console.warn
       break
     case 'info':
-      console.info(print)
+      logfn = console.info
       break
     case 'debug':
-      console.debug(print)
+      logfn = console.debug
       break
     case 'silly':
-      console.debug(print)
-      break
-    default:
-      console.log(print)
+      logfn = console.debug
       break
   }
 
+  logfn(print)
+
   if (meta && Object.getOwnPropertyNames(meta).length !== 0) {
-    console.dir(meta)
+    logfn(meta)
   }
 }
 
