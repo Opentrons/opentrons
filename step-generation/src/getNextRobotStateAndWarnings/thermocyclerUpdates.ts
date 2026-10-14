@@ -12,10 +12,9 @@ import {
 import { handleWaitForTaskForModules } from './forWaitForTasks'
 
 import type {
+  AtomicProfileStep,
   TCExtendedProfileParams,
-  TCStartExtendedProfileParams,
 } from '@opentrons/shared-data'
-import type { TCProfileParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   ModuleStepGenArgs,
@@ -24,6 +23,18 @@ import type {
   SetTemperatureStepGenArgs,
   ThermocyclerModuleState,
 } from '../types'
+
+type RuntimeProfileStep = {
+  celsius: number | string
+  holdSeconds: number | string
+}
+
+type RuntimeProfileElement =
+  | RuntimeProfileStep
+  | {
+      steps: RuntimeProfileStep[]
+      repetitions: number | string
+    }
 
 const _getThermocyclerModuleState = (
   robotState: RobotState,
@@ -178,8 +189,60 @@ export const forThermocyclerOpenLid = (
   moduleState.lidOpen = true
 }
 
+function resolveProfileStep(
+  step: RuntimeProfileStep,
+  runtimeParameters: InvariantContext['runtimeParameters']
+): AtomicProfileStep | null {
+  const celsius = resolveNumericRuntimeValue(step.celsius, runtimeParameters)
+  const holdSeconds = resolveNumericRuntimeValue(
+    step.holdSeconds,
+    runtimeParameters
+  )
+  if (celsius == null || holdSeconds == null) {
+    return null
+  }
+  return { celsius, holdSeconds }
+}
+
+function resolveProfileElements(
+  profileElements: RuntimeProfileElement[],
+  runtimeParameters: InvariantContext['runtimeParameters']
+): TCExtendedProfileParams['profileElements'] | null {
+  const resolved: TCExtendedProfileParams['profileElements'] = []
+  for (const element of profileElements) {
+    if ('steps' in element) {
+      const repetitions = resolveNumericRuntimeValue(
+        element.repetitions,
+        runtimeParameters
+      )
+      if (repetitions == null) {
+        return null
+      }
+      const steps: AtomicProfileStep[] = []
+      for (const step of element.steps) {
+        const resolvedStep = resolveProfileStep(step, runtimeParameters)
+        if (resolvedStep == null) {
+          return null
+        }
+        steps.push(resolvedStep)
+      }
+      resolved.push({ steps, repetitions })
+    } else {
+      const resolvedStep = resolveProfileStep(element, runtimeParameters)
+      if (resolvedStep == null) {
+        return null
+      }
+      resolved.push(resolvedStep)
+    }
+  }
+  return resolved
+}
+
 export const forThermocyclerRunProfile = (
-  params: TCProfileParams,
+  params: ModuleStepGenArgs & {
+    profile: RuntimeProfileStep[]
+    blockMaxVolumeUl?: number | string
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -196,7 +259,10 @@ export const forThermocyclerRunProfile = (
 }
 
 export const forThermocyclerRunExtendedProfile = (
-  params: TCExtendedProfileParams,
+  params: ModuleStepGenArgs & {
+    profileElements: RuntimeProfileElement[]
+    blockMaxVolumeUl?: number | string
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -210,11 +276,14 @@ export const forThermocyclerRunExtendedProfile = (
   // UUID to keep it unique just in case something goes wrong and it does leak out of
   // this function somehow.
   const privateTaskId = +'thermocyclerRunExtendedProfile-private-' + uuid()
-  forThermocyclerStartRunExtendedProfile(
+  const started = forThermocyclerStartRunExtendedProfile(
     { ...params, taskId: privateTaskId },
     invariantContext,
     robotStateAndWarnings
   )
+  if (!started) {
+    return
+  }
 
   // new shared entrypoint for module task updates (currently used by thermocyclers and vacuums, but extensible to other modules)
   handleWaitForTaskForModules(
@@ -225,11 +294,34 @@ export const forThermocyclerRunExtendedProfile = (
 }
 
 export const forThermocyclerStartRunExtendedProfile = (
-  params: TCStartExtendedProfileParams,
+  params: ModuleStepGenArgs & {
+    profileElements: RuntimeProfileElement[]
+    blockMaxVolumeUl?: number | string
+    taskId?: string | null
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
-): void => {
-  const { moduleId, taskId, profileElements } = params
+): boolean => {
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const profileElements = resolveProfileElements(
+    params.profileElements,
+    runtimeParameters
+  )
+  if (moduleId == null || profileElements == null) {
+    return false
+  }
+  let taskId: string | null = null
+  if (params.taskId != null) {
+    const resolvedTaskId = resolveStringRuntimeValue(
+      params.taskId,
+      runtimeParameters
+    )
+    if (resolvedTaskId == null) {
+      return false
+    }
+    taskId = resolvedTaskId
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -237,9 +329,10 @@ export const forThermocyclerStartRunExtendedProfile = (
   moduleState.currentBlockActivity = {
     type: 'profile',
     profileElements,
-    taskId: taskId ?? null,
+    taskId,
   }
   moduleState.numProfilesStarted++
+  return true
 }
 
 /**
