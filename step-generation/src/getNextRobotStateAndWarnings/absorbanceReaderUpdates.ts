@@ -1,6 +1,7 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import { resolveStringRuntimeValue } from '../utils'
 
 import type {
   AbsorbanceReaderInitializeParams,
@@ -9,6 +10,7 @@ import type {
 import type {
   AbsorbanceReaderState,
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -30,12 +32,16 @@ const _getAbsorbanceReaderState = (
 }
 
 export const forAbsorbanceReaderOpenLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
 
   if (moduleState != null) {
