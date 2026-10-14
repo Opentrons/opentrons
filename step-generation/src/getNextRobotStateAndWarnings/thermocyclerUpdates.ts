@@ -15,12 +15,10 @@ import type {
   TCExtendedProfileParams,
   TCStartExtendedProfileParams,
 } from '@opentrons/shared-data'
-import type {
-  ModuleOnlyParams,
-  TCProfileParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { TCProfileParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
   SetTemperatureStepGenArgs,
@@ -85,7 +83,7 @@ export const forThermocyclerSetTargetLidTemperature = (
 }
 
 export const forThermocyclerAwaitBlockTemperature = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -93,7 +91,7 @@ export const forThermocyclerAwaitBlockTemperature = (
 }
 
 export const forThermocyclerAwaitLidTemperature = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -103,7 +101,7 @@ export const forThermocyclerAwaitLidTemperature = (
 // todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
 // Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitProfileComplete = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -111,11 +109,15 @@ export const forThermocyclerAwaitProfileComplete = (
 }
 
 export const forThermocyclerDeactivateBlock = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -126,11 +128,15 @@ export const forThermocyclerDeactivateBlock = (
 }
 
 export const forThermocyclerDeactivateLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -139,11 +145,15 @@ export const forThermocyclerDeactivateLid = (
 }
 
 export const forThermocyclerCloseLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -152,11 +162,15 @@ export const forThermocyclerCloseLid = (
 }
 
 export const forThermocyclerOpenLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
