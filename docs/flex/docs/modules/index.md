@@ -29,7 +29,9 @@ Opentrons Flex is compatible with the following Opentrons modules:
 
 - The [**Temperature Module**](temperature.md) is a hot and cold plate module that is able to maintain steady state temperatures between 4 and 95 °C.
 
-- The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
+- The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the Gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
+
+- The [**Vacuum Module**](vacuum.md) is an on-deck, fully automated vacuum filtration, sample purification, and waste extraction system for Opentrons Flex. The Vacuum Module accepts ANSI/SLAS compliant vacuum filtration labware and is fully compatible with the Gripper, Opentrons software, and the Opentrons Python API.
 
 Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](../../python-api/modules/concurrent.md) to continue pipetting and other steps in your Flex protocols. 
 
@@ -50,3 +52,4 @@ Some modules originally designed for the OT-2 are compatible with Flex, as summa
 | Temperature Module GEN2    | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |
 | Thermocycler Module GEN1   | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
 | Thermocycler Module GEN2   | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |
+| Vacuum Module GEN1         | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
