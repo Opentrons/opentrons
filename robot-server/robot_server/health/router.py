@@ -30,16 +30,16 @@ OT2_LOG_PATHS = [
     "/logs/update_server.log",
 ]
 FLEX_LOG_PATHS = [
-    "/logs/serial.log",
-    "/logs/can_bus.log",
-    "/logs/api.log",
-    "/logs/server.log",
-    "/logs/update_server.log",
-    "/logs/touchscreen.log",
-    "/logs/kernel.log",
-    "/logs/auth_server.log",
-    "/logs/audit_server.log",
-    "/logs/remote_access.log",
+    "/system/logs/serial.log",
+    "/system/logs/can_bus.log",
+    "/system/logs/api.log",
+    "/system/logs/server.log",
+    "/system/logs/update_server.log",
+    "/system/logs/touchscreen.log",
+    "/system/logs/kernel.log",
+    "/system/logs/auth_server.log",
+    "/system/logs/audit_server.log",
+    "/system/logs/remote_access.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
 
@@ -151,21 +151,28 @@ async def get_health(
     and ready to operate. A 200 OK response means the server is running.
     The response includes information about the software and system.
     """
-    health_links = HealthLinks(
-        apiLog="/logs/api.log",
-        serialLog="/logs/serial.log",
-        serverLog="/logs/server.log",
-        apiSpec="/openapi.json",
-        systemTime="/system/time",
-    )
-
     if robot_type == "OT-3 Standard":
         minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION_FOR_FLEX
         logs = FLEX_LOG_PATHS
-        health_links.oddLog = "/logs/touchscreen.log"
+        health_links = HealthLinks(
+            apiLog="/system/logs/api.log",
+            serialLog="/system/logs/serial.log",
+            serverLog="/system/logs/server.log",
+            apiSpec="/openapi.json",
+            systemTime="/system/time",
+            oddLog="/system/logs/touchscreen.log",
+        )
+
     else:
         minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION
         logs = OT2_LOG_PATHS
+        health_links = HealthLinks(
+            apiLog="/logs/api.log",
+            serialLog="/logs/serial.log",
+            serverLog="/logs/server.log",
+            apiSpec="/openapi.json",
+            systemTime="/system/time",
+        )
 
     hardware_details = await hardware.get_hw_details()
 
