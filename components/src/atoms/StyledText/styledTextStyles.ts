@@ -8,10 +8,9 @@ import styles from './styledtext.module.css'
 import type { CSSProperties } from 'react'
 
 /**
- * Desktop styles use Helix product typography (`fontStyle*` strings).
- * Applied via --styled-text-desktop-font on the desktop viewport only.
+ * Desktop styles — Helix product typography font strings.
  */
-const helixFontStyleMap = {
+const desktopStyleMap = {
   displayBold: HELIX_TYPOGRAPHY.fontStyleDisplayBold,
   headingLargeRegular: HELIX_TYPOGRAPHY.fontStyleHeadingLargeRegular,
   headingLargeBold: HELIX_TYPOGRAPHY.fontStyleHeadingLargeBold,
@@ -41,8 +40,7 @@ type OddTypographyTokens = {
 }
 
 /**
- * ODD styles use ui-style-constants TYPOGRAPHY tokens
- * (level*Header / bodyText* / smallBodyText*).
+ * ODD styles — ui-style-constants TYPOGRAPHY tokens.
  */
 const ODDStyleMap = {
   level1Header: {
@@ -127,3 +125,89 @@ const ODDStyleMap = {
   },
   hidden: null,
 } as const satisfies Record<string, OddTypographyTokens | null>
+
+export type HelixStyles = keyof typeof desktopStyleMap
+export type ODDStyles = keyof typeof ODDStyleMap
+
+export const HELIX_STYLES: Array<HelixStyles> = Object.keys(
+  desktopStyleMap
+) as Array<HelixStyles>
+
+export const ODD_STYLES: Array<ODDStyles> = Object.keys(
+  ODDStyleMap
+) as Array<ODDStyles>
+
+/** Extra CSS-module classes beyond the Helix / ODD font tokens. */
+const desktopExtraClassMap: Partial<Record<HelixStyles, string>> = {
+  bodyDefaultRegLink: styles.desktop_underline,
+  codeBold: styles.desktop_code_bold_color,
+  hidden: styles.desktop_hidden,
+}
+
+const oddExtraClassMap: Partial<Record<ODDStyles, string>> = {
+  hidden: styles.odd_hidden,
+}
+
+function oddTypographyToStyle(tokens: OddTypographyTokens): CSSProperties {
+  const style = {
+    '--odd-font-size': tokens.fontSize,
+    '--odd-line-height': tokens.lineHeight,
+  } as CSSProperties
+
+  if (tokens.fontWeight != null) {
+    ;(style as Record<string, string | number>)['--odd-font-weight'] =
+      tokens.fontWeight
+  }
+
+  return style
+}
+
+function resolveStyledTextClassName({
+  desktopStyle,
+  oddStyle,
+  desktopFont,
+  oddTokens,
+}: {
+  desktopStyle?: HelixStyles
+  oddStyle?: ODDStyles
+  desktopFont: string | null
+  oddTokens: OddTypographyTokens | null
+}): string {
+  return clsx(
+    desktopFont != null ? styles.desktop_helix_font : null,
+    desktopStyle != null ? desktopExtraClassMap[desktopStyle] : null,
+    oddTokens != null ? styles.odd_style : null,
+    oddStyle != null ? oddExtraClassMap[oddStyle] : null
+  )
+}
+
+export function resolveStyledTextStyles({
+  desktopStyle,
+  oddStyle,
+}: {
+  desktopStyle?: HelixStyles
+  oddStyle?: ODDStyles
+}): { className: string; style?: CSSProperties } {
+  const desktopFont =
+    desktopStyle != null ? desktopStyleMap[desktopStyle] : null
+  const oddTokens = oddStyle != null ? ODDStyleMap[oddStyle] : null
+
+  const className = resolveStyledTextClassName({
+    desktopStyle,
+    oddStyle,
+    desktopFont,
+    oddTokens,
+  })
+
+  const style: CSSProperties = {
+    ...(desktopFont != null
+      ? ({ '--helix-font': desktopFont } as CSSProperties)
+      : null),
+    ...(oddTokens != null ? oddTypographyToStyle(oddTokens) : null),
+  }
+
+  return {
+    className,
+    style: Object.keys(style).length > 0 ? style : undefined,
+  }
+}

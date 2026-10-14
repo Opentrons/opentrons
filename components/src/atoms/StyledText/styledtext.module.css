@@ -1,0 +1,33 @@
+/*
+ * Desktop: Helix font string via --helix-font.
+ * ODD: typography tokens via --odd-font-size / --odd-font-weight / --odd-line-height.
+ */
+@media not all and (height = 600px) and (width = 1024px) {
+  .desktop_helix_font {
+    font: var(--helix-font);
+  }
+
+  .desktop_underline {
+    text-decoration: underline;
+  }
+
+  .desktop_code_bold_color {
+    color: var(--black-90);
+  }
+
+  .desktop_hidden {
+    display: none;
+  }
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .odd_style {
+    font-size: var(--odd-font-size);
+    font-weight: var(--odd-font-weight);
+    line-height: var(--odd-line-height);
+  }
+
+  .odd_hidden {
+    display: none;
+  }
+}
