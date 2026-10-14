@@ -31,13 +31,12 @@ import type {
 import type {
   ModuleOnlyParams,
   TCProfileParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   InvariantContext,
   RobotState,
+  SetTemperatureStepGenArgs,
   ThermocyclerModuleState,
   WarningType,
 } from '../../types'
@@ -107,33 +106,67 @@ interface TestCase<P> {
   moduleStateBefore: Partial<ThermocyclerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
+  runtimeParameters?: InvariantContext['runtimeParameters']
 }
 type TestCases<P> = Array<TestCase<P>>
 describe('thermocycler state updaters', () => {
-  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> =
-    [
-      {
-        params: {
-          moduleId,
-          celsius: 42,
-        },
-        moduleStateBefore: {
-          currentBlockActivity: {
-            type: 'blockDeactivated',
-          },
-        },
-        expectedUpdate: {
-          currentBlockActivity: {
-            type: 'blockTargetTemp',
-            blockTargetTemp: 42,
-          },
-        },
-        fn: forThermocyclerSetTargetBlockTemperature,
-        testName:
-          'forThermocyclerSetBlockTemperature should update the block temp',
+  const blockTempTestCase: TestCases<SetTemperatureStepGenArgs> = [
+    {
+      params: {
+        moduleId,
+        celsius: 42,
       },
-    ]
-  const temperatureParamsCases: TestCases<TemperatureParams> = [
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
+      },
+      fn: forThermocyclerSetTargetBlockTemperature,
+      testName:
+        'forThermocyclerSetBlockTemperature should update the block temp',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 42,
+        },
+      },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
+      },
+      fn: forThermocyclerSetTargetBlockTemperature,
+      testName:
+        'forThermocyclerSetBlockTemperature should resolve runtime parameters',
+    },
+  ]
+  const temperatureParamsCases: TestCases<SetTemperatureStepGenArgs> = [
     {
       params: {
         moduleId,
@@ -148,6 +181,35 @@ describe('thermocycler state updaters', () => {
       fn: forThermocyclerSetTargetLidTemperature,
       testName:
         'forThermocyclerSetTargetLidTemperature should update the lid temp',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 42,
+        },
+      },
+      moduleStateBefore: {
+        lidTargetTemp: null,
+      },
+      expectedUpdate: {
+        lidTargetTemp: 42,
+      },
+      fn: forThermocyclerSetTargetLidTemperature,
+      testName:
+        'forThermocyclerSetTargetLidTemperature should resolve runtime parameters',
     },
     {
       params: {
@@ -473,8 +535,12 @@ describe('thermocycler state updaters', () => {
     expectedWarningTypes,
     fn,
     testName,
+    runtimeParameters,
   }: TestCase<P>): void => {
     it(testName, () => {
+      if (runtimeParameters != null) {
+        invariantContext.runtimeParameters = runtimeParameters
+      }
       const prevRobotState = merge({}, lidOpenRobotState, {
         modules: {
           [moduleId]: {

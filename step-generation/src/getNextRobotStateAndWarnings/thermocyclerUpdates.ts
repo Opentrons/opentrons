@@ -3,7 +3,12 @@ import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { unrollThermocyclerProfile, uuid } from '../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  unrollThermocyclerProfile,
+  uuid,
+} from '../utils'
 import { handleWaitForTaskForModules } from './forWaitForTasks'
 
 import type {
@@ -13,13 +18,12 @@ import type {
 import type {
   ModuleOnlyParams,
   TCProfileParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
+  SetTemperatureStepGenArgs,
   ThermocyclerModuleState,
 } from '../types'
 
@@ -42,11 +46,16 @@ const _getThermocyclerModuleState = (
 }
 
 export const forThermocyclerSetTargetBlockTemperature = (
-  params: ThermocyclerSetTargetBlockTemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -58,11 +67,16 @@ export const forThermocyclerSetTargetBlockTemperature = (
 }
 
 export const forThermocyclerSetTargetLidTemperature = (
-  params: TemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
