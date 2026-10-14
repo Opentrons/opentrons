@@ -1,17 +1,12 @@
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import {
-  resolveNumericRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
-import type {
-  ModuleOnlyParams,
-  ShakeSpeedParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   HeaterShakerModuleState,
+  HeaterShakerSetTargetShakeSpeedStepGenArgs,
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
@@ -74,12 +69,17 @@ export const forHeaterShakerDeactivateHeater = (
 }
 
 export const forHeaterShakerSetTargetShakeSpeed = (
-  params: ShakeSpeedParams,
+  params: HeaterShakerSetTargetShakeSpeedStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, rpm } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const rpm = resolveNumericRuntimeValue(params.rpm, runtimeParameters)
+  if (moduleId == null || rpm == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.targetSpeed = rpm

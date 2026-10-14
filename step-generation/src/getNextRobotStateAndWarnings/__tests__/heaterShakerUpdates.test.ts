@@ -18,13 +18,11 @@ import {
   forHeaterShakerStopShake as _forHeaterShakerStopShake,
 } from '../heaterShakerUpdates'
 
-import type {
-  ModuleOnlyParams,
-  ShakeSpeedParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   HeaterShakerModuleState,
+  HeaterShakerSetTargetShakeSpeedStepGenArgs,
   InvariantContext,
   RobotState,
   SetTemperatureStepGenArgs,
@@ -204,22 +202,52 @@ describe('heater shaker state updaters', () => {
       testName: 'forHeaterShakerCloseLatch should close latch',
     },
   ]
-  const shakeSpeedParamsCases: TestCases<ShakeSpeedParams> = [
-    {
-      params: {
-        moduleId: moduleId,
-        rpm: 400,
+  const shakeSpeedParamsCases: TestCases<HeaterShakerSetTargetShakeSpeedStepGenArgs> =
+    [
+      {
+        params: {
+          moduleId: moduleId,
+          rpm: 400,
+        },
+        moduleStateBefore: {
+          targetSpeed: null,
+        },
+        expectedUpdate: {
+          targetSpeed: 400,
+        },
+        fn: forHeaterShakerSetTargetShakeSpeed,
+        testName: 'forHeaterShakerSetTargetShakeSpeed should set target speed',
       },
-      moduleStateBefore: {
-        targetSpeed: null,
+      {
+        params: {
+          moduleId: 'selected_module',
+          rpm: 'target_rpm',
+        },
+        moduleStateBefore: {
+          targetSpeed: null,
+        },
+        expectedUpdate: {
+          targetSpeed: 400,
+        },
+        fn: forHeaterShakerSetTargetShakeSpeed,
+        testName:
+          'forHeaterShakerSetTargetShakeSpeed should set target speed from runtime parameters',
+        runtimeParameters: {
+          selected_module: {
+            variableName: 'selected_module',
+            displayName: 'Selected module',
+            type: 'string',
+            default: moduleId,
+          },
+          target_rpm: {
+            variableName: 'target_rpm',
+            displayName: 'Target rpm',
+            type: 'int',
+            default: 400,
+          },
+        },
       },
-      expectedUpdate: {
-        targetSpeed: 400,
-      },
-      fn: forHeaterShakerSetTargetShakeSpeed,
-      testName: 'forHeaterShakerSetTargetShakeSpeed should set target speed',
-    },
-  ]
+    ]
 
   const runTest = <P>({
     params,
