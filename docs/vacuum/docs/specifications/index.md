@@ -174,7 +174,7 @@ The control box houses the vacuum pump, air/water separator, electronics, and po
   <tbody>
     <tr>
       <td><strong>Dimensions</strong></td>
-      <td>225 mm L x 200 mm W x 278 mm H (&asymp; 9" L x 8" W x 11" H)</td>
+      <td>227 mm L x 200 mm W x 278 mm H<br>(&asymp; 9" L x 8" W x 11" H)</td>
     </tr>
     <tr>
       <td><strong>Weight</strong></td>
@@ -196,6 +196,14 @@ The control box houses the vacuum pump, air/water separator, electronics, and po
           <li>Absolute pressure: 1,013 mbar (sea level ambient) to ~132 mbar.</li>
         </ul>
       </td>
+    </tr>
+    <tr>
+      <td><strong>Noise level</strong></td>
+      <td>63 dB</td>
+    </tr>
+    <tr>
+      <td><strong>Use location</td>
+      <td>For indoor use only. Not rated for outdoor use or wet locations.</td>
     </tr>
   </tbody>
 </table>
@@ -278,7 +286,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>Slow-blow (time-delay)</li>
-          <li>8 A, 250 V</li>
+          <li>T 8 A, 250 V</li>
         </ul>
           <strong>Warning:</strong> Do not attempt to replace the fuse unless at the direction of Opentrons Support.
       </td>
@@ -299,7 +307,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td><strong>Over-voltage</strong></td>
       <td>
         <ul>
-          <li>Category III (OVC III)</li>
+          <li>Category II (OVC II)</li>
           <li>Protection Type: Shutdown output voltage; requires re-powering to recover.</li>
         </ul>
       </td>
