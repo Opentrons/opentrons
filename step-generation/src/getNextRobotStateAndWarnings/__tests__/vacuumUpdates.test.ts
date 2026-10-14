@@ -845,7 +845,8 @@ describe('forVacuumStartRunProfile', () => {
     const result = forVacuumStartRunProfile(
       {
         moduleId: vacuumModuleId,
-        steps: sampleVacuumProfile,
+        profile: sampleVacuumProfile,
+        ventAfter: true,
         taskId: vacuumTaskId,
       },
       invariantContext,
@@ -875,7 +876,8 @@ describe('forVacuumStartRunProfile', () => {
       forVacuumStartRunProfile(
         {
           moduleId: missingModuleId,
-          steps: sampleVacuumProfile,
+          profile: sampleVacuumProfile,
+          ventAfter: true,
           taskId: vacuumTaskId,
         },
         invariantContext,
@@ -886,13 +888,58 @@ describe('forVacuumStartRunProfile', () => {
     const paramsWithNullTask = {
       moduleId: vacuumModuleId,
       profile: sampleVacuumProfile,
+      ventAfter: true,
       taskId: null,
-    } as unknown as VacuumModuleStartRunProfileCreateCommand['params']
+    }
 
     expect(
       forVacuumStartRunProfile(paramsWithNullTask, invariantContext, before)
         .robotState
     ).toEqual(before)
+  })
+
+  it('sets profile activity when moduleId and ventAfter are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      ventStatus: VACUUM_VENT_CLOSED,
+      numPumpActivitiesStarted: 0,
+    })
+
+    const result = forVacuumStartRunProfile(
+      {
+        moduleId: 'selected_module',
+        profile: sampleVacuumProfile,
+        ventAfter: 'vent_after',
+        taskId: vacuumTaskId,
+      },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual({
+      type: 'profile',
+      profileElements: sampleVacuumProfile,
+      taskId: vacuumTaskId,
+      ventAfter: false,
+    })
+    expect(updated.numPumpActivitiesStarted).toBe(1)
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
   })
 })
 

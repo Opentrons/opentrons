@@ -14,10 +14,7 @@ import {
   resolveStringRuntimeValue,
 } from '../utils'
 
-import type {
-  LabwareDefinition,
-  VacuumModuleStartRunProfileCreateCommand,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
@@ -27,6 +24,7 @@ import type {
   VacuumModuleState,
   VacuumSetPumpPowerStepGenArgs,
   VacuumSetPumpPressureStepGenArgs,
+  VacuumStartRunProfileStepGenArgs,
 } from '../types'
 
 const getLabwareDimensionsEqual = (
@@ -273,15 +271,22 @@ export const forVacuumStopPump = (
 }
 
 export const forVacuumStartRunProfile = (
-  params: VacuumModuleStartRunProfileCreateCommand['params'],
+  params: VacuumStartRunProfileStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, steps, taskId, ventAfter = true } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const ventAfter = resolveBooleanRuntimeValue(
+    params.ventAfter,
+    runtimeParameters
+  )
+  if (moduleId == null || ventAfter == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
-  // taskId should not be null, but this is to satisfy type checks
+  const { taskId, profile } = params
   if (moduleState == null || taskId == null) {
     return
   }
@@ -290,7 +295,7 @@ export const forVacuumStartRunProfile = (
 
   moduleState.currentPumpActivity = {
     type: 'profile',
-    profileElements: steps,
+    profileElements: profile,
     taskId,
     ventAfter,
   }
