@@ -8,6 +8,7 @@ import type {
   HeaterShakerModuleState,
   HeaterShakerSetTargetShakeSpeedStepGenArgs,
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
   SetTemperatureStepGenArgs,
@@ -57,12 +58,16 @@ export const forHeaterShakerAwaitTemperature = (
 }
 
 export const forHeaterShakerDeactivateHeater = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.targetTemp = null
@@ -86,36 +91,48 @@ export const forHeaterShakerSetTargetShakeSpeed = (
 }
 
 export const forHeaterShakerStopShake = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.targetSpeed = null
 }
 
 export const forHeaterShakerOpenLatch = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.latchOpen = true
 }
 
 export const forHeaterShakerCloseLatch = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.latchOpen = false
