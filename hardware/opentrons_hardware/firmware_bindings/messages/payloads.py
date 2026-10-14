@@ -332,6 +332,25 @@ class PipetteFunctionData(EmptyPayload):
 
 
 @dataclass(eq=False)
+class PipetteFunctionDataAcknowledge(EmptyPayload):
+    """A response to a firmware update message with an error code."""
+
+    error_code: ErrorCodeField
+
+
+@dataclass(eq=False)
+class PipetteFunctionDataCompleteAcknowledge(EmptyPayload):
+    """A response to a firmware update message with an error code."""
+
+    error_code: ErrorCodeField
+
+
+@dataclass(eq=False)
+class PipetteFunctionUpdateComplete(EmptyPayload):
+    """All data messages have been transmitted."""
+
+
+@dataclass(eq=False)
 class FirmwareUpdateData(FirmwareUpdateWithAddress):
     """A FW update data payload."""
 

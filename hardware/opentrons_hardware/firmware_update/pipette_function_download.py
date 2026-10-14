@@ -1,15 +1,22 @@
+"""Send a pipetting function from shared data to the EEPROM over CAN."""
+
+import asyncio
 import logging
+from typing import AsyncIterator, Dict, List, Tuple
 
 from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
+from opentrons_shared_data.pipette.types import PipetteTipType
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, utils
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteFunctionDataField,
 )
+from opentrons_hardware.firmware_update.errors import TimeoutResponse
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +25,8 @@ PIPETTING_FUNCTION_DECIMAL_PRECISION = 3
 
 
 class PipetteFunctionProcessor:
+    """Takes in a shared data SupportedTips definition and sends the pipetting function over CAN."""
+
     def __init__(
         self,
         node_id: NodeId,
@@ -30,15 +39,20 @@ class PipetteFunctionProcessor:
         """Initialize RunUpdate class.
 
         Args:
+            node_id: Node Id of the pipette whose function to send
             can_messenger: The canbus messenger
+            supported_tips_def: The SupportedTips definition from the pipette config
+            retry_count: How many times to retry sending and receiving an ack from the pipette firmware
+            ack_wait_seconds: How long to wait for an ack before retrying
+            timeout_seconds: How long to wait for an ack to initiate download
 
         Returns:
             None
         """
         self._can_messenger = can_messenger
-        if self._node_id not in [NodeId.pipette_left, NodeId.pipette_right]:
+        if node_id not in [NodeId.pipette_left, NodeId.pipette_right]:
             raise ValueError(
-                f"tried to start pipette function EEPROM update with invalid node {self._node_id}."
+                f"tried to start pipette function EEPROM update with invalid node {node_id}."
             )
         self._node_id = node_id
         self._supported_tips_def = supported_tips_def
@@ -47,23 +61,25 @@ class PipetteFunctionProcessor:
         self._timeout_seconds = timeout_seconds
 
     @property
-    def formatted_pipetting_function(self) -> Dict[str, List[Tuple(float)]]:
-        formatted_dict: Dict[str, List[Tuple(float)]] = {}
+    def formatted_pipetting_function(
+        self,
+    ) -> Dict[int, List[Tuple[float, float, float]]]:
+        """Reformats the pipetting function from shared data to be converted to bytes."""
+        formatted_dict: Dict[int, List[Tuple[float, float, float]]] = {}
         for tip_size, tip_size_data in self._supported_tips_def.items():
             func_for_tip_size = tip_size_data.aspirate.default
-            try:
-                pip_func_key = max([int(key) for key in func_for_tip_size])
-            except ValueError:
-                raise ValueError(
-                    f"Invalid key in pipetting function: {aspirate_outer_dict.keys()}"
-                )
-            formatted_dict[tip_size] = func_for_tip_size[pip_func_key]
+            # func_for_tip_size should be {"1": [[], [], [], ...]}
+            assert len(list(func_for_tip_size.items())) == 1, ValueError(
+                "Invalid pipette function format."
+            )
+            formatted_dict[int(tip_size.value)] = list(func_for_tip_size.values())[0]
         return formatted_dict
 
+    @staticmethod
     async def pipetting_function_chunks(
-        pip_function: Dict[str, List[Tuple[float]]],
-    ) -> AsycnIterator[bytearray]:
-        # pipetting_data_chunks = List[bytearray]
+        pip_function: Dict[int, List[Tuple[float, float, float]]],
+    ) -> AsyncIterator[bytearray]:
+        """Generator that yields a pipetting function in 48-byte chunks."""
         bytes_index = 0
         current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
         data_values_in_buffer = (
@@ -80,14 +96,14 @@ class PipetteFunctionProcessor:
             current_message_bytes[0:PIPETTING_FUNCTION_VALUE_BYTES] = tip_size_bytes
             for line in pip_values:
                 for number in line:
-                    if i >= data_values_in_buffer:
+                    if bytes_index >= data_values_in_buffer:
                         # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
                         yield current_message_bytes
                         # pipetting_data_chunks.append(current_message_bytes)
                         current_message_bytes = bytearray(
                             PipetteFunctionDataField.NUM_BYTES
                         )
-                        i = PIPETTING_FUNCTION_VALUE_BYTES
+                        bytes_index = PIPETTING_FUNCTION_VALUE_BYTES
                     # preserve 3 decimal places
                     pip_value_int = int(
                         number * 10**PIPETTING_FUNCTION_DECIMAL_PRECISION
@@ -98,106 +114,108 @@ class PipetteFunctionProcessor:
                     # use largest bit to indicate sign
                     sign_bit_place = 2 ** (8 * PIPETTING_FUNCTION_VALUE_BYTES - 1)
                     pip_value_bytes |= sign_bit_place * pip_value_int < 0
-                    current_message_bytes[i : i + PIPETTING_FUNCTION_VALUE_BYTES] = (
-                        pip_value_bytes
-                    )
-                    i += PIPETTING_FUNCTION_VALUE_BYTES
-        return pipetting_data_chunks
+                    current_message_bytes[
+                        bytes_index : bytes_index + PIPETTING_FUNCTION_VALUE_BYTES
+                    ] = pip_value_bytes
+                    bytes_index += PIPETTING_FUNCTION_VALUE_BYTES
 
-    async def send_to_eeprom(self) -> bool:
-        with WaitableCallback(self._messenger) as reader:
-            num_messages = 0
-            async for data_chunk in pipetting_function_chunks(
-                pip_function=pip_function
-            ):
-                passed = False
-                for retry in range(self.retry_count):
-                    data_bytes = bytes(data_chunk)
-                    # Create and send message from this chunk
-                    data_message = message_definitions.PipetteFunctionData(
-                        payload=PipetteFunctionData(
-                            num_bytes=PipetteFunctionDataField.NUM_BYTES,
-                            data=data_chunk,
-                        )
+    async def send_to_eeprom(self, reader: WaitableCallback) -> None:
+        """Formats the pipette's function from shared data and sends it over CAN."""
+        # num_messages = 0
+        async for data_chunk in self.pipetting_function_chunks(
+            pip_function=self.formatted_pipetting_function
+        ):
+            passed = False
+            for retry in range(self._retry_count):
+                data_bytes = bytes(data_chunk)
+                # Create and send message from this chunk
+                data_message = message_definitions.PipetteFunctionData(
+                    payload=payloads.PipetteFunctionData(
+                        num_bytes=utils.UInt8Field(PipetteFunctionDataField.NUM_BYTES),
+                        data=PipetteFunctionDataField(data_bytes),
                     )
-                    await self._messenger.send(node_id=self._node_id, message=data_message)
-                    try:
-                        # Wait for ack.
-                        await asyncio.wait_for(
-                            self._wait_data_message_ack(self._node_id, reader),
-                            self._ack_wait_seconds,
-                        )
-                        passed = True
-                        break
-                    except asyncio.TimeoutError:
-                        raise TimeoutResponse(complete_message, node_id)
-                # message was not successful
-                if not passed:
+                )
+                await self._can_messenger.send(
+                    node_id=self._node_id, message=data_message
+                )
+                try:
+                    # Wait for ack.
+                    await asyncio.wait_for(
+                        self._wait_for_data_ack(reader),
+                        self._ack_wait_seconds,
+                    )
+                    passed = True
+                    break
+                except asyncio.TimeoutError:
                     raise TimeoutResponse(data_message, self._node_id)
+            # message was not successful
+            if not passed:
+                raise TimeoutResponse(data_message, self._node_id)
 
-    async def initiate_pipette_function_update(self) -> None:
+    async def initiate_pipette_function_update(self, reader: WaitableCallback) -> None:
+        """Sends initiate message and waits for ack."""
         initiate_acknowledged = False
-        with WaitableCallback(self._messenger) as reader:
-            for retry in range(self.retry_count):
-                asyncio.wait_for(
-                    self._wait_for_initiate(reader=reader)
+        with WaitableCallback(self._can_messenger) as reader:
+            for retry in range(self._retry_count):
+                await asyncio.wait_for(
+                    self._wait_for_initiate(reader=reader), self._timeout_seconds
                 )
         if not initiate_acknowledged:
             # make this an actual enumerated error
-            raise ValueError(f"Initiate Pipette Function Update Timed out. ")
+            raise ValueError("Initiate Pipette Function Update Timed out.")
 
     async def run_update_pipette_function(self) -> None:
-        # send initiate message and wait for ack
-        await self.initiate_pipette_function_update()
-        # process pipette function and send it over CAN
-        await self.send_to_eeprom()
-        # send complete message
-        complete_message = message_definitions.PipetteFunctionUpdateComplete(
-                payload=payloads.PipetteFunctionUpdateComplete(
+        """Starts, executes, and confirms ack of pipette function download."""
+        with WaitableCallback(self._can_messenger) as reader:
+            # send initiate message and wait for ack
+            await self.initiate_pipette_function_update(reader)
+            # process pipette function and send it over CAN
+            await self.send_to_eeprom(reader)
+            # send complete message
+            complete_message = message_definitions.PipetteFunctionUpdateComplete(
+                payload=payloads.PipetteFunctionUpdateComplete()
+            )
+            await self._can_messenger.send(
+                node_id=self._node_id, message=complete_message
+            )
+            try:
+                await asyncio.wait_for(
+                    self._wait_for_pipette_function_update_complete(reader),
+                    self._ack_wait_seconds,
                 )
-            )
-        await self._messenger.send(node_id=node_id, message=complete_message)
-        try:
-            await asyncio.wait_for(
-                self._wait_for_pipette_function_update_complete(node_id, reader), self._ack_wait_seconds
-            )
-        except asyncio.TimeoutError:
-            raise TimeoutResponse(complete_message, node_id)
+            except asyncio.TimeoutError:
+                # make this an actual enum error
+                raise ValueError("response timed out")
+                # raise TimeoutResponse(complete_message, self._node_id)
 
-    @staticmethod
-    async def _wait_for_initiate(
-        self, reader: WaitableCallback
-    ) -> None:
-        await self._messenger.send(
-            node_id=self._node_id, message=message_definitions.PipetteFunctionUpdateInitiate()
+    async def _wait_for_initiate(self, reader: WaitableCallback) -> None:
+        await self._can_messenger.send(
+            node_id=self._node_id,
+            message=message_definitions.PipetteFunctionUpdateInitiate(),
         )
         async for response, arbitration_id in reader:
             if (
-                isinstance(
-                    response, message_definitions.PipetteFunctionDataAcknowledge
-                )
+                isinstance(response, message_definitions.PipetteFunctionDataAcknowledge)
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
                 break
 
-    @staticmethod
     async def _wait_for_data_ack(self, reader: WaitableCallback) -> None:
         async for response, arbitration_id in reader:
             if (
-                isinstance(
-                    response, message_definitions.PipetteFunctionDataAcknowledge
-                )
+                isinstance(response, message_definitions.PipetteFunctionDataAcknowledge)
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
                 break
 
-
-    @staticmethod
-    async def _wait_for_pipette_function_update_complete(self, reader: WaitableCallback) -> None:
+    async def _wait_for_pipette_function_update_complete(
+        self, reader: WaitableCallback
+    ) -> None:
         async for response, arbitration_id in reader:
             if (
                 isinstance(
-                    response, message_definitions.PipetteFunctionUpdateCompleteAcknowledge
+                    response,
+                    message_definitions.PipetteFunctionDataCompleteAcknowledge,
                 )
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
