@@ -1,14 +1,16 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
 import type {
-  AbsorbanceReaderInitializeParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data'
-import type {
+  AbsorbanceReaderInitializeStepGenArgs,
   AbsorbanceReaderState,
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -30,12 +32,18 @@ const _getAbsorbanceReaderState = (
 }
 
 export const forAbsorbanceReaderOpenLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
 
   if (moduleState != null) {
@@ -44,12 +52,18 @@ export const forAbsorbanceReaderOpenLid = (
 }
 
 export const forAbsorbanceReaderCloseLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
 
   if (moduleState != null) {
@@ -58,19 +72,44 @@ export const forAbsorbanceReaderCloseLid = (
 }
 
 export const forAbsorbanceReaderInitialize = (
-  params: AbsorbanceReaderInitializeParams,
+  params: AbsorbanceReaderInitializeStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const measureModeValue = resolveStringRuntimeValue(
+    params.measureMode,
+    runtimeParameters
+  )
+  let measureMode: 'single' | 'multi' | null = null
+  if (measureModeValue === 'single' || measureModeValue === 'multi') {
+    measureMode = measureModeValue
+  }
+  const sampleWavelengths = params.sampleWavelengths.map(wavelength =>
+    resolveNumericRuntimeValue(wavelength, runtimeParameters)
+  )
+  const referenceWavelength =
+    params.referenceWavelength == null
+      ? undefined
+      : resolveNumericRuntimeValue(
+          params.referenceWavelength,
+          runtimeParameters
+        )
+  if (
+    moduleId == null ||
+    measureMode == null ||
+    sampleWavelengths.some(wavelength => wavelength == null) ||
+    referenceWavelength === null
+  ) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId, measureMode, sampleWavelengths, referenceWavelength } =
-    params
-
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
   if (moduleState != null) {
     moduleState.initialization = {
       mode: measureMode,
-      wavelengths: sampleWavelengths,
+      wavelengths: sampleWavelengths as number[],
       referenceWavelength,
     }
     moduleState.lidOpen = false
