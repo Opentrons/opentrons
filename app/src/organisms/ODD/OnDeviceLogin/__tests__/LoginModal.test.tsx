@@ -168,7 +168,7 @@ describe('LoginModal', () => {
     })
     vi.mocked(useValidateSelfPasswordMutation).mockReturnValue({
       validateSelfPassword: vi.fn().mockResolvedValue(null),
-    } as unknown as ReturnType<typeof useValidateSelfPasswordMutation>)
+    } as any)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,

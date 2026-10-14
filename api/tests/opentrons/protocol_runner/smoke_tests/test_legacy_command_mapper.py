@@ -26,7 +26,6 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import DeckSlotName, MountType
 
 
@@ -569,6 +568,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
         commandAnnotationIds=[],
     )
+
+    # TODO (chb, 10-5-2026): These have been updated to reflect the command history refactor JSON type conversion.
+    # Legacy commands aren't relevant to the API 2.15+ Flex-only codebase. We could in theory remove these legacy commands mappings.
+
     #   TODO:(jr, 15.08.2022): this should map to move_to when move_to is mapped in a followup ticket RSS-62
     assert commands_result[23] == commands.Custom.model_construct(
         id=matchers.IsA(str),
@@ -577,7 +580,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Moving to (100, 100, 10)",
             legacyCommandType="command.MOVE_TO",
         ),
@@ -594,7 +597,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Aspirating 300.0 uL from (100, 100, 10) at 150.0 uL/sec",
             legacyCommandType="command.ASPIRATE",
         ),
@@ -611,7 +614,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Dispensing 300.0 uL into (100, 100, 10) at 300.0 uL/sec",
             legacyCommandType="command.DISPENSE",
         ),
@@ -628,7 +631,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Blowing out into (100, 100, 10) at 1000.0 uL/sec",
             legacyCommandType="command.BLOW_OUT",
         ),
@@ -681,7 +684,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Aspirating 50.0 uL from Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3 at 150.0 uL/sec",
             legacyCommandType="command.ASPIRATE",
         ),
@@ -698,7 +701,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
+        params=commands.CustomParams(  # type: ignore
             legacyCommandText="Dispensing 50.0 uL into Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3 at 300.0 uL/sec",
             legacyCommandType="command.DISPENSE",
         ),

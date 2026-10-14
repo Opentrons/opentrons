@@ -1,12 +1,29 @@
 """Protocol Engine CommandStore sub-state."""
 
-from collections import OrderedDict
+import asyncio
+import logging
+from collections import OrderedDict, deque
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from ..commands import Command, CommandIntent, CommandStatus
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
+
+log = logging.getLogger(__name__)
+_COMMAND_BATCH_MAX = 10
+
+
+@dataclass(frozen=True)
+class CommandEntryJSON:
+    """A raw command entry in state, including its index in the list."""
+
+    command: str
+    command_type: type[Command]
+    index: int
 
 
 @dataclass(frozen=True)
@@ -15,6 +32,63 @@ class CommandEntry:
 
     command: Command
     index: int
+
+
+class CommandPersistenceInterface:
+    """Provides command insertion into and queries on persistent command storage through the CommandStoreProvider."""
+
+    def __init__(
+        self,
+        command_store_provider: CommandStoreProvider,
+    ) -> None:
+        self._teardown_signal = asyncio.Event()
+        self._command_store_provider = command_store_provider
+        self._command_queue: deque[CommandEntryJSON] = deque()
+
+        # Set up the run store task
+        self._command_store_interface_task = asyncio.create_task(
+            self.command_store_interface_task()
+        )
+
+    async def teardown_command_store_task(self) -> None:
+        """Send the teardown signal to the command store interface task."""
+        self._teardown_signal.set()
+        await self._command_store_interface_task
+
+    async def _send_batch_command_insert_request(
+        self, command_json_batch: list[CommandEntryJSON]
+    ) -> None:
+        """Send insert command request to the CommandStoreProvider."""
+        command_batch = [
+            (
+                command_json.index,
+                command_json.command_type.model_validate_json(command_json.command),
+            )
+            for command_json in command_json_batch
+        ]
+
+        await self._command_store_provider.insert_batch_commands(command_batch)
+
+    async def command_store_interface_task(self) -> None:
+        """Handle interactions with the CommandStoreProvider."""
+        while True:
+            command_entry_json_batch = []
+            if len(self._command_queue) > 0:
+                # Remove batch of commands from the queue and insert/update them on the RunStore
+                batch_length = min(_COMMAND_BATCH_MAX, len(self._command_queue))
+                command_entry_json_batch = [
+                    self._command_queue.pop() for _ in range(batch_length)
+                ]
+
+                await self._send_batch_command_insert_request(command_entry_json_batch)
+            if not self._teardown_signal.is_set():
+                await asyncio.sleep(0.1)
+            if self._teardown_signal.is_set() and not self._command_queue:
+                break
+
+    def insert_command(self, command_entry: CommandEntryJSON) -> None:
+        """Insert a command into the command queue for storage into persistence."""
+        self._command_queue.appendleft(command_entry)
 
 
 @dataclass  # dataclass for __eq__() autogeneration.
@@ -30,7 +104,7 @@ class CommandHistory:
     _all_command_ids_but_fixit_command_ids: List[str]
     """All command IDs besides fixit command intents, in insertion order."""
 
-    _commands_by_id: Dict[str, CommandEntry]
+    _commands_by_id: Dict[str, CommandEntryJSON]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
     _queued_command_ids: OrderedSet[str]
@@ -48,7 +122,10 @@ class CommandHistory:
     _most_recently_completed_command_id: Optional[str]
     """ID of the most recent command that SUCCEEDED or FAILED, if any"""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        command_store_provider: Optional[CommandStoreProvider] = None,
+    ) -> None:
         self._all_command_ids = []
         self._all_failed_command_ids = []
         self._all_command_ids_but_fixit_command_ids = []
@@ -58,6 +135,11 @@ class CommandHistory:
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._most_recently_completed_command_id = None
+        self._command_manager = (
+            CommandPersistenceInterface(command_store_provider)
+            if command_store_provider
+            else None
+        )
 
     def length(self) -> int:
         """Get the length of all elements added to the history."""
@@ -70,7 +152,9 @@ class CommandHistory:
     def get(self, command_id: str) -> CommandEntry:
         """Get a command entry if present, otherwise raise an exception."""
         try:
-            return self._commands_by_id[command_id]
+            raw_command = self._commands_by_id[command_id]
+            command = raw_command.command_type.model_validate_json(raw_command.command)
+            return CommandEntry(command=command, index=raw_command.index)
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
@@ -78,7 +162,9 @@ class CommandHistory:
         """Get the command which follows the command associated with the given ID, if any."""
         index = self.get(command_id).index
         try:
-            return self._commands_by_id[self._all_command_ids[index + 1]]
+            raw_command = self._commands_by_id[self._all_command_ids[index + 1]]
+            command = raw_command.command_type.model_validate_json(raw_command.command)
+            return CommandEntry(command=command, index=raw_command.index)
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
         except IndexError:
@@ -91,7 +177,11 @@ class CommandHistory:
         """
         index = self.get(command_id).index
         try:
-            prev_command = self._commands_by_id[self._all_command_ids[index - 1]]
+            raw_prev_command = self._commands_by_id[self._all_command_ids[index - 1]]
+            command = raw_prev_command.command_type.model_validate_json(
+                raw_prev_command.command
+            )
+            prev_command = CommandEntry(command=command, index=raw_prev_command.index)
             return prev_command if index != 0 else None
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
@@ -100,17 +190,27 @@ class CommandHistory:
 
     def get_all_commands(self) -> List[Command]:
         """Get all commands."""
-        return [
-            self._commands_by_id[command_id].command
-            for command_id in self._all_command_ids
+        all_commands = [
+            raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
+            )
+            for raw_command_entry in self._commands_by_id.values()
         ]
+
+        # todo (chb, 2026-09-28): We should avoid using this in the future, it can cause a huge jump in memory size on long protocols.
+        return all_commands
 
     def get_all_failed_commands(self) -> List[Command]:
         """Get all failed commands."""
-        return [
-            self._commands_by_id[command_id].command
-            for command_id in self._all_failed_command_ids
-        ]
+        all_failed_commands = []
+        for command_id in self._all_failed_command_ids:
+            raw_command_entry = self._commands_by_id[command_id]
+            command = raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
+            )
+            all_failed_commands.append(command)
+
+        return all_failed_commands
 
     def get_filtered_command_ids(self, include_fixit_commands: bool) -> List[str]:
         """Get all fixit command IDs."""
@@ -132,7 +232,14 @@ class CommandHistory:
             command_ids if command_ids is not None else self._all_command_ids
         )
         commands = selected_command_ids[start:stop]
-        return [self._commands_by_id[command].command for command in commands]
+        raw_command_slice = [self._commands_by_id[command] for command in commands]
+        command_slice = [
+            raw_command_entry.command_type.model_validate_json(
+                raw_command_entry.command
+            )
+            for raw_command_entry in raw_command_slice
+        ]
+        return command_slice
 
     def del_end_slice(self, length: int) -> None:
         """Delete the end of the command history up to a given length."""
@@ -143,14 +250,24 @@ class CommandHistory:
     def get_tail_command(self) -> Optional[CommandEntry]:
         """Get the command most recently added."""
         if self._commands_by_id:
-            return next(reversed(self._commands_by_id.values()))
+            tail_raw_command_entry = next(reversed(self._commands_by_id.values()))
+            command = tail_raw_command_entry.command_type.model_validate_json(
+                tail_raw_command_entry.command
+            )
+            return CommandEntry(command=command, index=tail_raw_command_entry.index)
         else:
             return None
 
     def get_most_recently_completed_command(self) -> Optional[CommandEntry]:
         """Get the command most recently marked as SUCCEEDED or FAILED."""
         if self._most_recently_completed_command_id is not None:
-            return self._commands_by_id[self._most_recently_completed_command_id]
+            completed_raw_command = self._commands_by_id[
+                self._most_recently_completed_command_id
+            ]
+            command = completed_raw_command.command_type.model_validate_json(
+                completed_raw_command.command
+            )
+            return CommandEntry(command=command, index=completed_raw_command.index)
         else:
             return None
 
@@ -159,7 +276,11 @@ class CommandHistory:
         if self._running_command_id is None:
             return None
         else:
-            return self._commands_by_id[self._running_command_id]
+            raw_running_command = self._commands_by_id[self._running_command_id]
+            command = raw_running_command.command_type.model_validate_json(
+                raw_running_command.command
+            )
+            return CommandEntry(command=command, index=raw_running_command.index)
 
     def get_queue_ids(self) -> OrderedSet[str]:
         """Get the IDs of all queued protocol commands, in FIFO order."""
@@ -233,6 +354,10 @@ class CommandHistory:
         self._remove_queue_id(command.id)
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
+        if self._command_manager:
+            self._command_manager.insert_command(
+                command_entry=self._commands_by_id[command.id]
+            )
 
     def set_command_failed(self, command: Command) -> None:
         """Validate and mark a command as failed in the command history."""
@@ -260,6 +385,15 @@ class CommandHistory:
         self._remove_setup_queue_id(command.id)
         self._set_most_recently_completed_command_id(command.id)
         self._all_failed_command_ids.append(command.id)
+        if self._command_manager:
+            self._command_manager.insert_command(
+                command_entry=self._commands_by_id[command.id]
+            )
+
+    async def teardown_command_manager(self) -> None:
+        """Handle teardown of the interface that interacts with the RunStore and AnalysisStore remotely."""
+        if self._command_manager:
+            await self._command_manager.teardown_command_store_task()
 
     # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
     # Explicitly clearing all history before dereferencing protocol engine and the run's run orchestrator eliminates
@@ -280,7 +414,12 @@ class CommandHistory:
             self._all_command_ids.append(command_id)
             if command_entry.command.intent != CommandIntent.FIXIT:
                 self._all_command_ids_but_fixit_command_ids.append(command_id)
-        self._commands_by_id[command_id] = command_entry
+
+        self._commands_by_id[command_id] = CommandEntryJSON(
+            command=command_entry.command.model_dump_json(by_alias=True),
+            command_type=type(command_entry.command),
+            index=command_entry.index,
+        )
 
     def _add_to_queue(self, command_id: str) -> None:
         """Add new ID to the queued."""
