@@ -8,6 +8,7 @@ import {
 import { getModuleState } from '../robotStateSelectors'
 import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
+import type { TemperatureModuleAwaitTemperatureParams } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleStepGenArgs,
@@ -46,11 +47,15 @@ export function forSetTemperature(
   _setTemperatureAndStatus(moduleState, celsius, TEMPERATURE_APPROACHING_TARGET)
 }
 export function forAwaitTemperature(
-  params: WaitForTemperatureStepGenArgs,
+  params:
+    WaitForTemperatureStepGenArgs | TemperatureModuleAwaitTemperatureParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { runtimeParameters } = invariantContext
+  if (params.celsius == null) {
+    return
+  }
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
