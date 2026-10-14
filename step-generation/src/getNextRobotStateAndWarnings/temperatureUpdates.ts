@@ -6,10 +6,7 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
 import { getModuleState } from '../robotStateSelectors'
-import {
-  resolveNumericRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
   InvariantContext,

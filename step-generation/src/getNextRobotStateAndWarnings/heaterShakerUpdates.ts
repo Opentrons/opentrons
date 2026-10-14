@@ -1,10 +1,7 @@
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import {
-  resolveNumericRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
   HeaterShakerModuleState,

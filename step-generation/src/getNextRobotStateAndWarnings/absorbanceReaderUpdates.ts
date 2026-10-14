@@ -1,10 +1,7 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import {
-  resolveNumericRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
   AbsorbanceReaderInitializeStepGenArgs,
