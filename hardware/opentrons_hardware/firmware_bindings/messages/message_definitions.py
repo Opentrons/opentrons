@@ -522,10 +522,10 @@ class PipetteFunctionDataAcknowledge(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class PipetteFunctionDataComplete(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionDataComplete
-    payload_type: Type[payloads.PipetteFunctionDataComplete] = (
-        payloads.PipetteFunctionDataComplete
+class PipetteFunctionUpdateComplete(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteFunctionUpdateComplete
+    payload_type: Type[payloads.PipetteFunctionUpdateComplete] = (
+        payloads.PipetteFunctionUpdateComplete
     )
     message_id: Literal[MessageId.pip_func_update_complete] = (
         MessageId.pip_func_update_complete
