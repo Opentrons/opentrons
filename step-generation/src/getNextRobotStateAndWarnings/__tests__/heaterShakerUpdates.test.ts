@@ -21,13 +21,13 @@ import {
 import type {
   ModuleOnlyParams,
   ShakeSpeedParams,
-  TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   HeaterShakerModuleState,
   InvariantContext,
   RobotState,
+  SetTemperatureStepGenArgs,
 } from '../../types'
 
 const forHeaterShakerSetTargetTemperature = makeImmutableStateUpdater(
@@ -84,11 +84,12 @@ interface TestCase<P> {
   moduleStateBefore: Partial<HeaterShakerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
+  runtimeParameters?: InvariantContext['runtimeParameters']
 }
 
 type TestCases<P> = Array<TestCase<P>>
 describe('heater shaker state updaters', () => {
-  const temperatureParamsCases: TestCases<TemperatureParams> = [
+  const temperatureParamsCases: TestCases<SetTemperatureStepGenArgs> = [
     {
       params: {
         moduleId: moduleId,
@@ -103,6 +104,35 @@ describe('heater shaker state updaters', () => {
       fn: forHeaterShakerSetTargetTemperature,
       testName:
         'forHeaterShakerSetTargetTemperature should update the temperature',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      moduleStateBefore: {
+        targetTemp: null,
+      },
+      expectedUpdate: {
+        targetTemp: 50,
+      },
+      fn: forHeaterShakerSetTargetTemperature,
+      testName:
+        'forHeaterShakerSetTargetTemperature should update the temperature from runtime parameters',
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 50,
+        },
+      },
     },
   ]
 
@@ -197,8 +227,12 @@ describe('heater shaker state updaters', () => {
     expectedUpdate,
     fn,
     testName,
+    runtimeParameters,
   }: TestCase<P>): void => {
     it(testName, () => {
+      if (runtimeParameters != null) {
+        invariantContext.runtimeParameters = runtimeParameters
+      }
       const prevRobotState = merge({}, startRobotState, {
         modules: {
           [moduleId]: {

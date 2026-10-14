@@ -1,17 +1,21 @@
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
 import type {
   ModuleOnlyParams,
   ShakeSpeedParams,
-  TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   HeaterShakerModuleState,
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
+  SetTemperatureStepGenArgs,
 } from '../types'
 
 const _getHeaterShakerModuleState = (
@@ -33,12 +37,17 @@ const _getHeaterShakerModuleState = (
 }
 
 export const forHeaterShakerSetTargetTemperature = (
-  params: TemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    return
+  }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
 
   moduleState.targetTemp = celsius
