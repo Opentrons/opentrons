@@ -600,6 +600,60 @@ describe('forVacuumSetPumpPower', () => {
     )
     expect(result.robotState).toEqual(before)
   })
+
+  it('uses timed hold with vent closed when args are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      percent_power: {
+        variableName: 'percent_power',
+        displayName: 'Percent power',
+        type: 'int',
+        default: 40,
+      },
+      hold_duration: {
+        variableName: 'hold_duration',
+        displayName: 'Hold duration',
+        type: 'int',
+        default: 120,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const robot = robotWithVacuum(
+      emptyModulesRobot,
+      vacuumModuleId,
+      baseVacuumState()
+    )
+
+    const result = forVacuumSetPumpPower(
+      {
+        moduleId: 'selected_module',
+        percentPower: 'percent_power',
+        duration: 'hold_duration',
+        ventAfter: 'vent_after',
+        taskId: vacuumTaskId,
+      },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual(
+      timedPowerHold(40, 120, vacuumTaskId, false)
+    )
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
+    expect(updated.numPumpActivitiesStarted).toBe(1)
+  })
 })
 
 describe('forVacuumStopPump', () => {
