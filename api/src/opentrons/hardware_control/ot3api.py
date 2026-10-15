@@ -144,7 +144,7 @@ from opentrons.config.types import (
     OT3Config,
     RobotConfig,
 )
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.drivers.usb.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )

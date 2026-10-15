@@ -27,7 +27,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from opentrons.config import IS_ROBOT
 from opentrons.config import feature_flags as ff
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,

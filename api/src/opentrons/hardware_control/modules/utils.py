@@ -17,7 +17,7 @@ from .types import (
     SpeedStatus,
 )
 from .vacuum_module import VacuumModule
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 log = logging.getLogger(__name__)
 

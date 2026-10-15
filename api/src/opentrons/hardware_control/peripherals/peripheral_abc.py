@@ -10,7 +10,7 @@ from ..modules.types import (
     ModuleErrorCallback,
 )
 from .types import PeripheralType
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 
 class AbstractPeripheral(AbstractDevice):
