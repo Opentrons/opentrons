@@ -33,8 +33,8 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 import opentrons.calibration_storage.types as calibration_types
 import opentrons.config.types as config_types
 import opentrons.drivers.flex_stacker.types as stacker_types
-import opentrons.drivers.rpi_drivers.types as rpi_types
 import opentrons.drivers.types as driver_types
+import opentrons.drivers.usb.types as rpi_types
 import opentrons.drivers.vacuum_module.types as vac_types
 import opentrons.hardware_control.dev_types as dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration as instr_calibration_types

@@ -27,7 +27,7 @@ from .types import (
     StatusBarUpdateEvent,
 )
 from opentrons.config import IS_LINUX, IS_ROBOT
-from opentrons.drivers.rpi_drivers import interfaces, types, usb, usb_simulator
+from opentrons.drivers.usb import interfaces, types, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
