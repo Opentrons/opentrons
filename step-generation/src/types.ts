@@ -1275,6 +1275,11 @@ export interface WaitForTemperatureStepGenArgs {
   celsius: number | string
 }
 
+export interface EngageMagnetStepGenArgs {
+  moduleId: string
+  height: number | string
+}
+
 export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
   moduleId: string
   rpm: number | string
