@@ -38,6 +38,11 @@ export const forAbsorbanceReaderOpenLid = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forAbsorbanceReaderOpenLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -58,6 +63,11 @@ export const forAbsorbanceReaderCloseLid = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forAbsorbanceReaderCloseLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -99,6 +109,13 @@ export const forAbsorbanceReaderInitialize = (
     sampleWavelengths.some(wavelength => wavelength == null) ||
     referenceWavelength === null
   ) {
+    console.error(
+      `forAbsorbanceReaderInitialize: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, measureMode=${String(measureMode)}, sampleWavelengths=${String(
+        sampleWavelengths
+      )}, referenceWavelength=${String(referenceWavelength)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings

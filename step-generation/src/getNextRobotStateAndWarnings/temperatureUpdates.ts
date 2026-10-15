@@ -39,6 +39,11 @@ export function forSetTemperature(
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forSetTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -59,6 +64,11 @@ export function forAwaitTemperature(
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forAwaitTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -80,6 +90,11 @@ export function forDeactivateTemperature(
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forDeactivateTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings

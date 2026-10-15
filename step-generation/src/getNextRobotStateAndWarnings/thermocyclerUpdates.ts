@@ -52,6 +52,11 @@ export const forThermocyclerSetTargetBlockTemperature = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetBlockTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -73,6 +78,11 @@ export const forThermocyclerSetTargetLidTemperature = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetLidTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -118,6 +128,11 @@ export const forThermocyclerDeactivateBlock = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateBlock: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -139,6 +154,11 @@ export const forThermocyclerDeactivateLid = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -158,6 +178,11 @@ export const forThermocyclerCloseLid = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerCloseLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -177,6 +202,11 @@ export const forThermocyclerOpenLid = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerOpenLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -246,6 +276,11 @@ export const forThermocyclerStartRunExtendedProfile = (
       ? null
       : resolveStringRuntimeValue(params.taskId, runtimeParameters)
   if (moduleId == null || (params.taskId != null && taskId == null)) {
+    console.error(
+      `forThermocyclerStartRunExtendedProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, taskId=${String(taskId)})`
+    )
     return
   }
 

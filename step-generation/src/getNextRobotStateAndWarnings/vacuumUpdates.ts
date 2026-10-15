@@ -111,6 +111,9 @@ export const forVacuumOpenVent = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumOpenVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -130,6 +133,9 @@ export const forVacuumCloseVent = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumCloseVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -159,7 +165,21 @@ export const forVacuumSetPumpPressure = (
       ? null
       : resolveStringRuntimeValue(params.taskId, runtimeParameters)
   if (moduleId == null || gaugePressure == null || ventAfter == null) {
+    console.error(
+      `forVacuumSetPumpPressure: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, gaugePressure=${String(gaugePressure)}, ventAfter=${String(
+        ventAfter
+      )})`
+    )
     return
+  }
+  if (params.taskId != null && taskId == null) {
+    console.error(
+      `forVacuumSetPumpPressure: arg resolved to null (taskId=${String(
+        taskId
+      )})`
+    )
   }
   let duration: number | undefined
   if (params.duration == null) {
@@ -170,6 +190,11 @@ export const forVacuumSetPumpPressure = (
       runtimeParameters
     )
     if (resolvedDuration == null) {
+      console.error(
+        `forVacuumSetPumpPressure: arg resolved to null (duration=${String(
+          resolvedDuration
+        )})`
+      )
       return
     }
     duration = resolvedDuration
@@ -226,7 +251,17 @@ export const forVacuumSetPumpPower = (
       ? null
       : resolveStringRuntimeValue(params.taskId, runtimeParameters)
   if (moduleId == null || percentPower == null || ventAfter == null) {
+    console.error(
+      `forVacuumSetPumpPower: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, percentPower=${String(percentPower)}, ventAfter=${String(ventAfter)})`
+    )
     return
+  }
+  if (params.taskId != null && taskId == null) {
+    console.error(
+      `forVacuumSetPumpPower: arg resolved to null (taskId=${String(taskId)})`
+    )
   }
   let duration: number | undefined
   if (params.duration == null) {
@@ -237,6 +272,11 @@ export const forVacuumSetPumpPower = (
       runtimeParameters
     )
     if (resolvedDuration == null) {
+      console.error(
+        `forVacuumSetPumpPower: arg resolved to null (duration=${String(
+          resolvedDuration
+        )})`
+      )
       return
     }
     duration = resolvedDuration
@@ -283,6 +323,9 @@ export const forVacuumStopPump = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumStopPump: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -312,7 +355,13 @@ export const forVacuumStartRunProfile = (
     'taskId' in params && params.taskId != null
       ? resolveStringRuntimeValue(params.taskId, runtimeParameters)
       : null
+  // taskId should not be null, but this is to satisfy type checks
   if (moduleId == null || ventAfter == null || taskId == null) {
+    console.error(
+      `forVacuumStartRunProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, ventAfter=${String(ventAfter)}, taskId=${String(taskId)})`
+    )
     return
   }
   const steps = 'profile' in params ? params.profile : params.steps

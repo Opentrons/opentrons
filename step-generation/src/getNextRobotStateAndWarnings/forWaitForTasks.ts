@@ -14,6 +14,11 @@ export function forWaitForTasks(
   const { runtimeParameters } = invariantContext
   for (const taskId of params.task_ids) {
     const resolvedTaskId = resolveStringRuntimeValue(taskId, runtimeParameters)
+    if (resolvedTaskId == null) {
+      console.error(
+        `forWaitForTasks: arg resolved to null (taskId=${String(resolvedTaskId)})`
+      )
+    }
     const handled =
       resolvedTaskId != null &&
       handleWaitForTaskForModules(resolvedTaskId, robotStateAndWarnings)
