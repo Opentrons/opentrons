@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../../helix-design-system/product'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 import styles from '../styledtext.module.css'
-import { resolveStyledTextStyles } from '../styledTextStyles'
+import {
+  resolveStyledTextStyles,
+  resolveStyledTextTag,
+} from '../styledTextStyles'
 import {
   DESKTOP_STYLE_TRANSLATIONS,
   ODD_STYLE_TRANSLATIONS,
@@ -74,5 +77,39 @@ describe('styledTextStyles', () => {
       className: '',
       style: undefined,
     })
+  })
+
+  it.each([
+    { desktopStyle: 'displayBold' as const, tag: 'h1' },
+    { desktopStyle: 'headingLargeBold' as const, tag: 'h2' },
+    { desktopStyle: 'headingMediumBold' as const, tag: 'h3' },
+    { desktopStyle: 'headingSmallBold' as const, tag: 'h4' },
+    { desktopStyle: 'bodyDefaultRegular' as const, tag: 'p' },
+    { desktopStyle: 'captionRegular' as const, tag: 'label' },
+  ])(
+    'maps desktopStyle=$desktopStyle to semantic tag $tag',
+    ({ desktopStyle, tag }) => {
+      expect(resolveStyledTextTag({ desktopStyle })).toBe(tag)
+    }
+  )
+
+  it.each([
+    { oddStyle: 'level1Header' as const, tag: 'h1' },
+    { oddStyle: 'level2HeaderBold' as const, tag: 'h2' },
+    { oddStyle: 'level3HeaderBold' as const, tag: 'h3' },
+    { oddStyle: 'level4HeaderBold' as const, tag: 'h4' },
+    { oddStyle: 'bodyTextRegular' as const, tag: 'p' },
+    { oddStyle: 'smallBodyTextBold' as const, tag: 'label' },
+  ])('maps oddStyle=$oddStyle to semantic tag $tag', ({ oddStyle, tag }) => {
+    expect(resolveStyledTextTag({ oddStyle })).toBe(tag)
+  })
+
+  it('prefers desktopStyle tag when both styles are set', () => {
+    expect(
+      resolveStyledTextTag({
+        desktopStyle: 'headingSmallBold',
+        oddStyle: 'level3HeaderBold',
+      })
+    ).toBe('h4')
   })
 })
