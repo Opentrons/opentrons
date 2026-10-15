@@ -46,6 +46,7 @@ endif
 # pdf-title-<dir> / pdf-file-<dir>. print_page is always <dir>/site/print_page/index.html
 PDF_PROJECTS := \
 	absorbance-plate-reader \
+	compliance-ready-software \
 	flex \
 	heater-shaker \
 	hepa-uv \
@@ -58,6 +59,8 @@ PDF_PROJECTS := \
 
 pdf-title-absorbance-plate-reader := Absorbance Plate Reader Instruction Manual
 pdf-file-absorbance-plate-reader := Opentrons-Absorbance-Plate-Reader-Instruction-Manual.pdf
+pdf-title-compliance-ready-software := Compliance Ready Software Instruction Manual
+pdf-file-compliance-ready-software := Opentrons-Compliance-Ready-Software-Instruction-Manual.pdf
 pdf-title-flex := Opentrons Flex Instruction Manual
 pdf-file-flex := Opentrons-Flex-Instruction-Manual.pdf
 pdf-title-heater-shaker := Heater-Shaker Module GEN1 Instruction Manual
