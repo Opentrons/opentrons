@@ -9,85 +9,62 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # Source labware 1: 3x Corning 96 Well Plate 360 uL Flat in D1, D2, D3
-    source_plate_d1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
-    source_plate_d2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
-    source_plate_d3 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D3')
-    source_plates_1 = [source_plate_d1, source_plate_d2, source_plate_d3]
+    # Labware
+    source_1_slots = ['D1', 'D2', 'D3']
+    dest_slots = ['C1', 'C2', 'C3']
+    tiprack_200_slots = ['B1', 'B2', 'B3']
 
-    # Source labware 2: reservoir in A1
-    reservoir = protocol.load_labware('nest_1_reservoir_195ml', 'A1')
+    source_1_plates = [
+        protocol.load_labware('corning_96_wellplate_360ul_flat', slot)
+        for slot in source_1_slots
+    ]
+    source_2 = protocol.load_labware('nest_1_reservoir_195ml', 'A1')
+    dest_plates = [
+        protocol.load_labware('corning_96_wellplate_360ul_flat', slot)
+        for slot in dest_slots
+    ]
+    tipracks_200 = [
+        protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', slot)
+        for slot in tiprack_200_slots
+    ]
+    tiprack_50 = protocol.load_labware('opentrons_flex_96_filtertiprack_50ul', 'A2')
 
-    # Destination labware: 3x Corning 96 Well Plate 360 uL Flat in C1, C2, C3
-    dest_plate_c1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'C1')
-    dest_plate_c2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'C2')
-    dest_plate_c3 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'C3')
-    dest_plates = [dest_plate_c1, dest_plate_c2, dest_plate_c3]
-
-    # Tip racks
-    tiprack_200_b1 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B1')
-    tiprack_200_b2 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B2')
-    tiprack_200_b3 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B3')
-    tiprack_50_a2 = protocol.load_labware('opentrons_flex_96_filtertiprack_50ul', 'A2')
-
-    # Pipettes
-    pipette_50 = protocol.load_instrument(
-        'flex_1channel_50', 'right', tip_racks=[tiprack_50_a2]
-    )
-    pipette_1000 = protocol.load_instrument(
-        'flex_1channel_1000', 'left',
-        tip_racks=[tiprack_200_b1, tiprack_200_b2, tiprack_200_b3]
-    )
-
-    # Trash bin
+    # Trash bin (Flex, apiLevel >= 2.16)
     trash = protocol.load_trash_bin('A3')
 
-    # Liquid definitions
-    reagent_liquid = protocol.define_liquid(
+    # Pipettes
+    p50 = protocol.load_instrument('flex_1channel_50', 'right', tip_racks=[tiprack_50])
+    p1000 = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=tipracks_200)
+
+    # Liquids
+    reagent = protocol.define_liquid(
         name='Reagent',
-        description='Reagent transferred from reservoir to destination plates',
-        display_color='#33FF33'
+        description='Reagent dispensed into every destination well',
+        display_color='#00AAFF',
     )
-    sample_liquid = protocol.define_liquid(
+    sample = protocol.define_liquid(
         name='Sample',
-        description='Sample liquid transferred from source plates to destination plates',
-        display_color='#FF0000'
+        description='Sample in source labware 1 wells',
+        display_color='#FF5533',
     )
 
-    # Load liquids into wells before pipetting
-    # Reservoir first well holds reagent
-    reservoir_well = reservoir.wells()[0]
-    reservoir_well.load_liquid(liquid=reagent_liquid, volume=0.8 * reservoir_well.max_volume)
+    # Load liquids before any pipetting (volumes are labels only)
+    source_2.load_liquid(wells=[source_2['A1']], volume=20 * 288 + 5000, liquid=reagent)
+    for plate in source_1_plates:
+        plate.load_liquid(wells=plate.wells(), volume=200, liquid=sample)
 
-    # All wells of source labware 1 (3 plates) hold sample liquid
-    source_wells_1 = []
-    for plate in source_plates_1:
-        for well in plate.wells():
-            well.load_liquid(liquid=sample_liquid, volume=100)
-            source_wells_1.append(well)
+    # Wells
+    reagent_source = source_2['A1']
+    all_dest_wells = [well for plate in dest_plates for well in plate.wells()]
+    all_source_1_wells = [well for plate in source_1_plates for well in plate.wells()]
 
-    # All destination wells (3 plates)
-    destination_wells = []
-    for plate in dest_plates:
-        destination_wells.extend(plate.wells())
+    # Step N: 20 uL reagent to all destination wells, same tip
+    p50.transfer(20, reagent_source, all_dest_wells, new_tip='once')
 
-    # Command N: transfer 20 uL of reagent from reservoir A1 to all destination wells, reuse tip
-    pipette_50.transfer(
-        20,
-        reservoir_well,
-        destination_wells,
-        new_tip='once'
-    )
-
-    # Command O: well-to-well transfer of 100 uL from source labware 1 to destination labware, new tip each
-    pipette_1000.transfer(
-        100,
-        source_wells_1,
-        destination_wells,
-        new_tip='always'
-    )
+    # Step O: well to well 100 uL, new tip for each transfer
+    p1000.transfer(100, all_source_1_wells, all_dest_wells, new_tip='always')

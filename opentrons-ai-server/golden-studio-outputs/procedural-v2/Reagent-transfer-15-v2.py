@@ -9,40 +9,42 @@ metadata = {
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
 def run(protocol: protocol_api.ProtocolContext):
+    # Adapters
+    source_adapter = protocol.load_adapter('opentrons_96_flat_bottom_adapter', 1)
+    dest_adapter = protocol.load_adapter('opentrons_96_flat_bottom_adapter', 5)
+
     # Labware
-    source = protocol.load_labware('opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat', 1)
-    destination = protocol.load_labware('opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat', 5)
+    source = source_adapter.load_labware('nest_96_wellplate_200ul_flat')
+    destination = dest_adapter.load_labware('nest_96_wellplate_200ul_flat')
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 4)
 
     # Pipette
-    p300m = protocol.load_instrument('p300_multi_gen2', mount='left', tip_racks=[tiprack])
+    p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tiprack])
 
-    # Liquid definition
+    # Liquids
     reagent = protocol.define_liquid(
         name='Reagent',
-        description='Reagent to be transferred from source to destination',
-        display_color='#00FFFF'
+        description='Reagent to be transferred',
+        display_color='#0000FF',
     )
 
-    # Source columns and destination columns (0-indexed)
-    src_col_indices = [3, 2, 5, 0, 10]   # columns 4, 3, 6, 1, 11
-    dest_col_indices = [4, 8, 0, 9, 1]   # columns 5, 9, 1, 10, 2
-
-    src_columns = [source.columns()[i] for i in src_col_indices]
-    dest_columns = [destination.columns()[i] for i in dest_col_indices]
-
-    # Load liquid into every source well that will be used
-    for col in src_columns:
-        for well in col:
-            well.load_liquid(liquid=reagent, volume=200)
-
-    # Volume setup
+    # Parameters
     transfer_vol = 88
+    src_col_names = ['4', '3', '6', '1', '11']
+    dest_col_names = ['5', '9', '1', '10', '2']
 
-    # Commands
-    p300m.transfer(transfer_vol, src_columns, dest_columns, new_tip='always')
+    src_cols = [source.columns_by_name()[c] for c in src_col_names]
+    dest_cols = [destination.columns_by_name()[c] for c in dest_col_names]
+
+    # Load reagent into every source well used (before any pipetting)
+    for col in src_cols:
+        for well in col:
+            well.load_liquid(liquid=reagent, volume=150)
+
+    # Transfer with a new tip for each transfer
+    p300m.transfer(transfer_vol, src_cols, dest_cols, new_tip='always')

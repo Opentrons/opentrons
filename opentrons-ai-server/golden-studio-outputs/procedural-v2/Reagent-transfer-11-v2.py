@@ -4,72 +4,73 @@ metadata = {
     'protocolName': 'Reagent-transfer-11-v2',
     'author': 'Bob',
     'description': 'Transfer',
+    'source': 'OpentronsAI',
 }
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # labware
+    # Labware
     source_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 4)
     source_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 5)
     destination_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
     destination_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
+    tiprack_300 = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
+    tiprack_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 11)
 
-    tiprack300 = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
-    tiprack20 = protocol.load_labware('opentrons_96_tiprack_20ul', 11)
+    # Pipettes
+    p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tiprack_300])
+    p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tiprack_20])
 
-    # pipettes
-    p300s = protocol.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack300])
-    p20s = protocol.load_instrument('p20_single_gen2', mount='right', tip_racks=[tiprack20])
-
-    # well setup
-    source_wells_1 = [source_1.wells_by_name()[well] for well in ['A1', 'A2']]
-    source_wells_2 = [source_2.wells_by_name()[well] for well in ['C4', 'C6']]
-    source_wells_3 = [source_2.wells_by_name()[well] for well in ['B6', 'B7']]
-    source_wells_4 = [source_2.wells_by_name()[well] for well in ['C4', 'C6']]
-    destination_wells_1 = [source_2.wells_by_name()[well] for well in ['B6', 'B7']]
-    destination_wells_2 = [source_1.wells_by_name()[well] for well in ['A3', 'A4']]
-    destination_wells_3 = [destination_1.wells_by_name()[well] for well in ['A1', 'B1']]
-    destination_wells_4 = [destination_2.wells_by_name()[well] for well in ['A1', 'B1']]
-
-    # volume setup
-    transfer_vol_1 = 50
-    transfer_vol_2 = 15
-    transfer_vol_3 = 10
-    transfer_vol_4 = 10
-
-    # liquid definitions
-    liquid_source_1 = protocol.define_liquid(
-        name='Source Labware 1 Reagent',
-        description='Reagent originally present in source labware 1 wells A1, A2',
-        display_color='#FF0000'
+    # Liquids
+    reagent_a = protocol.define_liquid(
+        name='Reagent A',
+        description='Reagent in source labware 1',
+        display_color='#FF0000',
     )
-    liquid_source_2 = protocol.define_liquid(
-        name='Source Labware 2 Reagent',
-        description='Reagent originally present in source labware 2 wells C4, C6, B6, B7',
-        display_color='#00FF00'
+    reagent_b = protocol.define_liquid(
+        name='Reagent B',
+        description='Reagent in source labware 2',
+        display_color='#0000FF',
     )
 
-    # load liquids into wells before they are used as sources
-    for well in source_wells_1:
-        well.load_liquid(liquid=liquid_source_1, volume=100)
+    # Label starting liquids before any pipetting
+    for well_name in ['A1', 'A2']:
+        source_1[well_name].load_liquid(liquid=reagent_a, volume=200)
+    for well_name in ['B6', 'B7', 'C4', 'C6']:
+        source_2[well_name].load_liquid(liquid=reagent_b, volume=200)
 
-    for well in [source_2.wells_by_name()[w] for w in ['C4', 'C6', 'B6', 'B7']]:
-        well.load_liquid(liquid=liquid_source_2, volume=100)
+    # Volumes
+    vol_o = 50
+    vol_p = 15
+    vol_q = 10
+    vol_r = 10
 
-    # commands
-    # O. Transfer 50 uL from source labware 1 (A1, A2) to source labware 2 (B6, B7), reuse tip
-    p300s.transfer(transfer_vol_1, source_wells_1, destination_wells_1, new_tip='once')
+    # Wells
+    src_wells_o = [source_1[w] for w in ['A1', 'A2']]
+    dest_wells_o = [source_2[w] for w in ['B6', 'B7']]
 
-    # P. Transfer 15 uL from source labware 2 (C4, C6) to source labware 1 (A3, A4), reuse tip
-    p20s.transfer(transfer_vol_2, source_wells_2, destination_wells_2, new_tip='once')
+    src_wells_p = [source_2[w] for w in ['C4', 'C6']]
+    dest_wells_p = [source_1[w] for w in ['A3', 'A4']]
 
-    # Q. Transfer 10 uL from source labware 2 (B6, B7) to destination labware 1 (A1, B1), new tip each time
-    p20s.transfer(transfer_vol_3, source_wells_3, destination_wells_3, new_tip='always')
+    src_wells_q = [source_2[w] for w in ['B6', 'B7']]
+    dest_wells_q = [destination_1[w] for w in ['A1', 'B1']]
 
-    # R. Transfer 10 uL from source labware 2 (C4, C6) to destination labware 2 (A1, B1), new tip each time
-    p20s.transfer(transfer_vol_4, source_wells_4, destination_wells_4, new_tip='always')
+    src_wells_r = [source_2[w] for w in ['C4', 'C6']]
+    dest_wells_r = [destination_2[w] for w in ['A1', 'B1']]
+
+    # Step O: P300, reuse the same tip
+    p300.transfer(vol_o, src_wells_o, dest_wells_o, new_tip='once')
+
+    # Step P: P20, reuse the same tip
+    p20.transfer(vol_p, src_wells_p, dest_wells_p, new_tip='once')
+
+    # Step Q: P20, new tip each time
+    p20.transfer(vol_q, src_wells_q, dest_wells_q, new_tip='always')
+
+    # Step R: P20, new tip each time
+    p20.transfer(vol_r, src_wells_r, dest_wells_r, new_tip='always')

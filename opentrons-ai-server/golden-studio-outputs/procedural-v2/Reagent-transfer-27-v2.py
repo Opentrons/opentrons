@@ -19,29 +19,31 @@ def run(protocol: protocol_api.ProtocolContext):
     destination = protocol.load_labware('opentrons_24_aluminumblock_nest_0.5ml_screwcap', 'D3')
     tiprack = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'C1')
 
-    # Pipette
-    p1000s = protocol.load_instrument('flex_1channel_1000', mount='left', tip_racks=[tiprack])
-
-    # Trash bin
+    # Trash bin (required on Flex for apiLevel >= 2.16)
     trash = protocol.load_trash_bin('A3')
+
+    # Pipette
+    pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tiprack])
 
     # Parameters
     transfer_vol = 195.0
-    src_well_names = ['H10', 'F12', 'D7', 'B1', 'C8']
-    src_wells = [source.wells_by_name()[well] for well in src_well_names]
-    dest_well = destination.wells()[0]
+    source_well_names = ['H10', 'F12', 'D7', 'B1', 'C8']
 
-    # Define liquid
-    reagent_liquid = protocol.define_liquid(
+    # Liquids
+    reagent = protocol.define_liquid(
         name='Reagent',
-        description='Reagent to be transferred to destination labware',
-        display_color='#00FFFF',
+        description='Reagent to be transferred to the destination well',
+        display_color='#0074D9',
     )
 
-    # Load liquid into every source well used
-    for well in src_wells:
-        well.load_liquid(liquid=reagent_liquid, volume=transfer_vol)
+    source_wells = [source.wells_by_name()[name] for name in source_well_names]
+    dest_well = destination.wells_by_name()['A1']
 
-    # Transfer 195.0 uL of reagent from source wells to the first well in the destination labware
-    # Use a new tip for each transfer
-    p1000s.transfer(transfer_vol, src_wells, dest_well, new_tip='always')
+    # Load liquid labels before any pipetting step
+    for well in source_wells:
+        well.load_liquid(liquid=reagent, volume=transfer_vol)
+    # Destination label (volume 0, since it starts empty)
+    dest_well.load_liquid(liquid=reagent, volume=0)
+
+    # Transfer with a new tip for each transfer
+    pipette.transfer(transfer_vol, source_wells, dest_well, new_tip='always')

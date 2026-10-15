@@ -16,44 +16,38 @@ requirements = {
 def run(protocol: protocol_api.ProtocolContext):
     # Labware
     source_1 = protocol.load_labware('nest_1_reservoir_195ml', 'B1')
-    destination_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
-    destination_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+    dest_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
+    dest_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+    tiprack_a1 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'A1')
+    tiprack_a2 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'A2')
 
-    tiprack_1 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'A1')
-    tiprack_2 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'A2')
-
-    # Pipette
-    p1000m = protocol.load_instrument(
-        'flex_8channel_1000',
-        mount='left',
-        tip_racks=[tiprack_1, tiprack_2]
-    )
-
-    # Trash
+    # Trash bin (Flex, apiLevel >= 2.16)
     trash = protocol.load_trash_bin('A3')
 
-    # Volumes
-    transfer_vol_1 = 50
-    transfer_vol_2 = 100
-
-    # Wells setup
-    source_well_1 = source_1.columns()[0]
-    destination_wells_1 = destination_1.columns()[0]
-    destination_wells_2 = destination_2.columns()[0]
-
-    # Liquid definitions
-    reagent_liquid = protocol.define_liquid(
-        name='Reagent',
-        description='Reagent to be transferred from reservoir',
-        display_color='#00FFF2',
+    # Pipette
+    p1000_multi = protocol.load_instrument(
+        'flex_8channel_1000', 'left', tip_racks=[tiprack_a1, tiprack_a2]
     )
 
-    # Load liquid into the source reservoir (enough for both transfers: 50*8 + 100*8 = 1200 uL)
-    source_1.wells_by_name()['A1'].load_liquid(liquid=reagent_liquid, volume=150000)
+    # Liquids
+    reagent = protocol.define_liquid(
+        name='Reagent',
+        description='Reagent to be transferred from the reservoir to the destination plates',
+        display_color='#0000FF',
+    )
 
-    # Commands
-    # L: Transfer 50 uL from source column 1 to destination 1 column 1, same tip
-    p1000m.transfer(transfer_vol_1, source_well_1, destination_wells_1, new_tip='once')
+    # Load liquid into the source reservoir before it is used as a source.
+    # Volume covers 8 channels x (50 + 100) uL = 1200 uL, plus excess.
+    source_well = source_1['A1']
+    source_well.load_liquid(liquid=reagent, volume=5000)
 
-    # M: Transfer 100 uL from source column 1 to destination 2 column 1, same tip
-    p1000m.transfer(transfer_vol_2, source_well_1, destination_wells_2, new_tip='once')
+    # Wells (8-channel pipette: use columns)
+    source_col = source_1.columns()[0]
+    dest_1_col = dest_1.columns()[0]
+    dest_2_col = dest_2.columns()[0]
+
+    # Step L: 50 uL from source column 1 to destination 1 column 1, same tip
+    p1000_multi.transfer(50, source_col, dest_1_col, new_tip='once')
+
+    # Step M: 100 uL from source column 1 to destination 2 column 1, same tip
+    p1000_multi.transfer(100, source_col, dest_2_col, new_tip='once')

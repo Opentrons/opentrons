@@ -8,8 +8,9 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
+
 
 def run(protocol: protocol_api.ProtocolContext):
 
@@ -31,72 +32,65 @@ def run(protocol: protocol_api.ProtocolContext):
         for slot in ['C1', 'D1']
     ]
 
-    # Pipette
-    pipette = protocol.load_instrument('flex_8channel_1000', 'right', tip_racks=tipracks)
-
     # Trash bin
     trash = protocol.load_trash_bin('A3')
 
-    # Reagent setup
-    diluent = reservoir.wells()[0]
-    source = plate.columns()[0]
+    # Pipette
+    pipette = protocol.load_instrument('flex_8channel_1000', 'right', tip_racks=tipracks)
 
-    # Define and load liquids
+    # Liquids
     diluent_liquid = protocol.define_liquid(
-        name="Diluent",
-        description="Diluent liquid is filled in the reservoir",
-        display_color="#33FF33"
+        name='Diluent',
+        description='Diluent liquid is filled in the reservoir',
+        display_color='#33FF33',
     )
     sample_liquid = protocol.define_liquid(
-        name="Sample",
-        description="Non-diluted samples are loaded in the 1st column",
-        display_color="#FF0000"
+        name='Sample',
+        description='Non-diluted samples are loaded in the 1st column',
+        display_color='#FF0000',
     )
 
-    diluent.load_liquid(liquid=diluent_liquid, volume=0.8 * diluent.max_volume)
-    for well in source:
-        well.load_liquid(liquid=sample_liquid, volume=150)
+    diluent_well = reservoir['A1']
+    diluent_well.load_liquid(liquid=diluent_liquid, volume=0.8 * diluent_well.max_volume)
+    for well in plate.columns()[0]:
+        well.load_liquid(liquid=sample_liquid, volume=TOTAL_MIXING_VOLUME)
 
-    # Set up dilution destinations along row A
-    dilution_destination_sets = [[well] for well in plate.rows()[0][1:NUM_DILUTIONS + 1]]
-    dilution_source_sets = [[well] for well in plate.rows()[0][:NUM_DILUTIONS]]
-    blank_set = [plate.rows()[0][NUM_DILUTIONS + 1]]
+    # Well sets (row A of the plate; the 8-channel pipette addresses full columns)
+    row_a = plate.rows()[0]
+    dilution_sources = row_a[:NUM_DILUTIONS]          # A1-A10
+    dilution_destinations = row_a[1:NUM_DILUTIONS + 1]  # A2-A11
+    blank_well = row_a[NUM_DILUTIONS + 1]             # A12
 
-    # 1. Distribute diluent to wells 2-11 in row A
-    all_diluent_destinations = [well for wells in dilution_destination_sets for well in wells]
+    # R. Distribute diluent to wells 2-11 (one tip, reused)
     pipette.pick_up_tip()
-    for dest in all_diluent_destinations:
-        pipette.transfer(
-            diluent_volume,
-            diluent,
-            dest,
-            air_gap=AIR_GAP_VOLUME,
-            new_tip='never'
-        )
+    pipette.transfer(
+        diluent_volume,
+        diluent_well,
+        dilution_destinations,
+        air_gap=AIR_GAP_VOLUME,
+        new_tip='never',
+    )
     pipette.drop_tip()
 
-    # 2. Perform serial dilutions along row A
+    # S. Serial dilution A1->A2, ..., A10->A11 (one tip, reused)
     pipette.pick_up_tip()
-    for source_set, dest_set in zip(dilution_source_sets, dilution_destination_sets):
-        for s, d in zip(source_set, dest_set):
-            pipette.transfer(
-                transfer_volume,
-                s,
-                d,
-                air_gap=AIR_GAP_VOLUME,
-                mix_after=(5, TOTAL_MIXING_VOLUME / 2),
-                new_tip='never'
-            )
+    pipette.transfer(
+        transfer_volume,
+        dilution_sources,
+        dilution_destinations,
+        air_gap=AIR_GAP_VOLUME,
+        mix_after=(5, TOTAL_MIXING_VOLUME / 2),
+        new_tip='never',
+    )
     pipette.drop_tip()
 
-    # 3. Add blank to well A12
+    # T. Add blank to well A12 (one tip)
     pipette.pick_up_tip()
-    for blank_well in blank_set:
-        pipette.transfer(
-            diluent_volume,
-            diluent,
-            blank_well,
-            air_gap=AIR_GAP_VOLUME,
-            new_tip='never'
-        )
+    pipette.transfer(
+        diluent_volume,
+        diluent_well,
+        blank_well,
+        air_gap=AIR_GAP_VOLUME,
+        new_tip='never',
+    )
     pipette.drop_tip()

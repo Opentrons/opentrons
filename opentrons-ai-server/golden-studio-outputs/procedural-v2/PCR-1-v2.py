@@ -1,8 +1,10 @@
+import math
 from opentrons import protocol_api
 
 metadata = {
     'protocolName': 'PCR-1-v2',
     'author': 'Bob',
+    'description': 'PCR setup and amplification with temperature modules and thermocycler (64 samples)',
     'source': 'OpentronsAI',
 }
 
@@ -10,130 +12,130 @@ requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # Sample preparation parameters
-    number_of_samples = 64
-    sample_vol = 5  # uL
-    mastermix_vol = 7  # uL
-    mix_cycles = 9
-    total_mix_vol = sample_vol + mastermix_vol  # 12 uL total
+    # Parameters
+    number_of_samples = 64  # O
+    sample_volume_ul = 5
+    master_mix_volume_ul = 7
+    mixing_cycles = 9
+    total_mix_volume_ul = sample_volume_ul + master_mix_volume_ul  # 12 uL
 
-    # Temperature parameters
-    sample_temp_c = 4
-    mastermix_temp_c = 10
-
-    # Thermocycler parameters
+    sample_temperature_c = 4
+    master_mix_temperature_c = 10
     lid_temperature_c = 55
     initial_block_temperature_c = 6
     hold_temperature_c = 4
 
     # Modules
-    thermocycler_module = protocol.load_module('thermocyclerModuleV2')
-    sample_temp_module = protocol.load_module('temperature module gen2', 1)
-    mastermix_temp_module = protocol.load_module('temperature module gen2', 3)
+    thermocycler_module = protocol.load_module('thermocyclerModuleV2')  # slot 7
+    sample_temperature_module = protocol.load_module('temperature module gen2', 1)
+    master_mix_temperature_module = protocol.load_module('temperature module gen2', 3)
+
+    # Adapters (PCR plates need a thermal adapter on the temperature modules)
+    sample_adapter = sample_temperature_module.load_adapter('opentrons_96_well_aluminum_block')
+    master_mix_adapter = master_mix_temperature_module.load_adapter('opentrons_96_well_aluminum_block')
 
     # Labware
-    tiprack = protocol.load_labware('opentrons_96_filtertiprack_20ul', 4)
-    sample_plate = sample_temp_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
-    mastermix_plate = mastermix_temp_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
-    dest_plate = thermocycler_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    sample_plate = sample_adapter.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    master_mix_plate = master_mix_adapter.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    pcr_plate = thermocycler_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    tips_20ul = protocol.load_labware('opentrons_96_filtertiprack_20ul', 4)
 
     # Pipette
-    p20_multi = protocol.load_instrument('p20_multi_gen2', 'left', tip_racks=[tiprack])
+    multi_channel_pipette = protocol.load_instrument('p20_multi_gen2', 'left', tip_racks=[tips_20ul])
 
-    # Well allocation (column-wise, first 64 wells = 8 columns)
-    num_columns = number_of_samples // 8
-    sample_source_wells = sample_plate.columns()[:num_columns]
-    mastermix_source_wells = mastermix_plate.columns()[:num_columns]
-    destination_wells = dest_plate.columns()[:num_columns]
+    # Well allocation (multi-channel -> columns)
+    number_of_columns = math.ceil(number_of_samples / 8)
+    sample_source_wells = sample_plate.columns()[:number_of_columns]
+    master_mix_source_wells = master_mix_plate.columns()[:number_of_columns]
+    destination_wells = pcr_plate.columns()[:number_of_columns]
 
-    # Define liquids
+    # Liquids
     sample_liquid = protocol.define_liquid(
         name='Sample',
-        description='PCR sample',
-        display_color='#FF0000'
+        description='PCR samples on the sample temperature module',
+        display_color='#FF0000',
     )
-    mastermix_liquid = protocol.define_liquid(
+    master_mix_liquid = protocol.define_liquid(
         name='Mastermix',
-        description='PCR mastermix',
-        display_color='#33FF33'
+        description='PCR mastermix on the mastermix temperature module',
+        display_color='#0000FF',
     )
+    # Label every well in the columns used (multi-channel pipette draws from all 8 rows)
+    for column in sample_source_wells:
+        for well in column:
+            well.load_liquid(liquid=sample_liquid, volume=sample_volume_ul * 2)
+    for column in master_mix_source_wells:
+        for well in column:
+            well.load_liquid(liquid=master_mix_liquid, volume=master_mix_volume_ul * 2)
 
-    # Load liquids into wells (first 64 wells column-wise on each source plate)
-    sample_wells_flat = [well for col in sample_source_wells for well in col]
-    mastermix_wells_flat = [well for col in mastermix_source_wells for well in col]
-
-    for well in sample_wells_flat:
-        well.load_liquid(liquid=sample_liquid, volume=sample_vol)
-
-    for well in mastermix_wells_flat:
-        well.load_liquid(liquid=mastermix_liquid, volume=mastermix_vol)
-
-    # Open thermocycler lid
+    # P: open thermocycler lid
     thermocycler_module.open_lid()
 
-    # Set thermocycler block temperature
+    # Q: thermocycler block temperature
     thermocycler_module.set_block_temperature(initial_block_temperature_c)
 
-    # Set thermocycler lid temperature
+    # R: thermocycler lid temperature
     thermocycler_module.set_lid_temperature(lid_temperature_c)
 
-    # Set sample temperature module
-    sample_temp_module.set_temperature(sample_temp_c)
+    # S: sample temperature module
+    sample_temperature_module.set_temperature(sample_temperature_c)
 
-    # Set mastermix temperature module
-    mastermix_temp_module.set_temperature(mastermix_temp_c)
+    # T: mastermix temperature module
+    master_mix_temperature_module.set_temperature(master_mix_temperature_c)
 
-    # Transfer mastermix to destination wells (same tip for all transfers)
-    p20_multi.transfer(
-        mastermix_vol,
-        mastermix_source_wells,
+    # U: transfer mastermix, same tip for all transfers
+    multi_channel_pipette.transfer(
+        master_mix_volume_ul,
+        master_mix_source_wells,
         destination_wells,
         new_tip='once'
     )
 
-    # Transfer samples to destination wells and mix (new tip for each transfer)
-    p20_multi.transfer(
-        sample_vol,
+    # V: transfer samples, mix, blow out in destination well, new tip each transfer
+    multi_channel_pipette.transfer(
+        sample_volume_ul,
         sample_source_wells,
         destination_wells,
         new_tip='always',
-        mix_after=(mix_cycles, total_mix_vol),
+        mix_after=(mixing_cycles, total_mix_volume_ul),
         blow_out=True,
         blowout_location='destination well'
     )
 
-    # Close thermocycler lid
+    # W: close thermocycler lid
     thermocycler_module.close_lid()
 
-    # PCR cycling
+    # X: 74C for 65 s, 1 cycle
     thermocycler_module.execute_profile(
         steps=[{'temperature': 74, 'hold_time_seconds': 65}],
         repetitions=1,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul
     )
 
+    # Y: 13 cycles
     thermocycler_module.execute_profile(
         steps=[
             {'temperature': 60, 'hold_time_seconds': 7},
             {'temperature': 84, 'hold_time_seconds': 19},
-            {'temperature': 57, 'hold_time_seconds': 44}
+            {'temperature': 57, 'hold_time_seconds': 44},
         ],
         repetitions=13,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul
     )
 
+    # Z: 75C for 480 s, 1 cycle
     thermocycler_module.execute_profile(
         steps=[{'temperature': 75, 'hold_time_seconds': 480}],
         repetitions=1,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul
     )
 
-    # Hold thermocycler block temperature
+    # AA: hold block at 4C
     thermocycler_module.set_block_temperature(hold_temperature_c)
 
-    # Open thermocycler lid
+    # AB: open thermocycler lid
     thermocycler_module.open_lid()
 
-    # Deactivate temperature modules
-    mastermix_temp_module.deactivate()
-    sample_temp_module.deactivate()
+    # AC, AD: deactivate temperature modules
+    master_mix_temperature_module.deactivate()
+    sample_temperature_module.deactivate()

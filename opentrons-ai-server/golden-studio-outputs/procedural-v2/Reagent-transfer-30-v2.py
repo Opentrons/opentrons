@@ -9,7 +9,7 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
@@ -18,42 +18,42 @@ def run(protocol: protocol_api.ProtocolContext):
     source_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'C1')
     source_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'C2')
     destination_1 = protocol.load_labware('nest_1_reservoir_195ml', 'D1')
-    tiprack_200 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B2')
+    tiprack = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B2')
 
-    # Pipette
-    p1000s = protocol.load_instrument('flex_1channel_1000', mount='left', tip_racks=[tiprack_200])
-
-    # Trash bin
+    # Trash bin (Flex, apiLevel >= 2.16)
     trash = protocol.load_trash_bin('A3')
 
-    # Define liquids
-    reagent_1 = protocol.define_liquid(
-        name='Reagent 1',
-        description='Reagent liquid in source labware 1',
-        display_color='#FF0000'
+    # Pipette
+    pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tiprack])
+
+    # Liquids
+    sample_a = protocol.define_liquid(
+        name='Sample A',
+        description='Liquid in source labware 1',
+        display_color='#FF0000',
     )
-    reagent_2 = protocol.define_liquid(
-        name='Reagent 2',
-        description='Reagent liquid in source labware 2',
-        display_color='#0000FF'
+    sample_b = protocol.define_liquid(
+        name='Sample B',
+        description='Liquid in source labware 2',
+        display_color='#0000FF',
     )
 
-    # Assign liquids to source wells before pipetting
+    # Assign liquids to wells before any pipetting
     for well in source_1.wells():
-        well.load_liquid(liquid=reagent_1, volume=100)
+        well.load_liquid(liquid=sample_a, volume=150)
     for well in source_2.wells():
-        well.load_liquid(liquid=reagent_2, volume=100)
+        well.load_liquid(liquid=sample_b, volume=150)
 
-    # wells setup
+    # Parameters
+    transfer_volume = 100  # uL
+
+    # Wells
     source_wells_1 = source_1.wells()
     source_wells_2 = source_2.wells()
     destination_well = destination_1.wells_by_name()['A1']
 
-    # volumes setup
-    transfer_vol = 100
+    # Step 1: pool all wells of source labware 1 into reservoir A1, same tip
+    pipette.transfer(transfer_volume, source_wells_1, destination_well, new_tip='once')
 
-    # Command 1: pool from source labware 1 into destination well A1
-    p1000s.transfer(transfer_vol, source_wells_1, destination_well, new_tip='once')
-
-    # Command 2: pool from source labware 2 into destination well A1
-    p1000s.transfer(transfer_vol, source_wells_2, destination_well, new_tip='once')
+    # Step 2: pool all wells of source labware 2 into reservoir A1, same tip
+    pipette.transfer(transfer_volume, source_wells_2, destination_well, new_tip='once')

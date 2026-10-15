@@ -9,7 +9,7 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
@@ -18,59 +18,64 @@ def run(protocol: protocol_api.ProtocolContext):
     source_1 = protocol.load_labware('nest_1_reservoir_195ml', 'B1')
     source_2 = protocol.load_labware('biorad_384_wellplate_50ul', 'B2')
     source_3 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 'B3')
-    destination_1 = protocol.load_labware('corning_384_wellplate_112ul_flat', 'D1')
-    destination_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+    dest_1 = protocol.load_labware('corning_384_wellplate_112ul_flat', 'D1')
+    dest_2 = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
 
     tiprack_200 = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'A1')
     tiprack_50 = protocol.load_labware('opentrons_flex_96_filtertiprack_50ul', 'A2')
 
-    # Pipettes
-    p1000s = protocol.load_instrument('flex_1channel_1000', mount='right', tip_racks=[tiprack_200])
-    p50s = protocol.load_instrument('flex_1channel_50', mount='left', tip_racks=[tiprack_50])
-
-    # Trash
+    # Trash bin
     trash = protocol.load_trash_bin('A3')
 
-    # Define liquids
-    reagent_1 = protocol.define_liquid(
-        name='Reagent 1',
-        description='Reagent in source labware 1 reservoir',
-        display_color='#33FF33'
+    # Pipettes
+    p1000 = protocol.load_instrument('flex_1channel_1000', 'right', tip_racks=[tiprack_200])
+    p50 = protocol.load_instrument('flex_1channel_50', 'left', tip_racks=[tiprack_50])
+
+    # Liquids
+    reagent_a = protocol.define_liquid(
+        name='Reagent A',
+        description='Reagent in source reservoir (slot B1)',
+        display_color='#00AAFF',
     )
-    reagent_2 = protocol.define_liquid(
-        name='Reagent 2',
-        description='Reagent in source labware 2 (384-well plate)',
-        display_color='#FF5733'
+    reagent_b = protocol.define_liquid(
+        name='Reagent B',
+        description='Liquid in 384-well source plate (slot B2)',
+        display_color='#FF8800',
     )
-    reagent_3 = protocol.define_liquid(
-        name='Reagent 3',
-        description='Reagent in source labware 3 (96-well PCR plate)',
-        display_color='#3357FF'
+    reagent_c = protocol.define_liquid(
+        name='Reagent C',
+        description='Liquid in 96-well PCR source plate (slot B3)',
+        display_color='#33CC33',
     )
 
-    # Load liquids into wells before pipetting
-    source_1.wells_by_name()['A1'].load_liquid(liquid=reagent_1, volume=180000)
+    # Load liquids (volumes in uL)
+    # Reservoir: 15 uL x (384 + 96) wells = 7200 uL needed; load 10000 uL
+    source_1.load_liquid(wells=['A1'], liquid=reagent_a, volume=10000)
+    # 384-well plate: 20 uL per well needed; wells hold max 50 uL
+    source_2.load_liquid(wells=source_2.wells(), liquid=reagent_b, volume=40)
+    # 96-well PCR plate: 100 uL per well needed
+    source_3.load_liquid(wells=source_3.wells(), liquid=reagent_c, volume=150)
 
-    for well in source_2.wells():
-        well.load_liquid(liquid=reagent_2, volume=45)
+    # Step P: 15 uL from reservoir A1 to every well in destination 1 and 2, same tip
+    p50.transfer(
+        15,
+        source_1['A1'],
+        dest_1.wells() + dest_2.wells(),
+        new_tip='once',
+    )
 
-    for well in source_3.wells():
-        well.load_liquid(liquid=reagent_3, volume=180)
+    # Step Q: 20 uL from each well in source 2 to each well in destination 1, same tip
+    p50.transfer(
+        20,
+        source_2.wells(),
+        dest_1.wells(),
+        new_tip='once',
+    )
 
-    # wells setup
-    source_wells_1 = source_1.wells_by_name()['A1']
-    source_wells_2 = source_2.wells()
-    source_wells_3 = source_3.wells()
-    destination_wells_1 = destination_1.wells()
-    destination_wells_2 = destination_2.wells()
-    all_destinations = destination_wells_1 + destination_wells_2
-
-    # Commands
-    # P: transfer 15 uL from source 1 to all wells in dest 1 and dest 2, same tip
-    p50s.transfer(15, source_wells_1, all_destinations, new_tip='once')
-
-    # Q: transfer 20 uL from each well in source 2 to each well in dest 1, same tip
-    p50s.transfer(20, source_wells_2, destination_wells_1, new_tip='once')
-
-    # R: transfer 100 uL from each well in source 3 to each well in dest 2, new tip each time
-    p1000s.transfer(100, source_wells_3, destination_wells_2, new_tip='always')
+    # Step R: 100 uL from each well in source 3 to each well in destination 2, new tip each time
+    p1000.transfer(
+        100,
+        source_3.wells(),
+        dest_2.wells(),
+        new_tip='always',
+    )

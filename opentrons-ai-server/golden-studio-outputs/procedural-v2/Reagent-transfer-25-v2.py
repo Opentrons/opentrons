@@ -2,7 +2,7 @@ from opentrons import protocol_api
 
 metadata = {
     'protocolName': 'Reagent-transfer-25-v2',
-    'author': 'Bob',
+    'author': 'OpentronsAI',
     'description': 'Transfer',
     'source': 'OpentronsAI',
 }
@@ -15,43 +15,32 @@ requirements = {
 
 def run(protocol: protocol_api.ProtocolContext):
     # Labware
-    source_rack = protocol.load_labware(
-        'opentrons_24_tuberack_nest_1.5ml_snapcap', 'C1'
-    )
+    source_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', 'C1')
     dest_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'B1')
-    tip_rack = protocol.load_labware(
-        'opentrons_flex_96_filtertiprack_200ul', 'B2'
-    )
+    tiprack = protocol.load_labware('opentrons_flex_96_filtertiprack_200ul', 'B2')
 
-    # Pipette
-    pipette = protocol.load_instrument(
-        'flex_1channel_1000', 'right', tip_racks=[tip_rack]
-    )
-
-    # Trash
+    # Trash bin
     trash = protocol.load_trash_bin('A3')
 
-    # Define liquid
+    # Pipette
+    pipette = protocol.load_instrument('flex_1channel_1000', 'right', tip_racks=[tiprack])
+
+    # Liquids
     sample_liquid = protocol.define_liquid(
         name='Sample',
-        description='Sample liquid aliquoted from source tube rack',
-        display_color='#FF0000'
+        description='Sample liquid in source tubes',
+        display_color='#FF6F00',
+    )
+    source_rack.load_liquid(
+        wells=source_rack.wells(),
+        volume=1000,
+        liquid=sample_liquid,
     )
 
-    # Load liquid into every source tube before it is used as a source
-    source_wells = source_rack.wells()
-    for well in source_wells:
-        well.load_liquid(liquid=sample_liquid, volume=1500)
-
-    # Destination wells: all wells of the destination plate
-    dest_wells = dest_plate.wells()
-
-    # Transfer 185 uL from each tube to all wells of destination plate
-    # 96 destination wells / 24 source tubes = 4, evenly divisible
-    # No for loop: transfer() handles list pairing/stretching internally
+    # Transfer 185 uL from each tube to the destination wells, new tip for each transfer
     pipette.transfer(
         185,
-        source_wells,
-        dest_wells,
-        new_tip='always'
+        source_rack.wells(),
+        dest_plate.wells(),
+        new_tip='always',
     )

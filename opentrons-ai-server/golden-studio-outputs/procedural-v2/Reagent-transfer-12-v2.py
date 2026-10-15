@@ -4,12 +4,10 @@ metadata = {
     'protocolName': 'Reagent-transfer-12-v2',
     'author': 'Bob',
     'description': 'Transfer',
+    'source': 'OpentronsAI',
 }
 
-requirements = {
-    'robotType': 'OT-2',
-    'apiLevel': '2.28'
-}
+requirements = {'robotType': 'OT-2', 'apiLevel': '2.28'}
 
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -25,55 +23,36 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_2 = protocol.load_labware('opentrons_96_filtertiprack_200ul', 8)
 
     # Pipette
-    p300_single = protocol.load_instrument(
-        'p300_single_gen2', 'right', tip_racks=[tiprack_1, tiprack_2]
-    )
+    p300 = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tiprack_1, tiprack_2])
 
-    # Volume
-    transfer_vol = 20
+    # Parameters
+    transfer_vol = 20  # uL
+    source_tube_vol = 100  # uL (assumed starting volume per tube)
 
-    # Define liquids
-    reagent_1 = protocol.define_liquid(
-        name='Reagent 1',
-        description='Reagent pooled from source labware 1',
-        display_color='#FF0000'
-    )
-    reagent_2 = protocol.define_liquid(
-        name='Reagent 2',
-        description='Reagent pooled from source labware 2',
-        display_color='#00FF00'
-    )
-    reagent_3 = protocol.define_liquid(
-        name='Reagent 3',
-        description='Reagent pooled from source labware 3',
-        display_color='#0000FF'
-    )
-    reagent_4 = protocol.define_liquid(
-        name='Reagent 4',
-        description='Reagent pooled from source labware 4',
-        display_color='#FFFF00'
-    )
+    # Liquids
+    sample_1 = protocol.define_liquid(name='Sample rack 1', description='Samples in source labware 1', display_color='#FF0000')
+    sample_2 = protocol.define_liquid(name='Sample rack 2', description='Samples in source labware 2', display_color='#00AA00')
+    sample_3 = protocol.define_liquid(name='Sample rack 3', description='Samples in source labware 3', display_color='#0000FF')
+    sample_4 = protocol.define_liquid(name='Sample rack 4', description='Samples in source labware 4', display_color='#FFA500')
+    pool_1 = protocol.define_liquid(name='Pool 1', description='Pooled samples from rack 1', display_color='#FF9999')
+    pool_2 = protocol.define_liquid(name='Pool 2', description='Pooled samples from rack 2', display_color='#99DD99')
+    pool_3 = protocol.define_liquid(name='Pool 3', description='Pooled samples from rack 3', display_color='#9999FF')
+    pool_4 = protocol.define_liquid(name='Pool 4', description='Pooled samples from rack 4', display_color='#FFD699')
 
-    # Load liquids into source wells
-    for well in source_1.wells():
-        well.load_liquid(liquid=reagent_1, volume=100)
-    for well in source_2.wells():
-        well.load_liquid(liquid=reagent_2, volume=100)
-    for well in source_3.wells():
-        well.load_liquid(liquid=reagent_3, volume=100)
-    for well in source_4.wells():
-        well.load_liquid(liquid=reagent_4, volume=100)
+    # Load liquids into source tubes
+    for rack, liquid in [(source_1, sample_1), (source_2, sample_2), (source_3, sample_3), (source_4, sample_4)]:
+        for well in rack.wells():
+            well.load_liquid(liquid=liquid, volume=source_tube_vol)
 
-    # Transfer/pool samples
-    p300_single.transfer(
-        transfer_vol, source_1.wells(), destination['A1'], new_tip='always'
-    )
-    p300_single.transfer(
-        transfer_vol, source_2.wells(), destination['B1'], new_tip='always'
-    )
-    p300_single.transfer(
-        transfer_vol, source_3.wells(), destination['C1'], new_tip='always'
-    )
-    p300_single.transfer(
-        transfer_vol, source_4.wells(), destination['D1'], new_tip='always'
-    )
+    # Label pooled destination wells (expected final contents: 24 x 20 uL = 480 uL)
+    pooled_vol = transfer_vol * 24
+    destination['A1'].load_liquid(liquid=pool_1, volume=pooled_vol)
+    destination['B1'].load_liquid(liquid=pool_2, volume=pooled_vol)
+    destination['C1'].load_liquid(liquid=pool_3, volume=pooled_vol)
+    destination['D1'].load_liquid(liquid=pool_4, volume=pooled_vol)
+
+    # Commands O-R: pool each rack into its destination well, new tip per tube
+    p300.transfer(transfer_vol, source_1.wells(), destination['A1'], new_tip='always')
+    p300.transfer(transfer_vol, source_2.wells(), destination['B1'], new_tip='always')
+    p300.transfer(transfer_vol, source_3.wells(), destination['C1'], new_tip='always')
+    p300.transfer(transfer_vol, source_4.wells(), destination['D1'], new_tip='always')

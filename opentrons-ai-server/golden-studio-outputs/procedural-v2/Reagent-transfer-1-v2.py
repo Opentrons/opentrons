@@ -4,55 +4,55 @@ metadata = {
     'protocolName': 'Reagent-transfer-1-v2',
     'author': 'Bob',
     'description': 'Transfer',
+    'source': 'OpentronsAI',
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
+requirements = {'robotType': 'OT-2', 'apiLevel': '2.28'}
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # labware
+    # Labware
     source = protocol.load_labware('thermoscientificnunc_96_wellplate_1300ul', 9)
-    destination = protocol.load_labware('opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat', 10)
+    adapter = protocol.load_adapter('opentrons_96_flat_bottom_adapter', 10)
+    destination = adapter.load_labware('nest_96_wellplate_200ul_flat')
+    tiprack_left = protocol.load_labware('opentrons_96_filtertiprack_1000ul', 8)
+    tiprack_right = protocol.load_labware('opentrons_96_tiprack_1000ul', 3)
 
-    tiprack_1 = protocol.load_labware('opentrons_96_filtertiprack_1000ul', 8)
-    tiprack_2 = protocol.load_labware('opentrons_96_tiprack_1000ul', 3)
+    # Pipettes
+    left_pip = protocol.load_instrument('p1000_single_gen2', 'left', tip_racks=[tiprack_left])
+    right_pip = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tiprack_right])
 
-    # pipettes
-    p1000_left = protocol.load_instrument('p1000_single_gen2', 'left', tip_racks=[tiprack_1])
-    p1000_right = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tiprack_2])
-
-    # liquids
-    reagent_1 = protocol.define_liquid(
-        name='Reagent 1',
-        description='Reagent transferred by left-mounted pipette',
-        display_color='#FF0000'
+    # Liquids
+    reagent = protocol.define_liquid(
+        name='Reagent',
+        description='Reagent transferred by the left pipette',
+        display_color='#0000FF',
     )
-    reagent_2 = protocol.define_liquid(
-        name='Reagent 2',
-        description='Liquid transferred by right-mounted pipette',
-        display_color='#0000FF'
+    liquid = protocol.define_liquid(
+        name='Liquid',
+        description='Liquid transferred by the right pipette',
+        display_color='#00AA00',
     )
 
-    # well setup
-    source_wells_1 = [source.wells_by_name()[well] for well in ['A7', 'A6', 'A5', 'A2', 'A3']]
-    destination_wells_1 = [destination.wells_by_name()[well] for well in ['A5', 'A9', 'A1', 'A10', 'A2']]
+    # Wells used by each step
+    left_src_names = ['A7', 'A6', 'A5', 'A2', 'A3']
+    left_dest_names = ['A5', 'A9', 'A1', 'A10', 'A2']
+    right_src_names = ['A9', 'A12', 'A6', 'A10', 'A3']
+    right_dest_names = ['A7', 'A11', 'A6', 'A3', 'A9']
 
-    source_wells_2 = [source.wells_by_name()[well] for well in ['A9', 'A12', 'A6', 'A10', 'A3']]
-    destination_wells_2 = [destination.wells_by_name()[well] for well in ['A7', 'A11', 'A6', 'A3', 'A9']]
+    # Label source liquids before any pipetting.
+    # Source wells A6 and A3 are used by both steps, so they are labeled with both liquids.
+    source_volumes_reagent = {'A7': 300, 'A6': 300, 'A5': 300, 'A2': 300, 'A3': 300}
+    source_volumes_liquid = {'A9': 100, 'A12': 100, 'A6': 100, 'A10': 100, 'A3': 100}
+    source.load_liquid_by_well(source_volumes_reagent, reagent)
+    source.load_liquid_by_well(source_volumes_liquid, liquid)
 
-    # load liquids into source wells before pipetting
-    for well in source_wells_1:
-        well.load_liquid(liquid=reagent_1, volume=196)
-    for well in source_wells_2:
-        well.load_liquid(liquid=reagent_2, volume=8)
+    # Step M: left pipette, new tip for each transfer
+    left_src = [source[w] for w in left_src_names]
+    left_dest = [destination[w] for w in left_dest_names]
+    left_pip.transfer(196, left_src, left_dest, new_tip='always')
 
-    # volumes
-    transfer_vol_1 = 196
-    transfer_vol_2 = 8
-
-    # commands
-    # M: left-mounted pipette, new tip each transfer
-    p1000_left.transfer(transfer_vol_1, source_wells_1, destination_wells_1, new_tip='always')
-
-    # N: right-mounted pipette, same tip for all transfers
-    p1000_right.transfer(transfer_vol_2, source_wells_2, destination_wells_2, new_tip='once')
+    # Step N: right pipette, same tip for all transfers
+    right_src = [source[w] for w in right_src_names]
+    right_dest = [destination[w] for w in right_dest_names]
+    right_pip.transfer(8, right_src, right_dest, new_tip='once')

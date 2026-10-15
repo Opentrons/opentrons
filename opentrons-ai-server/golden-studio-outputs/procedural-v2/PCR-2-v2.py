@@ -2,138 +2,118 @@ from opentrons import protocol_api
 
 metadata = {
     'protocolName': 'PCR-2-v2',
-    'author': 'Bob',
+    'author': 'OpentronsAI',
+    'description': 'PCR setup of 24 samples with mastermix on an OT-2 using a temperature module and thermocycler',
     'source': 'OpentronsAI',
 }
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.28'
+    'apiLevel': '2.28',
 }
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # Sample parameters
-    num_samples = 24
-    sample_vol = 7  # uL
-    mastermix_vol = 8  # uL
+    # Protocol parameters
+    number_of_samples = 24
+    mastermix_volume_ul = 8
+    sample_volume_ul = 7
+    total_mix_volume_ul = mastermix_volume_ul + sample_volume_ul  # 15 uL
     mix_cycles = 4
-    total_mix_vol = sample_vol + mastermix_vol  # 15 uL total
 
-    # Temperature settings
-    sample_temp_c = 4
-    tc_block_temp_c = 8
-    tc_lid_temp_c = 90
-    tc_hold_temp_c = 4
+    block_temperature_c = 8
+    lid_temperature_c = 90
+    sample_temperature_c = 4
+    hold_temperature_c = 4
 
     # Modules
-    thermocycler_module = protocol.load_module('thermocyclerModuleV2')
-    sample_temperature_module = protocol.load_module('temperature module gen2', 1)
+    thermocycler_module = protocol.load_module('thermocyclerModuleV2')  # slot 7
+    sample_temp_module = protocol.load_module('temperature module gen2', 1)
 
     # Labware
-    sample_plate = sample_temperature_module.load_labware(
-        'opentrons_24_aluminumblock_nest_1.5ml_snapcap'
-    )
-    mastermix_rack = protocol.load_labware(
-        'opentrons_24_tuberack_nest_1.5ml_snapcap', 3
-    )
-    dest_plate = thermocycler_module.load_labware(
-        'opentrons_96_wellplate_200ul_pcr_full_skirt'
-    )
+    sample_rack = sample_temp_module.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
+    mastermix_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', 3)
+    destination_plate = thermocycler_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
     tiprack = protocol.load_labware('opentrons_96_filtertiprack_20ul', 4)
 
     # Pipette
-    p20_single = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack]
-    )
+    p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tiprack])
 
     # Well allocation
-    sample_wells = sample_plate.wells()[:num_samples]
-    mastermix_wells = mastermix_rack.wells()[:num_samples]
-    dest_wells = dest_plate.wells()[:num_samples]
+    sample_source_wells = sample_rack.wells()[:number_of_samples]
+    mastermix_source_wells = mastermix_rack.wells()[:number_of_samples]
+    destination_wells = destination_plate.wells()[:number_of_samples]
 
-    # Define liquids
+    # Liquids
     sample_liquid = protocol.define_liquid(
         name='Sample',
-        description='PCR sample liquid',
-        display_color='#FF0000'
+        description='DNA/RNA samples in 1.5 mL tubes on the temperature module',
+        display_color='#FF0000',
     )
     mastermix_liquid = protocol.define_liquid(
         name='Mastermix',
-        description='PCR mastermix liquid',
-        display_color='#00FF00'
+        description='PCR mastermix in 1.5 mL tubes',
+        display_color='#0000FF',
     )
+    for well in sample_source_wells:
+        well.load_liquid(liquid=sample_liquid, volume=50)
+    for well in mastermix_source_wells:
+        well.load_liquid(liquid=mastermix_liquid, volume=100)
 
-    # Load liquids into wells
-    for well in sample_wells:
-        well.load_liquid(liquid=sample_liquid, volume=sample_vol)
-    for well in mastermix_wells:
-        well.load_liquid(liquid=mastermix_liquid, volume=mastermix_vol)
-
-    # Command O: Set thermocycler block temperature
-    thermocycler_module.set_block_temperature(tc_block_temp_c)
-
-    # Command P: Set thermocycler lid temperature
-    thermocycler_module.set_lid_temperature(tc_lid_temp_c)
-
-    # Command Q: Open thermocycler lid
+    # Thermocycler setup
+    thermocycler_module.set_block_temperature(block_temperature_c)
+    thermocycler_module.set_lid_temperature(lid_temperature_c)
     thermocycler_module.open_lid()
 
-    # Command R: Set sample temperature module
-    sample_temperature_module.set_temperature(sample_temp_c)
+    # Sample temperature module
+    sample_temp_module.set_temperature(sample_temperature_c)
 
-    # Command S: Transfer mastermix, same tip for all transfers
-    p20_single.transfer(
-        mastermix_vol,
-        mastermix_wells,
-        dest_wells,
-        new_tip='once'
+    # Transfer mastermix (same tip for all transfers)
+    p20.transfer(
+        mastermix_volume_ul,
+        mastermix_source_wells,
+        destination_wells,
+        new_tip='once',
     )
 
-    # Command T: Transfer sample, mix, blow out, new tip each transfer
-    p20_single.transfer(
-        sample_vol,
-        sample_wells,
-        dest_wells,
+    # Transfer samples, mix, blow out in destination well (new tip each transfer)
+    p20.transfer(
+        sample_volume_ul,
+        sample_source_wells,
+        destination_wells,
         new_tip='always',
-        mix_after=(mix_cycles, total_mix_vol),
+        mix_after=(mix_cycles, total_mix_volume_ul),
         blow_out=True,
-        blowout_location='destination well'
+        blowout_location='destination well',
     )
 
-    # Command U: Close thermocycler lid
+    # PCR
     thermocycler_module.close_lid()
 
-    # Command V: PCR cycling - step 1
     thermocycler_module.execute_profile(
         steps=[{'temperature': 72, 'hold_time_seconds': 57}],
         repetitions=1,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul,
     )
 
-    # Command W: PCR cycling - step 2
     thermocycler_module.execute_profile(
         steps=[
             {'temperature': 75, 'hold_time_seconds': 9},
             {'temperature': 84, 'hold_time_seconds': 10},
-            {'temperature': 65, 'hold_time_seconds': 43}
+            {'temperature': 65, 'hold_time_seconds': 43},
         ],
         repetitions=12,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul,
     )
 
-    # Command X: PCR cycling - step 3
     thermocycler_module.execute_profile(
         steps=[{'temperature': 62, 'hold_time_seconds': 180}],
         repetitions=1,
-        block_max_volume=total_mix_vol
+        block_max_volume=total_mix_volume_ul,
     )
 
-    # Command Y: Hold thermocycler block
-    thermocycler_module.set_block_temperature(tc_hold_temp_c)
-
-    # Command Z: Open thermocycler lid
+    # Hold and finish
+    thermocycler_module.set_block_temperature(hold_temperature_c)
     thermocycler_module.open_lid()
 
-    # Command AA: Deactivate sample temperature module
-    sample_temperature_module.deactivate()
+    sample_temp_module.deactivate()

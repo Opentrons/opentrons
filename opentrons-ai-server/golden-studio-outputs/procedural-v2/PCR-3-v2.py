@@ -3,7 +3,7 @@ from opentrons import protocol_api
 metadata = {
     'protocolName': 'PCR-3-v2',
     'author': 'OpentronsAI',
-    'description': 'PCR setup protocol with sample and mastermix temperature modules and thermocycler',
+    'description': 'PCR setup with temperature modules and thermocycler using a 1-channel pipette (64 samples)',
     'source': 'OpentronsAI',
 }
 
@@ -14,125 +14,120 @@ requirements = {
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    # Sample parameters
-    num_samples = 64
-    num_cols = num_samples // 8
-    sample_volume_ul = 5
-    master_mix_volume_ul = 7
-    mix_cycles = 9
-    total_mix_volume_ul = sample_volume_ul + master_mix_volume_ul  # 12 uL total
+    # Parameters
+    NUMBER_OF_SAMPLES = 64
+    SAMPLE_VOL = 5          # uL
+    MASTERMIX_VOL = 7       # uL
+    MIX_CYCLES = 9
+    TOTAL_VOL = SAMPLE_VOL + MASTERMIX_VOL  # 12 uL
 
-    # Temperature settings
-    sample_temperature_c = 4
-    master_mix_temperature_c = 10
-
-    # Thermocycler parameters
-    lid_temperature_c = 55
-    initial_block_temperature_c = 6
-    final_hold_temperature_c = 4
+    SAMPLE_TEMP = 4         # C
+    MASTERMIX_TEMP = 10     # C
+    TC_BLOCK_TEMP = 6       # C
+    TC_LID_TEMP = 55        # C
+    TC_HOLD_TEMP = 4        # C
 
     # Modules
-    thermocycler_module = protocol.load_module('thermocyclerModuleV2')
-    sample_temperature_module = protocol.load_module('temperature module gen2', 'D1')
-    master_mix_temperature_module = protocol.load_module('temperature module gen2', 'D3')
+    thermocycler = protocol.load_module('thermocyclerModuleV2')  # occupies A1+B1
+    sample_temp_mod = protocol.load_module('temperature module gen2', 'D1')
+    mastermix_temp_mod = protocol.load_module('temperature module gen2', 'D3')
 
     # Adapters
-    sample_adapter = sample_temperature_module.load_adapter('opentrons_96_well_aluminum_block')
-    master_mix_adapter = master_mix_temperature_module.load_adapter('opentrons_96_well_aluminum_block')
+    sample_adapter = sample_temp_mod.load_adapter('opentrons_96_well_aluminum_block')
+    mastermix_adapter = mastermix_temp_mod.load_adapter('opentrons_96_well_aluminum_block')
 
     # Labware
     sample_plate = sample_adapter.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
-    master_mix_plate = master_mix_adapter.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
-    destination_plate = thermocycler_module.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    mastermix_plate = mastermix_adapter.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
+    dest_plate = thermocycler.load_labware('opentrons_96_wellplate_200ul_pcr_full_skirt')
     tiprack = protocol.load_labware('opentrons_flex_96_filtertiprack_1000ul', 'C1')
+
+    # Trash bin (Flex, apiLevel >= 2.16)
+    trash = protocol.load_trash_bin('A3')
 
     # Pipette
     pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tiprack])
 
-    # Trash bin
-    trash = protocol.load_trash_bin('A3')
-
-    # Well allocation - first 64 wells column-wise
-    sample_source_wells = sample_plate.wells()[:num_samples]
-    master_mix_source_wells = master_mix_plate.wells()[:num_samples]
-    destination_wells = destination_plate.wells()[:num_samples]
+    # Well allocation (single-channel: first 64 wells, column-wise)
+    sample_wells = sample_plate.wells()[:NUMBER_OF_SAMPLES]
+    mastermix_wells = mastermix_plate.wells()[:NUMBER_OF_SAMPLES]
+    dest_wells = dest_plate.wells()[:NUMBER_OF_SAMPLES]
 
     # Define liquids
     sample_liquid = protocol.define_liquid(
         name='Sample',
-        description='PCR sample liquid',
+        description='PCR sample',
         display_color='#FF0000',
     )
-    master_mix_liquid = protocol.define_liquid(
+    mastermix_liquid = protocol.define_liquid(
         name='Mastermix',
-        description='PCR mastermix liquid',
-        display_color='#00FF00',
+        description='PCR mastermix',
+        display_color='#0000FF',
     )
 
-    # Assign liquids to wells before pipetting
-    for well in sample_source_wells:
-        well.load_liquid(liquid=sample_liquid, volume=sample_volume_ul)
-    for well in master_mix_source_wells:
-        well.load_liquid(liquid=master_mix_liquid, volume=master_mix_volume_ul)
+    # Assign liquids to the wells that contain them (volumes are labels only)
+    for well in sample_wells:
+        well.load_liquid(liquid=sample_liquid, volume=SAMPLE_VOL + 5)
+    for well in mastermix_wells:
+        well.load_liquid(liquid=mastermix_liquid, volume=MASTERMIX_VOL + 5)
 
-    # Set thermocycler block and lid temperature, open lid
-    thermocycler_module.set_block_temperature(initial_block_temperature_c)
-    thermocycler_module.set_lid_temperature(lid_temperature_c)
-    thermocycler_module.open_lid()
+    # Thermocycler setup
+    thermocycler.open_lid()
+    thermocycler.set_block_temperature(TC_BLOCK_TEMP)
+    thermocycler.set_lid_temperature(TC_LID_TEMP)
 
-    # Set sample and mastermix temperature modules
-    sample_temperature_module.set_temperature(sample_temperature_c)
-    master_mix_temperature_module.set_temperature(master_mix_temperature_c)
+    # Temperature module setup
+    sample_temp_mod.set_temperature(SAMPLE_TEMP)
+    mastermix_temp_mod.set_temperature(MASTERMIX_TEMP)
 
-    # Transfer mastermix to destination wells (same tip for all transfers)
+    # Transfer mastermix (same tip for all transfers)
     pipette.transfer(
-        master_mix_volume_ul,
-        master_mix_source_wells,
-        destination_wells,
-        new_tip='once'
-    )
-
-    # Transfer sample to destination wells, mix, blow out (same tip for all transfers)
-    pipette.transfer(
-        sample_volume_ul,
-        sample_source_wells,
-        destination_wells,
+        MASTERMIX_VOL,
+        mastermix_wells,
+        dest_wells,
         new_tip='once',
-        mix_after=(mix_cycles, total_mix_volume_ul),
-        blow_out=True,
-        blowout_location='destination well'
     )
 
-    # Close thermocycler lid
-    thermocycler_module.close_lid()
+    # Transfer samples, mix, blow out in destination well (same tip for all transfers)
+    pipette.transfer(
+        SAMPLE_VOL,
+        sample_wells,
+        dest_wells,
+        new_tip='once',
+        mix_after=(MIX_CYCLES, TOTAL_VOL),
+        blow_out=True,
+        blowout_location='destination well',
+    )
 
     # PCR cycling
-    thermocycler_module.execute_profile(
+    thermocycler.close_lid()
+
+    thermocycler.execute_profile(
         steps=[{'temperature': 74, 'hold_time_seconds': 65}],
         repetitions=1,
-        block_max_volume=total_mix_volume_ul
+        block_max_volume=TOTAL_VOL,
     )
 
-    thermocycler_module.execute_profile(
+    thermocycler.execute_profile(
         steps=[
             {'temperature': 60, 'hold_time_seconds': 7},
             {'temperature': 84, 'hold_time_seconds': 19},
-            {'temperature': 57, 'hold_time_seconds': 44}
+            {'temperature': 57, 'hold_time_seconds': 44},
         ],
         repetitions=13,
-        block_max_volume=total_mix_volume_ul
+        block_max_volume=TOTAL_VOL,
     )
 
-    thermocycler_module.execute_profile(
+    thermocycler.execute_profile(
         steps=[{'temperature': 75, 'hold_time_seconds': 480}],
         repetitions=1,
-        block_max_volume=total_mix_volume_ul
+        block_max_volume=TOTAL_VOL,
     )
 
-    # Hold at final temperature, open lid
-    thermocycler_module.set_block_temperature(final_hold_temperature_c)
-    thermocycler_module.open_lid()
+    # Hold and finish
+    thermocycler.set_block_temperature(TC_HOLD_TEMP)
+    thermocycler.open_lid()
 
     # Deactivate temperature modules
-    master_mix_temperature_module.deactivate()
-    sample_temperature_module.deactivate()
+    mastermix_temp_mod.deactivate()
+    sample_temp_mod.deactivate()
