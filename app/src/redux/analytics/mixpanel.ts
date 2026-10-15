@@ -1,13 +1,11 @@
 import mixpanel from 'mixpanel-browser'
 
-import { createLogger } from '/app/logger'
-
 import { CURRENT_VERSION } from '../shell'
 
 import type { Config as MixpanelConfig } from 'mixpanel-browser'
 import type { AnalyticsConfig, AnalyticsEvent } from './types'
 
-const log = createLogger('app/src/redux/analytics/mixpanel.ts')
+const LOG_TAG = 'app/src/redux/analytics/mixpanel.ts'
 
 // pulled in from environment at build time
 const MIXPANEL_ID = _OT_APP_MIXPANEL_ID_
@@ -36,7 +34,9 @@ export function initializeMixpanel(
       console.error('Failed to initialize Mixpanel:', error)
     }
   } else {
-    log.warn('MIXPANEL_ID not found; this is a bug if build is production')
+    console.warn(
+      `[${LOG_TAG}]: MIXPANEL_ID not found; this is a bug if build is production`
+    )
   }
 }
 
@@ -48,7 +48,7 @@ export function trackEvent(
   const name =
     'name' in event && event.name != null ? event.name : 'unknown event'
 
-  log.debug(`Trackable event: ${name}`, { event, optedIn })
+  console.debug(`[${LOG_TAG}]: Trackable event: ${name}`, { event, optedIn })
   if (MIXPANEL_ID != null && optedIn) {
     try {
       if (event.superProperties != null) {
@@ -71,7 +71,9 @@ export function setMixpanelTracking(
     initMixpanelInstanceOnce(config)
     try {
       if (config.optedIn) {
-        log.debug('User has opted into analytics; tracking with Mixpanel')
+        console.debug(
+          `[${LOG_TAG}]: User has opted into analytics; tracking with Mixpanel`
+        )
         mixpanel.identify(config.appId)
         mixpanel.opt_in_tracking()
         mixpanel.register({
@@ -80,7 +82,9 @@ export function setMixpanelTracking(
           appMode: Boolean(isOnDevice) ? 'ODD' : 'Desktop',
         })
       } else {
-        log.debug('User has opted out of analytics; stopping tracking')
+        console.debug(
+          `[${LOG_TAG}]: User has opted out of analytics; stopping tracking`
+        )
         mixpanel.opt_out_tracking()
         mixpanel.reset()
       }
@@ -99,7 +103,7 @@ function initializeMixpanelInstanceOnce(
     if (!hasBeenInitialized && MIXPANEL_ID != null) {
       try {
         hasBeenInitialized = true
-        log.debug('Initializing Mixpanel', { config })
+        console.debug(`[${LOG_TAG}]: Initializing Mixpanel`, { config })
         mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
       } catch (error) {
         console.error('Failed to initialize Mixpanel instance:', error)

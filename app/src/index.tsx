@@ -7,7 +7,6 @@ import { HashRouter } from 'react-router-dom'
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
 import { App } from './App'
-import { createLogger } from './logger'
 import { uiInitialized } from './redux/shell'
 import { store } from './redux/store'
 
@@ -22,12 +21,10 @@ export * from './redux/types'
 
 // component tree
 
-const log = createLogger('app/src/index.tsx')
-
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
 
-log.info('Rendering app UI')
+console.info('[app/src/index.tsx]: Rendering app UI')
 
 const container = document.getElementById('root')
 if (container == null) throw new Error('Failed to find the root element')

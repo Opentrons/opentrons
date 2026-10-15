@@ -37,7 +37,7 @@ async function ensureReleaseCache(baseDirectory: string): Promise<Dirent[]> {
   try {
     return await readdir(baseDirectory, { withFileTypes: true })
   } catch (error: any) {
-    console.error(
+    log.error(
       `Could not read download cache base directory: ${error.name}: ${error.message}: remaking`
     )
     await rm(baseDirectory, { force: true, recursive: true })

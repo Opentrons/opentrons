@@ -9,7 +9,6 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { createLogger } from '../../logger'
 import { ALERT_APP_UPDATE_AVAILABLE, alertTriggered } from '../alerts'
 import { getUpdateChannel } from '../config'
 import { remote } from './remote'
@@ -19,8 +18,6 @@ import type { OperatorFunction } from 'rxjs'
 import type { Action, Epic } from '../types'
 
 const { ipcRenderer } = remote
-
-const log = createLogger('redux/shell/epic.ts')
 
 const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
@@ -42,7 +39,9 @@ const receiveActionFromShellEpic: Epic = () =>
     (_: unknown, incoming: Action) => incoming
   ).pipe<Action>(
     tap(incoming => {
-      log.debug(`Received action from main via IPC: ${incoming.type}`)
+      console.debug(
+        `[redux/shell/epic.ts]: Received action from main via IPC: ${incoming.type}`
+      )
     })
   )
 
