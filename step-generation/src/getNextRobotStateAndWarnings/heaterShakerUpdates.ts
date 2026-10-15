@@ -41,6 +41,11 @@ export const forHeaterShakerSetTargetTemperature = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forHeaterShakerSetTargetTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
@@ -65,6 +70,11 @@ export const forHeaterShakerDeactivateHeater = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forHeaterShakerDeactivateHeater: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
@@ -82,6 +92,11 @@ export const forHeaterShakerSetTargetShakeSpeed = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const rpm = resolveNumericRuntimeValue(params.rpm, runtimeParameters)
   if (moduleId == null || rpm == null) {
+    console.error(
+      `forHeaterShakerSetTargetShakeSpeed: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, rpm=${String(rpm)})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
@@ -98,6 +113,11 @@ export const forHeaterShakerStopShake = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forHeaterShakerStopShake: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
@@ -114,6 +134,11 @@ export const forHeaterShakerOpenLatch = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forHeaterShakerOpenLatch: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
@@ -130,6 +155,11 @@ export const forHeaterShakerCloseLatch = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forHeaterShakerCloseLatch: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const moduleState = _getHeaterShakerModuleState(robotState, moduleId)
