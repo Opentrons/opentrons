@@ -31,8 +31,10 @@ from .commands import (
 from .config import Config
 from .files import FileState, FileStore, FileView
 from .geometry import GeometryView
+from .instrument_interfacing import InstrumentInterfacingView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
+from .liquid_tracking import LiquidTrackingView
 from .liquids import LiquidState, LiquidStore, LiquidView
 from .modules import (
     FlexStackerSubstateNotification,
@@ -113,6 +115,8 @@ class StateView(HasState[State]):
     _wells: WellView
     _geometry: GeometryView
     _motion: MotionView
+    _liquid_tracking: LiquidTrackingView
+    _instrument_interface: InstrumentInterfacingView
     _files: FileView
     _config: Config
     _tasks: TaskView
@@ -178,6 +182,14 @@ class StateView(HasState[State]):
     def motion(self) -> MotionView:
         """Get state view selectors for derived motion state."""
         return self._motion
+
+    @property
+    def liquid_tracking(self) -> LiquidTrackingView:
+        return self._liquid_tracking
+
+    @property
+    def instrument_interfacing(self) -> InstrumentInterfacingView:
+        return self._instrument_interface
 
     @property
     def files(self) -> FileView:
@@ -531,6 +543,21 @@ class StateStore(StateView, ActionHandler):
             addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
             module_view=self._modules,
+        )
+        self._liquid_tracking = LiquidTrackingView(
+            labware_view=self._labware,
+            well_view=self._wells,
+            pipette_view=self._pipettes,
+            geometry_view=self._geometry,
+        )
+        self._instrument_interface = InstrumentInterfacingView(
+            config=self._config,
+            labware_view=self._labware,
+            module_view=self._modules,
+            pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
+            geometry_view=self._geometry,
+            liquid_tracking_view=self._liquid_tracking,
         )
 
     def _update_state_views(self) -> None:
