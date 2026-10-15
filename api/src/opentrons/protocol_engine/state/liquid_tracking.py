@@ -46,35 +46,6 @@ class LiquidTrackingView:
         self._pipettes = pipette_view
         self._geometry = geometry_view
 
-    def get_liquid_handling_z_change(
-        self,
-        labware_id: str,
-        well_name: str,
-        pipette_id: str,
-        operation_volume: float,
-    ) -> float:
-        """Get the change in height from a liquid handling operation."""
-        initial_handling_height = self.get_meniscus_height(
-            labware_id=labware_id, well_name=well_name
-        )
-        final_height = self.get_well_height_after_liquid_handling(
-            labware_id=labware_id,
-            well_name=well_name,
-            pipette_id=pipette_id,
-            initial_height=initial_handling_height,
-            volume=operation_volume,
-        )
-        # this function is only called by
-        # HardwarePipetteHandler::aspirate/dispense while_tracking, and shouldn't
-        # be reached in the case of a simulated liquid_probe
-        assert not isinstance(initial_handling_height, SimulatedProbeResult), (
-            "Initial handling height got SimulatedProbeResult"
-        )
-        assert not isinstance(final_height, SimulatedProbeResult), (
-            "final height is SimulatedProbeResult"
-        )
-        return final_height - initial_handling_height
-
     def get_well_offset_adjustment(
         self,
         labware_id: str,
@@ -90,7 +61,7 @@ class LiquidTrackingView:
         """
         # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
 
-        initial_handling_height = self.get_well_handling_height(
+        initial_handling_height = self._get_well_handling_height(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
@@ -231,7 +202,7 @@ class LiquidTrackingView:
                 f"Unable to find liquid height despite an update at {last_updated}."
             )
 
-    def get_well_handling_height(
+    def _get_well_handling_height(
         self,
         labware_id: str,
         well_name: str,
@@ -250,7 +221,7 @@ class LiquidTrackingView:
             )
         return handling_height
 
-    def find_volume_at_well_height(
+    def _find_volume_at_well_height(
         self,
         labware_id: str,
         well_name: str,
@@ -269,7 +240,7 @@ class LiquidTrackingView:
                 target_height=target_height, well_geometry=well_geometry
             )
 
-    def find_height_at_well_volume(
+    def _find_height_at_well_volume(
         self,
         labware_id: str,
         well_name: str,
@@ -304,7 +275,7 @@ class LiquidTrackingView:
         well_depth = well_def.depth
 
         try:
-            initial_volume = self.find_volume_at_well_height(
+            initial_volume = self._find_volume_at_well_height(
                 labware_id=labware_id, well_name=well_name, target_height=initial_height
             )
             # TODO(jbl, 2026-10-15) DRY. Should try and refactor this out (or the outlying function)
@@ -317,7 +288,7 @@ class LiquidTrackingView:
             # NOTE(cm): if final_volume is outside the bounds of the well, it will get
             # adjusted inside find_height_at_well_volume to accommodate well the height
             # calculation.
-            height_inside_well = self.find_height_at_well_volume(
+            height_inside_well = self._find_height_at_well_volume(
                 labware_id=labware_id, well_name=well_name, target_volume=final_volume
             )
             return self._validate_well_position(
@@ -355,7 +326,7 @@ class LiquidTrackingView:
     ) -> LiquidTrackingType:
         """Convert well volume to height."""
         try:
-            return self.find_height_at_well_volume(
+            return self._find_height_at_well_volume(
                 labware_id=labware_id, well_name=well_name, target_volume=volume
             )
         except InvalidLiquidHeightFound as _exception:
@@ -373,7 +344,7 @@ class LiquidTrackingView:
     ) -> LiquidTrackingType:
         """Convert well height to volume."""
         try:
-            return self.find_volume_at_well_height(
+            return self._find_volume_at_well_height(
                 labware_id=labware_id, well_name=well_name, target_height=height
             )
         except InvalidLiquidHeightFound as _exception:
@@ -399,7 +370,7 @@ class LiquidTrackingView:
                 labware_id=labware_id, well_name=well_name
             )
             try:
-                meniscus_volume = self.find_volume_at_well_height(
+                meniscus_volume = self._find_volume_at_well_height(
                     labware_id=labware_id,
                     well_name=well_name,
                     target_height=meniscus_height,

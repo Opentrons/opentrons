@@ -322,7 +322,7 @@ class LiquidProbeImplementation(
                 well_volume: Union[
                     LiquidTrackingType,
                     update_types.ClearType,
-                ] = self._state_view.geometry.get_well_volume_at_height(
+                ] = self._state_view.liquid_tracking.get_well_volume_at_height(
                     labware_id=params.labwareId,
                     well_name=params.wellName,
                     height=z_pos_or_error,
@@ -394,8 +394,12 @@ class TryLiquidProbeImplementation(
         else:
             z_pos = z_pos_or_error
             try:
-                well_volume = self._state_view.geometry.get_well_volume_at_height(
-                    labware_id=params.labwareId, well_name=params.wellName, height=z_pos
+                well_volume = (
+                    self._state_view.liquid_tracking.get_well_volume_at_height(
+                        labware_id=params.labwareId,
+                        well_name=params.wellName,
+                        height=z_pos,
+                    )
                 )
             except IncompleteLabwareDefinitionError:
                 well_volume = update_types.CLEAR
