@@ -1289,6 +1289,15 @@ interface RuntimeWellLocation {
   }
 }
 
+export interface LiquidProbeStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+}
+
+export type TryLiquidProbeStepGenArgs = LiquidProbeStepGenArgs
+
 export interface TouchTipStepGenArgs {
   pipetteId: string
   labwareId: string
