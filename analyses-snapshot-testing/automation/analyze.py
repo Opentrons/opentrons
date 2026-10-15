@@ -1,6 +1,7 @@
 import asyncio
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -20,7 +21,8 @@ from automation.data.protocol import Protocol
 
 CUSTOM_LABWARE_DIR = Path(__file__).parent.parent / "files" / "labware"
 custom_labware_files = list(CUSTOM_LABWARE_DIR.glob("*.json"))
-ANALYSIS_TIMEOUT = 120  # Timeout per protocol in seconds
+ANALYSIS_TIMEOUT = int(os.environ.get("ANALYSIS_TIMEOUT", "120"))  # Timeout per protocol in seconds
+ANALYSIS_MAX_CONCURRENCY = max(1, int(os.environ.get("ANALYSIS_MAX_CONCURRENCY", "4")))
 OUTPUT_DIR: Path = Path(Path(__file__).parent.parent, "analysis_results")
 OUTPUT_SUFFIX = "_analysis.json"
 
@@ -162,10 +164,12 @@ def analyze_protocol_files(protocol_files: list[Path]) -> list[AnalysisResult]:
             transient=True,
         ) as progress:
             task_id = progress.add_task("Analyzing protocols", total=total)
+            semaphore = anyio.Semaphore(ANALYSIS_MAX_CONCURRENCY)
 
             async def run_and_collect(file: Path) -> None:
                 try:
-                    results.append(await run_analysis(file))
+                    async with semaphore:
+                        results.append(await run_analysis(file))
                 except Exception:
                     pass
                 progress.update(task_id, advance=1)

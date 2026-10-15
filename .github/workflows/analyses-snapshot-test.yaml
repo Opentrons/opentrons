@@ -87,12 +87,15 @@ jobs:
           fi
 
   process-chunk:
-    timeout-minutes: 5
+    timeout-minutes: 15
     needs: collect-chunks
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.collect-chunks.outputs.matrix_json) }}
     runs-on: ubuntu-latest
+    env:
+      ANALYSIS_MAX_CONCURRENCY: "2"
+      ANALYSIS_TIMEOUT: "300"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0

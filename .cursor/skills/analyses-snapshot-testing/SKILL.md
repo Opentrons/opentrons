@@ -146,9 +146,11 @@ Workflow (`analyses-snapshot-test.yaml`) triggers on:
 
 PR label `gen-analyses-snapshot-pr` auto-opens a PR with updated snapshots on failure.
 
+`process-chunk` sets `ANALYSIS_MAX_CONCURRENCY=2` and `ANALYSIS_TIMEOUT=300` to limit runner CPU contention. Local defaults: max concurrency **4**, timeout **120** seconds (override via env).
+
 ## Troubleshooting
 
 - **Snapshot mismatch**: Review diff, update if intentional (`make snapshot-test-update PROTOCOL_NAMES=...`), fix code if not
 - **Protocol not found**: Check registry, run `make prep`, verify file exists and follows naming convention
-- **Analysis timeout** (120s): Simplify protocol or increase timeout in `automation/analyze.py`
+- **Analysis timeout**: Raise `ANALYSIS_TIMEOUT` or lower `ANALYSIS_MAX_CONCURRENCY` when running heavy chunks locally
 - **Environment issues**: Run `make setup`, ensure `uv` is installed and Python 3.12 is available
