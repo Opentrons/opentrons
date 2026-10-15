@@ -101,7 +101,7 @@ class DispenseWhileTrackingImplementation(
 
         state_update = StateUpdate()
 
-        end_point = self._state_view.geometry.get_well_position(
+        end_point = self._state_view.instrument_interface.get_well_position(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.trackToLocation,
@@ -147,7 +147,7 @@ class DispenseWhileTrackingImplementation(
         if isinstance(dispense_result, DefinedErrorData):
             state_update.set_liquid_operated(
                 labware_id=params.labwareId,
-                well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                     params.labwareId,
                     params.wellName,
                     params.pipetteId,
@@ -192,13 +192,13 @@ class DispenseWhileTrackingImplementation(
             ),
             state_update=state_update.set_liquid_operated(
                 labware_id=params.labwareId,
-                well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                     params.labwareId,
                     params.wellName,
                     params.pipetteId,
                 ),
                 volume_added=dispense_result.public.volume
-                * self._state_view.geometry.get_nozzles_per_well(
+                * self._state_view.instrument_interface.get_nozzles_per_well(
                     params.labwareId,
                     params.wellName,
                     params.pipetteId,

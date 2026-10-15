@@ -131,7 +131,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                         move_result.state_update, dispense_result.state_update
                     ).set_liquid_operated(
                         labware_id=labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                        well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                             labware_id, well_name, params.pipetteId
                         ),
                         volume_added=CLEAR,
@@ -149,8 +149,10 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 )
             )
             if volume_added is not None:
-                volume_added *= self._state_view.geometry.get_nozzles_per_well(
-                    labware_id, well_name, params.pipetteId
+                volume_added *= (
+                    self._state_view.instrument_interface.get_nozzles_per_well(
+                        labware_id, well_name, params.pipetteId
+                    )
                 )
             return SuccessData(
                 public=DispenseResult(
@@ -162,7 +164,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                         move_result.state_update, dispense_result.state_update
                     ).set_liquid_operated(
                         labware_id=labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                        well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                             labware_id, well_name, params.pipetteId
                         ),
                         volume_added=volume_added

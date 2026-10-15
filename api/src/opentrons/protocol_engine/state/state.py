@@ -188,7 +188,7 @@ class StateView(HasState[State]):
         return self._liquid_tracking
 
     @property
-    def instrument_interfacing(self) -> InstrumentInterfacingView:
+    def instrument_interface(self) -> InstrumentInterfacingView:
         return self._instrument_interface
 
     @property
@@ -536,14 +536,6 @@ class StateStore(StateView, ActionHandler):
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
         )
-        self._motion = MotionView(
-            config=self._config,
-            labware_view=self._labware,
-            pipette_view=self._pipettes,
-            addressable_area_view=self._addressable_areas,
-            geometry_view=self._geometry,
-            module_view=self._modules,
-        )
         self._liquid_tracking = LiquidTrackingView(
             labware_view=self._labware,
             well_view=self._wells,
@@ -558,6 +550,15 @@ class StateStore(StateView, ActionHandler):
             addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
             liquid_tracking_view=self._liquid_tracking,
+        )
+        self._motion = MotionView(
+            config=self._config,
+            labware_view=self._labware,
+            pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
+            geometry_view=self._geometry,
+            instrument_interface_view=self._instrument_interface,
+            module_view=self._modules,
         )
 
     def _update_state_views(self) -> None:

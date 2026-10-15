@@ -195,7 +195,7 @@ class LabwareMovementHandler:
             # only have a `labware_definition`, not a `labware_id`. Resolve when
             # `check_gripper_labware_tip_collision()` can be made independent of `labware_id`.
             if labware_id is not None:
-                self._state_store.geometry.check_gripper_labware_tip_collision(
+                self._state_store.instrument_interface.check_gripper_labware_tip_collision(
                     # During Analysis we will pass in hard coded estimates for certain positions only accessible during execution
                     gripper_homed_position_z=_GRIPPER_HOMED_POSITION_Z,
                     labware_id=labware_id,
@@ -227,7 +227,7 @@ class LabwareMovementHandler:
         # only have a `labware_definition`, not a `labware_id`. Resolve when
         # `check_gripper_labware_tip_collision()` can be made independent of `labware_id`.
         if labware_id is not None:
-            self._state_store.geometry.check_gripper_labware_tip_collision(
+            self._state_store.instrument_interface.check_gripper_labware_tip_collision(
                 gripper_homed_position_z=gripper_homed_position.z,
                 labware_id=labware_id,
                 current_location=current_location,

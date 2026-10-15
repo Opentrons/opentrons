@@ -193,7 +193,7 @@ async def _execute_common(  # noqa: C901
             well_name=well_name,
             well_location=params.wellLocation,
         )
-        state_view.geometry.validate_probed_height(
+        state_view.instrument_interface.validate_probed_height(
             labware_id=labware_id,
             well_name=well_name,
             pipette_id=pipette_id,

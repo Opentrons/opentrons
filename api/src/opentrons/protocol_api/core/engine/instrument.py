@@ -271,7 +271,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -295,7 +295,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 (
                     end_well_location,
                     _,
-                ) = self._engine_client.state.geometry.get_relative_well_location(
+                ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                     labware_id=labware_id,
                     well_name=well_name,
                     absolute_point=end_location.point,
@@ -412,7 +412,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -436,7 +436,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 (
                     end_well_location,
                     _,
-                ) = self._engine_client.state.geometry.get_relative_well_location(
+                ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                     labware_id=labware_id,
                     well_name=well_name,
                     absolute_point=end_location.point,
@@ -530,7 +530,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -639,7 +639,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         (
             well_location,
             _,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
+        ) = self._engine_client.state.instrument_interface.get_relative_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
@@ -700,7 +700,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 relative_well_location,
                 _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -855,7 +855,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -924,7 +924,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         (
             well_location,
             _,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
+        ) = self._engine_client.state.instrument_interface.get_relative_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
@@ -949,7 +949,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 relative_well_location,
                 _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
@@ -1009,7 +1009,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         (
             well_location,
             dynamic_tracking,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
+        ) = self._engine_client.state.instrument_interface.get_relative_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
@@ -2122,7 +2122,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Given a tip rack, return the maximum allowed volume that can be aspirated with the pipette's current volume mode."""
         return min(
             self.get_max_volume(),
-            self._engine_client.state.geometry.get_nominal_tip_geometry(
+            self._engine_client.state.instrument_interface.get_nominal_tip_geometry(
                 pipette_id=self.pipette_id,
                 labware_id=tip_rack.labware_id,
                 well_name=None,
@@ -2133,11 +2133,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self, tip_rack: LabwareCore, volume: float
     ) -> float:
         """Given a tip rack and the volume to handle, return the maximum allowed volume for the pipette, taking volume mode into consideration."""
-        max_tip_volume = self._engine_client.state.geometry.get_nominal_tip_geometry(
-            pipette_id=self.pipette_id,
-            labware_id=tip_rack.labware_id,
-            well_name=None,
-        ).volume
+        max_tip_volume = (
+            self._engine_client.state.instrument_interface.get_nominal_tip_geometry(
+                pipette_id=self.pipette_id,
+                labware_id=tip_rack.labware_id,
+                well_name=None,
+            ).volume
+        )
 
         # Get the volume mode that the pipette will be in for transferring the given volume, disregarding the current volume mode of the pipette
         volume_mode = self._engine_client.state.pipettes.get_volume_mode_from_volume(

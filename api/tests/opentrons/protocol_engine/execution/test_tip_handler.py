@@ -133,7 +133,7 @@ async def test_flex_pick_up_tip_state(
         mock_state_view.pipettes.get_nozzle_configuration("pipette-id")
     ).then_return(MOCK_MAP)
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry(
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
@@ -210,7 +210,7 @@ async def test_pick_up_tip(
     ).then_return(MOCK_MAP)
 
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry(
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
@@ -470,7 +470,7 @@ async def test_virtual_pick_up_tip(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry(
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
