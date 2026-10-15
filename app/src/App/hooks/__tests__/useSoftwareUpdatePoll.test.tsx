@@ -35,7 +35,7 @@ describe('useSoftwareUpdatePoll', () => {
     renderHook(useSoftwareUpdatePoll, { wrapper })
 
     expect(store.dispatch).not.toHaveBeenCalledWith(checkShellUpdate())
-    vi.advanceTimersByTime(60001)
+    vi.advanceTimersByTime(1000 * 60 * 60 + 1)
     expect(store.dispatch).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledWith(checkShellUpdate())
   })

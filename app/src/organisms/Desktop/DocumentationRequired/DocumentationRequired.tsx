@@ -7,6 +7,7 @@ import {
   SecondaryButton,
   StyledText,
   TextAreaField,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
@@ -80,7 +81,7 @@ export function DocumentationRequired({
       title={t('documentation_required')}
       onClose={onClose}
       closeOnOutsideClick={false}
-      zIndexOverlay={10000}
+      zIndexOverlay={Z_INDEX.COMPLIANCE_MODALS}
       width="47rem"
       height="30rem"
       overflowY="hidden"

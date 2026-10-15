@@ -2,17 +2,17 @@ import asyncio
 import json
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, TypeAlias
 from warnings import warn
 
 from typing_extensions import Literal
 
 from opentrons.config import robot_configs
-from opentrons.config.types import OT3Config, RobotConfig
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
+from opentrons.config.types import OT3Config
+from opentrons.hardware_control import HardwareControlAPI, ThreadManager
 from opentrons.hardware_control.modules import SimulatingModule
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import HardwareFeatureFlags, OT3Mount
-from opentrons.types import Mount
 
 
 # Name and kwargs for a module function
@@ -31,17 +31,6 @@ class ModuleItem:
 
 
 @dataclass(frozen=True)
-class OT2SimulatorSetup:
-    machine: Literal["OT-2 Standard"] = "OT-2 Standard"
-    attached_instruments: Dict[Mount, Dict[str, Optional[str]]] = field(
-        default_factory=dict
-    )
-    attached_modules: Dict[str, List[ModuleItem]] = field(default_factory=dict)
-    config: Optional[RobotConfig] = None
-    strict_attached_instruments: bool = True
-
-
-@dataclass(frozen=True)
 class OT3SimulatorSetup:
     machine: Literal["OT-3 Standard"] = "OT-3 Standard"
     attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]] = field(
@@ -52,44 +41,26 @@ class OT3SimulatorSetup:
     strict_attached_instruments: bool = True
 
 
-SimulatorSetup = Union[OT2SimulatorSetup, OT3SimulatorSetup]
+SimulatorSetup: TypeAlias = OT3SimulatorSetup
 
 
 async def _simulator_for_setup(
     setup: SimulatorSetup, loop: Optional[asyncio.AbstractEventLoop]
 ) -> HardwareControlAPI:
-    if setup.machine == "OT-2 Standard":
-        return await API.build_hardware_simulator(
-            attached_instruments=setup.attached_instruments,
-            attached_modules={
-                k: [
-                    SimulatingModule(serial_number=m.serial_number, model=m.model)
-                    for m in v
-                ]
-                for k, v in setup.attached_modules.items()
-            },
-            config=setup.config,
-            strict_attached_instruments=setup.strict_attached_instruments,
-            loop=loop,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
-    else:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        return await OT3API.build_hardware_simulator(
-            attached_instruments=setup.attached_instruments,
-            attached_modules={
-                k: [
-                    SimulatingModule(serial_number=m.serial_number, model=m.model)
-                    for m in v
-                ]
-                for k, v in setup.attached_modules.items()
-            },
-            config=setup.config,
-            strict_attached_instruments=setup.strict_attached_instruments,
-            loop=loop,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
+    return await OT3API.build_hardware_simulator(
+        attached_instruments=setup.attached_instruments,
+        attached_modules={
+            k: [
+                SimulatingModule(serial_number=m.serial_number, model=m.model)
+                for m in v
+            ]
+            for k, v in setup.attached_modules.items()
+        },
+        config=setup.config,
+        strict_attached_instruments=setup.strict_attached_instruments,
+        loop=loop,
+        feature_flags=HardwareFeatureFlags.build_from_ff(),
+    )
 
 
 async def create_simulator(
@@ -118,38 +89,20 @@ async def load_simulator(
 def _thread_manager_for_setup(
     setup: SimulatorSetup,
 ) -> ThreadManager[HardwareControlAPI]:
-    if setup.machine == "OT-2 Standard":
-        return ThreadManager(
-            API.build_hardware_simulator,
-            attached_instruments=setup.attached_instruments,
-            attached_modules={
-                k: [
-                    SimulatingModule(serial_number=m.serial_number, model=m.model)
-                    for m in v
-                ]
-                for k, v in setup.attached_modules.items()
-            },
-            config=setup.config,
-            strict_attached_instruments=setup.strict_attached_instruments,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
-    else:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        return ThreadManager(
-            OT3API.build_hardware_simulator,
-            attached_instruments=setup.attached_instruments,
-            attached_modules={
-                k: [
-                    SimulatingModule(serial_number=m.serial_number, model=m.model)
-                    for m in v
-                ]
-                for k, v in setup.attached_modules.items()
-            },
-            config=setup.config,
-            strict_attached_instruments=setup.strict_attached_instruments,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
+    return ThreadManager(
+        OT3API.build_hardware_simulator,
+        attached_instruments=setup.attached_instruments,
+        attached_modules={
+            k: [
+                SimulatingModule(serial_number=m.serial_number, model=m.model)
+                for m in v
+            ]
+            for k, v in setup.attached_modules.items()
+        },
+        config=setup.config,
+        strict_attached_instruments=setup.strict_attached_instruments,
+        feature_flags=HardwareFeatureFlags.build_from_ff(),
+    )
 
 
 async def create_simulator_thread_manager(
@@ -206,38 +159,9 @@ def load_simulator_setup(path: Path) -> SimulatorSetup:
         warn(
             "Simulator configuration does not name a machine, defaulting to OT-2 Standard"
         )
-    machine_type = obj.get("machine", "OT-2 Standard")
-    if machine_type == "OT-2 Standard":
-        return OT2SimulatorSetup(
-            **{k: _prepare_for_simulator_setup(k, v) for (k, v) in obj.items()}
-        )
-    else:
-        return OT3SimulatorSetup(
-            **{k: _prepare_for_ot3_simulator_setup(k, v) for (k, v) in obj.items()}
-        )
-
-
-def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
-    """Convert value to a SimulatorSetup"""
-    if key == "attached_instruments" and value:
-        return {Mount[mount.upper()]: data for (mount, data) in value.items()}
-    if key == "config" and value:
-        return robot_configs.build_config_ot2(value)
-    if key == "attached_modules" and value:
-        attached_modules: Dict[str, List[ModuleItem]] = {}
-        for key, item in value.items():
-            for obj in item:
-                attached_modules.setdefault(key, []).append(
-                    ModuleItem(
-                        serial_number=obj["serial_number"],
-                        model=obj["model"],
-                        calls=[ModuleCall(**data) for data in obj["calls"]],
-                    )
-                )
-
-        return attached_modules
-
-    return value
+    return OT3SimulatorSetup(
+        **{k: _prepare_for_ot3_simulator_setup(k, v) for (k, v) in obj.items()}
+    )
 
 
 def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:

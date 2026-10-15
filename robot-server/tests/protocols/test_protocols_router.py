@@ -51,12 +51,10 @@ from robot_server.protocols.analysis_models import (
     PendingAnalysis,
 )
 from robot_server.protocols.analysis_store import (
-    AnalysisIsPendingError,
     AnalysisNotFoundError,
     AnalysisStore,
 )
 from robot_server.protocols.completed_analysis_store import UnreadableAnalysisError
-from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.protocol_models import (
     Metadata,
@@ -475,7 +473,6 @@ async def test_create_existing_protocol(
         id="analysis-id",
         status=AnalysisStatus.COMPLETED,
     )
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
         await file_reader_writer.read(
             # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
@@ -494,19 +491,14 @@ async def test_create_existing_protocol(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([completed_analysis])
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
             run_time_param_paths={},
+            last_analysis_summary=completed_analysis,
         )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            last_analysis_summary=completed_analysis, new_parameters=[]
-        )
-    ).then_return(True)
+    ).then_return(None)
     decoy.when(protocol_store.get_all()).then_return([stored_protocol_resource])
 
     result = await create_protocol(
@@ -617,20 +609,12 @@ async def test_create_protocol(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return([])
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.enqueue_analysis(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
             run_time_param_paths={},
-        )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id",
-            analyzer=analyzer,
         )
     ).then_return(pending_analysis)
 
@@ -767,19 +751,12 @@ async def test_create_new_protocol_with_run_time_params(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return([])
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.enqueue_analysis(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
             run_time_param_paths={"my_csv_file": Path("/dev/null/file-id/file.abc")},
-        )
-    ).then_return(analyzer)
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id",
-            analyzer=analyzer,
         )
     ).then_return(pending_analysis)
     decoy.when(protocol_store.get_all()).then_return([])
@@ -891,20 +868,12 @@ async def test_create_existing_protocol_with_no_previous_analysis(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([])
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.enqueue_analysis(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
             run_time_param_paths={},
-        )
-    ).then_return(analyzer)
-
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id",
-            analyzer=analyzer,
         )
     ).then_return(pending_analysis)
 
@@ -1038,29 +1007,15 @@ async def test_create_existing_protocol_with_different_run_time_params(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return([completed_summary])
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
             run_time_param_paths={
                 "my_csv_file": Path("/dev/null/csv-file-id/file.abc")
             },
-        )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter]
-    )
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            completed_summary, [run_time_parameter]
-        )
-    ).then_return(False)
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id",
-            analyzer=analyzer,
+            last_analysis_summary=completed_summary,
         )
     ).then_return(pending_summary)
 
@@ -1146,15 +1101,6 @@ async def test_create_existing_protocol_with_same_run_time_params(
         protocol_key="dummy-key-222",
         protocol_kind=ProtocolKind.STANDARD,
     )
-    run_time_parameter = NumberParameter(
-        displayName="My parameter",
-        variableName="cool_param",
-        type="int",
-        min=1,
-        max=5,
-        value=2.0,
-        default=3.0,
-    )
     analysis_summaries = [
         AnalysisSummary(
             id="analysis-id",
@@ -1180,23 +1126,15 @@ async def test_create_existing_protocol_with_same_run_time_params(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return(analysis_summaries)
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
             run_time_param_paths={},
+            last_analysis_summary=analysis_summaries[-1],
         )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter]
-    )
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summaries[-1], [run_time_parameter]
-        )
-    ).then_return(True)
+    ).then_return(None)
 
     result = await create_protocol(
         files=[protocol_file],
@@ -1234,7 +1172,6 @@ async def test_create_existing_protocol_with_same_run_time_params(
         key="dummy-key-222",
     )
     assert result.status_code == 200
-    decoy.verify(await analyzer.clean_up())
 
 
 async def test_create_existing_protocol_with_pending_analysis_raises(
@@ -1281,15 +1218,6 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
         protocol_key="dummy-key-222",
         protocol_kind=ProtocolKind.STANDARD,
     )
-    run_time_parameter = NumberParameter(
-        displayName="My parameter",
-        variableName="cool_param",
-        type="int",
-        min=1,
-        max=5,
-        value=2.0,
-        default=3.0,
-    )
     analysis_summaries = [
         AnalysisSummary(
             id="analysis-id",
@@ -1315,23 +1243,6 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
     ).then_return(analysis_summaries)
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
-    decoy.when(
-        await analyses_manager.initialize_analyzer(
-            analysis_id="analysis-id",
-            protocol_resource=stored_protocol_resource,
-            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-            run_time_param_paths={},
-        )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter]
-    )
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summaries[-1], [run_time_parameter]
-        )
-    ).then_raise(AnalysisIsPendingError("a-id"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_protocol(
@@ -1754,15 +1665,6 @@ async def test_create_protocol_analyses_with_same_rtp_values(
             status=AnalysisStatus.COMPLETED,
         ),
     ]
-    run_time_parameter = NumberParameter(
-        displayName="My parameter",
-        variableName="cool_param",
-        type="int",
-        min=1,
-        max=5,
-        value=2.0,
-        default=3.0,
-    )
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/foo.json"),
@@ -1792,23 +1694,15 @@ async def test_create_protocol_analyses_with_same_rtp_values(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return(analysis_summaries)
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
             run_time_param_paths={},
+            last_analysis_summary=analysis_summaries[-1],
         )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter]
-    )
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summaries[-1], [run_time_parameter]
-        )
-    ).then_return(True)
+    ).then_return(None)
 
     result = await create_protocol_analysis(
         protocolId="protocol-id",
@@ -1825,7 +1719,6 @@ async def test_create_protocol_analyses_with_same_rtp_values(
     )
     assert result.content.data == analysis_summaries
     assert result.status_code == 200
-    decoy.verify(await analyzer.clean_up())
 
 
 async def test_update_protocol_analyses_with_new_rtp_values(
@@ -1905,27 +1798,13 @@ async def test_update_protocol_analyses_with_new_rtp_values(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return(analysis_summaries)
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.start_analysis_if_rtps_differ(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_files,
-        )
-    ).then_return(analyzer)
-    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
-        [run_time_parameter, csv_parameter]
-    )
-    decoy.when(
-        await analysis_store.matching_rtp_values_in_analysis(
-            analysis_summaries[-1], [run_time_parameter, csv_parameter]
-        )
-    ).then_return(False)
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id-2",
-            analyzer=analyzer,
+            last_analysis_summary=analysis_summaries[-1],
         )
     ).then_return(
         AnalysisSummary(
@@ -2006,19 +1885,12 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
         stored_protocol_resource
     )
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.enqueue_analysis(
             analysis_id="analysis-id-2",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={},
             run_time_param_paths={},
-        )
-    ).then_return(analyzer)
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id-2",
-            analyzer=analyzer,
         )
     ).then_return(AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING))
 
@@ -2119,19 +1991,12 @@ async def test_create_protocol_kind_quick_transfer(
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
     ).then_return([])
-    analyzer = decoy.mock(cls=ProtocolAnalyzer)
     decoy.when(
-        await analyses_manager.initialize_analyzer(
+        await analyses_manager.enqueue_analysis(
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
             run_time_param_values={},
             run_time_param_paths={},
-        )
-    ).then_return(analyzer)
-    decoy.when(
-        await analyses_manager.start_analysis(
-            analysis_id="analysis-id",
-            analyzer=analyzer,
         )
     ).then_return(pending_analysis)
     decoy.when(protocol_store.get_all()).then_return([])

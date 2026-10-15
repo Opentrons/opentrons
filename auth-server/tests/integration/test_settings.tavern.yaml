@@ -87,6 +87,8 @@ stages:
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
+        meta:
+          requiresLogout: true
 
   - name: GET settings after PATCH returns updated value
     request:
@@ -158,6 +160,8 @@ stages:
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
+        meta:
+          requiresLogout: true
 
   - name: Admin re-login after enabling password complexity
     request:
@@ -215,12 +219,14 @@ stages:
         data:
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
+          passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+---
 test_name: DELETE resets to defaults except including accessControlEnabled when not in db
 
 marks:
@@ -251,6 +257,8 @@ stages:
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
+        meta:
+          requiresLogout: false
 
   - name: DELETE returns the newly reset settings
     request:

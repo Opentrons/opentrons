@@ -23,6 +23,7 @@ import {
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
@@ -108,12 +109,13 @@ const ProtocolHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -122,13 +124,15 @@ const ProtocolHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isProtocolFetching ? (
@@ -154,14 +158,16 @@ const ProtocolHeader = ({
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={handleRunProtocol}
-        buttonText={t('protocol_details:start_setup')}
-        disabled={isProtocolFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={handleRunProtocol}
+          buttonText={t('protocol_details:start_setup')}
+          disabled={isProtocolFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -392,7 +398,14 @@ export function ProtocolDetails(): JSX.Element | null {
     setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId })
+      : createRun(
+          { protocolId },
+          {
+            onError: () => {
+              setStartSetup(false)
+            },
+          }
+        )
   }
   const [showConfirmDeleteProtocol, setShowConfirmationDeleteProtocol] =
     useState<boolean>(false)

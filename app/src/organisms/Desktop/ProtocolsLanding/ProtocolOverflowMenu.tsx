@@ -16,6 +16,7 @@ import {
   POSITION_RELATIVE,
   useConditionalConfirm,
   useMenuHandleClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
@@ -127,7 +128,7 @@ export function ProtocolOverflowMenu(
       {showOverflowMenu ? (
         <Flex
           whiteSpace={NO_WRAP}
-          zIndex={10}
+          zIndex={Z_INDEX.MENUS}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

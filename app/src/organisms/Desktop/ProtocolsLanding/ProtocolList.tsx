@@ -21,6 +21,7 @@ import {
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { Slideout } from '/app/atoms/Slideout'
@@ -203,7 +204,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           </Flex>
           {showSortByMenu && (
             <Flex
-              zIndex={2}
+              zIndex={Z_INDEX.MENUS}
               borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}

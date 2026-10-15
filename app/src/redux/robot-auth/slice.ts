@@ -198,6 +198,11 @@ export const getLocalRobotAuthState = createSelector(
   }
 )
 
+export const getIsLoggedInToAnyRobot = (state: State): boolean =>
+  Object.values(state.robotAuth.perRobotAuthStates).some(
+    authState => authState != null
+  )
+
 export const getMostRecentRobotName = createSelector(
   (state: State) => state,
   (state: State): string | null => state.robotAuth.mostRecentRobotName

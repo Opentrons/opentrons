@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -220,7 +220,7 @@ describe('OnDeviceLogin', () => {
   })
 
   it('keeps next enabled and shows a required error when the new password is empty', () => {
-    const { onStepChange } = renderLogin({
+    const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
       initialUsername: 'alice',
@@ -234,10 +234,11 @@ describe('OnDeviceLogin', () => {
       screen.getByText('on_device_login_password_required')
     ).toBeInTheDocument()
     expect(onStepChange).not.toHaveBeenCalled()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows a length error when the new password is too short', () => {
-    const { onStepChange } = renderLogin({
+    const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
       initialUsername: 'alice',
@@ -249,10 +250,11 @@ describe('OnDeviceLogin', () => {
 
     expect(screen.getByText('must_be_at_least_characters')).toBeInTheDocument()
     expect(onStepChange).not.toHaveBeenCalled()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows a special-character error when length is met but a special character is missing', () => {
-    const { onStepChange } = renderLogin({
+    const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
       initialUsername: 'alice',
@@ -266,10 +268,11 @@ describe('OnDeviceLogin', () => {
       screen.getByText('must_include_at_least_one_special_character')
     ).toBeInTheDocument()
     expect(onStepChange).not.toHaveBeenCalled()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows the length error when both password policy rules fail', () => {
-    const { onStepChange } = renderLogin({
+    const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
       initialUsername: 'alice',
@@ -284,19 +287,25 @@ describe('OnDeviceLogin', () => {
       screen.queryByText('must_include_at_least_one_special_character')
     ).not.toBeInTheDocument()
     expect(onStepChange).not.toHaveBeenCalled()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
-  it('advances to confirm password when the new password meets complexity rules', () => {
+  it('advances to confirm password when the new password meets complexity rules', async () => {
+    const onValidateNewPassword = vi.fn().mockResolvedValue(null)
     const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
       initialUsername: 'alice',
       passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+      onValidateNewPassword,
     })
 
     fillField('access_control:on_device_login_new_password', 'password!')
     clickPrimary('next')
 
+    await waitFor(() => {
+      expect(onValidateNewPassword).toHaveBeenCalledWith('password!')
+    })
     expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
     expect(submitPassword).not.toHaveBeenCalled()
     expect(
@@ -304,7 +313,29 @@ describe('OnDeviceLogin', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('advances to confirm password when reset is required', () => {
+  it('stays on the new-password step when server validation fails', async () => {
+    const onValidateNewPassword = vi
+      .fn()
+      .mockResolvedValue('desktop_password_previously_used')
+    const { onStepChange, submitPassword } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      onValidateNewPassword,
+    })
+
+    fillField('access_control:on_device_login_new_password', 'oldpass123')
+    clickPrimary('next')
+
+    expect(
+      await screen.findByText('desktop_password_previously_used')
+    ).toBeInTheDocument()
+    expect(onValidateNewPassword).toHaveBeenCalledWith('oldpass123')
+    expect(onStepChange).not.toHaveBeenCalled()
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('advances to confirm password when reset is required', async () => {
     const { onStepChange, submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
@@ -314,14 +345,16 @@ describe('OnDeviceLogin', () => {
     fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
 
-    expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
+    await waitFor(() => {
+      expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
+    })
     expect(submitPassword).not.toHaveBeenCalled()
     expect(
       screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
   })
 
-  it('shows a mismatch error when confirm password does not match', () => {
+  it('shows a mismatch error when confirm password does not match', async () => {
     const { submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
@@ -330,6 +363,11 @@ describe('OnDeviceLogin', () => {
 
     fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
+    expect(
+      await screen.findByLabelText(
+        'access_control:on_device_login_confirm_password'
+      )
+    ).toBeInTheDocument()
     fillField('access_control:on_device_login_confirm_password', 'different')
     clickPrimary('confirm')
 
@@ -356,7 +394,7 @@ describe('OnDeviceLogin', () => {
     expect(submitPassword).not.toHaveBeenCalled()
   })
 
-  it('submits when confirm password matches', () => {
+  it('submits when confirm password matches', async () => {
     const { submitPassword } = renderLogin({
       initialStep: 'password',
       isPasswordResetRequired: true,
@@ -365,6 +403,11 @@ describe('OnDeviceLogin', () => {
 
     fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
+    expect(
+      await screen.findByLabelText(
+        'access_control:on_device_login_confirm_password'
+      )
+    ).toBeInTheDocument()
     fillField('access_control:on_device_login_confirm_password', 'newpass123')
     clickPrimary('confirm')
 

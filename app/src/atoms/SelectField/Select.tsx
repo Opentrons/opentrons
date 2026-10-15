@@ -10,6 +10,7 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
@@ -80,7 +81,7 @@ export function Select(props: SelectComponentProps): ReactNode {
     indicatorSeparator: NO_STYLE_FN,
     input: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      zIndex: 5,
+      zIndex: Z_INDEX.BASE,
       position: POSITION_ABSOLUTE,
       top: SPACING.spacing4,
       paddingLeft: SPACING.spacing6,
@@ -104,7 +105,7 @@ export function Select(props: SelectComponentProps): ReactNode {
     }),
     menuPortal: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      zIndex: 10,
+      zIndex: Z_INDEX.MODALS,
     }),
     multiValue: NO_STYLE_FN,
     multiValueLabel: NO_STYLE_FN,

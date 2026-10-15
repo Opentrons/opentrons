@@ -64,6 +64,18 @@ stages:
     response:
       status_code: 201
 
+  - name: Get run after stop
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: stop-requested
+
   - name: Wait for the run to complete
     max_retries: 10
     delay_after: 0.2

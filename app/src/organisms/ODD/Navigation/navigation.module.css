@@ -13,13 +13,13 @@
 
 .nav_bar_sticky {
   position: sticky;
-  z-index: 3;
+  z-index: var(--z-index-details);
   top: 0;
 }
 
 .nav_bar_static {
   position: static;
-  z-index: 0;
+  z-index: var(--z-index-base);
 }
 
 .carousel_contents {

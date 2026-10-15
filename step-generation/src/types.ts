@@ -1219,3 +1219,202 @@ export type UnsafePipetteMovementReason =
 
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+
+export interface ModuleStepGenArgs {
+  moduleId: string
+}
+
+export interface AbsorbanceReaderInitializeStepGenArgs {
+  moduleId: string
+  measureMode: string
+  sampleWavelengths: Array<number | string>
+  referenceWavelength?: number | string
+}
+
+export interface AbsorbanceReaderReadStepGenArgs {
+  moduleId: string
+  fileName?: string | null
+}
+
+export interface ConfigureForVolumeStepGenArgs {
+  pipetteId: string
+  volume: number | string
+}
+
+export interface ConfigureNozzleLayoutStepGenArgs {
+  pipetteId: string
+  configurationParams: {
+    style: string
+    primaryNozzle?: string
+    backLeftNozzle?: string
+  }
+}
+
+export interface VacuumSetPumpPowerStepGenArgs {
+  moduleId: string
+  percentPower: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumSetPumpPressureStepGenArgs {
+  moduleId: string
+  gaugePressure: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumStartRunProfileStepGenArgs {
+  moduleId: string
+  profile: VacuumRunProfileParams['steps']
+  ventAfter: boolean | string
+}
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
+  moduleId: string
+  rpm: number | string
+}
+
+interface RuntimeWellLocation {
+  origin?: string
+  offset?: {
+    x?: number | string
+    y?: number | string
+    z?: number | string
+  }
+}
+
+export interface LiquidProbeStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+}
+
+export type TryLiquidProbeStepGenArgs = LiquidProbeStepGenArgs
+
+export interface TouchTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  zOffsetFromTop: number | string
+  speed?: number | string
+  mmFromEdge?: number | string
+}
+
+export interface PrepareToAspirateStepGenArgs {
+  pipetteId: string
+}
+
+export interface PickUpTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
+  tipTrackingOption?: TipTrackingOption
+}
+
+export interface DropTipStepGenArgs {
+  pipette: string
+  wellName?: string
+  dropTipLocation?: string
+  isReturnTip?: boolean
+}
+
+export interface DispenseWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+  pushOut?: number | string
+}
+
+export interface DispenseInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  pushOut?: number | string
+  correctionVolume?: number | string
+  isAirGap?: boolean
+}
+
+export interface BlowOutInWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  flowRate: number | string
+  wellLocation?: RuntimeWellLocation
+}
+
+export interface BlowOutInPlaceStepGenArgs {
+  pipetteId: string
+  flowRate: number | string
+}
+
+export interface AspirateWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+}
+
+export interface AspirateInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  correctionVolume?: number | string
+}
+
+export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
+  celsius: number | string
+}
+
+export interface MoveRelativeStepGenArgs {
+  pipetteId: string
+  axis: string
+  distance: number | string
+}
+
+export interface MoveToCoordinatesStepGenArgs {
+  pipetteId: string
+  coordinates: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+}
+
+export interface MoveToWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  speed?: number | string
+}
+
+export interface MoveLabwareStepGenArgs {
+  labwareId: string
+  strategy: string
+  newLocation:
+    | string
+    | { slotName: string }
+    | { moduleId: string }
+    | { labwareId: string }
+    | { addressableAreaName: string }
+}

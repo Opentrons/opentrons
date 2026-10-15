@@ -9,6 +9,7 @@ import {
   Flex,
   LegacyStyledText,
   SPACING,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -30,9 +31,6 @@ import { UpdateResultsModal } from './UpdateResultsModal'
 import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-
-// Below the login overlay (z-index 10001) and admin-credentials toast (10002).
-const UPDATE_NEEDED_MODAL_Z_INDEX = 1000
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -88,10 +86,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
   }
 
   const modalContent = (
-    <OddModal
-      header={updateNeededHeader}
-      modalZIndex={UPDATE_NEEDED_MODAL_Z_INDEX}
-    >
+    <OddModal header={updateNeededHeader} modalZIndex={Z_INDEX.BLOCKING_MODALS}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans

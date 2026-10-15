@@ -7,7 +7,7 @@ import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};
   inset: 0;
-  z-index: 4;
+  z-index: var(--z-index-menus);
   background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
 `
 

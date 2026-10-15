@@ -17,6 +17,7 @@ import {
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -215,7 +216,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): ReactNode {
               value={selectedValue}
               width="16rem"
               menuPortalTarget={document.body}
-              styles={{ menuPortal: base => ({ ...base, zIndex: 10 }) }}
+              styles={{
+                menuPortal: base => ({ ...base, zIndex: Z_INDEX.MODALS }),
+              }}
             />
           </Box>
           <Trans

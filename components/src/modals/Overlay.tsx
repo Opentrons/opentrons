@@ -1,4 +1,4 @@
-import { Flex, POSITION_FIXED } from '..'
+import { Flex, POSITION_FIXED, Z_INDEX } from '..'
 
 import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 
@@ -26,7 +26,7 @@ export function Overlay(props: OverlayProps): ReactNode {
       right="0"
       top="0"
       bottom="0"
-      zIndex="1"
+      zIndex={Z_INDEX.BASE}
       backgroundColor={
         alertOverlay != null && alertOverlay
           ? alertOverlayBackgroundColor

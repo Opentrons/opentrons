@@ -1,21 +1,42 @@
-import { PROTOCOL_CONTEXT_NAME, uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import {
+  PROTOCOL_CONTEXT_NAME,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
 import type { WaitForTasksParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const waitForTasks: CommandCreator<WaitForTasksParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const pythonArg = `[${args.task_ids.join(', ')}]`
+  const { runtimeParameters } = invariantContext
+  const errors: CommandCreatorError[] = []
+  const resolvedTaskIds: string[] = []
+  args.task_ids.forEach(taskId => {
+    const resolvedTaskId = resolveStringRuntimeValue(taskId, runtimeParameters)
+    if (resolvedTaskId == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({ parameterName: taskId })
+      )
+    } else {
+      resolvedTaskIds.push(resolvedTaskId)
+    }
+  })
+  if (errors.length > 0) {
+    return { errors }
+  }
+  const pythonArg = `[${resolvedTaskIds.join(', ')}]`
   const python = `${PROTOCOL_CONTEXT_NAME}.wait_for_tasks(${pythonArg})`
   return {
     commands: [
       {
         key: uuid(),
         commandType: 'waitForTasks',
-        params: args,
+        params: { task_ids: resolvedTaskIds },
       },
     ],
     python,

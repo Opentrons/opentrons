@@ -15,6 +15,7 @@ import {
   POSITION_RELATIVE,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -211,7 +212,7 @@ export function OverflowMenu({
         <Flex
           ref={calsOverflowWrapperRef}
           whiteSpace={NO_WRAP}
-          zIndex={10}
+          zIndex={Z_INDEX.MENUS}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

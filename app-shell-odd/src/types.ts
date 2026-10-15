@@ -1,5 +1,4 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Logger } from '@opentrons/app/src/logger'
 import type { Config } from '@opentrons/app/src/redux/config/types'
 import type {
   Action,
@@ -9,9 +8,6 @@ import type {
 export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
-
-export type { Logger }
-
 export interface Manifest {
   productionV2: {
     [version: string]: {
@@ -21,6 +17,17 @@ export interface Manifest {
       releaseNotes: [url: string]
     }
   }
+}
+
+export type Log = (message: string, meta?: {}) => void
+export interface Logger {
+  error: Log
+  warn: Log
+  info: Log
+  http: Log
+  verbose: Log
+  debug: Log
+  silly: Log
 }
 
 export type { Config }

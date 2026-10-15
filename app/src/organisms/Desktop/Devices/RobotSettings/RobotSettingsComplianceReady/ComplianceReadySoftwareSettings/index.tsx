@@ -12,6 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
@@ -21,7 +22,6 @@ import {
   getFieldValuesFromSettings,
   isValidLogoutIdleTime,
   isValidMaxNumberOfLoginAttempts,
-  isValidPasswordComplexityMinimumLength,
   isValidPasswordResetTime,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,

@@ -1,3 +1,5 @@
+import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
+
 import {
   AUDIT_SERVER_SETTING_FIELD_IDS,
   AUTH_SERVER_SETTING_FIELD_IDS,
@@ -27,15 +29,6 @@ export const MIN_PASSWORD_RESET_TIME_DAYS = 1
 export function isValidLogoutIdleTime(value: string): boolean {
   const parsedValue = Number(value)
   return Number.isFinite(parsedValue) && parsedValue > 0
-}
-
-export function isValidPasswordComplexityMinimumLength(value: string): boolean {
-  const parsedValue = Number(value)
-  return (
-    Number.isInteger(parsedValue) &&
-    parsedValue > 0 &&
-    parsedValue <= MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH
-  )
 }
 
 export function isValidMaxNumberOfLoginAttempts(value: string): boolean {

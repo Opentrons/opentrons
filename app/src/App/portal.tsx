@@ -12,7 +12,7 @@
  * things should use the top portal.
  */
 
-import { Box } from '@opentrons/components'
+import { Box, Z_INDEX } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 
@@ -28,9 +28,21 @@ export function getTopPortalEl(): HTMLElement {
 }
 
 export function ModalPortalRoot(): ReactNode {
-  return <Box zIndex={1} id={MODAL_PORTAL_ID} data-testid={MODAL_PORTAL_ID} />
+  return (
+    <Box
+      zIndex={Z_INDEX.BASE}
+      id={MODAL_PORTAL_ID}
+      data-testid={MODAL_PORTAL_ID}
+    />
+  )
 }
 
 export function TopPortalRoot(): ReactNode {
-  return <Box zIndex={10} id={TOP_PORTAL_ID} data-testid={TOP_PORTAL_ID} />
+  return (
+    <Box
+      zIndex={Z_INDEX.MODALS}
+      id={TOP_PORTAL_ID}
+      data-testid={TOP_PORTAL_ID}
+    />
+  )
 }

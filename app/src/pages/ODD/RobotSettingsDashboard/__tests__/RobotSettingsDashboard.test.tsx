@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useAccessControlEnabledQuery,
   usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
@@ -127,6 +128,9 @@ const mockDispatch = vi.fn()
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
     } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)

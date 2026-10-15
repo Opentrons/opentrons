@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { COLORS } from '@opentrons/components'
+import { COLORS, Z_INDEX } from '@opentrons/components'
 
 import { OddModal } from '/app/molecules/OddModal'
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
@@ -29,7 +29,7 @@ const ActionsViewImpl = ({
   return (
     <OddModal
       header={actionViewHeader}
-      modalZIndex={1002}
+      modalZIndex={Z_INDEX.COMPLIANCE_MODAL_DETAILS}
       onOutsideClick={modal.remove}
       overflow="hidden"
     >

@@ -43,7 +43,7 @@ import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ProtocolCardProps {
   protocol: ProtocolResource
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
@@ -113,7 +113,7 @@ export function ProtocolCard(props: ProtocolCardProps): ReactNode {
 
   useEffect(() => {
     if (longpress.isLongPressed) {
-      longPress(true)
+      longPress?.(true)
       setTargetProtocolId(protocol.id)
       setIsRequiredCSV(isRequiredCSV)
     }

@@ -141,7 +141,7 @@ export const fontStyleCaptionRegular = `${fontWeightCaptionRegular} ${fontSizeCa
 // Code
 const fontSizeCode = '0.8125rem' // 12px
 const lineHeightCode = '1.25rem' // 20px
-const fontFamilyCode = 'Reddit Mono'
+const fontFamilyCode = 'Reddit Mono Variable'
 
 // Code-Regular
 export const fontSizeCodeRegular = fontSizeCode
@@ -149,3 +149,10 @@ export const lineHeightCodeRegular = lineHeightCode
 export const fontFamilyCodeRegular = fontFamilyCode
 export const fontWeightCodeRegular = fontWeightRegular
 export const fontStyleCodeRegular = `${fontWeightCodeRegular} ${fontSizeCodeRegular}/${lineHeightCodeRegular} ${fontFamilyCodeRegular}`
+
+// Code-Bold
+export const fontSizeCodeBold = fontSizeCode
+export const lineHeightCodeBold = lineHeightCode
+export const fontFamilyCodeBold = fontFamilyCode
+export const fontWeightCodeBold = fontWeightBold
+export const fontStyleCodeBold = `${fontWeightCodeBold} ${fontSizeCodeBold}/${lineHeightCodeBold} ${fontFamilyCodeBold}`

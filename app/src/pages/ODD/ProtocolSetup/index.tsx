@@ -631,11 +631,16 @@ function PrepareToRun({
         overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing40}
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing2}
-            maxWidth="43rem"
+            flex="1"
+            minWidth="0"
           >
             {!isLoading ? (
               <>
@@ -658,7 +663,7 @@ function PrepareToRun({
               <ProtocolSetupTitleSkeleton />
             )}
           </Flex>
-          <Flex gridGap={SPACING.spacing16}>
+          <Flex gridGap={SPACING.spacing16} flexShrink={0}>
             <CloseButton
               onClose={() => {
                 setShowConfirmCancelModal(true)
@@ -890,7 +895,6 @@ export function ProtocolSetup(): ReactNode {
       !offsetsConfirmed ? 'apply_offsets' : null,
       'play_run',
     ].filter((action): action is AuditLogAction => action != null)
-    console.log('actionsToDocument', actions)
     return actions
   }, [cameraSettingsApplied, offsetsConfirmed])
 

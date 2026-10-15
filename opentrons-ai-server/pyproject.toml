@@ -21,6 +21,7 @@ dependencies = [
     "google-auth-oauthlib==1.2.1",
     "anthropic==0.120.2",
     "weave==0.51.54",
+    "nh3==0.3.7",
 ]
 
 [project.optional-dependencies]

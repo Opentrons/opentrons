@@ -116,6 +116,7 @@ export function DocumentationRequired({
       </div>
       <div className={styles.keyboard_container}>
         <AccordionKeyboard
+          inputRef={textAreaRef}
           isOpen={keyboardExpanded}
           onToggle={handleKeyboardToggle}
         >

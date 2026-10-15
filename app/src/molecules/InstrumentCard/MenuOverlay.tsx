@@ -8,6 +8,7 @@ import {
   MenuItem,
   NO_WRAP,
   POSITION_ABSOLUTE,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
@@ -41,7 +42,7 @@ export function MenuOverlay(props: MenuOverlayProps): ReactNode {
       top="2.25rem"
       right="0"
       whiteSpace={NO_WRAP}
-      zIndex={10}
+      zIndex={Z_INDEX.MENUS}
       onClick={(e: MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()

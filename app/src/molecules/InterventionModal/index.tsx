@@ -18,6 +18,7 @@ import {
   POSITION_STICKY,
   RESPONSIVENESS,
   SPACING,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
@@ -105,7 +106,7 @@ const WRAPPER_STYLE = {
   right: '0',
   top: '0',
   bottom: '0',
-  zIndex: '1',
+  zIndex: Z_INDEX.BASE,
   backgroundColor: `${COLORS.black90}${COLORS.opacity40HexCode}`,
   cursor: CURSOR_DEFAULT,
   'data-testid': '__otInterventionModalWrapper',
@@ -155,7 +156,7 @@ export function InterventionModal({
 
   return (
     <Flex {...WRAPPER_STYLE}>
-      <Flex {...BASE_STYLE} zIndex={10}>
+      <Flex {...BASE_STYLE} zIndex={Z_INDEX.MODALS}>
         <Flex
           {...modalStyle}
           flexDirection={DIRECTION_COLUMN}

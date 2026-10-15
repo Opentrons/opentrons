@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Box } from '@opentrons/components'
+import { Box, Z_INDEX } from '@opentrons/components'
 
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 import { ConfigForm } from './ConfigForm'
@@ -33,7 +33,7 @@ export function ConfigurePipette(props: Props): ReactNode {
   ]
 
   return (
-    <Box zIndex={1}>
+    <Box zIndex={Z_INDEX.BASE}>
       {updateError != null && (
         <ConfigErrorBanner message={updateError.message} />
       )}

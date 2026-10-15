@@ -134,5 +134,5 @@ const IconWrapper = styled(Box)<IconWrapperProps>`
   position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
   left: ${props => `${props.leftPosition}px`};
-  z-index: 3;
+  z-index: var(--z-index-details);
 `

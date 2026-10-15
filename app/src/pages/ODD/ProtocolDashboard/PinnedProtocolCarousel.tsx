@@ -17,7 +17,7 @@ import type { CardSizeType } from './PinnedProtocol'
 
 interface PinnedProtocolCarouselProps {
   pinnedProtocols: ProtocolResource[]
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   isRequiredCSV?: boolean
@@ -28,7 +28,6 @@ export function PinnedProtocolCarousel(
 ): ReactNode {
   const {
     pinnedProtocols,
-    longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
     isRequiredCSV = false,
@@ -59,7 +58,6 @@ export function PinnedProtocolCarousel(
               key={protocol.key}
               lastRun={lastRun}
               protocol={protocol}
-              longPress={longPress}
               setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
               setTargetProtocolId={setTargetProtocolId}
               isRequiredCSV={isRequiredCSV}

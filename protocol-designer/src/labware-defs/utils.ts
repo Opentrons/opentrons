@@ -44,15 +44,25 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
         const version = latestLoadnamesByVersion[groupKey]
+        const group = labwareDefGroups[groupKey]
 
-        //  if the labware is new to a higher up robot-stack version
-        //  do not list it with the labware definition at all
+        // Load names not in the frozen robot-stack snapshot are new to this
+        // PD/robot-stack release (e.g. vacuum spacers). Include the highest
+        // bundled version instead of hiding them.
         if (version == null) {
-          return acc
+          const latestDefInGroup = group.reduce((max, def) =>
+            def.version > max.version ? def : max
+          )
+          return {
+            ...acc,
+            [getLabwareDefURI(latestDefInGroup)]: latestDefInGroup,
+          }
         }
 
-        const group = labwareDefGroups[groupKey]
         const resultIdx = group.findIndex(d => d.version === version)
+        if (resultIdx < 0) {
+          return acc
+        }
         const latestDefInGroup = group[resultIdx]
         return {
           ...acc,

@@ -79,6 +79,35 @@ def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
     return decoy.mock(cls=RunProcessPyroProvider)
 
 
+async def test_get_verified_run_time_parameters_without_coordinator(
+    analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
+) -> None:
+    """Init failure before load must not assert when reading RTPs."""
+    robot_type: RobotType = "OT-3 Standard"
+    subject = ProtocolAnalyzer(
+        analysis_store=analysis_store,
+        protocol_resource=ProtocolResource(
+            protocol_id="protocol-id",
+            created_at=datetime(year=2021, month=1, day=1),
+            source=ProtocolSource(
+                directory=Path("/dev/null"),
+                main_file=Path("/dev/null/abc.json"),
+                config=JsonProtocolConfig(schema_version=123),
+                files=[],
+                metadata={},
+                robot_type=robot_type,
+                content_hash="abc123",
+            ),
+            protocol_key="dummy-data-111",
+            protocol_kind=ProtocolKind.STANDARD,
+        ),
+        run_process_pyro_provider=run_process_pyro_provider,
+    )
+
+    assert await subject.get_verified_run_time_parameters() == []
+
+
 async def test_load_orchestrator(
     decoy: Decoy,
     analysis_store: AnalysisStore,
@@ -116,6 +145,7 @@ async def test_load_orchestrator(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(run_orchestrator)
     await subject.load_orchestrator(
@@ -214,6 +244,7 @@ async def test_analyze(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
     subject = ProtocolAnalyzer(
@@ -296,7 +327,7 @@ async def test_analyze(
             analysis_id="analysis-id",
             robot_type=robot_type,
             run_time_parameters=[bool_parameter],
-            commands=[analysis_command],
+            commands=None,
             labware=[analysis_labware],
             modules=[],
             pipettes=[analysis_pipette],
@@ -356,6 +387,7 @@ async def test_analyze_updates_pending_on_error(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
 

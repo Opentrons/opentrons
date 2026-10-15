@@ -25,14 +25,16 @@ export interface EnsureProtocolAnalysisResult {
 }
 
 /**
- * Poll protocol summaries until analysis is completed. If the protocol has no
- * analysis summaries, start one with POST /protocols/:id/analyses.
+ * Poll protocol summaries until the latest is completed, and poll asDocument
+ * until that analysis document is completed. If the protocol has no analysis
+ * summaries, start one with POST /protocols/:id/analyses.
  */
 export function useEnsureProtocolAnalysis(
   protocolId: string | null
 ): EnsureProtocolAnalysisResult {
   const hasRequestedAnalysis = useRef(false)
   const [shouldPollProtocol, setShouldPollProtocol] = useState(true)
+  const [shouldPollDocument, setShouldPollDocument] = useState(true)
   const { createProtocolAnalysis } =
     useCreateProtocolAnalysisMutation(protocolId)
 
@@ -51,8 +53,7 @@ export function useEnsureProtocolAnalysis(
     analysisId,
     {
       enabled: protocolId != null && analysisId != null,
-      refetchInterval:
-        latestSummary?.status === 'completed' ? false : ANALYSIS_POLL_MS,
+      refetchInterval: shouldPollDocument ? ANALYSIS_POLL_MS : false,
     }
   )
 
@@ -63,6 +64,10 @@ export function useEnsureProtocolAnalysis(
   useEffect(() => {
     setShouldPollProtocol(latestSummary?.status !== 'completed')
   }, [latestSummary?.status])
+
+  useEffect(() => {
+    setShouldPollDocument(analysis?.status !== 'completed')
+  }, [analysis?.status])
 
   useEffect(() => {
     if (

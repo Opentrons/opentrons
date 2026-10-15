@@ -2,7 +2,7 @@ import { I18nextProvider } from 'react-i18next'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { WARNING_TOAST } from '@opentrons/components'
+import { WARNING_TOAST, Z_INDEX } from '@opentrons/components'
 import {
   fetchSelfQuery,
   getSelfQueryKey,
@@ -215,8 +215,8 @@ describe('useRequireAdminForUpdates', () => {
       expect.objectContaining({
         closeButton: true,
         disableTimeout: true,
-        heading: 'Admin credentials required',
-        zIndex: 10002,
+        heading: 'Additional permissions required',
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       })
     )
     expect(mockShowLoginModal).toHaveBeenCalledWith(

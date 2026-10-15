@@ -6,6 +6,7 @@ import {
   Modal,
   PrimaryButton,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
@@ -48,14 +49,13 @@ export function RobotCertImportModal(
       </PrimaryButton>
     </div>
   )
-  // TODO(jj): fix z-index
   return (
     <Modal
       title={t('robot_encryption_key')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
-      zIndexOverlay={10000}
+      zIndexOverlay={Z_INDEX.COMPLIANCE_MODALS}
     >
       <div className={styles.robot_cert_import_container}>
         <div className={styles.text_block}>

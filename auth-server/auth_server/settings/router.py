@@ -34,6 +34,8 @@ from .models import (
     AUTH_SERVER_AUDIT_SYSTEM_NAME,
     AccessControlResponseData,
     PatchSettingsRequestData,
+    PatchSettingsResponseBody,
+    PatchSettingsResponseMeta,
     SettingsResponseData,
 )
 from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
@@ -64,13 +66,37 @@ async def _enable_pyro_subprocess_flags(robot_client: RobotClient) -> None:
         ) from e
 
 
-def _patch_changes_password_complexity(patch: PatchSettingsRequestData) -> bool:
-    """Return whether a settings patch includes password complexity fields."""
+def _patch_increases_password_complexity(
+    patch: PatchSettingsRequestData, old_settings: SettingsResponseData | None = None
+) -> bool:
+    """Return whether a settings patch tightens password requirements."""
     patch_data = patch.model_dump(exclude_unset=True)
-    return (
+    if (
         "passwordComplexitySpecialCharacters" in patch_data
-        or "passwordComplexityMinimumLength" in patch_data
-    )
+        and patch_data["passwordComplexitySpecialCharacters"] is True
+    ):
+        if old_settings is None:
+            return True
+        old_settings_data = old_settings.model_dump()
+        if (
+            old_settings_data["passwordComplexitySpecialCharacters"] is None
+            or old_settings_data["passwordComplexitySpecialCharacters"] is False
+        ):
+            return True
+    if (
+        "passwordComplexityMinimumLength" in patch_data
+        and patch_data["passwordComplexityMinimumLength"] is not None
+    ):
+        if old_settings is None:
+            return True
+        old_settings_data = old_settings.model_dump()
+        if (
+            old_settings_data["passwordComplexityMinimumLength"] is None
+            or old_settings_data["passwordComplexityMinimumLength"]
+            < patch_data["passwordComplexityMinimumLength"]
+        ):
+            return True
+    return False
 
 
 @router.get(
@@ -171,12 +197,19 @@ async def patch_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
     user_store: Annotated[UserStore, fastapi.Depends(get_user_store)],
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
-) -> SimpleBody[SettingsResponseData]:
+) -> PatchSettingsResponseBody:
+    old_settings = settings_store.get_settings()
     new_settings = settings_store.patch_settings(request_body.data)
-    if _patch_changes_password_complexity(request_body.data):
+    requires_logout = _patch_increases_password_complexity(
+        request_body.data, old_settings
+    )
+    if requires_logout:
         user_store.mark_all_reset_password()
         oauth2_backend.revoke_all_tokens()
-    return SimpleBody.model_construct(data=new_settings)
+    return PatchSettingsResponseBody.model_construct(
+        data=new_settings,
+        meta=PatchSettingsResponseMeta(requiresLogout=requires_logout),
+    )
 
 
 @router.delete(

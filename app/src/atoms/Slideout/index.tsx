@@ -18,6 +18,7 @@ import {
   POSITION_FIXED,
   SPACING,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -40,7 +41,7 @@ export interface SlideoutProps {
 }
 
 const SHARED_STYLE = css`
-  z-index: 2;
+  z-index: var(--z-index-details);
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -237,7 +238,7 @@ export const Slideout = (props: SlideoutProps): ReactNode => {
               paddingX={SPACING.spacing16}
               flex="0 0 auto"
               boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
-              zIndex="3"
+              zIndex={Z_INDEX.MENUS}
             >
               {footer}
             </Box>

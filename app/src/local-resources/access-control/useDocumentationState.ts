@@ -57,8 +57,14 @@ export function useDocumentationState(
     auditSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
   const reasonForInteractionLoading = useMemo(
-    () => auditSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
-    [accessControlEnabledQuery?.isLoading, auditSettingsQuery?.isLoading]
+    () =>
+      accessControlEnabledQuery?.isLoading ||
+      (accessControlEnabled && (auditSettingsQuery?.isLoading ?? false)),
+    [
+      accessControlEnabled,
+      accessControlEnabledQuery?.isLoading,
+      auditSettingsQuery?.isLoading,
+    ]
   )
 
   const reasonForInteractionRequired = useMemo(
@@ -80,7 +86,6 @@ export function useDocumentationState(
     ) => {
       let username = usernameOverride ?? usernameRef.current
       if (username == null || username.length === 0) {
-        console.log('calling requireLogin', currentRobotName)
         const loginResult = await requireLogin({
           robotName: currentRobotName ?? '',
         })

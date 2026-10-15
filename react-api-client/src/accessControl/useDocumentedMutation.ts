@@ -100,12 +100,7 @@ async function runMutation<TData, TVariables>(
   // local overrides for in-flight retries; do not write these back to the ref
   documentationState: DocumentationState = docStateRef.current
 ): Promise<TData> {
-  console.log('running mutation', {
-    documentationState,
-    actionsToDocument,
-    mutationFnRef,
-    variables,
-  })
+  console.debug(`running mutation ${actionsToDocument?.join(', ')}`)
   if (documentationState.isLoading) {
     throw new DocumentedMutationError('access_control_loading')
   }
@@ -166,13 +161,11 @@ async function runMutation<TData, TVariables>(
           : '',
     })
     .catch(async (e: unknown) => {
-      console.log('hit error', e)
-      console.log(documentationState)
       if (
         isAxiosUnauthorizedError(e) &&
         documentationState.accessControlEnabled
       ) {
-        console.log('hit 401')
+        console.log('login expired, retrying mutation')
         return await runMutation(
           docStateRef,
           actionsToDocument,

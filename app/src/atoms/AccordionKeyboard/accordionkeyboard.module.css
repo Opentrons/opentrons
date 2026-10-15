@@ -5,6 +5,12 @@
   flex-direction: column;
   background-color: var(--transparent);
   pointer-events: none;
+  transform: translateY(calc(100% - var(--spacing-48)));
+  transition: transform 0.2s ease-in-out;
+}
+
+.accordion_container_open {
+  transform: translateY(0);
 }
 
 .accordion_header {
@@ -35,4 +41,9 @@
   width: 100%;
   background-color: var(--grey-35);
   pointer-events: auto;
+  transition: display 0.2s ease-in-out allow-discrete;
+}
+
+.accordion_body_closed {
+  display: none;
 }
