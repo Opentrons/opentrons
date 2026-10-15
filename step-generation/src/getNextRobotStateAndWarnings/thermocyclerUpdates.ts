@@ -63,6 +63,11 @@ export const forThermocyclerSetTargetBlockTemperature = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetBlockTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -84,6 +89,11 @@ export const forThermocyclerSetTargetLidTemperature = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
   if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetLidTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -127,6 +137,11 @@ export const forThermocyclerDeactivateBlock = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateBlock: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -146,6 +161,11 @@ export const forThermocyclerDeactivateLid = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -163,6 +183,11 @@ export const forThermocyclerCloseLid = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerCloseLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -180,6 +205,11 @@ export const forThermocyclerOpenLid = (
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
+    console.error(
+      `forThermocyclerOpenLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -199,6 +229,11 @@ function resolveProfileStep(
     runtimeParameters
   )
   if (celsius == null || holdSeconds == null) {
+    console.error(
+      `resolveProfileStep: arg resolved to null (celsius=${String(
+        celsius
+      )}, holdSeconds=${String(holdSeconds)})`
+    )
     return null
   }
   return { celsius, holdSeconds }
@@ -216,12 +251,20 @@ function resolveProfileElements(
         runtimeParameters
       )
       if (repetitions == null) {
+        console.error(
+          `resolveProfileElements: arg resolved to null (repetitions=${String(
+            repetitions
+          )})`
+        )
         return null
       }
       const steps: AtomicProfileStep[] = []
       for (const step of element.steps) {
         const resolvedStep = resolveProfileStep(step, runtimeParameters)
         if (resolvedStep == null) {
+          console.error(
+            'resolveProfileElements: arg resolved to null (step=null)'
+          )
           return null
         }
         steps.push(resolvedStep)
@@ -230,6 +273,9 @@ function resolveProfileElements(
     } else {
       const resolvedStep = resolveProfileStep(element, runtimeParameters)
       if (resolvedStep == null) {
+        console.error(
+          'resolveProfileElements: arg resolved to null (step=null)'
+        )
         return null
       }
       resolved.push(resolvedStep)
@@ -309,6 +355,11 @@ export const forThermocyclerStartRunExtendedProfile = (
     runtimeParameters
   )
   if (moduleId == null || profileElements == null) {
+    console.error(
+      `forThermocyclerStartRunExtendedProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, profileElements=${String(profileElements)})`
+    )
     return false
   }
   let taskId: string | null = null
@@ -318,6 +369,11 @@ export const forThermocyclerStartRunExtendedProfile = (
       runtimeParameters
     )
     if (resolvedTaskId == null) {
+      console.error(
+        `forThermocyclerStartRunExtendedProfile: arg resolved to null (taskId=${String(
+          resolvedTaskId
+        )})`
+      )
       return false
     }
     taskId = resolvedTaskId
