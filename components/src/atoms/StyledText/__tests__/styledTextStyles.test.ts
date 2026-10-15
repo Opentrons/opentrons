@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../../helix-design-system/product'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
+import styles from '../styledtext.module.css'
 import { resolveStyledTextStyles } from '../styledTextStyles'
 import {
   DESKTOP_STYLE_TRANSLATIONS,
   ODD_STYLE_TRANSLATIONS,
 } from './styledTextStyleFixtures'
-import styles from '../styledtext.module.css'
 
 describe('styledTextStyles', () => {
   it.each(DESKTOP_STYLE_TRANSLATIONS)(

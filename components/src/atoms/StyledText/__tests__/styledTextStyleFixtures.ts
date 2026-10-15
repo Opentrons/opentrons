@@ -1,10 +1,10 @@
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../../helix-design-system/product'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 
-import type { HelixStyles, ODDStyles } from '../styledTextStyles'
+import type { DesktopStyles, ODDStyles } from '../styledTextStyles'
 
 export const DESKTOP_STYLE_TRANSLATIONS: Array<{
-  desktopStyle: HelixStyles
+  desktopStyle: DesktopStyles
   font: string | null
 }> = [
   {

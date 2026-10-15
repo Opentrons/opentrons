@@ -2,7 +2,6 @@ import clsx from 'clsx'
 
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../helix-design-system/product'
 import { TYPOGRAPHY } from '../../ui-style-constants'
-
 import styles from './styledtext.module.css'
 
 import type { CSSProperties } from 'react'
@@ -126,19 +125,19 @@ const ODDStyleMap = {
   hidden: null,
 } as const satisfies Record<string, OddTypographyTokens | null>
 
-export type HelixStyles = keyof typeof desktopStyleMap
+export type DesktopStyles = keyof typeof desktopStyleMap
 export type ODDStyles = keyof typeof ODDStyleMap
 
-export const HELIX_STYLES: Array<HelixStyles> = Object.keys(
+export const HELIX_STYLES: Array<DesktopStyles> = Object.keys(
   desktopStyleMap
-) as Array<HelixStyles>
+) as Array<DesktopStyles>
 
 export const ODD_STYLES: Array<ODDStyles> = Object.keys(
   ODDStyleMap
 ) as Array<ODDStyles>
 
 /** Extra CSS-module classes beyond the Helix / ODD font tokens. */
-const desktopExtraClassMap: Partial<Record<HelixStyles, string>> = {
+const desktopExtraClassMap: Partial<Record<DesktopStyles, string>> = {
   bodyDefaultRegLink: styles.desktop_underline,
   codeBold: styles.desktop_code_bold_color,
   hidden: styles.desktop_hidden,
@@ -168,7 +167,7 @@ function resolveStyledTextClassName({
   desktopFont,
   oddTokens,
 }: {
-  desktopStyle?: HelixStyles
+  desktopStyle?: DesktopStyles
   oddStyle?: ODDStyles
   desktopFont: string | null
   oddTokens: OddTypographyTokens | null
@@ -185,7 +184,7 @@ export function resolveStyledTextStyles({
   desktopStyle,
   oddStyle,
 }: {
-  desktopStyle?: HelixStyles
+  desktopStyle?: DesktopStyles
   oddStyle?: ODDStyles
 }): { className: string; style?: CSSProperties } {
   const desktopFont =
