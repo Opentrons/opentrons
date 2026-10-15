@@ -1,5 +1,6 @@
 import functools
 import logging
+from copy import deepcopy
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons_shared_data.errors.exceptions import (
@@ -80,6 +81,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         use_old_aspiration_functions: bool = False,
     ) -> None:
         self._config = config
+        self._default_config = deepcopy(config)
         self._config_as_dict = config.model_dump()
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
@@ -251,12 +253,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return cast(PipetteName, f"{self._acting_as}")
 
     def reload_configurations(self) -> None:
-        self._config = load_pipette_data.load_definition(
-            self._pipette_model.pipette_type,
-            self._pipette_model.pipette_channels,
-            self._pipette_model.pipette_version,
-            self._pipette_model.oem_type,
-        )
+        self._config = deepcopy(self._default_config)
         self._config_as_dict = self._config.model_dump()
 
     def reset_state(self) -> None:

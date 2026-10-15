@@ -10,7 +10,7 @@ from typing import Any, Dict, Iterator, List, Tuple, Type
 from pydantic import BaseModel
 from pydantic.main import ModelMetaclass
 
-from ..load_data import _geometry, _liquid, _physical
+from ..load_data import _geometry, _liquid, _physical, pipette_version_has_def
 from ..pipette_definition import (
     PipetteConfigurations,
     PipetteGeometryDefinition,
@@ -24,9 +24,8 @@ from ..types import (
     LiquidClasses,
     PipetteChannelType,
     PipetteModel,
-    PipetteModelMajorVersion,
-    PipetteModelMinorVersion,
     PipetteModelType,
+    PipetteOEMType,
     PipetteTipType,
     PipetteVersionType,
 )
@@ -115,13 +114,18 @@ def handle_subclass_model(
         return top_level_configuration
 
 
-def check_from_version(version: str) -> str:
+def check_from_version(
+    version: str, model: PipetteModelType, channels: PipetteChannelType
+) -> str:
     """Check that the version requested is supported in the system."""
     version_int = [int(v) for v in version.split(".")]
-    if version_int[0] not in PipetteModelMajorVersion:
-        raise ValueError(f"Major version {version_int[0]} is not supported.")
-    if version_int[1] not in PipetteModelMinorVersion:
-        raise ValueError(f"Minor version {version_int[1]} is not supported.")
+    if not pipette_version_has_def(
+        model,
+        channels,
+        PipetteVersionType(version_int[0], version_int[1]),
+        PipetteOEMType.OT,
+    ):
+        raise ValueError(f"Version {version_int[0]} {version_int[1]} is not supported.")
     return version
 
 
@@ -325,7 +329,11 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
     channels = list(PipetteChannelType)[int(input("Please select from above\n"))]
 
     version = PipetteVersionType.convert_from_float(
-        float(check_from_version(input("Please input the version of the model\n")))
+        float(
+            check_from_version(
+                input("Please input the version of the model\n"), model, channels
+            )
+        )
     )
 
     built_model: PipetteModel = PipetteModel(

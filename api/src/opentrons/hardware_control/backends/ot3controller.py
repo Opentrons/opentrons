@@ -151,6 +151,10 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     touch_probe,
 )
 from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
+from opentrons_hardware.hardware_control.tools.tool_data_loader import (
+    ammend_pipette_definition,
+    pipette_supports_onboard_data,
+)
 from opentrons_hardware.hardware_control.types import (
     MotorPositionStatus,
     MoveCompleteAck,
@@ -1101,9 +1105,8 @@ class OT3Controller(FlexBackend):
         version = pipette_load_name.version_from_string(pipette_info.model)
         return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
-    @staticmethod
     def _build_attached_pip(
-        attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
+        self, attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
     ) -> AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount.name)
@@ -1127,6 +1130,26 @@ class OT3Controller(FlexBackend):
                 "id": OT3Controller._combine_serial_number(attached),
             }
         except KeyError:
+            # call convert_pipette_name again without a version to get the latest
+            pip_node = axis_to_node(Axis.of_main_tool_actuator(mount))
+            if pipette_supports_onboard_data(self._messenger, pip_node):
+                converted_name = pipette_load_name.convert_pipette_name(
+                    cast(PipetteName, attached.name.name)
+                )
+                latest_def = load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
+                    converted_name.oem_type,
+                )
+
+                updated_config = ammend_pipette_definition(
+                    latest_def, self._messenger, pip_node
+                )
+                return {
+                    "config": updated_config,
+                    "id": OT3Controller._combine_serial_number(attached),
+                }
             raise InvalidPipetteModel(
                 name=attached.name.name, model=attached.model, mount=mount.name
             )
@@ -1142,19 +1165,19 @@ class OT3Controller(FlexBackend):
             "id": f"GRPV{attached.model.replace('.', '')}{serial}",
         }
 
-    @staticmethod
     def _generate_attached_instrs(
+        self,
         attached: ohc_tool_types.ToolSummary,
     ) -> Iterator[Tuple[OT3Mount, OT3AttachedInstruments]]:
         if attached.left:
             yield (
                 OT3Mount.LEFT,
-                OT3Controller._build_attached_pip(attached.left, OT3Mount.LEFT),
+                self._build_attached_pip(attached.left, OT3Mount.LEFT),
             )
         if attached.right:
             yield (
                 OT3Mount.RIGHT,
-                OT3Controller._build_attached_pip(attached.right, OT3Mount.RIGHT),
+                self._build_attached_pip(attached.right, OT3Mount.RIGHT),
             )
         if attached.gripper:
             yield (
@@ -1173,9 +1196,7 @@ class OT3Controller(FlexBackend):
         Returns:
             A map of mount to instrument name.
         """
-        return dict(
-            OT3Controller._generate_attached_instrs(self._subsystem_manager.tools)
-        )
+        return dict(self._generate_attached_instrs(self._subsystem_manager.tools))
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
