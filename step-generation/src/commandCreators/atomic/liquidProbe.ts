@@ -109,6 +109,9 @@ export const liquidProbe: CommandCreator<LiquidProbeStepGenArgs> = (
       : formatPyStr(wellName)
 
   return {
+    // Note: The Python API doesn't let you specify a starting wellLocation.
+    // measure_liquid_height() probes from LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
+    // which is the same as our SAFE_MOVE_TO_WELL_LOCATION.
     commands: [
       {
         commandType: 'liquidProbe' as const,
