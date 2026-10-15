@@ -6,31 +6,10 @@ WRONG_LW_HASH = "wronghash"
 
 
 def test_access_tip_length_calibration(api_client, set_up_tip_length_temp_directory):
-    expected = {
-        "id": f"{LW_HASH}&{PIPETTE_ID}",
-        "tipLength": 30.5,
-        "pipette": PIPETTE_ID,
-        "tiprack": LW_HASH,
-        "lastModified": None,
-        "source": "user",
-        "status": {"markedAt": None, "markedBad": False, "source": None},
-        "uri": "opentrons/opentrons_96_filtertiprack_200ul/1",
-    }
-
     resp = api_client.get(
         f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_hash={LW_HASH}"
     )
-    assert resp.status_code == 200
-    data = resp.json()["data"][0]
-    data["lastModified"] = None
-    assert data == expected
-
-    resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={FAKE_PIPETTE_ID}&"
-        f"tiprack_hash={WRONG_LW_HASH}"
-    )
-    assert resp.status_code == 200
-    assert resp.json()["data"] == []
+    assert resp.status_code == 403
 
 
 def test_delete_tip_length_calibration(api_client, set_up_tip_length_temp_directory):
@@ -38,33 +17,4 @@ def test_delete_tip_length_calibration(api_client, set_up_tip_length_temp_direct
         f"/calibration/tip_length?pipette_id={FAKE_PIPETTE_ID}&"
         f"tiprack_uri={WRONG_LW_HASH}"
     )
-    assert resp.status_code == 404
-    body = resp.json()
-    assert body == {
-        "errors": [
-            {
-                "id": "UncategorizedError",
-                "title": "Resource Not Found",
-                "detail": "Resource type 'TipLengthCalibration' with id "
-                "'wronghash&fake_pip' was not found",
-                "errorCode": "4000",
-            }
-        ]
-    }
-
-    resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
-    )
-    assert resp.status_code == 200
-    assert resp.json()["data"][0]["uri"] == LW_URI
-
-    resp = api_client.delete(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
-    )
-    assert resp.status_code == 200
-
-    resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
-    )
-    assert resp.status_code == 200
-    assert resp.json()["data"] == []
+    assert resp.status_code == 403

@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 import json
 import time
-from pathlib import Path
 from typing import Any, Callable, Dict, Generator
 
 import pytest
@@ -41,40 +40,15 @@ def pytest_tavern_beta_after_every_response(
 
 
 @pytest.fixture
-def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
-    """Return the URL for a running dev server.
-
-    Because it can take several seconds to start up and shut down, one server is shared across all
-    tests in the test session. This fixture softly "resets" it after each test by deleting all
-    runs and protocols, which provides good enough isolation in practice.
-    """
-    yield _ot2_session_server
-    _clean_server_state(_ot2_session_server)
-
-
-@pytest.fixture
 def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
     """Like `ot2_server_base_url()`, but the server is configured as an OT-3 instead of an OT-2."""
     yield _ot3_session_server
     _clean_server_state(_ot3_session_server)
 
 
-@pytest.fixture(scope="session")
-def _ot2_session_server(
-    server_temp_directory: str,
-    # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
-    # error, since it's function-scoped and we're session-scoped.
-    unused_tcp_port_factory: Callable[[], int],
-) -> Generator[str, None, None]:
-    port = unused_tcp_port_factory()
-    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
-    with DevServer(
-        port=str(port),
-        ot_api_config_dir=Path(server_temp_directory),
-    ) as dev_server:
-        dev_server.start()
-        _wait_until_ready(base_url)
-        yield base_url
+@pytest.fixture
+def ot2_server_base_url() -> None:
+    pytest.skip("OT-2 tests are no longer supported")
 
 
 @pytest.fixture(scope="session")

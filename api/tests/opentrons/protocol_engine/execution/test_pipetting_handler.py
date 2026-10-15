@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..note_utils import CommandNoteMatcher
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.errors.exceptions import (
@@ -67,9 +67,9 @@ _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
 
 
 @pytest.fixture
-def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
+def mock_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Passthrough to limit diff."""
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -81,7 +81,7 @@ def mock_state_view(decoy: Decoy) -> StateView:
 @pytest.fixture
 def hardware_subject(
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
 ) -> HardwarePipettingHandler:
     """Get a HardwarePipettingHandler test subject."""
     return HardwarePipettingHandler(
@@ -104,7 +104,7 @@ def mock_well_view(decoy: Decoy) -> WellView:
 async def test_create_pipette_handler(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should return virtual or real tip handlers depending on config."""
     decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
@@ -135,7 +135,7 @@ async def test_create_pipette_handler(
 def test_hw_get_is_ready_to_aspirate(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
     aspirated_volume: float,
     ready_to_aspirate: bool,
@@ -164,7 +164,7 @@ def test_hw_get_is_ready_to_aspirate(
 def test_hw_get_is_ready_to_aspirate_raises_no_tip_attached(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """Should raise a TipNotAttachedError error."""
@@ -188,7 +188,7 @@ def test_hw_get_is_ready_to_aspirate_raises_no_tip_attached(
 async def test_hw_dispense_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """It should find the pipette by ID and use it to dispense."""
@@ -246,7 +246,7 @@ async def test_hw_dispense_in_place(
 async def test_hw_dispense_in_place_raises_invalid_push_out(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """It should raise an InvalidPushOutVolumeError."""
@@ -287,7 +287,7 @@ async def test_hw_dispense_in_place_raises_invalid_push_out(
 async def test_hw_dispense_while_tracking(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     hardware_subject: HardwarePipettingHandler,
@@ -369,7 +369,7 @@ async def test_hw_dispense_while_tracking(
 async def test_hw_aspirate_while_tracking(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     mock_labware_view: LabwareView,
     mock_well_view: WellView,
     hardware_subject: HardwarePipettingHandler,
@@ -449,7 +449,7 @@ async def test_hw_aspirate_while_tracking(
 async def test_hw_aspirate_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
     mock_command_note_adder: CommandNoteAdder,
 ) -> None:
@@ -506,7 +506,7 @@ async def test_hw_aspirate_in_place(
 async def test_virtual_blow_out_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """Should set flow_rate and call hardware_api blow-out."""
@@ -714,7 +714,7 @@ async def test_virtual_dispense_validate_tip_attached(
 async def test_aspirate_volume_validation(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
     mock_command_note_adder: CommandNoteAdder,
 ) -> None:
@@ -791,7 +791,7 @@ async def test_aspirate_volume_validation(
 async def test_dispense_volume_validation(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """It should validate the input volume, possibly adjusting it for rounding error.
@@ -857,7 +857,7 @@ async def test_dispense_volume_validation(
 async def test_hw_increase_evo_disp_count(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    mock_hardware_api: HardwareControlAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """Should set flow_rate and call hardware_api aspirate."""
