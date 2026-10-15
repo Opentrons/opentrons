@@ -21,6 +21,8 @@ IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     # system behavior, the client currently triggers them implicitly, and thus isn't
     # prepared for them to require authentication or audit log notes.
     ("post", "/protocols/{protocolId}/analyses"),
+    # this is a redirect to the system server, which does have access control
+    ("post", "/settings/log_level/local"),
 }
 
 
