@@ -7,7 +7,7 @@ This section covers the different types of labware included in the Opentrons Lab
 
 ## Reservoirs 
 
-Opentrons Flex works by default with single-well and multi-well reservoirs. [Reservoirs on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=reservoir) are automation-ready right out of the box.
+Opentrons Flex works by default with several brands of single-well and multi-well reservoirs. The [Opentrons Labware Library](https://labware.opentrons.com/#/?category=reservoir) lists reservoirs that are automation-ready for Flex right out of the box.
 
 <figure class="side-by-side" markdown>
 ![Single-well reservoir labware.](../images/labware-1-well-reservoir.png "Single-well reservoir")
@@ -16,9 +16,12 @@ Opentrons Flex works by default with single-well and multi-well reservoirs. [Res
 
 ### Custom reservoirs
 
-Labware Library currently only includes reservoirs in 1-well and 12-well configurations, although other well configurations are possible.
+While the Labware Library supports standard single-well and multi-well reservoir formats, some protocols may require custom structures such as specialized channel layouts, column formats, or split-volume vessels.
 
-Try creating a custom labware definition with the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex needs this information to understand how to work with your custom labware. See the [Labware Definitions section](definitions.md) for more information. 
+If you need a reservoir that's not listed in the Labware Library, try creating a custom labware definition using the [Custom Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. The Labware Creator produces a JSON definition file containing the reservoir's physical dimensions, well geometry, volumetric capacity, and other information required by Flex.
+
+!!! tip
+    For more information about the Custom Labware Creator, customization requirements, and JSON definition files, see [Labware Definitions](definitions.md).
 
 ## Well plates 
 
