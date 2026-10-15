@@ -18,30 +18,13 @@ from starlette.testclient import TestClient
 from typing_extensions import NoReturn
 
 from opentrons import config
-from opentrons.calibration_storage import (
-    helpers,
-    save_robot_deck_attitude,
-)
-
-# NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
-# get pulled in by OT-2 server tests. If this ever changes, we need to
-# conditionally set up ot2/ot3 calibration structures instead of invariably
-# calling the OT2 functions.
-from opentrons.calibration_storage.ot2 import (
-    create_tip_length_data,
-    save_pipette_calibration,
-    save_tip_length_calibration,
-)
 from opentrons.hardware_control import (
     HardwareControlAPI,
-    ThreadedAsyncLock,
 )
 from opentrons.hardware_control import (
     types as hw_types,
 )
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.protocol_api import labware
-from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.audit_server import (
@@ -71,7 +54,6 @@ from robot_server.service.notifications.notification_client import (
     NotificationClient,
     get_notification_client,
 )
-from robot_server.service.session.manager import SessionManager
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 test_router = routing.APIRouter()
@@ -363,51 +345,6 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     yield
     os.remove(pipette_file_path)
     del os.environ["OT_API_CONFIG_DIR"]
-
-
-@pytest.fixture
-def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    mount_list = [Mount.LEFT, Mount.RIGHT]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    def_hash = helpers.hash_labware_def(definition)
-    for pip, mount in zip(attached_pip_list, mount_list):
-        save_pipette_calibration(
-            offset=Point(0, 0, 0),
-            pip_id=pip,
-            mount=mount,
-            tiprack_hash=def_hash,
-            tiprack_uri="opentrons/opentrons_96_filtertiprack_200ul/1",
-        )
-
-
-@pytest.fixture
-def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    tip_length_list = [30.5, 31.5]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    assert definition["schemaVersion"] == 2  # Required by create_tip_length_data().
-    for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal_data = create_tip_length_data(definition, tip_len)
-        save_tip_length_calibration(pip, cal_data)
-
-
-@pytest.fixture
-def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
-    attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
-    save_robot_deck_attitude(
-        attitude,
-        "pip_1",
-        "fakehash",
-    )
-
-
-@pytest.fixture
-def session_manager(hardware: HardwareControlAPI) -> SessionManager:
-    return SessionManager(
-        hardware=hardware,
-        motion_lock=ThreadedAsyncLock(),
-    )
 
 
 @pytest.fixture

@@ -70,7 +70,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     SimulatingModule,
 )
-from opentrons.hardware_control.ot3_calibration import OT3Transforms
+from opentrons.hardware_control.ot3_calibration import DeckCalibration, OT3Transforms
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
@@ -79,7 +79,6 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     HARDWARE_PYDANTIC_PACKAGES,
     register_hardware_types,
 )
-from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import DoorState
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
