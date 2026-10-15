@@ -21,6 +21,7 @@ import {
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
+import { createLogger } from '../log'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 import * as FileSystem from './file-system'
 
@@ -29,6 +30,8 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+const log = createLogger('protocol-storage')
 
 let protocolsDirectoryPath: string | null = null
 
@@ -79,17 +82,17 @@ export function preParityMigrateProtocolsFrom(
         .then(doesSrcExist => {
           if (!doesSrcExist.isDirectory()) resolve()
 
-          console.log(
+          log.info(
             `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
           )
 
           return migrateProtocols(src, dest).then(() => {
-            console.log('Protocol migration complete.')
+            log.info('Protocol migration complete.')
             resolve()
           })
         })
         .catch(e => {
-          console.log(
+          log.error(
             `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
           )
           resolve()
@@ -152,11 +155,11 @@ async function migrateProtocolsToNotOt2Directory(): Promise<void> {
         await fse.copy(dirPath, destPath, { overwrite: false })
       }
     }
-    console.log(
+    log.info(
       `Protocol migration to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME} complete.`
     )
   } catch (e) {
-    console.log(
+    log.error(
       `Error migrating protocols to ${FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_NAME}: ${e}`
     )
   }

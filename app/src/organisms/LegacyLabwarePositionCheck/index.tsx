@@ -5,7 +5,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getIsOnDevice } from '/app/redux/config'
 
-import { useLogger } from '../../logger'
 import { FatalErrorModal } from './FatalErrorModal'
 import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
 
@@ -40,11 +39,9 @@ interface LabwarePositionCheckModalProps {
 export const LegacyLabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): ReactNode => {
-  const logger = useLogger(new URL('', import.meta.url).pathname)
   const isOnDevice = useSelector(getIsOnDevice)
   return (
     <ErrorBoundary
-      logger={logger}
       ErrorComponent={FatalErrorModal}
       shouldUseMetalProbe={props.robotType === FLEX_ROBOT_TYPE}
       onClose={props.onCloseClick}
@@ -59,7 +56,6 @@ interface ErrorBoundaryProps {
   children: ReactNode
   onClose: () => void
   shouldUseMetalProbe: boolean
-  logger: ReturnType<typeof useLogger>
   ErrorComponent: (props: {
     errorMessage: string
     shouldUseMetalProbe: boolean
@@ -78,9 +74,11 @@ class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    this.props.logger.error(`LPC error message: ${error.message}`)
-    this.props.logger.error(
-      `LPC error component stack: ${errorInfo.componentStack}`
+    console.error(
+      `[app/src/organisms/LegacyLabwarePositionCheck/index.tsx]: LPC error message: ${error.message}`
+    )
+    console.error(
+      `[app/src/organisms/LegacyLabwarePositionCheck/index.tsx]: LPC error component stack: ${errorInfo.componentStack}`
     )
     this.setState({
       error,
@@ -101,7 +99,6 @@ class ErrorBoundary extends Component<
         />
       )
     }
-    // Normally, just render children
     return children
   }
 }

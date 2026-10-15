@@ -114,7 +114,7 @@ export function SystemLanguagePreferenceModal(): JSX.Element | null {
             // locale set to "C" (https://www.gnu.org/software/libc/manual/html_node/Standard-Locales.html)
             // and that will cause Intl.Locale to throw. In this case, we'll treat it as
             // unset and fall back to our default.
-            console.log(`Failed to search languages: ${error}`)
+            console.error(`Failed to search languages: ${error}`)
             return null
           }
         }
