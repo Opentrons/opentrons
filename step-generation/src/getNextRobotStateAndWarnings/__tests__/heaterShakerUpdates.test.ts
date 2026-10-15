@@ -18,16 +18,14 @@ import {
   forHeaterShakerStopShake as _forHeaterShakerStopShake,
 } from '../heaterShakerUpdates'
 
-import type {
-  ModuleOnlyParams,
-  ShakeSpeedParams,
-  TemperatureParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   HeaterShakerModuleState,
+  HeaterShakerSetTargetShakeSpeedStepGenArgs,
   InvariantContext,
   RobotState,
+  SetTemperatureStepGenArgs,
 } from '../../types'
 
 const forHeaterShakerSetTargetTemperature = makeImmutableStateUpdater(
@@ -84,11 +82,12 @@ interface TestCase<P> {
   moduleStateBefore: Partial<HeaterShakerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
+  runtimeParameters?: InvariantContext['runtimeParameters']
 }
 
 type TestCases<P> = Array<TestCase<P>>
 describe('heater shaker state updaters', () => {
-  const temperatureParamsCases: TestCases<TemperatureParams> = [
+  const temperatureParamsCases: TestCases<SetTemperatureStepGenArgs> = [
     {
       params: {
         moduleId: moduleId,
@@ -103,6 +102,35 @@ describe('heater shaker state updaters', () => {
       fn: forHeaterShakerSetTargetTemperature,
       testName:
         'forHeaterShakerSetTargetTemperature should update the temperature',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+        celsius: 'target_temp',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+        target_temp: {
+          variableName: 'target_temp',
+          displayName: 'Target temp',
+          type: 'int',
+          default: 50,
+        },
+      },
+      moduleStateBefore: {
+        targetTemp: null,
+      },
+      expectedUpdate: {
+        targetTemp: 50,
+      },
+      fn: forHeaterShakerSetTargetTemperature,
+      testName:
+        'forHeaterShakerSetTargetTemperature should resolve runtime parameter module id and celsius',
     },
   ]
 
@@ -120,6 +148,28 @@ describe('heater shaker state updaters', () => {
       fn: forHeaterShakerDeactivateHeater,
       testName:
         'forHeaterShakerDeactivateHeater should deactivate the temperature',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        targetTemp: 50,
+      },
+      expectedUpdate: {
+        targetTemp: null,
+      },
+      fn: forHeaterShakerDeactivateHeater,
+      testName:
+        'forHeaterShakerDeactivateHeater should resolve a string runtime parameter module id',
     },
     {
       params: {
@@ -149,6 +199,28 @@ describe('heater shaker state updaters', () => {
     },
     {
       params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        targetSpeed: 500,
+      },
+      expectedUpdate: {
+        targetSpeed: null,
+      },
+      fn: forHeaterShakerStopShake,
+      testName:
+        'forHeaterShakerStopShake should resolve a string runtime parameter module id',
+    },
+    {
+      params: {
         moduleId: moduleId,
       },
       moduleStateBefore: {
@@ -159,6 +231,28 @@ describe('heater shaker state updaters', () => {
       },
       fn: forHeaterShakerOpenLatch,
       testName: 'forHeaterShakerOpenLatch should open latch',
+    },
+    {
+      params: {
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
+      },
+      moduleStateBefore: {
+        latchOpen: false,
+      },
+      expectedUpdate: {
+        latchOpen: true,
+      },
+      fn: forHeaterShakerOpenLatch,
+      testName:
+        'forHeaterShakerOpenLatch should resolve a string runtime parameter module id',
     },
     {
       params: {
@@ -173,23 +267,75 @@ describe('heater shaker state updaters', () => {
       fn: forHeaterShakerCloseLatch,
       testName: 'forHeaterShakerCloseLatch should close latch',
     },
-  ]
-  const shakeSpeedParamsCases: TestCases<ShakeSpeedParams> = [
     {
       params: {
-        moduleId: moduleId,
-        rpm: 400,
+        moduleId: 'selected_module',
+      },
+      runtimeParameters: {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: moduleId,
+        },
       },
       moduleStateBefore: {
-        targetSpeed: null,
+        latchOpen: true,
       },
       expectedUpdate: {
-        targetSpeed: 400,
+        latchOpen: false,
       },
-      fn: forHeaterShakerSetTargetShakeSpeed,
-      testName: 'forHeaterShakerSetTargetShakeSpeed should set target speed',
+      fn: forHeaterShakerCloseLatch,
+      testName:
+        'forHeaterShakerCloseLatch should resolve a string runtime parameter module id',
     },
   ]
+  const shakeSpeedParamsCases: TestCases<HeaterShakerSetTargetShakeSpeedStepGenArgs> =
+    [
+      {
+        params: {
+          moduleId: moduleId,
+          rpm: 400,
+        },
+        moduleStateBefore: {
+          targetSpeed: null,
+        },
+        expectedUpdate: {
+          targetSpeed: 400,
+        },
+        fn: forHeaterShakerSetTargetShakeSpeed,
+        testName: 'forHeaterShakerSetTargetShakeSpeed should set target speed',
+      },
+      {
+        params: {
+          moduleId: 'selected_module',
+          rpm: 'target_rpm',
+        },
+        runtimeParameters: {
+          selected_module: {
+            variableName: 'selected_module',
+            displayName: 'Selected module',
+            type: 'string',
+            default: moduleId,
+          },
+          target_rpm: {
+            variableName: 'target_rpm',
+            displayName: 'Target rpm',
+            type: 'int',
+            default: 400,
+          },
+        },
+        moduleStateBefore: {
+          targetSpeed: null,
+        },
+        expectedUpdate: {
+          targetSpeed: 400,
+        },
+        fn: forHeaterShakerSetTargetShakeSpeed,
+        testName:
+          'forHeaterShakerSetTargetShakeSpeed should resolve runtime parameter module id and rpm',
+      },
+    ]
 
   const runTest = <P>({
     params,
@@ -197,8 +343,12 @@ describe('heater shaker state updaters', () => {
     expectedUpdate,
     fn,
     testName,
+    runtimeParameters,
   }: TestCase<P>): void => {
     it(testName, () => {
+      if (runtimeParameters != null) {
+        invariantContext.runtimeParameters = runtimeParameters
+      }
       const prevRobotState = merge({}, startRobotState, {
         modules: {
           [moduleId]: {

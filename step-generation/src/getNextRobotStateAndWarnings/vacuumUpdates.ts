@@ -7,22 +7,27 @@ import {
   VACUUM_VENT_OPEN,
 } from '../constants'
 import { vacuumModuleStateGetter } from '../robotStateSelectors'
-import { getFullStackFromLabwares } from '../utils'
+import {
+  getFullStackFromLabwares,
+  resolveBooleanRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
 import type {
   LabwareDefinition,
-  VacuumModuleOpenVentCreateCommand,
-  VacuumModuleSetTargetPowerCreateCommand,
-  VacuumModuleSetTargetPressureCreateCommand,
   VacuumModuleStartRunProfileCreateCommand,
-  VacuumModuleStopPumpCreateCommand,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
+  ModuleStepGenArgs,
   RobotStateAndWarnings,
   TimelineFrame,
   VacuumModuleState,
+  VacuumSetPumpPowerStepGenArgs,
+  VacuumSetPumpPressureStepGenArgs,
+  VacuumStartRunProfileStepGenArgs,
 } from '../types'
 
 const getLabwareDimensionsEqual = (
@@ -97,11 +102,20 @@ const vacuumMergeLiquid = (
 }
 
 export const forVacuumOpenVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forVacuumOpenVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -110,11 +124,20 @@ export const forVacuumOpenVent = (
 }
 
 export const forVacuumCloseVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forVacuumCloseVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -123,11 +146,59 @@ export const forVacuumCloseVent = (
 }
 
 export const forVacuumSetPumpPressure = (
-  params: VacuumModuleSetTargetPressureCreateCommand['params'],
+  params: VacuumSetPumpPressureStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, gaugePressure, duration, ventAfter = true, taskId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const gaugePressure = resolveNumericRuntimeValue(
+    params.gaugePressure,
+    runtimeParameters
+  )
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  const taskId =
+    params.taskId == null
+      ? null
+      : resolveStringRuntimeValue(params.taskId, runtimeParameters)
+  if (moduleId == null || gaugePressure == null || ventAfter == null) {
+    console.error(
+      `forVacuumSetPumpPressure: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, gaugePressure=${String(gaugePressure)}, ventAfter=${String(
+        ventAfter
+      )})`
+    )
+    return
+  }
+  if (params.taskId != null && taskId == null) {
+    console.error(
+      `forVacuumSetPumpPressure: arg resolved to null (taskId=${String(
+        taskId
+      )})`
+    )
+  }
+  let duration: number | undefined
+  if (params.duration == null) {
+    duration = undefined
+  } else {
+    const resolvedDuration = resolveNumericRuntimeValue(
+      params.duration,
+      runtimeParameters
+    )
+    if (resolvedDuration == null) {
+      console.error(
+        `forVacuumSetPumpPressure: arg resolved to null (duration=${String(
+          resolvedDuration
+        )})`
+      )
+      return
+    }
+    duration = resolvedDuration
+  }
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
@@ -161,11 +232,55 @@ export const forVacuumSetPumpPressure = (
 }
 
 export const forVacuumSetPumpPower = (
-  params: VacuumModuleSetTargetPowerCreateCommand['params'],
+  params: VacuumSetPumpPowerStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, percentPower, duration, ventAfter = true, taskId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const percentPower = resolveNumericRuntimeValue(
+    params.percentPower,
+    runtimeParameters
+  )
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  const taskId =
+    params.taskId == null
+      ? null
+      : resolveStringRuntimeValue(params.taskId, runtimeParameters)
+  if (moduleId == null || percentPower == null || ventAfter == null) {
+    console.error(
+      `forVacuumSetPumpPower: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, percentPower=${String(percentPower)}, ventAfter=${String(ventAfter)})`
+    )
+    return
+  }
+  if (params.taskId != null && taskId == null) {
+    console.error(
+      `forVacuumSetPumpPower: arg resolved to null (taskId=${String(taskId)})`
+    )
+  }
+  let duration: number | undefined
+  if (params.duration == null) {
+    duration = undefined
+  } else {
+    const resolvedDuration = resolveNumericRuntimeValue(
+      params.duration,
+      runtimeParameters
+    )
+    if (resolvedDuration == null) {
+      console.error(
+        `forVacuumSetPumpPower: arg resolved to null (duration=${String(
+          resolvedDuration
+        )})`
+      )
+      return
+    }
+    duration = resolvedDuration
+  }
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
@@ -199,11 +314,20 @@ export const forVacuumSetPumpPower = (
 }
 
 export const forVacuumStopPump = (
-  params: VacuumModuleStopPumpCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forVacuumStopPump: arg resolved to null (moduleId=${String(moduleId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
@@ -215,16 +339,36 @@ export const forVacuumStopPump = (
 }
 
 export const forVacuumStartRunProfile = (
-  params: VacuumModuleStartRunProfileCreateCommand['params'],
+  params:
+    | (VacuumStartRunProfileStepGenArgs & { taskId?: string | null })
+    | VacuumModuleStartRunProfileCreateCommand['params'],
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, steps, taskId, ventAfter = true } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  const taskId =
+    'taskId' in params && params.taskId != null
+      ? resolveStringRuntimeValue(params.taskId, runtimeParameters)
+      : null
+  // taskId should not be null, but this is to satisfy type checks
+  if (moduleId == null || ventAfter == null || taskId == null) {
+    console.error(
+      `forVacuumStartRunProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, ventAfter=${String(ventAfter)}, taskId=${String(taskId)})`
+    )
+    return
+  }
+  const steps = 'profile' in params ? params.profile : params.steps
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
-  // taskId should not be null, but this is to satisfy type checks
-  if (moduleState == null || taskId == null) {
+  if (moduleState == null) {
     return
   }
 

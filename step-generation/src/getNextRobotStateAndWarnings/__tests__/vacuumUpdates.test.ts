@@ -276,6 +276,34 @@ describe('forVacuumOpenVent', () => {
     )
     expect(result.robotState).toEqual(before)
   })
+
+  it('opens vent when module id is a runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      ventStatus: VACUUM_VENT_CLOSED,
+    })
+
+    const result = forVacuumOpenVent(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robot
+    )
+
+    expect(
+      (
+        result.robotState.modules[vacuumModuleId]
+          .moduleState as VacuumModuleState
+      ).ventStatus
+    ).toBe(VACUUM_VENT_OPEN)
+  })
 })
 
 describe('forVacuumCloseVent', () => {
@@ -307,6 +335,34 @@ describe('forVacuumCloseVent', () => {
       emptyModulesRobot
     )
     expect(result.robotState).toEqual(before)
+  })
+
+  it('closes vent when module id is a runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      ventStatus: VACUUM_VENT_OPEN,
+    })
+
+    const result = forVacuumCloseVent(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robot
+    )
+
+    expect(
+      (
+        result.robotState.modules[vacuumModuleId]
+          .moduleState as VacuumModuleState
+      ).ventStatus
+    ).toBe(VACUUM_VENT_CLOSED)
   })
 })
 
@@ -426,6 +482,66 @@ describe('forVacuumSetPumpPressure', () => {
     expect(updated.numPumpActivitiesStarted).toBe(0)
   })
 
+  it('uses timed hold when pressure, duration, ventAfter, module id, and task id are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      target_pressure: {
+        variableName: 'target_pressure',
+        displayName: 'Target pressure',
+        type: 'int',
+        default: 200,
+      },
+      hold_duration: {
+        variableName: 'hold_duration',
+        displayName: 'Hold duration',
+        type: 'int',
+        default: 10,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: true,
+      },
+      selected_task: {
+        variableName: 'selected_task',
+        displayName: 'Selected task',
+        type: 'string',
+        default: vacuumTaskId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      currentPumpActivity: pressureRun(50),
+      ventStatus: VACUUM_VENT_CLOSED,
+    })
+
+    const result = forVacuumSetPumpPressure(
+      {
+        moduleId: 'selected_module',
+        gaugePressure: 'target_pressure',
+        duration: 'hold_duration',
+        ventAfter: 'vent_after',
+        taskId: 'selected_task',
+      },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual(
+      timedPressureHold(200, 10, vacuumTaskId)
+    )
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
+    expect(updated.numPumpActivitiesStarted).toBe(1)
+  })
+
   it('no-ops when module is missing or not a vacuum module', () => {
     const tempRobot = robotWithTemperatureModule(emptyModulesRobot)
 
@@ -509,6 +625,66 @@ describe('forVacuumSetPumpPower', () => {
         duration: 5,
         ventAfter: true,
         taskId: vacuumTaskId,
+      },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual(
+      timedPowerHold(80, 5, vacuumTaskId)
+    )
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
+    expect(updated.numPumpActivitiesStarted).toBe(1)
+  })
+
+  it('uses timed hold when power, duration, ventAfter, module id, and task id are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      target_power: {
+        variableName: 'target_power',
+        displayName: 'Target power',
+        type: 'int',
+        default: 80,
+      },
+      hold_duration: {
+        variableName: 'hold_duration',
+        displayName: 'Hold duration',
+        type: 'int',
+        default: 5,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: true,
+      },
+      selected_task: {
+        variableName: 'selected_task',
+        displayName: 'Selected task',
+        type: 'string',
+        default: vacuumTaskId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      currentPumpActivity: pressureRun(10),
+      ventStatus: VACUUM_VENT_CLOSED,
+    })
+
+    const result = forVacuumSetPumpPower(
+      {
+        moduleId: 'selected_module',
+        percentPower: 'target_power',
+        duration: 'hold_duration',
+        ventAfter: 'vent_after',
+        taskId: 'selected_task',
       },
       invariantContext,
       robot
@@ -609,6 +785,33 @@ describe('forVacuumStopPump', () => {
     })
   })
 
+  it('sets pump deactivated when module id is a runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      currentPumpActivity: powerRun(60),
+      ventStatus: VACUUM_VENT_OPEN,
+    })
+
+    const result = forVacuumStopPump(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual(pumpDeactivated)
+    expect(updated.ventStatus).toBe(VACUUM_VENT_OPEN)
+  })
+
   it('no-ops when module is missing or not a vacuum module', () => {
     const tempRobot = robotWithTemperatureModule(emptyModulesRobot)
 
@@ -667,6 +870,57 @@ describe('forVacuumStartRunProfile', () => {
       profileElements: sampleVacuumProfile,
       taskId: vacuumTaskId,
       ventAfter: true,
+    })
+    expect(updated.numPumpActivitiesStarted).toBe(1)
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
+  })
+
+  it('sets profile activity when module id, ventAfter, and task id are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: false,
+      },
+      selected_task: {
+        variableName: 'selected_task',
+        displayName: 'Selected task',
+        type: 'string',
+        default: vacuumTaskId,
+      },
+    }
+    const robot = robotWithVacuum(emptyModulesRobot, vacuumModuleId, {
+      ...baseVacuumState(),
+      currentPumpActivity: powerRun(60),
+      ventStatus: VACUUM_VENT_CLOSED,
+      numPumpActivitiesStarted: 0,
+    })
+
+    const result = forVacuumStartRunProfile(
+      {
+        moduleId: 'selected_module',
+        profile: sampleVacuumProfile,
+        ventAfter: 'vent_after',
+        taskId: 'selected_task',
+      },
+      invariantContext,
+      robot
+    )
+
+    const updated = result.robotState.modules[vacuumModuleId]
+      .moduleState as VacuumModuleState
+    expect(updated.currentPumpActivity).toEqual({
+      type: 'profile',
+      profileElements: sampleVacuumProfile,
+      taskId: vacuumTaskId,
+      ventAfter: false,
     })
     expect(updated.numPumpActivitiesStarted).toBe(1)
     expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)

@@ -6,17 +6,17 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
 import { getModuleState } from '../robotStateSelectors'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
-import type {
-  ModuleOnlyParams,
-  TemperatureModuleAwaitTemperatureParams,
-  TemperatureParams,
-} from '@opentrons/shared-data'
+import type { TemperatureModuleAwaitTemperatureParams } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  ModuleStepGenArgs,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
+  SetTemperatureStepGenArgs,
   TemperatureStatus,
+  WaitForTemperatureStepGenArgs,
 } from '../types'
 
 function _setTemperatureAndStatus(
@@ -31,23 +31,47 @@ function _setTemperatureAndStatus(
 }
 
 export function forSetTemperature(
-  params: TemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forSetTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId, celsius } = params
   const moduleState = getModuleState(robotState, moduleId)
 
   _setTemperatureAndStatus(moduleState, celsius, TEMPERATURE_APPROACHING_TARGET)
 }
 export function forAwaitTemperature(
-  params: TemperatureModuleAwaitTemperatureParams,
+  params:
+    WaitForTemperatureStepGenArgs | TemperatureModuleAwaitTemperatureParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
+  const { runtimeParameters } = invariantContext
+  if (params.celsius == null) {
+    return
+  }
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forAwaitTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId, celsius } = params
   const moduleState = getModuleState(robotState, moduleId)
 
   if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
@@ -57,12 +81,23 @@ export function forAwaitTemperature(
   }
 }
 export function forDeactivateTemperature(
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forDeactivateTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
   const moduleState = getModuleState(robotState, moduleId)
   const temperature = null
 

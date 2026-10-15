@@ -3,23 +3,25 @@ import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { unrollThermocyclerProfile, uuid } from '../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  unrollThermocyclerProfile,
+  uuid,
+} from '../utils'
 import { handleWaitForTaskForModules } from './forWaitForTasks'
 
 import type {
   TCExtendedProfileParams,
   TCStartExtendedProfileParams,
 } from '@opentrons/shared-data'
-import type {
-  ModuleOnlyParams,
-  TCProfileParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { TCProfileParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
+  SetTemperatureStepGenArgs,
   ThermocyclerModuleState,
 } from '../types'
 
@@ -42,11 +44,21 @@ const _getThermocyclerModuleState = (
 }
 
 export const forThermocyclerSetTargetBlockTemperature = (
-  params: ThermocyclerSetTargetBlockTemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetBlockTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -58,11 +70,21 @@ export const forThermocyclerSetTargetBlockTemperature = (
 }
 
 export const forThermocyclerSetTargetLidTemperature = (
-  params: TemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forThermocyclerSetTargetLidTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -71,7 +93,7 @@ export const forThermocyclerSetTargetLidTemperature = (
 }
 
 export const forThermocyclerAwaitBlockTemperature = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -79,7 +101,7 @@ export const forThermocyclerAwaitBlockTemperature = (
 }
 
 export const forThermocyclerAwaitLidTemperature = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -89,7 +111,7 @@ export const forThermocyclerAwaitLidTemperature = (
 // todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
 // Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitProfileComplete = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -97,11 +119,22 @@ export const forThermocyclerAwaitProfileComplete = (
 }
 
 export const forThermocyclerDeactivateBlock = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateBlock: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -112,11 +145,22 @@ export const forThermocyclerDeactivateBlock = (
 }
 
 export const forThermocyclerDeactivateLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forThermocyclerDeactivateLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -125,11 +169,22 @@ export const forThermocyclerDeactivateLid = (
 }
 
 export const forThermocyclerCloseLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forThermocyclerCloseLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -138,11 +193,22 @@ export const forThermocyclerCloseLid = (
 }
 
 export const forThermocyclerOpenLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forThermocyclerOpenLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
@@ -201,15 +267,29 @@ export const forThermocyclerStartRunExtendedProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, taskId, profileElements } = params
+  const { profileElements } = params
   const { robotState } = robotStateAndWarnings
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const taskId =
+    params.taskId == null
+      ? null
+      : resolveStringRuntimeValue(params.taskId, runtimeParameters)
+  if (moduleId == null || (params.taskId != null && taskId == null)) {
+    console.error(
+      `forThermocyclerStartRunExtendedProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, taskId=${String(taskId)})`
+    )
+    return
+  }
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   moduleState.currentBlockActivity = {
     type: 'profile',
     profileElements,
-    taskId: taskId ?? null,
+    taskId,
   }
   moduleState.numProfilesStarted++
 }
