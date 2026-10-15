@@ -9,7 +9,7 @@ from ..modules.types import (
 from .barcode_scanner import BarcodeScanner
 from .peripheral_abc import AbstractPeripheral
 from .types import PeripheralType
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 PERIPHERAL_TYPE_BY_NAME: Dict[str, PeripheralType] = {
     BarcodeScanner.name(): BarcodeScanner.PERIPHERAL_TYPE,
