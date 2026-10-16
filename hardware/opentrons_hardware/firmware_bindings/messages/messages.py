@@ -116,6 +116,11 @@ MessageDefinition = Union[
     defs.SendAccumulatedSensorDataRequest,
     defs.AddSensorLinearMoveRequest,
     defs.IncreaseEvoTipDispenseCountRequestRequest,
+    defs.PipetteFunctionData,
+    defs.PipetteFunctionUpdateComplete,
+    defs.PipetteFunctionUpdateInitiate,
+    defs.PipetteFunctionDataAcknowledge,
+    defs.PipetteFunctionDataCompleteAcknowledge,
 ]
 
 
