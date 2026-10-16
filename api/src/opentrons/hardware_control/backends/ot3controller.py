@@ -1133,8 +1133,12 @@ class OT3Controller(FlexBackend):
             # call convert_pipette_name again without a version to get the latest
             pip_node = axis_to_node(Axis.of_main_tool_actuator(mount))
             if pipette_supports_onboard_data(self._messenger, pip_node):
+                log.info(
+                    f"Fount Attached pipette not supported by default, patching with onboard data {attached}"
+                )
+                # Use generic P[vol]_[channels]_flex name to find latest supported version.
                 converted_name = pipette_load_name.convert_pipette_name(
-                    cast(PipetteName, attached.name.name)
+                    cast(PipetteName, f"{attached.name.name}_flex")
                 )
                 latest_def = load_pipette_data.load_definition(
                     converted_name.pipette_type,
