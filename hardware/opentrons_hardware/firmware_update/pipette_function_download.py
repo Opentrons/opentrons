@@ -24,7 +24,7 @@ PIPETTING_FUNCTION_VALUE_BYTES = 3
 PIPETTING_FUNCTION_DECIMAL_PRECISION = 3
 
 
-class PipetteFunctionProcessor:
+class PipetteFunctionDownloader:
     """Takes in a shared data SupportedTips definition and sends the pipetting function over CAN."""
 
     def __init__(
@@ -116,6 +116,8 @@ class PipetteFunctionProcessor:
     async def send_to_eeprom(self, reader: WaitableCallback) -> None:
         """Formats the pipette's function from shared data and sends it over CAN."""
         # num_messages = 0
+
+        # this might not actually needs to be an async for
         async for data_chunk in self.pipetting_function_chunks():
             passed = False
             for retry in range(self._retry_count):
