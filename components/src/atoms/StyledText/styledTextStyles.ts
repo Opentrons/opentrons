@@ -246,13 +246,11 @@ const ODDStyleMap = {
 export type DesktopStyles = keyof typeof desktopStyleMap
 export type ODDStyles = keyof typeof ODDStyleMap
 
-export const DESKTOP_STYLES: Array<DesktopStyles> = Object.keys(
+export const DESKTOP_STYLES: DesktopStyles[] = Object.keys(
   desktopStyleMap
-) as Array<DesktopStyles>
+) as DesktopStyles[]
 
-export const ODD_STYLES: Array<ODDStyles> = Object.keys(
-  ODDStyleMap
-) as Array<ODDStyles>
+export const ODD_STYLES: ODDStyles[] = Object.keys(ODDStyleMap) as ODDStyles[]
 
 /** Extra CSS-module classes beyond the Desktop / ODD font tokens. */
 const desktopExtraClassMap: Partial<Record<DesktopStyles, string>> = {
@@ -266,17 +264,16 @@ const oddExtraClassMap: Partial<Record<ODDStyles, string>> = {
 }
 
 function oddTypographyToStyle(tokens: OddTypographyTokens): CSSProperties {
-  const style = {
+  const style: CSSProperties = {
     '--odd-font-size': tokens.fontSize,
     '--odd-line-height': tokens.lineHeight,
-  } as CSSProperties
-
-  if (tokens.fontWeight != null) {
-    ;(style as Record<string, string | number>)['--odd-font-weight'] =
-      tokens.fontWeight
   }
 
-  return style
+  if (tokens.fontWeight != null) {
+    style['--odd-font-weight'] = tokens.fontWeight
+  }
+
+  return style as CSSProperties
 }
 
 function resolveStyledTextClassName({

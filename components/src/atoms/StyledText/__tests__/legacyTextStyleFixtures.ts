@@ -2,8 +2,7 @@ import { TYPOGRAPHY } from '../../../ui-style-constants'
 import styles from '../legacystyledtext.module.css'
 
 /**
- * Old LegacyStyledText API cases, copied from the former styled-components
- * `styleMap` keys (`${as}${''|SemiBold|Bold}`).
+ * Old LegacyStyledText API cases copied from LegacyStyledText.
  */
 export const OLD_API_TRANSLATIONS: Array<{
   as: keyof JSX.IntrinsicElements

@@ -13,6 +13,7 @@ describe('legacyTextStyles', () => {
     }
   )
 
+  // this fallback is new, it was not in the old API it used to default to undefined with no matching style
   it('defaults to legacy-p when as/fontWeight do not match a style', () => {
     expect(resolveLegacyTextStyle({})).toBe(styles.legacy_p)
     expect(

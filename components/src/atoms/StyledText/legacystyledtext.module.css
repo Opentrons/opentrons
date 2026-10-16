@@ -1,4 +1,4 @@
-/* Desktop / default — values match ui-style-constants TYPOGRAPHY */
+/* LegacyStyledText styles copied from ui-style-constants */
 .legacy_h1 {
   font-size: 1.188rem;
   font-weight: var(--font-weight-semi-bold);
