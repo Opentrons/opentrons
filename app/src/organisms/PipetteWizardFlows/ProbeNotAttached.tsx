@@ -21,7 +21,7 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void
-  setShowUnableToDetect: (ableToDetect: boolean) => void
+  dismissError: () => void
   isOnDevice: boolean
 }
 
@@ -31,7 +31,7 @@ export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'branded'])
-  const { isOnDevice, handleOnClick, setShowUnableToDetect } = props
+  const { isOnDevice, handleOnClick, dismissError } = props
   const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
 
   return (
@@ -51,7 +51,7 @@ export const ProbeNotAttached = (
       >
         <Btn
           onClick={() => {
-            setShowUnableToDetect(false)
+            dismissError()
           }}
         >
           <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>

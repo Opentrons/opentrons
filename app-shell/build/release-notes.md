@@ -12,11 +12,28 @@ Welcome to the v10.2.0 release of the Opentrons App! This release introduces the
 
 ---
 
+## Opentrons App Changes in 10.1.0
+
+Welcome to the v10.1.0 release of the Opentrons App! This release includes Opentrons Flex Compliance Ready Software feature improvements and other bug fixes.
+
+### Feature Improvements
+
+- Collapse the Flex touchscreen's on-screen keyboard by tapping the gray arrow on the right.
+- Flex robots with Opentrons Flex Compliance Ready Software capture protocol data in audit logs. Use the separate Opentrons Log Verifier App to open and verify protocol data from your Flex's audit logs.
+- Opentrons Flex Compliance Ready Software settings are accessible from the Flex's touchscreen.
+
+### Bug Fixes
+
+- When any account is reset, that user needs to select a new password.
+- The Opentrons App now prompts you to remove the pipette and try again when errors occur during pipette calibration.
+
+---
+
 ## Opentrons App Changes in 10.0.0
 
 Welcome to the v10.0.0 release of the Opentrons App! This release introduces Opentrons Flex Compliance Ready Software and includes other feature improvements.
 
-## New Features
+### New Features
 
 - [Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) is additional software installed on your Flex robot by Opentrons. It permanently enables features like role-based user access and required documentation for 21 CFR part 11-ready operation, and changes how you interact with the Flex touchscreen and Opentrons App:
   - The app and touchscreen require user login to change settings, set up and run protocols, and complete robot actions like homing the gantry.

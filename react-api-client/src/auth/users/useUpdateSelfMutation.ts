@@ -5,6 +5,7 @@ import { updateSelf } from '@opentrons/api-client'
 import { useDocumentedMutation } from '../../accessControl'
 import { useHost } from '../../api'
 import { getSelfQueryKey } from './useSelfQuery'
+import { getUsersQueryKey } from './useUsersQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -63,6 +64,9 @@ export function useUpdateSelfMutation(
     }: DocumentedMutationParameters<UpdateSelfRequest>) =>
       updateSelf(host!, body, userNotes).then(response => {
         queryClient.setQueryData(selfQueryKey, response.data)
+        void queryClient.invalidateQueries(getUsersQueryKey(host), {
+          exact: true,
+        })
         return response.data
       }),
     options

@@ -44,7 +44,7 @@
   "deck_calibration_redo": "重新校准甲板",
   "deck_calibration_spinner": "甲板校准正在进行{{ongoing_action}}",
   "deck_invalidates_pipette_offset": "重新校准甲板将清除移液器校准数据",
-  "definition": "您的 OT-2 会根据校准结果在三维空间中移动移液器。<a>详细了解</a> OT-2 的校准工作原理。",
+  "definition": "您的 OT-2 根据校准结果在三维空间中移动移液器。<a>了解更多</a>关于 OT-2 的校准工作原理。",
   "delete_calibration_data": "删除校准数据",
   "delete_calibration_data_q": "删除校准数据？",
   "delete_calibration_modal_description": "此操作无法撤消。协议运行前，您需要重新校准。",

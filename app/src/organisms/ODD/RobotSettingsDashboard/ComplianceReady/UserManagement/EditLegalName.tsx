@@ -26,6 +26,7 @@ export function EditLegalName({
   const keyboardRef = useRef(null)
   const inputElementRef = useRef(null)
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
+  const [error, setError] = useState<string | undefined>(undefined)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setLegalName(e.target.value)
@@ -34,8 +35,10 @@ export function EditLegalName({
   const handleConfirm = useCallback((): void => {
     if (!!legalName?.trim()) {
       onSave(legalName.trim())
+    } else {
+      setError(t('odd_legal_name_required') as string)
     }
-  }, [legalName, onSave])
+  }, [legalName, onSave, t])
 
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
@@ -84,6 +87,7 @@ export function EditLegalName({
             ref={inputElementRef}
             borderRadius="8px"
             autoFocus
+            error={error}
           />
         </div>
         <div className={styles.keyboard_container}>
