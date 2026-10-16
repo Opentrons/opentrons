@@ -9,6 +9,8 @@ The module is represented in code by a [`VacuumModuleContext`][opentrons.protoco
 
 For hardware and installation information, see the [Opentrons Vacuum Module GEN1 Instruction Manual](../../vacuum/index.md).
 
+_New in version 2.31_
+
 ## Filter plate load names
 
 See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter plate and well plate API load names. You can also find the `loadName` for filter plates in the [labware definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on Github. When searching, note that all filter plate load names end with `_filter`.
@@ -40,8 +42,6 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-_New in version 2.31_
-
 ## Collars and spacers
 
 Collars and spacers are modular components that you use to create deck stacks for different types of vacuum filtration protocols. 
@@ -52,8 +52,8 @@ Collars support filter plates during vacuum extraction. The Vacuum Module includ
 
 | Collar height | Load name |
 |:----|:----|
-| 42 mm | `opentrons_vacuum_manifold_collar_short` |
-| 72 mm | `opentrons_vacuum_manifold_collar_tall` |
+| **42 mm** | `opentrons_vacuum_manifold_collar_short` |
+| **72 mm** | `opentrons_vacuum_manifold_collar_tall` |
 
 For complete JSON definitions and dimensions, see the [collar definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on GitHub.
 
