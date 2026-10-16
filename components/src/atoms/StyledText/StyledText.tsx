@@ -16,16 +16,13 @@ export type { DesktopStyles, ODDStyles } from './styledTextStyles'
 export { DESKTOP_STYLES as HELIX_STYLES, ODD_STYLES } from './styledTextStyles'
 
 export interface Props extends ComponentProps<'p'>, StyleProps {
-  /**
-   * Optional semantic HTML tag override. When omitted with `desktopStyle` /
-   * `oddStyle`, the tag is derived from those styles. With legacy usage
-   * (`as` / `forwardedAs` + `fontWeight` only), defaults to `p`.
-   */
   as?: keyof JSX.IntrinsicElements
-  /** @deprecated Prefer `as`. Kept so LegacyStyledText callsites can migrate. */
+  /** @deprecated Prefer `as`. For LegacyStyledText migration. */
   forwardedAs?: keyof JSX.IntrinsicElements
   oddStyle?: ODDStyles
   desktopStyle?: DesktopStyles
+  children?: ReactNode
+  htmlFor?: string
 }
 
 /**
@@ -84,6 +81,6 @@ export function StyledText({
         ...style,
       } as CSSProperties,
     },
-    children as ReactNode
+    children
   )
 }
