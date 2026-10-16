@@ -82,15 +82,32 @@ async def test_function_bytes_generator(
         supported_tips_def=supported_tips_def,
     )
     formatted_dict = subject.formatted_pipetting_function
+    unpacked_dict = convert_chunks_back_to_floats(subject)
+    for processed, unpacked in zip(formatted_dict.items(), unpacked_dict.items()):
+        test_tip_size, test_vals = processed
+        unpacked_tip_size, unpacked_vals = unpacked
+
+        assert test_tip_size == unpacked_tip_size
+        try:
+            assert test_vals == unpacked_vals
+        except AssertionError:
+            breakpoint()
+
+        
+def convert_chunks_back_to_floats(
+    subject: PipetteFunctionProcessor
+) -> Dict[int, List[Tuple[float, float, float]]]:
     expected_chunk_len = 15
     entry_size_bytes = 3
     tip_size = 0
     unpacked_dict = {}
     current_function_list = []
     had_trailing_0 = False
-    async for chunk in subject.pipetting_function_chunks():
+    for chunk in subject.pipetting_function_chunks():
         data_list = [
-            int.from_bytes(chunk[i:i+entry_size_bytes ], "big") for i in range(0, len(chunk), entry_size_bytes)
+            int.from_bytes(
+                chunk[i:i+entry_size_bytes], "big"
+            ) for i in range(0, len(chunk), entry_size_bytes)
         ]
 
         # if the first entry is anything besides 0, that should be a tip size
@@ -104,6 +121,19 @@ async def test_function_bytes_generator(
         while data_list[-1] == 0:
             had_trailing_0 = True
             data_list.pop()
+
+        # reformat floats- handle negative numbers and shift decimal place back
+        for i in range(len(data_list)):
+            before = data_list[i]
+            pip_val_bytes = bytearray(data_list[i].to_bytes(3))
+            is_negative = bool(pip_val_bytes[0] & 128)
+            if is_negative:
+                pip_val_bytes[0] &= 127
+                data_list[i] = int.from_bytes(pip_val_bytes, "big") * -1
+            # shift decimal point back 3 places
+            data_list[i] = data_list[i] / (10**3)
+            after = data_list[i]
+            # breakpoint()
         
         # make sure a multiple of 3 got taken off
         numbers_removed = expected_chunk_len - len(data_list)
@@ -112,9 +142,6 @@ async def test_function_bytes_generator(
         # pack them into tuples of 3
         for i in range(0, len(data_list)-2, 3):
             current_function_list.append((data_list[i], data_list[i+1], data_list[i+2])) 
-        
-#        if had_trailing_0:
-#            breakpoint()
 
         # end of a function for the given tip size
         if numbers_removed > 0:
@@ -123,11 +150,7 @@ async def test_function_bytes_generator(
             current_function_list.clear()
             tip_size = 0
 
-        
-        # need to handle unpacking negative numbers
-
-
-
+    return unpacked_dict
 
 
 

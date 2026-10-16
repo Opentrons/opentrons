@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import AsyncIterator, Dict, List, Tuple
+from typing import Iterator, Dict, List, Tuple
 
 from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
 from opentrons_shared_data.pipette.types import PipetteTipType
@@ -74,9 +74,9 @@ class PipetteFunctionProcessor:
             formatted_dict[int(tip_size.value)] = list(func_for_tip_size.values())[0]
         return formatted_dict
 
-    async def pipetting_function_chunks(
+    def pipetting_function_chunks(
         self,
-    ) -> AsyncIterator[bytearray]:
+    ) -> Iterator[bytearray]:
         """Generator that yields a pipetting function in 48-byte chunks."""
         bytes_index = 0
         current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
