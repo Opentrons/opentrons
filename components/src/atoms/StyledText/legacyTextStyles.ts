@@ -9,7 +9,6 @@ interface LegacyTextStyleDefinition {
   className: string
 }
 
-
 const legacyTextStyleMap = {
   'legacy-h1': {
     as: 'h1',
