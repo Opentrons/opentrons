@@ -159,9 +159,12 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             validated_func = wrap_parameter_validation(proxy, func_name)
             return validated_func(self, *args, **kwargs)
 
-        return await asyncio.to_thread(
+        result = await asyncio.to_thread(
             _thread_call, self._proxy, method_metadata["__name__"], *args, **kwargs
         )
+        # Yield to the event loop after transaction, prevents stale refs waiting to clear
+        await asyncio.sleep(0)
+        return result
 
     # Construct the metadata of the client wrapper function
     wrapper.__module__ = method_metadata["__module__"]

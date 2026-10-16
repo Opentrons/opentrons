@@ -62,7 +62,7 @@ class CommandPersistenceInterface:
         command_batch = [
             (
                 command_json.index,
-                command_json.command_type.model_validate_json(command_json.command),
+                command_json.command,
             )
             for command_json in command_json_batch
         ]
