@@ -68,38 +68,30 @@ class PipetteFunctionProcessor:
         formatted_dict: Dict[int, List[Tuple[float, float, float]]] = {}
         for tip_size, tip_size_data in self._supported_tips_def.items():
             func_for_tip_size = tip_size_data.aspirate.default
-            # func_for_tip_size should be {"1": [[], [], [], ...]}
             assert len(list(func_for_tip_size.items())) == 1, ValueError(
                 "Invalid pipette function format."
             )
             formatted_dict[int(tip_size.value)] = list(func_for_tip_size.values())[0]
         return formatted_dict
 
-    @staticmethod
     async def pipetting_function_chunks(
-        pip_function: Dict[int, List[Tuple[float, float, float]]],
+        self,
     ) -> AsyncIterator[bytearray]:
         """Generator that yields a pipetting function in 48-byte chunks."""
         bytes_index = 0
         current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
-        data_values_in_buffer = (
-            PipetteFunctionDataField.NUM_BYTES / PIPETTING_FUNCTION_VALUE_BYTES
-        ) - 1
-        for tip_size, pip_values in pip_function.items():
-            # RESET THE BUFFER
-            # pipetting_data_chunks.append(current_message_bytes)
-            yield current_message_bytes
+        for tip_size, pip_values in self.formatted_pipetting_function.items():
+            # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
             current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
-            bytes_index = 0
+            bytes_index = PIPETTING_FUNCTION_VALUE_BYTES
             # add the tip size to the first 3 bytes
-            tip_size_bytes = int(tip_size).to_bytes(PIPETTING_FUNCTION_VALUE_BYTES)
-            current_message_bytes[0:PIPETTING_FUNCTION_VALUE_BYTES] = tip_size_bytes
+            tip_size_bytes = tip_size.to_bytes(PIPETTING_FUNCTION_VALUE_BYTES)
+            current_message_bytes[:PIPETTING_FUNCTION_VALUE_BYTES] = tip_size_bytes
             for line in pip_values:
                 for number in line:
-                    if bytes_index >= data_values_in_buffer:
-                        # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
+                    if bytes_index >= PipetteFunctionDataField.NUM_BYTES:
                         yield current_message_bytes
-                        # pipetting_data_chunks.append(current_message_bytes)
+                        # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
                         current_message_bytes = bytearray(
                             PipetteFunctionDataField.NUM_BYTES
                         )
@@ -108,23 +100,23 @@ class PipetteFunctionProcessor:
                     pip_value_int = int(
                         number * 10**PIPETTING_FUNCTION_DECIMAL_PRECISION
                     )
-                    pip_value_bytes = pip_value_int.to_bytes(
-                        PIPETTING_FUNCTION_VALUE_BYTES
+                    is_negative = pip_value_int < 0
+                    pip_value_bytes = bytearray(
+                        abs(pip_value_int).to_bytes(PIPETTING_FUNCTION_VALUE_BYTES)
                     )
                     # use largest bit to indicate sign
-                    sign_bit_place = 2 ** (8 * PIPETTING_FUNCTION_VALUE_BYTES - 1)
-                    pip_value_bytes |= sign_bit_place * pip_value_int < 0
+                    sign_bit_place = 2**7
+                    pip_value_bytes[0] |= sign_bit_place * is_negative
                     current_message_bytes[
                         bytes_index : bytes_index + PIPETTING_FUNCTION_VALUE_BYTES
                     ] = pip_value_bytes
                     bytes_index += PIPETTING_FUNCTION_VALUE_BYTES
+            yield current_message_bytes
 
     async def send_to_eeprom(self, reader: WaitableCallback) -> None:
         """Formats the pipette's function from shared data and sends it over CAN."""
         # num_messages = 0
-        async for data_chunk in self.pipetting_function_chunks(
-            pip_function=self.formatted_pipetting_function
-        ):
+        async for data_chunk in self.pipetting_function_chunks():
             passed = False
             for retry in range(self._retry_count):
                 data_bytes = bytes(data_chunk)
