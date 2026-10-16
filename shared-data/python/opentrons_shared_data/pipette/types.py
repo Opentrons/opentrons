@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, NewType, Tuple, Union, cast
+from typing import Dict, List, Mapping, NewType, Tuple, Union
 
 from pydantic import BaseModel
 from typing_extensions import Literal, TypedDict
@@ -10,18 +10,6 @@ from typing_extensions import Literal, TypedDict
 from ..labware.types import LabwareUri as LabwareUri
 
 """Pipette Definition V2 Types"""
-
-# Needed for Int Comparison. Keeping it next to
-# the Literal type for ease of readability
-PipetteModelMajorVersion = [1, 2, 3]
-PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5, 6, 7]
-
-# TODO Literals are only good for writing down
-# exact values. Is there a better typing mechanism
-# so we don't need to keep track of versions in two
-# different places?
-PipetteModelMajorVersionType = Literal[1, 2, 3]
-PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5, 6, 7]
 
 
 class LiquidClasses(enum.Enum):
@@ -88,13 +76,13 @@ class PipetteGenerationType(enum.Enum):
 
 @dataclass(frozen=True)
 class PipetteVersionType:
-    major: PipetteModelMajorVersionType
-    minor: PipetteModelMinorVersionType
+    major: int
+    minor: int
 
     @classmethod
     def convert_from_float(cls, version: float) -> "PipetteVersionType":
-        major = cast(PipetteModelMajorVersionType, int(version // 1))
-        minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
+        major = int(version // 1)
+        minor = int(round((version % 1), 2) * 10)
         return cls(major=major, minor=minor)
 
     def __str__(self) -> str:
@@ -108,7 +96,7 @@ class PipetteVersionType:
     @property
     def as_tuple(
         self,
-    ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
+    ) -> Tuple[int, int]:
         return (self.major, self.minor)
 
 
