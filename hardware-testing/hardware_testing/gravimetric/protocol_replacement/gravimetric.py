@@ -173,6 +173,46 @@ def _hide_serial_port_from_other_devices(port: str) -> Iterator[None]:
         asair_mod.comports, impact_mod.comports = previous
 
 
+def _harden_env_sensor(
+    ctx: ProtocolContext, env_sensor: AsairDriver.AsairSensorBase
+) -> None:
+    """Keep a bad Asair frame from aborting a volume trial.
+
+    The sensor sometimes returns an empty serial payload
+    (``invalid literal for int() with base 16: ''``). Temperature and humidity
+    are recorded with the measurement, but they are not the pass/fail metric.
+    """
+    original_get_reading = env_sensor.get_reading
+    last_reading: Dict[str, Optional[AsairDriver.Reading]] = {"value": None}
+    notified = {"done": False}
+
+    def _get_reading_or_last() -> AsairDriver.Reading:
+        try:
+            reading = original_get_reading()
+        except Exception as exc:
+            print_warning(f"env sensor read failed, using last value: {exc}")
+            cached = last_reading["value"]
+            reading = (
+                cached
+                if cached is not None
+                else AsairDriver.Reading(temperature=25.0, relative_humidity=50.0)
+            )
+            if not notified["done"]:
+                notified["done"] = True
+                _notify_operator(
+                    ctx,
+                    "ENV SENSOR READ FAILED",
+                    "The Asair sensor returned an empty or invalid frame. "
+                    "The run will keep the last temperature/humidity and continue. "
+                    f"Detail: {type(exc).__name__}: {exc}",
+                )
+        else:
+            last_reading["value"] = reading
+        return reading
+
+    env_sensor.get_reading = _get_reading_or_last  # type: ignore[method-assign]
+
+
 def _harden_scale_reader(scale: Scale, recorder: GravimetricRecorder) -> None:
     """Wait for one stable Radwag reply, and keep the recorder thread alive."""
     radwag = getattr(scale, "_scale", None)
@@ -194,9 +234,15 @@ def _harden_scale_reader(scale: Scale, recorder: GravimetricRecorder) -> None:
 
     def _read_without_killing_recorder() -> object:
         while recorder.is_recording:
+            # Stop issuing SI as soon as the measurement window closes so a
+            # retry loop cannot keep the USB adapter busy during gantry moves.
+            if not getattr(recorder, "_scale_reads_enabled", True):
+                return None
             try:
                 return original_read()
             except Exception as exc:
+                if not getattr(recorder, "_scale_reads_enabled", True):
+                    return None
                 print_warning(f"scale read failed, retrying one SI: {exc}")
                 try:
                     connection.reset_input_buffer()
@@ -232,6 +278,9 @@ def _harden_recorder_against_clock_skew(recorder: GravimetricRecorder) -> None:
             int(self._cfg.duration * self._cfg.frequency) + 1 if self._cfg.duration else 0
         )
         interval = 1.0 / self._cfg.frequency
+        # The thread starts before is_recording is set. Wait, or the loop
+        # exits immediately and record() blocks forever (analysis hang).
+        self._wait_for_record_start()
         self._recording = record_mod.GravimetricRecording()
         start_mono = monotonic()
         last_sample_mono: Optional[float] = None
@@ -241,12 +290,24 @@ def _harden_recorder_against_clock_skew(recorder: GravimetricRecorder) -> None:
         while self.is_recording:
             if length and len(self._recording) >= length:
                 break
+            # SI during gantry/pipette motion starves CAN (gantry_y timeouts).
+            # Only poll the scale while a measurement window is open.
+            if not getattr(self, "_scale_reads_enabled", True):
+                sleep(sleep_sim if self.is_simulator else sleep_real)
+                continue
             now_mono = monotonic()
             if timeout is not None and (now_mono - start_mono) >= timeout:
                 break
             due = last_sample_mono is None or (now_mono - last_sample_mono) >= interval
             if due:
-                mass = self._scale.read()
+                self._scale_read_in_progress = True
+                try:
+                    mass = self._scale.read()
+                finally:
+                    self._scale_read_in_progress = False
+                if mass is None:
+                    sleep(sleep_sim if self.is_simulator else sleep_real)
+                    continue
                 if self._cfg.stable and not mass.stable:
                     self._recording.clear()
                     last_sample_mono = None
@@ -670,6 +731,7 @@ class FixtureSettings(CSVSettings):
         with _hide_serial_port_from_other_devices(scale_port):
             env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
             env_serial = env_sensor.get_serial()
+            _harden_env_sensor(ctx, env_sensor)
             if use_impact_protection:
                 skip_port = link_port if link_port is not None else ""
                 ImpactSerial = ImpactProtectionV2.BuildImpactProtection(
@@ -679,7 +741,11 @@ class FixtureSettings(CSVSettings):
                 ctx.delay(seconds=1, msg=f"p {ImpactSerial.port}")
         _harden_scale_reader(scale, recorder)
         _harden_recorder_against_clock_skew(recorder)
+        # record() blocks until the first sample, so reads stay enabled here.
+        recorder._scale_reads_enabled = True  # type: ignore[attr-defined]
         recorder.record(in_thread=True)
+        # Stay quiet until a weigh. An in-flight SI must finish before any move.
+        _set_scale_reads_enabled(recorder, False)
 
         ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
 
@@ -1246,6 +1312,31 @@ def _notify_operator(
         )
 
 
+def _wait_until_scale_read_idle(recorder: GravimetricRecorder) -> None:
+    """Block until the recorder thread is not inside a scale read.
+
+    A Radwag SI can sit on the USB adapter for the serial timeout. Starting a
+    gantry move during that read is what produced gantry_y "Command timed out".
+    """
+    deadline = monotonic() + SCALE_READ_TIMEOUT_S + 1.0
+    idle_since: Optional[float] = None
+    while monotonic() < deadline:
+        if getattr(recorder, "_scale_read_in_progress", False):
+            idle_since = None
+        elif idle_since is None:
+            idle_since = monotonic()
+        elif monotonic() - idle_since >= 0.2:
+            return
+        sleep(0.05)
+    print_warning("scale read still in progress; continuing anyway")
+
+
+def _set_scale_reads_enabled(recorder: GravimetricRecorder, enabled: bool) -> None:
+    recorder._scale_reads_enabled = enabled  # type: ignore[attr-defined]
+    if not enabled:
+        _wait_until_scale_read_idle(recorder)
+
+
 def _tagged_sample_count(recorder: GravimetricRecorder, tag: str) -> int:
     """Count in-memory samples currently tagged for this measurement."""
     return len(
@@ -1269,26 +1360,33 @@ def _wait_for_scale_samples(
     if ctx.is_simulating():
         return
     max_wait_s = max(min_wait_s, max_wait_s)
-    with recorder.samples_of_tag(tag):
-        print_info(
-            f"waiting {min_wait_s}s (max {max_wait_s}s) for measurement {tag}, "
-            "please wait..."
-        )
-        ctx.delay(min_wait_s)
-        waited = float(min_wait_s)
-        while _tagged_sample_count(recorder, tag) < MIN_MEASUREMENT_SAMPLES:
-            remaining = max_wait_s - waited
-            if remaining <= 0:
-                break
-            extra = min(MEASUREMENT_POLL_S, remaining)
-            n = _tagged_sample_count(recorder, tag)
+    _set_scale_reads_enabled(recorder, True)
+    try:
+        with recorder.samples_of_tag(tag):
             print_info(
-                f"scale not settled ({n}/{MIN_MEASUREMENT_SAMPLES} samples "
-                f"for {tag}); waiting extra {extra}s "
-                f"({waited:.0f}/{max_wait_s}s)..."
+                f"waiting {min_wait_s}s (max {max_wait_s}s) for measurement {tag}, "
+                "please wait..."
             )
-            ctx.delay(extra)
-            waited += extra
+            ctx.delay(min_wait_s)
+            waited = float(min_wait_s)
+            while _tagged_sample_count(recorder, tag) < MIN_MEASUREMENT_SAMPLES:
+                remaining = max_wait_s - waited
+                if remaining <= 0:
+                    break
+                extra = min(MEASUREMENT_POLL_S, remaining)
+                n = _tagged_sample_count(recorder, tag)
+                print_info(
+                    f"scale not settled ({n}/{MIN_MEASUREMENT_SAMPLES} samples "
+                    f"for {tag}); waiting extra {extra}s "
+                    f"({waited:.0f}/{max_wait_s}s)..."
+                )
+                ctx.delay(extra)
+                waited += extra
+            # Drop the tag only after the current SI returns, so the next
+            # gantry move does not share the scale USB adapter.
+            _set_scale_reads_enabled(recorder, False)
+    finally:
+        _set_scale_reads_enabled(recorder, False)
     sample_count = _tagged_sample_count(recorder, tag)
     if sample_count < 1:
         raise RuntimeError(
