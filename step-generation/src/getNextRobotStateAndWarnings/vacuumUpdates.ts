@@ -7,22 +7,24 @@ import {
   VACUUM_VENT_OPEN,
 } from '../constants'
 import { vacuumModuleStateGetter } from '../robotStateSelectors'
-import { getFullStackFromLabwares } from '../utils'
+import {
+  getFullStackFromLabwares,
+  resolveBooleanRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
-import type {
-  LabwareDefinition,
-  VacuumModuleOpenVentCreateCommand,
-  VacuumModuleSetTargetPowerCreateCommand,
-  VacuumModuleSetTargetPressureCreateCommand,
-  VacuumModuleStartRunProfileCreateCommand,
-  VacuumModuleStopPumpCreateCommand,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntities,
+  ModuleStepGenArgs,
   RobotStateAndWarnings,
   TimelineFrame,
   VacuumModuleState,
+  VacuumSetPumpPowerStepGenArgs,
+  VacuumSetPumpPressureStepGenArgs,
+  VacuumStartRunProfileStepGenArgs,
 } from '../types'
 
 const getLabwareDimensionsEqual = (
@@ -97,11 +99,17 @@ const vacuumMergeLiquid = (
 }
 
 export const forVacuumOpenVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -110,11 +118,17 @@ export const forVacuumOpenVent = (
 }
 
 export const forVacuumCloseVent = (
-  params: VacuumModuleOpenVentCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState != null) {
@@ -123,13 +137,34 @@ export const forVacuumCloseVent = (
 }
 
 export const forVacuumSetPumpPressure = (
-  params: VacuumModuleSetTargetPressureCreateCommand['params'],
+  params: VacuumSetPumpPressureStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, gaugePressure, duration, ventAfter = true, taskId } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const gaugePressure = resolveNumericRuntimeValue(
+    params.gaugePressure,
+    runtimeParameters
+  )
+  const duration =
+    params.duration == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.duration, runtimeParameters)
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  if (
+    moduleId == null ||
+    gaugePressure == null ||
+    duration === null ||
+    ventAfter == null
+  ) {
+    return
+  }
+  const { taskId } = params
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
     return
@@ -137,8 +172,6 @@ export const forVacuumSetPumpPressure = (
 
   vacuumMergeLiquid(moduleId, robotState, labwareEntities)
 
-  // if holding indefinitely or not venting after the pressure is reached for a duration, the pressure is held
-  // taskId should not be null, but this is to satisfy type checks
   if (duration == null || taskId == null) {
     moduleState.currentPumpActivity = {
       type: 'indefiniteHold',
@@ -156,18 +189,38 @@ export const forVacuumSetPumpPressure = (
     }
     moduleState.numPumpActivitiesStarted++
   }
-  // vent status is always closed for timed holds. Opening will be handled by the wait for task updates
   moduleState.ventStatus = VACUUM_VENT_CLOSED
 }
 
 export const forVacuumSetPumpPower = (
-  params: VacuumModuleSetTargetPowerCreateCommand['params'],
+  params: VacuumSetPumpPowerStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, percentPower, duration, ventAfter = true, taskId } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const percentPower = resolveNumericRuntimeValue(
+    params.percentPower,
+    runtimeParameters
+  )
+  const duration =
+    params.duration == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.duration, runtimeParameters)
+  const ventAfter =
+    params.ventAfter == null
+      ? true
+      : resolveBooleanRuntimeValue(params.ventAfter, runtimeParameters)
+  if (
+    moduleId == null ||
+    percentPower == null ||
+    duration === null ||
+    ventAfter == null
+  ) {
+    return
+  }
+  const { taskId } = params
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
     return
@@ -175,8 +228,6 @@ export const forVacuumSetPumpPower = (
 
   vacuumMergeLiquid(moduleId, robotState, labwareEntities)
 
-  // if holding indefinitely or not venting after the power is reached for a duration, the power is held
-  // taskId should not be null, but this is to satisfy type checks
   if (duration == null || taskId == null) {
     moduleState.currentPumpActivity = {
       type: 'indefiniteHold',
@@ -194,16 +245,21 @@ export const forVacuumSetPumpPower = (
     }
     moduleState.numPumpActivitiesStarted++
   }
-  // vent status is always closed for timed holds. Opening will be handled by the wait for task updates
   moduleState.ventStatus = VACUUM_VENT_CLOSED
 }
 
 export const forVacuumStopPump = (
-  params: VacuumModuleStopPumpCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId } = params
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   if (moduleState == null) {
@@ -215,15 +271,22 @@ export const forVacuumStopPump = (
 }
 
 export const forVacuumStartRunProfile = (
-  params: VacuumModuleStartRunProfileCreateCommand['params'],
+  params: VacuumStartRunProfileStepGenArgs & { taskId?: string | null },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, steps, taskId, ventAfter = true } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const ventAfter = resolveBooleanRuntimeValue(
+    params.ventAfter,
+    runtimeParameters
+  )
+  if (moduleId == null || ventAfter == null) {
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
-  // taskId should not be null, but this is to satisfy type checks
+  const { taskId, profile } = params
   if (moduleState == null || taskId == null) {
     return
   }
@@ -232,7 +295,7 @@ export const forVacuumStartRunProfile = (
 
   moduleState.currentPumpActivity = {
     type: 'profile',
-    profileElements: steps,
+    profileElements: profile,
     taskId,
     ventAfter,
   }
