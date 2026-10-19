@@ -2,7 +2,11 @@ import range from 'lodash/range'
 
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
-import { AIR } from '../utils'
+import {
+  AIR,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 
 import type { AirGapInPlaceParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
@@ -14,7 +18,20 @@ export function forAirGapInPlace(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, volume } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  const volume = resolveNumericRuntimeValue(params.volume, runtimeParameters)
+  if (pipetteId == null || volume == null) {
+    console.error(
+      `forAirGapInPlace: arg resolved to null (pipetteId=${String(
+        pipetteId
+      )}, volume=${String(volume)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
