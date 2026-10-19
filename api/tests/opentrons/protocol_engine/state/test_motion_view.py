@@ -26,8 +26,8 @@ from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.instrument_interfacing import (
-    InstrumentInterfacingView,
+from opentrons.protocol_engine.state.instrument_interface import (
+    InstrumentInterfaceView,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
@@ -58,8 +58,8 @@ def mock_module_view(decoy: Decoy) -> ModuleView:
 
 
 @pytest.fixture
-def mock_instrument_interface(decoy: Decoy) -> InstrumentInterfacingView:
-    return decoy.mock(cls=InstrumentInterfacingView)
+def mock_instrument_interface(decoy: Decoy) -> InstrumentInterfaceView:
+    return decoy.mock(cls=InstrumentInterfaceView)
 
 
 @pytest.fixture(autouse=True)
@@ -133,7 +133,7 @@ def subject(
     addressable_area_view: AddressableAreaView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
 ) -> MotionView:
     """Get a MotionView with its dependencies mocked out."""
     return MotionView(
@@ -440,7 +440,7 @@ def test_get_pipette_offset_for_reservoirs(
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
     mock_module_view: ModuleView,
     subject: MotionView,
     has_96_grid: bool,
@@ -558,7 +558,7 @@ def test_get_movement_waypoints_to_well_for_x_center(
     pipette_view: PipetteView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
     subject: MotionView,
 ) -> None:
     """It should call get_waypoints() with the correct args to move to a well."""
@@ -647,7 +647,7 @@ def test_get_movement_waypoints_to_well_for_y_center(
     pipette_view: PipetteView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
     subject: MotionView,
 ) -> None:
     """It should call get_waypoints() with the correct args to move to a well."""
@@ -736,7 +736,7 @@ def test_get_movement_waypoints_to_well_for_xy_center(
     pipette_view: PipetteView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
     subject: MotionView,
 ) -> None:
     """It should call get_waypoints() with the correct args to move to a well."""
@@ -819,7 +819,7 @@ def test_get_movement_waypoints_to_well_raises(
     decoy: Decoy,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    mock_instrument_interface: InstrumentInterfacingView,
+    mock_instrument_interface: InstrumentInterfaceView,
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""

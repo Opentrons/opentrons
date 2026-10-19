@@ -31,7 +31,7 @@ from .commands import (
 from .config import Config
 from .files import FileState, FileStore, FileView
 from .geometry import GeometryView
-from .instrument_interfacing import InstrumentInterfacingView
+from .instrument_interface import InstrumentInterfaceView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
 from .liquid_tracking import LiquidTrackingView
@@ -116,7 +116,7 @@ class StateView(HasState[State]):
     _geometry: GeometryView
     _motion: MotionView
     _liquid_tracking: LiquidTrackingView
-    _instrument_interface: InstrumentInterfacingView
+    _instrument_interface: InstrumentInterfaceView
     _files: FileView
     _config: Config
     _tasks: TaskView
@@ -188,7 +188,7 @@ class StateView(HasState[State]):
         return self._liquid_tracking
 
     @property
-    def instrument_interface(self) -> InstrumentInterfacingView:
+    def instrument_interface(self) -> InstrumentInterfaceView:
         return self._instrument_interface
 
     @property
@@ -542,7 +542,7 @@ class StateStore(StateView, ActionHandler):
             pipette_view=self._pipettes,
             geometry_view=self._geometry,
         )
-        self._instrument_interface = InstrumentInterfacingView(
+        self._instrument_interface = InstrumentInterfaceView(
             config=self._config,
             labware_view=self._labware,
             module_view=self._modules,

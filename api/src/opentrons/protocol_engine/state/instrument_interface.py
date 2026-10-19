@@ -56,7 +56,7 @@ class _TipDropSection(enum.Enum):
     RIGHT = "right"
 
 
-class InstrumentInterfacingView:
+class InstrumentInterfaceView:
     """Instrument-labware interface state getters and validators."""
 
     def __init__(
@@ -102,6 +102,7 @@ class InstrumentInterfacingView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
+    # TODO spin this out into the base funciton in geometry
     def get_well_position(
         self,
         labware_id: str,
@@ -160,6 +161,7 @@ class InstrumentInterfacingView:
             )
         return location, dynamic_liquid_tracking
 
+    # TODO: Refactor this as well perhaps
     def get_relative_well_location(
         self,
         labware_id: str,

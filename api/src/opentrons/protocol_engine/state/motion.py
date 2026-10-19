@@ -17,7 +17,7 @@ from . import _move_types
 from .addressable_areas import AddressableAreaView
 from .config import Config
 from .geometry import GeometryView
-from .instrument_interfacing import InstrumentInterfacingView
+from .instrument_interface import InstrumentInterfaceView
 from .labware import LabwareView
 from .module_substates import HeaterShakerModuleId
 from .modules import ModuleView
@@ -51,7 +51,7 @@ class MotionView:
         pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
         geometry_view: GeometryView,
-        instrument_interface_view: InstrumentInterfacingView,
+        instrument_interface_view: InstrumentInterfaceView,
         module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
