@@ -42,7 +42,17 @@ export const forDropTipInPlace = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { pipetteId } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  if (pipetteId == null) {
+    console.error(
+      `forDropTipInPlace: arg resolved to null (pipetteId=${String(pipetteId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const entityId = robotState.pipettes[pipetteId].entityId ?? ''
   robotState.tipState.pipettes[pipetteId] = {
