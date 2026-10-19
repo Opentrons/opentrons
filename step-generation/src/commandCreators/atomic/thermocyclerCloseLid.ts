@@ -8,12 +8,14 @@ import {
 import type {
   CommandCreator,
   CommandCreatorError,
-  ThermocyclerCloseLidStepGenArgs,
+  ModuleStepGenArgs,
 } from '../../types'
 
-export const thermocyclerCloseLid: CommandCreator<
-  ThermocyclerCloseLidStepGenArgs
-> = (args, invariantContext, prevRobotState) => {
+export const thermocyclerCloseLid: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const { moduleEntities, labwareEntities, runtimeParameters } =
     invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)

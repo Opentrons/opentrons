@@ -1236,14 +1236,6 @@ export interface AbsorbanceReaderReadStepGenArgs {
   fileName?: string | null
 }
 
-export type ThermocyclerCloseLidStepGenArgs = ModuleStepGenArgs
-
-export type ThermocyclerOpenLidStepGenArgs = ModuleStepGenArgs
-
-export type ThermocyclerDeactivateBlockStepGenArgs = ModuleStepGenArgs
-
-export type ThermocyclerDeactivateLidStepGenArgs = ModuleStepGenArgs
-
 export interface ThermocyclerSetTargetBlockTemperatureStepGenArgs {
   moduleId: string
   celsius: number | string

@@ -1,14 +1,13 @@
 import * as errorCreators from '../../errorCreators'
 import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type {
-  CommandCreator,
-  ThermocyclerDeactivateLidStepGenArgs,
-} from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
-export const thermocyclerDeactivateLid: CommandCreator<
-  ThermocyclerDeactivateLidStepGenArgs
-> = (args, invariantContext, prevRobotState) => {
+export const thermocyclerDeactivateLid: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const moduleId = resolveStringRuntimeValue(
     args.moduleId,
     invariantContext.runtimeParameters
