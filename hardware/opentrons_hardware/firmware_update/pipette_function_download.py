@@ -1,7 +1,6 @@
 """Send a pipetting function from shared data to the EEPROM over CAN."""
 
 import asyncio
-import logging
 from typing import Dict, Iterator, List, Tuple
 
 from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
@@ -17,8 +16,6 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteConfigDataField,
 )
 from opentrons_hardware.firmware_update.errors import TimeoutResponse
-
-logger = logging.getLogger(__name__)
 
 PIPETTING_FUNCTION_VALUE_BYTES = 3
 PIPETTING_FUNCTION_DECIMAL_PRECISION = 3
@@ -115,8 +112,6 @@ class PipetteFunctionDownloader:
 
     async def send_to_eeprom(self, reader: WaitableCallback) -> None:
         """Formats the pipette's function from shared data and sends it over CAN."""
-        # num_messages = 0
-
         for data_chunk in self.pipetting_function_chunks():
             passed = False
             for retry in range(self._retry_count):
@@ -132,7 +127,7 @@ class PipetteFunctionDownloader:
                     node_id=self._node_id, message=data_message
                 )
                 try:
-                    # Wait for ack.
+                    # Wait for ack
                     await asyncio.wait_for(
                         self._wait_for_data_ack(reader),
                         self._ack_wait_seconds,
@@ -149,13 +144,17 @@ class PipetteFunctionDownloader:
         """Sends initiate message and waits for ack."""
         initiate_acknowledged = False
         with WaitableCallback(self._can_messenger) as reader:
+            initiate_message = message_definitions.PipetteConfigUpdateInitiate()
             for retry in range(self._retry_count):
+                await self._can_messenger.send(
+                    node_id=self._node_id,
+                    message=initiate_message,
+                )
                 await asyncio.wait_for(
                     self._wait_for_initiate(reader=reader), self._timeout_seconds
                 )
         if not initiate_acknowledged:
-            # make this an actual enumerated error
-            raise ValueError("Initiate Pipette Function Update Timed out.")
+            raise TimeoutResponse(initiate_message, self._node_id)
 
     async def run_update_pipette_function(self) -> None:
         """Starts, executes, and confirms ack of pipette function download."""
@@ -182,10 +181,6 @@ class PipetteFunctionDownloader:
                 # raise TimeoutResponse(complete_message, self._node_id)
 
     async def _wait_for_initiate(self, reader: WaitableCallback) -> None:
-        await self._can_messenger.send(
-            node_id=self._node_id,
-            message=message_definitions.PipetteConfigUpdateInitiate(),
-        )
         async for response, arbitration_id in reader:
             if (
                 isinstance(response, message_definitions.PipetteConfigDataAcknowledge)
@@ -213,6 +208,3 @@ class PipetteFunctionDownloader:
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
                 break
-
-
-# maybe add in number of messages and progress tracking
