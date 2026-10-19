@@ -1686,21 +1686,6 @@ def test_get_labware_position(
 #     )
 
 
-# TODO delete this
-def test_get_well_height(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    subject: GeometryView,
-) -> None:
-    """It should be able to get the well height."""
-    well_def = well_plate_def.wells["B2"]
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    assert subject.get_well_height("labware-id", "B2") == 10.67
-
-
 def test_get_ancestor_slot_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,

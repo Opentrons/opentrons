@@ -96,7 +96,7 @@ class InstrumentInterfaceView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
-    # TODO spin this out into the base funciton in geometry
+    # TODO spin this out into the base function in geometry
     def get_well_position(
         self,
         labware_id: str,

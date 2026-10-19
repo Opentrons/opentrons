@@ -514,16 +514,6 @@ class GeometryView:
             z=origin_pos.z + cal_offset.z,
         )
 
-    # TODO: Remove this
-    def get_well_height(
-        self,
-        labware_id: str,
-        well_name: str,
-    ) -> float:
-        """Get the height of a specified well for a labware."""
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        return well_def.depth
-
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         if lw_data.location == WASTE_CHUTE_LOCATION:
             # Returns 0 so that the waste chute height is not added to the height of the lbw
