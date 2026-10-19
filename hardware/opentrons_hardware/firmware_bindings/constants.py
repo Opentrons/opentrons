@@ -268,13 +268,12 @@ class MessageId(int, Enum):
     get_hepa_uv_state_request = 0x94
     get_hepa_uv_state_response = 0x95
 
-    pip_func_update_initiate = 0x96
-    pip_func_data = 0x97
-    pip_func_data_ack = 0x98
-    pip_func_update_complete = 0x99
-    pip_func_update_complete_ack = 0x9A
-    # pip_func_status_request = 0x9B
-    # pip_func_status_response = 0x9C
+    pip_config_update_initiate = 0x96
+    pip_config_data = 0x97
+    pip_config_data_ack = 0x98
+    pip_config_update_complete = 0x99
+    pip_config_update_complete_ack = 0x9A
+    pip_config_update_request = 0x9B
 
 
 @unique

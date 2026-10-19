@@ -499,47 +499,60 @@ class FirmwareUpdateEraseAppResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class PipetteFunctionUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.pip_func_update_initiate] = (
-        MessageId.pip_func_update_initiate
+class PipetteConfigEEPROMMessage(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigData
+    payload_type: Type[payloads.PipetteConfigData] = payloads.PipetteConfigData
+
+
+@dataclass
+class PipetteConfigUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pip_config_update_initiate] = (
+        MessageId.pip_config_update_initiate
     )
 
 
 @dataclass
-class PipetteFunctionData(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionData
-    payload_type: Type[payloads.PipetteFunctionData] = payloads.PipetteFunctionData
-    message_id: Literal[MessageId.pip_func_data] = MessageId.pip_func_data
-
-
-@dataclass
-class PipetteFunctionDataAcknowledge(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionDataAcknowledge
-    payload_type: Type[payloads.PipetteFunctionDataAcknowledge] = (
-        payloads.PipetteFunctionDataAcknowledge
-    )
-    message_id: Literal[MessageId.pip_func_data_ack] = MessageId.pip_func_data_ack
-
-
-@dataclass
-class PipetteFunctionUpdateComplete(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionUpdateComplete
-    payload_type: Type[payloads.PipetteFunctionUpdateComplete] = (
-        payloads.PipetteFunctionUpdateComplete
-    )
-    message_id: Literal[MessageId.pip_func_update_complete] = (
-        MessageId.pip_func_update_complete
+class PipetteConfigUpdateRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pip_config_update_initiate] = (
+        MessageId.pip_config_update_initiate
     )
 
 
 @dataclass
-class PipetteFunctionDataCompleteAcknowledge(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionDataAcknowledge
-    payload_type: Type[payloads.PipetteFunctionDataAcknowledge] = (
-        payloads.PipetteFunctionDataAcknowledge
+class PipetteConfigData(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigData
+    payload_type: Type[payloads.PipetteConfigData] = payloads.PipetteConfigData
+    message_id: Literal[MessageId.pip_config_data] = MessageId.pip_config_data
+
+
+@dataclass
+class PipetteConfigDataAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigDataAcknowledge
+    payload_type: Type[payloads.PipetteConfigDataAcknowledge] = (
+        payloads.PipetteConfigDataAcknowledge
     )
-    message_id: Literal[MessageId.pip_func_update_complete_ack] = (
-        MessageId.pip_func_update_complete_ack
+    message_id: Literal[MessageId.pip_config_data_ack] = MessageId.pip_config_data_ack
+
+
+@dataclass
+class PipetteConfigUpdateComplete(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigUpdateComplete
+    payload_type: Type[payloads.PipetteConfigUpdateComplete] = (
+        payloads.PipetteConfigUpdateComplete
+    )
+    message_id: Literal[MessageId.pip_config_update_complete] = (
+        MessageId.pip_config_update_complete
+    )
+
+
+@dataclass
+class PipetteConfigDataCompleteAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigDataAcknowledge
+    payload_type: Type[payloads.PipetteConfigDataAcknowledge] = (
+        payloads.PipetteConfigDataAcknowledge
+    )
+    message_id: Literal[MessageId.pip_config_update_complete_ack] = (
+        MessageId.pip_config_update_complete_ack
     )
 
 
@@ -704,12 +717,6 @@ class PipetteInfoResponse(BaseMessage):  # noqa: D101
     message_id: Literal[MessageId.pipette_info_response] = (
         MessageId.pipette_info_response
     )
-
-
-@dataclass
-class PipetteFunctionEEPROMMessage(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteFunctionData
-    payload_type: Type[payloads.PipetteFunctionData] = payloads.PipetteFunctionData
 
 
 @dataclass

@@ -14,7 +14,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.firmware_bindings import NodeId, utils
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings.messages.fields import (
-    PipetteFunctionDataField,
+    PipetteConfigDataField,
 )
 from opentrons_hardware.firmware_update.errors import TimeoutResponse
 
@@ -79,21 +79,21 @@ class PipetteFunctionDownloader:
     ) -> Iterator[bytearray]:
         """Generator that yields a pipetting function in 48-byte chunks."""
         bytes_index = 0
-        current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
+        current_message_bytes = bytearray(PipetteConfigDataField.NUM_BYTES)
         for tip_size, pip_values in self.formatted_pipetting_function.items():
             # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
-            current_message_bytes = bytearray(PipetteFunctionDataField.NUM_BYTES)
+            current_message_bytes = bytearray(PipetteConfigDataField.NUM_BYTES)
             bytes_index = PIPETTING_FUNCTION_VALUE_BYTES
             # add the tip size to the first 3 bytes
             tip_size_bytes = tip_size.to_bytes(PIPETTING_FUNCTION_VALUE_BYTES)
             current_message_bytes[:PIPETTING_FUNCTION_VALUE_BYTES] = tip_size_bytes
             for line in pip_values:
                 for number in line:
-                    if bytes_index >= PipetteFunctionDataField.NUM_BYTES:
+                    if bytes_index >= PipetteConfigDataField.NUM_BYTES:
                         yield current_message_bytes
                         # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
                         current_message_bytes = bytearray(
-                            PipetteFunctionDataField.NUM_BYTES
+                            PipetteConfigDataField.NUM_BYTES
                         )
                         bytes_index = PIPETTING_FUNCTION_VALUE_BYTES
                     # preserve 3 decimal places
@@ -122,10 +122,10 @@ class PipetteFunctionDownloader:
             for retry in range(self._retry_count):
                 data_bytes = bytes(data_chunk)
                 # Create and send message from this chunk
-                data_message = message_definitions.PipetteFunctionData(
-                    payload=payloads.PipetteFunctionData(
-                        num_bytes=utils.UInt8Field(PipetteFunctionDataField.NUM_BYTES),
-                        data=PipetteFunctionDataField(data_bytes),
+                data_message = message_definitions.PipetteConfigData(
+                    payload=payloads.PipetteConfigData(
+                        num_bytes=utils.UInt8Field(PipetteConfigDataField.NUM_BYTES),
+                        data=PipetteConfigDataField(data_bytes),
                     )
                 )
                 await self._can_messenger.send(
@@ -165,8 +165,8 @@ class PipetteFunctionDownloader:
             # process pipette function and send it over CAN
             await self.send_to_eeprom(reader)
             # send complete message
-            complete_message = message_definitions.PipetteFunctionUpdateComplete(
-                payload=payloads.PipetteFunctionUpdateComplete()
+            complete_message = message_definitions.PipetteConfigUpdateComplete(
+                payload=payloads.PipetteConfigUpdateComplete()
             )
             await self._can_messenger.send(
                 node_id=self._node_id, message=complete_message
@@ -184,11 +184,11 @@ class PipetteFunctionDownloader:
     async def _wait_for_initiate(self, reader: WaitableCallback) -> None:
         await self._can_messenger.send(
             node_id=self._node_id,
-            message=message_definitions.PipetteFunctionUpdateInitiate(),
+            message=message_definitions.PipetteConfigUpdateInitiate(),
         )
         async for response, arbitration_id in reader:
             if (
-                isinstance(response, message_definitions.PipetteFunctionDataAcknowledge)
+                isinstance(response, message_definitions.PipetteConfigDataAcknowledge)
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
                 break
@@ -196,7 +196,7 @@ class PipetteFunctionDownloader:
     async def _wait_for_data_ack(self, reader: WaitableCallback) -> None:
         async for response, arbitration_id in reader:
             if (
-                isinstance(response, message_definitions.PipetteFunctionDataAcknowledge)
+                isinstance(response, message_definitions.PipetteConfigDataAcknowledge)
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):
                 break
@@ -208,7 +208,7 @@ class PipetteFunctionDownloader:
             if (
                 isinstance(
                     response,
-                    message_definitions.PipetteFunctionDataCompleteAcknowledge,
+                    message_definitions.PipetteConfigDataCompleteAcknowledge,
                 )
                 and arbitration_id.parts.originating_node_id == self._node_id
             ):

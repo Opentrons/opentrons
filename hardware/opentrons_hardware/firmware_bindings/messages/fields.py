@@ -213,8 +213,8 @@ class BatchSensorDataField(utils.BinaryFieldBase[bytes]):
     FORMAT = f"{NUM_BYTES}s"
 
 
-class PipetteFunctionDataField(utils.BinaryFieldBase[bytes]):
-    """The data field for sending pipette functions in chunks."""
+class PipetteConfigDataField(utils.BinaryFieldBase[bytes]):
+    """The data field for sending pipette configurations in chunks."""
 
     NUM_BYTES = 48
     FORMAT = f"{NUM_BYTES}s"
