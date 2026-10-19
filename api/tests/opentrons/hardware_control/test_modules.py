@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 from packaging.version import Version
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules, ot3api
 from opentrons.hardware_control.modules import (
     AbsorbanceReader,
