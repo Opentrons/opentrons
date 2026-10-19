@@ -321,7 +321,7 @@ def run(protocol: ProtocolContext) -> None:
 
         if CUSTOM_OFFSETS:
             PCRPlate_Z_offset = 1
-            Deepwell_Z_offset = 0.5 
+            Deepwell_Z_offset = 0.5
             Deep384_Z_offset = 0.5
             # HEATERSHAKER OFFSETS
             # MAG BLOCK OFFSETS
@@ -333,7 +333,7 @@ def run(protocol: ProtocolContext) -> None:
             deck_drop_offset = {"x": 0, "y": 0, "z": 0}
             deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
         else:
-            PCRPlate_Z_offset = 1.0 
+            PCRPlate_Z_offset = 1.0
             Deepwell_Z_offset = 0.5
             Deep384_Z_offset = 0.5
             # HEATERSHAKER OFFSETS
@@ -374,9 +374,7 @@ def run(protocol: ProtocolContext) -> None:
                 # ===============================================
                 p200.pick_up_tip()
                 p200.aspirate(EPH3Vol, EPH3.bottom(z=Deep384_Z_offset + 1))
-                p200.dispense(
-                    EPH3Vol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset)
-                )
+                p200.dispense(EPH3Vol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
                 p200.move_to(sample_plate_1["A1"].bottom(z=1))
                 p200.mix(EPH3MixRep, EPH3MixVol)
                 p200.blow_out(sample_plate_1["A1"].top(z=-5))
@@ -1013,9 +1011,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.aspirate(
                 TransferSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
             )
-            p200.dispense(
-                TransferSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset)
-            )
+            p200.dispense(TransferSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.return_tip()
             # ===============================================
 
@@ -1197,7 +1193,9 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_200_5)
             # ===============================================
             p200.pick_up_tip()
-            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.aspirate(
+                RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2)
+            )
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             p200.return_tip()
             # ===============================================
@@ -1278,7 +1276,9 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_200_6)
             # ===============================================
             p200.pick_up_tip()
-            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.aspirate(
+                RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2)
+            )
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             p200.return_tip()
             # ===============================================
@@ -1356,7 +1356,9 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p200.reset_tipracks()
             p200.pick_up_tip()
-            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.aspirate(
+                RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2)
+            )
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             p200.return_tip()
             # ===============================================
@@ -1435,7 +1437,9 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p200.reset_tipracks()
             p200.pick_up_tip()
-            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.aspirate(
+                RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2)
+            )
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             p200.return_tip()
             # ===============================================
