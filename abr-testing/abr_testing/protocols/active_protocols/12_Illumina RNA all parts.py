@@ -156,20 +156,23 @@ def run(protocol: ProtocolContext) -> None:
     )
 
     # =============================== PIPETTE ===============================
-    p1000 = protocol.load_instrument("flex_96channel_200", "left")
-    p1000_flow_rate_aspirate_default = 200
-    p1000_flow_rate_dispense_default = 200
-    p1000_flow_rate_blow_out_default = 400
-    p20_flow_rate_aspirate_default = 50
-    p20_flow_rate_dispense_default = 50
-    p20_flow_rate_blow_out_default = 100
+    p200 = protocol.load_instrument("flex_96channel_200", "left")
+    # Flex 96-channel 200 µL defaults (µL/s). InstrumentContext.flow_rate
+    # exposes aspirate, dispense, and blow_out; these are the values for each tip.
+    # 20 µL tips: 6.5 / 6.5 / 10. 200 µL tips: 15 / 15 / 10.
+    p20_flow_rate_aspirate_default = 6.5
+    p20_flow_rate_dispense_default = 6.5
+    p20_flow_rate_blow_out_default = 10
+    p200_flow_rate_aspirate_default = p200.flow_rate.aspirate
+    p200_flow_rate_dispense_default = p200.flow_rate.dispense
+    p200_flow_rate_blow_out_default = p200.flow_rate.blow_out
 
     # ================================ LISTS ================================
 
     def nozzlecheck(nozzletype: str, tip_rack: Labware) -> None:
         """Configures Pipette - 96-channel only."""
         # Always use 96-channel (ALL) configuration - no column pickups allowed
-        p1000.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
+        p200.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
 
     # ========== FIRST ROW ===========
     try:
@@ -317,9 +320,9 @@ def run(protocol: ProtocolContext) -> None:
         p200_in_Deep384_Z_offset = 9
 
         if CUSTOM_OFFSETS:
-            PCRPlate_Z_offset = 0.2
-            Deepwell_Z_offset = 0.2
-            Deep384_Z_offset = 0.2
+            PCRPlate_Z_offset = 1
+            Deepwell_Z_offset = 0.5 
+            Deep384_Z_offset = 0.5
             # HEATERSHAKER OFFSETS
             # MAG BLOCK OFFSETS
             mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
@@ -330,9 +333,9 @@ def run(protocol: ProtocolContext) -> None:
             deck_drop_offset = {"x": 0, "y": 0, "z": 0}
             deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
         else:
-            PCRPlate_Z_offset = 0.2
-            Deepwell_Z_offset = 0.2
-            Deep384_Z_offset = 0.2
+            PCRPlate_Z_offset = 1.0 
+            Deepwell_Z_offset = 0.5
+            Deep384_Z_offset = 0.5
             # HEATERSHAKER OFFSETS
             # MAG BLOCK OFFSETS
             mb_drop_offset = {"x": 0, "y": 0.0, "z": 0}
@@ -364,20 +367,20 @@ def run(protocol: ProtocolContext) -> None:
                 EPH3Vol = 8.5
                 EPH3MixRep = 5 if DRYRUN == "NO" else 1
                 EPH3MixVol = 20
-                p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-                p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-                p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+                p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+                p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+                p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
                 nozzlecheck("96", tiprack_20_1)
                 # ===============================================
-                p1000.pick_up_tip()
-                p1000.aspirate(EPH3Vol, EPH3.bottom(z=Deep384_Z_offset + 1))
-                p1000.dispense(
+                p200.pick_up_tip()
+                p200.aspirate(EPH3Vol, EPH3.bottom(z=Deep384_Z_offset + 1))
+                p200.dispense(
                     EPH3Vol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset)
                 )
-                p1000.move_to(sample_plate_1["A1"].bottom(z=1))
-                p1000.mix(EPH3MixRep, EPH3MixVol)
-                p1000.blow_out(sample_plate_1["A1"].top(z=-5))
-                p1000.return_tip()
+                p200.move_to(sample_plate_1["A1"].bottom(z=1))
+                p200.mix(EPH3MixRep, EPH3MixVol)
+                p200.blow_out(sample_plate_1["A1"].top(z=-5))
+                p200.return_tip()
                 # ===============================================
 
             protocol.comment(
@@ -437,22 +440,22 @@ def run(protocol: ProtocolContext) -> None:
                 FSMMVol = 8
                 FSMMMixRep = 5 if DRYRUN == "NO" else 1
                 FSMMMixVol = 20
-                p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-                p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-                p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+                p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+                p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+                p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
                 nozzlecheck("96", tiprack_20_2)
                 # ===============================================
                 # 96-channel operation - process entire plate at once
-                p1000.pick_up_tip()
-                p1000.aspirate(FSMMVol, FSMM.bottom(z=Deep384_Z_offset))
-                p1000.dispense(
+                p200.pick_up_tip()
+                p200.aspirate(FSMMVol, FSMM.bottom(z=Deep384_Z_offset))
+                p200.dispense(
                     FSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1)
                 )
-                p1000.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
-                p1000.mix(FSMMMixRep, FSMMMixVol)
-                p1000.blow_out(sample_plate_1["A1"].top(z=-5))
+                p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
+                p200.mix(FSMMMixRep, FSMMMixVol)
+                p200.blow_out(sample_plate_1["A1"].top(z=-5))
                 # Return tips to origin tiprack instead of dropping
-                p1000.return_tip()
+                p200.return_tip()
                 # ===============================================
 
             protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
@@ -510,34 +513,34 @@ def run(protocol: ProtocolContext) -> None:
                 SSMMVol = 20
                 SSMMMixRep = 5 if DRYRUN == "NO" else 1
                 SSMMMixVol = 20
-                p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-                p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-                p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+                p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+                p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+                p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
                 nozzlecheck("96", tiprack_20_3)
                 # ===============================================
                 # 96-channel operation - multi-well aspiration for sufficient volume
-                p1000.pick_up_tip()
+                p200.pick_up_tip()
                 # Aspirate from multiple SSMM wells to get sufficient volume (A3, A4)
-                p1000.aspirate(
+                p200.aspirate(
                     SSMMVol // 2,
                     reagent_plate_1.wells_by_name()["A1"].bottom(
                         z=Deep384_Z_offset + 1
                     ),
                 )
-                p1000.aspirate(
+                p200.aspirate(
                     SSMMVol // 2,
                     reagent_plate_1.wells_by_name()["A1"].bottom(
                         z=Deep384_Z_offset + 1
                     ),
                 )
-                p1000.dispense(
+                p200.dispense(
                     SSMMVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1)
                 )
-                p1000.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
-                p1000.mix(SSMMMixRep, SSMMMixVol)
-                p1000.blow_out(sample_plate_1["A1"].top(z=-5))
+                p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 1))
+                p200.mix(SSMMMixRep, SSMMMixVol)
+                p200.blow_out(sample_plate_1["A1"].top(z=-5))
                 # Return tips to origin tiprack instead of dropping
-                p1000.return_tip()
+                p200.return_tip()
                 # ===============================================
 
             protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
@@ -594,27 +597,27 @@ def run(protocol: ProtocolContext) -> None:
             AMPureVol = 20
             SampleVol = 20
             AMPurePremix = 3 if DRYRUN is False else 1
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_1)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.move_to(AMPure.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset))
-            p1000.mix(3, AMPureVol)
-            p1000.aspirate(
+            p200.pick_up_tip()
+            p200.move_to(AMPure.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset))
+            p200.mix(3, AMPureVol)
+            p200.aspirate(
                 AMPureVol, AMPure.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset)
             )
-            p1000.dispense(
+            p200.dispense(
                 AMPureVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 0.75)
             )
             # ========PIPETTE MIXING==========
-            p1000.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 0.75))
-            p1000.mix(10, AMPureVol)
+            p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 0.75))
+            p200.mix(10, AMPureVol)
             # ================================
             protocol.delay(seconds=0.2)
-            p1000.blow_out(sample_plate_1["A1"].top(z=-2))
-            p1000.return_tip()
+            p200.blow_out(sample_plate_1["A1"].top(z=-2))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -665,25 +668,25 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 1A")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_2)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.pick_up_tip()
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
             protocol.delay(minutes=0.1)
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.default_speed = 5
-            p1000.move_to(sample_plate_1["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.default_speed = 5
+            p200.move_to(sample_plate_1["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-5))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-5))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -725,26 +728,26 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> ETOH Wash 1A")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(
+            p200.pick_up_tip()
+            p200.aspirate(
                 ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1)
             )
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=-5))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(sample_plate_1["A1"].top(z=-2))
-            p1000.dispense(ETOHMaxVol, rate=1)
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(ETOH_reservoir["A1"].top(z=-5))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(sample_plate_1["A1"].top(z=-2))
+            p200.dispense(ETOHMaxVol, rate=1)
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.move_to(sample_plate_1["A1"].top(z=5))
-            p1000.move_to(sample_plate_1["A1"].top(z=0))
-            p1000.move_to(sample_plate_1["A1"].top(z=5))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.move_to(sample_plate_1["A1"].top(z=5))
+            p200.move_to(sample_plate_1["A1"].top(z=0))
+            p200.move_to(sample_plate_1["A1"].top(z=5))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -762,50 +765,50 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 1B")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_3)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.pick_up_tip()
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
             protocol.delay(minutes=0.1)
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.default_speed = 5
-            p1000.move_to(sample_plate_1["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.default_speed = 5
+            p200.move_to(sample_plate_1["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-5))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-5))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1B")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(
                 ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1)
             )
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=-5))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(sample_plate_1["A1"].top(z=-2))
-            p1000.dispense(ETOHMaxVol, rate=1)
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(ETOH_reservoir["A1"].top(z=-5))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(sample_plate_1["A1"].top(z=-2))
+            p200.dispense(ETOHMaxVol, rate=1)
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.move_to(sample_plate_1["A1"].top(z=5))
-            p1000.move_to(sample_plate_1["A1"].top(z=0))
-            p1000.move_to(sample_plate_1["A1"].top(z=5))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.move_to(sample_plate_1["A1"].top(z=5))
+            p200.move_to(sample_plate_1["A1"].top(z=0))
+            p200.move_to(sample_plate_1["A1"].top(z=5))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -841,25 +844,25 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 1C")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_4)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.pick_up_tip()
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
             protocol.delay(minutes=0.1)
-            p1000.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.default_speed = 5
-            p1000.move_to(sample_plate_1["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.aspirate(20, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.default_speed = 5
+            p200.move_to(sample_plate_1["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-5))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-5))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -908,33 +911,33 @@ def run(protocol: ProtocolContext) -> None:
             if MODESPEED != "QUICK":
                 protocol.comment("--> Adding RSB")
                 RSBVol = 20
-                p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-                p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-                p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+                p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+                p200.flow_rate.dispense = p200_flow_rate_dispense_default
+                p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
                 nozzlecheck("96", tiprack_20_4)
                 # ===============================================
                 # 96-channel operation - multi-well aspiration for sufficient volume
-                p1000.pick_up_tip()
+                p200.pick_up_tip()
                 # Aspirate from multiple RSB wells to get sufficient volume (A6, A7, A8)
-                p1000.aspirate(
+                p200.aspirate(
                     RSBVol // 3,
                     reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset),
                 )
-                p1000.aspirate(
+                p200.aspirate(
                     RSBVol // 3,
                     reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset),
                 )
-                p1000.aspirate(
+                p200.aspirate(
                     RSBVol - (2 * (RSBVol // 3)),  # Handle remainder
                     reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset),
                 )
-                p1000.dispense(RSBVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
+                p200.dispense(RSBVol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
                 # ========PIPETTE MIXING==========
-                p1000.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 0.75))
-                p1000.mix(10, AMPureVol)
+                p200.move_to(sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 0.75))
+                p200.mix(10, AMPureVol)
                 # ================================
                 # Return tips to origin tiprack instead of dropping
-                p1000.return_tip()
+                p200.return_tip()
                 # ===============================================
 
             # ============================================================================================
@@ -999,21 +1002,21 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("--> ADDING TAGMIX")
             TagVol = 20
             TransferSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_20_5)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(TagVol, TAGMIX.bottom(z=Deep384_Z_offset))
-            p1000.dispense(TagVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.aspirate(
-                TransferSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset)
+            p200.pick_up_tip()
+            p200.aspirate(TagVol, TAGMIX.bottom(z=Deep384_Z_offset))
+            p200.dispense(TagVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.aspirate(
+                TransferSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
             )
-            p1000.dispense(
+            p200.dispense(
                 TransferSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset)
             )
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment(
@@ -1092,19 +1095,19 @@ def run(protocol: ProtocolContext) -> None:
             if MODESPEED != "QUICK":
                 protocol.comment("--> Adding TAGSTOP")
                 TAGSTOPVol = 10
-                p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-                p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-                p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+                p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+                p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+                p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
                 nozzlecheck("96", tiprack_20_6)
                 # ===============================================
                 # 96-channel operation - process entire plate at once
-                p1000.pick_up_tip()
-                p1000.aspirate(TAGSTOPVol, TAGSTOP.bottom(z=PCRPlate_Z_offset))
-                p1000.dispense(
+                p200.pick_up_tip()
+                p200.aspirate(TAGSTOPVol, TAGSTOP.bottom(z=PCRPlate_Z_offset))
+                p200.dispense(
                     TAGSTOPVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset)
                 )
                 # Return tips to origin tiprack instead of dropping
-                p1000.return_tip()
+                p200.return_tip()
                 # ===============================================
 
             protocol.comment(
@@ -1188,43 +1191,43 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_5)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 1")
             TWBMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1269,43 +1272,43 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_6)
             # ===============================================
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 2")
             TWBMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1346,44 +1349,44 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_7)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 3")
             TWBMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.aspirate(
+            p200.aspirate(
                 TWBMaxVol // 2,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p200_in_Deep384_Z_offset
                 ),
             )
-            p1000.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.dispense(TWBMaxVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1425,16 +1428,16 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_200_8)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset + 2))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1500,19 +1503,19 @@ def run(protocol: ProtocolContext) -> None:
             EPMMixVol = 20
             BarcodeVol = 10
             TransferSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_20_7)
             # ===============================================
-            p1000.pick_up_tip()
+            p200.pick_up_tip()
             protocol.comment("--> Adding Barcodes")
-            p1000.aspirate(BarcodeVol, Barcodes.bottom(z=Deep384_Z_offset))
-            p1000.dispense(BarcodeVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.aspirate(BarcodeVol, Barcodes.bottom(z=Deep384_Z_offset))
+            p200.dispense(BarcodeVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             protocol.comment("--> Adding EPM")
-            p1000.aspirate(EPMVol, EPM_1.bottom(z=Deep384_Z_offset))
-            p1000.dispense(EPMVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.return_tip()
+            p200.aspirate(EPMVol, EPM_1.bottom(z=Deep384_Z_offset))
+            p200.dispense(EPMVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment(
@@ -1547,20 +1550,20 @@ def run(protocol: ProtocolContext) -> None:
             AMPureVol = 20
             SampleVol = 20
             AMPurePremix = 3 if DRYRUN is False else 1
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_20_7)
-            p1000.reset_tipracks()
+            p200.reset_tipracks()
             # ===============================================
-            p1000.pick_up_tip()
+            p200.pick_up_tip()
             protocol.comment("--> ADDING AMPure (0.8x)")
-            p1000.aspirate(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset))
-            p1000.dispense(AMPureVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.aspirate(AMPureVol, AMPure.bottom(z=Deepwell_Z_offset))
+            p200.dispense(AMPureVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             protocol.comment("--> Adding SAMPLE")
-            p1000.aspirate(SampleVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p1000.dispense(SampleVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.aspirate(SampleVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.dispense(SampleVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1601,32 +1604,32 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 2A")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_9)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1A")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
             # 96-channel operation - process entire plate at once
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
+            p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1667,32 +1670,32 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 2B")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_10)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1B")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_X)
             # ===============================================
             # 96-channel operation - process entire plate at once
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
+            p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p1000.return_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1733,16 +1736,16 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant 1C")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-            p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+            p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+            p200.flow_rate.dispense = p200_flow_rate_dispense_default
+            p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
             nozzlecheck("96", tiprack_200_11)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            p1000.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+            p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1799,21 +1802,21 @@ def run(protocol: ProtocolContext) -> None:
             if MODESPEED != "QUICK":
                 protocol.comment("--> Adding RSB")
                 RSBVol = 20
-                p1000.flow_rate.aspirate = p1000_flow_rate_aspirate_default
-                p1000.flow_rate.dispense = p1000_flow_rate_dispense_default
-                p1000.flow_rate.blow_out = p1000_flow_rate_blow_out_default
+                p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
+                p200.flow_rate.dispense = p200_flow_rate_dispense_default
+                p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
                 nozzlecheck("96", tiprack_20_9)
                 # ===============================================
                 # 96-channel operation - process entire plate at once
-                p1000.reset_tipracks()
-                p1000.pick_up_tip()
-                p1000.aspirate(
+                p200.reset_tipracks()
+                p200.pick_up_tip()
+                p200.aspirate(
                     RSBVol,
                     reagent_plate_1.wells_by_name()["A1"].bottom(z=Deep384_Z_offset),
                 )
-                p1000.dispense(RSBVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
+                p200.dispense(RSBVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
                 # Return tips to origin tiprack instead of dropping
-                p1000.return_tip()
+                p200.return_tip()
                 # ===============================================
 
             # ============================================================================================
@@ -1934,48 +1937,48 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> add NHB2")
             NHB2Vol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(NHB2Vol, NHB2.bottom(z=0.3))
-            p1000.dispense(NHB2Vol, sample_plate_3["A1"].bottom(z=1))
-            p1000.blow_out(sample_plate_3["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(NHB2Vol, NHB2.bottom(z=0.9))
+            p200.dispense(NHB2Vol, sample_plate_3["A1"].bottom(z=1))
+            p200.blow_out(sample_plate_3["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding Panel")
             PanelVol = 10
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(PanelVol, Panel.bottom(z=0.3))
-            p1000.dispense(PanelVol, sample_plate_3["A1"].bottom(z=1))
-            p1000.blow_out(sample_plate_3["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(PanelVol, Panel.bottom(z=0.9))
+            p200.dispense(PanelVol, sample_plate_3["A1"].bottom(z=1))
+            p200.blow_out(sample_plate_3["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EHB2")
             EHB2Vol = 10
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
             # ===============================================
             for loop, X in enumerate("A1"):
-                p1000.aspirate(EHB2Vol, EHB2.bottom(z=0.3))
-                p1000.dispense(EHB2Vol, sample_plate_3["A1"].bottom(z=1))
-                p1000.blow_out(sample_plate_3["A1"].bottom(z=1))
-            p1000.return_tip()
+                p200.aspirate(EHB2Vol, EHB2.bottom(z=0.9))
+                p200.dispense(EHB2Vol, sample_plate_3["A1"].bottom(z=1))
+                p200.blow_out(sample_plate_3["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if ONDECK_THERMO:
@@ -2079,17 +2082,17 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Transfer Hybridization")
             TransferSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(sample_plate_3["A1"].bottom(z=0.3))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, CleanupPlate_2["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(sample_plate_3["A1"].bottom(z=0.9))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
             if ONDECK_THERMO:
                 thermocycler.close_lid()
@@ -2098,34 +2101,46 @@ def run(protocol: ProtocolContext) -> None:
             SMBVol = 20
             SampleVol = 20
             SMBPremix = 3 if DRYRUN is False else 1
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.mix(SMBPremix, 20, SMB_1.bottom(z=1))
-            p1000.aspirate(SMBVol / 2, SMB_1.bottom(z=1), rate=0.25)
-            p1000.dispense(SMBVol / 2, CleanupPlate_2["A1"].top(z=-7), rate=0.25)
-            p1000.aspirate(SMBVol / 2, SMB_1.bottom(z=1), rate=0.25)
-            p1000.dispense(SMBVol / 2, CleanupPlate_2["A1"].bottom(z=1), rate=0.25)
-            p1000.default_speed = 5
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=5))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.mix(
+                SMBPremix,
+                20,
+                SMB_1.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset),
+            )
+            p200.aspirate(
+                SMBVol / 2,
+                SMB_1.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset),
+                rate=0.25,
+            )
+            p200.dispense(SMBVol / 2, CleanupPlate_2["A1"].top(z=-7), rate=0.25)
+            p200.aspirate(
+                SMBVol / 2,
+                SMB_1.bottom(z=Deep384_Z_offset + p200_in_Deep384_Z_offset),
+                rate=0.25,
+            )
+            p200.dispense(SMBVol / 2, CleanupPlate_2["A1"].bottom(z=1), rate=0.25)
+            p200.default_speed = 5
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=5))
             for Mix in range(2):
-                p1000.aspirate(20, rate=0.5)
-                p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
-                p1000.aspirate(20, rate=0.5)
-                p1000.dispense(20, rate=0.5)
-                p1000.move_to(CleanupPlate_2["A1"].bottom(z=5))
-                p1000.dispense(20, rate=0.5)
+                p200.aspirate(20, rate=0.5)
+                p200.move_to(CleanupPlate_2["A1"].bottom(z=1))
+                p200.aspirate(20, rate=0.5)
+                p200.dispense(20, rate=0.5)
+                p200.move_to(CleanupPlate_2["A1"].bottom(z=5))
+                p200.dispense(20, rate=0.5)
                 Mix += 1
-            p1000.blow_out(CleanupPlate_2["A1"].top(z=-7))
-            p1000.default_speed = 400
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.return_tip()
+            p200.blow_out(CleanupPlate_2["A1"].top(z=-7))
+            p200.default_speed = 400
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.move_to(CleanupPlate_2["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.return_tip()
             # ===============================================
 
             if ONDECK_THERMO:
@@ -2139,38 +2154,43 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("==============================================")
 
             protocol.comment("--> Remove SUPERNATANT")
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(4))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(CleanupPlate_2["A1"].bottom(0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(LW_reservoir["A1"].top(z=-7))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(4))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out(LW_reservoir["A1"].top(z=-7))
-            p1000.aspirate(20)
-            p1000.return_tip()
+            p200.blow_out(LW_reservoir["A1"].top(z=-7))
+            p200.aspirate(20)
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
             EEWVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
-            p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(
+                EEWVol,
+                reagent_plate_1["A1"].bottom(
+                    z=Deep384_Z_offset + p200_in_Deep384_Z_offset
+                ),
+            )
+            p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2181,24 +2201,24 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0.5))
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.move_to(CleanupPlate_2["A1"].top(z=0.5))
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out(LW_reservoir["A1"].top(z=-7))
-            p1000.aspirate(20)
-            p1000.return_tip()
+            p200.blow_out(LW_reservoir["A1"].top(z=-7))
+            p200.aspirate(20)
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -2239,16 +2259,21 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Adding EEW")
             EEWVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
-            p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(
+                EEWVol,
+                reagent_plate_1["A1"].bottom(
+                    z=Deep384_Z_offset + p200_in_Deep384_Z_offset
+                ),
+            )
+            p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2259,38 +2284,43 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0.5))
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.move_to(CleanupPlate_2["A1"].top(z=0.5))
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out(LW_reservoir["A1"].top(z=-7))
-            p1000.aspirate(20)
-            p1000.return_tip()
+            p200.blow_out(LW_reservoir["A1"].top(z=-7))
+            p200.aspirate(20)
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
             EEWVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
-            p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(
+                EEWVol,
+                reagent_plate_1["A1"].bottom(
+                    z=Deep384_Z_offset + p200_in_Deep384_Z_offset
+                ),
+            )
+            p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2301,38 +2331,43 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0.5))
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.move_to(CleanupPlate_2["A1"].top(z=0.5))
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out(LW_reservoir["A1"].top(z=-7))
-            p1000.aspirate(20)
-            p1000.return_tip()
+            p200.blow_out(LW_reservoir["A1"].top(z=-7))
+            p200.aspirate(20)
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
             EEWVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
-            p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(
+                EEWVol,
+                reagent_plate_1["A1"].bottom(
+                    z=Deep384_Z_offset + p200_in_Deep384_Z_offset
+                ),
+            )
+            p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2340,17 +2375,17 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Transfer Hybridization")
             TransferSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.25))
-            p1000.aspirate(TransferSup, rate=0.25)
-            p1000.dispense(TransferSup, CleanupPlate_2["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.95))
+            p200.aspirate(TransferSup, rate=0.25)
+            p200.dispense(TransferSup, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2361,44 +2396,44 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0.5))
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.move_to(CleanupPlate_2["A1"].top(z=0.5))
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out(LW_reservoir["A1"].top(z=-7))
-            p1000.aspirate(20)
-            p1000.return_tip()
+            p200.blow_out(LW_reservoir["A1"].top(z=-7))
+            p200.aspirate(20)
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Removing Residual")
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.3))
-            p1000.aspirate(20, rate=0.25)
-            p1000.default_speed = 200
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.9))
+            p200.aspirate(20, rate=0.25)
+            p200.default_speed = 200
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-7))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("==============================================")
@@ -2426,41 +2461,41 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Adding Elute")
             EluteVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(EluteVol, Elute.bottom(z=0.3))
-            p1000.dispense(EluteVol, CleanupPlate_2["A1"].bottom(z=0.3))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(EluteVol, Elute.bottom(z=0.9))
+            p200.dispense(EluteVol, CleanupPlate_2["A1"].bottom(z=0.9))
             # ===============================================
 
             protocol.comment("--> Transfer Elution")
             TransferSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.3))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, sample_plate_3["A1"].bottom(z=1))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.9))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, sample_plate_3["A1"].bottom(z=1))
             # ===============================================
 
             protocol.comment("--> Adding ET2")
             ET2Vol = 4
             ET2MixRep = 10 if DRYRUN is False else 1
             ET2MixVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.aspirate(ET2Vol, ET2.bottom())
-            p1000.dispense(ET2Vol, sample_plate_3["A1"].bottom())
-            p1000.move_to(sample_plate_3["A1"].bottom())
-            p1000.mix(ET2MixRep, ET2MixVol)
-            p1000.return_tip()
+            p200.aspirate(ET2Vol, ET2.bottom(z=Deep384_Z_offset))
+            p200.dispense(ET2Vol, sample_plate_3["A1"].bottom(z=1))
+            p200.move_to(sample_plate_3["A1"].bottom(z=1))
+            p200.mix(ET2MixRep, ET2MixVol)
+            p200.return_tip()
             # ===============================================
 
         if STEP_PCR:
@@ -2470,30 +2505,30 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Adding PPC")
             PPCVol = 5
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(PPCVol, PPC.bottom(z=0.5))
-            p1000.dispense(PPCVol, sample_plate_3["A1"].bottom(z=0.5))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(PPCVol, PPC.bottom(z=0.5))
+            p200.dispense(PPCVol, sample_plate_3["A1"].bottom(z=0.5))
             # ===============================================
 
             protocol.comment("--> Adding EPM")
             EPMVol = 20
             EPMMixRep = 10 if DRYRUN is False else 1
             EPMMixVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.aspirate(EPMVol, EPM_2.bottom(z=0.5))
-            p1000.dispense(EPMVol, sample_plate_3["A1"].bottom(z=0.5))
-            p1000.move_to(sample_plate_3["A1"].bottom(z=0.5))
-            p1000.mix(EPMMixRep, EPMMixVol)
-            p1000.return_tip()
+            p200.aspirate(EPMVol, EPM_2.bottom(z=0.5))
+            p200.dispense(EPMVol, sample_plate_3["A1"].bottom(z=0.5))
+            p200.move_to(sample_plate_3["A1"].bottom(z=0.5))
+            p200.mix(EPMMixRep, EPMMixVol)
+            p200.return_tip()
             # ===============================================
 
             if ONDECK_THERMO:
@@ -2543,48 +2578,48 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Transfer Elution")
             TransferSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(sample_plate_3["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, CleanupPlate_2["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(sample_plate_3["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, CleanupPlate_2["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
             protocol.comment("--> ADDING AMPure (0.8x)")
             AMPureVol = 20
             SampleVol = 20
             AMPurePremix = 3 if DRYRUN is False else 1
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
             nozzlecheck("R8", tiprack_20_X)
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.mix(AMPurePremix, AMPureVol, AMPure.bottom(z=1))
-            p1000.aspirate(AMPureVol, AMPure.bottom(z=1), rate=0.25)
-            p1000.dispense(AMPureVol, CleanupPlate_2["A1"].bottom(z=1))
-            p1000.default_speed = 5
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=5))
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.mix(AMPurePremix, AMPureVol, AMPure.bottom(z=1))
+            p200.aspirate(AMPureVol, AMPure.bottom(z=1), rate=0.25)
+            p200.dispense(AMPureVol, CleanupPlate_2["A1"].bottom(z=1))
+            p200.default_speed = 5
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=5))
             for Mix in range(2):
-                p1000.aspirate(10)
-                p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
-                p1000.aspirate(9)
-                p1000.dispense(9)
-                p1000.move_to(CleanupPlate_2["A1"].bottom(z=5))
-                p1000.dispense(9)
+                p200.aspirate(10)
+                p200.move_to(CleanupPlate_2["A1"].bottom(z=1))
+                p200.aspirate(9)
+                p200.dispense(9)
+                p200.move_to(CleanupPlate_2["A1"].bottom(z=5))
+                p200.dispense(9)
                 Mix += 1
-            p1000.blow_out(CleanupPlate_2["A1"].top(z=2))
-            p1000.default_speed = 400
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.return_tip()
+            p200.blow_out(CleanupPlate_2["A1"].top(z=2))
+            p200.default_speed = 400
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.move_to(CleanupPlate_2["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -2611,51 +2646,51 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Removing Supernatant")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.default_speed = 5
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.default_speed = 5
+            p200.move_to(CleanupPlate_2["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-7))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=1))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=-5))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=-2))
-            p1000.dispense(ETOHMaxVol, rate=1)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=1))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(ETOH_reservoir["A1"].top(z=-5))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=-2))
+            p200.dispense(ETOHMaxVol, rate=1)
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.move_to(CleanupPlate_2["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.return_tip()
             # ================================================
 
             if DRYRUN is False:
@@ -2663,50 +2698,50 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Remove ETOH Wash")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.default_speed = 5
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.default_speed = 5
+            p200.move_to(CleanupPlate_2["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-7))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash")
             ETOHMaxVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_200_XX)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=1))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=-5))
-            p1000.move_to(ETOH_reservoir["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=-2))
-            p1000.dispense(ETOHMaxVol, rate=1)
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=1))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(ETOH_reservoir["A1"].top(z=-5))
+            p200.move_to(ETOH_reservoir["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=-2))
+            p200.dispense(ETOHMaxVol, rate=1)
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.blow_out()
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
+            p200.move_to(CleanupPlate_2["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2["A1"].top(z=5))
             # ================================================
 
             if DRYRUN is False:
@@ -2714,25 +2749,25 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Remove ETOH Wash")
             RemoveSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p1000.aspirate(20, rate=0.25)
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
+            p200.aspirate(20, rate=0.25)
             protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.default_speed = 5
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.default_speed = 200
-            p1000.dispense(20, LW_reservoir["A1"].top(z=-7))
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.default_speed = 5
+            p200.move_to(CleanupPlate_2["A1"].top(z=2))
+            p200.default_speed = 200
+            p200.dispense(20, LW_reservoir["A1"].top(z=-7))
             protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(LW_reservoir["A1"].top(z=-7))
-            p1000.move_to(LW_reservoir["A1"].top(z=0))
-            p1000.return_tip()
+            p200.blow_out()
+            p200.default_speed = 400
+            p200.move_to(LW_reservoir["A1"].top(z=-7))
+            p200.move_to(LW_reservoir["A1"].top(z=0))
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2759,59 +2794,59 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Adding RSB")
             RSBVol = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             nozzlecheck("R8", tiprack_20_X)
             # ===============================================
-            p1000.reset_tipracks()
-            p1000.pick_up_tip()
-            p1000.aspirate(RSBVol, RSB_1.bottom(z=1))
-            p1000.move_to(
+            p200.reset_tipracks()
+            p200.pick_up_tip()
+            p200.aspirate(RSBVol, RSB_1.bottom(z=1))
+            p200.move_to(
                 (
                     CleanupPlate_2.wells_by_name()["A1"]
                     .center()
                     .move(types.Point(x=1.3 * 0.8, y=0, z=-4))
                 )
             )
-            p1000.dispense(RSBVol)
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
-            p1000.aspirate(RSBVol)
-            p1000.move_to(
+            p200.dispense(RSBVol)
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
+            p200.aspirate(RSBVol)
+            p200.move_to(
                 (
                     CleanupPlate_2.wells_by_name()["A1"]
                     .center()
                     .move(types.Point(x=0, y=1.3 * 0.8, z=-4))
                 )
             )
-            p1000.dispense(RSBVol)
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
-            p1000.aspirate(RSBVol)
-            p1000.move_to(
+            p200.dispense(RSBVol)
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
+            p200.aspirate(RSBVol)
+            p200.move_to(
                 (
                     CleanupPlate_2.wells_by_name()["A1"]
                     .center()
                     .move(types.Point(x=1.3 * -0.8, y=0, z=-4))
                 )
             )
-            p1000.dispense(RSBVol)
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
-            p1000.aspirate(RSBVol)
-            p1000.move_to(
+            p200.dispense(RSBVol)
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
+            p200.aspirate(RSBVol)
+            p200.move_to(
                 (
                     CleanupPlate_2.wells_by_name()["A1"]
                     .center()
                     .move(types.Point(x=0, y=1.3 * -0.8, z=-4))
                 )
             )
-            p1000.dispense(RSBVol)
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
-            p1000.aspirate(RSBVol)
-            p1000.dispense(RSBVol)
-            p1000.blow_out(CleanupPlate_2.wells_by_name()["A1"].center())
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=5))
+            p200.dispense(RSBVol)
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=1))
+            p200.aspirate(RSBVol)
+            p200.dispense(RSBVol)
+            p200.blow_out(CleanupPlate_2.wells_by_name()["A1"].center())
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=5))
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=0))
+            p200.move_to(CleanupPlate_2.wells_by_name()["A1"].top(z=5))
             # ===============================================
 
             if DRYRUN is False:
@@ -2819,14 +2854,14 @@ def run(protocol: ProtocolContext) -> None:
 
             protocol.comment("--> Transferring Supernatant")
             TransferSup = 20
-            p1000.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
+            p200.flow_rate.aspirate = p20_flow_rate_aspirate_default * 0.5
+            p200.flow_rate.dispense = p20_flow_rate_dispense_default * 0.5
+            p200.flow_rate.blow_out = p20_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.aspirate(20, rate=0.25)
-            p1000.dispense(20, sample_plate_3["A1"].bottom(z=1))
-            p1000.return_tip()
+            p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
+            p200.aspirate(20, rate=0.25)
+            p200.dispense(20, sample_plate_3["A1"].bottom(z=1))
+            p200.return_tip()
             # ===============================================
 
             while len(stacker_20_1.get_stored_labware()) != 0:
