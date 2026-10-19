@@ -21,8 +21,8 @@ PIPETTING_FUNCTION_VALUE_BYTES = 3
 PIPETTING_FUNCTION_DECIMAL_PRECISION = 3
 
 
-class PipetteFunctionDownloader:
-    """Takes in a shared data SupportedTips definition and sends the pipetting function over CAN."""
+class PipetteConfigDownloader:
+    """Takes in a shared data SupportedTips definition and sends the desired pipette config over CAN."""
 
     def __init__(
         self,
@@ -36,7 +36,7 @@ class PipetteFunctionDownloader:
         """Initialize RunUpdate class.
 
         Args:
-            node_id: Node Id of the pipette whose function to send
+            node_id: Node Id of the pipette whose config to send
             can_messenger: The canbus messenger
             supported_tips_def: The SupportedTips definition from the pipette config
             retry_count: How many times to retry sending and receiving an ack from the pipette firmware
@@ -49,7 +49,7 @@ class PipetteFunctionDownloader:
         self._can_messenger = can_messenger
         if node_id not in [NodeId.pipette_left, NodeId.pipette_right]:
             raise ValueError(
-                f"tried to start pipette function EEPROM update with invalid node {node_id}."
+                f"tried to start pipette config EEPROM update with invalid node {node_id}."
             )
         self._node_id = node_id
         self._supported_tips_def = supported_tips_def
@@ -57,7 +57,6 @@ class PipetteFunctionDownloader:
         self._ack_wait_seconds = ack_wait_seconds
         self._timeout_seconds = timeout_seconds
 
-    @property
     def formatted_pipetting_function(
         self,
     ) -> Dict[int, List[Tuple[float, float, float]]]:
@@ -77,7 +76,7 @@ class PipetteFunctionDownloader:
         """Generator that yields a pipetting function in 48-byte chunks."""
         bytes_index = 0
         current_message_bytes = bytearray(PipetteConfigDataField.NUM_BYTES)
-        for tip_size, pip_values in self.formatted_pipetting_function.items():
+        for tip_size, pip_values in self.formatted_pipetting_function().items():
             # RESET THE BUFFER and set the index to 3 to reserve space for tip length entries
             current_message_bytes = bytearray(PipetteConfigDataField.NUM_BYTES)
             bytes_index = PIPETTING_FUNCTION_VALUE_BYTES
@@ -110,7 +109,7 @@ class PipetteFunctionDownloader:
                     bytes_index += PIPETTING_FUNCTION_VALUE_BYTES
             yield current_message_bytes
 
-    async def send_to_eeprom(self, reader: WaitableCallback) -> None:
+    async def send_pipette_function_to_eeprom(self, reader: WaitableCallback) -> None:
         """Formats the pipette's function from shared data and sends it over CAN."""
         for data_chunk in self.pipetting_function_chunks():
             passed = False
@@ -140,7 +139,7 @@ class PipetteFunctionDownloader:
             if not passed:
                 raise TimeoutResponse(data_message, self._node_id)
 
-    async def initiate_pipette_function_update(self, reader: WaitableCallback) -> None:
+    async def initiate_pipette_config_update(self, reader: WaitableCallback) -> None:
         """Sends initiate message and waits for ack."""
         initiate_acknowledged = False
         with WaitableCallback(self._can_messenger) as reader:
@@ -160,9 +159,9 @@ class PipetteFunctionDownloader:
         """Starts, executes, and confirms ack of pipette function download."""
         with WaitableCallback(self._can_messenger) as reader:
             # send initiate message and wait for ack
-            await self.initiate_pipette_function_update(reader)
+            await self.initiate_pipette_config_update(reader)
             # process pipette function and send it over CAN
-            await self.send_to_eeprom(reader)
+            await self.send_pipette_function_to_eeprom(reader)
             # send complete message
             complete_message = message_definitions.PipetteConfigUpdateComplete(
                 payload=payloads.PipetteConfigUpdateComplete()
@@ -172,7 +171,7 @@ class PipetteFunctionDownloader:
             )
             try:
                 await asyncio.wait_for(
-                    self._wait_for_pipette_function_update_complete(reader),
+                    self._wait_for_pipette_config_update_complete(reader),
                     self._ack_wait_seconds,
                 )
             except asyncio.TimeoutError:
@@ -196,7 +195,7 @@ class PipetteFunctionDownloader:
             ):
                 break
 
-    async def _wait_for_pipette_function_update_complete(
+    async def _wait_for_pipette_config_update_complete(
         self, reader: WaitableCallback
     ) -> None:
         async for response, arbitration_id in reader:

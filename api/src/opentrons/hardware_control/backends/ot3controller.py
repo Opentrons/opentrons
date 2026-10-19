@@ -91,8 +91,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from opentrons_hardware.firmware_update import FirmwareUpdate
-from opentrons_hardware.firmware_update.pipette_function_download import (
-    PipetteFunctionDownloader,
+from opentrons_hardware.firmware_update.pipette_config_download import (
+    PipetteConfigDownloader,
 )
 from opentrons_hardware.hardware_control import network, status_bar, tools
 from opentrons_hardware.hardware_control.current_settings import (
@@ -2011,7 +2011,7 @@ class OT3Controller(FlexBackend):
     ) -> None:
         """Process and send a pipetting function to the pipette's EEPROM over CAN."""
         node = sensor_node_for_mount(mount)
-        pip_function_processor = PipetteFunctionDownloader(
+        pip_function_processor = PipetteConfigDownloader(
             can_messenger=self._messenger,
             node_id=node,
             supported_tips_def=supported_tips_def,

@@ -12,8 +12,8 @@ from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_hardware.firmware_bindings import (
     NodeId,
 )
-from opentrons_hardware.firmware_update.pipette_function_download import (
-    PipetteFunctionDownloader,
+from opentrons_hardware.firmware_update.pipette_config_download import (
+    PipetteConfigDownloader,
 )
 
 
@@ -42,13 +42,13 @@ def test_pipette_function_formatting(
 ) -> None:
     """Pipetting functions should be reformatted from the pipette config so they're all in the same dictionary, with tip size as int as the keys."""
     supported_tips_def = get_supported_tips_model_from_json(pip_liquid_def_path)
-    subject = PipetteFunctionDownloader(
+    subject = PipetteConfigDownloader(
         node_id=NodeId.pipette_left,
         can_messenger=mock_messenger,
         supported_tips_def=supported_tips_def,
     )
 
-    formatted_dict = subject.formatted_pipetting_function
+    formatted_dict = subject.formatted_pipetting_function()
     for tip_size, tip_size_data in subject._supported_tips_def.items():
         # this is the actual pipetting function
         func_for_tip_size = tip_size_data.aspirate.default
@@ -68,12 +68,12 @@ async def test_function_bytes_generator(
 ) -> None:
     """Test the generated pipette func bytestream by converting it back to floats and comparing to the object's formatted dict before conversion to bytes."""
     supported_tips_def = get_supported_tips_model_from_json(pip_liquid_def_path)
-    subject = PipetteFunctionDownloader(
+    subject = PipetteConfigDownloader(
         node_id=NodeId.pipette_left,
         can_messenger=mock_messenger,
         supported_tips_def=supported_tips_def,
     )
-    formatted_dict = subject.formatted_pipetting_function
+    formatted_dict = subject.formatted_pipetting_function()
     unpacked_dict = convert_chunks_back_to_floats(subject)
     for before_processing, unpacked in zip(
         formatted_dict.items(), unpacked_dict.items()
@@ -94,7 +94,7 @@ async def test_function_bytes_generator(
 
 
 def convert_chunks_back_to_floats(
-    subject: PipetteFunctionDownloader,
+    subject: PipetteConfigDownloader,
 ) -> Dict[int, List[Tuple[float, float, float]]]:
     """Convert byte streams back to floats and reformat for comparing to supported tips definitions."""
     expected_chunk_len = 15
