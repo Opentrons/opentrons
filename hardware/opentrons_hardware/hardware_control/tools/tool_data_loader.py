@@ -16,7 +16,7 @@ def pipette_supports_onboard_data(messenger: CanMessenger, node: NodeId) -> bool
     return False
 
 
-def ammend_pipette_definition(
+def amend_pipette_definition(
     generic_config: PipetteConfigurations, messenger: CanMessenger, node: NodeId
 ) -> PipetteConfigurations:
     """Update the closest pipette def we have with the data stored onboard the pipette."""

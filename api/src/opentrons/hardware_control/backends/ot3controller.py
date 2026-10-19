@@ -152,7 +152,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 )
 from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 from opentrons_hardware.hardware_control.tools.tool_data_loader import (
-    ammend_pipette_definition,
+    amend_pipette_definition,
     pipette_supports_onboard_data,
 )
 from opentrons_hardware.hardware_control.types import (
@@ -1134,7 +1134,7 @@ class OT3Controller(FlexBackend):
             pip_node = axis_to_node(Axis.of_main_tool_actuator(mount))
             if pipette_supports_onboard_data(self._messenger, pip_node):
                 log.info(
-                    f"Fount Attached pipette not supported by default, patching with onboard data {attached}"
+                    f"Fount attached pipette not supported by default, patching with onboard data {attached}"
                 )
                 # Use generic P[vol]_[channels]_flex name to find latest supported version.
                 converted_name = pipette_load_name.convert_pipette_name(
@@ -1147,7 +1147,7 @@ class OT3Controller(FlexBackend):
                     converted_name.oem_type,
                 )
 
-                updated_config = ammend_pipette_definition(
+                updated_config = amend_pipette_definition(
                     latest_def, self._messenger, pip_node
                 )
                 return {
