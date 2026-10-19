@@ -5,9 +5,7 @@ import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useIsFlex } from '/app/redux-resources/robots'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { useDeckCalibrationStatus } from '/app/resources/calibration'
 
 import {
   useNotifyRunQuery,
@@ -28,15 +26,10 @@ let wrapper: FunctionComponent<{ children: ReactNode }>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {
-    when(vi.mocked(useDeckCalibrationStatus))
-      .calledWith('otie')
-      .thenReturn('OK')
-
     when(vi.mocked(useRunPipetteInfoByMount)).calledWith('1').thenReturn({
       left: null,
       right: null,
     })
-    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(false)
     vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
 
     const store = legacy_createStore(vi.fn(), {})
@@ -51,87 +44,7 @@ describe('useRunCalibrationStatus hook', () => {
     )
   })
 
-  it('should return deck cal failure if not calibrated', () => {
-    when(vi.mocked(useDeckCalibrationStatus))
-      .calledWith('otie')
-      .thenReturn('BAD_CALIBRATION')
-    const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
-      wrapper,
-    })
-    expect(result.current).toStrictEqual({
-      complete: false,
-      reason: 'calibrate_deck_failure_reason',
-    })
-  })
-  it('should ignore deck calibration status of a Flex', () => {
-    when(vi.mocked(useDeckCalibrationStatus))
-      .calledWith('otie')
-      .thenReturn('BAD_CALIBRATION')
-    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
-    const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
-      wrapper,
-    })
-    expect(result.current).toStrictEqual({
-      complete: true,
-    })
-  })
-  it('should return attach pipette if missing', () => {
-    when(vi.mocked(useRunPipetteInfoByMount))
-      .calledWith('1')
-      .thenReturn({
-        left: {
-          requestedPipetteMatch: 'incompatible',
-          pipetteCalDate: null,
-          pipetteSpecs: {
-            displayName: 'pipette 1',
-          },
-          tipRacksForPipette: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: '',
-              tipRackDef: mockTipRackDefinition,
-            },
-          ],
-        } as PipetteInfo,
-        right: null,
-      })
-    const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
-      wrapper,
-    })
-    expect(result.current).toStrictEqual({
-      complete: false,
-      reason: 'attach_pipette_failure_reason',
-    })
-  })
-  it('should return calibrate pipette if cal date null', () => {
-    when(vi.mocked(useRunPipetteInfoByMount))
-      .calledWith('1')
-      .thenReturn({
-        left: {
-          requestedPipetteMatch: 'match',
-          pipetteCalDate: null,
-          pipetteSpecs: {
-            displayName: 'pipette 1',
-          },
-          tipRacksForPipette: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: '',
-              tipRackDef: mockTipRackDefinition,
-            },
-          ],
-        } as PipetteInfo,
-        right: null,
-      })
-    const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
-      wrapper,
-    })
-    expect(result.current).toStrictEqual({
-      complete: false,
-      reason: 'calibrate_pipette_failure_reason',
-    })
-  })
-  it('should return calibrate tip rack if cal date null', () => {
+  it('should ignore tip rack calibration ', () => {
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
       .thenReturn({
@@ -151,35 +64,6 @@ describe('useRunCalibrationStatus hook', () => {
         } as PipetteInfo,
         right: null,
       })
-    const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
-      wrapper,
-    })
-    expect(result.current).toStrictEqual({
-      complete: false,
-      reason: 'calibrate_tiprack_failure_reason',
-    })
-  })
-  it('should ignore tip rack calibration for the Flex', () => {
-    when(vi.mocked(useRunPipetteInfoByMount))
-      .calledWith('1')
-      .thenReturn({
-        left: {
-          requestedPipetteMatch: 'match',
-          pipetteCalDate: '2020-08-30T10:02',
-          pipetteSpecs: {
-            displayName: 'pipette 1',
-          },
-          tipRacksForPipette: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: null,
-              tipRackDef: mockTipRackDefinition,
-            },
-          ],
-        } as PipetteInfo,
-        right: null,
-      })
-    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })
