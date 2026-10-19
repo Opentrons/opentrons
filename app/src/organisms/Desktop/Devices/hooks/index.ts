@@ -1,6 +1,5 @@
 export * from './useDeckCalibrationData'
 export * from './useDownloadRunLog'
-export * from './useCalibrationTaskList'
 export * from './useRunStartedOrLegacySessionInProgress'
 export * from './useTrackCreateProtocolRunEvent'
 export * from './useSyncRobotClock'
