@@ -5,13 +5,13 @@ from typing import Annotated, Optional, Type, cast
 from fastapi import Depends
 from opentrons_hardware.hardware_control.types import PCBARevision
 
-from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbsorbanceReaderStatus,
