@@ -320,7 +320,7 @@ def run(protocol: ProtocolContext) -> None:
         p200_in_Deep384_Z_offset = 9
 
         if CUSTOM_OFFSETS:
-            PCRPlate_Z_offset = 1
+            PCRPlate_Z_offset = 1.0
             Deepwell_Z_offset = 0.5
             Deep384_Z_offset = 0.5
             # HEATERSHAKER OFFSETS
