@@ -5,10 +5,7 @@ import {
   HOPPER_STACKER_LOCATION,
 } from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
-import {
-  resolveNumericRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 import { getFlexStackerShuttleAddressableArea } from '../utils/misc'
 
 import type {
@@ -17,6 +14,7 @@ import type {
   FlexStackerFillParams,
   FlexStackerSetStoredLabwareItemsParams,
   FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareDetails,
   FlexStackerStoredLabwareGroup,
 } from '@opentrons/shared-data'
 import type {
@@ -338,21 +336,124 @@ export const forFlexStackerFillItems = (
   moduleState.labwareInHopper = [...existingGroups, ...newGroups]
 }
 
+const resolveStoredLabwareDetails = (
+  details: Omit<FlexStackerStoredLabwareDetails, 'version'> & {
+    version: number | string
+  },
+  runtimeParameters: InvariantContext['runtimeParameters']
+): FlexStackerStoredLabwareDetails | null => {
+  const loadName = resolveStringRuntimeValue(
+    details.loadName,
+    runtimeParameters
+  )
+  const namespace = resolveStringRuntimeValue(
+    details.namespace,
+    runtimeParameters
+  )
+  const version = resolveNumericRuntimeValue(details.version, runtimeParameters)
+  if (loadName == null || namespace == null || version == null) {
+    return null
+  }
+  return { loadName, namespace, version }
+}
+
 export const forFlexStackerSetStoredLabware = (
-  params: FlexStackerSetStoredLabwareParams,
+  params: Omit<
+    FlexStackerSetStoredLabwareParams,
+    'initialCount' | 'primaryLabware' | 'adapterLabware' | 'lidLabware'
+  > & {
+    initialCount?: number | string | null
+    primaryLabware: Omit<FlexStackerStoredLabwareDetails, 'version'> & {
+      version: number | string
+    }
+    adapterLabware?:
+      | (Omit<FlexStackerStoredLabwareDetails, 'version'> & {
+          version: number | string
+        })
+      | null
+    lidLabware?:
+      | (Omit<FlexStackerStoredLabwareDetails, 'version'> & {
+          version: number | string
+        })
+      | null
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
-  const {
-    moduleId,
-    primaryLabware,
-    initialCount,
-    adapterLabware,
-    lidLabware,
-    initialStoredLabware,
-  } = params
+  const { labwareEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const primaryLabware = resolveStoredLabwareDetails(
+    params.primaryLabware,
+    runtimeParameters
+  )
+  const adapterLabware =
+    params.adapterLabware == null
+      ? null
+      : resolveStoredLabwareDetails(params.adapterLabware, runtimeParameters)
+  const lidLabware =
+    params.lidLabware == null
+      ? null
+      : resolveStoredLabwareDetails(params.lidLabware, runtimeParameters)
+  const initialCount =
+    params.initialCount == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.initialCount, runtimeParameters)
+  if (
+    moduleId == null ||
+    primaryLabware == null ||
+    (params.adapterLabware != null && adapterLabware == null) ||
+    (params.lidLabware != null && lidLabware == null) ||
+    initialCount === null
+  ) {
+    console.error(
+      `forFlexStackerSetStoredLabware: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, primaryLabware=${String(primaryLabware)}, adapterLabware=${String(
+        adapterLabware
+      )}, lidLabware=${String(lidLabware)}, initialCount=${String(
+        initialCount
+      )})`
+    )
+    return
+  }
+  let initialStoredLabware: FlexStackerStoredLabwareGroup[] | undefined
+  if (initialCount == null && params.initialStoredLabware != null) {
+    initialStoredLabware = []
+    for (const group of params.initialStoredLabware) {
+      const primaryLabwareId = resolveStringRuntimeValue(
+        group.primaryLabwareId,
+        runtimeParameters
+      )
+      const adapterLabwareId =
+        group.adapterLabwareId == null
+          ? null
+          : resolveStringRuntimeValue(group.adapterLabwareId, runtimeParameters)
+      const lidLabwareId =
+        group.lidLabwareId == null
+          ? null
+          : resolveStringRuntimeValue(group.lidLabwareId, runtimeParameters)
+      if (
+        primaryLabwareId == null ||
+        (group.adapterLabwareId != null && adapterLabwareId == null) ||
+        (group.lidLabwareId != null && lidLabwareId == null)
+      ) {
+        console.error(
+          `forFlexStackerSetStoredLabware: arg resolved to null (primaryLabwareId=${String(
+            primaryLabwareId
+          )}, adapterLabwareId=${String(
+            adapterLabwareId
+          )}, lidLabwareId=${String(lidLabwareId)})`
+        )
+        return
+      }
+      initialStoredLabware.push({
+        primaryLabwareId,
+        adapterLabwareId,
+        lidLabwareId,
+      })
+    }
+  }
   const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const baseLabwareStack = [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
@@ -364,7 +465,6 @@ export const forFlexStackerSetStoredLabware = (
         adapterLabware != null
           ? `${adapterLabware.namespace}/${adapterLabware.loadName}/${adapterLabware.version}`
           : null,
-
       lidLabwareURI:
         lidLabware != null
           ? `${lidLabware.namespace}/${lidLabware.loadName}/${lidLabware.version}`
@@ -403,8 +503,20 @@ export const forFlexStackerSetStoredLabwareItems = (
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, labware } = params
-  const { labwareEntities } = invariantContext
+  const { labwareEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const labwareIds = params.labware.map(labwareId =>
+    resolveStringRuntimeValue(labwareId, runtimeParameters)
+  )
+  if (moduleId == null || labwareIds.some(labwareId => labwareId == null)) {
+    console.error(
+      `forFlexStackerSetStoredLabwareItems: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, labware=${String(labwareIds)})`
+    )
+    return
+  }
+  const labware = labwareIds as string[]
   const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState == null) {
@@ -708,9 +820,7 @@ export const forFlexStackerStore = (
   const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
   if (moduleId == null) {
     console.error(
-      `forFlexStackerStore: arg resolved to null (moduleId=${String(
-        moduleId
-      )})`
+      `forFlexStackerStore: arg resolved to null (moduleId=${String(moduleId)})`
     )
     return
   }
