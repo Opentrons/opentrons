@@ -400,6 +400,68 @@ describe('forFlexStackerFillItems stackedOnNode', () => {
       moduleId,
     })
   })
+
+  it('assigns hopper stackedOnNode only to real labware ids from runtime parameters', () => {
+    const ic = makeContext()
+    const rs = cloneDeep(getInitialRobotStateStandard(ic))
+    const moduleId = 'flexStackerFillTest'
+    const plateDef = fixture96Plate as LabwareDefinition2
+    const primaryUri = getLabwareDefURI(plateDef)
+    ic.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+      fill_labware: {
+        variableName: 'fill_labware',
+        displayName: 'Fill labware',
+        type: 'string',
+        default: 'fillTestLw',
+      },
+    }
+    ic.moduleEntities[moduleId] = {
+      id: moduleId,
+      type: FLEX_STACKER_MODULE_TYPE,
+      model: FLEX_STACKER_MODULE_V1,
+      pythonName: 'flex_stacker_fill',
+    }
+    ic.labwareEntities.fillTestLw = {
+      id: 'fillTestLw',
+      labwareDefURI: primaryUri,
+      def: plateDef,
+      pythonName: 'fill_test_lw',
+    }
+    rs.modules[moduleId] = {
+      slot: 'D4',
+      moduleState: {
+        ...cloneDeep(FLEX_STACKER_MODULE_INITIAL_STATE),
+        storedLabwareDetails: {
+          primaryLabwareURI: primaryUri,
+          adapterLabwareURI: null,
+          lidLabwareURI: null,
+        },
+        labwareInHopper: [],
+        labwareOnShuttle: null,
+      } as FlexStackerModuleState,
+    }
+    rs.labware.fillTestLw = { stack: ['fillTestLw', 'offDeck'] }
+
+    forFlexStackerFillItems(
+      { moduleId: 'selected_module', labware: ['fill_labware'] },
+      ic,
+      {
+        robotState: rs,
+        warnings: [],
+      }
+    )
+
+    expect(rs.labware.fillTestLw.stackedOnNode).toEqual({
+      kind: 'inStackerHopper',
+      moduleId,
+    })
+  })
 })
 
 describe('flex stacker state updates forFlexStackerStore', () => {

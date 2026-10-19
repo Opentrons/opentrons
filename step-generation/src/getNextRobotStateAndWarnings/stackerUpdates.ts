@@ -220,8 +220,20 @@ export const forFlexStackerFillItems = (
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
-  const { moduleId, labware } = params
+  const { labwareEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const labwareIds = params.labware.map(labwareId =>
+    resolveStringRuntimeValue(labwareId, runtimeParameters)
+  )
+  if (moduleId == null || labwareIds.some(labwareId => labwareId == null)) {
+    console.error(
+      `forFlexStackerFillItems: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, labware=${String(labwareIds)})`
+    )
+    return
+  }
+  const labware = labwareIds as string[]
 
   const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
@@ -531,13 +543,27 @@ export const forFlexStackerSetStoredLabwareItems = (
 }
 
 export const forFlexStackerFill = (
-  params: FlexStackerFillParams,
+  params: Omit<FlexStackerFillParams, 'count'> & {
+    count?: number | string
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, count, labwareToStore } = params
-  const { labwareEntities } = invariantContext
+  const { labwareEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const count =
+    params.count == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.count, runtimeParameters)
+  if (moduleId == null || count === null) {
+    console.error(
+      `forFlexStackerFill: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, count=${String(count)})`
+    )
+    return
+  }
   const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const baseLabwareStack = [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
@@ -556,7 +582,44 @@ export const forFlexStackerFill = (
         adapterLabware,
         lidLabware
       )
-    } else if (labwareToStore != null) {
+    } else if (params.labwareToStore != null) {
+      const labwareToStore: FlexStackerStoredLabwareGroup[] = []
+      for (const group of params.labwareToStore) {
+        const primaryLabwareId = resolveStringRuntimeValue(
+          group.primaryLabwareId,
+          runtimeParameters
+        )
+        const adapterLabwareId =
+          group.adapterLabwareId == null
+            ? null
+            : resolveStringRuntimeValue(
+                group.adapterLabwareId,
+                runtimeParameters
+              )
+        const lidLabwareId =
+          group.lidLabwareId == null
+            ? null
+            : resolveStringRuntimeValue(group.lidLabwareId, runtimeParameters)
+        if (
+          primaryLabwareId == null ||
+          (group.adapterLabwareId != null && adapterLabwareId == null) ||
+          (group.lidLabwareId != null && lidLabwareId == null)
+        ) {
+          console.error(
+            `forFlexStackerFill: arg resolved to null (primaryLabwareId=${String(
+              primaryLabwareId
+            )}, adapterLabwareId=${String(
+              adapterLabwareId
+            )}, lidLabwareId=${String(lidLabwareId)})`
+          )
+          return
+        }
+        labwareToStore.push({
+          primaryLabwareId,
+          adapterLabwareId,
+          lidLabwareId,
+        })
+      }
       setLabwareOnHopperFromItemCommands(
         moduleState,
         labwareToStore,
