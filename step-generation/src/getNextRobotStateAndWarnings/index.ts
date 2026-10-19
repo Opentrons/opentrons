@@ -487,7 +487,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'vacuumModule/startRunProfile':
       forVacuumStartRunProfile(
-        command.params,
+        {
+          moduleId: command.params.moduleId,
+          profile: command.params.steps,
+          ventAfter: command.params.ventAfter ?? true,
+          taskId: command.params.taskId,
+        },
         invariantContext,
         robotStateAndWarnings
       )
