@@ -11,7 +11,6 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useNotifyRunQuery,

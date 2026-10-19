@@ -95,7 +95,7 @@ export function SetupRobotCalibration({
         gridGap={SPACING.spacing16}
         marginY={SPACING.spacing16}
       >
-        <SetupInstrumentCalibration robotName={robotName} runId={runId} />
+        <SetupInstrumentCalibration runId={runId} />
       </Flex>
       <PrimaryButton
         disabled={!calibrationStatus.complete || runHasStarted}
