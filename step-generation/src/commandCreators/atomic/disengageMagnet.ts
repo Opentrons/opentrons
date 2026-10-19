@@ -13,21 +13,14 @@ export const disengageMagnet: CommandCreator<ModuleStepGenArgs> = (
 ) => {
   const { moduleEntities, runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
-  const commandType = 'magneticModule/disengage'
-
-  if (args.moduleId != null && moduleId == null) {
+  if (moduleId == null) {
+    console.error(
+      `disengageMagnet: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return {
       errors: [
-        errorCreators.invalidRuntimeParameter({
-          parameterName: args.moduleId,
-        }),
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
       ],
-    }
-  }
-
-  if (moduleId === null) {
-    return {
-      errors: [errorCreators.missingModuleError()],
     }
   }
 
@@ -42,7 +35,7 @@ export const disengageMagnet: CommandCreator<ModuleStepGenArgs> = (
   return {
     commands: [
       {
-        commandType,
+        commandType: 'magneticModule/disengage',
         key: uuid(),
         params: {
           moduleId,
