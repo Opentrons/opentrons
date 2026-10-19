@@ -68,7 +68,6 @@
     "updateErrorRecoveryPolicy",
     "updateErrorRecoverySettings",
     "updateModule",
-    "updatePipetteSettings",
     "updateRobotName",
     "updateRobotSetting",
     "updateSelf",
