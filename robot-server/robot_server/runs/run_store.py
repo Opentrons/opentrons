@@ -776,11 +776,11 @@ class RunStore:
                         "index_in_run": index,
                         "command_id": command_dict["id"],
                         "command": command,
-                        "command_intent": command_dict["intent"]
-                        if command_dict["intent"]
+                        "command_intent": command_dict.get("intent")
+                        if command_dict.get("intent")
                         else CommandIntent.PROTOCOL,
-                        "command_error": pydantic_to_json(command_dict["error"])
-                        if command_dict["error"]
+                        "command_error": json.dumps(command_dict.get("error"))
+                        if command_dict.get("error")
                         else None,
                         "command_status": _convert_commands_status_to_sql_command_status(
                             command_dict["status"]

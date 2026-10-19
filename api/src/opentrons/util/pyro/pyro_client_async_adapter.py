@@ -163,6 +163,7 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             _thread_call, self._proxy, method_metadata["__name__"], *args, **kwargs
         )
         # Yield to the event loop after transaction, prevents stale refs waiting to clear
+        # This is done to address a known CPython issue https://github.com/python/cpython/issues/85865
         await asyncio.sleep(0)
         return result
 
