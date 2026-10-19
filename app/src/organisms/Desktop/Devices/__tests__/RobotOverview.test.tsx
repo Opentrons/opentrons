@@ -202,10 +202,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Robot is missing calibration data')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -227,10 +227,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -242,10 +242,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -257,10 +257,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -272,10 +272,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -287,10 +287,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
@@ -302,10 +302,10 @@ describe('RobotOverview', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
+    const calibrationSettingsLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
+    expect(calibrationSettingsLink.getAttribute('href')).toEqual(
       '/devices/opentrons-robot-name/robot-settings/calibration'
     )
   })
