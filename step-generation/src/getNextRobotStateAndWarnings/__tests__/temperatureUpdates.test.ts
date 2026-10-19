@@ -102,6 +102,39 @@ describe('forSetTemperature', () => {
       ),
     })
   })
+
+  it('module status is set to approaching and temp is set to target from runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: temperatureModuleId,
+      },
+      target_temp: {
+        variableName: 'target_temp',
+        displayName: 'Target temp',
+        type: 'int',
+        default: temperature,
+      },
+    }
+    const params = {
+      moduleId: 'selected_module',
+      celsius: 'target_temp',
+    }
+
+    const result = forSetTemperature(params, invariantContext, deactivatedRobot)
+
+    expect(result).toEqual({
+      robotState: robotWithStatusAndTemp(
+        deactivatedRobot,
+        temperatureModuleId,
+        TEMPERATURE_APPROACHING_TARGET,
+        temperature
+      ),
+      warnings: [],
+    })
+  })
 })
 
 describe('forDeactivateTemperature', () => {

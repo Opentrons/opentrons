@@ -6,16 +6,17 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
 import { getModuleState } from '../robotStateSelectors'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
   ModuleOnlyParams,
   TemperatureModuleAwaitTemperatureParams,
-  TemperatureParams,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
+  SetTemperatureStepGenArgs,
   TemperatureStatus,
 } from '../types'
 
@@ -31,12 +32,22 @@ function _setTemperatureAndStatus(
 }
 
 export function forSetTemperature(
-  params: TemperatureParams,
+  params: SetTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forSetTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const moduleState = getModuleState(robotState, moduleId)
 
   _setTemperatureAndStatus(moduleState, celsius, TEMPERATURE_APPROACHING_TARGET)
