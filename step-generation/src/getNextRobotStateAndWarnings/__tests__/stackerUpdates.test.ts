@@ -113,6 +113,41 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
     const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
     expect(moduleState?.labwareInHopper).toEqual([])
   })
+
+  it('should remove the last item from the stored stacker list from runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: FLEX_STACKER_ID,
+      },
+      empty_count: {
+        variableName: 'empty_count',
+        displayName: 'Empty count',
+        type: 'int',
+        default: 1,
+      },
+    }
+    const props = {
+      count: 'empty_count',
+      moduleId: 'selected_module',
+      strategy: 'logical' as const,
+    }
+    forFlexStackerEmpty(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
+
+    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
+    expect(moduleState!.labwareInHopper).toEqual([
+      {
+        primaryLabwareId: 'labware1',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
+    ])
+  })
 })
 
 describe('flex stacker state updates forFlexStackerRetrieve', () => {

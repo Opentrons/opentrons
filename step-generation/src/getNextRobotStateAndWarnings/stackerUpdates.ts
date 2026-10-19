@@ -5,7 +5,10 @@ import {
   HOPPER_STACKER_LOCATION,
 } from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
-import { resolveStringRuntimeValue } from '../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+} from '../utils'
 import { getFlexStackerShuttleAddressableArea } from '../utils/misc'
 
 import type {
@@ -170,12 +173,27 @@ const setLabwareOnHopper = (
 }
 
 export const forFlexStackerEmpty = (
-  params: FlexStackerEmptyCreateCommand['params'],
+  params: Omit<FlexStackerEmptyCreateCommand['params'], 'count'> & {
+    count?: number | string
+  },
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const count =
+    params.count == null
+      ? undefined
+      : resolveNumericRuntimeValue(params.count, runtimeParameters)
+  if (moduleId == null || count === null) {
+    console.error(
+      `forFlexStackerEmpty: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, count=${String(count)})`
+    )
+    return
+  }
   const labwareInHopper = Object.entries(robotState.labware).filter(
     ([, labware]) =>
       labware.stack.includes(HOPPER_STACKER_LOCATION) &&
@@ -183,11 +201,8 @@ export const forFlexStackerEmpty = (
   )
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState != null && moduleState.labwareInHopper != null) {
-    if (params.count != null) {
-      moduleState.labwareInHopper = moduleState.labwareInHopper.slice(
-        0,
-        params.count
-      )
+    if (count != null) {
+      moduleState.labwareInHopper = moduleState.labwareInHopper.slice(0, count)
     } else {
       moduleState.labwareInHopper = []
     }
