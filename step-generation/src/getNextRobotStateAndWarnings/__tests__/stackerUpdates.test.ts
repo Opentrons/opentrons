@@ -278,6 +278,47 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       labwareId: 'tiprack4AdapterId',
     })
   })
+
+  it('should retrieve the labware from the stacker from runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: FLEX_STACKER_ID,
+      },
+    }
+    robotState.modules[FLEX_STACKER_ID] = {
+      slot: '1',
+      moduleState: {
+        type: FLEX_STACKER_MODULE_TYPE,
+        labwareInHopper: [
+          {
+            primaryLabwareId: 'tiprack1Id',
+            adapterLabwareId: null,
+            lidLabwareId: null,
+          },
+        ],
+        storedLabwareDetails: {
+          primaryLabwareURI: LABWARE_ID,
+        },
+        labwareOnShuttle: null,
+      },
+    }
+
+    forFlexStackerRetrieve({ moduleId: 'selected_module' }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+
+    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
+    expect(moduleState?.labwareOnShuttle).toEqual({
+      primaryLabwareId: 'tiprack1Id',
+      adapterLabwareId: null,
+      lidLabwareId: null,
+    })
+    expect(moduleState?.labwareInHopper).toEqual([])
+  })
 })
 
 describe('forFlexStackerFillItems stackedOnNode', () => {
@@ -374,14 +415,10 @@ describe('flex stacker state updates forFlexStackerStore', () => {
         stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
       },
     }
-    forFlexStackerStore(
-      { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
-      invariantContext,
-      {
-        robotState,
-        warnings: [],
-      }
-    )
+    forFlexStackerStore({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
 
     const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
     expect(moduleState?.labwareOnShuttle).toBeNull()
@@ -403,18 +440,41 @@ describe('flex stacker state updates forFlexStackerStore', () => {
         stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
       },
     }
-    forFlexStackerStore(
-      { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
-      invariantContext,
-      {
-        robotState,
-        warnings: [],
-      }
-    )
+    forFlexStackerStore({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
 
     expect(robotState.labware.tiprack4Id.stackedOnNode).toEqual({
       kind: 'inStackerHopper',
       moduleId: FLEX_STACKER_ID,
     })
+  })
+
+  it('should store the labware in the stacker from runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: FLEX_STACKER_ID,
+      },
+    }
+    robotState.labware = {
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, SYSTEM_LOCATION],
+      },
+      tiprack4Id: {
+        stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
+      },
+    }
+    forFlexStackerStore({ moduleId: 'selected_module' }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+
+    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
+    expect(moduleState?.labwareOnShuttle).toBeNull()
+    expect(moduleState?.labwareInHopper).toHaveLength(4)
   })
 })

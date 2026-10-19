@@ -5,16 +5,15 @@ import {
   HOPPER_STACKER_LOCATION,
 } from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
+import { resolveStringRuntimeValue } from '../utils'
 import { getFlexStackerShuttleAddressableArea } from '../utils/misc'
 
 import type {
   FlexStackerEmptyCreateCommand,
   FlexStackerFillItemsParams,
   FlexStackerFillParams,
-  FlexStackerRetrieveCreateCommand,
   FlexStackerSetStoredLabwareItemsParams,
   FlexStackerSetStoredLabwareParams,
-  FlexStackerStoreCreateCommand,
   FlexStackerStoredLabwareGroup,
 } from '@opentrons/shared-data'
 import type {
@@ -22,6 +21,7 @@ import type {
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -556,12 +556,21 @@ export const forFlexStackerFill = (
 }
 
 export const forFlexStackerRetrieve = (
-  params: FlexStackerRetrieveCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    console.error(
+      `forFlexStackerRetrieve: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const moduleSlot = robotState.modules[moduleId].slot
   if (moduleState != null) {
@@ -612,12 +621,21 @@ export const forFlexStackerRetrieve = (
 }
 
 export const forFlexStackerStore = (
-  params: FlexStackerStoreCreateCommand['params'],
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    console.error(
+      `forFlexStackerStore: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const moduleSlot = robotState.modules[moduleId].slot
   if (moduleState != null) {
