@@ -107,6 +107,7 @@ interface TestCase<P> {
   moduleStateBefore: Partial<ThermocyclerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
+  runtimeParameters?: InvariantContext['runtimeParameters']
 }
 type TestCases<P> = Array<TestCase<P>>
 describe('thermocycler state updaters', () => {
@@ -427,6 +428,42 @@ describe('thermocycler state updaters', () => {
     },
     {
       fn: forWaitForTasks,
+      params: { task_ids: ['selected_task'] },
+      runtimeParameters: {
+        selected_task: {
+          variableName: 'selected_task',
+          displayName: 'Selected task',
+          type: 'string',
+          default: 'test-task-id',
+        },
+      },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'profile',
+          taskId: 'test-task-id',
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 100,
+            },
+            {
+              holdSeconds: 20,
+              celsius: 200,
+            },
+          ],
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 200,
+        },
+      },
+      testName:
+        'Waiting for a profile task should resolve a string runtime parameter task id',
+    },
+    {
+      fn: forWaitForTasks,
       params: { task_ids: ['nonmatching-task-id'] },
       moduleStateBefore: {
         currentBlockActivity: {
@@ -473,8 +510,12 @@ describe('thermocycler state updaters', () => {
     expectedWarningTypes,
     fn,
     testName,
+    runtimeParameters,
   }: TestCase<P>): void => {
     it(testName, () => {
+      if (runtimeParameters != null) {
+        invariantContext.runtimeParameters = runtimeParameters
+      }
       const prevRobotState = merge({}, lidOpenRobotState, {
         modules: {
           [moduleId]: {
