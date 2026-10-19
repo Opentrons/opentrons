@@ -18,11 +18,8 @@ import {
   useRunHasStarted,
 } from '/app/resources/runs'
 
-import { useDeckCalibrationData } from '../../hooks'
-import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 import type { ComponentProps } from 'react'
 
@@ -30,9 +27,7 @@ vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')
-vi.mock('../SetupTipLengthCalibration')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -64,19 +59,9 @@ describe('SetupRobotCalibration', () => {
 
   beforeEach(() => {
     when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
-    vi.mocked(SetupDeckCalibration).mockReturnValue(
-      <div>Mock SetupDeckCalibration</div>
-    )
     vi.mocked(SetupInstrumentCalibration).mockReturnValue(
       <div>Mock SetupInstrumentCalibration</div>
     )
-    vi.mocked(SetupTipLengthCalibration).mockReturnValue(
-      <div>Mock SetupTipLengthCalibration</div>
-    )
-    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
-      deckCalibrationData: mockDeckCalData,
-      isDeckCalibrated: true,
-    })
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useNotifyRunQuery))
@@ -95,19 +80,9 @@ describe('SetupRobotCalibration', () => {
     vi.resetAllMocks()
   })
 
-  it('renders deck, pipette, and tip length calibration components', () => {
+  it('renders only pipette calibration component', () => {
     render()
-    screen.getByText('Mock SetupDeckCalibration')
     screen.getByText('Mock SetupInstrumentCalibration')
-    screen.getByText('Mock SetupTipLengthCalibration')
-  })
-
-  it('renders only pipette calibration component for Flex', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock SetupDeckCalibration')).toBeNull()
-    screen.getByText('Mock SetupInstrumentCalibration')
-    expect(screen.queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
   it('changes Proceed CTA copy based on next step', () => {
