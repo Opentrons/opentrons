@@ -70,16 +70,18 @@ export function StyledText({
     {}
   )
 
+  const combinedStyle: CSSProperties = {
+    ...stylePropsStyles,
+    ...modernStyles?.style,
+    ...style,
+  }
+
   return createElement(
     tag,
     {
       ...forwardedProps,
       className: clsx(modernStyles?.className, legacyClassName, className),
-      style: {
-        ...stylePropsStyles,
-        ...modernStyles?.style,
-        ...style,
-      } as CSSProperties,
+      style: combinedStyle,
     },
     children
   )

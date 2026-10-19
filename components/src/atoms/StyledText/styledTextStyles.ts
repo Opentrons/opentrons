@@ -263,8 +263,10 @@ const oddExtraClassMap: Partial<Record<ODDStyles, string>> = {
   hidden: styles.odd_hidden,
 }
 
+type CSSPropertiesWithVars = CSSProperties & Record<string, string | number>
+
 function oddTypographyToStyle(tokens: OddTypographyTokens): CSSProperties {
-  const style: CSSProperties = {
+  const style: CSSPropertiesWithVars = {
     '--odd-font-size': tokens.fontSize,
     '--odd-line-height': tokens.lineHeight,
   }
@@ -273,7 +275,7 @@ function oddTypographyToStyle(tokens: OddTypographyTokens): CSSProperties {
     style['--odd-font-weight'] = tokens.fontWeight
   }
 
-  return style as CSSProperties
+  return style
 }
 
 function resolveStyledTextClassName({
@@ -332,11 +334,12 @@ export function resolveStyledTextStyles({
     oddTokens,
   })
 
-  const style: CSSProperties = {
-    ...(desktopFont != null
-      ? ({ '--helix-font': desktopFont } as CSSProperties)
-      : null),
-    ...(oddTokens != null ? oddTypographyToStyle(oddTokens) : null),
+  const style: CSSPropertiesWithVars = {
+    ...(oddTokens != null ? oddTypographyToStyle(oddTokens) : {}),
+  }
+
+  if (desktopFont != null) {
+    style['--helix-font'] = desktopFont
   }
 
   return {
