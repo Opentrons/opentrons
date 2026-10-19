@@ -8,9 +8,9 @@ import {
 import { getModuleState } from '../robotStateSelectors'
 import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  ModuleStepGenArgs,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
   SetTemperatureStepGenArgs,
@@ -76,12 +76,21 @@ export function forAwaitTemperature(
   }
 }
 export function forDeactivateTemperature(
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    console.error(
+      `forDeactivateTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const moduleState = getModuleState(robotState, moduleId)
   const temperature = null
 

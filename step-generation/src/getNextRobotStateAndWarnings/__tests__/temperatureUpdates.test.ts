@@ -171,6 +171,31 @@ describe('forDeactivateTemperature', () => {
       warnings: [],
     })
   })
+
+  it('module status is deactivated and no temperature is set from runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: temperatureModuleId,
+      },
+    }
+    const params = {
+      moduleId: 'selected_module',
+    }
+
+    const result = forDeactivateTemperature(
+      params,
+      invariantContext,
+      robotWithTemp
+    )
+
+    expect(result).toEqual({
+      robotState: deactivatedRobot,
+      warnings: [],
+    })
+  })
 })
 
 describe('forAwaitTemperature', () => {
