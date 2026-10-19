@@ -12,12 +12,15 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 9.1.0!**
 
-This release adds support for the Opentrons Flex Automated Vacuum Module in Protocol Designer. 
+This release adds support for the Opentrons Flex Automated Vacuum Module in Protocol Designer and includes other bug fixes.
 
 ### New Features
 
-- The Opentrons Flex Automated Vacuum Module applies vacuum pressure to filter samples in your Protocol Designer protocols. 
+- The Opentrons Flex Automated Vacuum Module applies vacuum pressure to filter samples in your Protocol Designer protocols.
 
+### Bug Fixes
+
+- In advanced dispense settings, set a blowout position from the top of the well or labware.
 
 ## Opentrons Protocol Designer Changes in 9.0.1
 
