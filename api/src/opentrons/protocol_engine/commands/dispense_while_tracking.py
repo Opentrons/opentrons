@@ -97,8 +97,6 @@ class DispenseWhileTrackingImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
 
-        # TODO(pbm, 10-15-24): call self._state_view.geometry.validate_dispense_volume_into_well()
-
         state_update = StateUpdate()
 
         end_point = self._state_view.instrument_interface.get_well_position(

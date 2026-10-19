@@ -92,8 +92,6 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
         well_name = params.wellName
         volume = params.volume
 
-        # TODO(pbm, 10-15-24): call self._state_view.geometry.validate_dispense_volume_into_well()
-
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
