@@ -287,11 +287,7 @@ describe('forAwaitTemperature', () => {
       temperature
     )
 
-    const result = forAwaitTemperature(
-      params,
-      invariantContext,
-      prevRobotState
-    )
+    const result = forAwaitTemperature(params, invariantContext, prevRobotState)
 
     expect(result).toEqual({
       robotState: robotAtTargetTemp,
