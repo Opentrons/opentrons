@@ -108,6 +108,9 @@ export const forVacuumOpenVent = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumOpenVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -127,6 +130,9 @@ export const forVacuumCloseVent = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumCloseVent: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -161,6 +167,13 @@ export const forVacuumSetPumpPressure = (
     duration === null ||
     ventAfter == null
   ) {
+    console.error(
+      `forVacuumSetPumpPressure: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, gaugePressure=${String(gaugePressure)}, duration=${String(
+        duration
+      )}, ventAfter=${String(ventAfter)})`
+    )
     return
   }
   const { taskId } = params
@@ -172,6 +185,8 @@ export const forVacuumSetPumpPressure = (
 
   vacuumMergeLiquid(moduleId, robotState, labwareEntities)
 
+  // if holding indefinitely or not venting after the pressure is reached for a duration, the pressure is held
+  // taskId should not be null, but this is to satisfy type checks
   if (duration == null || taskId == null) {
     moduleState.currentPumpActivity = {
       type: 'indefiniteHold',
@@ -189,6 +204,7 @@ export const forVacuumSetPumpPressure = (
     }
     moduleState.numPumpActivitiesStarted++
   }
+  // vent status is always closed for timed holds. Opening will be handled by the wait for task updates
   moduleState.ventStatus = VACUUM_VENT_CLOSED
 }
 
@@ -217,6 +233,13 @@ export const forVacuumSetPumpPower = (
     duration === null ||
     ventAfter == null
   ) {
+    console.error(
+      `forVacuumSetPumpPower: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, percentPower=${String(percentPower)}, duration=${String(
+        duration
+      )}, ventAfter=${String(ventAfter)})`
+    )
     return
   }
   const { taskId } = params
@@ -228,6 +251,8 @@ export const forVacuumSetPumpPower = (
 
   vacuumMergeLiquid(moduleId, robotState, labwareEntities)
 
+  // if holding indefinitely or not venting after the power is reached for a duration, the power is held
+  // taskId should not be null, but this is to satisfy type checks
   if (duration == null || taskId == null) {
     moduleState.currentPumpActivity = {
       type: 'indefiniteHold',
@@ -245,6 +270,7 @@ export const forVacuumSetPumpPower = (
     }
     moduleState.numPumpActivitiesStarted++
   }
+  // vent status is always closed for timed holds. Opening will be handled by the wait for task updates
   moduleState.ventStatus = VACUUM_VENT_CLOSED
 }
 
@@ -258,6 +284,9 @@ export const forVacuumStopPump = (
     invariantContext.runtimeParameters
   )
   if (moduleId == null) {
+    console.error(
+      `forVacuumStopPump: arg resolved to null (moduleId=${String(moduleId)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
@@ -282,11 +311,17 @@ export const forVacuumStartRunProfile = (
     runtimeParameters
   )
   if (moduleId == null || ventAfter == null) {
+    console.error(
+      `forVacuumStartRunProfile: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, ventAfter=${String(ventAfter)})`
+    )
     return
   }
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   const { taskId, profile } = params
+  // taskId should not be null, but this is to satisfy type checks
   if (moduleState == null || taskId == null) {
     return
   }
