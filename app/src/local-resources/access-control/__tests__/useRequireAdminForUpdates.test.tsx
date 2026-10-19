@@ -215,7 +215,7 @@ describe('useRequireAdminForUpdates', () => {
       expect.objectContaining({
         closeButton: true,
         disableTimeout: true,
-        heading: 'Admin credentials required',
+        heading: 'Additional permissions required',
         zIndex: Z_INDEX.LOGIN_TOASTS,
       })
     )

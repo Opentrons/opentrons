@@ -111,6 +111,7 @@ export interface LabwareDefinition1 {
 // here and in shared-data/labware/schemas/2.json
 export type LabwareDisplayCategory =
   | 'wellPlate'
+  | 'filterPlate'
   | 'tipRack'
   | 'tubeRack'
   | 'reservoir'
@@ -368,6 +369,13 @@ export interface LabwareDefinition2 {
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
+  /** Recommended grip height, from the labware bottom to the center of the gripper pads. */
+  gripHeightFromLabwareBottom?: number
+  /**
+   * Height of the skirt wall. Wells may hang below this; `dimensions.zDimension`
+   * still reaches the lowest point.
+   */
+  skirtHeight?: number
   innerLabwareGeometry?: Record<
     string,
     InnerWellGeometry | UserDefinedVolumes
@@ -393,6 +401,8 @@ export interface LabwareDefinition3 {
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
+  /** See `LabwareDefinition2.skirtHeight`. */
+  skirtHeight?: number
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 

@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import pytest
-from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons.protocol_reader import (
@@ -23,7 +22,6 @@ from robot_server.persistence.tables import (
     analysis_primitive_type_rtp_table,
     analysis_table,
 )
-from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -48,18 +46,11 @@ from robot_server.protocols.rtp_resources import (
 
 
 @pytest.fixture
-def memcache(decoy: Decoy) -> MemoryCache[str, CompletedAnalysisResource]:
-    """Get a memcache mock."""
-    return decoy.mock(cls=MemoryCache)
-
-
-@pytest.fixture
 def subject(
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     sql_engine: Engine,
 ) -> CompletedAnalysisStore:
     """Get a subject."""
-    return CompletedAnalysisStore(sql_engine, memcache, "2")
+    return CompletedAnalysisStore(sql_engine, "2")
 
 
 @pytest.fixture
@@ -138,28 +129,11 @@ def _completed_analysis_resource(
     )
 
 
-async def test_get_by_analysis_id_prefers_cache(
+async def test_get_by_analysis_id(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
-    decoy: Decoy,
 ) -> None:
-    """It should return analyses without using SQL the second time the analyses are accessed."""
-    resource = _completed_analysis_resource("analysis-id", "protocol-id")
-    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    # When we retrieve a resource via its id we should see it query the cache, and it should
-    # return the identity-same resource
-    decoy.when(memcache.get("analysis-id")).then_return(resource)
-    assert (await subject.get_by_id("analysis-id")) is resource
-
-
-async def test_get_by_analysis_id_falls_back_to_sql(
-    subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
-    protocol_store: ProtocolStore,
-    decoy: Decoy,
-) -> None:
-    """It should return analyses from sql if they are not cached."""
+    """It should return analyses from sql."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     await subject.make_room_and_add(
@@ -168,31 +142,9 @@ async def test_get_by_analysis_id_falls_back_to_sql(
         csv_rtp_resources=[],
     )
     # the analysis is not cached
-    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     analysis_from_sql = await subject.get_by_id("analysis-id")
     # the cached analysis should be value-equal to what we entered
     assert analysis_from_sql == resource
-
-
-async def test_get_by_analysis_id_stores_results_in_cache(
-    subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
-    protocol_store: ProtocolStore,
-    decoy: Decoy,
-) -> None:
-    """It should cache successful fetches from sql."""
-    resource = _completed_analysis_resource("analysis-id", "protocol-id")
-    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.make_room_and_add(
-        completed_analysis_resource=resource,
-        primitive_rtp_resources=[],
-        csv_rtp_resources=[],
-    )
-    # the analysis is not cached
-    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
-    from_sql = await subject.get_by_id("analysis-id")
-    assert from_sql == resource
-    decoy.verify(memcache.insert("analysis-id", from_sql))
 
 
 async def test_get_by_analysis_id_as_document(
@@ -285,9 +237,7 @@ async def test_get_summaries_by_protocol(
 
 async def test_get_by_protocol(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
-    decoy: Decoy,
 ) -> None:
     """It should get analysis by protocol with appropriate caching."""
     resource_1 = _completed_analysis_resource("analysis-id-1", "protocol-id-1")
@@ -295,17 +245,9 @@ async def test_get_by_protocol(
     resource_3 = _completed_analysis_resource("analysis-id-3", "protocol-id-2")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-1"))
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-2"))
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
-    decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)  # type: ignore[func-returns-value]
-    decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)  # type: ignore[func-returns-value]
     await subject.make_room_and_add(resource_1, [], [])
     await subject.make_room_and_add(resource_2, [], [])
     await subject.make_room_and_add(resource_3, [], [])
-    decoy.when(memcache.get("analysis-id-1")).then_raise(KeyError())
-    decoy.when(memcache.get("analysis-id-2")).then_return(resource_2)
-    decoy.when(memcache.contains("analysis-id-1")).then_return(False)
-    decoy.when(memcache.contains("analysis-id-2")).then_return(True)
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
     resources = await subject.get_by_protocol("protocol-id-1")
     assert resources == [resource_1, resource_2]
 
@@ -451,11 +393,9 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
 )
 async def test_add_makes_room_for_new_analysis(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     existing_analysis_ids: List[str],
     expected_analyses_ids_after_making_room: List[str],
-    decoy: Decoy,
     sql_engine: Engine,
 ) -> None:
     """It should delete old analyses and make room for new analysis."""
@@ -488,18 +428,9 @@ async def test_add_makes_room_for_new_analysis(
         == expected_analyses_ids_after_making_room
     )
 
-    removed_ids = [
-        analysis_id
-        for analysis_id in existing_analysis_ids
-        if analysis_id not in expected_analyses_ids_after_making_room
-    ]
-    for analysis_id in removed_ids:
-        decoy.verify(memcache.remove(analysis_id))
-
 
 async def test_make_room_and_add_handles_rtp_tables_correctly(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
     data_files_store: DataFilesStore,
     sql_engine: Engine,
@@ -617,9 +548,7 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
 
 async def test_raise_error_on_analysis_parsing_error(
     subject: CompletedAnalysisStore,
-    memcache: MemoryCache[str, CompletedAnalysisResource],
     protocol_store: ProtocolStore,
-    decoy: Decoy,
     sql_engine: Engine,
 ) -> None:
     """It should raise a ValueError when parsing a bad analysis from db."""
@@ -646,6 +575,5 @@ async def test_raise_error_on_analysis_parsing_error(
     statement = analysis_table.insert().values(analysis_resource_blob)
     with sql_engine.begin() as transaction:
         transaction.execute(statement)
-    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     with pytest.raises(UnreadableAnalysisError):
         await subject.get_by_id("analysis-id")

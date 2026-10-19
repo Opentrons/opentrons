@@ -39,6 +39,13 @@ EXPECTED_STATEMENTS = [
         PRIMARY KEY (id)
     )
     """,
+    """
+    CREATE TABLE settings (
+        "key" VARCHAR(200) NOT NULL,
+        value VARCHAR NOT NULL,
+        PRIMARY KEY ("key")
+    )
+    """,
 ]
 
 

@@ -59,10 +59,7 @@ describe('BeforeBeginning', () => {
       flowType: FLOWS.CALIBRATE,
       createMaintenanceRun: vi.fn(),
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
-      isDoorOpenError: false,
-      setIsDoorOpenError: vi.fn(),
-      dismissDoorOpenError: vi.fn(),
+      handleCommandError: vi.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
@@ -142,16 +139,6 @@ describe('BeforeBeginning', () => {
         name: 'Move gantry to front',
       })
       expect(proceedBtn).toBeDisabled()
-    })
-
-    it('renders the error modal screen when errorMessage is true', () => {
-      props = {
-        ...props,
-        errorMessage: 'error shmerror',
-      }
-      render(props)
-      screen.getByText('Error encountered')
-      screen.getByText('error shmerror')
     })
   })
 
@@ -612,23 +599,6 @@ describe('BeforeBeginning', () => {
       await waitFor(() => {
         expect(props.proceed).toHaveBeenCalled()
       })
-    })
-  })
-
-  describe('door open error handling', () => {
-    it('renders the door-open modal when isDoorOpenError is true', () => {
-      props = {
-        ...props,
-        flowType: FLOWS.CALIBRATE,
-        errorMessage: 'Robot door is open',
-        isDoorOpenError: true,
-      }
-      render(props)
-      screen.getByText('Robot door is open')
-      screen.getByText('Close the door and try again.')
-      const tryAgainBtn = screen.getByRole('button', { name: 'Try again' })
-      fireEvent.click(tryAgainBtn)
-      expect(props.dismissDoorOpenError).toHaveBeenCalled()
     })
   })
 })

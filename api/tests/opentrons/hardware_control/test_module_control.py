@@ -8,7 +8,6 @@ from decoy import Decoy, matchers
 
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control import types
 from opentrons.hardware_control.abstract_device import AbstractDevice
 from opentrons.hardware_control.module_control import (
@@ -20,6 +19,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleType,
     SimulatingModuleAtPort,
 )
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.peripherals import AbstractPeripheral
 from opentrons.hardware_control.peripherals.types import PeripheralType
 
@@ -39,10 +39,10 @@ def _make_module(
     return module
 
 
-@pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mocked out HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> OT3API:
+    """Mocked hardware API."""
+    return decoy.mock(cls=OT3API)
 
 
 @pytest.fixture()
@@ -75,7 +75,7 @@ def event_callback(decoy: Decoy) -> Callable[[types.HardwareEvent], None]:
 
 @pytest.fixture()
 def subject(
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
     event_callback: Callable[[types.HardwareEvent], None],
@@ -95,7 +95,7 @@ async def test_register_mixed_devices(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """It should register attached modules."""
@@ -165,7 +165,7 @@ async def test_register_modules(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
     module_at_port_input: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
 ) -> None:
@@ -204,7 +204,7 @@ async def test_register_modules_sort(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """It should sort modules by port and hub, in ascending order."""
@@ -261,7 +261,7 @@ async def test_unregister_modules(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """It should register attached modules."""
@@ -343,7 +343,7 @@ async def test_unregister_modules(
 
 async def test_dedupe_available_modules_replaces_stale_entry(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should replace an existing entry with the same serial."""
@@ -360,7 +360,7 @@ async def test_dedupe_available_modules_replaces_stale_entry(
 
 async def test_dedupe_available_modules_keeps_other_serials(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should only remove entries sharing the serial."""
@@ -388,7 +388,7 @@ async def test_dedupe_available_modules_keeps_other_serials(
 
 async def test_dedupe_available_modules_appends_when_no_existing(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should append when no matching serial exists."""
@@ -402,7 +402,7 @@ async def test_dedupe_available_modules_appends_when_no_existing(
 
 async def test_dedupe_available_modules_evicts_parked_entry_same_serial(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """A fresh attach should not duplicate a parked entry in available_modules
@@ -436,7 +436,7 @@ async def test_register_devices_dedupes_on_attach(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_device: Callable[..., Awaitable[AbstractDevice]],
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """register_devices should not create a duplicate when a stale entry exists."""
@@ -478,7 +478,7 @@ async def test_register_devices_dedupes_on_attach(
 
 async def test_reconnect_patch_breaks_after_first_match(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_reconnect_patch should process a reconnected module exactly once."""
@@ -511,7 +511,7 @@ async def test_reconnect_patch_breaks_after_first_match(
 
 async def test_reconnect_patch_dedupes_when_fresh_already_present(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_reconnect_patch should not leave two entries for one serial."""
@@ -565,7 +565,7 @@ async def test_clear_old_modules_guarded_remove(
 
 async def test_reconnect_patch_guarded_remove(
     decoy: Decoy,
-    hardware_api: HardwareAPI,
+    hardware_api: OT3API,
     subject: AttachedModulesControl,
 ) -> None:
     """_reconnect_patch should not raise if old_mod was concurrently removed."""

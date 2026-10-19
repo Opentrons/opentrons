@@ -39,10 +39,11 @@ Administrators can change this setting to allow users to send protocols to your 
 
 <div class="instruction-list" markdown>
 
-1. Log in to Compliance Ready Software in the Opentrons App. 
-2. Use the three-dot menu at the right to access robot settings for your Flex. 
-3. Select the **Compliance Ready** tab. 
+1. Log in to Compliance Ready Software in the Opentrons App or on the Flex touchscreen. 
+2. Access your robot's settings. In the app, click the three-dot menu on the right, or tap the user account icon on the top right on the touchscreen.  
+3. Select the **Compliance Ready** tab or **Compliance Ready Software settings** option. 
 4. Under **Actions requiring admin credentials**, toggle the **Require admin credentials to send protocols to this robot** setting.
+5. Document your reason for updating this setting.
 
 !!! note
     Because Compliance Ready Software limits protocol runs to those chosen by verified users, [Quick Transfer protocols](../../flex/touchscreen/quick-transfer.md) are disabled on your compliance ready Flex.

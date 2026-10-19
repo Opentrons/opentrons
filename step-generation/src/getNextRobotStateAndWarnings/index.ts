@@ -288,13 +288,17 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'temperatureModule/waitForTemperature':
-      forAwaitTemperature(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+    case 'temperatureModule/waitForTemperature': {
+      const { moduleId, celsius } = command.params
+      if (celsius != null) {
+        forAwaitTemperature(
+          { moduleId, celsius },
+          invariantContext,
+          robotStateAndWarnings
+        )
+      }
       break
+    }
 
     case 'thermocycler/setTargetBlockTemperature':
       forThermocyclerSetTargetBlockTemperature(
@@ -487,7 +491,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'vacuumModule/startRunProfile':
       forVacuumStartRunProfile(
-        command.params,
+        {
+          moduleId: command.params.moduleId,
+          profile: command.params.steps,
+          ventAfter: command.params.ventAfter ?? true,
+          taskId: command.params.taskId,
+        },
         invariantContext,
         robotStateAndWarnings
       )

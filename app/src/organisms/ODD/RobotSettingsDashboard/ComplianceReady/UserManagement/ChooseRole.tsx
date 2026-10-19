@@ -28,7 +28,7 @@ export function ChooseRole({
   isLoading: boolean
 }): ReactNode {
   const [role, setRole] = useState<('admin' | 'user' | 'auditor') | undefined>(
-    savedRole
+    savedRole ?? 'user'
   )
   const { t } = useTranslation('device_settings')
 

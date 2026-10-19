@@ -47,7 +47,7 @@ class Client:
             **self.type_headers,
             **self.auth_headers,
         }
-        # Read/write allow 5-minute requests (match server request_timeout_seconds) plus buffer
+        # BASE_URL is the API root (e.g. http://localhost:8000/api); paths are relative to that.
         self.timeout = Timeout(connect=5.0, read=320.0, write=320.0, pool=5.0)
         self.httpx = HttpxClient(base_url=self.settings.BASE_URL, timeout=self.timeout)
 
@@ -142,7 +142,7 @@ class Client:
 
     def get_options(self) -> Response:
         """Call the OPTIONS endpoint and return the response."""
-        return self.httpx.options("/chat/completions", headers=self.type_headers)
+        return self.httpx.options("/chat/completion", headers=self.type_headers)
 
 
 def print_response(response: Response) -> None:

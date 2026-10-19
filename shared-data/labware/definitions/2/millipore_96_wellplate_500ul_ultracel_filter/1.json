@@ -4,7 +4,7 @@
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Millipore 96 Well Plate 500\u00b5L HTS Ultracel",
-    "displayCategory": "wellPlate",
+    "displayCategory": "filterPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },

@@ -53,6 +53,7 @@ nav:
       - Running a protocol: using/running.md 
       - Completing a protocol: using/complete.md
       - Accessing files: using/files.md
+      - Log verifier: using/log-verifier.md
   - Additional Features: 
       - Additional Features: features/index.md
       - Security: features/security.md 

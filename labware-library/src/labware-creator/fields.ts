@@ -63,9 +63,15 @@ export interface RichOption {
 export type RichOptions = readonly RichOption[]
 
 export type LabwareType =
-  'wellPlate' | 'reservoir' | 'tubeRack' | 'aluminumBlock' | 'tipRack'
+  | 'wellPlate'
+  | 'filterPlate'
+  | 'reservoir'
+  | 'tubeRack'
+  | 'aluminumBlock'
+  | 'tipRack'
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
+  { name: 'Filter Plate', value: 'filterPlate' },
   { name: 'Reservoir', value: 'reservoir' },
   { name: 'Tubes + Tube Rack', value: 'tubeRack' },
   { name: 'Tubes / Plates + Opentrons Aluminum Block', value: 'aluminumBlock' },
@@ -107,6 +113,7 @@ export interface LabwareFields {
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
   labwareZDimension: string | null | undefined
+  skirtHeight: string | null | undefined
   stackedLabwareZDimension: number | null | undefined
 
   gridRows: string | null | undefined
@@ -162,6 +169,7 @@ export interface ProcessedLabwareFields {
   footprintXDimension: number
   footprintYDimension: number
   labwareZDimension: number
+  skirtHeight: number | null
   stackedLabwareZDimension: number
 
   gridRows: number
@@ -351,6 +359,9 @@ export const labwareTypeAutofills = {
   },
   tubeRack: {},
   wellPlate: {},
+  filterPlate: {
+    hasLpcQuirk: 'true',
+  },
   reservoir: {},
   aluminumBlock: {},
 } as const
@@ -386,6 +397,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
+  skirtHeight: '0',
   stackedLabwareZDimension: null,
   gridRows: null,
   gridColumns: null,
@@ -433,6 +445,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',
   labwareZDimension: 'Height',
+  skirtHeight: 'Skirt height',
   gridRows: 'Number of rows',
   gridColumns: 'Number of columns',
   regularRowSpacing: 'Are all of your rows evenly spaced?',

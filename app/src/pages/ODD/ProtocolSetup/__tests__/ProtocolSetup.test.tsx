@@ -14,6 +14,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
   useRestartMutation,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -400,6 +401,9 @@ describe('ProtocolSetup', () => {
       restart: vi.fn(),
       isLoading: false,
     } as any)
+    vi.mocked(useStopRunMutation).mockReturnValue({
+      stopRun: vi.fn(),
+    } as any)
   })
 
   it('should render text, image, and buttons', () => {
@@ -586,8 +590,12 @@ describe('ProtocolSetup', () => {
   it('shows a timeout modal after 3 minutes of loading and dismisses the run when returning to the dashboard', () => {
     vi.useFakeTimers()
     try {
+      const stopRun = vi.fn()
       vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
         data: null,
+      } as any)
+      vi.mocked(useStopRunMutation).mockReturnValue({
+        stopRun,
       } as any)
       render(`/runs/${RUN_ID}/setup/`)
       expect(
@@ -598,10 +606,9 @@ describe('ProtocolSetup', () => {
       })
       screen.getByText('Run is taking longer than usual to load')
       fireEvent.click(screen.getByText('Return to dashboard'))
-      expect(mockCloseCurrentRun).toHaveBeenCalledWith(
-        expect.objectContaining({
-          onSuccess: expect.any(Function),
-        })
+      expect(stopRun).toHaveBeenCalledWith(
+        RUN_ID,
+        expect.objectContaining({ onError: expect.any(Function) })
       )
     } finally {
       vi.useRealTimers()

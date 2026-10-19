@@ -18,12 +18,13 @@ When this setting is on, all users will be prompted to download audit logs in th
 <figcaption>By default, you'll need to download audit logs from the Opentrons App immediately after a protocol run.</figcaption>
 </figure>
 
-Administrators can change this setting in the Opentrons App:
+Administrators can change this setting in the Opentrons App or on the Flex touchscreen:
 
 <div class="instruction-list" markdown>
 
-1. Log in to your compliance ready Flex and click the three-dot menu on the right to access your robot's settings.
-2. Select the **Compliance Ready** tab. 
+1. Log in to your account. 
+2. Access your robot's settings either in the Opentrons App (click the three-dot menu on the right) or on the Flex touchscreen (tap the user account icon in the top right).
+2. Select the **Compliance Ready** tab or **Compliance Ready Software settings** option.
 3. Under **Audit log requirements**, toggle the **Require downloading audit logs in the Opentrons App at the end of a protocol run** setting.
 4. Document your reason for updating this setting.
 

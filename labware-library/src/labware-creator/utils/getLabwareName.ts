@@ -17,6 +17,7 @@ export const getLabwareName = (
     case 'tubeRack':
       return `tube${plural ? 's' : ''}`
     case 'wellPlate':
+    case 'filterPlate':
     case 'reservoir':
     default:
       return `well${plural ? 's' : ''}`

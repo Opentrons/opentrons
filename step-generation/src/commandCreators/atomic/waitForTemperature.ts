@@ -10,19 +10,41 @@ import {
 } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getModuleState } from '../../robotStateSelectors'
-import { uuid } from '../../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 import * as warningCreators from '../../warningCreators'
 
-import type { TemperatureParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorWarning } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CommandCreatorWarning,
+  WaitForTemperatureStepGenArgs,
+} from '../../types'
 
 /** Set temperature target for specified module. */
-export const waitForTemperature: CommandCreator<TemperatureParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { moduleId, celsius } = args
+export const waitForTemperature: CommandCreator<
+  WaitForTemperatureStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(args.celsius, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (args.moduleId != null && moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (typeof args.celsius === 'string' && celsius == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.celsius })
+    )
+  }
+  if (errors.length > 0 || celsius == null) {
+    return { errors }
+  }
   const moduleState = moduleId ? getModuleState(prevRobotState, moduleId) : null
   const warnings: CommandCreatorWarning[] = []
 
@@ -87,7 +109,7 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
           },
         ],
         warnings: warnings.length > 0 ? warnings : undefined,
-        python: `${module?.pythonName}.await_temperature(${celsius})`,
+        python: `${module?.pythonName}.await_temperature(${args.celsius})`,
       }
 
     case HEATERSHAKER_MODULE_TYPE:

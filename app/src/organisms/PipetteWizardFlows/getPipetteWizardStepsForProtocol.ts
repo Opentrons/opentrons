@@ -10,7 +10,8 @@ import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instru
 import type { PipetteWizardStep } from './types'
 
 const calibrateAlreadyAttachedPipetteOn = (
-  mount: Mount
+  mount: Mount,
+  attaching96andWasteChute: boolean
 ): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
@@ -22,11 +23,29 @@ const calibrateAlreadyAttachedPipetteOn = (
     mount,
     flowType: FLOWS.CALIBRATE,
   },
+  ...(attaching96andWasteChute
+    ? [
+        {
+          section: SECTIONS.REMOVE_WASTE_CHUTE,
+          mount,
+          flowType: FLOWS.CALIBRATE,
+        },
+      ]
+    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount,
     flowType: FLOWS.CALIBRATE,
   },
+  ...(attaching96andWasteChute
+    ? [
+        {
+          section: SECTIONS.ATTACH_WASTE_CHUTE,
+          mount,
+          flowType: FLOWS.CALIBRATE,
+        },
+      ]
+    : []),
   { section: SECTIONS.RESULTS, mount, flowType: FLOWS.CALIBRATE },
 ]
 
@@ -512,7 +531,10 @@ export const getPipetteWizardStepsForProtocol = (
     requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
   ) {
     // return calibration flow if correct pipette is attached
-    return calibrateAlreadyAttachedPipetteOn(mount)
+    return calibrateAlreadyAttachedPipetteOn(
+      mount,
+      wasteChute && ninetySixChannelRequested
+    )
   } else if (!ninetySixChannelRequested && ninetySixChannelAttached) {
     // 96-channel pipette attached and need to attach single mount pipette
     return detachNinetySixAndAttachSingleMountOn(mount)
