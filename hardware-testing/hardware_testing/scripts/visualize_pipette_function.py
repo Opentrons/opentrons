@@ -1,4 +1,5 @@
 """Visualize Pipette Function."""
+
 import argparse
 import asyncio
 from math import pi as PI
@@ -26,8 +27,8 @@ from opentrons_shared_data.pipette import (
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
-from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette import model_config
