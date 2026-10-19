@@ -288,13 +288,17 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'temperatureModule/waitForTemperature':
-      forAwaitTemperature(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+    case 'temperatureModule/waitForTemperature': {
+      const { moduleId, celsius } = command.params
+      if (celsius != null) {
+        forAwaitTemperature(
+          { moduleId, celsius },
+          invariantContext,
+          robotStateAndWarnings
+        )
+      }
       break
+    }
 
     case 'thermocycler/setTargetBlockTemperature':
       forThermocyclerSetTargetBlockTemperature(

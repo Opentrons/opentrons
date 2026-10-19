@@ -229,4 +229,48 @@ describe('forAwaitTemperature', () => {
       warnings: [],
     })
   })
+
+  it(`update status to 'at target' when previous status is ${TEMPERATURE_APPROACHING_TARGET} and the given target temp matches the previous target temp from runtime parameters`, () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: temperatureModuleId,
+      },
+      target_temp: {
+        variableName: 'target_temp',
+        displayName: 'Target temp',
+        type: 'int',
+        default: temperature,
+      },
+    }
+    const params = {
+      moduleId: 'selected_module',
+      celsius: 'target_temp',
+    }
+    const prevRobotState = robotWithStatusAndTemp(
+      deactivatedRobot,
+      temperatureModuleId,
+      TEMPERATURE_APPROACHING_TARGET,
+      temperature
+    )
+    const robotAtTargetTemp = robotWithStatusAndTemp(
+      robotWithTemp,
+      temperatureModuleId,
+      TEMPERATURE_AT_TARGET,
+      temperature
+    )
+
+    const result = forAwaitTemperature(
+      params,
+      invariantContext,
+      prevRobotState
+    )
+
+    expect(result).toEqual({
+      robotState: robotAtTargetTemp,
+      warnings: [],
+    })
+  })
 })

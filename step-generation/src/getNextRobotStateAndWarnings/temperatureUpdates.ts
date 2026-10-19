@@ -8,16 +8,14 @@ import {
 import { getModuleState } from '../robotStateSelectors'
 import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
-import type {
-  ModuleOnlyParams,
-  TemperatureModuleAwaitTemperatureParams,
-} from '@opentrons/shared-data'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
   SetTemperatureStepGenArgs,
   TemperatureStatus,
+  WaitForTemperatureStepGenArgs,
 } from '../types'
 
 function _setTemperatureAndStatus(
@@ -53,12 +51,22 @@ export function forSetTemperature(
   _setTemperatureAndStatus(moduleState, celsius, TEMPERATURE_APPROACHING_TARGET)
 }
 export function forAwaitTemperature(
-  params: TemperatureModuleAwaitTemperatureParams,
+  params: WaitForTemperatureStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, celsius } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(params.celsius, runtimeParameters)
+  if (moduleId == null || celsius == null) {
+    console.error(
+      `forAwaitTemperature: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, celsius=${String(celsius)})`
+    )
+    return
+  }
   const moduleState = getModuleState(robotState, moduleId)
 
   if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
