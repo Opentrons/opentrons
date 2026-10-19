@@ -499,12 +499,6 @@ class FirmwareUpdateEraseAppResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class PipetteConfigEEPROMMessage(BaseMessage):  # noqa: D101
-    payload: payloads.PipetteConfigData
-    payload_type: Type[payloads.PipetteConfigData] = payloads.PipetteConfigData
-
-
-@dataclass
 class PipetteConfigUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[MessageId.pip_config_update_initiate] = (
         MessageId.pip_config_update_initiate
