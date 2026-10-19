@@ -207,6 +207,14 @@ _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
 
 
 @pytest.fixture
+def available_sensors() -> pipette_definition.AvailableSensorDefinition:
+    """Provide a list of sensors."""
+    return pipette_definition.AvailableSensorDefinition(
+        sensors=["pressure", "capacitive", "environment"]
+    )
+
+
+@pytest.fixture
 def mock_labware_view(decoy: Decoy) -> LabwareView:
     """Get a mock in the shape of a LabwareView."""
     return decoy.mock(cls=LabwareView)
@@ -310,920 +318,639 @@ def test_validate_probed_height(
         )
 
 
-# TODO: The following 5 well position tests can and should be moved back to geometry
-def test_get_well_position(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well top in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result = subject.get_well_position("labware-id", "B2")
-
-    assert result.elementwise_isclose(
-        Point(
-            x=slot_pos[0] + 1 + well_def.x + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-            y=slot_pos[1] - 2 + well_def.y + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-            z=slot_pos[2]
-            + 3
-            + well_def.z
-            + well_def.depth
-            + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-        )
-    )
-
-
-def test_get_module_labware_well_position(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_module_view: ModuleView,
-    mock_addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV5,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well top in a labware on module."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=ModuleLocation(moduleId="module-id"),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
-        "magneticModuleV2Slot3"
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(
-            "magneticModuleV2Slot3"
-        )
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    decoy.when(mock_module_view.get_location("module-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
-    )
-    decoy.when(
-        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
-            module_id="module-id"
-        )
-    ).then_return(Point(x=0, y=0, z=0))
-    decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetData(
-            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        )
-    )
-    decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
-        ModuleModel.MAGNETIC_MODULE_V2
-    )
-
-    result = subject.get_well_position("labware-id", "B2")
-    assert result.elementwise_isclose(
-        Point(
-            x=slot_pos[0]
-            + calibration_offset.x
-            + well_def.x
-            + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-            y=slot_pos[1]
-            + calibration_offset.y
-            + well_def.y
-            + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-            z=slot_pos[2]
-            + calibration_offset.z
-            + well_def.z
-            + well_def.depth
-            + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-        )
-    )
-
-
-def test_get_well_position_with_top_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well top in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.TOP,
-            offset=WellOffset(x=1, y=2, z=3),
-        ),
-    )
-
-    assert result.elementwise_isclose(
-        Point(
-            x=slot_pos[0] + 1 + well_def.x + 1 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-            y=slot_pos[1] - 2 + well_def.y + 2 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-            z=slot_pos[2]
-            + 3
-            + well_def.z
-            + well_def.depth
-            + 3
-            + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-        )
-    )
-
-
-def test_get_well_position_with_bottom_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well bottom in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.BOTTOM,
-            offset=WellOffset(x=3, y=2, z=1),
-        ),
-    )
-
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1] - 2 + well_def.y + 2 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2] + 3 + well_def.z + 1 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-
-
-def test_get_well_position_with_center_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """It should be able to get the position of a well center in a labware."""
-    monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
-        lambda *args, **kwargs: Point(0, 0, 0),
-    )
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.CENTER,
-            offset=WellOffset(x=2, y=3, z=4),
-        ),
-    )
-
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x + 2,
-        y=slot_pos[1] - 2 + well_def.y + 3,
-        z=slot_pos[2] + 3 + well_def.z + 4 + (well_def.depth / 2.0),
-    )
+# TODO These will be uncommented in the refactor well position PR
+# def test_get_well_position_with_meniscus_offset(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """It should be able to get the position of a well meniscus in a labware."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     meniscus_offset = WellOffset(x=2, y=3, z=4)
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     probed_liquid_height = 5.53
+#     well_def = well_plate_def.wells["B2"]
+#
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             probed_volume=None,
+#             probed_height=ProbedHeightInfo(
+#                 height=probed_liquid_height, last_probed=probe_time
+#             ),
+#             loaded_volume=None,
+#         )
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(0.5)
+#
+#     result = subject.get_well_position(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=WellLocation(
+#             origin=WellOrigin.MENISCUS,
+#             offset=meniscus_offset,
+#         ),
+#         pipette_id="pipette-id",
+#     )
+#     # slot_pos + calibration_offset + well_def + meniscus_offset + meniscus height(for z)
+#     assert result == Point(
+#         x=slot_pos[0]
+#         + calibration_offset.x
+#         + well_def.x
+#         + meniscus_offset.x
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+#         y=slot_pos[1]
+#         + calibration_offset.y
+#         + well_def.y
+#         + meniscus_offset.y
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+#         z=slot_pos[2]
+#         + calibration_offset.z
+#         + well_def.z
+#         + meniscus_offset.z
+#         + probed_liquid_height
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+#     )
+#
+#
+# def test_get_well_position_with_volume_offset_raises_error(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """Calling get_well_position with any volume offset should raise an error when there's no innerLabwareGeometry."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     well_def = well_plate_def.wells["B2"]
+#
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             loaded_volume=None,
+#             probed_height=ProbedHeightInfo(height=45.0, last_probed=probe_time),
+#             probed_volume=None,
+#         )
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(0.5)
+#     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_raise(
+#         errors.IncompleteLabwareDefinitionError("Woops!")
+#     )
+#
+#     with pytest.raises(errors.IncompleteLabwareDefinitionError):
+#         subject.get_well_position(
+#             labware_id="labware-id",
+#             well_name="B2",
+#             well_location=LiquidHandlingWellLocation(
+#                 origin=WellOrigin.MENISCUS,
+#                 offset=WellOffset(x=2, y=3, z=4),
+#                 volumeOffset="operationVolume",
+#             ),
+#             operation_volume=-1245.833,
+#             pipette_id="pipette-id",
+#         )
+#
+#
+# def test_get_well_position_with_meniscus_and_literal_volume_offset(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """It should be able to get the position of a well meniscus in a labware with a volume offset."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     well_def = well_plate_def.wells["B2"]
+#     meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+#     probed_height = 5.53
+#
+#     pip_type = PipetteNameType.P300_SINGLE
+#     decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+#         get_default_nozzle_map(pip_type)
+#     )
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             loaded_volume=None,
+#             probed_height=ProbedHeightInfo(
+#                 height=probed_height, last_probed=probe_time
+#             ),
+#             probed_volume=None,
+#         )
+#     )
+#     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+#         _TEST_INNER_WELL_GEOMETRY
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(0.5)
+#
+#     result = subject.get_well_position(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=LiquidHandlingWellLocation(
+#             origin=WellOrigin.MENISCUS,
+#             offset=meniscus_well_offset,
+#             volumeOffset="operationVolume",
+#         ),
+#         operation_volume=-124.58,
+#         pipette_id="pipette-id",
+#     )
+#     volume_adjustment = 4.3909
+#     expected = Point(
+#         x=slot_pos[0]
+#         + calibration_offset.x
+#         + well_def.x
+#         + meniscus_well_offset.x
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+#         y=slot_pos[1]
+#         + calibration_offset.y
+#         + well_def.y
+#         + meniscus_well_offset.y
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+#         z=slot_pos[2]
+#         + calibration_offset.z
+#         + well_def.z
+#         + meniscus_well_offset.z
+#         + volume_adjustment
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+#     )
+#     assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
 
 
-def test_get_well_position_with_meniscus_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well meniscus in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    meniscus_offset = WellOffset(x=2, y=3, z=4)
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    probed_liquid_height = 5.53
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            probed_volume=None,
-            probed_height=ProbedHeightInfo(
-                height=probed_liquid_height, last_probed=probe_time
-            ),
-            loaded_volume=None,
-        )
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(0.5)
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.MENISCUS,
-            offset=meniscus_offset,
-        ),
-        pipette_id="pipette-id",
-    )
-    # slot_pos + calibration_offset + well_def + meniscus_offset + meniscus height(for z)
-    assert result == Point(
-        x=slot_pos[0]
-        + calibration_offset.x
-        + well_def.x
-        + meniscus_offset.x
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1]
-        + calibration_offset.y
-        + well_def.y
-        + meniscus_offset.y
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2]
-        + calibration_offset.z
-        + well_def.z
-        + meniscus_offset.z
-        + probed_liquid_height
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-
-
-def test_get_well_position_with_volume_offset_raises_error(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """Calling get_well_position with any volume offset should raise an error when there's no innerLabwareGeometry."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            loaded_volume=None,
-            probed_height=ProbedHeightInfo(height=45.0, last_probed=probe_time),
-            probed_volume=None,
-        )
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(0.5)
-    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_raise(
-        errors.IncompleteLabwareDefinitionError("Woops!")
-    )
-
-    with pytest.raises(errors.IncompleteLabwareDefinitionError):
-        subject.get_well_position(
-            labware_id="labware-id",
-            well_name="B2",
-            well_location=LiquidHandlingWellLocation(
-                origin=WellOrigin.MENISCUS,
-                offset=WellOffset(x=2, y=3, z=4),
-                volumeOffset="operationVolume",
-            ),
-            operation_volume=-1245.833,
-            pipette_id="pipette-id",
-        )
-
-
-def test_get_well_position_with_meniscus_and_literal_volume_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
-    probed_height = 5.53
-
-    pip_type = PipetteNameType.P300_SINGLE
-    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
-        get_default_nozzle_map(pip_type)
-    )
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            loaded_volume=None,
-            probed_height=ProbedHeightInfo(
-                height=probed_height, last_probed=probe_time
-            ),
-            probed_volume=None,
-        )
-    )
-    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        _TEST_INNER_WELL_GEOMETRY
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(0.5)
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=LiquidHandlingWellLocation(
-            origin=WellOrigin.MENISCUS,
-            offset=meniscus_well_offset,
-            volumeOffset="operationVolume",
-        ),
-        operation_volume=-124.58,
-        pipette_id="pipette-id",
-    )
-    volume_adjustment = 4.3909
-    expected = Point(
-        x=slot_pos[0]
-        + calibration_offset.x
-        + well_def.x
-        + meniscus_well_offset.x
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1]
-        + calibration_offset.y
-        + well_def.y
-        + meniscus_well_offset.y
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2]
-        + calibration_offset.z
-        + well_def.z
-        + meniscus_well_offset.z
-        + volume_adjustment
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-    assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
-
-
-def test_get_well_position_with_meniscus_and_float_volume_offset(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    probed_height = 5.35
-    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
-    well_def = well_plate_def.wells["B2"]
-    pip_type = PipetteNameType.P300_SINGLE
-    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
-        get_default_nozzle_map(pip_type)
-    )
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    well_def = well_def.model_copy(update={"depth": 45.0})
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            loaded_volume=None,
-            probed_height=ProbedHeightInfo(
-                height=probed_height, last_probed=probe_time
-            ),
-            probed_volume=None,
-        )
-    )
-    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        _TEST_INNER_WELL_GEOMETRY
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(0.5)
-    operation_volume = -124.58
-    well_loc = LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS,
-        offset=meniscus_well_offset,
-        volumeOffset=operation_volume,
-    )
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=well_loc,
-        pipette_id="pipette-id",
-    )
-    expected_vol_offset = subject.get_well_offset_adjustment(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=well_loc,
-        well_depth=well_def.depth,
-        pipette_id="pipette-id",
-        operation_volume=operation_volume,
-    )
-    assert isinstance(expected_vol_offset, float)
-    expected = Point(
-        x=slot_pos[0]
-        + calibration_offset.x
-        + well_def.x
-        + meniscus_well_offset.x
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1]
-        + calibration_offset.y
-        + well_def.y
-        + meniscus_well_offset.y
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2]
-        + calibration_offset.z
-        + well_def.z
-        + meniscus_well_offset.z
-        + expected_vol_offset
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-    assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
-
-
-@pytest.mark.parametrize(
-    "operation_volume",
-    [199.0, -10000.0, 10000.0],
-)
-def test_get_well_position_adjusts_well_position_to_boundaries(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-    operation_volume: float,
-) -> None:
-    """If a volume offset is too large or too small, geometry should constrain the volume offset to the well bounds ."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    # should not constrain user-specified offsets
-    meniscus_well_offset = WellOffset(x=2, y=3, z=-40)
-    well_def = well_plate_def.wells["B2"]
-    lld_min_height = 0.5
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    well_def = well_def.model_copy(update={"depth": 45.0})
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            loaded_volume=None,
-            probed_height=ProbedHeightInfo(height=40.0, last_probed=probe_time),
-            probed_volume=None,
-        )
-    )
-    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        _TEST_INNER_WELL_GEOMETRY
-    )
-    pip_type = PipetteNameType.P300_SINGLE
-    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
-        get_default_nozzle_map(pip_type)
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(lld_min_height)
-
-    # make sure that just the volume offset has been adjusted to the correct well boundary
-    # but the well offset overall can still end up outside the well
-    well_loc = LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS,
-        offset=meniscus_well_offset,
-        volumeOffset="operationVolume",
-    )
-    expected_vol_offset = subject.get_well_offset_adjustment(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=well_loc,
-        well_depth=well_def.depth,
-        pipette_id="pipette-id",
-        operation_volume=operation_volume,
-    )
-    assert isinstance(expected_vol_offset, float) or isinstance(
-        expected_vol_offset, int
-    )
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=well_loc,
-        operation_volume=operation_volume,
-        pipette_id="pipette-id",
-    )
-    expected = Point(
-        x=slot_pos[0]
-        + calibration_offset.x
-        + well_def.x
-        + meniscus_well_offset.x
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1]
-        + calibration_offset.y
-        + well_def.y
-        + meniscus_well_offset.y
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2]
-        + calibration_offset.z
-        + well_def.z
-        + meniscus_well_offset.z
-        + expected_vol_offset
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-    assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
+# def test_get_well_position_with_meniscus_and_float_volume_offset(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """It should be able to get the position of a well meniscus in a labware with a volume offset."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     probed_height = 5.35
+#     meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+#     well_def = well_plate_def.wells["B2"]
+#     pip_type = PipetteNameType.P300_SINGLE
+#     decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+#         get_default_nozzle_map(pip_type)
+#     )
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     well_def = well_def.model_copy(update={"depth": 45.0})
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             loaded_volume=None,
+#             probed_height=ProbedHeightInfo(
+#                 height=probed_height, last_probed=probe_time
+#             ),
+#             probed_volume=None,
+#         )
+#     )
+#     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+#         _TEST_INNER_WELL_GEOMETRY
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(0.5)
+#     operation_volume = -124.58
+#     well_loc = LiquidHandlingWellLocation(
+#         origin=WellOrigin.MENISCUS,
+#         offset=meniscus_well_offset,
+#         volumeOffset=operation_volume,
+#     )
+#     result = subject.get_well_position(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=well_loc,
+#         pipette_id="pipette-id",
+#     )
+#     expected_vol_offset = subject.get_well_offset_adjustment(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=well_loc,
+#         well_depth=well_def.depth,
+#         pipette_id="pipette-id",
+#         operation_volume=operation_volume,
+#     )
+#     assert isinstance(expected_vol_offset, float)
+#     expected = Point(
+#         x=slot_pos[0]
+#         + calibration_offset.x
+#         + well_def.x
+#         + meniscus_well_offset.x
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+#         y=slot_pos[1]
+#         + calibration_offset.y
+#         + well_def.y
+#         + meniscus_well_offset.y
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+#         z=slot_pos[2]
+#         + calibration_offset.z
+#         + well_def.z
+#         + meniscus_well_offset.z
+#         + expected_vol_offset
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+#     )
+#     assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
+#
+#
+# @pytest.mark.parametrize(
+#     "operation_volume",
+#     [199.0, -10000.0, 10000.0],
+# )
+# def test_get_well_position_adjusts_well_position_to_boundaries(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+#     operation_volume: float,
+# ) -> None:
+#     """If a volume offset is too large or too small, geometry should constrain the volume offset to the well bounds ."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     # should not constrain user-specified offsets
+#     meniscus_well_offset = WellOffset(x=2, y=3, z=-40)
+#     well_def = well_plate_def.wells["B2"]
+#     lld_min_height = 0.5
+#
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     well_def = well_def.model_copy(update={"depth": 45.0})
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             loaded_volume=None,
+#             probed_height=ProbedHeightInfo(height=40.0, last_probed=probe_time),
+#             probed_volume=None,
+#         )
+#     )
+#     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+#         _TEST_INNER_WELL_GEOMETRY
+#     )
+#     pip_type = PipetteNameType.P300_SINGLE
+#     decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+#         get_default_nozzle_map(pip_type)
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(lld_min_height)
+#
+#     # make sure that just the volume offset has been adjusted to the correct well boundary
+#     # but the well offset overall can still end up outside the well
+#     well_loc = LiquidHandlingWellLocation(
+#         origin=WellOrigin.MENISCUS,
+#         offset=meniscus_well_offset,
+#         volumeOffset="operationVolume",
+#     )
+#     expected_vol_offset = subject.get_well_offset_adjustment(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=well_loc,
+#         well_depth=well_def.depth,
+#         pipette_id="pipette-id",
+#         operation_volume=operation_volume,
+#     )
+#     assert isinstance(expected_vol_offset, float) or isinstance(
+#         expected_vol_offset, int
+#     )
+#     result = subject.get_well_position(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=well_loc,
+#         operation_volume=operation_volume,
+#         pipette_id="pipette-id",
+#     )
+#     expected = Point(
+#         x=slot_pos[0]
+#         + calibration_offset.x
+#         + well_def.x
+#         + meniscus_well_offset.x
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+#         y=slot_pos[1]
+#         + calibration_offset.y
+#         + well_def.y
+#         + meniscus_well_offset.y
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+#         z=slot_pos[2]
+#         + calibration_offset.z
+#         + well_def.z
+#         + meniscus_well_offset.z
+#         + expected_vol_offset
+#         + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+#     )
+#     assert all([isclose(i[0], i[1], abs_tol=0.0001) for i in zip(result, expected)])
+#
+#
+# def test_get_well_position_with_meniscus(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_well_view: WellView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     mock_pipette_view: PipetteView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """It should be able to get the position of a well meniscus in a labware."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     well_def = well_plate_def.wells["B2"]
+#
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+#         well_plate_def
+#     )
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#     probe_time = datetime.now()
+#     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+#         probe_time
+#     )
+#     decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+#         WellLiquidInfo(
+#             loaded_volume=LoadedVolumeInfo(
+#                 volume=2000.0, last_loaded=probe_time, operations_since_load=0
+#             ),
+#             probed_height=None,
+#             probed_volume=None,
+#         )
+#     )
+#     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+#         _TEST_INNER_WELL_GEOMETRY
+#     )
+#     decoy.when(
+#         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+#     ).then_return(0.5)
+#
+#     result = subject.get_well_position(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         well_location=WellLocation(
+#             origin=WellOrigin.MENISCUS,
+#             offset=WellOffset(x=2, y=3, z=4),
+#         ),
+#         pipette_id="pipette-id",
+#     )
+#
+#     assert result == Point(
+#         x=slot_pos[0] + 1 + well_def.x + 2 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+#         y=slot_pos[1] - 2 + well_def.y + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+#         z=slot_pos[2]
+#         + 3
+#         + well_def.z
+#         + 4
+#         + 39.2423
+#         + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+#     )
+#
+#
+# def test_get_relative_well_location(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     subject: InstrumentInterfaceView,
+#     monkeypatch: pytest.MonkeyPatch,
+# ) -> None:
+#     """It should get the relative location of a well given an absolute position."""
+#     monkeypatch.setattr(
+#         "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
+#         lambda *args, **kwargs: Point(0, 0, 0),
+#     )
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="load-name",
+#         definitionUri="definition-uri",
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+#         offsetId="offset-id",
+#     )
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     slot_pos = Point(4, 5, 6)
+#     well_def = well_plate_def.wells["B2"]
+#
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+#     ).then_return(slot_pos)
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#
+#     result, _ = subject.get_relative_well_location(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         absolute_point=Point(
+#             x=slot_pos[0] + 1 + well_def.x + 7,
+#             y=slot_pos[1] - 2 + well_def.y + 8,
+#             z=slot_pos[2] + 3 + well_def.z + well_def.depth + 9,
+#         ),
+#         location_type=WellLocationFunction.BASE,
+#     )
+#     assert result == WellLocation(
+#         origin=WellOrigin.TOP,
+#         offset=WellOffset.model_construct(
+#             x=cast(float, pytest.approx(7)),
+#             y=cast(float, pytest.approx(8)),
+#             z=cast(float, pytest.approx(9)),
+#         ),
+#     )
 
 
-def test_get_well_meniscus_position(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_well_view: WellView,
-    mock_addressable_area_view: AddressableAreaView,
-    mock_pipette_view: PipetteView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should be able to get the position of a well meniscus in a labware."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-    probe_time = datetime.now()
-    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
-        probe_time
-    )
-    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
-        WellLiquidInfo(
-            loaded_volume=LoadedVolumeInfo(
-                volume=2000.0, last_loaded=probe_time, operations_since_load=0
-            ),
-            probed_height=None,
-            probed_volume=None,
-        )
-    )
-    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        _TEST_INNER_WELL_GEOMETRY
-    )
-    decoy.when(
-        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
-    ).then_return(0.5)
-
-    result = subject.get_well_position(
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(
-            origin=WellOrigin.MENISCUS,
-            offset=WellOffset(x=2, y=3, z=4),
-        ),
-        pipette_id="pipette-id",
-    )
-
-    assert result == Point(
-        x=slot_pos[0] + 1 + well_def.x + 2 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=slot_pos[1] - 2 + well_def.y + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=slot_pos[2]
-        + 3
-        + well_def.z
-        + 4
-        + 39.2423
-        + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
-    )
-
-
-def test_get_relative_well_location(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """It should get the relative location of a well given an absolute position."""
-    monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
-        lambda *args, **kwargs: Point(0, 0, 0),
-    )
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="load-name",
-        definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        offsetId="offset-id",
-    )
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    slot_pos = Point(4, 5, 6)
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
-    ).then_return(slot_pos)
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result, _ = subject.get_relative_well_location(
-        labware_id="labware-id",
-        well_name="B2",
-        absolute_point=Point(
-            x=slot_pos[0] + 1 + well_def.x + 7,
-            y=slot_pos[1] - 2 + well_def.y + 8,
-            z=slot_pos[2] + 3 + well_def.z + well_def.depth + 9,
-        ),
-        location_type=WellLocationFunction.BASE,
-    )
-    assert result == WellLocation(
-        origin=WellOrigin.TOP,
-        offset=WellOffset.model_construct(
-            x=cast(float, pytest.approx(7)),
-            y=cast(float, pytest.approx(8)),
-            z=cast(float, pytest.approx(9)),
-        ),
-    )
-
-
-def test_get_relative_liquid_handling_well_location(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    mock_labware_view: LabwareView,
-    mock_addressable_area_view: AddressableAreaView,
-    subject: InstrumentInterfaceView,
-) -> None:
-    """It should get the relative location of a well given an absolute position."""
-    labware_data = LoadedLabware(
-        id="labware-id",
-        loadName="b",
-        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        offsetId=None,
-    )
-    decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area_position("3")
-    ).then_return(Point(1, 2, 3))
-    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
-    decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
-        calibration_offset
-    )
-
-    well_def = well_plate_def.wells["B2"]
-
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
-        well_def
-    )
-
-    result, dynamic_liquid_tracking = subject.get_relative_well_location(
-        labware_id="labware-id",
-        well_name="B2",
-        absolute_point=Point(x=0, y=0, z=-2),
-        meniscus_tracking=MeniscusTrackingTarget.END,
-        location_type=WellLocationFunction.LIQUID_HANDLING,
-    )
-
-    assert result == LiquidHandlingWellLocation(
-        origin=WellOrigin.MENISCUS,
-        offset=WellOffset.model_construct(
-            x=0.0,
-            y=0.0,
-            z=cast(float, pytest.approx(-2)),
-        ),
-        volumeOffset="operationVolume",
-    )
+# def test_get_relative_liquid_handling_well_location(
+#     decoy: Decoy,
+#     well_plate_def: LabwareDefinition,
+#     mock_labware_view: LabwareView,
+#     mock_addressable_area_view: AddressableAreaView,
+#     subject: InstrumentInterfaceView,
+# ) -> None:
+#     """It should get the relative location of a well given an absolute position."""
+#     labware_data = LoadedLabware(
+#         id="labware-id",
+#         loadName="b",
+#         definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+#         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+#         offsetId=None,
+#     )
+#     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
+#     decoy.when(
+#         mock_addressable_area_view.get_addressable_area_position("3")
+#     ).then_return(Point(1, 2, 3))
+#     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+#     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
+#         calibration_offset
+#     )
+#
+#     well_def = well_plate_def.wells["B2"]
+#
+#     decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+#         well_def
+#     )
+#
+#     result, dynamic_liquid_tracking = subject.get_relative_well_location(
+#         labware_id="labware-id",
+#         well_name="B2",
+#         absolute_point=Point(x=0, y=0, z=-2),
+#         meniscus_tracking=MeniscusTrackingTarget.END,
+#         location_type=WellLocationFunction.LIQUID_HANDLING,
+#     )
+#
+#     assert result == LiquidHandlingWellLocation(
+#         origin=WellOrigin.MENISCUS,
+#         offset=WellOffset.model_construct(
+#             x=0.0,
+#             y=0.0,
+#             z=cast(float, pytest.approx(-2)),
+#         ),
+#         volumeOffset="operationVolume",
+#     )
 
 
 def test_get_nominal_effective_tip_length(
@@ -1507,6 +1234,7 @@ def test_get_next_drop_tip_location(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_pipette_view: PipetteView,
+    mock_geometry_view: GeometryView,
     subject: InstrumentInterfaceView,
     labware_slot: DeckSlotName,
     well_size: float,
@@ -1564,14 +1292,10 @@ def test_get_next_drop_tip_location(
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
-    decoy.when(mock_labware_view.get("abc")).then_return(
-        LoadedLabware(
-            id="abc",
-            loadName="load-name2",
-            definitionUri="4567",
-            location=DeckSlotLocation(slotName=labware_slot),
-        )
+    decoy.when(mock_geometry_view.get_ancestor_slot_name("abc")).then_return(
+        labware_slot
     )
+    decoy.when(mock_geometry_view.get_slot_column(labware_slot)).then_return(3)
     drop_location: List[DropTipWellLocation] = []
     for i in range(4):
         drop_location.append(

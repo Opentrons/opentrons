@@ -25,10 +25,13 @@ from opentrons_shared_data.pipette.types import (
 from ..pipette_fixtures import get_default_nozzle_map
 from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.state import liquid_tracking
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     find_height_inner_well_geometry,
+    find_height_user_defined_volumes,
     find_volume_inner_well_geometry,
+    find_volume_user_defined_volumes,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.liquid_tracking import LiquidTrackingView
@@ -45,6 +48,7 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
     SimulatedProbeResult,
 )
 
+# TODO refactor this into conftest
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
     sections=[
         CuboidalFrustum(
@@ -97,6 +101,64 @@ def mock_pipette_view(decoy: Decoy) -> PipetteView:
 def mock_geometry_view(decoy: Decoy) -> GeometryView:
     """Get a mock in the shape of a GeometryView."""
     return decoy.mock(cls=GeometryView)
+
+
+@pytest.fixture
+def inner_labware_geometry_fixture() -> LabwareDefinition:
+    """Load a labware def containing an InnerWellGeometry object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data("labware/fixtures/3/fixture_corning_24_plate.json").decode(
+                "utf-8"
+            )
+        )
+    )
+
+
+@pytest.fixture
+def user_volumes_fixture() -> LabwareDefinition:
+    """Load a labware def containing a UserDefinedVolumes object."""
+    return labware_definition_type_adapter.validate_python(
+        json.loads(
+            load_shared_data(
+                "labware/fixtures/2/fixture_user_volumes_prototype.json"
+            ).decode("utf-8")
+        )
+    )
+
+
+@pytest.fixture
+def mock_well_math_utils(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> Dict[str, Any]:
+    """Patch inner_well_math_utils functions."""
+    mocks = {
+        "volume_user_volumes": decoy.mock(func=find_volume_user_defined_volumes),
+        "height_user_volumes": decoy.mock(func=find_height_user_defined_volumes),
+        "volume_inner_well_geometry": decoy.mock(func=find_volume_inner_well_geometry),
+        "height_inner_well_geometry": decoy.mock(func=find_height_inner_well_geometry),
+    }
+    monkeypatch.setattr(
+        liquid_tracking,
+        "find_volume_user_defined_volumes",
+        mocks["volume_user_volumes"],
+    )
+    monkeypatch.setattr(
+        liquid_tracking,
+        "find_height_user_defined_volumes",
+        mocks["height_user_volumes"],
+    )
+    monkeypatch.setattr(
+        liquid_tracking,
+        "find_volume_inner_well_geometry",
+        mocks["volume_inner_well_geometry"],
+    )
+    monkeypatch.setattr(
+        liquid_tracking,
+        "find_height_inner_well_geometry",
+        mocks["height_inner_well_geometry"],
+    )
+    return mocks
 
 
 @pytest.fixture
