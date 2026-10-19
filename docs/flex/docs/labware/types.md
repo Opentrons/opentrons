@@ -16,8 +16,6 @@ Opentrons Flex works by default with several brands of single-well and multi-wel
 
 ### Custom reservoirs
 
-While the Labware Library supports standard single-well and multi-well reservoir formats, some protocols may require custom structures such as specialized channel layouts, column formats, or split-volume containers.
-
 If you need a reservoir that's not listed in the Labware Library, try creating a custom labware definition using [Custom Labware Creator](https://labware.opentrons.com/create/). This tool produces a JSON definition file containing the reservoir's physical dimensions, well geometry, volumetric capacity, and other information required by Flex. For more information about Custom Labware Creator, labware requirements, and our custom labware service, see [Labware Definitions](definitions.md).
 
 ## Well plates
