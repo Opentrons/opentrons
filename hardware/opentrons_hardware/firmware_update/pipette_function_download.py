@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Iterator, Dict, List, Tuple
+from typing import Dict, Iterator, List, Tuple
 
 from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
 from opentrons_shared_data.pipette.types import PipetteTipType
@@ -117,8 +117,7 @@ class PipetteFunctionDownloader:
         """Formats the pipette's function from shared data and sends it over CAN."""
         # num_messages = 0
 
-        # this might not actually needs to be an async for
-        async for data_chunk in self.pipetting_function_chunks():
+        for data_chunk in self.pipetting_function_chunks():
             passed = False
             for retry in range(self._retry_count):
                 data_bytes = bytes(data_chunk)

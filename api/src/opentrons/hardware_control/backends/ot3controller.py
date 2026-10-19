@@ -2011,7 +2011,7 @@ class OT3Controller(FlexBackend):
     ) -> None:
         """Process and send a pipetting function to the pipette's EEPROM over CAN."""
         node = sensor_node_for_mount(mount)
-        pip_function_processor = PipetteFunctionDownaloder(
+        pip_function_processor = PipetteFunctionDownloader(
             can_messenger=self._messenger,
             node_id=node,
             supported_tips_def=supported_tips_def,
