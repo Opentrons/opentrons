@@ -543,9 +543,7 @@ class StateStore(StateView, ActionHandler):
             geometry_view=self._geometry,
         )
         self._instrument_interface = InstrumentInterfaceView(
-            config=self._config,
             labware_view=self._labware,
-            module_view=self._modules,
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,

@@ -30,11 +30,9 @@ from ..types import (
 from ..types.liquid_level_detection import LiquidTrackingType, SimulatedProbeResult
 from ._well_math import nozzles_per_well, wells_covered_by_pipette_configuration
 from .addressable_areas import AddressableAreaView
-from .config import Config
 from .geometry import GeometryView
 from .labware import LabwareView
 from .liquid_tracking import LiquidTrackingView
-from .modules import ModuleView
 from .pipettes import PipetteView
 from opentrons.types import (
     MeniscusTrackingTarget,
@@ -61,17 +59,13 @@ class InstrumentInterfaceView:
 
     def __init__(
         self,
-        config: Config,
         labware_view: LabwareView,
-        module_view: ModuleView,
         pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
         geometry_view: GeometryView,
         liquid_tracking_view: LiquidTrackingView,
     ) -> None:
-        self._config = config
         self._labware = labware_view
-        self._modules = module_view
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
         self._geometry = geometry_view
