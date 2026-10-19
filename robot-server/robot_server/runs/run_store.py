@@ -739,7 +739,7 @@ class RunStore:
         )
 
     async def insert_batch_commands(
-        self, run_id: str, batch_commands: list[tuple[int, Command]]
+        self, run_id: str, batch_commands: list[tuple[int, str]]
     ) -> None:
         """Insert or update commands on the run command table.
 
@@ -751,11 +751,12 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
             for index, command in batch_commands:
+                command_dict = json.loads(command)
                 select_existing_index = sqlalchemy.select(
                     run_command_table.c.index_in_run
                 ).where(
                     run_command_table.c.run_id == run_id,
-                    run_command_table.c.command_id == command.id,
+                    run_command_table.c.command_id == command_dict["id"],
                 )
                 insert_command = sqlalchemy.insert(run_command_table)
                 existing_index = transaction.execute(
@@ -763,7 +764,7 @@ class RunStore:
                 ).scalar_one_or_none()
                 delete_existing_command = sqlalchemy.delete(run_command_table).where(
                     run_command_table.c.run_id == run_id,
-                    run_command_table.c.command_id == command.id,
+                    run_command_table.c.command_id == command_dict["id"],
                 )
                 if existing_index is not None:
                     index = existing_index
@@ -773,16 +774,16 @@ class RunStore:
                     {
                         "run_id": run_id,
                         "index_in_run": index,
-                        "command_id": command.id,
-                        "command": pydantic_to_json(command),
-                        "command_intent": str(command.intent.value)
-                        if command.intent
+                        "command_id": command_dict["id"],
+                        "command": command,
+                        "command_intent": command_dict.get("intent")
+                        if command_dict.get("intent")
                         else CommandIntent.PROTOCOL,
-                        "command_error": pydantic_to_json(command.error)
-                        if command.error
+                        "command_error": json.dumps(command_dict.get("error"))
+                        if command_dict.get("error")
                         else None,
                         "command_status": _convert_commands_status_to_sql_command_status(
-                            command.status
+                            command_dict["status"]
                         ),
                     },
                 )
