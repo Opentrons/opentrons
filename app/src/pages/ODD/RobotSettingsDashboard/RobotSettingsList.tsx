@@ -341,7 +341,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
         <RobotSettingButton
           settingName={t('debug_logging')}
           dataTestId="RobotSettingButton_enable_debug_logging"
-          settingInfo={t('debug_logging_description_odd')}
+          settingInfo={t('debug_logging_description')}
           rightElement={<OnOffToggle isOn={debugLogsEnabled} />}
           onClick={() => {
             handleToggleDebugLogs(!debugLogsEnabled)

@@ -109,7 +109,6 @@
   "crs_title": "Compliance Ready Software",
   "debug_logging": "Debug logging",
   "debug_logging_description": "Use only for troubleshooting; extended use shortens log time and wears memory.",
-  "debug_logging_description_odd": "Use only for troubleshooting.",
   "deck_calibration_description": "Calibrating the deck is required for new robots or after you relocate your robot. Recalibrating the deck will require you to also recalibrate pipette offsets.",
   "deck_calibration_missing": "Deck calibration missing",
   "deck_calibration_missing_no_pipette": "Deck calibration missing. Attach a pipette to perform deck calibration.",
