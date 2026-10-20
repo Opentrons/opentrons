@@ -11,8 +11,6 @@ export interface TipLengthDeletionParams {
   tiprack_uri: string
   pipette_id: string
 }
-export type DeleteCalRequestParams =
-  PipOffsetDeletionParams | TipLengthDeletionParams
 
 export type FetchCalibrationStatusParams =
   PipOffsetDeletionParams | TipLengthDeletionParams
