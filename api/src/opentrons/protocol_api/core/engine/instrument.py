@@ -60,7 +60,6 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
     NozzleLayoutConfigurationType,
     PickUpTipWellLocation,
-    WellLocationFunction,
 )
 from opentrons.protocol_engine.types.automatic_tip_selection import (
     NoTipAvailable,

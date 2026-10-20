@@ -55,15 +55,6 @@ class DropTipWellOrigin(StrEnum):
     DEFAULT = "default"
 
 
-class WellLocationFunction(int, Enum):
-    """The type of well location object to be created."""
-
-    BASE = auto()
-    LIQUID_HANDLING = auto()
-    PICK_UP_TIP = auto()
-    DROP_TIP = auto()
-
-
 # This is deliberately a separate type from Vec3f to let components default to 0.
 class WellOffset(BaseModel):
     """An offset vector in (x, y, z)."""

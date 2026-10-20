@@ -71,7 +71,6 @@ from opentrons.protocol_engine.types import (
     RowNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     TipGeometry,
-    WellLocationFunction,
 )
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION

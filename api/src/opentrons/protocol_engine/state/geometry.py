@@ -64,7 +64,6 @@ from ..types import (
     PotentialCutoutFixture,
     StagingSlotLocation,
     WellLocation,
-    WellLocationFunction,
     WellLocationType,
     WellOffset,
     WellOrigin,

@@ -157,7 +157,6 @@ from opentrons.protocol_engine.types import (
     TipGeometry,
     WellLiquidInfo,
     WellLocation,
-    WellLocationFunction,
     WellOffset,
     WellOrigin,
 )

@@ -156,7 +156,6 @@ from .well_position import (
     PickUpTipWellLocation,
     PickUpTipWellOrigin,
     WellLocation,
-    WellLocationFunction,
     WellLocationType,
     WellOffset,
     WellOrigin,
@@ -302,7 +301,6 @@ __all__ = [
     "PickUpTipWellLocation",
     "DropTipWellLocation",
     "WellLocationType",
-    "WellLocationFunction",
     # Execution
     "EngineStatus",
     "PostRunHardwareState",
