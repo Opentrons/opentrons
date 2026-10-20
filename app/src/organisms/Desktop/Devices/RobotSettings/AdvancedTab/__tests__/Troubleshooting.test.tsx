@@ -5,7 +5,11 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useHost } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useLogLevelQuery,
+  usePostLogLevelMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -19,7 +23,7 @@ import {
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { ComponentProps } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
+import type { HostConfig, LogLevels } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
 const mockSaveLogs = vi.hoisted(() =>
@@ -56,6 +60,14 @@ const render = (props: ComponentProps<typeof Troubleshooting>) => {
 
 describe('RobotSettings Troubleshooting', () => {
   let props: ComponentProps<typeof Troubleshooting>
+  let logLevel: LogLevels = 'warning'
+  const mockChangeLogLevel: ReturnType<
+    typeof usePostLogLevelMutation
+  >['postLogLevel'] = async newLevel => {
+    logLevel = newLevel
+    return newLevel
+  }
+
   beforeEach(() => {
     mockSaveLogs.mockClear()
     mockSaveLogs.mockResolvedValue({
@@ -65,7 +77,12 @@ describe('RobotSettings Troubleshooting', () => {
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
-
+    when(useLogLevelQuery)
+      .calledWith()
+      .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
+    when(usePostLogLevelMutation)
+      .calledWith(expect.anything())
+      .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     props = {
       robotName: ROBOT_NAME,
     }
@@ -89,7 +106,7 @@ describe('RobotSettings Troubleshooting', () => {
   it('should render title, description, and button', () => {
     render(props)
     screen.getByText('Troubleshooting')
-    screen.getByTestId('RobotSettings_Troubleshooting')
+    screen.getByTestId('RobotSettings_Troubleshooting_Download')
     screen.getByRole('button', { name: 'Download logs' })
   })
 
