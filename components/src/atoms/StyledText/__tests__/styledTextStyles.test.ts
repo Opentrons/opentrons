@@ -10,7 +10,7 @@ import {
 import {
   DESKTOP_STYLE_TRANSLATIONS,
   ODD_STYLE_TRANSLATIONS,
-} from './styledTextStyleFixtures'
+} from '../__fixtures__'
 
 describe('styledTextStyles', () => {
   it.each(DESKTOP_STYLE_TRANSLATIONS)(

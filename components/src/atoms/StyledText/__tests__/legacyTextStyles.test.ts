@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 import styles from '../legacystyledtext.module.css'
 import { resolveLegacyTextStyle } from '../legacyTextStyles'
-import { OLD_API_TRANSLATIONS } from './legacyTextStyleFixtures'
+import { OLD_API_TRANSLATIONS } from '../__fixtures__'
 
 describe('legacyTextStyles', () => {
   it.each(OLD_API_TRANSLATIONS)(

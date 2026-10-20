@@ -9,11 +9,11 @@ import { TYPOGRAPHY } from '../../../ui-style-constants'
 import legacyStyles from '../legacystyledtext.module.css'
 import { StyledText } from '../StyledText'
 import styles from '../styledtext.module.css'
-import { OLD_API_TRANSLATIONS } from './legacyTextStyleFixtures'
 import {
   DESKTOP_STYLE_TRANSLATIONS,
   ODD_STYLE_TRANSLATIONS,
-} from './styledTextStyleFixtures'
+  OLD_API_TRANSLATIONS,
+} from '../__fixtures__'
 
 import type { ComponentProps } from 'react'
 
