@@ -51,7 +51,6 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
     SimulatedProbeResult,
 )
-from opentrons.types import Point
 
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
     sections=[
@@ -172,6 +171,7 @@ def subject(
     mock_pipette_view: PipetteView,
     mock_geometry_view: GeometryView,
 ) -> LiquidTrackingView:
+    """Get a LiquidTrackingView with its store dependencies provided."""
     return LiquidTrackingView(
         labware_view=mock_labware_view,
         well_view=mock_well_view,
