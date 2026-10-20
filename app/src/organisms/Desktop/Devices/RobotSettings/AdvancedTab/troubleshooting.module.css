@@ -22,10 +22,25 @@
   justify-content: space-between;
 }
 
+.option_name_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
 .option_name {
   /* p semibold from LegacyStyledText */
   font-size: var(--font-size-13);
   font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+}
+
+.option_description {
+  /* p from LegacyStyledText */
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
 }
 

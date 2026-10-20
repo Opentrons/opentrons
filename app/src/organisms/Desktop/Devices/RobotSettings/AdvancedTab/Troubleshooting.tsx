@@ -95,13 +95,20 @@ export function Troubleshooting({
         </TertiaryButton>
       </div>
       <div className={styles.option_row}>
-        <p
-          data-testid="RobotSettings_Troubleshooting_LogLevel"
-          className={styles.option_name}
-        >
-          {t('enable_debug_logging')}
-        </p>
-
+        <div className={styles.option_name_container}>
+          <p
+            data-testid="RobotSettings_Troubleshooting_LogLevel_Title"
+            className={styles.option_name}
+          >
+            {t('debug_logging')}
+          </p>
+          <p
+            data-testid="RobotSettings_Troubleshooting_LogLevel_description"
+            className={styles.option_description}
+          >
+            {t('debug_logging_description')}
+          </p>
+        </div>
         <ToggleButton
           label="debug_logs_enabled"
           toggledOn={debugLogsEnabled}
