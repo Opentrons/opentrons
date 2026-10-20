@@ -51,10 +51,7 @@ describe('AttachProbe', () => {
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
-      isDoorOpenError: false,
-      setIsDoorOpenError: vi.fn(),
-      dismissDoorOpenError: vi.fn(),
+      handleCommandError: vi.fn(),
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -183,18 +180,6 @@ describe('AttachProbe', () => {
         'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
       )
     ).not.toBeInTheDocument()
-  })
-
-  it('renders the error modal screen when errorMessage is true', () => {
-    props = {
-      ...props,
-      errorMessage: 'error shmerror',
-    }
-    render(props)
-    screen.getByText(
-      'Return the calibration probe to its storage location before exiting.'
-    )
-    screen.getByText('error shmerror')
   })
 
   it('renders the correct text when is on device', async () => {

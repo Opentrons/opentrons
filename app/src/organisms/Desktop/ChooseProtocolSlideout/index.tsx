@@ -47,7 +47,6 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { useLogger } from '/app/logger'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
@@ -98,7 +97,6 @@ export function ChooseProtocolSlideoutComponent(
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const navigate = useNavigate()
-  const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
   const [showRestoreValuesTooltip, setShowRestoreValuesTooltip] =
@@ -273,7 +271,9 @@ export function ChooseProtocolSlideoutComponent(
           }
         })
     } else {
-      logger.warn('failed to create protocol, no protocol selected')
+      console.warn(
+        '[app/src/organisms/Desktop/ChooseProtocolSlideout/index.tsx]: failed to create protocol, no protocol selected'
+      )
     }
   }
 

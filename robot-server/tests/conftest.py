@@ -33,13 +33,13 @@ from opentrons.calibration_storage.ot2 import (
     save_tip_length_calibration,
 )
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
     ThreadedAsyncLock,
 )
 from opentrons.hardware_control import (
     types as hw_types,
 )
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -60,7 +60,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from robot_server.app import app
-from robot_server.hardware import HardwareStateStore, get_hardware, get_ot2_hardware
+from robot_server.hardware import HardwareStateStore, get_hardware
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
@@ -118,7 +118,7 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Return a mock in the shape of a HardwareControlAPI."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return decoy.mock(cls=API)
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -172,7 +172,7 @@ def current_time() -> datetime:
 
 @pytest.fixture
 def hardware() -> MagicMock:
-    return MagicMock(spec=API)
+    return MagicMock(spec=OT3API)
 
 
 @pytest.fixture
@@ -221,17 +221,6 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
     app.dependency_overrides[get_versions] = get_version_override
     yield
     del app.dependency_overrides[get_versions]
-
-
-@pytest.fixture
-def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
-    async def get_ot2_hardware_override() -> API:
-        """Override for the get_ot2_hardware FastAPI dependency."""
-        return hardware
-
-    app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
-    yield
-    del app.dependency_overrides[get_ot2_hardware]
 
 
 @pytest.fixture
@@ -303,7 +292,6 @@ def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,
     _override_audit_client_with_mock: None,
@@ -320,7 +308,6 @@ def api_client_camera_overrides(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,

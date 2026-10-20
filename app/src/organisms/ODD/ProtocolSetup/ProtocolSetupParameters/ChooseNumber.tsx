@@ -37,7 +37,7 @@ export function ChooseNumber({
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type as string}`)
+    console.error(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
 

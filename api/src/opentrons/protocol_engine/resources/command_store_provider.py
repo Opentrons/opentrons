@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Awaitable, Callable, Optional
-
-if TYPE_CHECKING:
-    from opentrons.protocol_engine.commands import Command
+from typing import Awaitable, Callable, Optional
 
 
 class CommandStoreProvider:
@@ -15,7 +12,7 @@ class CommandStoreProvider:
         self,
         run_id: Optional[str] = None,
         store_insert_batch_commands: Optional[
-            Callable[[str, list[tuple[int, "Command"]]], Awaitable[None]]
+            Callable[[str, list[tuple[int, str]]], Awaitable[None]]
         ] = None,
     ) -> None:
         """Initialize a provider to access the RunStore or AnalysisStore."""
@@ -27,7 +24,7 @@ class CommandStoreProvider:
         self._run_id = run_id
 
     async def insert_batch_commands(
-        self, commands_batch: list[tuple[int, "Command"]]
+        self, commands_batch: list[tuple[int, str]]
     ) -> None:
         """Insert or update a batch of commands."""
         if self._run_id and self._store_insert_batch_commands:

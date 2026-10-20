@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from logging import getLogger
 from typing import Any, Dict, List, Optional
 
@@ -9,7 +10,6 @@ import sqlalchemy
 from typing_extensions import Final
 
 from opentrons.protocol_engine import (
-    Command,
     ErrorOccurrence,
     Liquid,
     LiquidClassRecordWithId,
@@ -130,12 +130,12 @@ class AnalysisStore:
         )
 
     async def insert_batch_analysis_command(
-        self, run_id: str, batch_commands: list[tuple[int, Command]]
+        self, run_id: str, batch_commands: list[tuple[int, str]]
     ) -> None:
         """Store analysis commands as JSON dicts locally."""
         for _index, command in batch_commands:
-            command_json = command.model_dump(by_alias=True, exclude_none=True)
-            self._commands_dict_list.append(command_json)
+            command_json_dict = json.loads(command)
+            self._commands_dict_list.append(command_json_dict)
 
     def set_analysis_provider_id(self, analysis_id: str) -> None:
         """Set the ID used by the analysis provider."""

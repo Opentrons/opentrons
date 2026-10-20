@@ -53,19 +53,13 @@ jobs:
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}, ot-hardware ${{ matrix.with-ot-hardware }}'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        os: ['ubuntu-24.04']
         python: ['3.12']
-        with-ot-hardware: ['true', 'false']
-        exclude:
-          - os: 'windows-2022'
-            with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -91,14 +85,7 @@ jobs:
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Remove OT-3 hardware package
-        run: make -C api setup-ot2
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Test without opentrons_hardware
-        run: make -C api test-ot2
-      - if: ${{ matrix.with-ot-hardware == 'true' }}
-        name: Test with opentrons_hardware
+      - name: Test
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel

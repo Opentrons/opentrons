@@ -30,6 +30,7 @@ describe('labwareDefToFields', () => {
       footprintXDimension: String(def.dimensions.xDimension),
       footprintYDimension: String(def.dimensions.yDimension),
       labwareZDimension: String(def.dimensions.zDimension),
+      skirtHeight: '0',
 
       gridRows: '8',
       gridColumns: '12',
@@ -103,5 +104,61 @@ describe('labwareDefToFields', () => {
     expect(result?.groupBrandId).toBe('tube123,other123')
 
     expect(result).toMatchSnapshot()
+  })
+
+  it('maps a filterPlate definition back to the filter plate labware type', () => {
+    const def = {
+      ...fixture_96_plate,
+      metadata: {
+        ...fixture_96_plate.metadata,
+        displayCategory: 'filterPlate',
+      },
+      parameters: {
+        ...fixture_96_plate.parameters,
+        quirks: ['filterPlate', 'noLabwarePositionCheck'],
+      },
+      skirtHeight: 5,
+    } as LabwareDefinition2
+
+    const result = labwareDefToFields(def, [def])
+
+    expect(result?.labwareType).toEqual('filterPlate')
+    expect(result?.hasLpcQuirk).toEqual('true')
+    expect(result?.skirtHeight).toEqual('5')
+    expect(result?.labwareZDimension).toEqual(
+      String(fixture_96_plate.dimensions.zDimension)
+    )
+  })
+
+  it('keeps total height as zDimension when wells hang past the skirt', () => {
+    const def = {
+      ...fixture_96_plate,
+      dimensions: {
+        ...fixture_96_plate.dimensions,
+        zDimension: 35,
+      },
+      skirtHeight: 10,
+    } as LabwareDefinition2
+
+    const result = labwareDefToFields(def, [def])
+
+    expect(result?.labwareZDimension).toEqual('35')
+    expect(result?.skirtHeight).toEqual('10')
+    expect(result?.wellDepth).toEqual('10.54')
+  })
+
+  it('treats a well plate with the filterPlate quirk as a filter plate', () => {
+    const def = {
+      ...fixture_96_plate,
+      parameters: {
+        ...fixture_96_plate.parameters,
+        quirks: ['filterPlate'],
+      },
+    } as LabwareDefinition2
+
+    const result = labwareDefToFields(def, [def])
+
+    expect(result?.labwareType).toEqual('filterPlate')
+    expect(result?.hasLpcQuirk).toEqual('false')
   })
 })

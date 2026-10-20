@@ -49,6 +49,7 @@
   "if_issue_persists_call_support": "如果问题仍然存在，请取消运行并联系技术支持人员",
   "image_capture_window_title": "{{timestamp}} step {{step}} 的设备图像.jpeg",
   "ip_description_second": "请联系网络管理员，为工作站分配静态IP地址。",
+  "issue_persists_contact_support": "如需进一步协助，请联系支持团队。",
   "labware_offsets_conflict_description": "设备存储的耗材校准参数已在最后一次运行后更新 <strong>{{timestamp}}</strong>。您想使用哪些耗材校准数据来再次运行此协议？",
   "language_preference_description": "除非您在下面选择其他语言，否则应用将与您的系统语言匹配。您可以稍后在应用设置中更改语言。",
   "learn_uninstalling": "了解更多有关卸载应用程序的信息",

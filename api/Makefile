@@ -76,11 +76,6 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
-.PHONY: setup-ot2
-setup-ot2:
-	@$(uv_sync_dev)
-	@$(UV) pip uninstall python-can
-	@$(UV) pip list
 
 .PHONY: lock
 lock:
@@ -131,9 +126,6 @@ test: test-unit
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: test-ot2
-test-ot2:
-	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:

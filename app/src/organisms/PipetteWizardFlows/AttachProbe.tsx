@@ -1,17 +1,11 @@
-import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
   AnimationVideo,
   Banner,
-  COLORS,
   Flex,
-  JUSTIFY_FLEX_END,
   LegacyStyledText,
-  PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
@@ -20,15 +14,10 @@ import {
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import {
-  SimpleWizardBody,
-  SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
-import { ProbeNotAttached } from './ProbeNotAttached'
 import {
   getPipetteAnimations,
   isWasteChuteOnDeck,
@@ -63,12 +52,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     goBack,
     proceed,
     isExiting,
-    errorMessage,
     isOnDevice,
     flowType,
     deckConfig,
-    isDoorOpenError,
-    dismissDoorOpenError,
   } = props
 
   const handleOnClick = (): void => {
@@ -77,18 +63,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
   const pipetteId = attachedPipettes[mount]?.serialNumber
   if (pipetteId == null) return null
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
-  const startCalibration = startCalibrationOnClick(
-    props,
-    setShowUnableToDetect,
-    pipetteId,
-    t('door_is_open') as string
-  )
+  const startCalibration = startCalibrationOnClick(props, pipetteId)
 
   const calSlotNum = 'C2'
   let src = pipetteProbe1
@@ -139,70 +119,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </SimpleWizardInProgressBody>
     )
-  } else if (showUnableToDetect) {
-    return (
-      <ProbeNotAttached
-        handleOnClick={
-          is96Channel && isWasteChuteOnDeck(deckConfig)
-            ? handleOnClick
-            : startCalibration
-        }
-        setShowUnableToDetect={setShowUnableToDetect}
-        isOnDevice={isOnDevice ?? false}
-      />
-    )
   }
 
-  return errorMessage != null ? (
-    isDoorOpenError ? (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('door_is_open')}
-        subHeader={t('close_door_and_try_again')}
-      >
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          {Boolean(isOnDevice) ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              onClick={dismissDoorOpenError}
-            />
-          ) : (
-            <PrimaryButton onClick={dismissDoorOpenError}>
-              {t('try_again')}
-            </PrimaryButton>
-          )}
-        </Flex>
-      </SimpleWizardBody>
-    ) : (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        subHeader={
-          <Trans
-            t={t}
-            i18nKey={'return_probe_error'}
-            values={{ error: errorMessage }}
-            components={{
-              block: <LegacyStyledText forwardedAs="p" />,
-              bold: (
-                <LegacyStyledText
-                  forwardedAs="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                />
-              ),
-            }}
-          />
-        }
-      />
-    )
-  ) : (
+  return (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={getPipetteAnimations({

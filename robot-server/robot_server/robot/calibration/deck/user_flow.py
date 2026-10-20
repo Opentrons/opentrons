@@ -26,13 +26,13 @@ from opentrons.calibration_storage.ot2.tip_length import (
     load_tip_length_calibration,
 )
 from opentrons.hardware_control import (
-    API,
     CriticalPoint,
     HardwareControlAPI,
-    OT2HardwareControlAPI,
+    OT3HardwareControlAPI,
     Pipette,
 )
 from opentrons.hardware_control import robot_calibration as robot_cal
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
@@ -98,9 +98,9 @@ def tuplefy_cal_point_dicts(
 
 class DeckCalibrationUserFlow:
     def __init__(self, hardware: HardwareControlAPI) -> None:
-        if not isinstance(hardware, API):
+        if isinstance(hardware, OT3API):
             raise HardwareNotSupportedError("This command is supported by OT-2 only.")
-        self._hardware = cast(OT2HardwareControlAPI, hardware)
+        self._hardware = hardware
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
@@ -142,7 +142,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> OT2HardwareControlAPI:
+    def hardware(self) -> OT3HardwareControlAPI:
         return self._hardware
 
     @property

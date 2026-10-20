@@ -4,7 +4,6 @@ import isEqual from 'lodash/isEqual'
 import {
   LabwareOutline,
   LabwareRender,
-  RobotCoordsForeignDiv,
   RobotWorkSpace,
 } from '@opentrons/components'
 import {
@@ -12,7 +11,7 @@ import {
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
 
-import styles from './ConditionalLabwareRender.module.css'
+import { MissingInfoPlaceholder } from './MissingInfoPlaceholder'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -106,30 +105,19 @@ const PopulatedPreview = (props: {
 
 const Placeholder = (): JSX.Element => {
   return (
-    <RobotWorkSpace
-      viewBox={`0 0 ${DEFAULT_X_DIMENSION} ${DEFAULT_Y_DIMENSION}`}
-    >
-      {() => (
-        <>
+    <MissingInfoPlaceholder>
+      <RobotWorkSpace
+        viewBox={`0 0 ${DEFAULT_X_DIMENSION} ${DEFAULT_Y_DIMENSION}`}
+      >
+        {() => (
           <LabwareOutline
             minX={0}
             minY={0}
             width={DEFAULT_X_DIMENSION}
             height={DEFAULT_Y_DIMENSION}
           />
-          <RobotCoordsForeignDiv
-            x={0}
-            y={0}
-            width={DEFAULT_X_DIMENSION}
-            height={DEFAULT_Y_DIMENSION}
-            innerDivProps={{ className: styles.error_text_wrapper }}
-          >
-            <div className={styles.error_text}>
-              Add missing info to see labware preview
-            </div>
-          </RobotCoordsForeignDiv>
-        </>
-      )}
-    </RobotWorkSpace>
+        )}
+      </RobotWorkSpace>
+    </MissingInfoPlaceholder>
   )
 }
