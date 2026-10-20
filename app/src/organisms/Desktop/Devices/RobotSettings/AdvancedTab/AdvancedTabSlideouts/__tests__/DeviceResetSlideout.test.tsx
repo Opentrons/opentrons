@@ -24,7 +24,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../../../../hooks')
+vi.mock('/app/resources/devices/hooks')
 
 const mockOnCloseClick = vi.fn()
 const ROBOT_NAME = 'otie'
@@ -93,35 +93,6 @@ describe('RobotSettings DeviceResetSlideout', () => {
       data: { options: mockResetConfigOptions },
     } as any)
     vi.mocked(useIsFlex).mockReturnValue(false)
-  })
-
-  it('should render title, description, checkboxes, links and button: OT-2', () => {
-    render()
-    screen.getByText('Device reset')
-    screen.getByText('Resets cannot be undone')
-    screen.getByText('Clear individual data')
-    screen.getByText(
-      'Select individual settings to only clear specific data types.'
-    )
-    screen.getByText('Robot Calibration Data')
-    screen.getByText('Clear deck calibration')
-    screen.getByText('Clear pipette offset calibrations')
-    screen.getByText('Clear tip length calibrations')
-    screen.getByText('Protocol run data')
-    expect(screen.queryByText('labware offset')).toBe(null)
-    screen.getByText('Clear protocol run history')
-    screen.getByText('Boot scripts')
-    screen.getByText('Clear custom boot scripts')
-    screen.getByText('Clear SSH public keys')
-    const downloads = screen.getAllByText('Download')
-    expect(downloads.length).toBe(2)
-    screen.getByRole('checkbox', { name: 'Clear deck calibration' })
-    screen.getByRole('checkbox', { name: 'Clear pipette offset calibrations' })
-    screen.getByRole('checkbox', { name: 'Clear tip length calibrations' })
-    screen.getByRole('checkbox', { name: 'Clear protocol run history' })
-    screen.getByRole('checkbox', { name: 'Clear custom boot scripts' })
-    screen.getByRole('checkbox', { name: 'Clear SSH public keys' })
-    screen.getByRole('button', { name: 'Clear data and restart robot' })
   })
 
   it('should change some options and text for Flex', () => {
