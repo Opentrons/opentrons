@@ -163,6 +163,7 @@ export function SimpleWizardBodyContent(props: Props): ReactNode {
                 size={isOnDevice ? '3.75rem' : '2.5rem'}
                 color={iconColor}
                 aria-label="ot-alert"
+                marginBottom={SPACING.spacing24}
               />
             )}
             <LegacyStyledText

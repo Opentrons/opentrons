@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -6,6 +6,10 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
+import {
+  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
+  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
+} from '../constants'
 import { PasswordComplexity } from '../PasswordComplexity'
 
 import type { ComponentProps } from 'react'
@@ -30,6 +34,20 @@ const render = (props: ComponentProps<typeof PasswordComplexity>): void => {
   renderWithProviders(<PasswordComplexity {...props} />, {
     i18nInstance: i18n,
   })
+}
+
+const clickHeaderConfirm = (): void => {
+  fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+}
+
+const clickModalConfirm = (): void => {
+  fireEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: 'Confirm' })
+  )
+}
+
+const clickHeaderCancel = (): void => {
+  fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
 }
 
 describe('PasswordComplexity', () => {
@@ -57,6 +75,12 @@ describe('PasswordComplexity', () => {
     screen.getByText('Require special characters')
     screen.getByText('Minimum password length')
     screen.getByText('8 chars')
+    expect(
+      screen.queryByTestId('ChildNavigation_Primary_Button')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ChildNavigation_Secondary_Button')
+    ).not.toBeInTheDocument()
   })
 
   it('hides preferences when password complexity is disabled', () => {
@@ -73,7 +97,7 @@ describe('PasswordComplexity', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows a warning modal before enabling complexity and cancels without patching', () => {
+  it('stages enabling complexity and shows a warning on confirm', () => {
     props.authSettings = {
       ...MOCK_AUTH_SETTINGS,
       passwordComplexityMinimumLength: null,
@@ -82,20 +106,49 @@ describe('PasswordComplexity', () => {
     render(props)
 
     fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
+    screen.getByText('Preferences')
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+
+    clickHeaderConfirm()
     screen.getByText('Require password complexity?')
     screen.getByText(
       'Enabling this setting will require users to reset their passwords to meet the new requirements the next time they sign in.'
     )
     expect(props.patchAuthSettings).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByText('Cancel'))
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' })
+    )
     expect(
       screen.queryByText('Require password complexity?')
     ).not.toBeInTheDocument()
     expect(props.patchAuthSettings).not.toHaveBeenCalled()
   })
 
-  it('patches default complexity settings when the warning is confirmed', () => {
+  it('discards staged changes when the header cancel button is clicked', () => {
+    render(props)
+
+    fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
+    expect(screen.queryByText('Preferences')).not.toBeInTheDocument()
+    screen.getByTestId('ChildNavigation_Secondary_Button')
+
+    clickHeaderCancel()
+
+    screen.getByText('Preferences')
+    screen.getByText('8 chars')
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+    expect(
+      screen.queryByTestId('ChildNavigation_Secondary_Button')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ChildNavigation_Primary_Button')
+    ).not.toBeInTheDocument()
+  })
+
+  it('patches staged complexity settings when the warning is confirmed', () => {
     props.authSettings = {
       ...MOCK_AUTH_SETTINGS,
       passwordComplexityMinimumLength: null,
@@ -104,34 +157,65 @@ describe('PasswordComplexity', () => {
     render(props)
 
     fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
-    fireEvent.click(screen.getByText('Confirm'))
+    clickHeaderConfirm()
+    clickModalConfirm()
 
-    expect(props.patchAuthSettings).toHaveBeenCalledWith({
-      passwordComplexitySpecialCharacters: true,
-      passwordComplexityMinimumLength: 8,
-    })
+    expect(props.patchAuthSettings).toHaveBeenCalledWith(
+      DEFAULT_PASSWORD_COMPLEXITY_SETTINGS
+    )
   })
 
-  it('clears complexity settings when the requirement is turned off', () => {
+  it('patches cleared complexity settings when turning the requirement off', () => {
     render(props)
 
     fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
-    expect(props.patchAuthSettings).toHaveBeenCalledWith({
-      passwordComplexitySpecialCharacters: false,
-      passwordComplexityMinimumLength: null,
-    })
+    expect(screen.queryByText('Preferences')).not.toBeInTheDocument()
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+
+    clickHeaderConfirm()
+    expect(props.patchAuthSettings).toHaveBeenCalledWith(
+      DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS
+    )
   })
 
-  it('patches special character requirement when that toggle is clicked', () => {
+  it('patches special character requirement after confirm', () => {
     render(props)
 
     fireEvent.click(screen.getByText('Require special characters'))
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+
+    clickHeaderConfirm()
     expect(props.patchAuthSettings).toHaveBeenCalledWith({
+      passwordComplexityMinimumLength: 8,
       passwordComplexitySpecialCharacters: false,
+    })
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+  })
+
+  it('warns before confirming a newly required special character setting', () => {
+    props.authSettings = {
+      ...MOCK_AUTH_SETTINGS,
+      passwordComplexitySpecialCharacters: false,
+    }
+    render(props)
+
+    fireEvent.click(screen.getByText('Require special characters'))
+    clickHeaderConfirm()
+    screen.getByText('Require password complexity?')
+
+    clickModalConfirm()
+    expect(props.patchAuthSettings).toHaveBeenCalledWith({
+      passwordComplexityMinimumLength: 8,
+      passwordComplexitySpecialCharacters: true,
     })
   })
 
-  it('opens minimum length and patches the entered value', () => {
+  it('stages a longer minimum length and patches it after the warning', () => {
     render(props)
 
     fireEvent.click(screen.getByText('Minimum password length'))
@@ -142,10 +226,37 @@ describe('PasswordComplexity', () => {
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
 
+    expect(props.patchAuthSettings).not.toHaveBeenCalled()
+    screen.getByText('Preferences')
+    screen.getByText('12 chars')
+
+    clickHeaderConfirm()
+    screen.getByText('Require password complexity?')
+    clickModalConfirm()
+
     expect(props.patchAuthSettings).toHaveBeenCalledWith({
       passwordComplexityMinimumLength: 12,
+      passwordComplexitySpecialCharacters: true,
     })
-    screen.getByText('Preferences')
+  })
+
+  it('patches a shorter minimum length without a warning', () => {
+    render(props)
+
+    fireEvent.click(screen.getByText('Minimum password length'))
+    fireEvent.change(screen.getByLabelText('Number of characters'), {
+      target: { value: '4' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    clickHeaderConfirm()
+
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+    expect(props.patchAuthSettings).toHaveBeenCalledWith({
+      passwordComplexityMinimumLength: 4,
+      passwordComplexitySpecialCharacters: true,
+    })
   })
 
   it('calls onClickBack from the main page', () => {
@@ -162,11 +273,11 @@ describe('PasswordComplexity', () => {
     expect(screen.queryByText('Preferences')).not.toBeInTheDocument()
 
     fireEvent.click(screen.getAllByText('Password complexity requirements')[1])
-    fireEvent.click(screen.getByText('Confirm'))
+    clickHeaderConfirm()
+    clickModalConfirm()
 
-    expect(props.patchAuthSettings).toHaveBeenCalledWith({
-      passwordComplexitySpecialCharacters: true,
-      passwordComplexityMinimumLength: 8,
-    })
+    expect(props.patchAuthSettings).toHaveBeenCalledWith(
+      DEFAULT_PASSWORD_COMPLEXITY_SETTINGS
+    )
   })
 })

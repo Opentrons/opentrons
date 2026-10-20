@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import axios from 'axios'
 import clsx from 'clsx'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
@@ -15,7 +16,7 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { useLogout, useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
@@ -59,6 +60,8 @@ const LoginModalImpl = NiceModal.create(
       (state: State) => getLocalRobot(state)?.name ?? null
     )
     const loggedInUsername = useUsernameForRobot(localRobotName)
+
+    const logout = useLogout()
 
     const isChoosingNewPassword = phase === 'chooseNewPassword'
 
@@ -125,6 +128,16 @@ const LoginModalImpl = NiceModal.create(
         await validateSelfPassword({ data: { password } })
         return null
       } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            return (
+              '' +
+              t('set_new_password_error_session_expired', {
+                ns: 'access_control',
+              })
+            )
+          }
+        }
         return mapSetNewPasswordError(error, t)
       } finally {
         setIsValidatingNewPassword(false)
@@ -179,6 +192,9 @@ const LoginModalImpl = NiceModal.create(
         : null
 
     const handleCancel = (): void => {
+      if (!!loggedInUsername) {
+        logout()
+      }
       dismissModal()
     }
 
