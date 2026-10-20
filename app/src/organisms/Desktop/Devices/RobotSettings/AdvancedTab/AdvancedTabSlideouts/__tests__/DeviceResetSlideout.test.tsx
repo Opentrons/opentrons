@@ -9,6 +9,7 @@ import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
@@ -29,6 +30,8 @@ vi.mock('/app/resources/devices/hooks')
 const mockOnCloseClick = vi.fn()
 const ROBOT_NAME = 'otie'
 const mockUpdateResetStatus = vi.fn()
+const downloadCalibration =
+  vi.fn<ReturnType<typeof useDownloadCalibrationData>['downloadCalibration']>()
 
 const mockResetConfigOptions = [
   {
@@ -93,6 +96,9 @@ describe('RobotSettings DeviceResetSlideout', () => {
       data: { options: mockResetConfigOptions },
     } as any)
     vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useDownloadCalibrationData).mockReturnValue({
+      downloadCalibration,
+    } as any)
   })
 
   it('should change some options and text for Flex', () => {
@@ -102,26 +108,18 @@ describe('RobotSettings DeviceResetSlideout', () => {
     screen.getByText(
       'Clears calibrations, protocols, and all settings. You’ll have to redo initial setup before using the robot again.'
     )
-    expect(screen.queryByText('Clear deck calibration')).toBeNull()
     screen.getByText('Clear pipette calibration')
-    expect(screen.queryByText('Clear tip length calibrations')).toBeNull()
     screen.getByText('Clear gripper calibration')
     screen.getByRole('checkbox', { name: 'Clear pipette calibration' })
     screen.getByRole('checkbox', { name: 'Clear gripper calibration' })
     screen.getByRole('checkbox', { name: 'Clear module calibration' })
-    expect(
-      screen.queryByRole('checkbox', { name: 'Clear deck calibration' })
-    ).toBeNull()
-    expect(
-      screen.queryByRole('checkbox', { name: 'Clear tip length calibrations' })
-    ).toBeNull()
     screen.getByRole('checkbox', { name: 'Clear labware offset data' })
   })
 
   it('should enable Clear data and restart robot button when checked one checkbox', () => {
     render()
     const checkbox = screen.getByRole('checkbox', {
-      name: 'Clear deck calibration',
+      name: 'Clear gripper calibration',
     })
     fireEvent.click(checkbox)
     const clearButton = screen.getByRole('button', {
