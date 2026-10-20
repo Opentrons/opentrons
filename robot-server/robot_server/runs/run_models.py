@@ -1,14 +1,13 @@
 """Request and response models for run resources."""
 
 from datetime import datetime
-from typing import Annotated, Dict, List, Literal, Optional
+from typing import Annotated, Dict, List, Literal, Optional, Any
 
 from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
     CommandIntent,
     CommandNote,
-    CommandParams,
     CommandStatus,
     CommandType,
     ErrorOccurrence,
@@ -62,14 +61,14 @@ class RunCommandSummary(ResourceModel):
         description="An identifier representing this command as a step in a protocol.",
     )
     commandType: CommandType = Field(..., description="Specific type of command.")
-    createdAt: datetime = Field(..., description="Command creation timestamp")
-    startedAt: Optional[datetime] = Field(
+    createdAt: str = Field(..., description="Command creation timestamp as a JSON string.")
+    startedAt: Optional[str] = Field(
         None,
-        description="Command execution start timestamp, if started",
+        description="Command execution start timestamp, if started, as a JSON string.",
     )
-    completedAt: Optional[datetime] = Field(
+    completedAt: Optional[str] = Field(
         None,
-        description="Command execution completed timestamp, if completed",
+        description="Command execution completed timestamp, if completed, as a JSON string.",
     )
     status: CommandStatus = Field(..., description="Execution status of the command.")
     error: Optional[ErrorOccurrence] = Field(
@@ -78,7 +77,7 @@ class RunCommandSummary(ResourceModel):
     )
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
-    params: CommandParams = Field(..., description="Command execution parameters.")
+    params: dict[str, Any] = Field(..., description="Command execution parameters as a JSON dict.")
     intent: Optional[CommandIntent] = Field(
         None,
         description="Why this command was added to the run.",

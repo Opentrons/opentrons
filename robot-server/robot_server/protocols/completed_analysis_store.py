@@ -247,6 +247,7 @@ class CompletedAnalysisStore:
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
+        # CASEY NOTE: This is responsible for a 254 MB jump on the 40k protocol
         with self._sql_engine.begin() as transaction:
             results = transaction.execute(statement).all()
 

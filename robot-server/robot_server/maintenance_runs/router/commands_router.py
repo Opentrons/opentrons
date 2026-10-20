@@ -289,6 +289,7 @@ async def get_run_commands(
         run_id=runId
     )
 
+    # CASEY NOTE We'll need to do it here too
     data = [
         RunCommandSummary.model_construct(
             id=c.id,

@@ -11,6 +11,8 @@ from robot_server.protocols.protocol_store import ProtocolNotFoundError, Protoco
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary
 from robot_server.runs.run_store import BadRunResource, RunResource
+from opentrons.protocol_engine import CommandStatus
+from robot_server.persistence.pydantic import json_to_pydantic
 
 
 def collect_protocol_file(
@@ -75,25 +77,33 @@ async def collect_run_log(
             length=length_probe.total_length,
             include_fixit_commands=True,
         )
+        commands_list = [json.loads(c) for c in command_slice.commands]
+        
         command_summaries = [
             RunCommandSummary.model_construct(
-                id=c.id,
-                key=c.key,
-                commandType=c.commandType,
-                intent=c.intent,
-                status=c.status,
-                createdAt=c.createdAt,
-                startedAt=c.startedAt,
-                completedAt=c.completedAt,
-                params=c.params,
-                error=c.error,
-                notes=c.notes,
-                failedCommandId=c.failedCommandId,
-                commandAnnotationIds=c.commandAnnotationIds
-                if c.commandAnnotationIds
+                id=c["id"],
+                key=c["key"],
+                commandType=c["commandType"],
+                intent=c.get("intent")
+                if c.get("intent")
+                else None,
+                status=CommandStatus(c["status"]),
+                createdAt=c["createdAt"],
+                startedAt=c["startedAt"],
+                completedAt=c["completedAt"],
+                params=c["params"],
+                error=c.get("error")
+                if c.get("error")
+                else None,
+                notes=c["notes"],
+                failedCommandId=c.get("failedCommandId")
+                if c.get("failedCommandId")
+                else None,
+                commandAnnotationIds=c.get("commandAnnotationIds")
+                if c.get("commandAnnotationIds")
                 else None,
             ).model_dump(mode="json", by_alias=True)
-            for c in command_slice.commands
+            for c in commands_list
         ]
 
         run_details = {

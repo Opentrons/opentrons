@@ -15,9 +15,11 @@ from typing import (
 from opentrons import config
 from opentrons.protocol_engine import (
     Command,
+    CommandAdapter,
     CommandErrorSlice,
     CommandPointer,
     CommandSlice,
+    JsonCommandSlice,
     EngineStatus,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
@@ -50,6 +52,7 @@ from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
+from robot_server.persistence.pydantic import json_to_pydantic
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -518,7 +521,7 @@ class RunDataManager:
         cursor: Optional[int],
         length: int,
         include_fixit_commands: bool,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
@@ -534,11 +537,18 @@ class RunDataManager:
             run_id == self._run_orchestrator_store.current_run_id
             and not await self._run_orchestrator_store.get_commands_deleted()
         ):
-            return await self._run_orchestrator_store.get_command_slice(
+            # CASEY NOTE: move this logic down into protocol engine
+            commands_slice = await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
                 include_fixit_commands=include_fixit_commands,
             )
+            converted_slice = JsonCommandSlice(
+                cursor=commands_slice.cursor,
+                total_length=commands_slice.total_length,
+                commands=[command.model_dump_json(by_alias=True, exclude_none=True) for command in commands_slice.commands]
+            )
+            return converted_slice
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
@@ -778,7 +788,7 @@ class RunDataManager:
         )
         if not command_slice.commands:
             return None
-        command = command_slice.commands[-1]
+        command = json_to_pydantic(CommandAdapter, command_slice.commands[-1])
 
         return (
             CommandPointer(

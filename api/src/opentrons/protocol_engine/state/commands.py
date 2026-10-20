@@ -137,6 +137,15 @@ class CommandSlice(BaseModel):
     cursor: int
     total_length: int
 
+class JsonCommandSlice(BaseModel):
+    """A subset of all commands in state in JSON format."""
+
+    model_config = ConfigDict(frozen=True)
+
+    commands: List[str]
+    cursor: int
+    total_length: int
+
 
 class CommandErrorSlice(BaseModel):
     """A subset of all commands errors in state."""
