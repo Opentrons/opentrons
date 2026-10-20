@@ -1964,6 +1964,14 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             )
             last_probed_tip_size = tip
             remove_tip(fixture_settings)
+            # Keep the fresh probe. Otherwise run_one_test() subtracts the
+            # absolute scale change since the previous tip's last trial from
+            # the just-probed volume, and channels 0-3 aspirate at the wrong
+            # height (seen as tip above liquid after switching to T200).
+            last_measurement = None
+            print_info(
+                f"Tip size changed to {tip}: LLD done, cleared last_measurement"
+            )
 
         volumes_to_tests = fixture_settings.volumes[tip]
         if tip in tip_sizes_done or len(fixture_settings.volumes[tip]) == 0:
