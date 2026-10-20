@@ -3,17 +3,17 @@ import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { OLD_API_TRANSLATIONS } from '../__fixtures__/legacyTextStyleFixtures'
+import {
+  DESKTOP_STYLE_TRANSLATIONS,
+  ODD_STYLE_TRANSLATIONS,
+} from '../__fixtures__/styledTextStyleFixtures'
 import { TYPOGRAPHY as HELIX_TYPOGRAPHY } from '../../../helix-design-system/product'
 import { renderWithProviders } from '../../../testing/utils'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 import legacyStyles from '../legacystyledtext.module.css'
 import { StyledText } from '../StyledText'
 import styles from '../styledtext.module.css'
-import {
-  DESKTOP_STYLE_TRANSLATIONS,
-  ODD_STYLE_TRANSLATIONS,
-  OLD_API_TRANSLATIONS,
-} from '../__fixtures__'
 
 import type { ComponentProps } from 'react'
 

@@ -10,6 +10,7 @@ import {
 
 import type { ComponentProps, CSSProperties, ReactNode } from 'react'
 import type { StyleProps } from '../../primitives/types'
+import type { LegacyFontWeight, LegacyTextTag } from './legacyTextStyles'
 import type { DesktopStyles, ODDStyles } from './styledTextStyles'
 
 export type { DesktopStyles, ODDStyles } from './styledTextStyles'
@@ -48,7 +49,11 @@ export function StyledText({
     : resolveStyledTextStyles({ desktopStyle, oddStyle })
 
   const legacyClassName = useLegacyStyles
-    ? resolveLegacyTextStyle({ as, forwardedAs, fontWeight })
+    ? resolveLegacyTextStyle({
+        as: as as LegacyTextTag | undefined,
+        forwardedAs: forwardedAs as LegacyTextTag | undefined,
+        fontWeight: fontWeight as LegacyFontWeight | undefined,
+      })
     : null
 
   const tag = useLegacyStyles

@@ -1,12 +1,14 @@
 import { TYPOGRAPHY } from '../../../ui-style-constants'
 import styles from '../legacystyledtext.module.css'
 
+import type { LegacyFontWeight, LegacyTextTag } from '../legacyTextStyles'
+
 /**
  * Old LegacyStyledText API cases copied from LegacyStyledText.
  */
 export const OLD_API_TRANSLATIONS: Array<{
-  as: keyof JSX.IntrinsicElements
-  fontWeight?: string | number
+  as: LegacyTextTag
+  fontWeight?: LegacyFontWeight
   className: string
   label: string
 }> = [
