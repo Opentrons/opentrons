@@ -1,62 +1,32 @@
-from typing import Annotated, Dict
-
-from fastapi import APIRouter, Query, Response
-
-from opentrons.system import log_control
-
-from robot_server.service.legacy.models.logs import LogFormat, LogIdentifier
+from fastapi import APIRouter, Request, Response, status
+from fastapi.responses import RedirectResponse
 
 router = APIRouter()
-
-IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
-    LogIdentifier.api: "opentrons-api",
-    LogIdentifier.serial: log_control.SERIAL_SPECIAL,
-    LogIdentifier.server: "uvicorn",
-    LogIdentifier.api_server: "opentrons-robot-server",
-    LogIdentifier.update_server: "opentrons-update-server",
-    LogIdentifier.touchscreen: "opentrons-robot-app",
-    LogIdentifier.can: "opentrons-api-serial-can",
-    LogIdentifier.auth: "opentrons-auth-server",
-    LogIdentifier.audit: "opentrons-audit-server",
-    LogIdentifier.kernel: log_control.KERNEL_SPECIAL,
-    LogIdentifier.remote_access: log_control.REMOTE_ACCESS_SPECIAL,
-}
 
 
 @router.get(
     path="/logs/{log_identifier}",
     summary="Get troubleshooting logs",
     description=(
-        "Get the robot's troubleshooting logs."
+        "Permanently moved to `GET /system/logs/{log_identifier}`."
         "\n\n"
         "If you want the list of steps executed in a protocol,"
         ' like "aspirated 5 µL from well A1...", you probably want the'
         " *protocol analysis commands* (`GET /protocols/{id}/analyses/{id}`)"
         " or *run commands* (`GET /runs/{id}/commands`) instead."
     ),
+    status_code=status.HTTP_301_MOVED_PERMANENTLY,
+    response_class=RedirectResponse,
 )
 async def get_logs(
-    log_identifier: LogIdentifier,
-    response: Response,
-    format: Annotated[LogFormat, Query(title="Log format type")] = LogFormat.text,
-    records: Annotated[
-        int,
-        Query(
-            title="Number of records to retrieve",
-            gt=0,
-            le=log_control.MAX_RECORDS,
-        ),
-    ] = log_control.DEFAULT_RECORDS,
-) -> Response:
-    syslog_id = IDENTIFIER_TO_SYSLOG_ID[log_identifier]
-    modes = {
-        LogFormat.json: ("json", "application/json"),
-        LogFormat.text: ("short-precise", "text/plain"),
-    }
-    format_type, media_type = modes[format]
-    output = await log_control.get_records_dumb(syslog_id, records, format_type)
-    return Response(
-        content=output.decode("utf-8"),
-        media_type=media_type,
+    log_identifier: str, request: Request, response: Response
+) -> RedirectResponse:
+    """Redirect to the system-server logs endpoint."""
+    url = f"/system/logs/{log_identifier}"
+    if request.url.query:
+        url = f"{url}?{request.url.query}"
+    return RedirectResponse(
+        url=url,
+        status_code=status.HTTP_301_MOVED_PERMANENTLY,
         headers=dict(response.headers),
     )

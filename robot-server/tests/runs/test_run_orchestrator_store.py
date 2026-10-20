@@ -3,13 +3,15 @@
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
+from typing import Literal
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons.config import feature_flags
-from opentrons.hardware_control import API, HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
     EstopState,
@@ -31,7 +33,6 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -66,8 +67,8 @@ async def subject(
         hardware_api=hardware_api,
         # Arbitrary choice of robot and deck type. Tests where these matter should
         # construct their own EngineStore.
-        robot_type="OT-2 Standard",
-        deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
+        robot_type="OT-3 Standard",
+        deck_type=pe_types.DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
         command_store_provider=CommandStoreProvider(),
@@ -124,20 +125,19 @@ async def test_create_engine(
     assert isinstance(subject._run_coordinator, RunOrchestrator)
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
     decoy: Decoy,
-    robot_type: RobotType,
     deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
+    robot_type: Literal["OT-3 Standard"] = "OT-3 Standard"
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    hardware_api = decoy.mock(cls=OT3API)
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
@@ -172,7 +172,7 @@ async def test_create_engine_with_labware_offsets(
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     labware_offset = pe_types.LegacyLabwareOffsetCreate(
         definitionUri="namespace/load_name/version",
-        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -194,10 +194,12 @@ async def test_create_engine_with_labware_offsets(
             id=matchers.IsA(str),
             createdAt=matchers.IsA(datetime),
             definitionUri="namespace/load_name/version",
-            location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+            location=pe_types.LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_C2
+            ),
             locationSequence=[
                 pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="5"
+                    addressableAreaName="C2"
                 )
             ],
             vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
@@ -381,20 +383,19 @@ async def test_get_default_orchestrator_idempotent(
     assert repeated_result is result
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_orchestrator_robot_type(
     decoy: Decoy,
-    robot_type: RobotType,
     deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
+    robot_type: Literal["OT-3 Standard"] = "OT-3 Standard"
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    hardware_api = decoy.mock(cls=OT3API)
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,

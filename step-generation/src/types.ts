@@ -1275,6 +1275,11 @@ export interface WaitForTemperatureStepGenArgs {
   celsius: number | string
 }
 
+export interface EngageMagnetStepGenArgs {
+  moduleId: string
+  height: number | string
+}
+
 export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
   moduleId: string
   rpm: number | string
@@ -1288,6 +1293,15 @@ interface RuntimeWellLocation {
     z?: number | string
   }
 }
+
+export interface LiquidProbeStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+}
+
+export type TryLiquidProbeStepGenArgs = LiquidProbeStepGenArgs
 
 export interface TouchTipStepGenArgs {
   pipetteId: string
@@ -1370,4 +1384,42 @@ export interface AspirateInPlaceStepGenArgs {
 
 export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
   celsius: number | string
+}
+
+export interface MoveRelativeStepGenArgs {
+  pipetteId: string
+  axis: string
+  distance: number | string
+}
+
+export interface MoveToCoordinatesStepGenArgs {
+  pipetteId: string
+  coordinates: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+}
+
+export interface MoveToWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  speed?: number | string
+}
+
+export interface MoveLabwareStepGenArgs {
+  labwareId: string
+  strategy: string
+  newLocation:
+    | string
+    | { slotName: string }
+    | { moduleId: string }
+    | { labwareId: string }
+    | { addressableAreaName: string }
 }

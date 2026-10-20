@@ -146,6 +146,7 @@ const _getLabwareCompatibleWithFlexStacker = (
     def.parameters.loadName
   ) ||
   def.metadata.displayCategory === 'wellPlate' ||
+  def.metadata.displayCategory === 'filterPlate' ||
   def.metadata.displayCategory === 'reservoir'
 
 const _getLabwareCompatibleWithVacuumModule = (

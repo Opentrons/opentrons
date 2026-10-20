@@ -53,6 +53,14 @@ vi.mock('/app/redux/discovery', async importOriginal => {
   }
 })
 
+vi.mock('/app/redux/robot-auth', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useLogout: vi.fn(),
+  }
+})
+
 vi.mock('/app/resources/auth')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,

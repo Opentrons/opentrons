@@ -27,7 +27,6 @@ import slot7LeftMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT
 import slot7LeftSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
 import slot7RightMultiDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '/app/assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
-import { useLogger } from '/app/logger'
 import {
   JogControls,
   MEDIUM_STEP_SIZE_MM,
@@ -130,7 +129,6 @@ const contentsBySessionTypeByCurrentStep: {
 
 export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const logger = useLogger(new URL('', import.meta.url).pathname)
   const {
     isMulti,
     mount,
@@ -156,8 +154,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
     useConfirmCrashRecovery(props)
 
   if (slotNumber == null) {
-    logger.warn(
-      `Failed to render SaveXYPoint component. no valid slot name associated with {sessionType: ${sessionType}, currentStep: ${currentStep}}`
+    console.warn(
+      `[app/src/organisms/Desktop/CalibrationPanels/SaveXYPoint.tsx]: Failed to render SaveXYPoint component. no valid slot name associated with {sessionType: ${sessionType}, currentStep: ${currentStep}}`
     )
     return null
   }

@@ -13,7 +13,14 @@ import {
 import { NOT_OT2_PROTOCOLS_DIRECTORY_PATH } from '../file-system'
 
 vi.mock('electron-store')
-vi.mock('../../log')
+vi.mock('../../log', () => ({
+  createLogger: () => ({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }),
+}))
 vi.mock('../../config', () => ({
   getConfig: vi.fn((path?: string) => {
     if (path === 'devInternal') {

@@ -208,8 +208,8 @@ def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None
     https://opentrons.atlassian.net/browse/RQA-1801
     """
     protocol = simulate.get_protocol_api(api_version)
-    pipette = protocol.load_instrument("p300_single_gen2", mount="left")
-    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+    pipette = protocol.load_instrument("flex_8channel_1000", mount="left")
+    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", 1)
     pipette.pick_up_tip(tip_rack["A1"])  # Should not raise.
 
 

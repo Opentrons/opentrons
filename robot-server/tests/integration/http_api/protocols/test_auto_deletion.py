@@ -28,7 +28,7 @@ async def test_protocols_auto_delete(
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(
-            port=port, maximum_unused_protocols=num_to_configure_as_maximum
+            is_ot3=True, port=port, maximum_unused_protocols=num_to_configure_as_maximum
         ) as server:
             server.start()
             await robot_client.wait_until_ready()

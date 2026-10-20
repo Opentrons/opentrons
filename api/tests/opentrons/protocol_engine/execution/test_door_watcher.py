@@ -6,7 +6,7 @@ import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 from opentrons.hardware_control.types import (
     DoorState,
     DoorStateNotification,
@@ -31,7 +31,7 @@ def hardware_control_api(
     decoy: Decoy,
 ) -> HardwareControlAPI:
     """Return a mock in the shape of a HardwareControlAPI."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
+    return decoy.mock(cls=OT3HardwareControlAPI)
 
 
 @pytest.fixture

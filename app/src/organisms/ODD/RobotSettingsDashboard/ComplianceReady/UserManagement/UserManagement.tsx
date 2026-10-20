@@ -20,10 +20,16 @@ export function UserManagement({
   onClickBack,
   users,
   loggedInUser,
+  editSelfHandlers,
 }: {
   onClickBack: () => void
   users: AuthUser[]
   loggedInUser: string
+  editSelfHandlers: {
+    onSaveNewUsername: (newUsername: string) => Promise<void>
+    onSaveNewPassword: (newPassword: string) => Promise<void>
+    onSaveNewLegalName: (newLegalName: string) => Promise<void>
+  }
 }): ReactNode {
   const { t } = useTranslation('device_settings')
   const [createUser, setCreateUser] = useState<boolean>(false)
@@ -70,6 +76,7 @@ export function UserManagement({
         passwordComplexity={passwordComplexity}
         {...currentUserInfo}
         {...editAccountHandlers(editUser)}
+        {...(editUser === loggedInUser ? editSelfHandlers : {})}
         adminView={editUser !== loggedInUser}
       />
     )

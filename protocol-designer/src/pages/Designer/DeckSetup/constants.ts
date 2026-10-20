@@ -69,6 +69,7 @@ export const ORDERED_CATEGORIES: string[] = [
   'tipRack',
   'tubeRack',
   'wellPlate',
+  'filterPlate',
   'reservoir',
   'aluminumBlock',
   'adapter',

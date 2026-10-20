@@ -44,9 +44,13 @@ describe('Preview', () => {
     render(wrapInFormik(<Preview />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/check your work/i)
     screen.getByText(
-      'Check that the size, spacing, and shape of your FAKE LABWARE NAME PLURAL looks correct.'
+      'Check that the size, spacing, shape, and height of your FAKE LABWARE NAME PLURAL looks correct.'
     )
-    screen.getByText('Add missing info to see labware preview')
+    expect(
+      screen.getAllByText('Add missing info to see labware preview')
+    ).toHaveLength(2)
+    screen.getByText('Top')
+    screen.getByText('Side')
   })
 })
 

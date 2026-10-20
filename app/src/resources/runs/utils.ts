@@ -123,7 +123,9 @@ export const chainMaintenanceCommandsRecursive = (
       if (!continuePastCommandFailure && response.data.status === 'failed') {
         setIsLoading(false)
         return Promise.reject(
-          new Error(response.data.error?.detail ?? 'command failed')
+          new Error(response.data.error?.detail ?? 'command failed', {
+            cause: response.data.error?.errorCode ?? undefined,
+          })
         )
       }
       if (commands.slice(1).length < 1) {
