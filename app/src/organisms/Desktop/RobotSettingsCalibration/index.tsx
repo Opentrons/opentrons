@@ -11,32 +11,23 @@ import {
   SpinnerModalPage,
 } from '@opentrons/components'
 import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { CONNECTABLE } from '/app/redux/discovery'
 import * as RobotApi from '/app/redux/robot-api'
 import * as Sessions from '/app/redux/sessions'
 import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import { CalibrateDeck } from '../CalibrateDeck'
-import { CalibrationStatusCard } from '../CalibrationStatusCard'
 import { CheckCalibration } from '../CheckCalibration'
 import { HowCalibrationWorksModal } from '../HowCalibrationWorksModal'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
-import { CalibrationHealthCheck } from './CalibrationHealthCheck'
-import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
-import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
 import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
@@ -84,9 +75,6 @@ export function RobotSettingsCalibration({
   const [showHowCalibrationWorksModal, setShowHowCalibrationWorksModal] =
     useState(false)
 
-  const robot = useRobot(robotName)
-  const notConnectable = robot?.status !== CONNECTABLE
-  const isFlex = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   useEffect(() => {
@@ -131,11 +119,7 @@ export function RobotSettingsCalibration({
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
-  useCalibrationStatusQuery({ refetchInterval: CALS_FETCH_MS })
-  useAllTipLengthCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
-  const pipetteOffsetCalibrations =
-    useAllPipetteOffsetCalibrationsQuery({ refetchInterval: CALS_FETCH_MS })
-      .data?.data ?? []
+
   const attachedInstruments =
     useInstrumentsQuery({ refetchInterval: CALS_FETCH_MS }).data?.data ?? []
   const attachedGripper =
@@ -143,8 +127,6 @@ export function RobotSettingsCalibration({
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     ) ?? null
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const pipettePresent =
-    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -174,14 +156,6 @@ export function RobotSettingsCalibration({
     }
   )
 
-  let buttonDisabledReason: string | null = null
-  if (notConnectable) {
-    buttonDisabledReason = t('shared:disabled_cannot_connect')
-  } else if (isRobotBusy) {
-    buttonDisabledReason = t('shared:disabled_robot_is_busy')
-  } else if (!pipettePresent) {
-    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
-  }
   const checkHealthSession = useSelector((state: State) => {
     const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
@@ -201,51 +175,19 @@ export function RobotSettingsCalibration({
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
     []
 
-  if (!isFlex && attachedPipettes != null) {
-    formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.left?.displayName,
-      serialNumber: attachedPipettes.left?.serialNumber,
-      mount: 'left' as Mount,
-      tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.serialNumber
-      )?.tiprackUri,
-      lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.serialNumber
-      )?.lastModified,
-      markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.left?.serialNumber
-      )?.status.markedBad,
-    })
-    formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.right?.displayName,
-      serialNumber: attachedPipettes.right?.serialNumber,
-      mount: 'right' as Mount,
-      tiprack: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.serialNumber
-      )?.tiprackUri,
-      lastCalibrated: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.serialNumber
-      )?.lastModified,
-      markedBad: pipetteOffsetCalibrations?.find(
-        p => p.pipette === attachedPipettes.right?.serialNumber
-      )?.status.markedBad,
-    })
-  } else {
-    formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.left?.displayName,
-      serialNumber: attachedPipettes.left?.serialNumber,
-      mount: 'left' as Mount,
-      lastCalibrated:
-        attachedPipettes.left?.data.calibratedOffset?.last_modified,
-    })
-    formattedPipetteOffsetCalibrations.push({
-      modelName: attachedPipettes.right?.displayName,
-      serialNumber: attachedPipettes.right?.serialNumber,
-      mount: 'right' as Mount,
-      lastCalibrated:
-        attachedPipettes.right?.data.calibratedOffset?.last_modified,
-    })
-  }
+  formattedPipetteOffsetCalibrations.push({
+    modelName: attachedPipettes.left?.displayName,
+    serialNumber: attachedPipettes.left?.serialNumber,
+    mount: 'left' as Mount,
+    lastCalibrated: attachedPipettes.left?.data.calibratedOffset?.last_modified,
+  })
+  formattedPipetteOffsetCalibrations.push({
+    modelName: attachedPipettes.right?.displayName,
+    serialNumber: attachedPipettes.right?.serialNumber,
+    mount: 'right' as Mount,
+    lastCalibrated:
+      attachedPipettes.right?.data.calibratedOffset?.last_modified,
+  })
 
   useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
@@ -320,71 +262,27 @@ export function RobotSettingsCalibration({
           }}
         />
       ) : null}
-      {isFlex ? (
-        <>
-          <CalibrationDataDownload
-            {...{ robotName, setShowHowCalibrationWorksModal }}
-          />
-          <Divider marginTop={SPACING.spacing24} marginBottom={0} />
-          <RobotSettingsPipetteOffsetCalibration
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-          <Divider marginY={0} />
-          <RobotSettingsGripperCalibration
-            gripper={attachedGripper}
-            robotName={robotName}
-          />
-          <Divider marginY={0} />
-          <RobotSettingsModuleCalibration
-            attachedModules={attachedModules}
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-        </>
-      ) : (
-        <>
-          <CalibrationStatusCard
-            {...{ robotName, setShowHowCalibrationWorksModal }}
-          />
-          <RobotSettingsDeckCalibration robotName={robotName} />
-          <Divider marginY={0} />
-          <RobotSettingsPipetteOffsetCalibration
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-          <Divider marginY={0} />
-          <RobotSettingsTipLengthCalibration
-            formattedPipetteOffsetCalibrations={
-              formattedPipetteOffsetCalibrations
-            }
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-          <Divider marginY={0} />
-          <CalibrationHealthCheck
-            buttonDisabledReason={buttonDisabledReason}
-            dispatchRequests={dispatchRequests}
-            isPending={isPending}
-            robotName={robotName}
-            isRobotBusy={isRobotBusy}
-          />
-          <Divider marginBottom={SPACING.spacing24} />
-          <CalibrationDataDownload
-            robotName={robotName}
-            setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
-          />
-        </>
-      )}
+      <CalibrationDataDownload
+        {...{ robotName, setShowHowCalibrationWorksModal }}
+      />
+      <Divider marginTop={SPACING.spacing24} marginBottom={0} />
+      <RobotSettingsPipetteOffsetCalibration
+        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+        robotName={robotName}
+        isRobotBusy={isRobotBusy}
+      />
+      <Divider marginY={0} />
+      <RobotSettingsGripperCalibration
+        gripper={attachedGripper}
+        robotName={robotName}
+      />
+      <Divider marginY={0} />
+      <RobotSettingsModuleCalibration
+        attachedModules={attachedModules}
+        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
+        robotName={robotName}
+        isRobotBusy={isRobotBusy}
+      />
     </>
   )
 }

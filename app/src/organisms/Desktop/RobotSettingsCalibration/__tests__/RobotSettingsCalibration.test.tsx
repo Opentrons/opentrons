@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
@@ -8,13 +8,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { usePipetteOffsetCalibrations } from '/app/organisms/Desktop/Devices/hooks'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-  mockPipetteOffsetCalibration3,
-} from '/app/redux/calibration/pipette-offset/__fixtures__'
 import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
@@ -29,14 +23,10 @@ import {
 import { useRunStatuses } from '/app/resources/runs'
 
 import { RobotSettingsCalibration } from '..'
-import { CalibrationStatusCard } from '../..//CalibrationStatusCard'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
-import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
-import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
-import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 
 import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
@@ -48,7 +38,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useInstrumentsQuery: vi.fn(),
   }
 })
-vi.mock('../../CalibrationStatusCard')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
@@ -57,11 +46,8 @@ vi.mock('/app/resources/instruments')
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/resources/runs')
 vi.mock('../CalibrationDataDownload')
-vi.mock('../CalibrationHealthCheck')
-vi.mock('../RobotSettingsDeckCalibration')
 vi.mock('../RobotSettingsGripperCalibration')
 vi.mock('../RobotSettingsPipetteOffsetCalibration')
-vi.mock('../RobotSettingsTipLengthCalibration')
 vi.mock('../RobotSettingsModuleCalibration')
 vi.mock('/app/organisms/Desktop/CalibrationError')
 
@@ -103,37 +89,20 @@ describe('RobotSettingsCalibration', () => {
         ],
       },
     } as any)
-    vi.mocked(usePipetteOffsetCalibrations).mockReturnValue([
-      mockPipetteOffsetCalibration1,
-      mockPipetteOffsetCalibration2,
-      mockPipetteOffsetCalibration3,
-    ])
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
     vi.mocked(getRequestById).mockReturnValue(null)
     when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
-    vi.mocked(CalibrationStatusCard).mockReturnValue(
-      <div>Mock CalibrationStatusCard</div>
-    )
     vi.mocked(CalibrationDataDownload).mockReturnValue(
       <div>Mock CalibrationDataDownload</div>
-    )
-    vi.mocked(CalibrationHealthCheck).mockReturnValue(
-      <div>Mock CalibrationHealthCheck</div>
-    )
-    vi.mocked(RobotSettingsDeckCalibration).mockReturnValue(
-      <div>Mock RobotSettingsDeckCalibration</div>
     )
     vi.mocked(RobotSettingsGripperCalibration).mockReturnValue(
       <div>Mock RobotSettingsGripperCalibration</div>
     )
     vi.mocked(RobotSettingsPipetteOffsetCalibration).mockReturnValue(
       <div>Mock RobotSettingsPipetteOffsetCalibration</div>
-    )
-    vi.mocked(RobotSettingsTipLengthCalibration).mockReturnValue(
-      <div>Mock RobotSettingsTipLengthCalibration</div>
     )
     vi.mocked(RobotSettingsModuleCalibration).mockReturnValue(
       <div>Mock RobotSettingsModuleCalibration</div>
@@ -151,80 +120,17 @@ describe('RobotSettingsCalibration', () => {
     screen.getByText('Mock CalibrationDataDownload')
   })
 
-  it('renders a Calibration Status component when the calibration wizard feature flag is set', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render()
-    screen.getByText('Mock CalibrationStatusCard')
-  })
-
-  it('renders a Deck Calibration component for an OT-2', () => {
-    render()
-    screen.getByText('Mock RobotSettingsDeckCalibration')
-  })
-
-  it('does not render a Deck Calibration component for a Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock RobotSettingsDeckCalibration')).toBeNull()
-  })
-
   it('renders a Pipette Offset Calibration component', () => {
     render()
     screen.getByText('Mock RobotSettingsPipetteOffsetCalibration')
   })
 
-  it('renders a Tip Length Calibration component for an OT-2', () => {
-    render()
-    screen.getByText('Mock RobotSettingsTipLengthCalibration')
-  })
-
-  it('does not render a Tip Length Calibration component for a Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(
-      screen.queryByText('Mock RobotSettingsTipLengthCalibration')
-    ).toBeNull()
-  })
-
-  it('renders a Calibration Health Check component for an OT-2', () => {
-    render()
-    screen.getByText('Mock CalibrationHealthCheck')
-  })
-
-  it('does not render a Calibration Health Check component for a Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock CalibrationHealthCheck')).toBeNull()
-  })
-
-  it('renders a Gripper Calibration component for a Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+  it('renders a Gripper Calibration component', () => {
     render()
     screen.getByText('Mock RobotSettingsGripperCalibration')
   })
 
-  it('does not render a Gripper Calibration component for an OT-2', () => {
-    render()
-    expect(
-      screen.queryByText('Mock RobotSettingsGripperCalibration')
-    ).toBeNull()
-  })
-
-  it('does not render the OT-2 components when there is a Flex attached with pipettes', () => {
-    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
-      left: mockAttachedPipetteInformation,
-      right: null,
-    })
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock RobotSettingsDeckCalibration')).toBeNull()
-    expect(
-      screen.queryByText('Mock RobotSettingsTipLengthCalibration')
-    ).toBeNull()
-    expect(screen.queryByText('Mock CalibrationHealthCheck')).toBeNull()
-  })
-
-  it('renders the correct calibration data for a Flex pipette', () => {
+  it('renders the correct calibration data for a pipette', () => {
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
@@ -234,7 +140,7 @@ describe('RobotSettingsCalibration', () => {
     screen.getByText('Mock RobotSettingsPipetteOffsetCalibration')
   })
 
-  it('render a Module Calibration component for a Flex and module calibration feature flag is on', () => {
+  it('render a Module Calibration component', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     when(useIsFlex).calledWith('otie').thenReturn(true)
     render()

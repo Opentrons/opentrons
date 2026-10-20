@@ -35,7 +35,6 @@
     "createSplash",
     "createUser",
     "deleteAllLabwareOffsets",
-    "deleteCalibration",
     "deleteLabwareOffset",
     "deleteLogPeriod",
     "deleteMaintenanceRun",

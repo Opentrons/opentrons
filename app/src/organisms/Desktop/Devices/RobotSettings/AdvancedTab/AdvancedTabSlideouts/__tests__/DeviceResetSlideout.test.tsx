@@ -8,7 +8,6 @@ import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
@@ -30,8 +29,6 @@ vi.mock('/app/resources/devices/hooks')
 const mockOnCloseClick = vi.fn()
 const ROBOT_NAME = 'otie'
 const mockUpdateResetStatus = vi.fn()
-const downloadCalibration =
-  vi.fn<ReturnType<typeof useDownloadCalibrationData>['downloadCalibration']>()
 
 const mockResetConfigOptions = [
   {
@@ -91,18 +88,20 @@ const render = () => {
 }
 
 describe('RobotSettings DeviceResetSlideout', () => {
+  const downloadCalibration =
+    vi.fn<
+      ReturnType<typeof useDownloadCalibrationData>['downloadCalibration']
+    >()
   beforeEach(() => {
     vi.mocked(useResetConfigOptionsQuery).mockReturnValue({
       data: { options: mockResetConfigOptions },
     } as any)
-    vi.mocked(useIsFlex).mockReturnValue(false)
     vi.mocked(useDownloadCalibrationData).mockReturnValue({
       downloadCalibration,
     } as any)
   })
 
   it('should change some options and text for Flex', () => {
-    vi.mocked(useIsFlex).mockReturnValue(true)
     render()
     screen.getByText('Clear all data')
     screen.getByText(
