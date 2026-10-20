@@ -177,36 +177,6 @@ from opentrons.types import (
     StagingSlotName,
 )
 
-# TODO refactor this into conftest
-_TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
-    sections=[
-        CuboidalFrustum(
-            shape="cuboidal",
-            topXDimension=7.6,
-            topYDimension=8.5,
-            bottomXDimension=5.6,
-            bottomYDimension=6.5,
-            topHeight=45,
-            bottomHeight=20,
-        ),
-        CuboidalFrustum(
-            shape="cuboidal",
-            topXDimension=5.6,
-            topYDimension=6.5,
-            bottomXDimension=4.5,
-            bottomYDimension=4.0,
-            topHeight=20,
-            bottomHeight=10,
-        ),
-        SphericalSegment(
-            shape="spherical",
-            radiusOfCurvature=6,
-            topHeight=10,
-            bottomHeight=0.0,
-        ),
-    ],
-)
-
 
 @pytest.fixture
 def available_sensors() -> pipette_definition.AvailableSensorDefinition:
@@ -244,19 +214,6 @@ def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
 def mock_liquid_tracking(decoy: Decoy) -> LiquidTrackingView:
     """Get a mock in the shape of a LiquidTrackingView."""
     return decoy.mock(cls=LiquidTrackingView)
-
-
-# TODO refactor this into conftest
-_PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
-
-
-@pytest.fixture(autouse=True)
-def mock_labware_origin_math(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock labware origin math's main export."""
-    monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
-        lambda *args, **kwargs: _PARENT_ORIGIN_TO_LABWARE_ORIGIN,
-    )
 
 
 @pytest.fixture

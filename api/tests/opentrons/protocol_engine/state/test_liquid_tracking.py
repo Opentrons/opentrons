@@ -53,7 +53,6 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
 )
 from opentrons.types import Point
 
-# TODO refactor this into conftest
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
     sections=[
         CuboidalFrustum(
@@ -82,9 +81,6 @@ _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
         ),
     ],
 )
-
-# TODO refactor this into conftest
-_PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
 
 
 @pytest.fixture
