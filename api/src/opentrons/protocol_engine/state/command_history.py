@@ -62,7 +62,7 @@ class CommandPersistenceInterface:
         command_batch = [
             (
                 command_json.index,
-                command_json.command_type.model_validate_json(command_json.command),
+                command_json.command,
             )
             for command_json in command_json_batch
         ]
@@ -416,7 +416,9 @@ class CommandHistory:
                 self._all_command_ids_but_fixit_command_ids.append(command_id)
 
         self._commands_by_id[command_id] = CommandEntryJSON(
-            command=command_entry.command.model_dump_json(by_alias=True),
+            command=command_entry.command.model_dump_json(
+                by_alias=True, exclude_none=True
+            ),
             command_type=type(command_entry.command),
             index=command_entry.index,
         )
