@@ -346,6 +346,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
           onClick={() => {
             handleToggleDebugLogs(!debugLogsEnabled)
           }}
+          iconName="compliance"
         />
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
