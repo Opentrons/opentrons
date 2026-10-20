@@ -22,7 +22,6 @@ from ..types import (
     PickUpTipWellLocation,
     TipGeometry,
     WellLocation,
-    WellLocationFunction,
     WellLocationType,
     WellOffset,
     WellOrigin,
@@ -108,8 +107,6 @@ class InstrumentInterfaceView:
         well_position = self._geometry.get_base_well_position(
             labware_id, well_name, well_location
         )
-
-        offset = WellOffset(x=0, y=0, z=0)
         if well_location is not None:
             offset_adjustment = self._liquid_tracking.get_well_offset_adjustment(
                 labware_id=labware_id,
@@ -118,20 +115,24 @@ class InstrumentInterfaceView:
                 operation_volume=operation_volume,
                 pipette_id=pipette_id,
             )
-            if not isinstance(offset_adjustment, SimulatedProbeResult):
-                offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
-        return Point(
-            x=well_position.x + offset.x,
-            y=well_position.y + offset.y,
-            z=well_position.z + offset.z,
-        )
+            if (
+                not isinstance(offset_adjustment, SimulatedProbeResult)
+                and offset_adjustment > 0
+            ):
+                well_position = Point(
+                    well_position.x,
+                    well_position.y,
+                    well_position.z + offset_adjustment,
+                )
+        return well_position
 
-    def _get_relative_liquid_handling_well_location(
+    def get_relative_liquid_handling_well_location(
         self,
+        labware_id: str,
+        well_name: str,
         absolute_point: Point,
-        delta: Point,
-        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
-    ) -> Tuple[WellLocationType, bool]:
+        meniscus_tracking: Optional[MeniscusTrackingTarget],
+    ) -> Tuple[LiquidHandlingWellLocation, bool]:
         """Given absolute position, get relative location of a well in a labware."""
         dynamic_liquid_tracking = False
         if meniscus_tracking:
@@ -147,44 +148,31 @@ class InstrumentInterfaceView:
             elif meniscus_tracking == MeniscusTrackingTarget.DYNAMIC:
                 dynamic_liquid_tracking = True
         else:
+            delta = self._geometry.get_relative_well_delta(
+                labware_id, well_name, absolute_point
+            )
             location = LiquidHandlingWellLocation(
                 offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
             )
         return location, dynamic_liquid_tracking
 
-    # TODO: Refactor this as well perhaps
     def get_relative_well_location(
         self,
         labware_id: str,
         well_name: str,
         absolute_point: Point,
-        location_type: WellLocationFunction,
-        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
-    ) -> Tuple[WellLocationType, bool]:
+        pick_up_tip: bool = False,
+    ) -> WellLocation | PickUpTipWellLocation:
         """Given absolute position, get relative location of a well in a labware."""
-        well_absolute_point = self._geometry.get_base_well_position(
-            labware_id, well_name
+        delta = self._geometry.get_relative_well_delta(
+            labware_id, well_name, absolute_point
         )
-        delta = absolute_point - well_absolute_point
-        match location_type:
-            case WellLocationFunction.BASE | WellLocationFunction.DROP_TIP:
-                return (
-                    WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)),
-                    False,
-                )
-            case WellLocationFunction.PICK_UP_TIP:
-                return (
-                    PickUpTipWellLocation(
-                        offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
-                    ),
-                    False,
-                )
-            case WellLocationFunction.LIQUID_HANDLING:
-                return self._get_relative_liquid_handling_well_location(
-                    absolute_point=absolute_point,
-                    delta=delta,
-                    meniscus_tracking=meniscus_tracking,
-                )
+        if pick_up_tip:
+            return PickUpTipWellLocation(
+                offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
+            )
+        else:
+            return WellLocation(offset=WellOffset(x=delta.x, y=delta.y, z=delta.z))
 
     def get_nominal_effective_tip_length(
         self,

@@ -64,6 +64,7 @@ from ..types import (
     PotentialCutoutFixture,
     StagingSlotLocation,
     WellLocation,
+    WellLocationFunction,
     WellLocationType,
     WellOffset,
     WellOrigin,
@@ -539,6 +540,17 @@ class GeometryView:
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
         )
+
+    def get_relative_well_delta(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> Point:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_base_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+        return delta
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         if lw_data.location == WASTE_CHUTE_LOCATION:

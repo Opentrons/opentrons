@@ -139,7 +139,7 @@ def test_get_top(
 ) -> None:
     """It should get a well top."""
     decoy.when(
-        mock_engine_client.state.instrument_interface.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -156,7 +156,7 @@ def test_get_bottom(
 ) -> None:
     """It should get a well bottom."""
     decoy.when(
-        mock_engine_client.state.instrument_interface.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -173,7 +173,7 @@ def test_get_center(
 ) -> None:
     """It should get a well center."""
     decoy.when(
-        mock_engine_client.state.instrument_interface.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(origin=WellOrigin.CENTER),
@@ -213,7 +213,7 @@ def test_get_meniscus(
         )
     ).then_return(1.23)
     decoy.when(
-        mock_engine_client.state.instrument_interface.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -405,7 +405,7 @@ def test_from_center_cartesian(
 ) -> None:
     """It should get the relative point from the center of a well."""
     decoy.when(
-        mock_engine_client.state.instrument_interface.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(origin=WellOrigin.CENTER),

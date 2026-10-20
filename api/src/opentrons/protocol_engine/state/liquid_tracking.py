@@ -11,7 +11,6 @@ from ..errors.exceptions import (
 )
 from ..types import (
     LiquidHandlingWellLocation,
-    PickUpTipWellLocation,
     WellLocationType,
     WellOrigin,
 )
@@ -58,8 +57,6 @@ class LiquidTrackingView:
 
         Distance is with reference to the well bottom.
         """
-        # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
-
         initial_handling_height: LiquidTrackingType = 0.0
         if well_location.origin == WellOrigin.MENISCUS:
             initial_handling_height = self.get_meniscus_height(
@@ -82,7 +79,7 @@ class LiquidTrackingView:
                     raise ValueError("Invalid volume offset.")
                 volume = well_location.volumeOffset
 
-        if volume is not None:
+        if volume:
             if pipette_id is None:
                 raise ValueError(
                     "cannot get liquid handling offset without pipette id."
@@ -95,8 +92,7 @@ class LiquidTrackingView:
                 volume=volume,
             )
             return liquid_height_after
-        else:
-            return initial_handling_height
+        return initial_handling_height
 
     def well_has_tracked_liquid(
         self,

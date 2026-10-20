@@ -38,15 +38,20 @@ from opentrons.protocol_engine.state.liquid_tracking import LiquidTrackingView
 from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.wells import WellView
 from opentrons.protocol_engine.types import (
+    LiquidHandlingWellLocation,
     LoadedVolumeInfo,
     ProbedHeightInfo,
     ProbedVolumeInfo,
     WellLiquidInfo,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
     SimulatedProbeResult,
 )
+from opentrons.types import Point
 
 # TODO refactor this into conftest
 _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
@@ -77,6 +82,9 @@ _TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
         ),
     ],
 )
+
+# TODO refactor this into conftest
+_PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
 
 
 @pytest.fixture
@@ -174,6 +182,312 @@ def subject(
         pipette_view=mock_pipette_view,
         geometry_view=mock_geometry_view,
     )
+
+
+def test_get_well_offset_adjustment_with_meniscus(
+    decoy: Decoy,
+    mock_well_view: WellView,
+    subject: LiquidTrackingView,
+) -> None:
+    """It should be able to get the position of a well meniscus in a labware."""
+    probe_time = datetime.now()
+    probed_liquid_height = 5.53
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            probed_volume=None,
+            probed_height=ProbedHeightInfo(
+                height=probed_liquid_height, last_probed=probe_time
+            ),
+            loaded_volume=None,
+        )
+    )
+    result = subject.get_well_offset_adjustment(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=WellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=WellOffset(x=2, y=3, z=4),
+        ),
+    )
+    assert result == probed_liquid_height
+
+
+def test_get_well_offset_adjustment_with_volume_offset_raises_error(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_pipette_view: PipetteView,
+    subject: LiquidTrackingView,
+) -> None:
+    """Calling get_well_offset_adjustment with any volume offset should raise when there's no innerLabwareGeometry."""
+    probe_time = datetime.now()
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(height=45.0, last_probed=probe_time),
+            probed_volume=None,
+        )
+    )
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_plate_def.wells["B2"]
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_raise(
+        errors.IncompleteLabwareDefinitionError("Woops!")
+    )
+
+    with pytest.raises(errors.IncompleteLabwareDefinitionError):
+        subject.get_well_offset_adjustment(
+            labware_id="labware-id",
+            well_name="B2",
+            well_location=LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=2, y=3, z=4),
+                volumeOffset="operationVolume",
+            ),
+            operation_volume=-1245.833,
+            pipette_id="pipette-id",
+        )
+
+
+def test_get_well_position_with_meniscus_and_literal_volume_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_pipette_view: PipetteView,
+    subject: LiquidTrackingView,
+) -> None:
+    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
+    probe_time = datetime.now()
+    well_def = well_plate_def.wells["B2"]
+    probed_height = 5.53
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(
+                height=probed_height, last_probed=probe_time
+            ),
+            probed_volume=None,
+        )
+    )
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
+
+    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+    result = subject.get_well_offset_adjustment(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=meniscus_well_offset,
+            volumeOffset="operationVolume",
+        ),
+        operation_volume=-124.58,
+        pipette_id="pipette-id",
+    )
+    assert result == 4.3909
+
+
+def test_get_well_position_with_meniscus_and_float_volume_offset(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_pipette_view: PipetteView,
+    subject: LiquidTrackingView,
+) -> None:
+    """It should be able to get the position of a well meniscus in a labware with a volume offset."""
+    probe_time = datetime.now()
+    well_def = well_plate_def.wells["B2"]
+    probed_height = 5.53
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(
+                height=probed_height, last_probed=probe_time
+            ),
+            probed_volume=None,
+        )
+    )
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.5)
+
+    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+    result = subject.get_well_offset_adjustment(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=meniscus_well_offset,
+            volumeOffset=-124.58,
+        ),
+        operation_volume=-999,
+        pipette_id="pipette-id",
+    )
+    assert result == 4.3909
+
+
+@pytest.mark.parametrize(
+    "operation_volume",
+    [-500.0, -1000.0, -10000.0],
+)
+def test_get_well_position_adjusts_to_lower_boundary(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_pipette_view: PipetteView,
+    subject: LiquidTrackingView,
+    operation_volume: float,
+) -> None:
+    """If a volume offset is too small, geometry should constrain the volume offset to the well bounds."""
+    probe_time = datetime.now()
+    well_def = well_plate_def.wells["B2"]
+    probed_height = 5.53
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(
+                height=probed_height, last_probed=probe_time
+            ),
+            probed_volume=None,
+        )
+    )
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.123)
+
+    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+    result = subject.get_well_offset_adjustment(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=meniscus_well_offset,
+            volumeOffset="operationVolume",
+        ),
+        operation_volume=operation_volume,
+        pipette_id="pipette-id",
+    )
+    assert result == 0.123
+
+
+@pytest.mark.parametrize(
+    "operation_volume",
+    [500.0, 1000.0, 10000.0],
+)
+def test_get_well_position_adjusts_to_higher_boundary(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    mock_pipette_view: PipetteView,
+    subject: LiquidTrackingView,
+    operation_volume: float,
+) -> None:
+    """If a volume offset is too small, geometry should constrain the volume offset to the well bounds."""
+    probe_time = datetime.now()
+    well_def = well_plate_def.wells["B2"]
+    probed_height = 5.53
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "B2")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "B2")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(
+                height=probed_height, last_probed=probe_time
+            ),
+            probed_volume=None,
+        )
+    )
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        well_plate_def
+    )
+    pip_type = PipetteNameType.P300_SINGLE
+    decoy.when(mock_pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(pip_type)
+    )
+    decoy.when(
+        mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
+    ).then_return(0.123)
+
+    meniscus_well_offset = WellOffset(x=2, y=3, z=4)
+    result = subject.get_well_offset_adjustment(
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=LiquidHandlingWellLocation(
+            origin=WellOrigin.MENISCUS,
+            offset=meniscus_well_offset,
+            volumeOffset="operationVolume",
+        ),
+        operation_volume=operation_volume,
+        pipette_id="pipette-id",
+    )
+    assert result == 10.67
 
 
 def test_get_latest_volume_information(
