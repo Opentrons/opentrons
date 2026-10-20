@@ -310,9 +310,13 @@ class ProtocolEditorPage(BasePage):
         except Exception:
             pass
 
-    def confirm_liquid_setup(self) -> None:
+    def select_done(self) -> None:
         """Confirm the liquid setup and close the modal."""
         self.page.get_by_text("Done").click()
+
+    def select_deck_hardware(self) -> None:
+        """Click the 'Deck hardware' button in the timeline to open the deck setup."""
+        self.page.get_by_role("button", name="Deck hardware", exact=True).click()
 
     def export_protocol(self, destination: Path, *, timeout: int = 60000) -> Path:
         """Click Export and save the downloaded protocol .py file."""

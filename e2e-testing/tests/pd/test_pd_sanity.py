@@ -110,11 +110,11 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
     editor.select_first_well()
     editor.define_liquid("Water")
     editor.assign_liquid_to_wells("Water", "400")
-    editor.confirm_liquid_setup()
+    editor.select_done()
     print("✓ Labware added and liquid configured")
 
     # Add Transfer Step
-    editor.confirm_liquid_setup()  # Close labware setup
+    editor.select_done()  # Close labware setup
     editor.add_step("Transfer")
     transfer_page = TransferPage(page)
     transfer_page.destination_labware_select(labware_on_deck)
