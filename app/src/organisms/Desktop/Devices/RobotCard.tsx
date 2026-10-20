@@ -26,13 +26,13 @@ import {
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 import {
-  getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
@@ -52,8 +52,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
 import type { ReactNode } from 'react'
-import type { GripperData } from '@opentrons/api-client'
-import type { GripperModel } from '@opentrons/shared-data'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
@@ -235,11 +234,32 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     ) ?? null
+  const leftPipette =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const rightPipette =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
+
+  const leftFlexDisplayName = useAttachedInstrumentDisplayName(leftPipette)
+  const rightFlexDisplayName = useAttachedInstrumentDisplayName(rightPipette)
+  const gripperDisplayName = useAttachedInstrumentDisplayName(attachedGripper)
+
   const leftPipetteModel = pipettesData?.left?.model ?? null
   const rightPipetteModel = pipettesData?.right?.model ?? null
-  const gripperDisplayName =
-    attachedGripper != null
-      ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel)
+  const leftDisplayName = isFlex
+    ? leftFlexDisplayName
+    : leftPipetteModel != null
+      ? (getPipetteModelSpecs(leftPipetteModel)?.displayName ?? '')
+      : null
+  const rightDisplayName = isFlex
+    ? rightFlexDisplayName
+    : rightPipetteModel != null
+      ? (getPipetteModelSpecs(rightPipetteModel)?.displayName ?? '')
       : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
@@ -259,19 +279,11 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
               displayName={leftAndRightMountsPipetteDisplayName}
             />
           ) : null}
-          {leftPipetteModel != null ? (
-            <InstrumentContainer
-              displayName={
-                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
-              }
-            />
+          {leftDisplayName != null ? (
+            <InstrumentContainer displayName={leftDisplayName} />
           ) : null}
-          {rightPipetteModel != null ? (
-            <InstrumentContainer
-              displayName={
-                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
-              }
-            />
+          {rightDisplayName != null ? (
+            <InstrumentContainer displayName={rightDisplayName} />
           ) : null}
           {gripperDisplayName != null ? (
             <InstrumentContainer displayName={gripperDisplayName} />
