@@ -51,7 +51,6 @@ class LiquidTrackingView:
         labware_id: str,
         well_name: str,
         well_location: WellLocationType,
-        well_depth: float,
         pipette_id: Optional[str] = None,
         operation_volume: Optional[float] = None,
     ) -> LiquidTrackingType:
@@ -61,24 +60,21 @@ class LiquidTrackingView:
         """
         # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
 
-        initial_handling_height = self._get_well_handling_height(
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
-            well_depth=well_depth,
-        )
-        # if we're tracking a MENISCUS origin, and targeting either the beginning
-        #   position of the liquid or doing dynamic tracking, return the initial height
-        if (
-            well_location.origin == WellOrigin.MENISCUS
-            and hasattr(well_location, "volumeOffset")
-            and not well_location.volumeOffset
-        ):
-            return initial_handling_height
+        initial_handling_height: LiquidTrackingType = 0.0
+        if well_location.origin == WellOrigin.MENISCUS:
+            initial_handling_height = self.get_meniscus_height(
+                labware_id=labware_id, well_name=well_name
+            )
+            # If we're tracking a MENISCUS origin, and targeting either the beginning
+            # position of the liquid or doing dynamic tracking, return the initial height
+            if (
+                hasattr(well_location, "volumeOffset")
+                and not well_location.volumeOffset
+            ):
+                return initial_handling_height
+
         volume: Optional[float] = None
-        if isinstance(well_location, PickUpTipWellLocation):
-            volume = 0.0
-        elif isinstance(well_location, LiquidHandlingWellLocation):
+        if isinstance(well_location, LiquidHandlingWellLocation):
             if well_location.volumeOffset == "operationVolume":
                 volume = operation_volume or 0.0
             else:
@@ -86,7 +82,7 @@ class LiquidTrackingView:
                     raise ValueError("Invalid volume offset.")
                 volume = well_location.volumeOffset
 
-        if volume:
+        if volume is not None:
             if pipette_id is None:
                 raise ValueError(
                     "cannot get liquid handling offset without pipette id."

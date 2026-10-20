@@ -96,7 +96,6 @@ class InstrumentInterfaceView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
-    # TODO spin this out into the base function in geometry
     def get_well_position(
         self,
         labware_id: str,
@@ -105,28 +104,26 @@ class InstrumentInterfaceView:
         operation_volume: Optional[float] = None,
         pipette_id: Optional[str] = None,
     ) -> Point:
-        """Given relative well location in a labware, get absolute position."""
-        labware_pos = self._geometry.get_labware_position(labware_id)
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        well_depth = well_def.depth
+        """Given relative well location in a labware, get absolute position taking into account liquid tracking."""
+        well_position = self._geometry.get_base_well_position(
+            labware_id, well_name, well_location
+        )
 
-        offset = WellOffset(x=0, y=0, z=well_depth)
+        offset = WellOffset(x=0, y=0, z=0)
         if well_location is not None:
-            offset = well_location.offset  # location of the bottom of the well
             offset_adjustment = self._liquid_tracking.get_well_offset_adjustment(
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
-                well_depth=well_depth,
                 operation_volume=operation_volume,
                 pipette_id=pipette_id,
             )
             if not isinstance(offset_adjustment, SimulatedProbeResult):
                 offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
         return Point(
-            x=labware_pos.x + offset.x + well_def.x,
-            y=labware_pos.y + offset.y + well_def.y,
-            z=labware_pos.z + offset.z + well_def.z,
+            x=well_position.x + offset.x,
+            y=well_position.y + offset.y,
+            z=well_position.z + offset.z,
         )
 
     def _get_relative_liquid_handling_well_location(
@@ -165,7 +162,9 @@ class InstrumentInterfaceView:
         meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
     ) -> Tuple[WellLocationType, bool]:
         """Given absolute position, get relative location of a well in a labware."""
-        well_absolute_point = self.get_well_position(labware_id, well_name)
+        well_absolute_point = self._geometry.get_base_well_position(
+            labware_id, well_name
+        )
         delta = absolute_point - well_absolute_point
         match location_type:
             case WellLocationFunction.BASE | WellLocationFunction.DROP_TIP:
