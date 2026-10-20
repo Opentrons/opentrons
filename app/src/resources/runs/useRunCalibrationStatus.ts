@@ -5,16 +5,8 @@ import { isGripperInCommands } from '/app/resources/protocols/utils'
 
 import { useMostRecentCompletedAnalysis } from '.'
 
-import type {
-  GripperData,
-  Instruments,
-  PipetteData,
-} from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { LoadedPipette } from '@opentrons/shared-data'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean
@@ -32,22 +24,10 @@ export function useRunCalibrationStatus(
   robotName: string,
   runId: string
 ): ProtocolCalibrationStatus {
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const robotAnalysis = useMostRecentCompletedAnalysis(runId)
+  const storedAnalysis = useStoredProtocolAnalysis(runId)
   const { data: instrumentsQueryData = null } = useInstrumentsQuery()
 
-  return getFlexRunCalibrationStatus(
-    mostRecentAnalysis,
-    storedProtocolAnalysis,
-    instrumentsQueryData
-  )
-}
-
-function getFlexRunCalibrationStatus(
-  robotAnalysis: CompletedProtocolAnalysis | null,
-  storedAnalysis: ProtocolAnalysisOutput | null,
-  instrumentsQueryData: Instruments | null
-): ProtocolCalibrationStatus {
   const attachedInstruments = instrumentsQueryData?.data ?? []
 
   const requiredPipettes: LoadedPipette[] =
