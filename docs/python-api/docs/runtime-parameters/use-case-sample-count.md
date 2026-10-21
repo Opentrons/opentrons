@@ -19,6 +19,7 @@ To keep things as simple as possible, this use case only focuses on setting up a
 First of all, we need to set up the sample count parameter so it’s both easy for technicians to understand during protocol setup and easy for us to use in the protocol’s `run()` function.
 
 We want to limit the number of samples to 8, 16, 24, or 32, so we'll use an integer parameter with choices:
+<!-- test: params-template -->
 ```python
 def add_parameters(parameters):
     parameters.add_int(
@@ -37,8 +38,7 @@ def add_parameters(parameters):
 All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
 
 ```python
-def run(protocol):
-    column_count = protocol.params.sample_count // 8
+column_count = protocol.params.sample_count // 8
 ```
 Most examples below will use `column_count`, rather than redoing (and retyping!) this calculation multiple times.
 
@@ -59,20 +59,25 @@ In the case of this DNA prep protocol, we can create formulas for the number of 
 
 Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And always round up — performing 13 pickups requires 2 racks. The [`math.ceil()`](https://docs.python.org/3/library/math.html#math.ceil) method rounds up to the nearest integer. We'll add `from math import ceil` at the top of the protocol and then calculate the number of tip racks as follows:
 
+<!-- test: continue-previous -->
 ```python
+from math import ceil
+
 tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
 tip_rack_200_count = ceil((2 + 13 * column_count) / 12)
 ```
 
 Running the numbers shows that the maximum combined number of tip racks is 7. Now decide where to load up to 7 racks, working around the modules and other labware on the deck. Assuming we're running this protocol on a Flex with staging area slots, they'll all fit! (If you don't have staging area slots, you can load labware off-deck instead.) Reserve these slots for the different size racks:
 
+<!-- test: continue-previous -->
 ```python
-tip_rack_50_slots = ["B3", "C3", "B4"]
-tip_rack_200_slots = ["A2", "B2", "A3", "A4"]
+tip_rack_50_slots = ["A1", "C3", "B4"]
+tip_rack_200_slots = ["B1", "D2", "A3", "A4"]
 ```
 
 Finally, we can combine this information to call [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Depending on the number of racks needed, we’ll slice that number of elements from the slot list and use a [list comprehension](https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions) to gather up the loaded tip racks. For the 50 µL tips, this would look like:
 
+<!-- test: continue-previous -->
 ```python
 tip_racks_50 = [
     protocol.load_labware(
@@ -85,17 +90,19 @@ tip_racks_50 = [
 
 Then we can associate those lists of tip racks directly with each pipette as we load them. All together, the start of our `run()` function looks like this:
 
+<!-- test: continue-previous -->
 ```python
 # calculate column count from sample count
 column_count = protocol.params.sample_count // 8
 
 # calculate number of required tip racks
+from math import ceil
 tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
 tip_rack_200_count = ceil((2 + 13 * column_count) / 12)
 
 # assign tip rack locations (maximal case)
-tip_rack_50_slots = ["B3", "C3", "B4"]
-tip_rack_200_slots = ["A2", "B2", "A3", "A4"]
+tip_rack_50_slots = ["A1", "C3", "B4"]
+tip_rack_200_slots = ["B1", "D2", "A3", "A4"]
 
 # create lists of loaded tip racks
 # limit to number of needed racks for each type
@@ -163,6 +170,7 @@ Now bring sample count into consideration as you [load the liquids][labeling-wel
 
 To calculate the total volume for each liquid, we'll multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`load_liquid()`][opentrons.protocol_api.Well.load_liquid]:
 
+<!-- test: continue-previous -->
 ```python
 reservoir["A1"].load_liquid(
     liquid=ampure_liquid, volume=180 * column_count * 1.1
@@ -178,6 +186,7 @@ Now, for example, the volume of AMPure beads to load will vary from 198 µL for 
 
 !!! tip
     Does telling a technician to load 792 µL of a liquid seem overly precise? You can perform any calculation you like to set the value of `volume`! For example, you could round the AMPure volume up to the nearest 10 µL:
+    <!-- test: syntax-only -->
     ```python
     volume=ceil((180 * column_count * 1.1) / 10) * 10
     ```
@@ -195,6 +204,7 @@ sample_plate = hs_adapter.load_labware(
 ```
 Now we can construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original *sample count* with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
 
+<!-- test: continue-previous -->
 ```python
 # define sample liquid
 sample_liquid = protocol.define_liquid(
@@ -263,6 +273,7 @@ This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL 
 
 However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the *last well* of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
 
+<!-- test: skip -->
 ```python
 if tip_racks_200[0].wells()[-1].has_tip is False:
     # same move_labware() steps as above
