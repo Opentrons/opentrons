@@ -1,4 +1,3 @@
-export * from './useDeckCalibrationData'
 export * from './useDownloadRunLog'
 export * from './useTrackCreateProtocolRunEvent'
 export * from './useSyncRobotClock'
