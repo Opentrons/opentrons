@@ -39,7 +39,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/instruments')

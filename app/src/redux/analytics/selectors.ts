@@ -7,17 +7,10 @@ import {
   getRobotUpdateSession,
   getRobotUpdateVersion,
 } from '../robot-update'
-import * as Sessions from '../sessions'
-import { getRobotSessionById } from '../sessions/selectors'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { State } from '../types'
-import type {
-  AnalyticsConfig,
-  AnalyticsSessionExitDetails,
-  BuildrootAnalyticsData,
-  SessionInstrumentAnalyticsData,
-} from './types'
+import type { AnalyticsConfig, BuildrootAnalyticsData } from './types'
 
 export function getBuildrootAnalyticsData(
   state: State,
@@ -77,14 +70,7 @@ export function getAnalyticsSessionExitDetails(
   state: State,
   robotName: string,
   sessionId: string
-): AnalyticsSessionExitDetails | null {
-  const session = getRobotSessionById(state, robotName, sessionId)
-  if (session != null) {
-    return {
-      step: session.details.currentStep,
-      sessionType: session.sessionType,
-    }
-  }
+): null {
   return null
 }
 
@@ -92,18 +78,6 @@ export function getSessionInstrumentAnalyticsData(
   state: State,
   robotName: string,
   sessionId: string
-): SessionInstrumentAnalyticsData | null {
-  const session = getRobotSessionById(state, robotName, sessionId)
-  if (session != null) {
-    const pipModel =
-      session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-        ? session.details.activePipette.model
-        : session.details.instrument.model
-
-    return {
-      sessionType: session.sessionType,
-      pipetteModel: pipModel,
-    }
-  }
+): null {
   return null
 }

@@ -26,7 +26,6 @@ import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import type { ComponentProps } from 'react'
 import type { TemperatureStatus } from '@opentrons/api-client'
 
-vi.mock('/app/resources/legacy_sessions')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({

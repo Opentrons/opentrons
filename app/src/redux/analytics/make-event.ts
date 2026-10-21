@@ -8,11 +8,7 @@ import * as Sessions from '../sessions'
 import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as SystemInfo from '../system-info'
 import * as Constants from './constants'
-import {
-  getAnalyticsSessionExitDetails,
-  getBuildrootAnalyticsData,
-  getSessionInstrumentAnalyticsData,
-} from './selectors'
+import { getBuildrootAnalyticsData } from './selectors'
 
 import type { Action, State } from '../types'
 import type { AnalyticsEvent } from './types'
@@ -169,46 +165,12 @@ export function makeEvent(
     case Sessions.CREATE_SESSION_COMMAND: {
       switch (action.payload.command.command) {
         case sharedCalCommands.EXIT: {
-          const sessionDetails = getAnalyticsSessionExitDetails(
-            state,
-            action.payload.robotName,
-            action.payload.sessionId
-          )
-          return Promise.resolve(
-            sessionDetails != null
-              ? {
-                  name: `${sessionDetails.sessionType}Exit`,
-                  properties: {
-                    step: sessionDetails.step,
-                    robotType: OT2_ROBOT_TYPE,
-                  },
-                }
-              : null
-          )
+          return Promise.resolve(null)
         }
         case sharedCalCommands.LOAD_LABWARE: {
           const commandData = action.payload.command.data
           if (commandData != null) {
-            const instrData = getSessionInstrumentAnalyticsData(
-              state,
-              action.payload.robotName,
-              action.payload.sessionId
-            )
-            return Promise.resolve(
-              instrData != null
-                ? {
-                    name: `${instrData.sessionType}TipRackSelect`,
-                    properties: {
-                      pipetteModel: instrData.pipetteModel,
-                      tipRackDisplayName:
-                        'tiprackDefinition' in commandData
-                          ? commandData.tiprackDefinition.metadata.displayName
-                          : null,
-                      robotType: OT2_ROBOT_TYPE,
-                    },
-                  }
-                : null
-            )
+            return Promise.resolve(null)
           } else {
             return Promise.resolve(null)
           }

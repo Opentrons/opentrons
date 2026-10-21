@@ -1,23 +1,6 @@
-import { SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION } from '../constants'
-import { getRobotSessionOfType } from '../selectors'
-
 import type { State } from '../../types'
-import type { PipetteOffsetCalibrationSession, Session } from '../types'
 
 export const getPipetteOffsetCalibrationSession: (
   state: State,
   robotName: string
-) => PipetteOffsetCalibrationSession | null = (state, robotName) => {
-  const pipetteOffsetSession: Session | null = getRobotSessionOfType(
-    state,
-    robotName,
-    SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-  )
-  if (
-    pipetteOffsetSession &&
-    pipetteOffsetSession.sessionType === SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-  ) {
-    return pipetteOffsetSession
-  }
-  return null
-}
+) => null = (state, robotName) => null

@@ -1,28 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 
-import {
-  AlertModal,
-  Divider,
-  LegacyStyledText,
-  SPACING,
-  SpinnerModalPage,
-} from '@opentrons/components'
+import { Divider, SPACING } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { getTopPortalEl } from '/app/App/portal'
-import * as RobotApi from '/app/redux/robot-api'
-import * as Sessions from '/app/redux/sessions'
-import { getDeckCalibrationSession } from '/app/redux/sessions/deck-calibration/selectors'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
-import { CalibrateDeck } from '../CalibrateDeck'
-import { CheckCalibration } from '../CheckCalibration'
 import { HowCalibrationWorksModal } from '../HowCalibrationWorksModal'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
@@ -32,12 +17,6 @@ import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOff
 import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
-import type { RequestState } from '/app/redux/robot-api/types'
-import type {
-  DeckCalibrationSession,
-  SessionCommandString,
-} from '/app/redux/sessions/types'
-import type { Dispatch, State } from '/app/redux/types'
 
 const CALS_FETCH_MS = 5000
 
@@ -55,61 +34,12 @@ export interface FormattedPipetteOffsetCalibration {
   markedBad?: boolean
 }
 
-const spinnerCommandBlockList: SessionCommandString[] = [
-  Sessions.sharedCalCommands.JOG,
-]
-
 export function RobotSettingsCalibration({
   robotName,
   isRobotBusy,
 }: CalibrationProps): ReactNode {
-  const { t } = useTranslation([
-    'device_settings',
-    'robot_calibration',
-    'shared',
-  ])
-  const trackedRequestId = useRef<string | null>(null)
-  const createRequestId = useRef<string | null>(null)
-  const jogRequestId = useRef<string | null>(null)
-
   const [showHowCalibrationWorksModal, setShowHowCalibrationWorksModal] =
     useState(false)
-
-  const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(Sessions.fetchAllSessions(robotName))
-  }, [dispatch, robotName])
-
-  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
-    dispatchedAction => {
-      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? (dispatchedAction.meta.requestId ?? null)
-            : null
-      } else if (
-        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
-        dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
-      ) {
-        jogRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? (dispatchedAction.meta.requestId ?? null)
-            : null
-      } else if (
-        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(
-          dispatchedAction.payload.command.command
-        )
-      ) {
-        trackedRequestId.current =
-          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? (dispatchedAction.meta.requestId ?? null)
-            : null
-      }
-    }
-  )
 
   // Modules Calibration
   const attachedModules =
@@ -128,50 +58,6 @@ export function RobotSettingsCalibration({
     ) ?? null
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
 
-  const isPending =
-    useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current != null
-        ? RobotApi.getRequestById(state, trackedRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const createRequest = useSelector((state: State) =>
-    createRequestId.current != null
-      ? RobotApi.getRequestById(state, createRequestId.current)
-      : null
-  )
-
-  const createStatus = createRequest?.status
-
-  const isJogging =
-    useSelector((state: State) =>
-      jogRequestId.current != null
-        ? RobotApi.getRequestById(state, jogRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
-    (state: State) => {
-      return getDeckCalibrationSession(state, robotName)
-    }
-  )
-
-  const checkHealthSession = useSelector((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-    )
-    if (
-      session != null &&
-      session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-    ) {
-      // TODO: add this analytics event when we deprecate this event firing in redux/analytics makeEvent
-      return session
-    }
-    return null
-  })
-
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
     []
 
@@ -189,72 +75,8 @@ export function RobotSettingsCalibration({
       attachedPipettes.right?.data.calibratedOffset?.last_modified,
   })
 
-  useEffect(() => {
-    if (createStatus === RobotApi.SUCCESS) {
-      createRequestId.current = null
-    }
-  }, [createStatus])
-
   return (
     <>
-      {createPortal(
-        <>
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-            requestIds={requestIds}
-          />
-          {createStatus === RobotApi.PENDING ? (
-            <SpinnerModalPage
-              titleBar={{
-                title: t('robot_calibration:health_check_title'),
-                back: {
-                  disabled: true,
-                  title: t('shared:exit'),
-                  children: t('shared:exit'),
-                },
-              }}
-            />
-          ) : null}
-          <CheckCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={isPending}
-            isJogging={isJogging}
-          />
-          {createStatus === RobotApi.FAILURE && (
-            <AlertModal
-              alertOverlay
-              heading={t('robot_calibration:deck_calibration_failure')}
-              buttons={[
-                {
-                  children: t('shared:ok'),
-                  onClick: () => {
-                    createRequestId.current != null &&
-                      dispatch(RobotApi.dismissRequest(createRequestId.current))
-                    createRequestId.current = null
-                  },
-                },
-              ]}
-            >
-              <LegacyStyledText>
-                {t('deck_calibration_error_occurred')}
-              </LegacyStyledText>
-              <LegacyStyledText>
-                {createRequest != null &&
-                  'error' in createRequest &&
-                  createRequest.error != null &&
-                  RobotApi.getErrorResponseMessage(createRequest.error)}
-              </LegacyStyledText>
-            </AlertModal>
-          )}
-        </>,
-        getTopPortalEl()
-      )}
       {showHowCalibrationWorksModal ? (
         <HowCalibrationWorksModal
           onCloseClick={() => {
