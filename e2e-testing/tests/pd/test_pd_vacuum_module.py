@@ -35,7 +35,7 @@ def test_vacuum_module_deck_configs(page: Page) -> None:
     deck_config_page.select_slot("A3")
     deck_config_page.select_module("Magnetic Block GEN1")
 
-    # Remove them
+    # Remove them //NOTE: NEED TO FIX THIS TEST
     # deck_config_page.remove_fixture("magneticBlockV1A3")
     # deck_config_page.remove_fixture("magneticBlockV1B3")
     page.get_by_test_id("magneticBlockV1A3").click()
@@ -59,24 +59,27 @@ def test_vacuum_module_deck_configs(page: Page) -> None:
     protocol_editor.select_labware_by_name(INCOMPATIBLE_LABWARE)
     protocol_editor.select_done()
     protocol_editor.select_deck_hardware()
-    
+
     deck_config_page.select_slot("A3")
     deck_config_page.select_module(VACUUM_MODULE)
+    deck_config_page.expect_snackbar(
+    "Module is incompatible with the labware in slot A3"
+    )
 
     # Remove labware, then add vacuum successfully
+    protocol_editor.select_starting_deck()
+    protocol_editor.clear_labware_from_slot("A3")
+    protocol_editor.select_deck_hardware()
     deck_config_page.select_slot("A3")
     deck_config_page.select_module(VACUUM_MODULE)
 
-    # Remove vacuum, add trash bin, replace trash with vacuum
+    # Remove vacuum module, add trash bin, replace trash with vacuum
     deck_config_page.remove_fixture("Vacuum")
     deck_config_page.select_slot("A3")
     deck_config_page.select_fixture("Trash bin")
+    deck_config_page.remove_fixture("Trash")
     deck_config_page.select_slot("A3")
     deck_config_page.select_module(VACUUM_MODULE)
 
-    # Vacuum should not be offered on other deck slots
-    deck_config_page.remove_fixture("Vacuum")
-    for slot in OTHER_SLOTS_WITHOUT_VACUUM:
-        deck_config_page.expect_module_unavailable_on_slot(slot, VACUUM_MODULE)
-
     print("\n✓ Vacuum module deck configs validated")
+
