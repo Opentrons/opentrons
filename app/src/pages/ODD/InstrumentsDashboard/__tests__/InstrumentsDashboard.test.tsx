@@ -32,7 +32,8 @@ const mockGripperData = {
 }
 const mockRightPipetteData = {
   instrumentModel: 'p50_single_v3.0',
-  instrumentType: 'p50',
+  instrumentType: 'pipette',
+  instrumentName: 'p50_single_flex',
   mount: 'right',
   serialNumber: 'abc123',
   ok: true,
@@ -47,7 +48,8 @@ const mockRightPipetteData = {
 }
 const mockLeftPipetteData = {
   instrumentModel: 'p1000_single_v3.0',
-  instrumentType: 'p1000',
+  instrumentType: 'pipette',
+  instrumentName: 'p1000_single_flex',
   mount: 'left',
   serialNumber: 'def456',
   ok: true,
@@ -62,7 +64,8 @@ const mockLeftPipetteData = {
 }
 const mock96ChannelData = {
   instrumentModel: 'p1000_96_v3.0',
-  instrumentType: 'p1000',
+  instrumentType: 'pipette',
+  instrumentName: 'p1000_96',
   mount: 'left',
   serialNumber: 'def456',
   ok: true,

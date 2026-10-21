@@ -23,7 +23,10 @@ export function usePipetteSpecsV2(
     pipetteName = name as PipetteName
   }
 
-  const pipetteSpecs = getPipetteSpecsV2(pipetteName)
+  const pipetteSpecs =
+    pipetteName != null && pipetteName.includes('_')
+      ? getPipetteSpecsV2(pipetteName)
+      : null
 
   if (pipetteSpecs == null) {
     return null
