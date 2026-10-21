@@ -69,6 +69,7 @@ import {
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  PickUpTipStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -119,7 +120,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'pickUpTip':
-      forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      forPickUpTip(
+        command.params as PickUpTipStepGenArgs,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'setTipState':
