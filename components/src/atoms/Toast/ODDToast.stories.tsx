@@ -10,7 +10,7 @@ import {
   Z_INDEX,
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { PrimaryButton } from '../buttons'
+import { PrimaryButton } from '../../helix/buttons'
 import { StyledText } from '../StyledText'
 
 import type { Meta, Story } from '@storybook/react'

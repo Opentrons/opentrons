@@ -1,4 +1,4 @@
-import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
+import { ICON_DATA_BY_NAME } from '../icons/Icons/icon-data'
 import { STYLE_PROPS } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { BasicButton as BasicButtonComponent } from './BasicButton'

@@ -1,15 +1,15 @@
 import styled from 'styled-components'
 
+import { StyledText } from '../../atoms/StyledText'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
 import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText/StyledText'
+import { Icon } from '../icons'
 
 import type { ComponentProps, MouseEvent, ReactNode } from 'react'
-import type { IconName } from '../../icons'
+import type { IconName } from '../../helix/icons'
 
 interface BasicButtonProps {
   children: string // Content of basic button

@@ -9,14 +9,14 @@ import {
   DISPLAY_FLEX,
   JUSTIFY_SPACE_BETWEEN,
 } from '../..'
+import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
+import { Icon } from '../icons'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '../../icons'
+import type { IconName } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 type LargeButtonTypes =
