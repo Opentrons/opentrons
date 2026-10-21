@@ -1,5 +1,5 @@
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { ModalShell } from '../../modals'
+import { ModalShell } from '../../helix/modals'
 import { Flex } from '../../primitives'
 import {
   DIRECTION_COLUMN,

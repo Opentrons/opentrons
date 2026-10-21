@@ -1,13 +1,13 @@
 import { ListItem as ListItemComponent, ListItemCustomize } from '.'
 import { customViewports } from '../../../../.storybook/preview'
+import { StyledText } from '../../atoms'
 import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
 import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { DropdownMenuProps } from '../../molecules'
+import type { DropdownMenuProps } from '../input'
 
 import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
 
