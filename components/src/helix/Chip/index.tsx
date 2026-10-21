@@ -1,15 +1,15 @@
 import { css } from 'styled-components'
 
+import { LegacyStyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../StyledText'
+import { Icon } from '../icons'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
-import type { IconName } from '../../icons'
+import type { IconName } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 export type ChipType = 'error' | 'info' | 'neutral' | 'success' | 'warning'
