@@ -1,16 +1,16 @@
 import { forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { RobotCoordsForeignDiv } from '../../hardware-sim'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RobotInfoLabel } from '../../molecules'
-import { DeckLabel } from '../../molecules/DeckLabel'
-import { Box } from '../../primitives'
-import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
-import { SPACING } from '../../ui-style-constants'
+import { RobotCoordsForeignDiv } from '../../../hardware-sim'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { Box } from '../../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../../styles'
+import { SPACING } from '../../../ui-style-constants'
+import { RobotInfoLabel } from '../../icons'
+import { DeckLabel } from '../DeckLabel'
 
 import type { ForwardedRef, ReactNode } from 'react'
-import type { DeckLabelProps } from '../../molecules/DeckLabel'
+import type { DeckLabelProps } from '../DeckLabel'
 
 interface DeckLabelSetProps {
   deckLabels: DeckLabelProps[]
