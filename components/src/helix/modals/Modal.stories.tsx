@@ -1,7 +1,8 @@
-import { PrimaryButton, StyledText } from '../atoms'
-import { Flex, STYLE_PROPS } from '../primitives'
-import { JUSTIFY_END } from '../styles'
-import { SPACING } from '../ui-style-constants'
+import { StyledText } from '../../atoms/StyledText'
+import { Flex, STYLE_PROPS } from '../../primitives'
+import { JUSTIFY_END } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
+import { PrimaryButton } from '../buttons'
 import { Modal as ModalComponent } from './Modal'
 
 import type { Meta, StoryObj } from '@storybook/react'
