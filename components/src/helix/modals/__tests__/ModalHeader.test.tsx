@@ -4,9 +4,9 @@ import '@testing-library/jest-dom/vitest'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { COLORS } from '../../helix-design-system'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { renderWithProviders } from '../../testing/utils'
+import { COLORS } from '../../../helix-design-system'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
+import { renderWithProviders } from '../../../testing/utils'
 import { ModalHeader } from '../ModalHeader'
 
 import type { ComponentProps } from 'react'

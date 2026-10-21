@@ -1,19 +1,19 @@
 import styled, { css } from 'styled-components'
 
-import { StyledText } from '../atoms'
-import { COLORS } from '../helix-design-system'
-import { Icon } from '../icons'
-import { Box, Btn, Flex } from '../primitives'
+import { StyledText } from '../../atoms/StyledText'
+import { COLORS } from '../../helix-design-system'
+import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-} from '../styles'
-import { SPACING } from '../ui-style-constants'
+} from '../../styles'
+import { SPACING } from '../../ui-style-constants'
+import { Icon } from '../icons/Icons/Icon'
 
 import type { MouseEventHandler, ReactNode } from 'react'
-import type { IconProps } from '../icons'
+import type { IconProps } from '../icons/Icons/Icon'
 
 export interface ModalHeaderProps {
   title: ReactNode
