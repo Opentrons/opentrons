@@ -1,5 +1,6 @@
 import { css } from 'styled-components'
 
+import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import {
   DIRECTION_COLUMN,
@@ -8,7 +9,6 @@ import {
   FLEX_MAX_CONTENT,
 } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'

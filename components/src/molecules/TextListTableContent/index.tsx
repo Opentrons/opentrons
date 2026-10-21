@@ -1,13 +1,13 @@
 import { css } from 'styled-components'
 
 import { StyledText } from '../../atoms'
-import { ListTable } from '../../atoms/ListTable'
+import { ListTable } from '../../helix/ListTable'
 import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { ReactNode } from 'react'
-import type { ListTableProps } from '../../atoms/ListTable'
+import type { ListTableProps } from '../../helix/ListTable'
 
 export interface TextListTableContentProps {
   /* The text that appears above the table. */
