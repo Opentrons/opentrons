@@ -74,6 +74,7 @@ def _pipette_dict_to_pipette_res(
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
+            displayName=pipette_dict.get("display_name"),
             serialNumber=pipette_dict["pipette_id"],
             subsystem=SubSystem.from_hw(HWSubSystem.of_mount(mount)),
             data=PipetteData(
@@ -118,6 +119,7 @@ def _gripper_dict_to_gripper_res(
         ok=True,
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
+        displayName=gripper_dict.get("display_name"),
         serialNumber=gripper_dict["gripper_id"],
         subsystem=SubSystem.from_hw(HWSubSystem.of_mount(OT3Mount.GRIPPER)),
         data=GripperData(

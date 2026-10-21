@@ -4,8 +4,8 @@ import { css } from 'styled-components'
 
 import { InlineNotification } from '@opentrons/components'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
 
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
@@ -14,7 +14,6 @@ import { AboutGripperSlideout } from './AboutGripperSlideout'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
-import type { GripperModel } from '@opentrons/shared-data'
 import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
@@ -48,6 +47,9 @@ export function GripperCard({
     useState<GripperWizardFlowType | null>(null)
   const [showAboutGripperSlideout, setShowAboutGripperSlideout] =
     useState<boolean>(false)
+  const gripperDisplayName = useAttachedInstrumentDisplayName(
+    attachedGripper?.ok === true ? attachedGripper : null
+  )
 
   const handleAttach: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
@@ -129,10 +131,8 @@ export function GripperCard({
       subsystemUpdateData == null ? (
         <InstrumentCard
           description={
-            attachedGripper != null
-              ? getGripperDisplayName(
-                  attachedGripper.instrumentModel as GripperModel
-                )
+            gripperDisplayName != null
+              ? gripperDisplayName
               : i18n.format(t('shared:empty'), 'capitalize')
           }
           banner={
