@@ -12,7 +12,7 @@ The Absorbance Plate Reader is designed for use with the Flex liquid handling ro
 The Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). Opentrons software does not support manual lid movement or plate reader protocols without a gripper.
 
 !!! warning
-    Always use the gripper to move the illumination unit on or off the detection unit. Do not move the illumination unit by hand during setup or protocol execution. Moving the illumination unit manually can damage the electronic pins that connect these components.
+    Always use the Flex Gripper to move the illumination unit on or off the detection unit. Do not move the illumination unit by hand during setup or protocol execution. Moving the illumination unit manually can damage the electronic pins that connect these components.
 
 ## Environmental Conditions
 

@@ -8,7 +8,7 @@ The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer th
 The Absorbance Plate Reader is represented in code by an [`AbsorbanceReaderContext`][opentrons.protocol_api.AbsorbanceReaderContext] object, which has methods for moving the module lid with the Flex Gripper, initializing the module to read at a single wavelength or multiple wavelengths, and reading a plate. With the Python Protocol API, you can process plate reader data immediately in your protocol or export it to a CSV for post-run use.
 
 !!! note
-    Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). Opentrons software does not support manual lid movement or plate reader protocols without a gripper.
+    Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). The API does not support manual lid movement or plate reader protocols without a gripper.
 
 This page explains the actions necessary for using the Absorbance Plate Reader. These combine to form the typical reader workflow:
 
