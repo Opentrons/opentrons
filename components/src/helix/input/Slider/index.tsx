@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 
-import { COLORS } from '../../helix-design-system'
-import { StyledText } from '../StyledText'
+import { StyledText } from '../../../atoms'
+import { COLORS } from '../../../helix-design-system'
 import styles from './slider.module.css'
 
 import type { CSSProperties, ReactNode } from 'react'

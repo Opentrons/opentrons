@@ -1,9 +1,9 @@
 import * as React from 'react'
 
 import { TextAreaField as TextAreaFieldComponent } from '.'
-import { customViewports } from '../../../../.storybook/preview'
-import { DIRECTION_COLUMN } from '../../styles'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { customViewports } from '../../../../../.storybook/preview'
+import { DIRECTION_COLUMN } from '../../../styles'
+import { SPACING, VIEWPORT } from '../../../ui-style-constants'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ComponentProps } from 'react'

@@ -1,8 +1,8 @@
 import * as React from 'react'
 
-import { customViewports } from '../../../../.storybook/preview'
-import { DIRECTION_COLUMN } from '../../styles'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { customViewports } from '../../../../../.storybook/preview'
+import { DIRECTION_COLUMN } from '../../../styles'
+import { SPACING, VIEWPORT } from '../../../ui-style-constants'
 import { InputField as InputFieldComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
