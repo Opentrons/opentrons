@@ -50,6 +50,39 @@ describe('forMoveLabware', () => {
       ])
     })
 
+    it('sets stackedOnNode on the moved labware from runtime parameters', () => {
+      invariantContext.runtimeParameters = {
+        selected_labware: {
+          variableName: 'selected_labware',
+          displayName: 'Selected labware',
+          type: 'string',
+          default: SOURCE_LABWARE,
+        },
+        dest_slot: {
+          variableName: 'dest_slot',
+          displayName: 'Dest slot',
+          type: 'string',
+          default: 'A1',
+        },
+      }
+      forMoveLabware(
+        {
+          labwareId: 'selected_labware',
+          newLocation: { slotName: 'dest_slot' },
+          strategy: 'usingGripper',
+        },
+        invariantContext,
+        { robotState, warnings: [] }
+      )
+      expect(robotState.labware[SOURCE_LABWARE].stackedOnNode).toEqual({
+        slotName: 'A1',
+      })
+      expect(robotState.labware[SOURCE_LABWARE].stack).toEqual([
+        SOURCE_LABWARE,
+        'A1',
+      ])
+    })
+
     it('sets stackedOnNode for off-deck destination', () => {
       const newLocation = 'offDeck' as const
       forMoveLabware(
