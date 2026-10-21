@@ -15,7 +15,7 @@ This page explains the actions necessary for using the Absorbance Plate Reader. 
 1. Close the lid with no plate inside
 2. Initialize the reader
 3. Open the lid
-4. Use the Flex Gripper to move a plate onto the module
+4. Move a plate onto the module
 5. Close the lid
 6. Read the plate
 
