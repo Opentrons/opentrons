@@ -57,17 +57,33 @@ class ProtocolEditorPage(BasePage):
         self._open_select_labware_modal()
 
     def open_slot_tools(self, slot: str) -> None:
-        """Open the overflow tools menu for a deck slot."""
+        """Open the overflow tools menu for a deck slot that has labware.
 
-        slot_region = self.page.get_by_test_id(slot)
-        trigger_anchor = slot_region.locator("a[role='button']").first
-        if trigger_anchor.count() > 0:
-            trigger_anchor.click()
-        trigger = slot_region.locator("[data-testid='SlotOverflowMenu_openTools']").first
-        if trigger.count() == 0:
-            trigger = self.page.get_by_test_id("SlotOverflowMenu_openTools").first
-        self.wait_for_visible(trigger)
-        trigger.click()
+        The labware overlay is opacity 0 until hovered, so we force-click it
+        to open SlotOverflowMenu.
+        """
+        labware_overlay = self.page.get_by_test_id(slot).filter(
+            has=self.page.get_by_role("button", name="Edit labware")
+        )
+        labware_overlay.first.wait_for(state="attached", timeout=10000)
+        # Opacity is 0 until hover; force-click still fires the overlay onClick
+        labware_overlay.first.click(force=True)
+
+    def clear_labware_from_slot(self, slot: str) -> None:
+        """Clear labware from a deck slot via the slot overflow menu.
+
+        Args:
+            slot: Slot identifier like "A3"
+        """
+        self.open_slot_tools(slot)
+        clear_button = self.page.get_by_role("button", name="Clear labware", exact=True)
+        self.wait_for_visible(clear_button)
+        clear_button.click()
+
+        # Confirm if labware is in use (modal only appears then)
+        confirm_clear = self.page.get_by_role("button", name="Clear slot", exact=True)
+        if confirm_clear.count() > 0 and confirm_clear.first.is_visible():
+            confirm_clear.first.click()
 
     def _ensure_labware_tab_active(self) -> None:
         """Ensure the labware tab in the toolbox is active."""
@@ -317,6 +333,14 @@ class ProtocolEditorPage(BasePage):
     def select_deck_hardware(self) -> None:
         """Click the 'Deck hardware' button in the timeline to open the deck setup."""
         self.page.get_by_role("button", name="Deck hardware", exact=True).click()
+
+    def select_deck_hardware(self) -> None:
+        """Click the 'Deck hardware' button in the timeline to open the deck setup."""
+        self.page.get_by_role("button", name="Deck hardware", exact=True).click()
+
+    def select_starting_deck(self) -> None:
+        """Click the 'Starting deck' button in the timeline to open the deck setup."""
+        self.page.get_by_role("button", name="Starting deck", exact=True).click()
 
     def export_protocol(self, destination: Path, *, timeout: int = 60000) -> Path:
         """Click Export and save the downloaded protocol .py file."""
