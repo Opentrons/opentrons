@@ -1304,8 +1304,7 @@ export interface WaitForTemperatureStepGenArgs {
   celsius: number | string
 }
 
-export interface EngageMagnetStepGenArgs {
-  moduleId: string
+export interface EngageMagnetStepGenArgs extends ModuleStepGenArgs {
   height: number | string
 }
 

@@ -23,9 +23,7 @@ export const engageMagnet: CommandCreator<EngageMagnetStepGenArgs> = (
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
   const height = resolveNumericRuntimeValue(args.height, runtimeParameters)
   const errors: CommandCreatorError[] = []
-  const commandType = 'magneticModule/engage'
-
-  if (args.moduleId != null && moduleId == null) {
+  if (moduleId == null) {
     errors.push(
       errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
     )
@@ -35,14 +33,13 @@ export const engageMagnet: CommandCreator<EngageMagnetStepGenArgs> = (
       errorCreators.invalidRuntimeParameter({ parameterName: args.height })
     )
   }
-  if (errors.length > 0 || height == null) {
+  if (errors.length > 0 || moduleId == null || height == null) {
+    console.error(
+      `engageMagnet: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, height=${String(height)})`
+    )
     return { errors }
-  }
-
-  if (moduleId === null) {
-    return {
-      errors: [errorCreators.missingModuleError()],
-    }
   }
 
   if (moduleEntities[moduleId]?.type !== MAGNETIC_MODULE_TYPE) {
@@ -56,7 +53,7 @@ export const engageMagnet: CommandCreator<EngageMagnetStepGenArgs> = (
   return {
     commands: [
       {
-        commandType,
+        commandType: 'magneticModule/engage',
         key: uuid(),
         params: {
           moduleId,
