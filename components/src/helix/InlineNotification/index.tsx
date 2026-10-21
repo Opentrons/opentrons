@@ -1,6 +1,7 @@
 import { css } from 'styled-components'
 
 import { StyledText } from '../../atoms'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { Box, Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -10,7 +11,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../icons'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'

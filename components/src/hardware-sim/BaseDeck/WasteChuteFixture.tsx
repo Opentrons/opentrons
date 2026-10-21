@@ -8,8 +8,8 @@ import {
   WASTE_CHUTE_Y,
 } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../helix/icons'
 import { DeckLabelSet } from '../../helix/deck'
+import { Icon } from '../../helix/icons'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import styles from './basedeck.module.css'
 

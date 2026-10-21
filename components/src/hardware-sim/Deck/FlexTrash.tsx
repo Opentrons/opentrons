@@ -10,8 +10,8 @@ import {
 
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../helix/icons'
 import { DeckLabelSet } from '../../helix/deck'
+import { Icon } from '../../helix/icons'
 import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 

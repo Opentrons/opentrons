@@ -1,8 +1,8 @@
 import { action } from 'storybook/actions'
 
 import { customViewports } from '../../../../.storybook/preview'
-import { ICON_DATA_BY_NAME } from '../icons/Icons/icon-data'
 import { VIEWPORT } from '../../ui-style-constants'
+import { ICON_DATA_BY_NAME } from '../icons/Icons/icon-data'
 import { RadioButton as RadioButtonComponent } from './RadioButton'
 
 import type { Meta, StoryObj } from '@storybook/react'
