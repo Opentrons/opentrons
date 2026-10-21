@@ -51,6 +51,7 @@ class CompletedAnalysisResource:
     protocol_id: str
     analyzer_version: str
     completed_analysis: CompletedAnalysis
+    result: str  # Also already in completed_analysis, but pulled out for efficient querying.
 
     async def to_sql_values(self) -> Dict[str, object]:
         """Return this data as a dict that can be passed to a SQLALchemy insert.
@@ -77,6 +78,7 @@ class CompletedAnalysisResource:
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
             "completed_analysis": serialized_analysis,
+            "result": self.result,
         }
 
     @classmethod
@@ -104,6 +106,9 @@ class CompletedAnalysisResource:
         protocol_id = sql_row.protocol_id
         assert isinstance(protocol_id, str)
 
+        result = sql_row.result
+        assert isinstance(result, str)
+
         def parse_completed_analysis() -> CompletedAnalysis:
             try:
                 parsed_analysis = json_to_pydantic(
@@ -125,6 +130,7 @@ class CompletedAnalysisResource:
             protocol_id=protocol_id,
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
+            result=result,
         )
 
 
@@ -240,14 +246,11 @@ class CompletedAnalysisStore:
         statement = (
             sqlalchemy.select(
                 analysis_table.c.id,
-                sqlalchemy.func.json_extract(
-                    analysis_table.c.completed_analysis, "$.result"
-                ).label("result"),
+                analysis_table.c.result,
             )
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
-        # CASEY NOTE: This is responsible for a 254 MB jump on the 40k protocol
         with self._sql_engine.begin() as transaction:
             results = transaction.execute(statement).all()
 

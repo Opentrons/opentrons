@@ -5,14 +5,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
+from opentrons.protocol_engine import CommandStatus
+
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.zip_utils import sanitize_filename_component
+from robot_server.persistence.pydantic import json_to_pydantic
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunCommandSummary
 from robot_server.runs.run_store import BadRunResource, RunResource
-from opentrons.protocol_engine import CommandStatus
-from robot_server.persistence.pydantic import json_to_pydantic
 
 
 def collect_protocol_file(
@@ -78,23 +79,19 @@ async def collect_run_log(
             include_fixit_commands=True,
         )
         commands_list = [json.loads(c) for c in command_slice.commands]
-        
+
         command_summaries = [
             RunCommandSummary.model_construct(
                 id=c["id"],
                 key=c["key"],
                 commandType=c["commandType"],
-                intent=c.get("intent")
-                if c.get("intent")
-                else None,
+                intent=c.get("intent") if c.get("intent") else None,
                 status=CommandStatus(c["status"]),
                 createdAt=c["createdAt"],
                 startedAt=c["startedAt"],
                 completedAt=c["completedAt"],
                 params=c["params"],
-                error=c.get("error")
-                if c.get("error")
-                else None,
+                error=c.get("error") if c.get("error") else None,
                 notes=c["notes"],
                 failedCommandId=c.get("failedCommandId")
                 if c.get("failedCommandId")

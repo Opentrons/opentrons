@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 
 from datetime import datetime
-from typing import Annotated, Dict, List, Literal, Optional, Any
+from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -61,7 +61,9 @@ class RunCommandSummary(ResourceModel):
         description="An identifier representing this command as a step in a protocol.",
     )
     commandType: CommandType = Field(..., description="Specific type of command.")
-    createdAt: str = Field(..., description="Command creation timestamp as a JSON string.")
+    createdAt: str = Field(
+        ..., description="Command creation timestamp as a JSON string."
+    )
     startedAt: Optional[str] = Field(
         None,
         description="Command execution start timestamp, if started, as a JSON string.",
@@ -77,7 +79,9 @@ class RunCommandSummary(ResourceModel):
     )
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
-    params: dict[str, Any] = Field(..., description="Command execution parameters as a JSON dict.")
+    params: dict[str, Any] = Field(
+        ..., description="Command execution parameters as a JSON dict."
+    )
     intent: Optional[CommandIntent] = Field(
         None,
         description="Why this command was added to the run.",

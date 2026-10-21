@@ -19,8 +19,8 @@ from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandPointer,
     CommandSlice,
-    JsonCommandSlice,
     EngineStatus,
+    JsonCommandSlice,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
@@ -50,9 +50,9 @@ from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
 from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.persistence.pydantic import json_to_pydantic
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
-from robot_server.persistence.pydantic import json_to_pydantic
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -546,7 +546,10 @@ class RunDataManager:
             converted_slice = JsonCommandSlice(
                 cursor=commands_slice.cursor,
                 total_length=commands_slice.total_length,
-                commands=[command.model_dump_json(by_alias=True, exclude_none=True) for command in commands_slice.commands]
+                commands=[
+                    command.model_dump_json(by_alias=True, exclude_none=True)
+                    for command in commands_slice.commands
+                ],
             )
             return converted_slice
 

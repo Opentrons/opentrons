@@ -15,9 +15,9 @@ from sqlalchemy import and_
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandIntent,
-    JsonCommandSlice,
     CommandStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
@@ -601,9 +601,7 @@ class RunStore:
                 )
             slice_result = transaction.execute(select_slice).all()
 
-        sliced_commands: List[str] = [
-            row.command for row in slice_result
-        ]
+        sliced_commands: List[str] = [row.command for row in slice_result]
 
         return JsonCommandSlice(
             cursor=actual_cursor,
