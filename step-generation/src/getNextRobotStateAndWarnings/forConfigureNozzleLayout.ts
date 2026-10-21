@@ -1,8 +1,5 @@
 import { NOZZLE_STYLES, PRIMARY_NOZZLES } from '../constants'
-import {
-  resolveAllowedRuntimeValue,
-  resolveStringRuntimeValue,
-} from '../utils'
+import { resolveAllowedRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
   NozzleConfigurationStyle,
