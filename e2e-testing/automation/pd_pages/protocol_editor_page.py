@@ -128,27 +128,61 @@ class ProtocolEditorPage(BasePage):
             search_input.fill("")
 
         modal = self.page.get_by_label("ModalShell_ModalArea")
-        category = modal.locator("[data-testid^='ListButton_']").filter(has_text=category_name).first
+        category = modal.locator("[data-testid^='ListButton_']").filter(has_text=category_name)
         if category.count() == 0:
             category = modal.get_by_text(category_name, exact=False)
         if category.count() == 0:
-            category_index_by_name = {
-                "Tip racks": 0,
-                "Tube racks": 1,
-                "Well plates": 2,
-                "Reservoirs": 3,
-                "Aluminum blocks": 4,
-                "Adapters": 5,
-                "Lids": 6,
-            }
-            category_index = category_index_by_name.get(category_name)
-            if category_index is not None:
-                category = self.page.get_by_test_id("ListButton_noActive").nth(category_index)
+            available = modal.locator("[data-testid^='ListButton_']").all_inner_texts()
+            raise AssertionError(
+                f"Labware category '{category_name}' was not found. Available categories: {available}"
+            )
         self.wait_for_visible(category.first)
         category.first.click()
 
+    def set_recommended_labware_filter(self, *, enabled: bool) -> None:
+        """Toggle the 'Only display recommended labware' checkbox in the labware modal."""
+        filter_label = self.page.locator("label").filter(has_text="Only display recommended labware").first
+        if filter_label.count() == 0:
+            return
+        checkbox = filter_label.locator("input[type='checkbox']").first
+        if checkbox.count() == 0:
+            return
+        if checkbox.is_checked() != enabled:
+            filter_label.click()
+
+    def cancel_labware_modal(self) -> None:
+        """Close the Add labware modal without adding anything."""
+        cancel = self.page.get_by_role("button", name="Cancel", exact=True)
+        if cancel.count() > 0 and cancel.first.is_visible():
+            cancel.first.click()
+            return
+        self.page.keyboard.press("Escape")
+
+    def expect_labware_unavailable(self, labware_name: str, *, recommended_only: bool = True) -> None:
+        """Assert labware is not offered in the open Add labware modal.
+
+        Args:
+            labware_name: Display name substring to search for
+            recommended_only: When True, keep the recommended-only filter enabled
+        """
+        self.set_recommended_labware_filter(enabled=recommended_only)
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        if search_input.count() > 0:
+            search_input.fill(labware_name)
+        pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
+        modal = self.page.get_by_label("ModalShell_ModalArea")
+        matches = modal.locator("label").filter(has_text=pattern)
+        expect(matches).to_have_count(0, timeout=5000)
+
     def select_labware_by_name(
-        self, labware_name: str, stacker: bool = False, fill_num: int = 6, lid: bool = False
+        self,
+        labware_name: str,
+        stacker: bool = False,
+        fill_num: int = 6,
+        lid: bool = False,
+        *,
+        recommended_only: bool = False,
+        lid_name: str = "Opentrons Flex 96 Tip Rack 50",
     ) -> None:
         """Select a specific labware by its name.
 
@@ -157,6 +191,8 @@ class ProtocolEditorPage(BasePage):
             stacker: Whether to add a stacker and fill number
             fill_num: Number of labware to fill if using stacker
             lid: Whether to add a lid to the labware
+            recommended_only: When True, keep recommended-only filtering enabled
+            lid_name: Label text used to locate the lid checkbox when lid=True
         """
 
         search_input = self.page.locator("input[placeholder='Search labware']").first
@@ -165,11 +201,7 @@ class ProtocolEditorPage(BasePage):
         else:
             self._expand_labware_category("Well plates")
 
-        filter_label = self.page.locator("label").filter(has_text="Only display recommended labware").first
-        if filter_label.count() > 0:
-            checkbox = filter_label.locator("input[type='checkbox']").first
-            if checkbox.count() > 0 and checkbox.is_checked():
-                filter_label.click()
+        self.set_recommended_labware_filter(enabled=recommended_only)
 
         pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
         modal = self.page.get_by_label("ModalShell_ModalArea")
@@ -217,7 +249,7 @@ class ProtocolEditorPage(BasePage):
             self.page.get_by_test_id("customize-expand-button-input-field").click()
             self.page.get_by_test_id("customize-expand-button-input-field").fill(str(fill_num))
         if lid:
-            self._add_lid("Opentrons Flex 96 Tip Rack 50", "CheckboxField_icon")
+            self._add_lid(lid_name, "CheckboxField_icon")
         modal.get_by_role("button", name=re.compile(r"^Add labware$", re.IGNORECASE)).click()
         if modal.count() > 0:
             modal.wait_for(state="hidden", timeout=5000)
@@ -334,13 +366,40 @@ class ProtocolEditorPage(BasePage):
         """Click the 'Deck hardware' button in the timeline to open the deck setup."""
         self.page.get_by_role("button", name="Deck hardware", exact=True).click()
 
-    def select_deck_hardware(self) -> None:
-        """Click the 'Deck hardware' button in the timeline to open the deck setup."""
-        self.page.get_by_role("button", name="Deck hardware", exact=True).click()
-
     def select_starting_deck(self) -> None:
         """Click the 'Starting deck' button in the timeline to open the deck setup."""
         self.page.get_by_role("button", name="Starting deck", exact=True).click()
+
+    def add_labware_and_done(
+        self,
+        slot: str,
+        labware_name: str,
+        category: str | None = None,
+        *,
+        recommended_only: bool = False,
+        lid: bool = False,
+        lid_name: str = "Opentrons Tough Universal Lid",
+    ) -> None:
+        """Add labware to a slot and click Done on the deck toolbox.
+
+        Args:
+            slot: Deck slot or addressable area test id
+            labware_name: Labware display name to select
+            category: Optional category to expand first (e.g. "Adapters")
+            recommended_only: Keep recommended-only filtering enabled
+            lid: Whether to also select a lid for the labware
+            lid_name: Lid checkbox label when lid=True
+        """
+        self.add_labware_to_slot(slot)
+        if category is not None:
+            self.select_labware_category_by_name(category)
+        self.select_labware_by_name(
+            labware_name,
+            recommended_only=recommended_only,
+            lid=lid,
+            lid_name=lid_name,
+        )
+        self.select_done()
 
     def export_protocol(self, destination: Path, *, timeout: int = 60000) -> Path:
         """Click Export and save the downloaded protocol .py file."""
@@ -425,11 +484,30 @@ class ProtocolEditorPage(BasePage):
 
     def _add_lid(self, labware: str, test_id: str) -> None:
         """Add a lid to the selected labware.
+
+        Tip racks often use a "with lid" checkbox. Well plates with multiple
+        compatible lids list each lid as a selectable option instead.
+
         Args:
-            labware: Name of the labware to add a lid to.
-            test_id: Test ID of the lid checkbox element.
+            labware: Parent labware name (checkbox UI) or lid display name (list UI)
+            test_id: Test ID of the lid checkbox element
         """
-        self.page.locator("label").filter(has_text=labware).get_by_test_id(test_id).click()
+        modal = self.page.get_by_label("ModalShell_ModalArea")
+        checkbox = modal.locator("label").filter(has_text=labware).get_by_test_id(test_id)
+        try:
+            checkbox.first.wait_for(state="visible", timeout=2000)
+            checkbox.first.click()
+            return
+        except TimeoutError:
+            pass
+
+        lid_option = modal.locator("[role='label']").filter(has_text=labware)
+        if lid_option.count() == 0:
+            lid_option = modal.get_by_text(labware, exact=False)
+        if lid_option.count() == 0:
+            raise AssertionError(f"Lid option '{labware}' was not found after selecting labware")
+        self.wait_for_visible(lid_option.first)
+        lid_option.first.click()
 
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
