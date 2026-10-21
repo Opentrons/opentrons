@@ -5,7 +5,6 @@ import type { ToggleConfigValueAction } from '../config/types'
 
 export * from './hooks'
 export * from './selectors'
-export * from './actions'
 export * from './constants'
 
 export function toggleAnalyticsOptedIn(): ToggleConfigValueAction {

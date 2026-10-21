@@ -9,7 +9,6 @@ import { isFlexPipette, OT3_PIPETTES } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useCalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -34,7 +33,6 @@ const CAL_TYPE = 'pipetteOffset'
 const PIPETTE_NAME = 'pipetteName'
 const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 
-const startCalibration = vi.fn()
 vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
   isFileSaveCanceledError: vi.fn(),
 }))
@@ -52,9 +50,6 @@ vi.mock('@opentrons/shared-data', async () => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-api/selectors')
-vi.mock(
-  '/app/organisms/Desktop/CalibratePipetteOffset/useCalibratePipetteOffset'
-)
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/resources/devices')
@@ -85,10 +80,7 @@ describe('OverflowMenu', () => {
       left: null,
       right: null,
     })
-    vi.mocked(useCalibratePipetteOffset).mockReturnValue([
-      startCalibration,
-      null,
-    ])
+
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     vi.mocked(isFlexPipette).mockReturnValue(false)
