@@ -1,12 +1,12 @@
 import clsx from 'clsx'
 
-import { PlaceholderStyledText } from '../../atoms'
-import { COLORS } from '../../helix-design-system'
+import { PlaceholderStyledText } from '../../../atoms'
+import { COLORS } from '../../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
 
 import type { ReactNode } from 'react'
-import type { DesktopStyles as HelixStyles } from '../../atoms/StyledText'
+import type { DesktopStyles as HelixStyles } from '../../../atoms/StyledText'
 import type { IconName } from '../../icons'
 
 export interface RobotInfoLabelProps {

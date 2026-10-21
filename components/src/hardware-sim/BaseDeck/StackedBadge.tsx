@@ -1,4 +1,4 @@
-import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
+import { RobotInfoLabel } from '../../helix/icons/RobotInfoLabel'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
 import type { ReactNode } from 'react'

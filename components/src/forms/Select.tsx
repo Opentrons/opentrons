@@ -1,7 +1,7 @@
 import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import { Z_INDEX } from '../styles'
 import styles from './Select.module.css'
 

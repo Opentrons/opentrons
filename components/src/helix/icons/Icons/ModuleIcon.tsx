@@ -9,7 +9,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { withStyleProps } from '../hocs/withStyleProps'
+import { withStyleProps } from '../../../hocs/withStyleProps'
 import { Icon } from './Icon'
 
 import type { ReactNode } from 'react'

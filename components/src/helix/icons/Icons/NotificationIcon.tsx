@@ -1,4 +1,4 @@
-import { COLOR_WARNING } from '../styles'
+import { COLOR_WARNING } from '../../../styles'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 

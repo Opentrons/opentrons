@@ -1,11 +1,11 @@
 import cx from 'classnames'
 
 import { IconButton } from '../buttons'
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './alerts.module.css'
 
 import type { ReactNode } from 'react'
-import type { IconProps } from '../icons'
+import type { IconProps } from '../helix/icons'
 
 export type AlertType = 'success' | 'warning' | 'error' | 'info'
 

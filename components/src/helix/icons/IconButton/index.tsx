@@ -1,6 +1,6 @@
 import clsx from 'classnames'
 
-import { COLORS } from '../../helix-design-system'
+import { COLORS } from '../../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './iconbutton.module.css'
 

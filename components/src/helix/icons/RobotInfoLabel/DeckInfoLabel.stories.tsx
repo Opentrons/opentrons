@@ -1,5 +1,5 @@
-import { customViewports } from '../../../../.storybook/preview'
-import { RobotInfoLabel } from './index'
+import { RobotInfoLabel } from '.'
+import { customViewports } from '../../../../../.storybook/preview'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
