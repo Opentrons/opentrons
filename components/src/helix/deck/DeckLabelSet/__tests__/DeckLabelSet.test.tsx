@@ -2,13 +2,13 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DeckLabelSet } from '..'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { DeckLabel } from '../../../molecules/DeckLabel'
-import { renderWithProviders } from '../../../testing/utils'
+import { BORDERS, COLORS } from '../../../../helix-design-system'
+import { renderWithProviders } from '../../../../testing/utils'
+import { DeckLabel } from '../../DeckLabel'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../molecules/DeckLabel')
+vi.mock('../../DeckLabel')
 
 const mockDeckLabels = [
   {

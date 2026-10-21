@@ -10,13 +10,13 @@ import {
 
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { DeckLabelSet } from '../../organisms'
+import { Icon } from '../../helix/icons'
+import { DeckLabelSet } from '../../helix/deck'
 import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { DeckLabelProps } from '../../molecules'
+import type { DeckLabelProps } from '../../helix/deck'
 
 // only allow edge cutout locations (columns 1 and 3)
 export type TrashCutoutId =
