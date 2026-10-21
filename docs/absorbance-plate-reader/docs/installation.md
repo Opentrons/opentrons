@@ -16,4 +16,7 @@ To attach the Absorbance Plate Reader to your Flex:
 
 When connected, the Absorbance Plate Reader appears in the Instruments and Modules section on your robot’s device details page in the Opentrons App. It does not require positional calibration after installation. You can use the Absorbance Plate Reader as soon as the robot detects it.
 
+!!! note
+    Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). Opentrons software does not support manual lid movement or plate reader protocols without a gripper.
+
 </div>
