@@ -19,7 +19,7 @@ import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ChangeEventHandler, MouseEventHandler, ReactNode } from 'react'
-import type { IconName } from '../../icons'
+import type { IconName } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 export interface RadioButtonSubLabel {
