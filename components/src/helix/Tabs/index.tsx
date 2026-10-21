@@ -1,11 +1,11 @@
 import { css } from 'styled-components'
 
-import { Tooltip } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn, Flex } from '../../primitives'
 import { DIRECTION_ROW, POSITION_RELATIVE } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Tooltip } from '../Tooltip'
 
 import type { ReactNode } from 'react'
 

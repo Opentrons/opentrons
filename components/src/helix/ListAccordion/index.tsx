@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { css } from 'styled-components'
 
-import { ListTable } from '../../atoms/ListTable'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
 import { Box, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -12,10 +10,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { Icon } from '../icons'
+import { ListTable } from '../ListTable'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
-import type { ListTableProps } from '../../atoms/ListTable'
+import type { ListTableProps } from '../ListTable'
 
 const TRANSITION_STYLE = 'all 150ms ease-in'
 
