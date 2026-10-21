@@ -1,9 +1,9 @@
 import * as React from 'react'
 
+import { PrimaryButton } from '../../helix/buttons'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_COLUMN, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
-import { PrimaryButton } from '../../helix/buttons'
 import { LegacyStyledText } from '../StyledText'
 import { Toast } from './index'
 

@@ -2,9 +2,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ListAccordion } from '..'
-import { ListTable } from '../../ListTable'
-import { Icon } from '../../icons'
 import { renderWithProviders } from '../../../testing/utils'
+import { Icon } from '../../icons'
+import { ListTable } from '../../ListTable'
 
 import type { ComponentProps } from 'react'
 
