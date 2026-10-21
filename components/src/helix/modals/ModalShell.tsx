@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
-import { BORDERS, COLORS } from '../helix-design-system'
-import { styleProps } from '../primitives'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { styleProps } from '../../primitives'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -17,11 +17,11 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   Z_INDEX,
-} from '../styles'
-import { RESPONSIVENESS, SPACING } from '../ui-style-constants'
+} from '../../styles'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
-import type { StyleProps } from '../primitives'
+import type { StyleProps } from '../../primitives'
 
 export type Position = 'center' | 'bottomRight'
 export interface ModalShellProps extends StyleProps {

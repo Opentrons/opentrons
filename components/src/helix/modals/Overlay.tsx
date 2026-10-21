@@ -1,4 +1,5 @@
-import { Flex, POSITION_FIXED, Z_INDEX } from '..'
+import { Flex } from '../../primitives'
+import { POSITION_FIXED, Z_INDEX } from '../../styles'
 
 import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
-import { StyledText } from '../../atoms/StyledText'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
-import { SPACING } from '../../ui-style-constants'
+import { StyledText } from '../../../atoms'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { SPACING } from '../../../ui-style-constants'
+import { RobotInfoLabel } from '../../icons'
 import { ModelessModal } from './'
 import styles from './modelessmodal.stories.module.css'
 
