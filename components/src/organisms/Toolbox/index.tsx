@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { PrimaryButton } from '../../atoms'
+import { PrimaryButton } from '../../helix/buttons'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Box, Btn, Flex } from '../../primitives'
 import {
