@@ -4,8 +4,6 @@ import { combineReducers } from 'redux'
 import { alertsReducer } from './alerts/reducer'
 // audit log period deletion key state
 import { auditReducer } from './audit/slice'
-// calibration data state
-import { calibrationReducer } from './calibration/reducer'
 // config state
 import { configReducer } from './config/reducer'
 // custom labware state
@@ -48,7 +46,6 @@ export const rootReducer: Reducer<State, Action> = (
     shell: shellReducer,
     systemInfo: systemInfoReducer,
     alerts: alertsReducer,
-    calibration: calibrationReducer,
     protocolStorage: protocolStorageReducer,
     protocolRuns: protocolRunReducer,
   })
