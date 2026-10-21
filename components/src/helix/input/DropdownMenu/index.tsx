@@ -21,7 +21,7 @@ import {
 } from '../../../styles'
 import { useHoverTooltip } from '../../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
-import { RobotInfoLabel, Icon, LiquidIcon } from '../../icons'
+import { Icon, LiquidIcon, RobotInfoLabel } from '../../icons'
 import { MenuItem } from '../../MenuList/MenuItem'
 import { Tooltip } from '../../Tooltip'
 
@@ -310,7 +310,10 @@ export function DropdownMenu(props: DropdownMenuProps): ReactNode {
               <LiquidIcon color={currentOption.liquidColor} />
             ) : null}
             {currentOption.deckLabel != null ? (
-              <RobotInfoLabel deckLabel={currentOption.deckLabel} svgSize={13} />
+              <RobotInfoLabel
+                deckLabel={currentOption.deckLabel}
+                svgSize={13}
+              />
             ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}

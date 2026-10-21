@@ -1,16 +1,16 @@
 import { css } from 'styled-components'
 
 import { StyledText } from '../../../atoms'
-import { Tag } from '../../Tag'
 import { COLORS } from '../../../helix-design-system'
 import { Flex, Link } from '../../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { DropdownMenu } from '../../input'
+import { Tag } from '../../Tag'
 
 import type { ReactNode } from 'react'
-import type { TagProps } from '../../Tag'
 import type { DropdownMenuProps } from '../../input'
+import type { TagProps } from '../../Tag'
 
 interface ListItemCustomizeProps {
   header: string

@@ -6,10 +6,10 @@ import {
   orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 
-import { Chip } from '../../helix/Chip'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { TYPOGRAPHY } from '../../helix-design-system/product'
+import { Chip } from '../../helix/Chip'
 import { Icon } from '../../helix/icons'
 import { Flex } from '../../primitives'
 import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
