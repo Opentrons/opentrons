@@ -23,7 +23,6 @@ import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
-import type { SessionsAction, SessionState } from './sessions/types'
 import type {
   ShellAction,
   ShellState,
@@ -43,7 +42,6 @@ export interface State {
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
   readonly alerts: AlertsState
-  readonly sessions: SessionState
   readonly calibration: CalibrationState
   readonly protocolStorage: ProtocolStorageState
   readonly protocolRuns: ProtocolRunState
@@ -64,7 +62,6 @@ export type Action =
   | CustomLabwareAction
   | SystemInfoAction
   | AlertsAction
-  | SessionsAction
   | CalibrationAction
   | AnalyticsTriggerAction
   | AddCustomLabwareFromCreatorAction

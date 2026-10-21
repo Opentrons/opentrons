@@ -65,19 +65,3 @@ export function getAnalyticsConfig(state: State): AnalyticsConfig | null {
 export function getAnalyticsOptedIn(state: State): boolean {
   return state.config?.analytics.optedIn ?? true
 }
-
-export function getAnalyticsSessionExitDetails(
-  state: State,
-  robotName: string,
-  sessionId: string
-): null {
-  return null
-}
-
-export function getSessionInstrumentAnalyticsData(
-  state: State,
-  robotName: string,
-  sessionId: string
-): null {
-  return null
-}

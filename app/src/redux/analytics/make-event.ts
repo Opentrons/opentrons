@@ -1,11 +1,8 @@
 // redux action types to analytics events map
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import * as Alerts from '../alerts'
 import * as CustomLabware from '../custom-labware'
 import * as RobotUpdate from '../robot-update/constants'
-import * as Sessions from '../sessions'
-import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as SystemInfo from '../system-info'
 import * as Constants from './constants'
 import { getBuildrootAnalyticsData } from './selectors'
@@ -162,24 +159,6 @@ export function makeEvent(
       )
     }
 
-    case Sessions.CREATE_SESSION_COMMAND: {
-      switch (action.payload.command.command) {
-        case sharedCalCommands.EXIT: {
-          return Promise.resolve(null)
-        }
-        case sharedCalCommands.LOAD_LABWARE: {
-          const commandData = action.payload.command.data
-          if (commandData != null) {
-            return Promise.resolve(null)
-          } else {
-            return Promise.resolve(null)
-          }
-        }
-        default:
-          return Promise.resolve(null)
-      }
-    }
-
     case Alerts.ALERT_DISMISSED: {
       const { alertId, remember } = action.payload
 
@@ -191,26 +170,6 @@ export function makeEvent(
       }
 
       return Promise.resolve(null)
-    }
-
-    case Constants.ANALYTICS_PIPETTE_OFFSET_STARTED: {
-      return Promise.resolve({
-        name: 'pipetteOffsetCalibrationStarted',
-        properties: {
-          ...action.payload,
-          robotType: OT2_ROBOT_TYPE,
-        },
-      })
-    }
-
-    case Constants.ANALYTICS_TIP_LENGTH_STARTED: {
-      return Promise.resolve({
-        name: 'tipLengthCalibrationStarted',
-        properties: {
-          ...action.payload,
-          robotType: OT2_ROBOT_TYPE,
-        },
-      })
     }
 
     case Constants.ANALYTICS_RESOURCE_MONITOR_REPORT: {

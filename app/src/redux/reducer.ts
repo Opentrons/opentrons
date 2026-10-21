@@ -24,8 +24,6 @@ import { robotApiReducer } from './robot-api/reducer'
 import { robotAuthReducer } from './robot-auth/slice'
 // robot robot update state
 import { robotUpdateReducer } from './robot-update/reducer'
-// robot  calibration and (eventually) protocol sessions state
-import { sessionReducer } from './sessions/reducer'
 // app shell state
 import { shellReducer } from './shell/reducer'
 // system info state
@@ -50,7 +48,6 @@ export const rootReducer: Reducer<State, Action> = (
     shell: shellReducer,
     systemInfo: systemInfoReducer,
     alerts: alertsReducer,
-    sessions: sessionReducer,
     calibration: calibrationReducer,
     protocolStorage: protocolStorageReducer,
     protocolRuns: protocolRunReducer,
