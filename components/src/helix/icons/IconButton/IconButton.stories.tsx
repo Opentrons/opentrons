@@ -1,7 +1,7 @@
 import { action } from 'storybook/actions'
 
-import { ICON_DATA_BY_NAME } from '../../icons'
-import { SPACING } from '../../ui-style-constants'
+import { SPACING } from '../../../ui-style-constants'
+import { ICON_DATA_BY_NAME } from '../Icons'
 // Note: this will be renamed to IconButton when remove IconButton from components
 import { NewIconButton as IconButtonComponent } from './index'
 

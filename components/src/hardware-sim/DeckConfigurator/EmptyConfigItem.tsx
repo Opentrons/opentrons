@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Btn } from '../../primitives'
 import {
   ALIGN_CENTER,

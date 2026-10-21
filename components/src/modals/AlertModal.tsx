@@ -1,13 +1,13 @@
 import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import { LegacyModal } from './LegacyModal'
 import styles from './modals.module.css'
 
 import type { ReactNode } from 'react'
 import type { ButtonProps } from '../buttons'
-import type { IconName } from '../icons'
+import type { IconName } from '../helix/icons'
 
 export interface AlertModalProps {
   /** optional handler for overlay click */

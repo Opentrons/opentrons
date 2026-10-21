@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { Btn, Flex } from '../../../primitives'
+import { FLEX_MAX_CONTENT } from '../../../styles'
+import { SPACING } from '../../../ui-style-constants'
 import { Icon } from '../../icons'
-import { Btn, Flex } from '../../primitives'
-import { FLEX_MAX_CONTENT } from '../../styles'
-import { SPACING } from '../../ui-style-constants'
 
 import type { MouseEvent, ReactNode } from 'react'
 
