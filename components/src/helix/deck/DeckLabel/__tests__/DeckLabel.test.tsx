@@ -2,10 +2,10 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { DeckLabel } from '..'
-import { COLORS } from '../../../helix-design-system'
-import { FLEX_MAX_CONTENT } from '../../../styles'
-import { renderWithProviders } from '../../../testing/utils'
-import { SPACING } from '../../../ui-style-constants'
+import { COLORS } from '../../../../helix-design-system'
+import { FLEX_MAX_CONTENT } from '../../../../styles'
+import { renderWithProviders } from '../../../../testing/utils'
+import { SPACING } from '../../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 

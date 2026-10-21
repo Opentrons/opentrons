@@ -8,8 +8,8 @@ import {
   WASTE_CHUTE_Y,
 } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { DeckLabelSet } from '../../organisms'
+import { Icon } from '../../helix/icons'
+import { DeckLabelSet } from '../../helix/deck'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import styles from './basedeck.module.css'
 
@@ -19,7 +19,7 @@ import type {
   ModuleType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import type { DeckLabelProps } from '../../molecules'
+import type { DeckLabelProps } from '../../helix/deck'
 
 const TAG_HEIGHT = 28
 interface WasteChuteFixtureProps extends SVGProps<SVGGElement> {

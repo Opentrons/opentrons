@@ -1,7 +1,7 @@
 import { DeckLabelSet as DeckLabelSetComponent } from '.'
-import { BORDERS } from '../../helix-design-system'
-import { Flex } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
+import { BORDERS } from '../../../helix-design-system'
+import { Flex } from '../../../primitives'
+import { SPACING } from '../../../ui-style-constants'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

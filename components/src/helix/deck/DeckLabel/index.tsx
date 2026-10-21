@@ -2,12 +2,12 @@ import { css } from 'styled-components'
 
 import { getModuleType } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms'
-import { COLORS } from '../../helix-design-system'
+import { StyledText } from '../../../atoms/StyledText'
+import { COLORS } from '../../../helix-design-system'
+import { Flex } from '../../../primitives'
+import { ALIGN_CENTER, FLEX_MAX_CONTENT } from '../../../styles'
+import { SPACING } from '../../../ui-style-constants'
 import { ModuleIcon } from '../../icons'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, FLEX_MAX_CONTENT } from '../../styles'
-import { SPACING } from '../../ui-style-constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
