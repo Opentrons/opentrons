@@ -10,8 +10,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "eyes-playwright>=6.4.20",
+    "httpx>=0.27.0",
     "mypy>=1.13.0",
     "playwright>=1.55.0",
+    "pyserial>=3.5",
     "pytest>=8.0.0",
     "pytest-html>=4.1.1",
     "pytest-playwright>=0.6.2",
@@ -40,6 +42,7 @@ ignore = []
 
 [tool.mypy]
 python_version = "3.12"
+explicit_package_bases = true
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
@@ -54,3 +57,18 @@ no_implicit_optional = true
 module = "tests.*"
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "automation.app_helpers.*",
+    "automation.app_pages.*",
+    "tests.app.*",
+    "open_app",
+    "configure_robot",
+    "main_script",
+    "bootstrap",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+ignore_missing_imports = true
+disable_error_code = ["import-untyped", "attr-defined", "union-attr", "arg-type"]

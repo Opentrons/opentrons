@@ -1,0 +1,1 @@
+"""App navigation smoke tests."""

@@ -1,0 +1,1 @@
+"""App device card tests."""
