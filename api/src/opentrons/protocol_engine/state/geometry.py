@@ -80,8 +80,6 @@ from .labware_origin_math.stackup_origin_to_labware_origin import (
     get_stackup_origin_to_labware_origin,
 )
 from .modules import ModuleView
-from .pipettes import PipetteView
-from .wells import WellView
 from opentrons.motion_planning.adjacent_slots_getters import get_north_south_slots
 from opentrons.types import (
     DeckSlotName,
@@ -117,17 +115,13 @@ class GeometryView:
         self,
         config: Config,
         labware_view: LabwareView,
-        well_view: WellView,
         module_view: ModuleView,
-        pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
     ) -> None:
         """Initialize a GeometryView instance."""
         self._config = config
         self._labware = labware_view
-        self._wells = well_view
         self._modules = module_view
-        self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
 
     @cached_property

@@ -74,16 +74,11 @@ from opentrons.protocol_engine.state.labware import (
     LabwareView,
 )
 from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
-from opentrons.protocol_engine.state.pipettes import (
-    PipetteStore,
-    PipetteView,
-)
 from opentrons.protocol_engine.state.update_types import (
     AddressableAreaUsedUpdate,
     LoadedLabwareUpdate,
     StateUpdate,
 )
-from opentrons.protocol_engine.state.wells import WellStore, WellView
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
@@ -169,21 +164,9 @@ def mock_labware_view(decoy: Decoy) -> LabwareView:
 
 
 @pytest.fixture
-def mock_well_view(decoy: Decoy) -> WellView:
-    """Get a mock in the shape of a WellView."""
-    return decoy.mock(cls=WellView)
-
-
-@pytest.fixture
 def mock_module_view(decoy: Decoy) -> ModuleView:
     """Get a mock in the shape of a ModuleView."""
     return decoy.mock(cls=ModuleView)
-
-
-@pytest.fixture
-def mock_pipette_view(decoy: Decoy) -> PipetteView:
-    """Get a mock in the shape of a PipetteView."""
-    return decoy.mock(cls=PipetteView)
 
 
 @pytest.fixture
@@ -306,18 +289,6 @@ def labware_view(labware_store: LabwareStore) -> LabwareView:
 
 
 @pytest.fixture
-def well_store() -> WellStore:
-    """Get a well store that can accept actions."""
-    return WellStore()
-
-
-@pytest.fixture
-def well_view(well_store: WellStore) -> WellView:
-    """Get a well view of a real well store."""
-    return WellView(well_store._state)
-
-
-@pytest.fixture
 def module_store(state_config: Config) -> ModuleStore:
     """Get a module store that can accept actions."""
     return ModuleStore(
@@ -329,18 +300,6 @@ def module_store(state_config: Config) -> ModuleStore:
 def module_view(module_store: ModuleStore, state_config: Config) -> ModuleView:
     """Get a module view of a real labware store."""
     return ModuleView(state=module_store._state)
-
-
-@pytest.fixture
-def pipette_store() -> PipetteStore:
-    """Get a pipette store that can accept actions."""
-    return PipetteStore()
-
-
-@pytest.fixture
-def pipette_view(pipette_store: PipetteStore) -> PipetteView:
-    """Get a pipette view of a real pipette store."""
-    return PipetteView(pipette_store._state)
 
 
 @pytest.fixture
@@ -419,15 +378,11 @@ def mock_labware_origin_math(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def subject(
     mock_labware_view: LabwareView,
-    mock_well_view: WellView,
     mock_module_view: ModuleView,
-    mock_pipette_view: PipetteView,
     mock_addressable_area_view: AddressableAreaView,
     state_config: Config,
     labware_view: LabwareView,
-    well_view: WellView,
     module_view: ModuleView,
-    pipette_view: PipetteView,
     addressable_area_view: AddressableAreaView,
     use_mocks: bool,
 ) -> GeometryView:
@@ -446,9 +401,7 @@ def subject(
     return GeometryView(
         config=state_config,
         labware_view=mock_labware_view if use_mocks else labware_view,
-        well_view=mock_well_view if use_mocks else well_view,
         module_view=mock_module_view if use_mocks else module_view,
-        pipette_view=mock_pipette_view if use_mocks else pipette_view,
         addressable_area_view=(
             mock_addressable_area_view if use_mocks else addressable_area_view
         ),
@@ -2169,9 +2122,7 @@ def test_get_labware_grip_point_for_labware_on_module(
     subject = GeometryView(
         config=subject._config,
         labware_view=subject._labware,
-        well_view=subject._wells,
         module_view=subject._modules,
-        pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
     decoy.when(mock_labware_view.get_grip_z(test_definition)).then_return(500)
@@ -2267,9 +2218,7 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
     subject = GeometryView(
         config=subject._config,
         labware_view=subject._labware,
-        well_view=subject._wells,
         module_view=subject._modules,
-        pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
     decoy.when(mock_labware_view.get_grip_z(test_definition)).then_return(500)
