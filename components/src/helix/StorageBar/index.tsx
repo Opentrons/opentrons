@@ -1,5 +1,5 @@
+import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
-import { StyledText } from '../StyledText'
 import styles from './storagebar.module.css'
 
 import type { CSSProperties, ReactNode } from 'react'

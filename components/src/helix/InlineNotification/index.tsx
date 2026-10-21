@@ -1,7 +1,6 @@
 import { css } from 'styled-components'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { StyledText } from '../../atoms'
 import { Box, Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -11,12 +10,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../icons'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { MouseEventHandler, ReactNode } from 'react'
-import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
+import type { IconProps } from '../icons'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

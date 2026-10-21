@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { Snackbar as SnackbarComponent } from '.'
 import { customViewports } from '../../../../.storybook/preview'
+import { StyledText } from '../../atoms'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -11,7 +12,6 @@ import {
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
-import { StyledText } from '../StyledText'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

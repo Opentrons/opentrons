@@ -1,7 +1,7 @@
 import { customViewports } from '../../../../.storybook/preview'
-import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { ICON_DATA_BY_NAME } from '../icons/Icons/icon-data'
 import { Tag as TagComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
