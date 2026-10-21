@@ -35,8 +35,8 @@ import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 
 import type { ReactNode } from 'react'
 import type { AnalyticsProtocolProceedButtonText } from '/app/redux/analytics/constants'
-import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { ProtocolCalibrationStatus } from '/app/resources/runs/types'
 
 interface SetupRobotCalibrationProps {
   robotName: string
