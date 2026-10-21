@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { Checkbox } from '..'
-import { renderWithProviders } from '../../../testing/utils'
+import { renderWithProviders } from '../../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

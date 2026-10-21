@@ -1,21 +1,21 @@
 import { forwardRef, useId, useRef } from 'react'
 import styled, { css } from 'styled-components'
 
-import { StyledText } from '../../atoms/StyledText'
-import { Tooltip } from '../../atoms/Tooltip'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { Flex } from '../../primitives'
+import { StyledText } from '../../../atoms'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { Flex } from '../../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   NO_WRAP,
   TEXT_ALIGN_RIGHT,
-} from '../../styles'
-import { useHoverTooltip } from '../../tooltips'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { setRefs } from '../../utils'
+} from '../../../styles'
+import { useHoverTooltip } from '../../../tooltips'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { setRefs } from '../../../utils'
+import { Icon } from '../../icons'
+import { Tooltip } from '../../Tooltip'
 
 import type {
   ChangeEventHandler,

@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import { COLORS } from '../../helix-design-system'
+import { COLORS } from '../../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './checkboxbasic.module.css'
 
