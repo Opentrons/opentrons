@@ -1,17 +1,42 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { TemperatureParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  SetTemperatureStepGenArgs,
+} from '../../types'
 
 export const thermocyclerSetTargetBlockTemperature: CommandCreator<
-  TemperatureParams
+  SetTemperatureStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
   if (args.celsius !== undefined) {
     console.warn(
       `'volume' param not implemented for thermocycler/setTargetBlockTemperature, should not be set!`
     )
   }
-  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const celsius = resolveNumericRuntimeValue(args.celsius, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (typeof args.celsius === 'string' && celsius == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.celsius })
+    )
+  }
+  if (errors.length > 0 || moduleId == null || celsius == null) {
+    return { errors }
+  }
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
 
   return {
     commands: [
@@ -19,8 +44,8 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<
         commandType: 'thermocycler/setTargetBlockTemperature',
         key: uuid(),
         params: {
-          moduleId: args.moduleId,
-          celsius: args.celsius,
+          moduleId,
+          celsius,
           //  TODO( jr 7/17/23): add optional blockMaxVolumeUI and holdTimeSeconds params
         },
       },
