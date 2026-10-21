@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { css } from 'styled-components'
 
+import { StyledText } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
 
 import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'

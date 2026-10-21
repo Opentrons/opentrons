@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
-import { PrimaryButton } from '../../atoms/buttons/PrimaryButton'
+import { StyledText } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { spacing8 } from '../../ui-style-constants/spacing'
-import { StyledText } from '../StyledText'
+import { PrimaryButton } from '../buttons'
 
 import type { ReactNode } from 'react'
 

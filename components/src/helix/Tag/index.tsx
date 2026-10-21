@@ -1,17 +1,16 @@
 import { css } from 'styled-components'
 
+import { StyledText } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { LiquidIcon } from '../../molecules/LiquidIcon'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
-import { StyledText } from '../StyledText'
+import { Icon, LiquidIcon } from '../icons'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
-import type { IconName } from '../../icons'
-import type { LiquidIconProps } from '../../molecules/LiquidIcon'
+import type { IconName } from '../icons'
+import type { LiquidIconProps } from '../icons/LiquidIcon'
 
 export type TagType = 'default' | 'interactive' | 'branded' | 'onColor' | 'flex'
 
