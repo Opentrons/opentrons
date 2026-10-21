@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSuccessResult } from '../../../fixtures'
+import { getErrorResult, getSuccessResult } from '../../../fixtures'
 import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../thermocyclerDeactivateLid'
@@ -35,6 +35,7 @@ const profileElements: TCExtendedProfileParams['profileElements'] = [
 ]
 invariantContext = {
   ...invariantContext,
+  runtimeParameters: {},
   moduleEntities: {
     [module]: {
       id: module,
@@ -132,4 +133,77 @@ describe('thermocycler atomic commands', () => {
   }
 
   testCases.forEach(testParams)
+
+  const moduleOnlyCases = [
+    {
+      commandCreator: thermocyclerDeactivateBlock,
+      expectedType: 'thermocycler/deactivateBlock',
+      python: 'mock_thermocycler.deactivate_block()',
+    },
+    {
+      commandCreator: thermocyclerDeactivateLid,
+      expectedType: 'thermocycler/deactivateLid',
+      python: 'mock_thermocycler.deactivate_lid()',
+    },
+    {
+      commandCreator: thermocyclerCloseLid,
+      expectedType: 'thermocycler/closeLid',
+      python: 'mock_thermocycler.close_lid()',
+    },
+    {
+      commandCreator: thermocyclerOpenLid,
+      expectedType: 'thermocycler/openLid',
+      python: 'mock_thermocycler.open_lid()',
+    },
+  ]
+  moduleOnlyCases.forEach(({ commandCreator, expectedType, python }) => {
+    it(`resolves moduleId when it is a string runtime parameter for ${expectedType}`, () => {
+      invariantContext.runtimeParameters = {
+        selected_module: {
+          variableName: 'selected_module',
+          displayName: 'Selected module',
+          type: 'string',
+          default: module,
+        },
+      }
+      const result = commandCreator(
+        { moduleId: 'selected_module' },
+        invariantContext,
+        { labware: {} }
+      )
+      expect(result).toEqual({
+        commands: [
+          {
+            commandType: expectedType,
+            key: expect.any(String),
+            params: {
+              moduleId: module,
+            },
+          },
+        ],
+        python,
+      })
+    })
+    it(`returns error if moduleId is not a string runtime parameter for ${expectedType}`, () => {
+      invariantContext.runtimeParameters = {
+        mock_rtp: {
+          variableName: 'mock_rtp',
+          displayName: 'mock rtp',
+          type: 'boolean',
+          default: false,
+        },
+      }
+      const result = commandCreator(
+        { moduleId: 'mock_rtp' },
+        invariantContext,
+        { labware: {} }
+      )
+      expect(getErrorResult(result).errors).toEqual([
+        {
+          message: 'Runtime parameter "mock_rtp" is missing',
+          type: 'INVALID_RUNTIME_PARAMETER',
+        },
+      ])
+    })
+  })
 })
