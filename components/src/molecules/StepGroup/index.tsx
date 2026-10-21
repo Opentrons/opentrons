@@ -1,6 +1,6 @@
 import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import styles from './stepgroup.module.css'
 
 import type { MouseEventHandler, ReactNode } from 'react'

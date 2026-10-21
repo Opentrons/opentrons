@@ -1,11 +1,11 @@
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './buttons.module.css'
 import { FlatButton } from './FlatButton'
 
 import type { ReactNode } from 'react'
-import type { IconProps } from '../icons'
+import type { IconProps } from '../helix/icons'
 import type { ButtonProps } from './Button'
 
 interface Props extends ButtonProps {

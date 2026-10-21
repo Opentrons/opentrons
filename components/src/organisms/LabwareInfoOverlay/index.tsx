@@ -5,7 +5,7 @@ import {
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { DIRECTION_COLUMN, DISPLAY_FLEX, JUSTIFY_FLEX_END } from '../../styles'
 import styles from './labwareinfooverlay.module.css'
 

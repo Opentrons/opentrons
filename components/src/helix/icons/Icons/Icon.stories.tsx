@@ -1,5 +1,5 @@
-import { Flex, STYLE_PROPS } from '../primitives'
-import { SPACING } from '../ui-style-constants'
+import { Flex, STYLE_PROPS } from '../../../primitives'
+import { SPACING } from '../../../ui-style-constants'
 import { Icon as IconComponent } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
