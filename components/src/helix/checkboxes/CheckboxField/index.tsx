@@ -1,15 +1,15 @@
 import { css } from 'styled-components'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { Box, Flex } from '../../primitives'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { Box, Flex } from '../../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_AUTO,
   CURSOR_POINTER,
   JUSTIFY_CENTER,
-} from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+} from '../../../styles'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { Icon } from '../../icons'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ChangeEventHandler, ComponentProps, ReactNode } from 'react'

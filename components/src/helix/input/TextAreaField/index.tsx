@@ -1,11 +1,12 @@
 import { forwardRef, useEffect, useId, useState } from 'react'
 import clsx from 'clsx'
 
-import { StyledText, Tooltip } from '../../atoms'
-import { COLORS } from '../../helix-design-system'
+import { StyledText } from '../../../atoms'
+import { COLORS } from '../../../helix-design-system'
+import { useHoverTooltip } from '../../../tooltips/useHoverTooltip'
+import { SPACING } from '../../../ui-style-constants'
 import { Icon } from '../../icons'
-import { useHoverTooltip } from '../../tooltips/useHoverTooltip'
-import { SPACING } from '../../ui-style-constants'
+import { Tooltip } from '../../Tooltip'
 import styles from './textareafield.module.css'
 
 import type {

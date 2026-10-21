@@ -4,10 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { CheckboxField } from '..'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
-import { renderWithProviders } from '../../../testing/utils'
-import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { BORDERS, COLORS } from '../../../../helix-design-system'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../../styles'
+import { renderWithProviders } from '../../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../../ui-style-constants'
 
 import type { ComponentProps } from 'react'
 

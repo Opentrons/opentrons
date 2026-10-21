@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 
-import { COLORS } from '../../helix-design-system'
+import { StyledText } from '../../../atoms'
+import { COLORS } from '../../../helix-design-system'
+import { FLEX_MAX_CONTENT } from '../../../styles'
 import { Icon } from '../../icons'
-import { FLEX_MAX_CONTENT } from '../../styles'
-import { StyledText } from '../StyledText'
 import styles from './checkbox.module.css'
 
 import type { ChangeEventHandler, CSSProperties, ReactNode } from 'react'

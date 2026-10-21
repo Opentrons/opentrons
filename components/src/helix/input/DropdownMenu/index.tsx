@@ -1,14 +1,11 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/StyledText'
-import { LegacyStyledText } from '../../atoms/StyledText/LegacyStyledText'
-import { Tooltip } from '../../atoms/Tooltip'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { useOnClickOutside } from '../../interaction-enhancers'
-import { Flex } from '../../primitives'
+import { StyledText } from '../../../atoms/StyledText'
+import { LegacyStyledText } from '../../../atoms/StyledText/LegacyStyledText'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { useOnClickOutside } from '../../../interaction-enhancers'
+import { Flex } from '../../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
@@ -21,11 +18,12 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   Z_INDEX,
-} from '../../styles'
-import { useHoverTooltip } from '../../tooltips'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LiquidIcon } from '../LiquidIcon'
-import { RobotInfoLabel } from '../RobotInfoLabel'
+} from '../../../styles'
+import { useHoverTooltip } from '../../../tooltips'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { RobotInfoLabel, Icon, LiquidIcon } from '../../icons'
+import { MenuItem } from '../../MenuList/MenuItem'
+import { Tooltip } from '../../Tooltip'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { FocusEventHandler, MouseEvent, ReactNode } from 'react'
@@ -312,10 +310,7 @@ export function DropdownMenu(props: DropdownMenuProps): ReactNode {
               <LiquidIcon color={currentOption.liquidColor} />
             ) : null}
             {currentOption.deckLabel != null ? (
-              <RobotInfoLabel
-                deckLabel={currentOption.deckLabel}
-                svgSize={13}
-              />
+              <RobotInfoLabel deckLabel={currentOption.deckLabel} svgSize={13} />
             ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}
