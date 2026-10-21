@@ -69,6 +69,7 @@ import {
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  PickUpTipStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -114,12 +115,26 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forBlowout(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'dropTip':
-      forDropTip(command.params, invariantContext, robotStateAndWarnings)
+    case 'dropTip': {
+      const { pipetteId, labwareId, wellName } = command.params
+      forDropTip(
+        {
+          pipette: pipetteId,
+          dropTipLocation: labwareId,
+          wellName,
+        },
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
+    }
 
     case 'pickUpTip':
-      forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      forPickUpTip(
+        command.params as PickUpTipStepGenArgs,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'setTipState':

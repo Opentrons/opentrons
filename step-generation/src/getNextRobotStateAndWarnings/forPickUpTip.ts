@@ -9,20 +9,38 @@ import {
 } from '@opentrons/shared-data'
 
 import { EMPTY } from '../constants'
-import { getNozzleConfig } from '../utils'
+import { getNozzleConfig, resolveStringRuntimeValue } from '../utils'
 
+import type { PartialPrimaryNozzles } from '@opentrons/shared-data'
 import type {
-  PartialPrimaryNozzles,
-  PickUpTipParams,
-} from '@opentrons/shared-data'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+  InvariantContext,
+  PickUpTipStepGenArgs,
+  RobotStateAndWarnings,
+} from '../types'
 
 export function forPickUpTip(
-  params: PickUpTipParams,
+  params: PickUpTipStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, labwareId, wellName } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  const labwareId = resolveStringRuntimeValue(
+    params.labwareId,
+    runtimeParameters
+  )
+  const wellName = resolveStringRuntimeValue(params.wellName, runtimeParameters)
+  if (pipetteId == null || labwareId == null || wellName == null) {
+    console.error(
+      `forPickUpTip: arg resolved to null (pipetteId=${String(
+        pipetteId
+      )}, labwareId=${String(labwareId)}, wellName=${String(wellName)})`
+    )
+    return
+  }
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
   if (!getIsTiprack(tiprackDef)) {
