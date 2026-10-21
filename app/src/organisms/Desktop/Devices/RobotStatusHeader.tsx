@@ -20,7 +20,6 @@ import {
   StyledText,
   Tooltip,
   truncateString,
-  TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import {
@@ -157,11 +156,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps} width="100%">
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing2}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>

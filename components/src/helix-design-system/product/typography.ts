@@ -94,7 +94,7 @@ export const fontWeightBodyLargeRegular = fontWeightRegular
 export const fontStyleBodyLargeRegular = `${fontWeightBodyLargeRegular} ${fontSizeBodyLargeRegular}/${lineHeightBodyLargeRegular} ${fontFamilyBodyLargeRegular}`
 
 // Body-Default
-const fontSizeBodyDefault = '0.875rem' // 14px
+const fontSizeBodyDefault = '0.8125rem' // 13px
 const lineHeightBodyDefault = '1.25rem' // 20px
 const fontFamilyBodyDefault = fontFamily
 
