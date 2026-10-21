@@ -1,17 +1,41 @@
 import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
 
 import { DIRTY } from '../constants'
-import { getNozzleConfig } from '../utils'
+import { getNozzleConfig, resolveStringRuntimeValue } from '../utils'
 
-import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import type {
+  DropTipStepGenArgs,
+  InvariantContext,
+  RobotStateAndWarnings,
+} from '../types'
 
 export function forDropTip(
-  params: DropTipParams,
+  params: DropTipStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, wellName, labwareId } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(params.pipette, runtimeParameters)
+  const labwareId =
+    params.dropTipLocation == null
+      ? undefined
+      : resolveStringRuntimeValue(params.dropTipLocation, runtimeParameters)
+  const wellName =
+    params.wellName == null
+      ? undefined
+      : resolveStringRuntimeValue(params.wellName, runtimeParameters)
+  if (
+    pipetteId == null ||
+    (params.dropTipLocation != null && labwareId == null) ||
+    (params.wellName != null && wellName == null)
+  ) {
+    console.error(
+      `forDropTip: arg resolved to null (pipetteId=${String(
+        pipetteId
+      )}, labwareId=${String(labwareId)}, wellName=${String(wellName)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   robotState.tipState.pipettes[pipetteId].hasTip = false
   robotState.tipState.pipettes[pipetteId].tiprackURI = null
@@ -27,8 +51,16 @@ export function forDropTip(
     targetWellName: string
   ): string[] | undefined =>
     ordering.find(column => column.includes(targetWellName))
-  const tiprackDef = invariantContext.labwareEntities[labwareId]?.def
-  if (tiprackDef == null || !getIsTiprack(tiprackDef)) {
+  const tiprackDef =
+    labwareId == null
+      ? undefined
+      : invariantContext.labwareEntities[labwareId]?.def
+  if (
+    labwareId == null ||
+    wellName == null ||
+    tiprackDef == null ||
+    !getIsTiprack(tiprackDef)
+  ) {
     //  early exit if the labware isn't a tiprack or dropping tip into the fixedTrash
     console.warn(
       `forDropTip expected ${labwareId} to have definition and to be a tiprack`

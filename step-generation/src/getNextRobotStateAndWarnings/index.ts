@@ -115,9 +115,19 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forBlowout(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'dropTip':
-      forDropTip(command.params, invariantContext, robotStateAndWarnings)
+    case 'dropTip': {
+      const { pipetteId, labwareId, wellName } = command.params
+      forDropTip(
+        {
+          pipette: pipetteId,
+          dropTipLocation: labwareId,
+          wellName,
+        },
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
+    }
 
     case 'pickUpTip':
       forPickUpTip(
