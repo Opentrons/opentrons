@@ -1,4 +1,10 @@
-import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
+import {
+  AUTOMATIC,
+  COLUMN_4_SLOTS,
+  MANUAL,
+  NOZZLE_STYLES,
+  PRIMARY_NOZZLES,
+} from '../../constants'
 import {
   incompletePickup,
   invalidRuntimeParameter,
@@ -11,10 +17,15 @@ import {
   getIsSafePickupWithinTiprack,
   getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
+  resolveAllowedRuntimeValue,
   resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -31,6 +42,21 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
   const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
   const labwareId = resolveStringRuntimeValue(args.labwareId, runtimeParameters)
   const wellName = resolveStringRuntimeValue(args.wellName, runtimeParameters)
+  const resolvedNozzles = resolveAllowedRuntimeValue(
+    nozzles,
+    NOZZLE_STYLES,
+    runtimeParameters
+  )
+  const resolvedPrimaryNozzle = resolveAllowedRuntimeValue(
+    primaryNozzle,
+    PRIMARY_NOZZLES,
+    runtimeParameters
+  )
+  const resolvedTipTracking = resolveAllowedRuntimeValue(
+    tipTrackingOption,
+    [AUTOMATIC, MANUAL],
+    runtimeParameters
+  )
   const rawValues = [args.pipetteId, args.labwareId, args.wellName]
   const resolvedValues = [pipetteId, labwareId, wellName]
   const rtpErrors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
@@ -38,14 +64,31 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
       ? [invalidRuntimeParameter({ parameterName: value })]
       : []
   )
+  if (resolvedNozzles == null) {
+    rtpErrors.push(invalidRuntimeParameter({ parameterName: nozzles }))
+  }
+  if (resolvedPrimaryNozzle == null) {
+    rtpErrors.push(invalidRuntimeParameter({ parameterName: primaryNozzle }))
+  }
+  if (resolvedTipTracking == null) {
+    rtpErrors.push(
+      invalidRuntimeParameter({ parameterName: tipTrackingOption })
+    )
+  }
   if (
     rtpErrors.length > 0 ||
     pipetteId == null ||
     labwareId == null ||
-    wellName == null
+    wellName == null ||
+    resolvedNozzles == null ||
+    resolvedPrimaryNozzle == null ||
+    resolvedTipTracking == null
   ) {
     return { errors: rtpErrors }
   }
+  const nozzleConfiguration = resolvedNozzles as NozzleConfigurationStyle
+  const resolvedPrimary =
+    resolvedPrimaryNozzle as PrimaryNozzleConfigurationStyle
   const errors: CommandCreatorError[] = []
   const channels = invariantContext.pipetteEntities[pipetteId].spec.channels
   const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
@@ -56,15 +99,15 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
     //  we don't adjust the offset when moving to the tiprack
     wellLocationOffset: { x: 0, y: 0 },
     wellTargetName: wellName,
-    nozzleConfiguration: nozzles,
-    primaryNozzle: primaryNozzle,
+    nozzleConfiguration,
+    primaryNozzle: resolvedPrimary,
   })
 
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
     tipState: prevRobotState.tipState.tipracks[labwareId],
-    primaryNozzle,
+    primaryNozzle: resolvedPrimary,
     channels,
-    nozzleConfiguration: nozzles,
+    nozzleConfiguration,
     wellName,
     tiprackDef: invariantContext.labwareEntities[labwareId].def,
   })
@@ -110,7 +153,7 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
     runtimeParameters[args.wellName] != null
       ? args.wellName
       : formatPyStr(wellName)
-  const manualWell = tipTrackingOption === MANUAL ? `[${pythonWellName}]` : ''
+  const manualWell = resolvedTipTracking === MANUAL ? `[${pythonWellName}]` : ''
   const python = `${pipettePythonName}.pick_up_tip(location=${tiprackPythonName}${manualWell})`
 
   if (errors.length > 0) {

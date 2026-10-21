@@ -6,7 +6,6 @@ import type {
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
-  Height,
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
@@ -29,7 +28,6 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
   VacuumRunProfileParams,
-  Width,
 } from '@opentrons/shared-data'
 import type {
   AUTOMATIC,
@@ -814,13 +812,13 @@ export interface CommentArgs extends CommonArgs {
 
 export interface CaptureImageArgs extends CommonArgs {
   commandCreatorFnName: 'captureImage'
-  homeBefore: boolean
+  homeBefore: boolean | string
   fileName: string
-  resolution: [Width, Height]
-  zoom: number
-  contrast: number
-  brightness: number
-  saturation: number
+  resolution: [number | string, number | string]
+  zoom: number | string
+  contrast: number | string
+  brightness: number | string
+  saturation: number | string
 }
 
 export interface FlexStackerEmptyArgs extends CommonArgs {
@@ -845,36 +843,36 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
 }
 
 export interface VacuumPumpAdvancedArgs {
-  duration?: number
-  ventAfter?: boolean
+  duration?: number | string
+  ventAfter?: boolean | string
 }
 
 export interface VacuumPumpPressureArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPressure'
-  gaugePressure: number
+  gaugePressure: number | string
 }
 
 export interface VacuumPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPower'
-  percentPower: number
+  percentPower: number | string
 }
 
 export interface VacuumCloseVentSetPumpPressureArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
-  gaugePressure: number
+  gaugePressure: number | string
 }
 
 export interface VacuumCloseVentSetPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
-  percentPower: number
+  percentPower: number | string
 }
 
 export interface VacuumOpenVentArgs extends CommonArgs {
@@ -925,14 +923,14 @@ export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
   profile: VacuumRunProfileParams['steps']
-  ventAfter: boolean
+  ventAfter: boolean | string
 }
 
 export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
   profile: VacuumRunProfileParams['steps']
-  ventAfter: boolean
+  ventAfter: boolean | string
 }
 
 export type VacuumArgs =
@@ -1320,16 +1318,16 @@ export interface PickUpTipStepGenArgs {
   pipetteId: string
   labwareId: string
   wellName: string
-  primaryNozzle: PrimaryNozzleConfigurationStyle
-  nozzles: NozzleConfigurationStyle
-  tipTrackingOption?: TipTrackingOption
+  primaryNozzle: string
+  nozzles: string
+  tipTrackingOption?: string
 }
 
 export interface DropTipStepGenArgs {
   pipette: string
   wellName?: string
   dropTipLocation?: string
-  isReturnTip?: boolean
+  isReturnTip?: boolean | string
 }
 
 export interface DispenseWhileTrackingStepGenArgs {
@@ -1349,7 +1347,7 @@ export interface DispenseInPlaceStepGenArgs {
   flowRate: number | string
   pushOut?: number | string
   correctionVolume?: number | string
-  isAirGap?: boolean
+  isAirGap?: boolean | string
 }
 
 export interface BlowOutInWellStepGenArgs {
