@@ -4,6 +4,7 @@ import { dropTipInPlace } from '..'
 import { FIXED_TRASH_ID } from '../../../constants'
 import {
   DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
   getSuccessResult,
@@ -77,5 +78,67 @@ describe('dropTipInPlace', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([])
     expect(res.python).toBeUndefined()
+  })
+  it('resolves pipetteId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+    }
+    const result = dropTipInPlace(
+      {
+        pipetteId: 'selected_pipette',
+      },
+      invariantContext,
+      {
+        ...robotStateWithTip,
+        pipettes: {
+          ...robotStateWithTip.pipettes,
+          [DEFAULT_PIPETTE]: {
+            ...robotStateWithTip.pipettes[DEFAULT_PIPETTE],
+            entityId: FIXED_TRASH_ID,
+          },
+        },
+      }
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+          },
+        },
+      ],
+      python:
+        'mock_pipette.drop_tip(trash_bin_1, alternate_drop_location=True)',
+    })
+  })
+  it('returns error if pipetteId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = dropTipInPlace(
+      {
+        pipetteId: 'mock_rtp',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

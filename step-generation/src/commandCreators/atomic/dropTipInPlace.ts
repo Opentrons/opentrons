@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { DropTipInPlaceParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
 // NOTE (ja 9/29/26): the python is emitted in here for OAIv2's purposes ONLY
@@ -9,12 +9,22 @@ import type { CommandCreator } from '../../types'
 // otherwise, the compound command dropTipInTrash is emitted for PD
 // with the python not being generated directly from dropTipInPlace via
 // curryWithoutPython(dropTipInPlace)
-export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
+export const dropTipInPlace: CommandCreator<{ pipetteId: string }> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId } = args
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  if (pipetteId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.pipetteId,
+        }),
+      ],
+    }
+  }
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     return {
