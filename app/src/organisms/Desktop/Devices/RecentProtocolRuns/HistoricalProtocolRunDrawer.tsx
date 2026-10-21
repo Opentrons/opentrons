@@ -8,7 +8,6 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   ALIGN_FLEX_START,
-  Banner,
   BORDERS,
   Box,
   COLORS,
@@ -49,7 +48,6 @@ import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import { OffsetTag } from '../../../LabwarePositionCheck'
 import { DownloadCsvFileLink } from '../DownloadCsvFileLink'
-import { useDeckCalibrationData } from '../hooks'
 
 import type { ReactNode } from 'react'
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
@@ -101,12 +99,6 @@ export function HistoricalProtocolRunDrawer(
     }
   )
 
-  const deckCalibrationData =
-    useDeckCalibrationData(robotName).deckCalibrationData
-  const lastModifiedDeckCal =
-    deckCalibrationData != null && 'lastModified' in deckCalibrationData
-      ? deckCalibrationData.lastModified
-      : null
   const protocolDetails = useMostRecentCompletedAnalysis(run.id)
 
   const sortedUniqueLwOffsets = uniqueLabwareOffsets.sort((a, b) => {
@@ -123,33 +115,6 @@ export function HistoricalProtocolRunDrawer(
       return nameCompare
     }
   })
-
-  const isOutOfDate =
-    typeof lastModifiedDeckCal === 'string' &&
-    sortedUniqueLwOffsets.length > 0 &&
-    new Date(lastModifiedDeckCal).getTime() >
-      new Date(
-        sortedUniqueLwOffsets[sortedUniqueLwOffsets?.length - 1].createdAt
-      ).getTime()
-  const outOfDateBanner = isOutOfDate ? (
-    <Banner
-      type="warning"
-      marginTop={SPACING.spacing8}
-      iconMarginLeft={SPACING.spacing4}
-    >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
-          {t('data_out_of_date')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
-          {t('robot_was_recalibrated')}
-        </LegacyStyledText>
-      </Flex>
-    </Banner>
-  ) : null
 
   const protocolFilesData =
     totalOutputFileCount === 0 ? (
@@ -195,7 +160,6 @@ export function HistoricalProtocolRunDrawer(
       <InfoScreen content={t('no_offsets_available')} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {outOfDateBanner}
         <LegacyStyledText>
           {i18n.format(t('labware_offset_data'), 'capitalize')}
         </LegacyStyledText>
