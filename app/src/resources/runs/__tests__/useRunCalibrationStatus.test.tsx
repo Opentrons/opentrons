@@ -50,7 +50,6 @@ describe('useRunCalibrationStatus hook', () => {
       .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
-          pipetteCalDate: '2020-08-30T10:02',
           pipetteSpecs: {
             displayName: 'pipette 1',
           },
@@ -77,7 +76,6 @@ describe('useRunCalibrationStatus hook', () => {
       .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
-          pipetteCalDate: '2020-08-30T10:02',
           pipetteSpecs: {
             displayName: 'pipette 1',
           },
