@@ -48,10 +48,13 @@ export function dispenseUpdateLiquidState(
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   const primaryNozzle =
     robotStateAndWarnings.robotState.pipettes[pipetteId].primaryNozzle
+  const backLeftNozzle =
+    robotStateAndWarnings.robotState.pipettes[pipetteId].backLeftNozzle
   const activeChannels = getActiveNozzleAmount({
     pipetteSpec,
     nozzles,
     primaryNozzle,
+    backLeftNozzle,
   })
 
   const well = wellName ?? null
