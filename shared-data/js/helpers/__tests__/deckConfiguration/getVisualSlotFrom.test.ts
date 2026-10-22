@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   getSlotDisplayNameFromAAWithFakes,
@@ -56,5 +56,14 @@ describe('getSlotDisplayNameFromAAWithFakes', () => {
   it('should return slot name for heater shaker addressable area (heaterShakerV1B3)', () => {
     const result = getSlotDisplayNameFromAAWithFakes('heaterShakerV1B3')
     expect(result).toEqual('B3')
+  })
+
+  it('should return OT-2 slot names that are not in the Flex visual-slot map', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(getSlotDisplayNameFromAAWithFakes('1')).toEqual('1')
+    expect(getSlotDisplayNameFromAAWithFakes('10')).toEqual('10')
+    expect(getSlotDisplayNameFromAAWithFakes('11')).toEqual('11')
+    expect(error).not.toHaveBeenCalled()
+    error.mockRestore()
   })
 })

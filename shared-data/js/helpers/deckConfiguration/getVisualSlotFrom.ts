@@ -154,10 +154,17 @@ export const getAAWithFakesFromVSId = (
 export const getSlotDisplayNameFromAAWithFakes = (
   aaId: AddressableAreaNamesWithFakes
 ): string => {
-  const vsId = getVisualSlotIdFromAAId(aaId as AddressableAreaNamesWithFakes)
+  const vsId = Object.entries(VS_TO_AA).find(([, areas]) =>
+    areas.includes(aaId)
+  )?.[0]
+  // OT-2 addressable areas are already slot names ("1"–"11") and are not in
+  // the Flex visual-slot map. An empty name here drops that labware from the deck.
+  if (vsId == null) {
+    return getAASlotDisplayName(aaId)
+  }
   const slot =
     getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
-    ('' as AddressableAreaNamesWithFakes)
+    (aaId as AddressableAreaNamesWithFakes)
 
   return getAASlotDisplayName(slot)
 }
