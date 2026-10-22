@@ -8,8 +8,10 @@ export const thermocyclerDeactivateBlock: CommandCreator<ModuleStepGenArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { runtimeParameters } = invariantContext
-  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const moduleId = resolveStringRuntimeValue(
+    args.moduleId,
+    invariantContext.runtimeParameters
+  )
   if (moduleId == null) {
     return {
       errors: [

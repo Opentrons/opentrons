@@ -8,11 +8,11 @@ import {
 import type {
   CommandCreator,
   CommandCreatorError,
-  SetTemperatureStepGenArgs,
+  ThermocyclerSetTargetBlockTemperatureStepGenArgs,
 } from '../../types'
 
 export const thermocyclerSetTargetBlockTemperature: CommandCreator<
-  SetTemperatureStepGenArgs
+  ThermocyclerSetTargetBlockTemperatureStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
   if (args.celsius !== undefined) {
     console.warn(
@@ -33,7 +33,7 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<
       errorCreators.invalidRuntimeParameter({ parameterName: args.celsius })
     )
   }
-  if (errors.length > 0 || moduleId == null || celsius == null) {
+  if (moduleId == null || celsius == null) {
     return { errors }
   }
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName

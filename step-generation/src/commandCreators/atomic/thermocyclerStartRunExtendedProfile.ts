@@ -7,11 +7,12 @@ import {
   uuid,
 } from '../../utils'
 
-import type { TCExtendedProfileParams } from '@opentrons/shared-data'
+import type { TCStartExtendedProfileParams } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
-  ModuleStepGenArgs,
+  ThermocyclerProfileStepStepGenArgs,
+  ThermocyclerStartRunExtendedProfileStepGenArgs,
 } from '../../types'
 
 /**
@@ -19,20 +20,7 @@ import type {
  * so it should be snake_case.
  */
 export const thermocyclerStartRunExtendedProfile: CommandCreator<
-  ModuleStepGenArgs & {
-    profileElements: Array<
-      | { celsius: number | string; holdSeconds: number | string }
-      | {
-          steps: Array<{
-            celsius: number | string
-            holdSeconds: number | string
-          }>
-          repetitions: number | string
-        }
-    >
-    blockMaxVolumeUl?: number | string
-    taskId?: string | null
-  }
+  ThermocyclerStartRunExtendedProfileStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
   const { taskId, profileElements, blockMaxVolumeUl } = args
   const { runtimeParameters } = invariantContext
@@ -41,10 +29,6 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
     taskId == null
       ? taskId
       : resolveStringRuntimeValue(taskId, runtimeParameters)
-  const resolvedBlockMaxVolumeUl =
-    blockMaxVolumeUl == null
-      ? undefined
-      : resolveNumericRuntimeValue(blockMaxVolumeUl, runtimeParameters)
   const errors: CommandCreatorError[] = []
   if (moduleId == null) {
     errors.push(
@@ -56,101 +40,49 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
       errorCreators.invalidRuntimeParameter({ parameterName: taskId })
     )
   }
-  if (
-    typeof blockMaxVolumeUl === 'string' &&
-    resolvedBlockMaxVolumeUl == null
-  ) {
-    errors.push(
-      errorCreators.invalidRuntimeParameter({
-        parameterName: blockMaxVolumeUl,
-      })
-    )
-  }
-  const resolvedProfileElements: TCExtendedProfileParams['profileElements'] = []
-  for (const element of profileElements) {
-    if ('steps' in element) {
-      const repetitions = resolveNumericRuntimeValue(
-        element.repetitions,
-        runtimeParameters
+  const resolveNumber = (value: number | string): number | null => {
+    const resolvedValue = resolveNumericRuntimeValue(value, runtimeParameters)
+    if (typeof value === 'string' && resolvedValue == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({ parameterName: value })
       )
-      if (typeof element.repetitions === 'string' && repetitions == null) {
-        errors.push(
-          errorCreators.invalidRuntimeParameter({
-            parameterName: element.repetitions,
-          })
-        )
-      }
-      const steps: Array<{ celsius: number; holdSeconds: number }> = []
-      for (const step of element.steps) {
-        const celsius = resolveNumericRuntimeValue(
-          step.celsius,
-          runtimeParameters
-        )
-        const holdSeconds = resolveNumericRuntimeValue(
-          step.holdSeconds,
-          runtimeParameters
-        )
-        if (typeof step.celsius === 'string' && celsius == null) {
-          errors.push(
-            errorCreators.invalidRuntimeParameter({
-              parameterName: step.celsius,
-            })
-          )
-        }
-        if (typeof step.holdSeconds === 'string' && holdSeconds == null) {
-          errors.push(
-            errorCreators.invalidRuntimeParameter({
-              parameterName: step.holdSeconds,
-            })
-          )
-        }
-        if (celsius != null && holdSeconds != null) {
-          steps.push({ celsius, holdSeconds })
-        }
-      }
-      if (repetitions != null) {
-        resolvedProfileElements.push({ steps, repetitions })
-      }
-    } else {
-      const celsius = resolveNumericRuntimeValue(
-        element.celsius,
-        runtimeParameters
-      )
-      const holdSeconds = resolveNumericRuntimeValue(
-        element.holdSeconds,
-        runtimeParameters
-      )
-      if (typeof element.celsius === 'string' && celsius == null) {
-        errors.push(
-          errorCreators.invalidRuntimeParameter({
-            parameterName: element.celsius,
-          })
-        )
-      }
-      if (typeof element.holdSeconds === 'string' && holdSeconds == null) {
-        errors.push(
-          errorCreators.invalidRuntimeParameter({
-            parameterName: element.holdSeconds,
-          })
-        )
-      }
-      if (celsius != null && holdSeconds != null) {
-        resolvedProfileElements.push({ celsius, holdSeconds })
-      }
     }
+    return resolvedValue
   }
-  if (
-    errors.length > 0 ||
-    moduleId == null ||
-    resolvedTaskId === null ||
-    resolvedBlockMaxVolumeUl === null
-  ) {
+  const resolveStep = (
+    step: ThermocyclerProfileStepStepGenArgs
+  ): { celsius: number | null; holdSeconds: number | null } => ({
+    celsius: resolveNumber(step.celsius),
+    holdSeconds: resolveNumber(step.holdSeconds),
+  })
+  const resolvedProfileElements = profileElements.map(element =>
+    'steps' in element
+      ? {
+          steps: element.steps.map(resolveStep),
+          repetitions: resolveNumber(element.repetitions),
+        }
+      : resolveStep(element)
+  )
+  const resolvedBlockMaxVolumeUl =
+    blockMaxVolumeUl == null ? undefined : resolveNumber(blockMaxVolumeUl)
+  if (moduleId == null || errors.length > 0) {
     return { errors }
   }
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
 
+  const pythonProfileElements = profileElements.map(element =>
+    'steps' in element && profileElements.length > 1
+      ? {
+          ...element,
+          repetitions: resolveNumericRuntimeValue(
+            element.repetitions,
+            runtimeParameters
+          ),
+        }
+      : element
+  )
   const repetitionsForPython = getThermocyclerProfileRepetitionsForPython(
-    profileElements as TCExtendedProfileParams['profileElements']
+    pythonProfileElements as TCStartExtendedProfileParams['profileElements']
   )
   const pythonSteps = repetitionsForPython.repeatingProfileSteps
     .map(
@@ -178,8 +110,9 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
         params: {
           moduleId,
           taskId: resolvedTaskId,
-          profileElements: resolvedProfileElements,
-          blockMaxVolumeUl: resolvedBlockMaxVolumeUl,
+          profileElements:
+            resolvedProfileElements as TCStartExtendedProfileParams['profileElements'],
+          blockMaxVolumeUl: resolvedBlockMaxVolumeUl ?? undefined,
         },
       },
     ],

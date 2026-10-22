@@ -16,7 +16,8 @@ export const thermocyclerCloseLid: CommandCreator<ModuleStepGenArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { runtimeParameters } = invariantContext
+  const { moduleEntities, labwareEntities, runtimeParameters } =
+    invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
   if (moduleId == null) {
     return {
@@ -25,7 +26,6 @@ export const thermocyclerCloseLid: CommandCreator<ModuleStepGenArgs> = (
       ],
     }
   }
-  const { moduleEntities, labwareEntities } = invariantContext
   const errors: CommandCreatorError[] = []
 
   const pythonName = moduleEntities[moduleId].pythonName

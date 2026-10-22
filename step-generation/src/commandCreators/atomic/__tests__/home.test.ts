@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getErrorResult, getSuccessResult } from '../../../fixtures'
+import {
+  getErrorResult,
+  getSuccessResult,
+  makeContext,
+} from '../../../fixtures'
 import { home } from '../home'
 
 import type { InvariantContext, RobotState } from '../../../types'
@@ -42,22 +46,21 @@ describe('home', () => {
     })
   })
   it('resolves runtime parameters into the command and python', () => {
-    const invariantContext = {
-      runtimeParameters: {
-        axis_y: {
-          variableName: 'axis_y',
-          displayName: 'Axis y',
-          type: 'string',
-          default: 'y',
-        },
-        mount: {
-          variableName: 'mount',
-          displayName: 'Mount',
-          type: 'string',
-          default: 'left',
-        },
+    const invariantContext = makeContext()
+    invariantContext.runtimeParameters = {
+      axis_y: {
+        variableName: 'axis_y',
+        displayName: 'Axis y',
+        type: 'string',
+        default: 'y',
       },
-    } as InvariantContext
+      mount: {
+        variableName: 'mount',
+        displayName: 'Mount',
+        type: 'string',
+        default: 'left',
+      },
+    }
     const result = home(
       { axes: ['x', 'axis_y'], skipIfMountPositionOk: 'mount' },
       invariantContext,
@@ -79,16 +82,15 @@ describe('home', () => {
     })
   })
   it('returns errors if runtime parameters are not valid', () => {
-    const invariantContext = {
-      runtimeParameters: {
-        mock_rtp: {
-          variableName: 'mock_rtp',
-          displayName: 'mock rtp',
-          type: 'boolean',
-          default: false,
-        },
+    const invariantContext = makeContext()
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
       },
-    } as InvariantContext
+    }
     const result = home(
       { axes: ['mock_rtp'], skipIfMountPositionOk: 'mock_rtp' },
       invariantContext,

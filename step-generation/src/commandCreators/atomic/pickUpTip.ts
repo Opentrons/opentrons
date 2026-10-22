@@ -42,16 +42,18 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
   const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
   const labwareId = resolveStringRuntimeValue(args.labwareId, runtimeParameters)
   const wellName = resolveStringRuntimeValue(args.wellName, runtimeParameters)
-  const resolvedNozzles = resolveAllowedRuntimeValue(
-    nozzles,
-    NOZZLE_STYLES,
-    runtimeParameters
-  )
-  const resolvedPrimaryNozzle = resolveAllowedRuntimeValue(
-    primaryNozzle,
-    PRIMARY_NOZZLES,
-    runtimeParameters
-  )
+  const resolvedNozzles =
+    nozzles == null
+      ? undefined
+      : resolveAllowedRuntimeValue(nozzles, NOZZLE_STYLES, runtimeParameters)
+  const resolvedPrimaryNozzle =
+    primaryNozzle == null
+      ? undefined
+      : resolveAllowedRuntimeValue(
+          primaryNozzle,
+          PRIMARY_NOZZLES,
+          runtimeParameters
+        )
   const resolvedTipTracking = resolveAllowedRuntimeValue(
     tipTrackingOption,
     [AUTOMATIC, MANUAL],
@@ -64,10 +66,10 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
       ? [invalidRuntimeParameter({ parameterName: value })]
       : []
   )
-  if (resolvedNozzles == null) {
+  if (nozzles != null && resolvedNozzles == null) {
     rtpErrors.push(invalidRuntimeParameter({ parameterName: nozzles }))
   }
-  if (resolvedPrimaryNozzle == null) {
+  if (primaryNozzle != null && resolvedPrimaryNozzle == null) {
     rtpErrors.push(invalidRuntimeParameter({ parameterName: primaryNozzle }))
   }
   if (resolvedTipTracking == null) {
@@ -80,8 +82,6 @@ export const pickUpTip: CommandCreator<PickUpTipStepGenArgs> = (
     pipetteId == null ||
     labwareId == null ||
     wellName == null ||
-    resolvedNozzles == null ||
-    resolvedPrimaryNozzle == null ||
     resolvedTipTracking == null
   ) {
     return { errors: rtpErrors }

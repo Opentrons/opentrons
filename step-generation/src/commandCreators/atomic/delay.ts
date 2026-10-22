@@ -43,7 +43,7 @@ export const delay: CommandCreator<
     command = {
       commandType: 'waitForDuration',
       key: uuid(),
-      params: { seconds, message: resolvedMessage },
+      params: { seconds, message: resolvedMessage ?? undefined },
     }
     const pythonArgs = [
       `seconds=${args.seconds}`,
@@ -61,7 +61,7 @@ export const delay: CommandCreator<
     command = {
       commandType: 'waitForResume',
       key: uuid(),
-      params: { message: resolvedMessage },
+      params: { message: resolvedMessage ?? undefined },
     }
     const pauseMessage =
       message && resolvedMessage != null
