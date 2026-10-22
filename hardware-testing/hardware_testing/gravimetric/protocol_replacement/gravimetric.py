@@ -124,7 +124,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3"}
+metadata = {"protocolName": "Gravimetric QC V6-debug"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -453,7 +453,7 @@ class CSVSettings:
     volumes_flat: List[float]
     scale_delay: int
     blank_trials: int
-    submerge_depth: float
+    submerge_depths: Dict[float, float]
     extra: bool
     labware_on_scale: str
     labware_on_scale_well_name: str
@@ -474,10 +474,18 @@ class CSVSettings:
         """Extract all of the data from the CSV runtime param."""
 
         def lookup_key(key: str, csv: List[List[str]]) -> List[str]:
+            found = lookup_key_optional(key, csv)
+            if found is None:
+                raise ValueError(f"{key} is not defined in the csv params.")
+            return found
+
+        def lookup_key_optional(
+            key: str, csv: List[List[str]]
+        ) -> Optional[List[str]]:
             for line in csv:
                 if line[0] == key:
                     return [e for e in line[1:] if e != ""]
-            raise ValueError(f"{key} is not defined in the csv params.")
+            return None
 
         retracted_offset = 5.0
         # TODO maybe make this a CSV option
@@ -513,7 +521,6 @@ class CSVSettings:
         slot_scale = lookup_key("slot_scale", csv_params)[0]
         scale_delay = int(lookup_key("scale_delay", csv_params)[0])
         blank_trials = int(lookup_key("blank_trials", csv_params)[0])
-        submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -570,6 +577,54 @@ class CSVSettings:
             200: extra_volumes_to_test_200ul,
             1000: extra_volumes_to_test_1000ul,
         }
+        legacy_depth_row = lookup_key_optional("submerge_depth", csv_params)
+        legacy_depth = (
+            float(legacy_depth_row[0])
+            if legacy_depth_row
+            else None
+        )
+        if legacy_depth_row and len(legacy_depth_row) != 1:
+            raise ValueError(
+                "submerge_depth must be a single fallback value. "
+                "Per-volume depths belong on submerge_depth_<tip>ul "
+                "and submerge_depth_extra_<tip>ul, one cell per volume."
+            )
+        submerge_depths: Dict[float, float] = {}
+        for tip_size in (20, 50, 200, 1000):
+            for prefix, volume_list in (
+                ("submerge_depth", volumes[tip_size]),
+                ("submerge_depth_extra", extra_volumes[tip_size]),
+            ):
+                depth_key = f"{prefix}_{tip_size}ul"
+                raw_depths = lookup_key_optional(depth_key, csv_params)
+                if not volume_list:
+                    if raw_depths:
+                        raise ValueError(
+                            f"{depth_key} has values but there are no volumes"
+                        )
+                    continue
+                if raw_depths is None:
+                    if legacy_depth is None:
+                        raise ValueError(
+                            f"{depth_key} needs {len(volume_list)} depths, "
+                            "one per volume"
+                        )
+                    parsed_depths = [legacy_depth] * len(volume_list)
+                elif len(raw_depths) != len(volume_list):
+                    raise ValueError(
+                        f"{depth_key} has {len(raw_depths)} depths for "
+                        f"{len(volume_list)} volumes"
+                    )
+                else:
+                    parsed_depths = [float(depth) for depth in raw_depths]
+                for volume, depth in zip(volume_list, parsed_depths):
+                    previous = submerge_depths.get(volume)
+                    if previous is not None and previous != depth:
+                        raise ValueError(
+                            f"volume {volume} has two submerge depths: "
+                            f"{previous} and {depth}"
+                        )
+                    submerge_depths[volume] = depth
         tips = {
             20: tipracks_20ul,
             50: tipracks_50ul,
@@ -607,7 +662,7 @@ class CSVSettings:
             volumes_flat=volumes_flat,
             scale_delay=scale_delay,
             blank_trials=blank_trials,
-            submerge_depth=submerge_depth,
+            submerge_depths=submerge_depths,
             extra=extra,
             labware_on_scale=labware_on_scale,
             labware_on_scale_well_name=labware_on_scale_well_name,
@@ -1244,6 +1299,19 @@ def remove_tip(fixture_settings: FixtureSettings) -> None:
         fixture_settings.pipette.drop_tip()
 
 
+def _submerge_depth_for_volume(
+    fixture_settings: FixtureSettings, volume: float
+) -> float:
+    """Return the CSV submerge depth paired with this test volume."""
+    try:
+        return fixture_settings.submerge_depths[volume]
+    except KeyError:
+        raise ValueError(
+            f"No submerge_depth for volume {volume}. "
+            "Add one cell on the matching submerge_depth row."
+        ) from None
+
+
 def _get_offset_for_channel(
     fixture_settings: FixtureSettings, channel: int, submerge_depth: float = 0
 ) -> Coordinate:
@@ -1623,11 +1691,12 @@ def run_blank_test(
         well_top.y + retracted_offset.y,
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
+    submerge_depth = _submerge_depth_for_volume(fixture_settings, volume)
     if fixture_settings.touch_blank:
         # submerge depth is negative so adding it will drop it into the liquid
-        blank_move_to_height = liquid_height + fixture_settings.submerge_depth
+        blank_move_to_height = liquid_height + submerge_depth
     else:
-        blank_move_to_height = liquid_height - fixture_settings.submerge_depth
+        blank_move_to_height = liquid_height - submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
     # Z轴在秤的上方，调用switch_mode
     maybe_switch_mode(fixture_settings, tip)
@@ -1720,14 +1789,18 @@ def run_one_test(
     last_measurement: Optional[MeasurementData],
 ) -> List[MeasurementData]:
     """Run one trial of one test."""
-    print_info(f"Running trial {trial} volume {volume} channel {channel} tip {tip}")
+    submerge_depth = _submerge_depth_for_volume(fixture_settings, volume)
+    print_info(
+        f"Running trial {trial} volume {volume} channel {channel} tip {tip} "
+        f"submerge_depth {submerge_depth}"
+    )
     tiprack_uri = tip_well.parent.uri
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
 
     submerged_offset = _get_offset_for_channel(
-        fixture_settings, channel, fixture_settings.submerge_depth
+        fixture_settings, channel, submerge_depth
     )
     retracted_offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.retracted_offset
