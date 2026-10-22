@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSuccessResult } from '../../../fixtures'
+import { getErrorResult, getSuccessResult } from '../../../fixtures'
 import { captureImage } from '../captureImage'
 
 import type { Height, Width } from '@opentrons/shared-data'
@@ -109,5 +109,76 @@ describe('captureImage', () => {
       python:
         'protocol.capture_image(home_before=home_before, filename=file_name, resolution=(width, height), zoom=zoom, contrast=contrast, brightness=brightness, saturation=saturation)',
     })
+  })
+  it('returns errors if homeBefore, fileName, resolution, zoom, contrast, brightness, and saturation are not valid runtime parameters', () => {
+    const invariantContext: any = {
+      runtimeParameters: {
+        mock_bool_rtp: {
+          variableName: 'mock_bool_rtp',
+          displayName: 'mock bool rtp',
+          type: 'boolean',
+          default: false,
+        },
+        mock_int_rtp: {
+          variableName: 'mock_int_rtp',
+          displayName: 'mock int rtp',
+          type: 'int',
+          default: 1,
+        },
+        mock_string_rtp: {
+          variableName: 'mock_string_rtp',
+          displayName: 'mock string rtp',
+          type: 'string',
+          default: 'mock',
+        },
+      },
+    }
+    const result = captureImage(
+      {
+        homeBefore: 'mock_int_rtp',
+        fileName: 'mock_bool_rtp',
+        resolution: ['missing_width', 'mock_string_rtp'],
+        zoom: 'mock_bool_rtp',
+        contrast: 'missing_contrast',
+        brightness: 'mock_string_rtp',
+        saturation: 'mock_bool_rtp',
+      },
+      invariantContext,
+      {}
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_width" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_contrast" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })
