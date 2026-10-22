@@ -18,10 +18,9 @@ from hardware_testing.data.csv_report import CSVReport
 from .config import TestSection, TestConfig, build_report, TESTS
 from ...common.utils import find_module_port
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.types import VentState
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
-
 
 VACUUM_VID = 0x0483
 VACUUM_PID = 0xEF40

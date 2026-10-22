@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from . import require_live_data_real_string
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.tempdeck import (
     READER_ERROR_DEBOUNCE,

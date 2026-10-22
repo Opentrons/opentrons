@@ -13,7 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from . import require_live_data_real_string
 from opentrons.config import feature_flags as ff
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.errors import (
     PressureNotReached,
     WasteContainerFull,
