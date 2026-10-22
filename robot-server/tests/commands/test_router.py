@@ -7,7 +7,6 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandSlice,
     JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
@@ -168,7 +167,10 @@ async def test_get_commands_list(
         pageLength=42,
     )
 
-    assert result.content.data == [command_1, command_2]
+    assert result.content.data == [
+        command_1.model_dump(mode="json"),
+        command_2.model_dump(mode="json"),
+    ]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 

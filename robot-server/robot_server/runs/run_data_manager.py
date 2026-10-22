@@ -18,7 +18,6 @@ from opentrons.protocol_engine import (
     CommandAdapter,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
     JsonCommandSlice,
     LabwareOffsetCreate,

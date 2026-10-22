@@ -126,6 +126,7 @@ def _completed_analysis_resource(
             errors=[],
             liquids=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
 
@@ -216,6 +217,7 @@ async def test_get_summaries_by_protocol(
             errors=[],
             liquids=[],
         ),
+        result=AnalysisResult.NOT_OK.value,
     )
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     await subject.make_room_and_add(ok_resource, [], [])

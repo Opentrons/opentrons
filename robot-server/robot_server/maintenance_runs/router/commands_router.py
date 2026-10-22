@@ -7,7 +7,7 @@ from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine import CommandPointer, CommandStatus
+from opentrons.protocol_engine import CommandPointer
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )

@@ -22,7 +22,6 @@ from opentrons.protocol_engine import (
     CommandCreate,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     DeckType,
     ErrorOccurrence,
     JsonCommandSlice,

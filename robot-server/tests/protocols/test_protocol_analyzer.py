@@ -11,7 +11,6 @@ import opentrons.protocol_runner.create_simulating_orchestrator as simulating_ru
 import opentrons.util.helpers as datetime_helper
 from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
-    CommandSlice,
     EngineStatus,
     JsonCommandSlice,
     StateSummary,
