@@ -22,7 +22,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 
 import type { ReactNode } from 'react'
-import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
+import type { SmallButtonTypes } from '/app/atoms/buttons'
 
 const MAX_SUPPORTED_LABELS = 3
 

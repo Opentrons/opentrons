@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from './constants'
+import { ODD_FOCUS_VISIBLE } from '../../constants'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -189,12 +189,7 @@ export function SmallButton(props: SmallButtonProps): ReactNode {
           </Flex>
         ) : null}
 
-        <StyledText
-          oddStyle="bodyTextSemiBold"
-          desktopStyle="bodyDefaultSemiBold"
-        >
-          {buttonText}
-        </StyledText>
+        <StyledText oddStyle="bodyTextSemiBold">{buttonText}</StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex
             aria-label={

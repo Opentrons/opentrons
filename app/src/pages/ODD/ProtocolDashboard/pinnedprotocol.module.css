@@ -6,16 +6,10 @@
 }
 
 .protocol_name_full {
-  font-size: var(--font-size-32);
-  font-weight: var(--font-weight-bold);
   -webkit-line-clamp: 1;
-  line-height: var(--line-height-42);
 }
 
 .protocol_name_half,
 .protocol_name_regular {
-  font-size: var(--font-size-28);
-  font-weight: var(--font-weight-semi-bold);
   -webkit-line-clamp: 2;
-  line-height: var(--line-height-36);
 }

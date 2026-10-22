@@ -16,6 +16,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
 
@@ -56,6 +57,24 @@ const protocolNameClassBySize: Record<CardSizeType, string> = {
   full: styles.protocol_name_full,
   half: styles.protocol_name_half,
   regular: styles.protocol_name_regular,
+}
+
+const protocolNameLegacyBySize: Record<
+  CardSizeType,
+  { forwardedAs: 'h3' | 'h4'; fontWeight: number }
+> = {
+  full: {
+    forwardedAs: 'h3',
+    fontWeight: TYPOGRAPHY.fontWeightBold,
+  },
+  half: {
+    forwardedAs: 'h4',
+    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+  },
+  regular: {
+    forwardedAs: 'h4',
+    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+  },
 }
 
 interface PinnedProtocolProps {
@@ -138,6 +157,8 @@ export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
           />
         ) : null}
         <StyledText
+          forwardedAs={protocolNameLegacyBySize[cardSize].forwardedAs}
+          fontWeight={protocolNameLegacyBySize[cardSize].fontWeight}
           className={clsx(
             styles.protocol_name,
             protocolNameClassBySize[cardSize]

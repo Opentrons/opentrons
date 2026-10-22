@@ -8,7 +8,7 @@ import { BORDERS, COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { SmallButton } from '../SmallButton'
+import { SmallButton } from '..'
 
 import type { ComponentProps } from 'react'
 
