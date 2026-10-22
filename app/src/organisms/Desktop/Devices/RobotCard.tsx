@@ -244,10 +244,6 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
       ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel)
       : null
 
-  // TODO(bh, 2022-11-1): insert actual 96-channel data
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-
   return (
     <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
@@ -256,11 +252,6 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
 
       {isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
-          {leftAndRightMountsPipetteDisplayName != null ? (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          ) : null}
           {leftPipetteModel != null ? (
             <InstrumentContainer
               displayName={
