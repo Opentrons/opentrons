@@ -16,8 +16,8 @@ import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../icons'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
+import type { IconName } from '../icons'
 
 type LargeButtonTypes =
   | 'primary'
