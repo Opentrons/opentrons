@@ -1,16 +1,7 @@
 // mock HTTP responses for pipettes endpoints
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-
-import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { MATCH } from '/app/resources/runs/constants'
 
 import type { AttachedPipette, PipetteData } from '@opentrons/api-client'
-import type {
-  RobotApiResponse,
-  RobotApiResponseMeta,
-} from '/app/redux/robot-api/types'
 import type { PipetteInformation } from '/app/resources/instruments/types'
-import type { PipetteInfo } from '/app/resources/runs/types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -25,93 +16,12 @@ export const mockAttachedPipette: Omit<AttachedPipette, 'modelSpecs'> = {
   plunger_axis: 'd',
 }
 
-export const mockP300PipetteSpecs: any = {
-  displayName: 'P300 Single-Channel GEN2',
-  name: 'p300_single_gen2',
-  backCompatNames: ['p300_single'],
-}
-
 export const mockUnattachedPipette = {
   id: null,
   name: null,
   model: null,
   mount_axis: 'a',
   plunger_axis: 'b',
-}
-
-export const mockAttachedFlexPipette: Omit<AttachedPipette, 'modelSpecs'> = {
-  id: 'abc',
-  name: 'p1000_single_flex',
-  model: 'p1000_single_v3.0',
-  tip_length: 42,
-  mount_axis: 'c',
-  plunger_axis: 'd',
-}
-
-export const mockFlexP1000PipetteSpecs: any = {
-  displayName: 'Flex 1-Channel 1000 µL',
-  name: 'p1000_single_flex',
-  backCompatNames: ['p1000_single'],
-  channels: 1,
-}
-
-export const mockFlexP1000Pipette8ChannelSpecs: any = {
-  displayName: 'Flex 8-Channel 1000 µL',
-  name: 'p1000_multi_flex',
-  channels: 8,
-  backCompatNames: ['p1000_multi'],
-}
-
-export const mockFetchPipettesSuccessMeta: RobotApiResponseMeta = {
-  method: 'GET',
-  path: '/pipettes',
-  ok: true,
-  status: 200,
-}
-
-export const mockFetchPipettesSuccess: RobotApiResponse = {
-  ...mockFetchPipettesSuccessMeta,
-  host: mockRobot,
-  body: {
-    left: mockUnattachedPipette,
-    right: mockAttachedPipette,
-  },
-}
-
-export const mockFetchPipettesFailureMeta: RobotApiResponseMeta = {
-  method: 'GET',
-  path: '/pipettes',
-  ok: false,
-  status: 500,
-}
-
-export const mockFetchPipettesFailure: RobotApiResponse = {
-  ...mockFetchPipettesFailureMeta,
-  host: mockRobot,
-  body: { message: 'AH' },
-}
-
-export const mockPipetteInfo: PipetteInfo = {
-  pipetteSpecs: fixtureP10Single,
-  requestedPipetteMatch: MATCH,
-  pipetteCalDate: '2021-04-10',
-  tipRacksForPipette: [
-    {
-      displayName: 'My TipRack',
-      lastModifiedDate: '2021-04-10',
-      tipRackDef: mockTipRackDefinition,
-    },
-  ],
-}
-
-export const mockLeftPipette: any = {
-  id: 'abc',
-  model: 'mock_left_model',
-}
-
-export const mockRightPipette: any = {
-  id: 'def',
-  model: 'mock_right_model',
 }
 
 export const mockLeftSpecs: any = {
@@ -128,35 +38,6 @@ export const mockLeftLegacySpecs: any = {
 export const mockRightSpecs: any = {
   displayName: 'Right Pipette',
   name: 'mock_right',
-}
-
-// NOTE: protocol pipettes use "pipetteName" for the exact "model" because reasons
-export const mockLeftProtoPipette: any = {
-  mount: 'left',
-  pipetteName: 'mock_left_model',
-  modelSpecs: mockLeftSpecs,
-}
-
-export const mockRightProtoPipette: any = {
-  mount: 'right',
-  pipetteName: 'mock_right_model',
-  modelSpecs: mockRightSpecs,
-}
-
-export const mockLeftPipetteCalibration: any = {
-  pipette: 'abc',
-  mount: 'left',
-  offset: [0, 1, 2],
-  tiprack: 'some-tiprack',
-  lastModified: '2020-08-30T10:02',
-}
-
-export const mockRightPipetteCalibration: any = {
-  pipette: 'def',
-  mount: 'right',
-  offset: [1, 2, 3],
-  tiprack: 'some-other-tiprack',
-  lastModified: '2020-08-25T20:25',
 }
 
 export const mockPipetteData1Channel: PipetteData = {

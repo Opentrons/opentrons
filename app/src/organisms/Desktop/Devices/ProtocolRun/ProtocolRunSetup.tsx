@@ -67,7 +67,7 @@ import {
   useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { INCOMPATIBLE, INEXACT_MATCH } from '/app/resources/runs/constants'
+import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
@@ -202,14 +202,7 @@ export function ProtocolRunSetup({
     (runPipetteInfoByMount.left != null &&
       runPipetteInfoByMount.left.requestedPipetteMatch === INCOMPATIBLE) ||
     (runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE) ||
-    // for Flex, require exact match
-    (isFlex &&
-      runPipetteInfoByMount.left != null &&
-      runPipetteInfoByMount.left.requestedPipetteMatch === INEXACT_MATCH) ||
-    (isFlex &&
-      runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INEXACT_MATCH)
+      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE)
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 

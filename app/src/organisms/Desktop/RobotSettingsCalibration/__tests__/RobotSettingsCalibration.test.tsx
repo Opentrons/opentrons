@@ -12,14 +12,8 @@ import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
-import {
-  useAttachedPipettes,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/resources/instruments'
-import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '/app/resources/instruments/__fixtures__'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { RobotSettingsCalibration } from '..'
@@ -28,7 +22,6 @@ import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibrat
 import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 
-import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -49,11 +42,6 @@ vi.mock('../RobotSettingsGripperCalibration')
 vi.mock('../RobotSettingsPipetteOffsetCalibration')
 vi.mock('../RobotSettingsModuleCalibration')
 vi.mock('/app/organisms/Desktop/CalibrationError')
-
-const mockAttachedPipettes: AttachedPipettesByMount = {
-  left: mockAttachedPipette,
-  right: mockAttachedPipette,
-} as any
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -89,7 +77,6 @@ describe('RobotSettingsCalibration', () => {
       },
     } as any)
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
-    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
     vi.mocked(getRequestById).mockReturnValue(null)
     when(useIsFlex).calledWith('otie').thenReturn(false)
