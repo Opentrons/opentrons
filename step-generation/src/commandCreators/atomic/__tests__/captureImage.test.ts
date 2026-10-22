@@ -7,7 +7,7 @@ import type { Height, Width } from '@opentrons/shared-data'
 
 describe('captureImage', () => {
   it('should generate a captureImage command', () => {
-    const invariantContext: any = {}
+    const invariantContext: any = { runtimeParameters: {} }
     const robotInitialState: any = {}
     const args = {
       homeBefore: true,
