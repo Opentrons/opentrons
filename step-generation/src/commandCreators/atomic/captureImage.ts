@@ -1,6 +1,8 @@
 import * as errorCreators from '../../errorCreators'
 import {
+  formatPyRuntimeValue,
   PROTOCOL_CONTEXT_NAME,
+  pythonRuntimeString,
   resolveBooleanRuntimeValue,
   resolveNumericRuntimeValue,
   resolveStringRuntimeValue,
@@ -92,7 +94,16 @@ export const captureImage: CommandCreator<
       saturation,
     },
   }
-  const python = `${PROTOCOL_CONTEXT_NAME}.capture_image()`
+  const pythonArgs = [
+    `home_before=${formatPyRuntimeValue(args.homeBefore)}`,
+    `filename=${pythonRuntimeString(args.fileName, fileName, runtimeParameters)}`,
+    `resolution=(${formatPyRuntimeValue(resolution[0])}, ${formatPyRuntimeValue(resolution[1])})`,
+    `zoom=${formatPyRuntimeValue(args.zoom)}`,
+    `contrast=${formatPyRuntimeValue(args.contrast)}`,
+    `brightness=${formatPyRuntimeValue(args.brightness)}`,
+    `saturation=${formatPyRuntimeValue(args.saturation)}`,
+  ]
+  const python = `${PROTOCOL_CONTEXT_NAME}.capture_image(${pythonArgs.join(', ')})`
   return {
     commands: [command],
     python,

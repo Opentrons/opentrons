@@ -20,6 +20,8 @@ describe('captureImage', () => {
     }
     const result = captureImage(args, invariantContext, robotInitialState)
     const res = getSuccessResult(result)
-    expect(res.python).toEqual(`protocol.capture_image()`)
+    expect(res.python).toEqual(
+      `protocol.capture_image(home_before=True, filename="fileName", resolution=(10, 10), zoom=10, contrast=10, brightness=10, saturation=10)`
+    )
   })
 })
