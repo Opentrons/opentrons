@@ -1,5 +1,6 @@
 """Tests for robot_server.commands.router."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -167,10 +168,12 @@ async def test_get_commands_list(
         pageLength=42,
     )
 
-    assert result.content.data == [
-        command_1.model_dump(mode="json"),
-        command_2.model_dump(mode="json"),
+    expected_data = [
+        command_1.model_dump_json(by_alias=True, exclude_none=True),
+        command_2.model_dump_json(by_alias=True, exclude_none=True),
     ]
+
+    assert result.content.data == [json.loads(command) for command in expected_data]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 

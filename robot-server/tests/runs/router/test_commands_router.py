@@ -1,5 +1,6 @@
 """Tests for the /runs/.../commands routes."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -380,16 +381,25 @@ async def test_get_run_commands(
             startedAt=datetime(year=2022, month=2, day=2).isoformat(),
             completedAt=datetime(year=2023, month=3, day=3).isoformat(),
             status=pe_commands.CommandStatus.FAILED,
-            params=pe_commands.WaitForResumeParams(message="hello world").model_dump(
-                mode="json"
+            params=json.loads(
+                pe_commands.WaitForResumeParams(message="hello world").model_dump_json(
+                    exclude_none=True, by_alias=True
+                )
             ),
-            error=pe_errors.ErrorOccurrence(
-                id="error-id",
-                errorType="PrettyBadError",
-                createdAt=datetime(year=2024, month=4, day=4),
-                detail="Things are not looking good.",
+            error=json.loads(
+                pe_errors.ErrorOccurrence(
+                    id="error-id",
+                    errorType="PrettyBadError",
+                    createdAt=datetime(year=2024, month=4, day=4),
+                    detail="Things are not looking good.",
+                ).model_dump_json(exclude_none=True, by_alias=True)
             ),
-            notes=[long_note, unenumed_note],
+            notes=[
+                json.loads(long_note.model_dump_json(exclude_none=True, by_alias=True)),
+                json.loads(
+                    unenumed_note.model_dump_json(exclude_none=True, by_alias=True)
+                ),
+            ],
             failedCommandId="failed-command-id",
         )
     ]

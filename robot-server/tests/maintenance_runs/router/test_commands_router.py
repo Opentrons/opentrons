@@ -1,5 +1,6 @@
 """Tests for the /maintenance_runs/.../commands routes."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -399,11 +400,13 @@ async def test_get_run_commands(
             params=pe_commands.WaitForResumeParams(message="hello world").model_dump(
                 mode="json"
             ),
-            error=pe_errors.ErrorOccurrence(
-                id="error-id",
-                errorType="PrettyBadError",
-                createdAt=datetime(year=2024, month=4, day=4),
-                detail="Things are not looking good.",
+            error=json.loads(
+                pe_errors.ErrorOccurrence(
+                    id="error-id",
+                    errorType="PrettyBadError",
+                    createdAt=datetime(year=2024, month=4, day=4),
+                    detail="Things are not looking good.",
+                ).model_dump_json(exclude_none=True, by_alias=True)
             ),
             failedCommandId="failed-command-id",
         )

@@ -572,6 +572,7 @@ async def test_raise_error_on_analysis_parsing_error(
         "protocol_id": "protocol-id",
         "analyzer_version": "123",
         "completed_analysis": unparseable_analysis,
+        "result": "ok",
     }
     # Set up the database with an unparseable analysis
     statement = analysis_table.insert().values(analysis_resource_blob)
