@@ -2,7 +2,7 @@ import { memo } from 'react'
 
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { TYPOGRAPHY } from '../../../ui-style-constants'
-import { RobotCoordsText } from '../../Deck'
+import { RobotCoordsText } from '../../Deck/RobotCoordsText'
 
 import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
