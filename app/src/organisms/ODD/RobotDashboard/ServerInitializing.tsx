@@ -8,8 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,13 +28,13 @@ export function ServerInitializing(): ReactNode {
       gridGap={SPACING.spacing32}
     >
       <Icon name="ot-spinner" spin size="6rem" color={COLORS.grey60} />
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={COLORS.grey60}
       >
         {t('robot_initializing')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }
