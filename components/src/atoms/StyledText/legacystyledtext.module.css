@@ -79,10 +79,17 @@
   line-height: var(--line-height-42);
 }
 
+/* h4 regular matched LegacyStyledText touchscreen-only styles; apply always so
+ * ODD (and Electron windows that aren't exactly 600×1024) still get level4 sizes. */
+.legacy_h4,
 .legacy_h4_semi_bold,
 .legacy_h4_bold {
   font-size: var(--font-size-28);
   line-height: var(--line-height-36);
+}
+
+.legacy_h4 {
+  font-weight: var(--font-weight-regular);
 }
 
 .legacy_h4_semi_bold {
@@ -111,12 +118,6 @@
     font-size: var(--font-size-80);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-96);
-  }
-
-  .legacy_h4 {
-    font-size: var(--font-size-28);
-    font-weight: var(--font-weight-regular);
-    line-height: var(--line-height-36);
   }
 
   .legacy_h2,

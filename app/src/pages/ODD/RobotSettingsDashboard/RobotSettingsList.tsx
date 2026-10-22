@@ -2,7 +2,12 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { Icon, InlineNotification, StyledText } from '@opentrons/components'
+import {
+  Icon,
+  InlineNotification,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
@@ -361,7 +366,7 @@ function FeatureFlags(): ReactNode {
             <div className={styles.feature_flag_text_content}>
               <StyledText
                 forwardedAs="h4"
-                className={styles.feature_flag_title}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t(`__dev_internal__${flag}`)}
               </StyledText>

@@ -1,4 +1,4 @@
-import { Icon, StyledText } from '@opentrons/components'
+import { Icon, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
 import styles from './robotsettingbutton.module.css'
 
@@ -33,11 +33,18 @@ export function RobotSettingButton({
           <Icon name={iconName} className={styles.icon_large} color="#171717" />
         ) : null}
         <div className={styles.text_content}>
-          <StyledText forwardedAs="h4" className={styles.setting_name}>
+          <StyledText
+            forwardedAs="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {settingName}
           </StyledText>
           {settingInfo != null ? (
-            <StyledText forwardedAs="h4" className={styles.setting_info}>
+            <StyledText
+              forwardedAs="h4"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              className={styles.setting_info}
+            >
               {settingInfo}
             </StyledText>
           ) : null}
