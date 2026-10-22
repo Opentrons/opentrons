@@ -152,7 +152,6 @@ class DeckConfigPage(BasePage):
 
     def expect_snackbar(self, message: str) -> None:
         """Assert a snackbar with the given message is visible."""
-        
+
         snackbar = self.page.get_by_test_id("Snackbar").get_by_text(message, exact=True)
         expect(snackbar.first).to_be_visible(timeout=5000)
-
