@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { RobotCoordsForeignDiv } from '../../../hardware-sim'
+import { RobotCoordsForeignDiv } from '../../../hardware-sim/Deck/RobotCoordsForeignDiv'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { Box } from '../../../primitives'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../../styles'
