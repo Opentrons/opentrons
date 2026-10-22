@@ -1,21 +1,23 @@
 import styled, { css } from 'styled-components'
 
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import {
-  ALIGN_CENTER,
-  ALIGN_START,
   CURSOR_DEFAULT,
   CURSOR_NOT_ALLOWED,
   CURSOR_POINTER,
+} from '../../styles/cursor'
+import {
+  ALIGN_CENTER,
+  ALIGN_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  StyledText,
-  Tag,
-} from '../..'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Flex } from '../../primitives'
+} from '../../styles/flexbox'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { Icon } from '../icons'
+import { Tag } from '../Tag'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ChangeEventHandler, MouseEventHandler, ReactNode } from 'react'

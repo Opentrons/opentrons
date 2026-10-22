@@ -1,20 +1,19 @@
 import styled from 'styled-components'
 
+import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles/cursor'
 import {
   ALIGN_CENTER,
-  CURSOR_DEFAULT,
-  CURSOR_POINTER,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_START,
-  SPACING,
-  StyledText,
-} from '../../index'
-import { Flex } from '../../primitives'
+} from '../../styles/flexbox'
+import { SPACING } from '../../ui-style-constants'
+import { Icon } from '../icons'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '../../index'
+import type { IconName } from '../icons'
 
 interface EmptySelectorButtonProps {
   onClick: () => void

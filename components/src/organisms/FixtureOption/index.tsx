@@ -1,5 +1,5 @@
 import { StyledText } from '../../atoms/StyledText'
-import { TertiaryButton } from '../../helix/buttons'
+import { TertiaryButton } from '../../helix/buttons/TertiaryButton'
 import { ListItem } from '../../helix/ListItem/index'
 import { Flex } from '../../primitives'
 import {
