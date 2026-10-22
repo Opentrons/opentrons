@@ -336,6 +336,7 @@ interface AddressableOffsetVector {
 }
 export interface DropTipInPlaceParams {
   pipetteId: string
+  homeAfter?: boolean
 }
 
 export interface MoveToAddressableAreaForDropTipParams {

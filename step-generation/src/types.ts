@@ -1393,6 +1393,11 @@ export interface BlowOutInPlaceStepGenArgs {
   flowRate: number | string
 }
 
+export interface DropTipInPlaceStepGenArgs {
+  pipetteId: string
+  homeAfter?: boolean | string
+}
+
 export interface AspirateWhileTrackingStepGenArgs {
   pipetteId: string
   volume: number | string
