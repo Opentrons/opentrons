@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Sequence
 
-from playwright.sync_api import Page, TimeoutError, expect
+from playwright.sync_api import Locator, Page, TimeoutError, expect
 
 from automation.base_page import BasePage
 
@@ -133,9 +133,7 @@ class ProtocolEditorPage(BasePage):
             category = modal.get_by_text(category_name, exact=False)
         if category.count() == 0:
             available = modal.locator("[data-testid^='ListButton_']").all_inner_texts()
-            raise AssertionError(
-                f"Labware category '{category_name}' was not found. Available categories: {available}"
-            )
+            raise AssertionError(f"Labware category '{category_name}' was not found. Available categories: {available}")
         self.wait_for_visible(category.first)
         category.first.click()
 
@@ -203,56 +201,116 @@ class ProtocolEditorPage(BasePage):
 
         self.set_recommended_labware_filter(enabled=recommended_only)
 
-        pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
         modal = self.page.get_by_label("ModalShell_ModalArea")
-        target = modal.locator("label").filter(has_text=pattern).first
+        target = self._find_labware_option(modal, labware_name)
+        target.scroll_into_view_if_needed()
+        # Force-check the associated radio so Redux selection sticks (label clicks
+        # can race with controlled inputs and leave hasNoLabware true on Add).
+        self._select_labware_option(modal, target, labware_name)
 
-        try:
-            target.wait_for(state="visible", timeout=1000)
-        except TimeoutError:
-            fallback_target = modal.get_by_text(pattern, exact=False).first
-            try:
-                fallback_target.wait_for(state="visible", timeout=1000)
-                target = fallback_target
-            except TimeoutError as retry_error:
-                if search_input.count() > 0 and search_input.is_visible():
-                    search_input.fill("")
-                category_buttons = self.page.get_by_test_id("ListButton_noActive")
-                found = False
-                for index in range(category_buttons.count()):
-                    category_buttons.nth(index).click()
-                    label_target = modal.locator("label").filter(has_text=pattern).first
-                    text_target = modal.get_by_text(pattern, exact=False).first
-                    try:
-                        label_target.wait_for(state="visible", timeout=500)
-                        target = label_target
-                        found = True
-                        break
-                    except TimeoutError:
-                        try:
-                            text_target.wait_for(state="visible", timeout=500)
-                            target = text_target
-                            found = True
-                            break
-                        except TimeoutError:
-                            continue
-
-                if not found:
-                    visible_options = modal.locator("label, [role='label'], button").all_inner_texts()
-                    raise AssertionError(
-                        f"Labware '{labware_name}' was not found in the selection modal. "
-                        f"Available options: {visible_options}"
-                    ) from retry_error
-
-        target.click()
         if stacker:
             self.page.get_by_test_id("customize-expand-button-input-field").click()
             self.page.get_by_test_id("customize-expand-button-input-field").fill(str(fill_num))
         if lid:
             self._add_lid(lid_name, "CheckboxField_icon")
-        modal.get_by_role("button", name=re.compile(r"^Add labware$", re.IGNORECASE)).click()
-        if modal.count() > 0:
+        modal.get_by_role("button", name="Add labware", exact=True).click()
+        try:
             modal.wait_for(state="hidden", timeout=5000)
+        except TimeoutError as close_error:
+            error_text = modal.get_by_test_id("InlineNotification_error").all_inner_texts()
+            if not error_text:
+                error_text = modal.get_by_text("Select labware", exact=False).all_inner_texts()
+            raise AssertionError(
+                f"Add labware modal stayed open after selecting '{labware_name}'. Modal errors: {error_text}"
+            ) from close_error
+
+    def _find_labware_option(self, modal: Locator, labware_name: str) -> Locator:
+        """Return the labware option label, preferring an exact display-name match."""
+        exact = modal.locator("label").filter(has_text=re.compile(rf"^{re.escape(labware_name)}$", re.IGNORECASE))
+        if exact.count() > 0:
+            try:
+                exact.first.wait_for(state="visible", timeout=1000)
+                return exact.first
+            except TimeoutError:
+                pass
+
+        pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
+        partial = modal.locator("label").filter(has_text=pattern)
+        if partial.count() > 0:
+            # Prefer the shortest label text (closest to an exact match) to avoid
+            # "Millipore … 300µL" also matching "… 300µL PCR" / "… 300µL HTS".
+            best: Locator | None = None
+            best_len = -1
+            for index in range(partial.count()):
+                option = partial.nth(index)
+                try:
+                    if not option.is_visible():
+                        continue
+                except Exception:
+                    continue
+                text = " ".join(option.inner_text().split())
+                if best is None or len(text) < best_len:
+                    best = option
+                    best_len = len(text)
+            if best is not None:
+                return best
+
+        fallback = modal.get_by_text(labware_name, exact=True)
+        if fallback.count() == 0:
+            fallback = modal.get_by_text(pattern, exact=False)
+        try:
+            fallback.first.wait_for(state="visible", timeout=1000)
+            return fallback.first
+        except TimeoutError as retry_error:
+            search_input = self.page.locator("input[placeholder='Search labware']").first
+            if search_input.count() > 0 and search_input.is_visible():
+                search_input.fill("")
+            category_buttons = self.page.get_by_test_id("ListButton_noActive")
+            for index in range(category_buttons.count()):
+                category_buttons.nth(index).click()
+                label_target = modal.locator("label").filter(has_text=pattern).first
+                try:
+                    label_target.wait_for(state="visible", timeout=500)
+                    return label_target
+                except TimeoutError:
+                    continue
+            visible_options = modal.locator("label, [role='label'], button").all_inner_texts()
+            raise AssertionError(
+                f"Labware '{labware_name}' was not found in the selection modal. Available options: {visible_options}"
+            ) from retry_error
+
+    # CustomizeExpandButton radio ids are `${category}_${loadName}`
+    _LABWARE_RADIO_IDS: dict[str, str] = {
+        "Millipore 96 Well Plate 300µL PCR": "filterPlate_millipore_96_wellplate_300ul_pcr_filter",
+        "Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt": (
+            "wellPlate_opentrons_96_wellplate_200ul_pcr_full_skirt"
+        ),
+        "Opentrons Vacuum Manifold Spacer Tall": "adapter_opentrons_vacuum_manifold_spacer_tall",
+        "Opentrons Vacuum Manifold Collar Tall": "adapter_opentrons_vacuum_manifold_collar_tall",
+        "Opentrons Flex 96 Tip Rack 1000 µL": "tipRack_opentrons_flex_96_tiprack_1000ul",
+        "Opentrons Flex 96 Tip Rack 200 µL": "tipRack_opentrons_flex_96_tiprack_200ul",
+    }
+
+    def _select_labware_option(self, modal: Locator, option: Locator, labware_name: str) -> None:
+        """Select a labware option and wait until its radio is checked."""
+        radio_id = self._LABWARE_RADIO_IDS.get(labware_name)
+        if radio_id is not None:
+            radio = modal.locator(f'input[type="radio"]#{radio_id}')
+            label = modal.locator(f'label[for="{radio_id}"]')
+            if label.count() > 0:
+                label.first.scroll_into_view_if_needed()
+                label.first.click()
+                expect(radio.first).to_be_checked(timeout=3000)
+                return
+            if radio.count() > 0:
+                # display:none radios: dispatch a native click via JS
+                radio.first.evaluate("el => el.click()")
+                expect(radio.first).to_be_checked(timeout=3000)
+                return
+
+        option.click()
+        checked = modal.locator('input[type="radio"]:checked')
+        expect(checked.first).to_be_attached(timeout=3000)
 
     def _expand_labware_category(self, category_name: str) -> None:
         """Expand a labware category if it is collapsed."""
@@ -268,14 +326,18 @@ class ProtocolEditorPage(BasePage):
         self.page.get_by_text("Edit liquid").click()
 
     def select_first_well(self) -> None:
-        """Select the first well in the labware."""
-        self.page.locator("circle").first.click()
+        """Select the first well in the labware (circle or rect SVG wells)."""
+        well = self.page.locator("[data-wellname]").first
+        if well.count() == 0:
+            well = self.page.locator("circle, rect").first
+        self.wait_for_visible(well)
+        well.click()
 
     def select_wells(self, wells: Sequence[str]) -> None:
         """Select each well in the provided sequence."""
 
         for well in wells:
-            locator = self.page.locator(f"circle[data-wellname='{well}']").first
+            locator = self.page.locator(f"[data-wellname='{well}']").first
             self.wait_for_visible(locator)
             locator.click()
 
@@ -301,16 +363,43 @@ class ProtocolEditorPage(BasePage):
         for text in ["Liquid", "Add liquid"]:
             self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
 
-    def define_liquid(self, name: str) -> None:
-        """Define a new liquid with a name.
+    def define_liquid(self, name: str, liquid_class: str | None = None) -> None:
+        """Define a new liquid with a name and optional liquid class.
 
         Args:
             name: Name of the liquid, e.g., "Water"
+            liquid_class: Optional liquid class display name fragment,
+                e.g. "Aqueous", "Viscous", or "Volatile"
         """
-        self.click_button("Define a liquid")
+        define_btn = self.page.get_by_role("button", name="Define a liquid")
+        if define_btn.count() == 0 or not define_btn.first.is_visible():
+            # Banner link (not always a button role) when no liquids exist yet
+            define_btn = self.page.get_by_text("Define a liquid", exact=True)
+        if define_btn.count() == 0 or not define_btn.first.is_visible():
+            # After the first liquid exists, open Liquids overflow to add more
+            liquids = self.page.get_by_role("button", name="Liquids", exact=True)
+            self.wait_for_visible(liquids.first)
+            liquids.first.click()
+            define_btn = self.page.get_by_text("Define a liquid", exact=True)
+        self.wait_for_visible(define_btn.first)
+        define_btn.first.click()
         self.page.locator('input[name="displayName"]').click()
         self.page.locator('input[name="displayName"]').fill(name)
+        if liquid_class is not None:
+            modal = self.page.get_by_label("ModalShell_ModalArea")
+            dropdown = modal.get_by_test_id("dropdownMenu").last
+            self.wait_for_visible(dropdown)
+            dropdown.click()
+            option = self.page.get_by_role("listbox").get_by_text(liquid_class, exact=False).first
+            self.wait_for_visible(option)
+            option.click()
         self.page.get_by_label("ModalShell_ModalArea").get_by_role("button", name="Save").click()
+
+    def select_all_wells(self) -> None:
+        """Select all wells in the liquid assignment view."""
+        button = self.page.get_by_role("button", name="Select all", exact=False)
+        self.wait_for_visible(button.first)
+        button.first.click()
 
     def assign_liquid_to_wells(self, liquid_name: str, volume: str) -> None:
         """Assign a liquid to selected wells with a specific volume.
@@ -470,7 +559,11 @@ class ProtocolEditorPage(BasePage):
         """
         self.add_step("Move")
         self.expect_move_labware_form()
-        self.toggle_checkbox("Use gripper")
+        # useGripper defaults to True when a gripper is mounted — only enable if off.
+        checkbox = self.page.locator("label").filter(has=self.page.get_by_text(re.compile(r"^Use gripper$")))
+        input_el = checkbox.locator('input[type="checkbox"]')
+        if input_el.count() > 0 and not input_el.first.is_checked():
+            self.toggle_checkbox("Use gripper")
         self.move_labware(labware, new_location)
 
     def toggle_checkbox(self, field_name: str) -> None:
