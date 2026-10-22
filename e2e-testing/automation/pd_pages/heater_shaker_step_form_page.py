@@ -22,8 +22,7 @@ class HeaterShakerStepPage(BasePage):
         super().__init__(page)
         self._save_button = self.page.get_by_role("button", name="Save", exact=True)
         self._target_speed_toggle = self.page.get_by_text("Target Speed").locator("..").locator(".ToggleButton_Off")
-        self._latch_closed_toggle = self.page.get_by_text("Labware latchClosed")
-        self._latch_open_toggle = self.page.get_by_text("Labware latchOpen")
+        self._latch_row = self.page.locator("[data-testid^='ListButton_']").filter(has_text="Labware latch")
 
     def wait_for_form_load(self) -> None:
         """Wait for the Heater-Shaker step form to be visible."""
@@ -51,15 +50,17 @@ class HeaterShakerStepPage(BasePage):
         self.page.locator('input[name="targetSpeed"]').fill(speed)
 
     def set_lid_position(self, position: LidPosition) -> None:
-        """Set the position of the Heater-Shaker lid.
+        """Set the position of the Heater-Shaker labware latch.
 
         Args:
             position: LidPosition.OPEN or LidPosition.CLOSED.
         """
-        if position == LidPosition.CLOSED:
-            self._latch_closed_toggle.click()
-        elif position == LidPosition.OPEN:
-            self._latch_open_toggle.click()
+        self.wait_for_visible(self._latch_row.first)
+        is_open = self._latch_row.first.get_by_text("Open", exact=True).count() > 0
+        wants_open = position == LidPosition.OPEN
+        if is_open != wants_open:
+            self._latch_row.first.click()
+
 
     def save_step(self) -> None:
         """Click the Save button to confirm and close the step editor."""
@@ -101,3 +102,15 @@ def _add_heater_shaker_step(page: Page, temp: str, speed: str, timer: str) -> No
     hs_page.pause_confirm()
 
     print(f"✓ Heater-Shaker step added (T:{temp}°C, S:{speed}rpm).")
+
+
+def _add_heater_shaker_latch_step(page: Page, position: LidPosition) -> None:
+    """Add a Heater-Shaker step that only changes the labware latch."""
+    hs_page = HeaterShakerStepPage(page)
+    hs_page.wait_for_form_load()
+    hs_page.set_lid_position(position)
+    hs_page.save_step()
+    confirm = page.get_by_role("button", name="Confirm")
+    if confirm.count() > 0 and confirm.first.is_visible():
+        confirm.first.click()
+    print(f"✓ Heater-Shaker latch set to {position.value}.")
