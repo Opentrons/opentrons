@@ -77,6 +77,7 @@ describe('captureImage', () => {
         },
       },
     }
+    const robotInitialState: any = {}
     const result = captureImage(
       {
         homeBefore: 'home_before',
@@ -88,7 +89,7 @@ describe('captureImage', () => {
         saturation: 'saturation',
       },
       invariantContext,
-      {}
+      robotInitialState
     )
     expect(getSuccessResult(result)).toEqual({
       commands: [
@@ -133,6 +134,7 @@ describe('captureImage', () => {
         },
       },
     }
+    const robotInitialState: any = {}
     const result = captureImage(
       {
         homeBefore: 'mock_int_rtp',
@@ -144,7 +146,7 @@ describe('captureImage', () => {
         saturation: 'mock_bool_rtp',
       },
       invariantContext,
-      {}
+      robotInitialState
     )
     expect(getErrorResult(result).errors).toEqual([
       {
