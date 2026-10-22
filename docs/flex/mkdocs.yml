@@ -31,6 +31,7 @@ nav:
       - Stacker Module: modules/stacker.md
       - Temperature Module: modules/temperature.md
       - Thermocycler: modules/thermocycler.md
+      - Vacuum Module: modules/vacuum.md
   - Labware: 
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md
