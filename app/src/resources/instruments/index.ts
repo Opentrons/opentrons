@@ -1,6 +1,4 @@
 export * from './constants'
 export * from './types'
-export * from './useAttachedPipettes'
-export * from './useAttachedPipetteCalibrations'
 export * from './useAttachedPipettesFromInstrumentsQuery'
 export * from './useTipAttachmentStatus'

@@ -12,11 +12,10 @@ import {
 
 import { Slideout } from '/app/atoms/Slideout'
 
-import type { AttachedPipette } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface AboutPipetteSlideoutProps {
-  pipetteId: AttachedPipette['id']
+  pipetteId: string
   pipetteName: PipetteModelSpecs['displayName']
   firmwareVersion?: string
   onCloseClick: () => unknown

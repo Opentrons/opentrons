@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional
 
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
-from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocol_engine.types import (
@@ -158,7 +157,6 @@ def exec_run(
     try:
         exec("run(__context)", new_globs)
     except (
-        SmoothieAlarm,
         asyncio.CancelledError,
         ExecutionCancelledError,
     ):

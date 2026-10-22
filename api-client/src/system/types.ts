@@ -32,3 +32,9 @@ export interface SystemTimeRequest {
     systemTime: string
   }
 }
+
+export type LogLevels = 'debug' | 'info' | 'warning' | 'error'
+
+export interface LogLevelPayload {
+  log_level: LogLevels
+}
