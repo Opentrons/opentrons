@@ -41,7 +41,6 @@ vi.mock('../CalibrationDataDownload')
 vi.mock('../RobotSettingsGripperCalibration')
 vi.mock('../RobotSettingsPipetteOffsetCalibration')
 vi.mock('../RobotSettingsModuleCalibration')
-vi.mock('/app/organisms/Desktop/CalibrationError')
 
 const RUN_STATUSES = {
   isRunRunning: false,
