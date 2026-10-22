@@ -2,11 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import {
-  Icon,
-  InlineNotification,
-  LegacyStyledText,
-} from '@opentrons/components'
+import { Icon, InlineNotification, StyledText } from '@opentrons/components'
 import {
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
@@ -363,12 +359,12 @@ function FeatureFlags(): ReactNode {
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
                 className={styles.feature_flag_title}
               >
                 {t(`__dev_internal__${flag}`)}
-              </LegacyStyledText>
+              </StyledText>
             </div>
           </div>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />

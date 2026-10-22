@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import clsx from 'clsx'
+import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_START,
@@ -12,10 +13,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   useLongPress,
 } from '@opentrons/components'
 
@@ -23,6 +23,7 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import { useUpdatedLastRunTime } from './hooks'
 import { LongPressModal } from './LongPressModal'
+import styles from './pinnedprotocol.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
@@ -32,35 +33,29 @@ export type CardSizeType = 'full' | 'half' | 'regular'
 
 const cardStyleBySize: {
   [s in CardSizeType]: {
-    fontSize: string
     height: string
-    lineHeight: string
-    fontWeight: number
     width: string
   }
 } = {
   full: {
-    fontSize: TYPOGRAPHY.fontSize32,
     height: '11.75rem',
-    lineHeight: TYPOGRAPHY.lineHeight42,
-    fontWeight: TYPOGRAPHY.fontWeightBold,
     width: '59rem',
   },
   // Note (kk:06/13/2024) height has been updated from 10.75rem because of a protocol with RTP CSV file
   half: {
-    fontSize: TYPOGRAPHY.fontSize28,
     height: '13.25rem',
-    lineHeight: TYPOGRAPHY.lineHeight36,
-    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '29.25rem',
   },
   regular: {
-    fontSize: TYPOGRAPHY.fontSize28,
     height: '13.25rem',
-    lineHeight: TYPOGRAPHY.lineHeight36,
-    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
     width: '28.375rem',
   },
+}
+
+const protocolNameClassBySize: Record<CardSizeType, string> = {
+  full: styles.protocol_name_full,
+  half: styles.protocol_name_half,
+  regular: styles.protocol_name_regular,
 }
 
 interface PinnedProtocolProps {
@@ -142,14 +137,14 @@ export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
             text={t('requires_csv')}
           />
         ) : null}
-        <ProtocolNameText
-          cardSize={cardSize}
-          fontSize={cardStyleBySize[cardSize].fontSize}
-          fontWeight={cardStyleBySize[cardSize].fontWeight}
-          lineHeight={cardStyleBySize[cardSize].lineHeight}
+        <StyledText
+          className={clsx(
+            styles.protocol_name,
+            protocolNameClassBySize[cardSize]
+          )}
         >
           {protocolName}
-        </ProtocolNameText>
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -158,14 +153,14 @@ export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
         width="100%"
         color={COLORS.grey60}
       >
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('last_run_time', { time: updatedLastRun })}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('date_added_date', {
             date: formatTimeWithUtcLabel(protocol.createdAt),
           })}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {longpress.isLongPressed && (
         <LongPressModal
@@ -178,18 +173,3 @@ export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
     </Flex>
   )
 }
-
-const ProtocolNameText = styled(LegacyStyledText)`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
-    props.cardSize === 'full' ? 1 : 2};
-  overflow: hidden;
-  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
-  font-size: ${(props: { cardSize: CardSizeType }) =>
-    cardStyleBySize[props.cardSize].fontSize};
-  font-weight: ${(props: { cardSize: CardSizeType }) =>
-    cardStyleBySize[props.cardSize].fontWeight};
-  line-height: ${(props: { cardSize: CardSizeType }) =>
-    cardStyleBySize[props.cardSize].lineHeight};
-`
