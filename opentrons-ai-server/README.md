@@ -136,6 +136,25 @@ ENV=staging make live-test
 
 Live tests use the `Client` helper in `tests/helpers/client.py` which wraps `httpx` with Auth0 token handling and a configurable timeout.
 
+#### Golden Studio Harness
+
+`tests/helpers/golden_harness.py` sends every prompt in a Golden Studio catalog export (`*.tar.zst`) to a running server's `/api/chat/completion` and writes each generated protocol to `golden-studio-outputs/<group>/<key>.py`. That directory is tracked so successive runs can be diffed in git. Python files bundled in the export are ignored. It reuses the live test `Client`, so auth and `BASE_URL` come from `tests/helpers/test.env`. Extracted catalogs and run artifacts go under the gitignored `tmp/golden-studio/` directory. Requires the `zstd` CLI (`brew install zstd`).
+
+```shell
+make golden-extract                                    # unpack the only *.tar.zst in this dir (or ARCHIVE=path)
+make golden-list                                       # show prompts, robot type, API level
+make golden-run ARGS="--fake --limit 3"                # smoke test with canned responses, no Anthropic calls
+make golden-run ARGS="--only 'PCR-*' --concurrency 3"  # real generation against localhost (ENV=local default)
+make golden-run ARGS="--resume tmp/golden-studio/runs/<run-id>"  # retry prompts that did not succeed
+make golden-analyze ARGS="--only 'PCR-*'"              # re-analyze already generated protocols
+```
+
+Each generated protocol is analyzed by the Protocol Analysis service (`opentrons/pe`, dev environment by default) through `tests/helpers/analysis_client.py`, and the Opentrons analysis is written beside it as `golden-studio-outputs/<group>/<key>.json`. The service analyzes OT-2 protocols with the OT-2 fork and Flex protocols with the monorepo analyzer. Configure it with `INTEGRATION_DEV_API_URL`, `INTEGRATION_DEV_AUTH0_DOMAIN`, `INTEGRATION_DEV_AUTH0_AUDIENCE`, `INTEGRATION_DEV_M2M_CLIENT_ID`, and `INTEGRATION_DEV_M2M_CLIENT_SECRET` in `tests/helpers/test.env`; select another target with `--analysis-env` or skip analysis with `--no-analyze`.
+
+`--pathway create` (default) seeds history with the prompt so the server generates the protocol in one shot with `claude.create`. `--pathway client` mirrors the AI client's first message (empty history, server chat/update path).
+
+Each run directory under `tmp/golden-studio/runs/` contains the raw `replies/<key>.md`, `results.jsonl` (status, timing, output path, static checks for parse, `run()`, `apiLevel`, and `robotType`), `run.json`, and `summary.md`. `--fake` runs write their canned protocols to the run directory instead of `golden-studio-outputs/`.
+
 #### API Access from the UI
 
 1. Follow the directions in the [opentrons-ai-client README](../opentrons-ai-client/README.md) to run the UI locally
