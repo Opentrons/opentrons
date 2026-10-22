@@ -42,16 +42,19 @@
   line-height: var(--line-height-12);
 }
 
+.legacy_p,
+.legacy_p_semi_bold,
+.legacy_p_bold {
+  font-size: var(--font-size-22);
+  line-height: var(--line-height-28);
+}
+
 .legacy_p {
-  font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-20);
 }
 
 .legacy_p_semi_bold {
-  font-size: var(--font-size-13);
   font-weight: var(--font-weight-semi-bold);
-  line-height: var(--line-height-20);
 }
 
 .legacy_label {
@@ -101,9 +104,7 @@
 }
 
 .legacy_p_bold {
-  font-size: var(--font-size-22);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-28);
 }
 
 .legacy_label_bold {
@@ -145,20 +146,6 @@
   }
 
   .legacy_h3_semi_bold {
-    font-weight: var(--font-weight-semi-bold);
-  }
-
-  .legacy_p,
-  .legacy_p_semi_bold {
-    font-size: var(--font-size-22);
-    line-height: var(--line-height-28);
-  }
-
-  .legacy_p {
-    font-weight: var(--font-weight-regular);
-  }
-
-  .legacy_p_semi_bold {
     font-weight: var(--font-weight-semi-bold);
   }
 
