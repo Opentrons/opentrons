@@ -1,5 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import {
+  formatPyRuntimeValue,
   resolveBooleanRuntimeValue,
   resolveStringRuntimeValue,
   uuid,
@@ -51,10 +52,16 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceStepGenArgs> = (
   const entityId = prevRobotState.pipettes[pipetteId]?.entityId ?? ''
   const trashBin = trashBinEntities[entityId]
   const wasteChute = wasteChuteEntities[entityId]
-  const dropTipArgs =
+  const dropTipArgs = [
     trashBin != null
       ? `${trashBin.pythonName}, alternate_drop_location=True`
-      : (wasteChute?.pythonName ?? '')
+      : wasteChute?.pythonName,
+    ...(args.homeAfter != null
+      ? [`home_after=${formatPyRuntimeValue(args.homeAfter)}`]
+      : []),
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   const commands = [
     {
