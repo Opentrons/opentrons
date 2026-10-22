@@ -1,6 +1,5 @@
 """Router for /maintenance_runs commands endpoints."""
 
-import json
 import textwrap
 from typing import Annotated, Optional, Union
 
@@ -288,29 +287,7 @@ async def get_run_commands(
         run_id=runId
     )
 
-    commands_list = [json.loads(c) for c in command_slice.commands]
-    data = [
-        RunCommandSummary.model_construct(
-            id=c["id"],
-            key=c["key"],
-            commandType=c["commandType"],
-            intent=c.get("intent") if c.get("intent") else None,
-            status=CommandStatus(c["status"]),
-            createdAt=c["createdAt"],
-            startedAt=c["startedAt"],
-            completedAt=c["completedAt"],
-            params=c["params"],
-            error=c.get("error") if c.get("error") else None,
-            notes=c["notes"],
-            failedCommandId=c.get("failedCommandId")
-            if c.get("failedCommandId")
-            else None,
-            commandAnnotationIds=c.get("commandAnnotationIds")
-            if c.get("commandAnnotationIds")
-            else None,
-        )
-        for c in commands_list
-    ]
+    data = [RunCommandSummary.build_from_json(c) for c in command_slice.commands]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,

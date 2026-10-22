@@ -857,7 +857,6 @@ async def test_uncurrent(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -982,7 +981,7 @@ async def test_uncurrent_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,
@@ -1042,7 +1041,7 @@ async def test_create_archives_existing(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
+            commands=[],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -1190,7 +1189,7 @@ async def test_create_replacement_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,

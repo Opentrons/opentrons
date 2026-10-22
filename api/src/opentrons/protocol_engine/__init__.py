@@ -20,7 +20,12 @@ from .errors import ErrorOccurrence, ProtocolEngineError
 from .notes import CommandNote
 from .plugins import AbstractPlugin
 from .protocol_engine import ProtocolEngine
-from .state.commands import CommandErrorSlice, CommandPointer, CommandSlice, JsonCommandSlice
+from .state.commands import (
+    CommandErrorSlice,
+    CommandPointer,
+    CommandSlice,
+    JsonCommandSlice,
+)
 from .state.config import Config
 from .state.state import State, StateView
 from .state.state_summary import StateSummary

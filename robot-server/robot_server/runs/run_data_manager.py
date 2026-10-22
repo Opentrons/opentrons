@@ -537,21 +537,12 @@ class RunDataManager:
             run_id == self._run_orchestrator_store.current_run_id
             and not await self._run_orchestrator_store.get_commands_deleted()
         ):
-            # CASEY NOTE: move this logic down into protocol engine
             commands_slice = await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
                 include_fixit_commands=include_fixit_commands,
             )
-            converted_slice = JsonCommandSlice(
-                cursor=commands_slice.cursor,
-                total_length=commands_slice.total_length,
-                commands=[
-                    command.model_dump_json(by_alias=True, exclude_none=True)
-                    for command in commands_slice.commands
-                ],
-            )
-            return converted_slice
+            return commands_slice
 
         # Let exception propagate
         return self._run_store.get_commands_slice(

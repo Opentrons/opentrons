@@ -13,6 +13,7 @@ from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
     CommandSlice,
     EngineStatus,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine import commands as pe_commands
@@ -287,8 +288,12 @@ async def test_analyze(
             include_fixit_commands=True,
         )
     ).then_return(
-        CommandSlice(
-            commands=[analysis_command], cursor=0, total_length=len([analysis_command])
+        JsonCommandSlice(
+            commands=[
+                analysis_command.model_dump_json(by_alias=True, exclude_none=True)
+            ],
+            cursor=0,
+            total_length=len([analysis_command]),
         )
     )
     decoy.when(await orchestrator.get_state_summary()).then_return(

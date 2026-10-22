@@ -9,7 +9,6 @@ from opentrons.config import (
 from opentrons.protocol_engine import (
     Command,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
     JsonCommandSlice,
     LabwareOffsetCreate,
@@ -234,16 +233,7 @@ class MaintenanceRunDataManager:
         the_slice = await self._run_orchestrator_store.get_command_slice(
             cursor=cursor, length=length
         )
-        # CASEY NOTE: Once this logic moves down into the orchestrator clean this up
-        converted_slice = JsonCommandSlice(
-            cursor=the_slice.cursor,
-            total_length=the_slice.total_length,
-            commands=[
-                command.model_dump_json(by_alias=True, exclude_none=True)
-                for command in the_slice.commands
-            ],
-        )
-        return converted_slice
+        return the_slice
 
     async def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.

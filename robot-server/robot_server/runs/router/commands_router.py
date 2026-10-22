@@ -1,6 +1,5 @@
 """Router for /runs commands endpoints."""
 
-import json
 import textwrap
 from typing import Annotated, Final, Literal, Optional, Union
 
@@ -8,7 +7,6 @@ from fastapi import Depends, Query, status
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandStatus,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -325,30 +323,7 @@ async def get_run_commands(
     recovery_target_command = await run_data_manager.get_recovery_target_command(
         run_id=runId
     )
-    commands_list = [json.loads(c) for c in command_slice.commands]
-
-    data = [
-        RunCommandSummary.model_construct(
-            id=c["id"],
-            key=c["key"],
-            commandType=c["commandType"],
-            intent=c.get("intent") if c.get("intent") else None,
-            status=CommandStatus(c["status"]),
-            createdAt=c["createdAt"],
-            startedAt=c.get("startedAt") if c.get("startedAt") else None,
-            completedAt=c.get("completedAt") if c.get("completedAt") else None,
-            params=c["params"],
-            error=c.get("error") if c.get("error") else None,
-            notes=c.get("notes") if c.get("notes") else None,
-            failedCommandId=c.get("failedCommandId")
-            if c.get("failedCommandId")
-            else None,
-            commandAnnotationIds=c.get("commandAnnotationIds")
-            if c.get("commandAnnotationIds")
-            else None,
-        )
-        for c in commands_list
-    ]
+    data = [RunCommandSummary.build_from_json(c) for c in command_slice.commands]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,

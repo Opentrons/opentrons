@@ -1,5 +1,6 @@
 """Request and response models for run resources."""
 
+import json
 from datetime import datetime
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
@@ -100,6 +101,34 @@ class RunCommandSummary(ResourceModel):
         None,
         description="List of command annotation ids associated with this command.",
     )
+
+    @classmethod
+    def build_from_json(cls, json_command: str) -> "RunCommandSummary":
+        """Build a RunCommandSummary from a Command is JSON format."""
+        command_dict: dict[str, Any] = json.loads(json_command)
+        return RunCommandSummary.model_construct(
+            id=command_dict["id"],
+            key=command_dict["key"],
+            commandType=command_dict["commandType"],
+            intent=command_dict.get("intent") if command_dict.get("intent") else None,
+            status=CommandStatus(command_dict["status"]),
+            createdAt=command_dict["createdAt"],
+            startedAt=command_dict.get("startedAt")
+            if command_dict.get("startedAt")
+            else None,
+            completedAt=command_dict.get("completedAt")
+            if command_dict.get("completedAt")
+            else None,
+            params=command_dict["params"],
+            error=command_dict.get("error") if command_dict.get("error") else None,
+            notes=command_dict.get("notes") if command_dict.get("notes") else None,
+            failedCommandId=command_dict.get("failedCommandId")
+            if command_dict.get("failedCommandId")
+            else None,
+            commandAnnotationIds=command_dict.get("commandAnnotationIds")
+            if command_dict.get("commandAnnotationIds")
+            else None,
+        )
 
 
 class Run(ResourceModel):

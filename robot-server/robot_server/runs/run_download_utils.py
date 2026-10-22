@@ -78,29 +78,10 @@ async def collect_run_log(
             length=length_probe.total_length,
             include_fixit_commands=True,
         )
-        commands_list = [json.loads(c) for c in command_slice.commands]
 
         command_summaries = [
-            RunCommandSummary.model_construct(
-                id=c["id"],
-                key=c["key"],
-                commandType=c["commandType"],
-                intent=c.get("intent") if c.get("intent") else None,
-                status=CommandStatus(c["status"]),
-                createdAt=c["createdAt"],
-                startedAt=c["startedAt"],
-                completedAt=c["completedAt"],
-                params=c["params"],
-                error=c.get("error") if c.get("error") else None,
-                notes=c["notes"],
-                failedCommandId=c.get("failedCommandId")
-                if c.get("failedCommandId")
-                else None,
-                commandAnnotationIds=c.get("commandAnnotationIds")
-                if c.get("commandAnnotationIds")
-                else None,
-            ).model_dump(mode="json", by_alias=True)
-            for c in commands_list
+            RunCommandSummary.build_from_json(c).model_dump(mode="json", by_alias=True)
+            for c in command_slice.commands
         ]
 
         run_details = {

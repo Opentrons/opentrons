@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     CommandSlice,
     DeckType,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -116,6 +117,7 @@ def register_process_types() -> None:
         CommandAnnotation,
         CommandPreconditions,
         CommandSlice,
+        JsonCommandSlice,
         CommandErrorSlice,
         CommandPointer,
         CommandAnnotationsSlice,
@@ -410,7 +412,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
