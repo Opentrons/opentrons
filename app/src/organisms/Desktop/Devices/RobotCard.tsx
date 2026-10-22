@@ -23,7 +23,6 @@ import {
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  usePipettesQuery,
 } from '@opentrons/react-api-client'
 import {
   getGripperDisplayName,
@@ -52,7 +51,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
 import type { ReactNode } from 'react'
-import type { GripperData } from '@opentrons/api-client'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
@@ -226,17 +225,20 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
 function AttachedInstruments(props: { robotName: string }): ReactNode {
   const { t, i18n } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
-  const { data: pipettesData, isLoading: isPipetteQueryLoading } =
-    usePipettesQuery()
 
   const { data: attachedInstruments, isLoading: isInstrumentsQueryLoading } =
     useInstrumentsQuery({ enabled: isFlex })
+  const pipettesData = (attachedInstruments?.data ?? []).filter(
+    (i): i is PipetteData => i.instrumentType === 'pipette' && i.ok
+  )
+  const attachedLeft = (pipettesData ?? []).find(i => i.mount === 'left')
+  const attachedRight = (pipettesData ?? []).find(i => i.mount === 'right')
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     ) ?? null
-  const leftPipetteModel = pipettesData?.left?.model ?? null
-  const rightPipetteModel = pipettesData?.right?.model ?? null
+  const leftPipetteModel = attachedLeft?.instrumentModel ?? null
+  const rightPipetteModel = attachedRight?.instrumentModel ?? null
   const gripperDisplayName =
     attachedGripper != null
       ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel)
@@ -252,7 +254,7 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
         {i18n.format(t('shared:instruments'), 'capitalize')}
       </StyledText>
 
-      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
+      {isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
           {leftAndRightMountsPipetteDisplayName != null ? (
             <InstrumentContainer
