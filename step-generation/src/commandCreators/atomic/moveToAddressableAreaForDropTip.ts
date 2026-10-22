@@ -103,9 +103,7 @@ export const moveToAddressableAreaForDropTip: CommandCreator<
           ...(speed != null ? { speed } : {}),
           ...(minimumZHeight != null ? { minimumZHeight } : {}),
           ...(forceDirect != null ? { forceDirect } : {}),
-          ...(ignoreTipConfiguration != null
-            ? { ignoreTipConfiguration }
-            : {}),
+          ...(ignoreTipConfiguration != null ? { ignoreTipConfiguration } : {}),
         },
       },
     ],
