@@ -3,14 +3,18 @@ title: "Plate Reader: Safety Information"
 description: "Safe use, environmental conditions, and compliance for the plate reader."
 ---
 
-Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
+Opentrons recommends that you follow the specifications listed in this section and throughout this manual. Always follow the [installation instructions](installation.md) to ensure proper and safe operation.
 
-## Safe Use Specifications
+## Hardware Requirements
 
-The Absorbance Plate Reader is designed for use with the Flex liquid handling robot. It cannot be used with an OT-2 robot or as standalone equipment. Follow the [installation instructions](installation.md) to ensure proper and safe operation.
+The Absorbance Plate Reader is designed for use with the Flex liquid handling robot. It cannot be used with an OT-2 robot or as standalone equipment.
 
-!!!warning
-    Always use the Opentrons Flex Gripper to move the illumination unit onto or off of the detection unit. Do not move the illumination unit by hand.
+The Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). Opentrons software does not support manual lid movement or plate reader protocols without a gripper.
+
+!!! warning
+    Always use the Flex Gripper to move the illumination unit on or off the detection unit. Do not move the illumination unit by hand during setup or protocol execution. Moving the illumination unit manually can damage the electronic pins that connect these components.
+
+## Environmental Conditions
 
 The Absorbance Plate Reader should only be used indoors in an environment with stable ambient conditions. The following table lists and defines the environmental operating conditions for recommended use, transportation, and storage of your plate reader.
 

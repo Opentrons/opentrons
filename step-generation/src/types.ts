@@ -1236,6 +1236,35 @@ export interface AbsorbanceReaderReadStepGenArgs {
   fileName?: string | null
 }
 
+export interface ThermocyclerSetTargetBlockTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerSetTargetLidTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerProfileStepStepGenArgs {
+  celsius: number | string
+  holdSeconds: number | string
+}
+
+export interface ThermocyclerProfileCycleStepGenArgs {
+  steps: ThermocyclerProfileStepStepGenArgs[]
+  repetitions: number | string
+}
+
+export interface ThermocyclerStartRunExtendedProfileStepGenArgs {
+  moduleId: string
+  profileElements: Array<
+    ThermocyclerProfileCycleStepGenArgs | ThermocyclerProfileStepStepGenArgs
+  >
+  blockMaxVolumeUl?: number | string
+  taskId?: string | null
+}
+
 export interface ConfigureForVolumeStepGenArgs {
   pipetteId: string
   volume: number | string
@@ -1275,8 +1304,7 @@ export interface WaitForTemperatureStepGenArgs {
   celsius: number | string
 }
 
-export interface EngageMagnetStepGenArgs {
-  moduleId: string
+export interface EngageMagnetStepGenArgs extends ModuleStepGenArgs {
   height: number | string
 }
 
@@ -1365,6 +1393,11 @@ export interface BlowOutInPlaceStepGenArgs {
   flowRate: number | string
 }
 
+export interface DropTipInPlaceStepGenArgs {
+  pipetteId: string
+  homeAfter?: boolean | string
+}
+
 export interface AspirateWhileTrackingStepGenArgs {
   pipetteId: string
   volume: number | string
@@ -1401,6 +1434,21 @@ export interface MoveToCoordinatesStepGenArgs {
   }
   minimumZHeight?: number | string
   forceDirect?: boolean | string
+}
+
+export interface MoveToAddressableAreaForDropTipStepGenArgs {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  alternateDropLocation?: boolean | string
+  speed?: number | string
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  ignoreTipConfiguration?: boolean | string
 }
 
 export interface MoveToWellStepGenArgs {

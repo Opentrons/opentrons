@@ -6,8 +6,8 @@ from typing import Awaitable, Callable, List, Union, cast
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.interfaces import USBDriverInterface
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import types
 from opentrons.hardware_control.abstract_device import AbstractDevice
 from opentrons.hardware_control.module_control import (

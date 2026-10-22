@@ -3,7 +3,7 @@
 import asyncio
 from typing import Awaitable, Callable, List, Sequence, Set
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import (
     ModuleServerClientError,
     ModuleServerDisconnected,

@@ -1,13 +1,12 @@
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import { resolveStringRuntimeValue } from '../utils'
 
 import type {
-  EngageMagnetParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type {
+  EngageMagnetStepGenArgs,
   InvariantContext,
+  ModuleStepGenArgs,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
 } from '../types'
@@ -22,23 +21,41 @@ function _setMagnet(
 }
 
 export function forEngageMagnet(
-  params: EngageMagnetParams,
+  params: EngageMagnetStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forEngageMagnet: arg resolved to null (moduleId=${String(moduleId)})`
+    )
+    return
+  }
   const moduleState = getModuleState(robotState, moduleId)
 
   _setMagnet(moduleState, true)
 }
 export function forDisengageMagnet(
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { moduleId } = params
   const { robotState } = robotStateAndWarnings
+  const moduleId = resolveStringRuntimeValue(
+    params.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    console.error(
+      `forDisengageMagnet: arg resolved to null (moduleId=${String(moduleId)})`
+    )
+    return
+  }
   const moduleState = getModuleState(robotState, moduleId)
 
   _setMagnet(moduleState, false)

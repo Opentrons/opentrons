@@ -1,21 +1,32 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
-export const thermocyclerDeactivateBlock: CommandCreator<ModuleOnlyParams> = (
+export const thermocyclerDeactivateBlock: CommandCreator<ModuleStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
+  const moduleId = resolveStringRuntimeValue(
+    args.moduleId,
+    invariantContext.runtimeParameters
+  )
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   return {
     commands: [
       {
         commandType: 'thermocycler/deactivateBlock',
         key: uuid(),
         params: {
-          moduleId: args.moduleId,
+          moduleId,
         },
       },
     ],

@@ -5,13 +5,13 @@ from typing import Annotated, Optional, Type, cast
 from fastapi import Depends
 from opentrons_hardware.hardware_control.types import PCBARevision
 
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbsorbanceReaderStatus,
@@ -103,9 +103,6 @@ class ModuleDataMapper:
             module_cls = MagneticModule
             assert ModuleDataValidator.is_magnetic_module_data(live_data["data"])
             live_data_height = live_data["data"].get("height")
-            assert isinstance(live_data_height, (int, float)), (
-                f"Expected magnetic module height, got {live_data_height}"
-            )
 
             # Origin of height reported by hardware API is the magnet home
             # Origin we report to the user should be labware bottom

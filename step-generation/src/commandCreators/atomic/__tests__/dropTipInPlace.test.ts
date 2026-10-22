@@ -4,6 +4,7 @@ import { dropTipInPlace } from '..'
 import { FIXED_TRASH_ID } from '../../../constants'
 import {
   DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
   getSuccessResult,
@@ -77,5 +78,76 @@ describe('dropTipInPlace', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([])
     expect(res.python).toBeUndefined()
+  })
+  it('resolves runtime parameters into the command and python', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+      home_after: {
+        variableName: 'home_after',
+        displayName: 'Home after',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = dropTipInPlace(
+      {
+        pipetteId: 'selected_pipette',
+        homeAfter: 'home_after',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+            homeAfter: false,
+          },
+        },
+      ],
+      python: 'mock_pipette.drop_tip(home_after=home_after)',
+    })
+  })
+  it('returns errors if runtime parameters are not valid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_string_rtp: {
+        variableName: 'mock_string_rtp',
+        displayName: 'mock string rtp',
+        type: 'string',
+        default: 'mock',
+      },
+    }
+    const result = dropTipInPlace(
+      {
+        pipetteId: 'mock_rtp',
+        homeAfter: 'mock_string_rtp',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

@@ -8,6 +8,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import {
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
@@ -67,6 +69,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const documentationState = useDocumentationState()
   const { updateRobotSetting } =
     useUpdateRobotSettingMutation(documentationState)
+  const robotLogLevel = useLogLevelQuery()
+  const { postLogLevel } = usePostLogLevelMutation(documentationState)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -111,6 +115,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
       message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
     })
   )
+  const DEBUG_LEVELS = ['info', 'debug']
+  const debugLogsEnabled = DEBUG_LEVELS.includes(
+    robotLogLevel?.data?.log_level ?? 'unknown'
+  )
+
+  const handleToggleDebugLogs = (newValue: boolean): void => {
+    postLogLevel(newValue ? 'debug' : 'warning')
+  }
 
   return (
     <div className={styles.main_content}>
@@ -327,6 +339,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
           iconName="update-channel"
         />
         <RobotSettingButton
+          settingName={t('debug_logging')}
+          dataTestId="RobotSettingButton_enable_debug_logging"
+          settingInfo={t('debug_logging_description')}
+          rightElement={<OnOffToggle isOn={debugLogsEnabled} />}
+          onClick={() => {
+            handleToggleDebugLogs(!debugLogsEnabled)
+          }}
+          iconName="compliance"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"
           settingInfo={t('dev_tools_description')}
@@ -336,6 +358,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
             handleToggleDevtools(!devToolsOn)
           }}
         />
+
         {devToolsOn ? <FeatureFlags /> : null}
       </div>
     </div>
