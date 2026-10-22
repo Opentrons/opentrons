@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../index'
 import { isntStyleProp, styleProps } from '../../primitives'
+import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { StyleProps } from '../../index'
+import type { StyleProps } from '../../primitives'
 
 interface SecondaryButtonProps extends StyleProps {
   /** button action is dangerous and may have non-reversible side-effects for user */

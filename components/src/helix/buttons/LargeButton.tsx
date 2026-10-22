@@ -1,17 +1,16 @@
 import { css } from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  CURSOR_DEFAULT,
-  CURSOR_POINTER,
-  DIRECTION_COLUMN,
-  DISPLAY_FLEX,
-  JUSTIFY_SPACE_BETWEEN,
-} from '../..'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
+import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles/cursor'
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+} from '../../styles/flexbox'
+import { DISPLAY_FLEX } from '../../styles/layout'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../icons'
 
