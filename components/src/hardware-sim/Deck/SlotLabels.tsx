@@ -2,7 +2,7 @@ import clsx from 'clsx'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { RobotInfoLabel } from '../../molecules'
+import { RobotInfoLabel } from '../../helix/icons'
 import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
