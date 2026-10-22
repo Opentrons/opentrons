@@ -1,38 +1,16 @@
 // mock HTTP responses for pipettes endpoints
 
-import type { AttachedPipette, PipetteData } from '@opentrons/api-client'
+import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteInformation } from '/app/resources/instruments/types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
 // fetch pipette fixtures
 
-export const mockAttachedPipette: Omit<AttachedPipette, 'modelSpecs'> = {
-  id: 'abc',
-  name: 'p300_single_gen2',
-  model: 'p300_single_v2.0',
-  tip_length: 42,
-  mount_axis: 'c',
-  plunger_axis: 'd',
-}
-
-export const mockUnattachedPipette = {
-  id: null,
-  name: null,
-  model: null,
-  mount_axis: 'a',
-  plunger_axis: 'b',
-}
-
 export const mockLeftSpecs: any = {
   displayName: 'Left Pipette',
   name: 'mock_left',
   backCompatNames: ['mock_left_legacy'],
-}
-
-export const mockLeftLegacySpecs: any = {
-  displayName: 'Left Pipette Legacy',
-  name: 'mock_left_legacy',
 }
 
 export const mockRightSpecs: any = {

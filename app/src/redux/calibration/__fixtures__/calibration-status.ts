@@ -5,7 +5,6 @@ import {
 } from '../../robot-api/__fixtures__'
 import { CALIBRATION_STATUS_PATH, DECK_CAL_STATUS_IDENTITY } from '../constants'
 
-import type { DeckCalibrationData } from '@opentrons/api-client'
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { CalibrationStatus, ProtocolCalibrationStatus } from '../types'
 
@@ -63,42 +62,4 @@ export const {
 export const mockProtocolCalibrationComplete: ProtocolCalibrationStatus = {
   complete: false,
   reason: 'calibrate_deck_failure_reason',
-}
-
-export const mockDeckCalData: DeckCalibrationData = {
-  type: 'affine' as const,
-  matrix: [
-    [1.0, 0.0, 0.0, 0.0],
-    [0.0, 1.0, 0.0, 0.0],
-    [0.0, 0.0, 1.0, 0.0],
-    [0.0, 0.0, 0.0, 1.0],
-  ],
-  lastModified: 'September 15, 2021',
-  pipetteCalibratedWith: null,
-  tiprack: null,
-  source: 'user' as const,
-  status: {
-    markedBad: false,
-    source: 'unknown' as const,
-    markedAt: '',
-  },
-}
-
-export const mockWarningDeckCalData: DeckCalibrationData = {
-  type: 'affine',
-  matrix: [
-    [1.0, 0.0, 0.0, 0.0],
-    [0.0, 1.0, 0.0, 0.0],
-    [0.0, 0.0, 1.0, 0.0],
-    [0.0, 0.0, 0.0, 1.0],
-  ],
-  lastModified: 'September 22, 2222',
-  pipetteCalibratedWith: null,
-  tiprack: null,
-  source: 'user',
-  status: {
-    markedBad: true,
-    source: 'unknown',
-    markedAt: '',
-  },
 }
