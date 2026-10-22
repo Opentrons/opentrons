@@ -1431,6 +1431,21 @@ export interface MoveToCoordinatesStepGenArgs {
   forceDirect?: boolean | string
 }
 
+export interface MoveToAddressableAreaForDropTipStepGenArgs {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  alternateDropLocation?: boolean | string
+  speed?: number | string
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  ignoreTipConfiguration?: boolean | string
+}
+
 export interface MoveToWellStepGenArgs {
   pipetteId: string
   labwareId: string

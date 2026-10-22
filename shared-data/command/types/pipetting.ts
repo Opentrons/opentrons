@@ -346,6 +346,7 @@ export interface MoveToAddressableAreaForDropTipParams {
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean
+  ignoreTipConfiguration?: boolean
 }
 export interface BlowoutInPlaceParams {
   pipetteId: string
