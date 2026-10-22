@@ -2060,6 +2060,18 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             actual_disp_list_all = []
             measurements[volume] = []
             for channel in fixture_settings.channels:
+                # Extra-only volumes (not in the standard QC list for this tip)
+                # only run on channel 0 (UI "channel 1"), matching pre-protocol
+                # CLI behavior in trial.py.
+                if (
+                    fixture_settings.pipette_channels == 8
+                    and channel > 0
+                    and volume not in fixture_settings.volumes[tip]
+                ):
+                    print_info(
+                        f"skipping channel {channel + 1} for extra volume {volume}ul"
+                    )
+                    continue
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
