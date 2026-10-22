@@ -1393,6 +1393,11 @@ export interface BlowOutInPlaceStepGenArgs {
   flowRate: number | string
 }
 
+export interface DropTipInPlaceStepGenArgs {
+  pipetteId: string
+  homeAfter?: boolean | string
+}
+
 export interface AspirateWhileTrackingStepGenArgs {
   pipetteId: string
   volume: number | string
@@ -1429,6 +1434,21 @@ export interface MoveToCoordinatesStepGenArgs {
   }
   minimumZHeight?: number | string
   forceDirect?: boolean | string
+}
+
+export interface MoveToAddressableAreaForDropTipStepGenArgs {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  alternateDropLocation?: boolean | string
+  speed?: number | string
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  ignoreTipConfiguration?: boolean | string
 }
 
 export interface MoveToWellStepGenArgs {
