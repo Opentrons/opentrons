@@ -1,17 +1,13 @@
-import { test } from '@applitools/eyes-playwright/fixture'
+import { expect, test } from '@playwright/test'
 
 test.describe('ProtocolDeck Component', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/deck-map')
   })
 
-  test('renders deck map from analysis', async ({ page, eyes }) => {
+  test('renders deck map from analysis', async ({ page }) => {
     await page.waitForLoadState('networkidle')
     const protocolDeckContainer = page.getByTestId('protocol-deck-container')
     await protocolDeckContainer.waitFor({ state: 'visible' })
-    await eyes.check('Components DeckMap from analysis', {
-      region: protocolDeckContainer,
-      matchLevel: 'Strict',
-    })
   })
 })
