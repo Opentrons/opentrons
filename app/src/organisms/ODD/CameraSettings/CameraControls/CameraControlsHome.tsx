@@ -13,6 +13,7 @@ import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
+import type { ReactNode } from 'react'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
@@ -28,7 +29,7 @@ export function CameraControlsHome({
   toggleShowControls,
   settings,
   runId,
-}: CameraControlsHomeProps): JSX.Element {
+}: CameraControlsHomeProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
   const {
@@ -159,7 +160,7 @@ function SettingButton({
   onClick,
   title,
   value,
-}: SettingButtonProps): JSX.Element {
+}: SettingButtonProps): ReactNode {
   return (
     <ListButton
       type="noActive"

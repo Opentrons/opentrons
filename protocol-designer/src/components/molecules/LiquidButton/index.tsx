@@ -13,7 +13,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 const BUTTON_HEIGHT_IN_TOOLBOX = '2.4375rem'
 interface LiquidButtonProps {
@@ -24,7 +24,7 @@ interface LiquidButtonProps {
 export function LiquidButton({
   showLiquidOverflowMenu,
   isInToolbox = false,
-}: LiquidButtonProps): JSX.Element {
+}: LiquidButtonProps): ReactNode {
   const { t } = useTranslation('starting_deck_state')
   return (
     <Btn

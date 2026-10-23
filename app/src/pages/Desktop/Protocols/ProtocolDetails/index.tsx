@@ -9,10 +9,11 @@ import {
   getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
 
+import type { ReactNode } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ProtocolDetails(): JSX.Element {
+export function ProtocolDetails(): ReactNode {
   const { protocolKey } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams

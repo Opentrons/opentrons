@@ -5,6 +5,7 @@ import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import styles from './wifiauthenticationselector.module.css'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { WifiScreenOption } from './'
 
@@ -20,7 +21,7 @@ export function WifiAuthenticationSelector({
   selectedAuthType,
   setCurrentOption,
   setSelectedAuthType,
-}: WifiAuthenticationSelectorProps): JSX.Element {
+}: WifiAuthenticationSelectorProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (

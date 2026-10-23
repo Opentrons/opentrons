@@ -21,6 +21,7 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 
+import type { ReactNode } from 'react'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolLiquidsDetailsProps {
@@ -30,7 +31,7 @@ interface ProtocolLiquidsDetailsProps {
 
 export const ProtocolLiquidsDetails = (
   props: ProtocolLiquidsDetailsProps
-): JSX.Element => {
+): ReactNode => {
   const { commands, liquids } = props
   const { i18n, t } = useTranslation('protocol_details')
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(liquids, commands)

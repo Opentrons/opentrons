@@ -13,10 +13,11 @@ import {
 import { ManageTips } from './ManageTips'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 const { HOME_AND_RETRY } = RECOVERY_MAP
-export function HomeAndRetry(props: RecoveryContentProps): JSX.Element {
+export function HomeAndRetry(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { route, step } = recoveryMap
   switch (step) {
@@ -50,7 +51,7 @@ export function HomeAndRetry(props: RecoveryContentProps): JSX.Element {
   }
 }
 
-export function RetryAfterHome(props: RecoveryContentProps): JSX.Element {
+export function RetryAfterHome(props: RecoveryContentProps): ReactNode {
   const { recoveryMap, routeUpdateActions } = props
   const { step, route } = recoveryMap
   const { HOME_AND_RETRY } = RECOVERY_MAP
@@ -80,7 +81,7 @@ export function RetryAfterHome(props: RecoveryContentProps): JSX.Element {
   return buildContent()
 }
 
-export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
+export function PrepareDeckForHome(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions, tipStatusUtils } = props
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -109,9 +110,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
   )
 }
 
-export function HomeGantryBeforeRetry(
-  props: RecoveryContentProps
-): JSX.Element {
+export function HomeGantryBeforeRetry(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions, tipStatusUtils } = props
   const { proceedToRouteAndStep } = routeUpdateActions

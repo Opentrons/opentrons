@@ -10,13 +10,13 @@ import {
 
 import { getUserOS } from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
 
+import type { ReactNode } from 'react'
+
 interface HotKeyDisplayProps {
   targetWidth: number
 }
 
-export function HotKeyDisplay({
-  targetWidth,
-}: HotKeyDisplayProps): JSX.Element {
+export function HotKeyDisplay({ targetWidth }: HotKeyDisplayProps): ReactNode {
   const { t } = useTranslation('starting_deck_state')
   const userOs = getUserOS()
   const isMac = userOs === 'Mac OS'

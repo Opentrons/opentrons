@@ -1342,7 +1342,7 @@ class ProtocolContext(CommandPublisher):
             seconds (float): The time to delay in seconds.
 
         This timer will continue to run until it is complete and will not block
-            subsequent commands.
+            subsequent commands. There is no notification when the timer is complete.
         """
         task_core = self._core.create_timer(seconds=seconds)
         return Task(core=task_core, api_version=self._api_version)

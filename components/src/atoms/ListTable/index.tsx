@@ -21,7 +21,7 @@ export interface ListTableProps {
 // ListTable contains the semantic HTML table identity.
 // This is a table-focused version of SubListTable, and children should include proper
 // <tr> tags when applicable.
-export function ListTable({ headers, children }: ListTableProps): JSX.Element {
+export function ListTable({ headers, children }: ListTableProps): ReactNode {
   const numHeaders = headers ? headers.filter(Boolean).length : 0
 
   return (

@@ -18,6 +18,7 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -30,7 +31,7 @@ interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
   robotName: string
 }
 
-export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
+export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
   const {
     proceed,
     setErrorMessage,

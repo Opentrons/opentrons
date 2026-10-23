@@ -15,7 +15,7 @@ from hardware_testing.data.csv_report import CSVReport
 from .config import TestSection, TestConfig, build_report, TESTS
 from opentrons.hardware_control.modules import FlexStacker
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 STACKER_VID = 0x483
 STACKER_PID = 0xEF24

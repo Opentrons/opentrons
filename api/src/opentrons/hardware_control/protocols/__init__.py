@@ -13,7 +13,6 @@ from .flex_instrument_configurer import FlexInstrumentConfigurer
 from .gripper_controller import GripperController
 from .hardware_manager import HardwareManager
 from .identifiable import Identifiable
-from .instrument_configurer import InstrumentConfigurer
 from .liquid_handler import LiquidHandler
 from .module_provider import ModuleProvider
 from .motion_controller import MotionController
@@ -92,7 +91,6 @@ __all__ = [
     "Stoppable",
     "AsyncioConfigurable",
     "ExecutionControllable",
-    "InstrumentConfigurer",
     "MotionController",
     "Configurable",
     "Calibratable",

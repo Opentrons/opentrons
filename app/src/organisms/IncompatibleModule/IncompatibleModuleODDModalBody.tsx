@@ -14,6 +14,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -23,7 +24,7 @@ export interface IncompatibleModuleODDModalBodyProps {
 
 export function IncompatibleModuleODDModalBody({
   modules,
-}: IncompatibleModuleODDModalBodyProps): JSX.Element {
+}: IncompatibleModuleODDModalBodyProps): ReactNode {
   const { t } = useTranslation('incompatible_modules')
   const incompatibleModuleHeader: OddModalHeaderBaseProps = {
     title: capitalize(t('incompatible_modules_attached') as string),

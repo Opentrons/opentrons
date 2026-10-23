@@ -1,6 +1,6 @@
 .floating_button_style {
   position: fixed;
-  z-index: 2;
+  z-index: var(--z-index-details);
   right: var(--spacing-24);
   bottom: var(--spacing-24);
   display: flex;

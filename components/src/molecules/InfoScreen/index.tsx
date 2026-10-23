@@ -5,6 +5,7 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '../../icons'
 
 interface InfoScreenProps {
@@ -22,7 +23,7 @@ export function InfoScreen({
   backgroundColor = COLORS.grey30,
   height = '100%',
   iconName,
-}: InfoScreenProps): JSX.Element {
+}: InfoScreenProps): ReactNode {
   return (
     <Flex
       alignItems={ALIGN_CENTER}

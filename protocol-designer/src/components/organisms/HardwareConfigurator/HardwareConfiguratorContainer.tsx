@@ -2,6 +2,7 @@ import { DeckConfigurator } from '@opentrons/components'
 
 import { useDeckConfigurationEditing } from './utils'
 
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { CutoutConfigMap, DeckConfiguration } from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
@@ -21,7 +22,7 @@ interface HardwareConfiguratorContainerProps {
 }
 export function HardwareConfiguratorContainer(
   props: HardwareConfiguratorContainerProps
-): JSX.Element {
+): ReactNode {
   const {
     modules,
     setValue,

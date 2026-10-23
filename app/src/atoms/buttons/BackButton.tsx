@@ -10,13 +10,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { HTMLProps } from 'react'
+import type { HTMLProps, ReactNode } from 'react'
 
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({
   onClick,
   children,
-}: HTMLProps<HTMLButtonElement>): JSX.Element {
+}: HTMLProps<HTMLButtonElement>): ReactNode {
   const navigate = useNavigate()
   const { t } = useTranslation('shared')
 

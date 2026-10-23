@@ -84,7 +84,6 @@ export function NumericSettingPage({
     } else if (parseResult.result === 'empty') {
       setCurrentValue(undefined)
     }
-    console.log('parseResult', parseResult)
   }
 
   return (

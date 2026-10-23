@@ -45,7 +45,7 @@ import type { State } from '/app/redux/types'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
 
-export function DevicesLanding(): JSX.Element {
+export function DevicesLanding(): ReactNode {
   const { t } = useTranslation('devices_landing')
   const showSearchBar = useFeatureFlag('robotSearchBar')
 
@@ -174,7 +174,7 @@ export function DevicesLanding(): JSX.Element {
   )
 }
 
-function DevicesLoadingState(): JSX.Element {
+function DevicesLoadingState(): ReactNode {
   const { t } = useTranslation('devices_landing')
   return (
     <Flex
@@ -228,7 +228,7 @@ function DevicesLoadingState(): JSX.Element {
 function ApiHostProviderForRobot(props: {
   robot: DiscoveredRobot
   children: ReactNode
-}): JSX.Element {
+}): ReactNode {
   const { robot, children } = props
   return <ApiHostProvider robotName={robot.name}>{children}</ApiHostProvider>
 }

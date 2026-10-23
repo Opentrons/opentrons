@@ -3,28 +3,29 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.protocol_engine.errors import (
     GripperNotAttachedError,
-    HardwareNotSupportedError,
     HeaterShakerLabwareLatchNotOpenError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
+    WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.execution.labware_movement import (
+    _VACUUM_MODULE_COLLAR_PICKUP_SPEED,
     LabwareMovementHandler,
+    _jaw_open_width_mm,
 )
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
@@ -37,6 +38,7 @@ from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
 )
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
     DeckSlotLocation,
     Dimensions,
     GripperMoveType,
@@ -127,6 +129,11 @@ async def set_up_decoy_hardware_gripper(
     ).then_return(6.0)
 
     decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(89)
+    decoy.when(ot3_hardware_api.hardware_gripper.min_jaw_width).then_return(60.0)
+    decoy.when(ot3_hardware_api.hardware_gripper.max_jaw_width).then_return(92.0)
+    decoy.when(ot3_hardware_api.hardware_gripper.geometry.jaw_width).then_return(
+        {"min": 60.0, "max": 92.0}
+    )
 
     decoy.when(state_store.labware.get_grip_force(labware_def)).then_return(100)
 
@@ -167,7 +174,15 @@ def subject(
     )
 
 
-@pytest.mark.ot3_only
+def test_jaw_open_width_mm() -> None:
+    """Open just enough to clear the labware, clamped to gripper geometry."""
+    assert _jaw_open_width_mm(85.48, 60.0, 92.0) == 84
+    assert _jaw_open_width_mm(94.0, 60.0, 92.0) == 92
+    assert _jaw_open_width_mm(108.6, 60.0, 92.0) == 92
+    assert _jaw_open_width_mm(108.6, 60.0, 92.6) == 92
+    assert _jaw_open_width_mm(50.0, 60.0, 92.0) == 60
+
+
 async def test_raise_error_if_gripper_pickup_failed(
     decoy: Decoy,
     state_store: StateStore,
@@ -239,7 +254,7 @@ async def test_raise_error_if_gripper_pickup_failed(
         await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),
         await ot3_hardware_api.grip(force_newtons=100),
-        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.hold_jaw_width(92),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
             expected_grip_width=100,
@@ -261,9 +276,9 @@ async def test_raise_error_if_gripper_pickup_failed(
             grip_width_uncertainty_narrower=5,
             disable_geometry_grip_check=False,
         ),
+        await ot3_hardware_api.hold_jaw_width(92),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-        await ot3_hardware_api.ungrip(),
-        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.hold_jaw_width(92),
     )
 
 
@@ -295,7 +310,6 @@ async def test_raise_error_if_gripper_pickup_failed(
         ),
     ],
 )
-@pytest.mark.ot3_only
 async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -367,13 +381,13 @@ async def test_move_labware_with_gripper(
         Point(
             pickup_grip_point.x, pickup_grip_point.y, 999
         ),  # move to above pickup location
-        pickup_grip_point,  # move to pickup location
+        pickup_grip_point,  # open jaws, then move to pickup location
         Point(
             pickup_grip_point.x, pickup_grip_point.y, 999
         ),  # gripper retract at pickup location
         Point(drop_grip_point.x, drop_grip_point.y, 999),  # move to above drop location
         drop_grip_point,  # move down to drop location
-        Point(drop_grip_point.x, drop_grip_point.y, 999),  # retract at drop location
+        Point(drop_grip_point.x, drop_grip_point.y, 999),  # ungrip and retract
     ]
 
     await subject.move_labware_with_gripper(
@@ -393,31 +407,31 @@ async def test_move_labware_with_gripper(
             await mock_tc_context_manager.__aenter__(),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[0]
+                mount=gripper, abs_position=expected_waypoints[0], speed=None
             ),
-            await ot3_hardware_api.ungrip(),
+            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[1]
+                mount=gripper, abs_position=expected_waypoints[1], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[2]
+                mount=gripper, abs_position=expected_waypoints[2], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[3]
+                mount=gripper, abs_position=expected_waypoints[3], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[4]
+                mount=gripper, abs_position=expected_waypoints[4], speed=None
             ),
+            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[5]
+                mount=gripper, abs_position=expected_waypoints[5], speed=None
             ),
-            await ot3_hardware_api.idle_gripper(),
+            await ot3_hardware_api.hold_jaw_width(92),
         )
     else:
         decoy.verify(
@@ -425,66 +439,303 @@ async def test_move_labware_with_gripper(
             await mock_tc_context_manager.__aenter__(),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[0]
+                mount=gripper, abs_position=expected_waypoints[0], speed=None
             ),
-            await ot3_hardware_api.ungrip(),
+            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[1]
+                mount=gripper, abs_position=expected_waypoints[1], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[2]
+                mount=gripper, abs_position=expected_waypoints[2], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[3]
+                mount=gripper, abs_position=expected_waypoints[3], speed=None
             ),
             await ot3_hardware_api.grip(force_newtons=100),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[4]
+                mount=gripper, abs_position=expected_waypoints[4], speed=None
             ),
+            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[5]
+                mount=gripper, abs_position=expected_waypoints[5], speed=None
             ),
-            await ot3_hardware_api.ungrip(),
+            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.move_to(
-                mount=gripper, abs_position=expected_waypoints[5] + slide_offset
+                mount=gripper,
+                abs_position=expected_waypoints[5] + slide_offset,
+                speed=None,
             ),
-            await ot3_hardware_api.idle_gripper(),
+            await ot3_hardware_api.hold_jaw_width(92),
         )
 
 
-async def test_labware_movement_raises_on_ot2(
+def _stub_gripper_move(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareControlAPI,
-    equipment: EquipmentHandler,
-    movement: MovementHandler,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    labware_def: LabwareDefinition2,
+    from_location: Union[
+        AddressableAreaLocation,
+        DeckSlotLocation,
+        ModuleLocation,
+        OnLabwareLocation,
+    ],
+    to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+) -> tuple[Point, Point, Any]:
+    """Shared decoy setup for gripper labware moves."""
+    user_pick_up_offset = Point(x=123, y=234, z=345)
+    user_drop_offset = Point(x=111, y=222, z=333)
+    pickup_grip_point = Point(101, 102, 119.5)
+    drop_grip_point = Point(201, 202, 219.5)
+
+    decoy.when(
+        state_store.labware.get_definition("my-teleporting-labware")
+    ).then_return(labware_def)
+    decoy.when(
+        state_store.geometry.get_labware_grip_point(
+            labware_definition=labware_def,
+            location=from_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
+            user_additional_offset=user_pick_up_offset,
+        )
+    ).then_return(pickup_grip_point)
+    decoy.when(
+        state_store.geometry.get_labware_grip_point(
+            labware_definition=labware_def,
+            location=to_location,
+            move_type=GripperMoveType.DROP_LABWARE,
+            user_additional_offset=user_drop_offset,
+        )
+    ).then_return(drop_grip_point)
+    mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
+    decoy.when(
+        thermocycler_plate_lifter.lift_plate_for_labware_movement(
+            labware_location=from_location
+        )
+    ).then_return(mock_tc_context_manager)
+    decoy.when(
+        state_store.labware.get_gripper_width_specs(labware_definition=labware_def)
+    ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
+    return pickup_grip_point, drop_grip_point, mock_tc_context_manager
+
+
+async def test_slow_pickup_for_vacuum_module_collar(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
 ) -> None:
-    """It should raise an error when attempting a gripper movement on a non-OT3 bot."""
-    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
-    subject = LabwareMovementHandler(
-        hardware_api=hardware_api,
-        state_store=state_store,
-        equipment=equipment,
-        movement=movement,
+    """Collar pickup from the vacuum module should slow only the post-grip Z retract."""
+    labware_def.parameters.quirks = ["vacuumModuleDock"]
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
     )
 
-    with pytest.raises(HardwareNotSupportedError):
-        await subject.move_labware_with_gripper(
-            labware_id="labware-id",
-            current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            user_pick_up_offset=Point(),
-            user_drop_offset=Point(),
-            post_drop_slide_offset=None,
-        )
+    from_location = ModuleLocation(moduleId="vacuum-module-id")
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    pickup_grip_point, drop_grip_point, mock_tc_context_manager = _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+    decoy.when(
+        state_store.modules.get_vacuum_module_substate("vacuum-module-id")
+    ).then_return(decoy.mock(name="vm-substate"))
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+    )
+
+    gripper = OT3Mount.GRIPPER
+    decoy.verify(
+        await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
+        await mock_tc_context_manager.__aenter__(),
+        await ot3_hardware_api.grip(force_newtons=100),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(pickup_grip_point.x, pickup_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=pickup_grip_point,
+            speed=None,
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(pickup_grip_point.x, pickup_grip_point.y, 999),
+            speed=_VACUUM_MODULE_COLLAR_PICKUP_SPEED,
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(drop_grip_point.x, drop_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=drop_grip_point, speed=None
+        ),
+        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+        await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(drop_grip_point.x, drop_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.hold_jaw_width(92),
+    )
 
 
-@pytest.mark.ot3_only
+async def test_does_not_slow_non_collar_pickup_from_vacuum_module(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
+) -> None:
+    """Filter plates and other VM labware should keep default pickup speed."""
+    labware_def.parameters.quirks = []
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
+
+    from_location = ModuleLocation(moduleId="vacuum-module-id")
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    pickup_grip_point, _, _ = _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+    )
+
+    gripper = OT3Mount.GRIPPER
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=pickup_grip_point, speed=None
+        ),
+        times=1,
+    )
+
+
+async def test_does_not_slow_collar_pickup_from_a4_dock(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
+) -> None:
+    """Collar pickup from the vacuum module A4 dock should keep default speed."""
+    labware_def.parameters.quirks = ["vacuumModuleDock"]
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
+
+    from_location = AddressableAreaLocation(addressableAreaName="vacuumModuleV1DockA4")
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    pickup_grip_point, _, _ = _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+    )
+
+    gripper = OT3Mount.GRIPPER
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=pickup_grip_point, speed=None
+        ),
+        times=1,
+    )
+
+
+async def test_does_not_slow_collar_pickup_from_heater_shaker(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
+) -> None:
+    """Collar pickup from a non-vacuum module should keep default speed."""
+    labware_def.parameters.quirks = ["vacuumModuleDock"]
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
+
+    from_location = ModuleLocation(moduleId="heater-shaker-id")
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    pickup_grip_point, _, _ = _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+    decoy.when(
+        state_store.modules.get_vacuum_module_substate("heater-shaker-id")
+    ).then_raise(WrongModuleTypeError("not a vacuum module"))
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+    )
+
+    gripper = OT3Mount.GRIPPER
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=pickup_grip_point, speed=None
+        ),
+        times=1,
+    )
+
+
 async def test_labware_movement_skips_for_virtual_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -510,7 +761,6 @@ async def test_labware_movement_skips_for_virtual_gripper(
     )
 
 
-@pytest.mark.ot3_only
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,

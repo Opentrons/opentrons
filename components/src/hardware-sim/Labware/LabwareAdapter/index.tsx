@@ -27,6 +27,10 @@ const CUSTOM_SVG_LOADNAME_PATHS = {
   opentrons_vacuum_manifold_collar_tall: OpentronsVacuumManifoldCollar,
   opentrons_vacuum_manifold_spacer_short: OpentronsVacuumManifoldSpacer,
   opentrons_vacuum_manifold_spacer_tall: OpentronsVacuumManifoldSpacer,
+  'opentrons_vacuum_manifold_spacer_3.2mm': OpentronsVacuumManifoldSpacer,
+  'opentrons_vacuum_manifold_spacer_5.2mm': OpentronsVacuumManifoldSpacer,
+  'opentrons_vacuum_manifold_spacer_7.25mm': OpentronsVacuumManifoldSpacer,
+  'opentrons_vacuum_manifold_spacer_12.8mm': OpentronsVacuumManifoldSpacer,
 }
 
 export type LabwareAdapterLoadName = keyof typeof CUSTOM_SVG_LOADNAME_PATHS

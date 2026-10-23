@@ -16,6 +16,7 @@ import {
 } from '/app/redux/analytics'
 import { U2E_DRIVER_UPDATE_URL } from '/app/redux/system-info'
 
+import type { ReactNode } from 'react'
 import type { AlertProps } from './types'
 
 const ADAPTER_INFO_URL = '/more/network-and-system'
@@ -32,7 +33,7 @@ const IgnoreCheckbox = styled(DeprecatedCheckboxField)`
   bottom: 1.5rem;
 `
 
-export function U2EDriverOutdatedAlert(props: AlertProps): JSX.Element {
+export function U2EDriverOutdatedAlert(props: AlertProps): ReactNode {
   const trackEvent = useTrackEvent()
   const { t } = useTranslation(['app_settings', 'branded'])
   const [rememberDismiss, toggleRememberDismiss] = useToggle()

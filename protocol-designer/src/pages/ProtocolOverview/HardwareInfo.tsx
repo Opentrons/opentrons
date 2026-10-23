@@ -21,6 +21,7 @@ import { getModuleDisplayLocation } from '/protocol-designer/ui/modules/utils'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { ModuleOnDeck } from '../../step-forms'
@@ -35,7 +36,7 @@ export function HardwareInfo({
   robotType,
   additionalEquipment,
   modules,
-}: InstrumentsInfoProps): JSX.Element {
+}: InstrumentsInfoProps): ReactNode {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const navigate = useNavigate()
   const isFlex = robotType === FLEX_ROBOT_TYPE

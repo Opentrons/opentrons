@@ -29,7 +29,7 @@ interface MountPipetteProps extends PipetteWizardStepProps {
 }
 const BACKGROUND_SIZE = '47rem'
 
-export const MountPipette = (props: MountPipetteProps): JSX.Element => {
+export const MountPipette = (props: MountPipetteProps): ReactNode => {
   const {
     proceed,
     goBack,

@@ -17,33 +17,159 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  resolveBooleanRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
   thermocyclerPipetteCollision,
   uuid,
 } from '../../utils'
 
-import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError, Point } from '../../types'
+import type { CreateCommand, WellLocation } from '@opentrons/shared-data'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  MoveToWellStepGenArgs,
+  Point,
+} from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
-export const moveToWell: CommandCreator<MoveToWellParams> = (
+export const moveToWell: CommandCreator<MoveToWellStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const {
-    pipetteId,
-    labwareId,
-    wellName,
-    wellLocation,
-    minimumZHeight,
-    forceDirect,
-    speed,
-  } = args
-  const actionName = 'moveToWell'
+  const { pipetteEntities, labwareEntities, runtimeParameters } =
+    invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  const labwareId = resolveStringRuntimeValue(args.labwareId, runtimeParameters)
+  const wellName = resolveStringRuntimeValue(args.wellName, runtimeParameters)
+  const origin =
+    args.wellLocation?.origin == null
+      ? undefined
+      : resolveStringRuntimeValue(args.wellLocation.origin, runtimeParameters)
+  const offsetX =
+    args.wellLocation?.offset?.x == null
+      ? undefined
+      : resolveNumericRuntimeValue(
+          args.wellLocation.offset.x,
+          runtimeParameters
+        )
+  const offsetY =
+    args.wellLocation?.offset?.y == null
+      ? undefined
+      : resolveNumericRuntimeValue(
+          args.wellLocation.offset.y,
+          runtimeParameters
+        )
+  const offsetZ =
+    args.wellLocation?.offset?.z == null
+      ? undefined
+      : resolveNumericRuntimeValue(
+          args.wellLocation.offset.z,
+          runtimeParameters
+        )
+  const minimumZHeight =
+    args.minimumZHeight == null
+      ? undefined
+      : resolveNumericRuntimeValue(args.minimumZHeight, runtimeParameters)
+  const forceDirect =
+    args.forceDirect == null
+      ? undefined
+      : resolveBooleanRuntimeValue(args.forceDirect, runtimeParameters)
+  const speed =
+    args.speed == null
+      ? undefined
+      : resolveNumericRuntimeValue(args.speed, runtimeParameters)
   const errors: CommandCreatorError[] = []
+  if (pipetteId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.pipetteId })
+    )
+  }
+  if (labwareId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.labwareId })
+    )
+  }
+  if (wellName == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.wellName })
+    )
+  }
+  if (args.wellLocation?.origin != null && origin == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.wellLocation.origin,
+      })
+    )
+  }
+  if (typeof args.wellLocation?.offset?.x === 'string' && offsetX == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.wellLocation.offset.x,
+      })
+    )
+  }
+  if (typeof args.wellLocation?.offset?.y === 'string' && offsetY == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.wellLocation.offset.y,
+      })
+    )
+  }
+  if (typeof args.wellLocation?.offset?.z === 'string' && offsetZ == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.wellLocation.offset.z,
+      })
+    )
+  }
+  if (typeof args.minimumZHeight === 'string' && minimumZHeight == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.minimumZHeight,
+      })
+    )
+  }
+  if (typeof args.forceDirect === 'string' && forceDirect == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: args.forceDirect,
+      })
+    )
+  }
+  if (typeof args.speed === 'string' && speed == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.speed })
+    )
+  }
+  if (
+    errors.length > 0 ||
+    pipetteId == null ||
+    labwareId == null ||
+    wellName == null
+  ) {
+    return { errors }
+  }
+  const wellLocation: WellLocation | undefined =
+    args.wellLocation == null
+      ? undefined
+      : {
+          ...(origin != null
+            ? { origin: origin as WellLocation['origin'] }
+            : {}),
+          ...(args.wellLocation.offset != null
+            ? {
+                offset: {
+                  ...(typeof offsetX === 'number' ? { x: offsetX } : {}),
+                  ...(typeof offsetY === 'number' ? { y: offsetY } : {}),
+                  ...(typeof offsetZ === 'number' ? { z: offsetZ } : {}),
+                },
+              }
+            : {}),
+        }
+  const actionName = 'moveToWell'
   const labwareState = prevRobotState.labware
-
-  const { pipetteEntities, labwareEntities } = invariantContext
   const pipetteSpec = pipetteEntities[pipetteId]?.spec
   const nozzleConfiguration = prevRobotState.pipettes[pipetteId]?.nozzles ?? ALL
   const primaryNozzle =
@@ -220,6 +346,16 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
 
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
   const labwarePythonName = labwareEntities[labwareId].pythonName
+  const wellPython =
+    runtimeParameters[args.wellName] != null
+      ? args.wellName
+      : formatPyStr(wellName)
+  const pythonWellLocation = formatPyWellLocation({
+    ...(origin != null ? { origin: origin as WellLocation['origin'] } : {}),
+    ...(args.wellLocation?.offset != null
+      ? { offset: args.wellLocation.offset as WellLocation['offset'] }
+      : {}),
+  })
 
   const commands: CreateCommand[] = [
     {
@@ -232,18 +368,24 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         wellLocation,
         ...(forceDirect != null ? { forceDirect } : {}),
         ...(minimumZHeight != null ? { minimumZHeight } : {}),
-        ...(speed != null ? { speed } : null),
+        ...(speed != null ? { speed } : {}),
       },
     },
   ]
   const pythonArgs = [
-    `${labwarePythonName}[${formatPyStr(wellName)}]${formatPyWellLocation(
-      wellLocation
-    )}`,
-    ...(forceDirect ? [`force_direct=True`] : []),
-    ...(minimumZHeight ? [`minimum_z_height=${minimumZHeight}`] : []),
-    ...(speed ? [`speed=${speed}`] : []),
+    `${labwarePythonName}[${wellPython}]${pythonWellLocation}`,
   ]
+  if (typeof args.forceDirect === 'string') {
+    pythonArgs.push(`force_direct=${args.forceDirect}`)
+  } else if (args.forceDirect) {
+    pythonArgs.push('force_direct=True')
+  }
+  if (args.minimumZHeight) {
+    pythonArgs.push(`minimum_z_height=${args.minimumZHeight}`)
+  }
+  if (args.speed) {
+    pythonArgs.push(`speed=${args.speed}`)
+  }
   return {
     commands,
     python: `${pipettePythonName}.move_to(${pythonArgs.join(', ')})`,

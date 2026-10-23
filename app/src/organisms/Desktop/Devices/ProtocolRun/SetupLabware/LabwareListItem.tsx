@@ -42,7 +42,7 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -401,7 +401,7 @@ const LabwareThumbnail = styled.svg`
 
 function StandaloneLabware(props: {
   definition: LabwareDefinition
-}): JSX.Element {
+}): ReactNode {
   const { definition } = props
   const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
 

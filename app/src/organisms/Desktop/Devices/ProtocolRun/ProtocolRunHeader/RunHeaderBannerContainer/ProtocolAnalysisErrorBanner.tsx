@@ -18,7 +18,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { AnalysisError } from '@opentrons/shared-data'
 
 interface ProtocolAnalysisErrorBannerProps {
@@ -27,7 +27,7 @@ interface ProtocolAnalysisErrorBannerProps {
 
 export function ProtocolAnalysisErrorBanner(
   props: ProtocolAnalysisErrorBannerProps
-): JSX.Element {
+): ReactNode {
   const { errors } = props
   const { t } = useTranslation(['run_details'])
   const [showErrorDetails, setShowErrorDetails] = useState(false)

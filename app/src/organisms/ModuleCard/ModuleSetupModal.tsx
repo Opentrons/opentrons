@@ -34,6 +34,7 @@ import temperatureManualQRCode from '/app/assets/images/temperature_setup_instru
 import thermocyclerManualQRCode from '/app/assets/images/thermocycler_setup_instructions_qr.png'
 import vacuumModuleManualQRCode from '/app/assets/images/vacuum_setup_instructions_qr.png'
 
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 const MODULE_SETUP_URL = 'https://docs.opentrons.com/modules'
@@ -50,7 +51,7 @@ interface ModuleSetupModalProps {
   moduleModel: ModuleModel
 }
 
-export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
+export const ModuleSetupModal = (props: ModuleSetupModalProps): ReactNode => {
   const { moduleDisplayName, moduleModel } = props
   const { t, i18n } = useTranslation([
     'protocol_setup',

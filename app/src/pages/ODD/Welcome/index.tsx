@@ -14,9 +14,11 @@ import {
 import screenImage from '/app/assets/images/on-device-display/welcome_background.png'
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 const IMAGE_ALT = 'Welcome screen background image'
 
-export function Welcome(): JSX.Element {
+export function Welcome(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
 

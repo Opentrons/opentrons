@@ -17,11 +17,12 @@ import {
 
 import { DropTipFooterButtons } from './shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from './types'
 
 export function ExitConfirmation(
   props: DropTipWizardContainerProps
-): JSX.Element {
+): ReactNode {
   const { mount, cancelExit, toggleExitInitiated, confirmExit } = props
   const { t } = useTranslation('drop_tip_wizard')
 

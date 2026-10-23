@@ -5,9 +5,10 @@ import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 import { TipSettings } from './TipSettings'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function MoveLiquidTools(props: StepFormProps): JSX.Element {
+export function MoveLiquidTools(props: StepFormProps): ReactNode {
   const {
     toolboxStep,
     propsForFields,

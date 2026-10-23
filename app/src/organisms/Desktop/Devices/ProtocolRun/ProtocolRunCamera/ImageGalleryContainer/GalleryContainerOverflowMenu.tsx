@@ -22,6 +22,8 @@ import { saveFileFromUrl } from '/app/redux/shell/remote'
 
 import styles from './gallery.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface GalleryContainerOverflowMenuProps {
   runId: string
   protocolName: string
@@ -34,7 +36,7 @@ export function GalleryContainerOverflowMenu({
   robotName,
   protocolName,
   runTimestamp,
-}: GalleryContainerOverflowMenuProps): JSX.Element {
+}: GalleryContainerOverflowMenuProps): ReactNode {
   const { t } = useTranslation('run_details')
   const {
     menuOverlay,

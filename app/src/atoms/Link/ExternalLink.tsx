@@ -17,7 +17,7 @@ export interface ExternalLinkProps extends LinkProps {
   children: ReactNode
 }
 
-export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
+export const ExternalLink = (props: ExternalLinkProps): ReactNode => (
   <Link external {...props} css={TYPOGRAPHY.linkPSemiBold}>
     {props.children}
     <span css={SPAN_STYLE}></span>

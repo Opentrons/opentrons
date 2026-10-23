@@ -6,7 +6,7 @@ import { FLEX_MAX_CONTENT } from '../../styles'
 import { StyledText } from '../StyledText'
 import styles from './checkbox.module.css'
 
-import type { ChangeEventHandler, CSSProperties } from 'react'
+import type { ChangeEventHandler, CSSProperties, ReactNode } from 'react'
 
 type CheckboxStyle = CSSProperties & {
   '--checkbox-width'?: string
@@ -29,7 +29,7 @@ export interface CheckboxProps {
   width?: string
 }
 
-export function Checkbox(props: CheckboxProps): JSX.Element {
+export function Checkbox(props: CheckboxProps): ReactNode {
   const {
     isChecked,
     labelText,
@@ -79,7 +79,7 @@ interface CheckProps {
   disabled?: boolean
 }
 
-export function Check(props: CheckProps): JSX.Element {
+export function Check(props: CheckProps): ReactNode {
   const { isChecked, color = COLORS.white, disabled = false } = props
 
   return isChecked ? (

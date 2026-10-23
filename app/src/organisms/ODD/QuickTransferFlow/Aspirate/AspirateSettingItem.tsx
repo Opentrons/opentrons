@@ -10,6 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SettingItem } from '../types'
 
 interface AspirateSettingItemProps {
@@ -18,7 +19,7 @@ interface AspirateSettingItemProps {
 
 export function AspirateSettingItem({
   displayItem,
-}: AspirateSettingItemProps): JSX.Element {
+}: AspirateSettingItemProps): ReactNode {
   return (
     <ListItem
       type="default"

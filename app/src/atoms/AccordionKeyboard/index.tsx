@@ -18,7 +18,7 @@ export function AccordionKeyboard({
   isOpen,
   onToggle,
   inputRef,
-}: AccordionKeyboardProps): JSX.Element {
+}: AccordionKeyboardProps): ReactNode {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'WakeUp' || event.target !== inputRef.current) {

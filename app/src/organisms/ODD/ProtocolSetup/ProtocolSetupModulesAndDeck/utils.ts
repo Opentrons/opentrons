@@ -77,7 +77,7 @@ export const getDoesModuleRequireCalibration = (
       return moduleOffset?.last_modified == null
     // should not hit
     default:
-      console.log(`unknown module type: ${moduleType}`)
+      console.error(`unknown module type: ${moduleType}`)
       return false
   }
 }

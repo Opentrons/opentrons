@@ -64,6 +64,7 @@ import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 import { startCalibrationOnClick } from './utils'
 
+import type { ReactNode } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type {
   DocumentationState,
@@ -718,7 +719,7 @@ export const handlePipetteWizardFlows = (
 }
 
 const NiceModalPipetteWizardFlows = NiceModal.create(
-  (props: PipetteWizardFlowsModalProps): JSX.Element => {
+  (props: PipetteWizardFlowsModalProps): ReactNode => {
     const { robotName, ...pipetteWizardFlowsProps } = props
     const modal = useModal()
     const closeFlowAndModal = (): void => {

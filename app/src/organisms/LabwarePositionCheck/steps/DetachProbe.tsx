@@ -21,9 +21,10 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
+export function DetachProbe(props: LPCWizardContentProps): ReactNode {
   const { proceedStep, goBackLastStep, commandUtils, runId } = props
   const { t } = useTranslation('labware_position_check')
   const { toggleRobotMoving, handleMoveToInitialOffsetPosition, home } =

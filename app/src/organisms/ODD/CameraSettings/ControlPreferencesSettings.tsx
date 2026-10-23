@@ -4,13 +4,15 @@ import { Icon, ListButton, StyledText } from '@opentrons/components'
 
 import styles from './preferences.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface ControlPreferencesSettingsProps {
   toggleShowControls: () => void
 }
 
 export function ControlPreferencesSettings({
   toggleShowControls,
-}: ControlPreferencesSettingsProps): JSX.Element {
+}: ControlPreferencesSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

@@ -12,6 +12,8 @@ import {
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
+import type { ReactNode } from 'react'
+
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'
 export const PREVIOUS_RELEASES_URL =
@@ -23,7 +25,7 @@ interface PreviousVersionModalProps {
 
 export function PreviousVersionModal(
   props: PreviousVersionModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
 
   return (

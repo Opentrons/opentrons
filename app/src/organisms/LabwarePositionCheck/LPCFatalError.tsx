@@ -18,9 +18,10 @@ import {
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function LPCFatalError(props: LPCWizardContentProps): JSX.Element {
+export function LPCFatalError(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   const { headerCommands } = props.commandUtils
   const isOnDevice = useSelector(getIsOnDevice)

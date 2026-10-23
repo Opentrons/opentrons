@@ -1,4 +1,6 @@
-export function PlateReader(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function PlateReader(): ReactNode {
   return (
     <g>
       <g id="plateReader">

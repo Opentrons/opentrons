@@ -17,6 +17,7 @@ import { FullKeyboard } from '../SoftwareKeyboard'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const dummyConfig = {
@@ -49,7 +50,7 @@ export default meta
 
 type Story = StoryObj<typeof AccordionKeyboardComponent>
 
-const Keyboard = (): JSX.Element => {
+const Keyboard = (): ReactNode => {
   const [value, setValue] = useState('')
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)

@@ -10,12 +10,12 @@ import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecali
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
 
-export const InstrumentsDashboard = (): JSX.Element => {
+export const InstrumentsDashboard = (): ReactNode => {
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: FETCH_PIPETTE_CAL_POLL,
   })

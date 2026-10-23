@@ -17,7 +17,7 @@ import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { DeckSlotId, Vector2D } from '@opentrons/shared-data'
 import type { DeckSetupTerminalIdType } from '../types'
 
@@ -32,9 +32,7 @@ interface OffDeckControlsProps extends DeckSetupTerminalIdType {
   isSelected?: boolean
 }
 
-export function OffDeckControls(
-  props: OffDeckControlsProps
-): JSX.Element | null {
+export function OffDeckControls(props: OffDeckControlsProps): ReactNode {
   const {
     hover,
     terminalItemId,

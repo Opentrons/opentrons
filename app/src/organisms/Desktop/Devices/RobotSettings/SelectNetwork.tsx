@@ -21,6 +21,7 @@ import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 import { ResultModal } from './ConnectNetwork/ResultModal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 
+import type { ReactNode } from 'react'
 import type { WifiNetwork } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 import type {
@@ -36,7 +37,7 @@ interface SelectNetworkProps {
 export const SelectNetwork = ({
   robotName,
   isRobotBusy,
-}: SelectNetworkProps): JSX.Element => {
+}: SelectNetworkProps): ReactNode => {
   const list = useWifiList(robotName)
   const robot = useRobot(robotName)
   const hostConfig =

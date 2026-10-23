@@ -32,10 +32,11 @@ import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRob
 
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 
-export const InstrumentDetail = (): JSX.Element => {
+export const InstrumentDetail = (): ReactNode => {
   const robotName = useLocalRobotName()
   const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()

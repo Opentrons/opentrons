@@ -17,6 +17,8 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
 
+import type { ReactNode } from 'react'
+
 const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 
 const JUPYTER_NOTEBOOK_LINK =
@@ -30,7 +32,7 @@ export interface OpenJupyterControlProps {
 export function OpenJupyterControl({
   robotIp,
   isEstopNotDisengaged,
-}: OpenJupyterControlProps): JSX.Element {
+}: OpenJupyterControlProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const targetURL = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
@@ -42,7 +44,7 @@ export function OpenJupyterControl({
 
   const handleClick = (): void => {
     trackEvent(EVENT_JUPYTER_OPEN)
-    window.open(targetURL, '_blank')
+    window.open(targetURL, '_blank', 'noopener')
   }
 
   return (

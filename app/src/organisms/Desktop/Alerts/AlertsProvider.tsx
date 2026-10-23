@@ -18,7 +18,7 @@ interface AlertsProps {
   children: ReactNode
 }
 
-export function Alerts({ children }: AlertsProps): JSX.Element {
+export function Alerts({ children }: AlertsProps): ReactNode {
   const toastRef = useRef<string | null>(null)
   const { eatToast } = useToaster()
 

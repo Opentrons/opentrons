@@ -13,6 +13,7 @@ import {
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 
 // ToDo (kk:10/17/2023) This component will be modified more later.
 // This is the initial step to reduce ProtocolSetup component's code.
@@ -30,7 +31,7 @@ export function PlayButton({
   onPlay,
   ready,
   isDoorOpen,
-}: PlayButtonProps): JSX.Element {
+}: PlayButtonProps): ReactNode {
   const isEnabled = !disabled && ready && !isDoorOpen
 
   const playButtonStyle = getPlayButtonStyle(isEnabled)
@@ -57,7 +58,7 @@ interface CloseButtonProps {
   onClose: () => void
 }
 
-export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
+export function CloseButton({ onClose }: CloseButtonProps): ReactNode {
   return (
     <Btn
       alignItems={ALIGN_CENTER}

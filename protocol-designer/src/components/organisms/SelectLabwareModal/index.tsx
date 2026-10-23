@@ -43,8 +43,10 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
+  getCanPlaceStackableVacuumSpacer,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
+  getIsStackableVacuumSpacer,
 } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
@@ -82,7 +84,7 @@ import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { CategoryExpand } from '/protocol-designer/pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -109,9 +111,7 @@ export interface LabwareInfo {
   def: LabwareDefinition2
 }
 
-export function SelectLabwareModal(
-  props: SelectLabwareModalProps
-): JSX.Element {
+export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
   const { slot, onClose, onConfirm, slotFull, moduleHasLabware = false } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
@@ -204,7 +204,7 @@ export function SelectLabwareModal(
     if (onMainModule.length === 0) {
       return false
     }
-    const topmost = onMainModule.sort(
+    const topmost = onMainModule.toSorted(
       (a, b) => b.stack.length - a.stack.length
     )[0]
     return topmost.def.parameters.quirks?.includes('filterPlate') ?? false
@@ -222,10 +222,25 @@ export function SelectLabwareModal(
     if (onMainModule.length === 0) {
       return false
     }
-    const topmost = onMainModule.sort(
+    const topmost = onMainModule.toSorted(
       (a, b) => b.stack.length - a.stack.length
     )[0]
     return getIsVacuumSpacer(topmost.def)
+  }, [vacuumModuleId, deckSetup.labware])
+
+  const mainModuleStack = useMemo(() => {
+    if (vacuumModuleId == null) {
+      return []
+    }
+    const onMainModule = Object.values(deckSetup.labware).filter(
+      lw =>
+        lw.stack.includes(vacuumModuleId) && !lw.stack.includes('vacuumDock')
+    )
+    if (onMainModule.length === 0) {
+      return []
+    }
+    return onMainModule.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      .stack
   }, [vacuumModuleId, deckSetup.labware])
 
   // collar placed on the dock slot
@@ -245,6 +260,12 @@ export function SelectLabwareModal(
       } else {
         setUserCategoryExpandState(prev => ({ ...prev, wellPlate: true }))
       }
+    } else if (moduleType === VACUUM_MODULE_TYPE && mainModuleTopIsSpacer) {
+      setUserCategoryExpandState(prev => ({
+        ...prev,
+        adapter: true,
+        wellPlate: true,
+      }))
     } else if (
       moduleType === VACUUM_MODULE_TYPE &&
       moduleHasLabware &&
@@ -335,6 +356,29 @@ export function SelectLabwareModal(
         return !isFilterPlate
       }
 
+      // spacer on the module: still allow filter plates (they sit on the spacer)
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        mainModuleTopIsSpacer &&
+        (parameters.quirks ?? []).includes('filterPlate')
+      ) {
+        return false
+      }
+
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        getIsStackableVacuumSpacer(labwareDef)
+      ) {
+        if (!moduleHasLabware) {
+          return false
+        }
+        return !getCanPlaceStackableVacuumSpacer(
+          labwareDef,
+          mainModuleStack,
+          deckSetup.labware
+        ).isCompatible
+      }
+
       // for main vacuum module area with existing labware, filter explicitly
       // (skip when only a bare spacer is present — treat like an empty module)
       if (
@@ -396,6 +440,8 @@ export function SelectLabwareModal(
       mainModuleHasCollar,
       mainModuleTopIsFilterPlate,
       mainModuleTopIsSpacer,
+      mainModuleStack,
+      deckSetup.labware,
     ]
   )
 

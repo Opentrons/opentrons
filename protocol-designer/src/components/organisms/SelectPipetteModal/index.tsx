@@ -30,7 +30,7 @@ import { SelectPipetteTips } from './SelectPipetteTips'
 import { SelectPipetteType } from './SelectPipetteType'
 import { SelectPipetteVolume } from './SelectPipetteVolume'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -52,7 +52,7 @@ interface SelectedPipetteModalProps extends WizardTileProps {
 
 export function SelectPipetteModal(
   props: SelectedPipetteModalProps
-): JSX.Element | null {
+): ReactNode {
   const {
     handleBack,
     watch,

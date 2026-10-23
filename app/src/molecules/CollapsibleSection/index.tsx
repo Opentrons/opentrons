@@ -32,9 +32,7 @@ interface CollapsibleSectionProps extends StyleProps {
   isExpandedInitially?: boolean
 }
 
-export function CollapsibleSection(
-  props: CollapsibleSectionProps
-): JSX.Element {
+export function CollapsibleSection(props: CollapsibleSectionProps): ReactNode {
   const { title, children, isExpandedInitially = true, ...styleProps } = props
   const [isExpanded, setIsExpanded] = useState(isExpandedInitially)
   return (

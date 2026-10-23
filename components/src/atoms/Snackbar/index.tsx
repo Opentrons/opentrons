@@ -7,6 +7,7 @@ import { ALIGN_CENTER } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '../../primitives'
 
 export interface SnackbarProps extends StyleProps {
@@ -22,7 +23,7 @@ const ODD_ANIMATION_OPTIMIZATIONS = `
   will-change: opacity;
   `
 
-export function Snackbar(props: SnackbarProps): JSX.Element {
+export function Snackbar(props: SnackbarProps): ReactNode {
   const { message, onClose, duration = 4000, ...styleProps } = props
   const [isClosed, setIsClosed] = useState<boolean>(false)
 

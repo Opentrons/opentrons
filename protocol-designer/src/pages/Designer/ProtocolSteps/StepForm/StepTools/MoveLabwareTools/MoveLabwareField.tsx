@@ -9,12 +9,13 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { getSortedAddressableArea } from './utils'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../../types'
 
 interface MoveLabwareFieldProps extends FieldProps {
   useGripper: boolean
 }
-export function MoveLabwareField(props: MoveLabwareFieldProps): JSX.Element {
+export function MoveLabwareField(props: MoveLabwareFieldProps): ReactNode {
   const { useGripper } = props
   const options = useLabwareDropdownOptions('moveLabware', useGripper)
   const robotState = useSelector(getRobotStateAtActiveItem)

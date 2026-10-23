@@ -20,6 +20,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useMenuHandleClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -43,7 +44,7 @@ interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
 
-export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
+export function RobotOverflowMenu(props: RobotOverflowMenuProps): ReactNode {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
@@ -198,7 +199,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         {showOverflowMenu && !showConnectionTroubleshootingModal ? (
           <Flex
             whiteSpace={NO_WRAP}
-            zIndex={10}
+            zIndex={Z_INDEX.MODALS}
             borderRadius={BORDERS.borderRadius8}
             boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
             position={POSITION_ABSOLUTE}

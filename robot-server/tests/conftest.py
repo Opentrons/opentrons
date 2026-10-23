@@ -18,30 +18,13 @@ from starlette.testclient import TestClient
 from typing_extensions import NoReturn
 
 from opentrons import config
-from opentrons.calibration_storage import (
-    helpers,
-    save_robot_deck_attitude,
-)
-
-# NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
-# get pulled in by OT-2 server tests. If this ever changes, we need to
-# conditionally set up ot2/ot3 calibration structures instead of invariably
-# calling the OT2 functions.
-from opentrons.calibration_storage.ot2 import (
-    create_tip_length_data,
-    save_pipette_calibration,
-    save_tip_length_calibration,
-)
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
-    ThreadedAsyncLock,
 )
 from opentrons.hardware_control import (
     types as hw_types,
 )
-from opentrons.protocol_api import labware
-from opentrons.types import Mount, Point
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.audit_server import (
@@ -60,7 +43,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from robot_server.app import app
-from robot_server.hardware import HardwareStateStore, get_hardware, get_ot2_hardware
+from robot_server.hardware import HardwareStateStore, get_hardware
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
@@ -71,7 +54,6 @@ from robot_server.service.notifications.notification_client import (
     NotificationClient,
     get_notification_client,
 )
-from robot_server.service.session.manager import SessionManager
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 test_router = routing.APIRouter()
@@ -118,7 +100,7 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Return a mock in the shape of a HardwareControlAPI."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return decoy.mock(cls=API)
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -172,7 +154,7 @@ def current_time() -> datetime:
 
 @pytest.fixture
 def hardware() -> MagicMock:
-    return MagicMock(spec=API)
+    return MagicMock(spec=OT3API)
 
 
 @pytest.fixture
@@ -221,17 +203,6 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
     app.dependency_overrides[get_versions] = get_version_override
     yield
     del app.dependency_overrides[get_versions]
-
-
-@pytest.fixture
-def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
-    async def get_ot2_hardware_override() -> API:
-        """Override for the get_ot2_hardware FastAPI dependency."""
-        return hardware
-
-    app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
-    yield
-    del app.dependency_overrides[get_ot2_hardware]
 
 
 @pytest.fixture
@@ -303,7 +274,6 @@ def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,
     _override_audit_client_with_mock: None,
@@ -320,7 +290,6 @@ def api_client_camera_overrides(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,
@@ -376,51 +345,6 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     yield
     os.remove(pipette_file_path)
     del os.environ["OT_API_CONFIG_DIR"]
-
-
-@pytest.fixture
-def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    mount_list = [Mount.LEFT, Mount.RIGHT]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    def_hash = helpers.hash_labware_def(definition)
-    for pip, mount in zip(attached_pip_list, mount_list):
-        save_pipette_calibration(
-            offset=Point(0, 0, 0),
-            pip_id=pip,
-            mount=mount,
-            tiprack_hash=def_hash,
-            tiprack_uri="opentrons/opentrons_96_filtertiprack_200ul/1",
-        )
-
-
-@pytest.fixture
-def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    tip_length_list = [30.5, 31.5]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    assert definition["schemaVersion"] == 2  # Required by create_tip_length_data().
-    for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal_data = create_tip_length_data(definition, tip_len)
-        save_tip_length_calibration(pip, cal_data)
-
-
-@pytest.fixture
-def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
-    attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
-    save_robot_deck_attitude(
-        attitude,
-        "pip_1",
-        "fakehash",
-    )
-
-
-@pytest.fixture
-def session_manager(hardware: HardwareControlAPI) -> SessionManager:
-    return SessionManager(
-        hardware=hardware,
-        motion_lock=ThreadedAsyncLock(),
-    )
 
 
 @pytest.fixture

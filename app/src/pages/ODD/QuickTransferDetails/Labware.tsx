@@ -17,6 +17,8 @@ import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
+import type { ReactNode } from 'react'
+
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   border-collapse: separate
@@ -50,7 +52,7 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Labware = (props: { transferId: string }): JSX.Element => {
+export const Labware = (props: { transferId: string }): ReactNode => {
   const labwareItems = useRequiredProtocolLabware(props.transferId)
   const { t, i18n } = useTranslation('protocol_details')
 

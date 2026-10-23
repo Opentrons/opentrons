@@ -45,7 +45,7 @@ export interface TwoUpTileLayoutProps {
   footer: ReactNode
 }
 
-export function TwoUpTileLayout(props: TwoUpTileLayoutProps): JSX.Element {
+export function TwoUpTileLayout(props: TwoUpTileLayoutProps): ReactNode {
   const { title, body, rightElement, footer } = props
   return (
     <Flex css={TILE_CONTAINER_STYLE}>

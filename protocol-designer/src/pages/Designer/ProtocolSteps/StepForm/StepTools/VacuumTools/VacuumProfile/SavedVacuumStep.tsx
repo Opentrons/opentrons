@@ -13,13 +13,14 @@ import { VACUUM_MODE_PRESSURE } from '@opentrons/step-generation'
 
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumStepBaseProps } from './types'
 
 export interface SavedVacuumStepProps extends VacuumStepBaseProps {
   onEdit: (id: string) => void
 }
 
-export function SavedVacuumStep(props: SavedVacuumStepProps): JSX.Element {
+export function SavedVacuumStep(props: SavedVacuumStepProps): ReactNode {
   const {
     stepData,
     displayIndex,

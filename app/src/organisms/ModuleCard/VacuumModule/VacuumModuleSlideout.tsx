@@ -27,6 +27,7 @@ import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
 import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumMode, VacuumModule } from '@opentrons/api-client'
 
 interface VacuumModuleSlideoutProps {
@@ -37,7 +38,7 @@ interface VacuumModuleSlideoutProps {
 
 export function VacuumModuleSlideout(
   props: VacuumModuleSlideoutProps
-): JSX.Element {
+): ReactNode {
   const { module, onCloseClick, isExpanded } = props
   const { moduleModel } = module
   const { t } = useTranslation('device_details')

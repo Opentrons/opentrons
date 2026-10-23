@@ -8,6 +8,8 @@ import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './setupcamera.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface SetupCameraProps {
   robotName: string
   liveStreamEnabled: boolean
@@ -24,7 +26,7 @@ export function SetupRunCameraUsage({
   cameraConfirmed,
   toggleRecoveryEnabled,
   toggleLiveStreamEnabled,
-}: SetupCameraProps): JSX.Element {
+}: SetupCameraProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const robotType = useRobotType(robotName)
 
@@ -73,7 +75,7 @@ function SettingCard({
   isToggleDisabled,
   onToggle,
   enabled,
-}: SettingCardProps): JSX.Element {
+}: SettingCardProps): ReactNode {
   return (
     <div className={styles.camera_setting_container}>
       <div className={styles.camera_setting_text_container}>

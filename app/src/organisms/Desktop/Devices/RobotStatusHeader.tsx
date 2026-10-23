@@ -38,7 +38,7 @@ import {
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
@@ -54,7 +54,7 @@ interface RobotNameContainerProps {
   isGoToRun: boolean
 }
 
-export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
+export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
   const { name, local, robotModel, ...styleProps } = props
   const { t, i18n } = useTranslation([
     'devices_landing',

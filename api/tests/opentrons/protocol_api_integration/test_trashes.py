@@ -14,17 +14,10 @@ from opentrons.protocols.api_support.util import UnsupportedAPIError
 @pytest.mark.parametrize(
     ("simulated_protocol_context", "expected_trash_class"),
     [
-        (("2.13", "OT-2"), protocol_api.Labware),
-        (("2.14", "OT-2"), protocol_api.Labware),
-        (("2.15", "OT-2"), protocol_api.Labware),
         pytest.param(
             ("2.15", "Flex"),
             protocol_api.Labware,
             marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
-        ),
-        pytest.param(
-            ("2.16", "OT-2"),
-            protocol_api.TrashBin,
         ),
         pytest.param(
             ("2.16", "Flex"),
@@ -45,9 +38,7 @@ def test_fixed_trash_presence(
     should point to it. The type of the object depends on the API version.
     """
     instrument = simulated_protocol_context.load_instrument(
-        "p300_single_gen2"
-        if simulated_protocol_context._core.robot_type == "OT-2 Standard"
-        else "flex_1channel_50",
+        "flex_1channel_50",
         mount="left",
     )
 
@@ -68,7 +59,6 @@ def test_fixed_trash_presence(
         assert instrument.trash_container is simulated_protocol_context.fixed_trash
 
 
-@pytest.mark.ot3_only  # Simulating a Flex protocol requires a Flex hardware API.
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.16", "Flex")], indirect=True
 )
@@ -115,22 +105,9 @@ def test_trash_search(simulated_protocol_context: protocol_api.ProtocolContext) 
     ("simulated_protocol_context", "expect_load_to_succeed"),
     [
         pytest.param(
-            ("2.13", "OT-2"),
-            False,
-            # This xfail (the system does let you load a labware onto slot 12, and does not raise)
-            # is surprising to me. It may be be a bug in old PAPI versions.
-            marks=pytest.mark.xfail(strict=True, raises=pytest.fail.Exception),
-        ),
-        (("2.14", "OT-2"), False),
-        (("2.15", "OT-2"), False),
-        pytest.param(
             ("2.15", "Flex"),
             False,
             marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
-        ),
-        pytest.param(
-            ("2.16", "OT-2"),
-            False,
         ),
         pytest.param(
             ("2.16", "Flex"),

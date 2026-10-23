@@ -43,7 +43,7 @@ interface WarningType {
   description: ReactNode | null
 }
 
-function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
+function FormAlertsComponent(props: FormAlertsProps): ReactNode {
   const { showFormErrors, focusedField, dirtyFields, page } = props
 
   const { t } = useTranslation('alert')

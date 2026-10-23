@@ -8,6 +8,8 @@ import {
 } from '../../../styles'
 import { SPACING } from '../../../ui-style-constants'
 
+import type { ReactNode } from 'react'
+
 interface ListItemDescriptorProps {
   /** ListItemDescriptor size type */
   type: 'default' | 'large'
@@ -21,7 +23,7 @@ interface ListItemDescriptorProps {
 
 export const ListItemDescriptor = (
   props: ListItemDescriptorProps
-): JSX.Element => {
+): ReactNode => {
   const { description, content, type, changeFlexDirection = false } = props
   let justifyContent = 'none'
   if (type === 'default' && changeFlexDirection) {

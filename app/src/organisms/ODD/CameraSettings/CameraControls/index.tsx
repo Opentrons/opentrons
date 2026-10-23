@@ -13,6 +13,7 @@ import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
 import { ZoomSettingsView } from './ZoomSettingsView'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 export type ActiveControlView =
@@ -26,7 +27,7 @@ export interface CameraControlsProps {
 export function CameraControls({
   toggleShowControls,
   runId,
-}: CameraControlsProps): JSX.Element {
+}: CameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)

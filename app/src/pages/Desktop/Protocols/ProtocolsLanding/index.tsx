@@ -5,9 +5,10 @@ import { ProtocolList } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolLi
 import { ProtocolsEmptyState } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolsEmptyState'
 import { fetchProtocols, getStoredProtocols } from '/app/redux/protocol-storage'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ProtocolsLanding(): JSX.Element {
+export function ProtocolsLanding(): ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)

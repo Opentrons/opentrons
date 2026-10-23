@@ -42,7 +42,7 @@ import { SelectBasics } from './SelectBasics'
 import { SelectFlexHardware } from './SelectFlexHardware'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   ModuleModel,
   ModuleType,
@@ -130,7 +130,7 @@ const validationSchema: any = Yup.object().shape({
   }),
 })
 
-export function Onboarding(): JSX.Element | null {
+export function Onboarding(): ReactNode {
   const navigate = useNavigate()
   const [analyticsStartTime] = useState<Date>(new Date())
   const customLabware = useSelector(
@@ -349,7 +349,7 @@ interface CreateFileFormProps {
   setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
-function CreateFileForm(props: CreateFileFormProps): JSX.Element {
+function CreateFileForm(props: CreateFileFormProps): ReactNode {
   const {
     currentWizardStep,
     createProtocolFile,

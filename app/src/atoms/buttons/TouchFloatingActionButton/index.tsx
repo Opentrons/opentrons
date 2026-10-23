@@ -2,7 +2,7 @@ import { COLORS, Icon, StyledText } from '@opentrons/components'
 
 import styles from './touchfloatingactionbutton.module.css'
 
-import type { ComponentPropsWithoutRef } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 
 interface TouchFloatingActionButtonProps extends ComponentPropsWithoutRef<'button'> {
@@ -14,7 +14,7 @@ interface TouchFloatingActionButtonProps extends ComponentPropsWithoutRef<'butto
 
 export function TouchFloatingActionButton(
   props: TouchFloatingActionButtonProps
-): JSX.Element {
+): ReactNode {
   const {
     buttonText,
     'aria-label': ariaLabel,

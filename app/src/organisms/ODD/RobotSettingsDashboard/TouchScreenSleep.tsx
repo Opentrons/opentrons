@@ -16,7 +16,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -28,7 +28,7 @@ interface TouchScreenSleepProps {
 
 export function TouchScreenSleep({
   setCurrentOption,
-}: TouchScreenSleepProps): JSX.Element {
+}: TouchScreenSleepProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings) ?? SLEEP_NEVER_MS
   const dispatch = useDispatch<Dispatch>()

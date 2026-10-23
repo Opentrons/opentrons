@@ -4,6 +4,7 @@ import { COLORS } from '../../../../helix-design-system'
 import { getWidthAndHeightOfWellSVG } from './utils'
 import styles from './wells.module.css'
 
+import type { ReactNode } from 'react'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 
 interface SelectedWellProps {
@@ -16,7 +17,7 @@ interface SelectedWellProps {
   isSelected?: boolean
   showStroke?: boolean
 }
-export function SelectedWell(props: SelectedWellProps): JSX.Element {
+export function SelectedWell(props: SelectedWellProps): ReactNode {
   const {
     wellMap,
     wellName,

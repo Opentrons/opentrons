@@ -31,12 +31,11 @@ import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
 
+import type { ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { SetupLabwarePositionCheckProps } from '..'
 
-export function OT2SetupLPC(
-  props: SetupLabwarePositionCheckProps
-): JSX.Element {
+export function OT2SetupLPC(props: SetupLabwarePositionCheckProps): ReactNode {
   const { robotName, runId, setOffsetsConfirmed, offsetsConfirmed } = props
   const { t, i18n } = useTranslation('protocol_setup')
 

@@ -1,11 +1,13 @@
 import { COLORS } from '../../../helix-design-system'
 
+import type { ReactNode } from 'react'
+
 interface ThermocyclerGEN2Props {
   lidMotorState: 'open' | 'closed'
   ledLightColor: string
 }
 
-export function ThermocyclerGEN2(props: ThermocyclerGEN2Props): JSX.Element {
+export function ThermocyclerGEN2(props: ThermocyclerGEN2Props): ReactNode {
   return (
     <g id="thermocyclerGEN2">
       <g id="buttonDarkFill">
@@ -28,7 +30,7 @@ export function ThermocyclerGEN2(props: ThermocyclerGEN2Props): JSX.Element {
 
 function ClosedThermocyclerGEN2Layers(props: {
   ledLightColor: string
-}): JSX.Element {
+}): ReactNode {
   return (
     <g id="closed_thermocycler_gen2">
       <path
@@ -103,7 +105,7 @@ function ClosedThermocyclerGEN2Layers(props: {
   )
 }
 
-function OpenThermocyclerGEN2Layers(): JSX.Element {
+function OpenThermocyclerGEN2Layers(): ReactNode {
   return (
     <g id="open_thermocycler_gen2">
       <g id="shading">

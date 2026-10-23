@@ -12,7 +12,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PIPETTE_VOLUMES } from '/protocol-designer/pages/Onboarding/constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -31,7 +31,7 @@ interface SelectPipetteVolumeProps {
 
 export function SelectPipetteVolume(
   props: SelectPipetteVolumeProps
-): JSX.Element {
+): ReactNode {
   const {
     robotType,
     setPipetteVolume,

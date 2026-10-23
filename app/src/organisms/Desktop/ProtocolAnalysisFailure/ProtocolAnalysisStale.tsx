@@ -15,7 +15,7 @@ import {
 
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolAnalysisStaleProps {
@@ -24,7 +24,7 @@ interface ProtocolAnalysisStaleProps {
 
 export function ProtocolAnalysisStale(
   props: ProtocolAnalysisStaleProps
-): JSX.Element {
+): ReactNode {
   const { protocolKey } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const dispatch = useDispatch<Dispatch>()

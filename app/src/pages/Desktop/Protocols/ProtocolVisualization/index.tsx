@@ -12,10 +12,11 @@ import { getGroupedCommands } from '/app/redux/protocol-storage/utils'
 import { VisualizerContainer } from '../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
 import styles from './visualization.module.css'
 
+import type { ReactNode } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ProtocolVisualization(): JSX.Element {
+export function ProtocolVisualization(): ReactNode {
   const { runId, protocolKey, robotName } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
@@ -66,7 +67,7 @@ export function ProtocolVisualization(): JSX.Element {
   return <ApiHostProvider robotName={robotName}>{visualizer}</ApiHostProvider>
 }
 
-const LoadingIcon = (): JSX.Element => {
+const LoadingIcon = (): ReactNode => {
   return (
     <div className={styles.loading_icon}>
       <Icon size="8rem" name="ot-spinner" spin color={COLORS.blue50} />

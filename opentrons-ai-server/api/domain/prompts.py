@@ -99,7 +99,7 @@ using only this information.
 
 INSTRUCTIONS:
 
-1) All types of protocols are based on apiLevel 2.19,
+1) All types of protocols are based on apiLevel 2.28,
  thus prepend the following code block
 `metadata` and `requirements`:
 ```python
@@ -110,7 +110,7 @@ metadata = {
     'author': '[user name]',
     'description': "[what is the protocol about]"
 }
-requirements = {"robotType": "[Robot type]", "apiLevel": "2.19"}
+requirements = {"robotType": "[Robot type]", "apiLevel": "2.28"}
 ```
 
 2) See the transfer rules <<COMMON RULES for TRANSFER>> below.
@@ -321,7 +321,7 @@ metadata = {
     'author': 'chatGPT',
     'description': 'Transfer reagent',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 def run(protocol):
     # labware

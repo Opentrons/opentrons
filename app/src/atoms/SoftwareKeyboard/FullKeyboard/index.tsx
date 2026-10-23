@@ -11,7 +11,7 @@ import {
   softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { KeyboardLanguage, LayoutName } from '../types'
 
@@ -42,7 +42,7 @@ export function FullKeyboard({
   keyboardRef,
   inputElementRef,
   debug = false,
-}: FullKeyboardProps): JSX.Element {
+}: FullKeyboardProps): ReactNode {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)
@@ -89,21 +89,17 @@ export function FullKeyboard({
       window.clearTimeout(languageTimerRef.current)
     }
 
-    setKeyboardLanguage(prev => {
-      const nextLanguage: KeyboardLanguage =
-        prev === 'en-US' ? 'zh-CN' : 'en-US'
+    const nextLanguage: KeyboardLanguage =
+      keyboardLanguage === 'en-US' ? 'zh-CN' : 'en-US'
+    setKeyboardLanguage(nextLanguage)
+    setSpacePreviewLabel(
+      nextLanguage === 'zh-CN' ? PREVIEW_LABEL_CH : PREVIEW_LABEL_EN
+    )
 
-      setSpacePreviewLabel(
-        nextLanguage === 'zh-CN' ? PREVIEW_LABEL_CH : PREVIEW_LABEL_EN
-      )
-
-      languageTimerRef.current = window.setTimeout(() => {
-        setSpacePreviewLabel(null)
-      }, PREVIEW_LABEL_RENDERING_DURATION_MS)
-
-      return nextLanguage
-    })
-  }, [])
+    languageTimerRef.current = window.setTimeout(() => {
+      setSpacePreviewLabel(null)
+    }, PREVIEW_LABEL_RENDERING_DURATION_MS)
+  }, [keyboardLanguage])
 
   // Language switch by Ctrl + Shift + Space
   // not using Alt + Shift or Meta + Space because they should be handled by the OS

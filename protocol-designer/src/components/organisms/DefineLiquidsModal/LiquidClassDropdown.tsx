@@ -8,6 +8,7 @@ import {
   Flex,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { Ingredient } from '@opentrons/step-generation'
 
@@ -23,7 +24,7 @@ export function LiquidClassDropdown({
   liquidClassOptions,
   liquidClass,
   setValue,
-}: LiquidClassDropdownProps): JSX.Element {
+}: LiquidClassDropdownProps): ReactNode {
   const { t } = useTranslation('liquids')
 
   return (

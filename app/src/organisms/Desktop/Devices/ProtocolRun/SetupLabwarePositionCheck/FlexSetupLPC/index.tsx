@@ -11,12 +11,11 @@ import { LPCOffsetsSnippets } from './LPCOffsetsSnippets'
 import { LPCSetupFlexBtns } from './LPCSetupFlexBtns'
 import { LPCSetupOffsetsTable } from './LPCSetupOffsetsTable'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 import type { SetupLabwarePositionCheckProps } from '..'
 
-export function FlexSetupLPC(
-  props: SetupLabwarePositionCheckProps
-): JSX.Element {
+export function FlexSetupLPC(props: SetupLabwarePositionCheckProps): ReactNode {
   const { launchLPC, showLPC, lpcProps } = props.lpcUtils
   const { protocolData } = useSelector(
     (state: State) => state.protocolRuns[props.runId]?.lpc

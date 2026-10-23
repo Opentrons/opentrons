@@ -9,7 +9,7 @@ import {
 
 import { InterventionInfo } from './InterventionInfo'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export type { InterventionInfoProps } from './InterventionInfo'
 export { InterventionInfo }
@@ -24,7 +24,7 @@ export function InterventionContent({
   headline,
   infoProps,
   notificationProps,
-}: InterventionContentProps): JSX.Element {
+}: InterventionContentProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

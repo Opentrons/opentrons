@@ -39,14 +39,14 @@ import { useDownloadRunLog } from '../Devices/hooks'
 import { useRunProgressCopy } from './hooks'
 import { InterventionTicks } from './InterventionTicks'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface RunProgressMeterProps {
   runId: string
   robotName: string
   makeHandleJumpToStep: (index: number) => () => void
 }
-export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
+export function RunProgressMeter(props: RunProgressMeterProps): ReactNode {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)

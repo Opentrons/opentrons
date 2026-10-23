@@ -14,7 +14,7 @@ export interface FilledWellsProps {
   strokeColor?: WellStroke
 }
 
-function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
+function FilledWellsComponent(props: FilledWellsProps): ReactNode {
   const { definition, fillByWell, strokeColor = COLORS.black90 } = props
   return (
     <>

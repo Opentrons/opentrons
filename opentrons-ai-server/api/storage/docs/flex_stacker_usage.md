@@ -219,7 +219,7 @@ metadata = {
     "lastModified": "2025-08-12T14:26:50.898Z"
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.25"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:

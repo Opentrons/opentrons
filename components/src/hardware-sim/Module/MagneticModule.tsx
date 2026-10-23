@@ -1,4 +1,6 @@
-export function MagneticModule(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function MagneticModule(): ReactNode {
   return (
     <g id="magneticModule">
       <g id="moduleVisualization">

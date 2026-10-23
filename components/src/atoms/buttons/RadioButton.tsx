@@ -77,7 +77,7 @@ interface RadioButtonProps extends StyleProps {
 }
 
 // used for ODD and helix
-export function RadioButton(props: RadioButtonProps): JSX.Element {
+export function RadioButton(props: RadioButtonProps): ReactNode {
   const {
     buttonLabel,
     buttonSubLabel,

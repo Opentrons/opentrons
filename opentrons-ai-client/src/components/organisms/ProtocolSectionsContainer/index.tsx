@@ -25,19 +25,17 @@ import {
 } from '../InstrumentsSection'
 import { LabwareLiquidsSection } from '../LabwareLiquidsSection'
 import { ModulesAndFixturesSection } from '../ModulesAndFixturesSection'
-import { ProtocolFormatSection } from '../ProtocolFormatSection'
 import { RuntimeParametersSection } from '../RuntimeParametersSection'
 import { StepsSection } from '../StepsSection'
 
-const PROTOCOL_FORMAT_SECTION = 0
-const APPLICATION_SECTION = 1
-const INSTRUMENTS_SECTION = 2
-const MODULES_SECTION = 3
-const LABWARE_LIQUIDS_SECTION = 4
-const RUNTIME_PARAMETERS_SECTION = 5
-const STEPS_SECTION = 6
+const APPLICATION_SECTION = 0
+const INSTRUMENTS_SECTION = 1
+const MODULES_SECTION = 2
+const LABWARE_LIQUIDS_SECTION = 3
+const RUNTIME_PARAMETERS_SECTION = 4
+const STEPS_SECTION = 5
 
-export const TOTAL_STEPS = 7
+export const TOTAL_STEPS = 6
 
 export function ProtocolSectionsContainer(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
@@ -52,11 +50,6 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
   const robotType: string = watch(ROBOT_FIELD_NAME)
 
   const sections = [
-    {
-      sectionNumber: PROTOCOL_FORMAT_SECTION,
-      title: 'protocol_format_title',
-      Component: ProtocolFormatSection,
-    },
     {
       sectionNumber: APPLICATION_SECTION,
       title: 'application_title',

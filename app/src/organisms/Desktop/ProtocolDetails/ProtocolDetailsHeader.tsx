@@ -34,6 +34,7 @@ import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 
+import type { ReactNode } from 'react'
 import type {
   JsonConfig,
   ProtocolAnalysisOutput,
@@ -74,7 +75,7 @@ export function ProtocolDetailsHeader({
   setShowChooseRobotToRunProtocolSlideout,
   setShowSendProtocolToFlexSlideout,
   props,
-}: ProtocolDetailsHeaderProps): JSX.Element {
+}: ProtocolDetailsHeaderProps): ReactNode {
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()

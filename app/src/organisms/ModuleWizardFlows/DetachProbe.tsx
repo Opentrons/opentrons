@@ -15,6 +15,7 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
+import type { ReactNode } from 'react'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
 
 const BODY_STYLE = css`
@@ -28,7 +29,7 @@ const BODY_STYLE = css`
 
 export function DetachProbe(
   props: ModuleSetupWizardRequiresPipetteStepProps
-): JSX.Element {
+): ReactNode {
   const { attachedPipette, proceed, goBack } = props
   const { t, i18n } = useTranslation('module_wizard_flows')
 

@@ -8,9 +8,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function ShuttleFullRetry(props: RecoveryContentProps): JSX.Element {
+export function ShuttleFullRetry(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { SHUTTLE_FULL_RETRY } = RECOVERY_MAP

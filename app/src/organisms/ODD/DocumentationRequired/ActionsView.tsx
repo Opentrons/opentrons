@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { COLORS } from '@opentrons/components'
+import { COLORS, Z_INDEX } from '@opentrons/components'
 
 import { OddModal } from '/app/molecules/OddModal'
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 
@@ -15,7 +16,7 @@ const ActionsViewImpl = ({
   actionsToDocument,
 }: {
   actionsToDocument: DocumentedAction[]
-}): JSX.Element => {
+}): ReactNode => {
   const { t } = useTranslation(['access_control', 'shared'])
   const modal = useModal()
   const actionViewHeader = {
@@ -28,7 +29,7 @@ const ActionsViewImpl = ({
   return (
     <OddModal
       header={actionViewHeader}
-      modalZIndex={1002}
+      modalZIndex={Z_INDEX.COMPLIANCE_MODAL_DETAILS}
       onOutsideClick={modal.remove}
       overflow="hidden"
     >

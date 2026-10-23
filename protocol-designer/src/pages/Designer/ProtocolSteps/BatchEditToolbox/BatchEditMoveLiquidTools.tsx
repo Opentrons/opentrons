@@ -27,6 +27,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepForm/utils'
 
+import type { ReactNode } from 'react'
 import type { WellOrderOption } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
@@ -36,7 +37,7 @@ interface BatchEditMoveLiquidProps {
 
 export function BatchEditMoveLiquidTools(
   props: BatchEditMoveLiquidProps
-): JSX.Element {
+): ReactNode {
   const { t, i18n } = useTranslation(['button', 'tooltip', 'protocol_steps'])
   const { propsForFields } = props
   const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')

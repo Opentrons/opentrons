@@ -13,6 +13,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_LOCATION,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -91,6 +92,9 @@ export const getModuleDisplayLocation = (
     return robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
+  }
+  if (type === VACUUM_MODULE_TYPE) {
+    return VACUUM_MODULE_LOCATION
   }
   return slot
 }

@@ -40,6 +40,7 @@ import { LiquidCardList } from './LiquidCardList'
 import { getDeckLabel } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 
 export interface WellContentsByNumber {
@@ -51,9 +52,7 @@ interface SlotDetailModalProps {
   stackOfLabware: string[]
 }
 
-export const SlotDetailModal = (
-  props: SlotDetailModalProps
-): JSX.Element | null => {
+export const SlotDetailModal = (props: SlotDetailModalProps): ReactNode => {
   const { closeModal, stackOfLabware } = props
   const { t } = useTranslation('protocol_steps')
   const [selectedLabware, setSelectedLabware] = useState<string>(

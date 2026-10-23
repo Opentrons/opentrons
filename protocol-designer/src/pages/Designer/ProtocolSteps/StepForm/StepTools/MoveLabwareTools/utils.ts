@@ -3,7 +3,12 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+} from '@opentrons/step-generation'
+
+import { VACUUM_DOCK_DISPLAY_LOCATION } from '/protocol-designer/constants'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
@@ -26,7 +31,13 @@ export const getSortedAddressableArea = (
         return modulesState[value].slot
       }
       if (labwareState?.[value]?.stack != null) {
-        return getSlotInLocationStack(labwareState[value]?.stack)
+        const slotInLocationStack = getSlotInLocationStack(
+          labwareState[value]?.stack
+        )
+        // explicit check for vacuum dock
+        return slotInLocationStack === VACUUM_DOCK_ADDRESSABLE_AREA
+          ? VACUUM_DOCK_DISPLAY_LOCATION
+          : slotInLocationStack
       }
       // value is a slot or OFFDECK
       return value

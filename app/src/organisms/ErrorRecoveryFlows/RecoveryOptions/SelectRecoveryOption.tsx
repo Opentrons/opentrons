@@ -19,12 +19,13 @@ import {
 } from '../constants'
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
-export function SelectRecoveryOption(props: RecoveryContentProps): JSX.Element {
+export function SelectRecoveryOption(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step } = recoveryMap
   const { OPTION_SELECTION } = RECOVERY_MAP
@@ -143,7 +144,7 @@ export function RecoveryOptions({
   setSelectedRoute,
   getRecoveryOptionCopy,
   isOnDevice,
-}: RecoveryOptionsProps): JSX.Element {
+}: RecoveryOptionsProps): ReactNode {
   return (
     <Flex css={RECOVERY_OPTION_CONTAINER_STYLE}>
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {

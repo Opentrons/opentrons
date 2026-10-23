@@ -10,12 +10,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface WellCountProps {
   count: number
   wellLabel: string
 }
 
-export function WellCount(props: WellCountProps): JSX.Element {
+export function WellCount(props: WellCountProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { count, wellLabel } = props
 

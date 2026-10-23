@@ -25,6 +25,8 @@ import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypes
 import { SetupLabwareList } from './SetupLabwareList'
 import { SetupLabwareMap } from './SetupLabwareMap'
 
+import type { ReactNode } from 'react'
+
 interface SetupLabwareProps {
   robotName: string
   runId: string
@@ -32,7 +34,7 @@ interface SetupLabwareProps {
   setLabwareConfirmed: (confirmed: boolean) => void
 }
 
-export function SetupLabware(props: SetupLabwareProps): JSX.Element {
+export function SetupLabware(props: SetupLabwareProps): ReactNode {
   const { robotName, runId, labwareConfirmed, setLabwareConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)

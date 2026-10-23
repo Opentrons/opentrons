@@ -22,6 +22,7 @@ import {
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -54,6 +55,7 @@ import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationMod
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 
+import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
@@ -72,7 +74,7 @@ const QuickTransferHeader = ({
   chipText,
   isScrolled,
   isTransferFetching,
-}: QuickTransferHeaderProps): JSX.Element => {
+}: QuickTransferHeaderProps): ReactNode => {
   const navigate = useNavigate()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const { t } = useTranslation('protocol_details')
@@ -112,7 +114,7 @@ const QuickTransferHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -201,7 +203,7 @@ interface TransferSectionTabsProps {
 const TransferSectionTabs = ({
   currentOption,
   setCurrentOption,
-}: TransferSectionTabsProps): JSX.Element => {
+}: TransferSectionTabsProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   const options = transferSectionTabOptions
 
@@ -226,7 +228,7 @@ interface SummaryProps {
   date: string | null
 }
 
-const Summary = ({ description, date }: SummaryProps): JSX.Element => {
+const Summary = ({ description, date }: SummaryProps): ReactNode => {
   const { t } = useTranslation(['protocol_info', 'shared'])
   return (
     <Flex

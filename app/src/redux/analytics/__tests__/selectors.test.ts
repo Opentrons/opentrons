@@ -1,12 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import * as SessionsSelectors from '../../sessions/selectors'
 import * as Selectors from '../selectors'
-
-import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
-import type { State } from '../../types'
-
-vi.mock('../../sessions/selectors')
 
 describe('analytics selectors', () => {
   describe('analytics config selectors', () => {
@@ -40,45 +34,6 @@ describe('analytics selectors', () => {
         },
       } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
-    })
-  })
-
-  describe('analytics calibration selectors', () => {
-    describe('getAnalyticsSessionExitDetails', () => {
-      it('returns data if the session exists', () => {
-        const mockState: State = {} as any
-        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue({
-          sessionType: 'deckCalibration',
-          details: {
-            currentStep: 'inspectingTip',
-          } as Partial<DeckCalibrationSessionDetails>,
-          createParams: {},
-          id: 'blah-bloo-blah',
-        } as any)
-        expect(
-          Selectors.getAnalyticsSessionExitDetails(
-            mockState,
-            'my-robot',
-            'blah-bloo-blah'
-          )
-        ).toEqual({ step: 'inspectingTip', sessionType: 'deckCalibration' })
-        expect(SessionsSelectors.getRobotSessionById).toHaveBeenCalledWith(
-          mockState,
-          'my-robot',
-          'blah-bloo-blah'
-        )
-      })
-      it('returns null if the session cannot be found', () => {
-        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue(null)
-        const mockState: State = {} as any
-        expect(
-          Selectors.getAnalyticsSessionExitDetails(
-            mockState,
-            'my-robot',
-            'blah-bloo-blah'
-          )
-        ).toBeNull()
-      })
     })
   })
 })

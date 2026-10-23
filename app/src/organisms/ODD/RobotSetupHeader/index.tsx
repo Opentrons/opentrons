@@ -32,7 +32,7 @@ export function RobotSetupHeader({
   inlineNotification,
   onClickBack,
   onClickButton,
-}: RobotSetupHeaderProps): JSX.Element {
+}: RobotSetupHeaderProps): ReactNode {
   return (
     <Flex paddingX={SPACING.spacing40} paddingY={SPACING.spacing32}>
       <Flex

@@ -1,6 +1,8 @@
 import { COLORS } from '../../../helix-design-system'
 
-export function OpentronsAluminumFlatBottomPlate(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OpentronsAluminumFlatBottomPlate(): ReactNode {
   return (
     <svg>
       <path

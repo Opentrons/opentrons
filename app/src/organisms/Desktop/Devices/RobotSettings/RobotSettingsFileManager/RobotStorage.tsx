@@ -5,7 +5,9 @@ import { useHealth } from '@opentrons/react-api-client'
 
 import styles from './robotsettingsfilemanager.module.css'
 
-export function RobotStorage(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function RobotStorage(): ReactNode {
   const { t } = useTranslation('device_details')
   const health = useHealth()
 

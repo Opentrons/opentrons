@@ -30,7 +30,7 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
@@ -55,7 +55,7 @@ interface LegacyApplyHistoricOffsetsProps {
 }
 export function LegacyApplyHistoricOffsets(
   props: LegacyApplyHistoricOffsetsProps
-): JSX.Element {
+): ReactNode {
   const {
     offsetCandidates,
     shouldApplyOffsets,

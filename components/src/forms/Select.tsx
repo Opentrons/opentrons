@@ -2,8 +2,10 @@ import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
+import { Z_INDEX } from '../styles'
 import styles from './Select.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
@@ -71,7 +73,7 @@ const CLEAR_STYLES: StylesConfig<SelectOption> = {
   indicatorSeparator: NO_STYLE_FN,
   input: (styles: CSSObjectWithLabel) => ({
     ...styles,
-    zIndex: 2,
+    zIndex: Z_INDEX.BASE,
     position: 'absolute',
   }),
   loadingIndicator: NO_STYLE_FN,
@@ -91,7 +93,7 @@ const CLEAR_STYLES: StylesConfig<SelectOption> = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps): JSX.Element {
+export function Select(props: SelectProps): ReactNode {
   return (
     <ReactSelect
       {...props}
@@ -105,7 +107,7 @@ export function Select(props: SelectProps): JSX.Element {
 
 function DropdownIndicator(
   props: DropdownIndicatorProps<SelectOption>
-): JSX.Element {
+): ReactNode {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
       <div
@@ -122,7 +124,7 @@ function DropdownIndicator(
   )
 }
 
-const Menu = (props: MenuProps<SelectOption>): JSX.Element => (
+const Menu = (props: MenuProps<SelectOption>): ReactNode => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

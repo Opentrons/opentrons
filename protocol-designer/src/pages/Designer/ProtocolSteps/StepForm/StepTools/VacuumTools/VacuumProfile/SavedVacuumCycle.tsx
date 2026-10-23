@@ -11,6 +11,7 @@ import {
 import { SavedVacuumStep } from './SavedVacuumStep'
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumCycleBaseProps } from './types'
 
 export interface SavedVacuumCycleProps extends VacuumCycleBaseProps {
@@ -19,7 +20,7 @@ export interface SavedVacuumCycleProps extends VacuumCycleBaseProps {
   onDeleteStep: (stepId: string) => void
 }
 
-export function SavedVacuumCycle(props: SavedVacuumCycleProps): JSX.Element {
+export function SavedVacuumCycle(props: SavedVacuumCycleProps): ReactNode {
   const {
     orderedProfileStepIds,
     profileStepItemsById,

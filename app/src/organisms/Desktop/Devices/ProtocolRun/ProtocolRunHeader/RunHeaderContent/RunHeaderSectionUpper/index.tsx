@@ -13,12 +13,11 @@ import { ActionButton } from '../ActionButton'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionupper.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderContentProps } from '..'
 
 // The upper row of Protocol Run Header.
-export function RunHeaderSectionUpper(
-  props: RunHeaderContentProps
-): JSX.Element {
+export function RunHeaderSectionUpper(props: RunHeaderContentProps): ReactNode {
   const { runId, runStatus, runHeaderModalContainerUtils } = props
   const { t } = useTranslation('run_details')
   const { pause } = useRunControls(runId)

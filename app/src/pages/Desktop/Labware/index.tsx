@@ -28,6 +28,7 @@ import {
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
 
@@ -45,6 +46,7 @@ import { addCustomLabwareFileFromCreator } from '/app/redux/custom-labware'
 
 import { useLabwareFailure, useNewLabwareName } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   LabwareDefAndDate,
@@ -85,7 +87,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
 `
 
-export function Labware(): JSX.Element {
+export function Labware(): ReactNode {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const enableLabwareCreator = useFeatureFlag('enableLabwareCreator')
   const [sortBy, setSortBy] = useState<LabwareSort>('alphabetical')
@@ -229,7 +231,7 @@ export function Labware(): JSX.Element {
           {showSortByMenu && (
             <Flex
               width="9.375rem"
-              zIndex={2}
+              zIndex={Z_INDEX.MENUS}
               borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}

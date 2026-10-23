@@ -48,6 +48,7 @@ import { ProtocolMetadata } from './ProtocolMetadata'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
 
+import type { ReactNode } from 'react'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../types'
 
@@ -67,7 +68,7 @@ export interface Fixture {
   stagingAreaSlots: string[]
 }
 
-export function ProtocolOverview(): JSX.Element {
+export function ProtocolOverview(): ReactNode {
   const { t } = useTranslation([
     'protocol_overview',
     'alert',

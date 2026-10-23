@@ -13,6 +13,7 @@ import {
 import { ProtocolDesignerAppFallback } from '../resources/ProtocolDesignerAppFallback'
 import styles from './protocolroutes.module.css'
 
+import type { ReactNode } from 'react'
 import type { RouteProps } from '../types'
 
 const ProtocolOverview = lazy(() =>
@@ -78,13 +79,14 @@ const pdRoutes: RouteProps[] = [
   },
 ]
 
-export function ProtocolRoutes(): JSX.Element {
-  const landingPage: RouteProps = {
-    Component: Landing,
-    name: 'Landing',
-    navLinkTo: '/',
-    path: '/',
-  }
+const landingPage: RouteProps = {
+  Component: Landing,
+  name: 'Landing',
+  navLinkTo: '/',
+  path: '/',
+}
+
+export function ProtocolRoutes(): ReactNode {
   const allRoutes: RouteProps[] = [...pdRoutes, landingPage]
   const navigate = useNavigate()
   const handleReset = (): void => {

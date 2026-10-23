@@ -16,9 +16,11 @@ import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { DisplayConnectionStatus } from './DisplayConnectionStatus'
 import { TitleHeader } from './TitleHeader'
 
+import type { ReactNode } from 'react'
+
 const STATUS_REFRESH_MS = 5000
 
-export function ConnectViaEthernet(): JSX.Element {
+export function ConnectViaEthernet(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'

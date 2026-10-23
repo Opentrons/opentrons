@@ -10,6 +10,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export type ModalContentMixedType =
   'icon' | 'image' | 'spinner' | 'no-media' | undefined
 
@@ -57,7 +59,7 @@ export type ModalContentMixedProps =
   | (ModalContentMixedMandatoryHeadlineProps & ModalContentMixedTextProps)
   | (ModalContentMixedNoMandatoryHeadlineProps &
       Partial<ModalContentMixedTextProps>)
-export function ModalContentMixed(props: ModalContentMixedProps): JSX.Element {
+export function ModalContentMixed(props: ModalContentMixedProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -102,7 +104,7 @@ function ModalContentMixedMedia(
   props:
     | ModalContentMixedMandatoryHeadlineProps
     | ModalContentMixedNoMandatoryHeadlineProps
-): JSX.Element {
+): ReactNode {
   switch (props?.type) {
     case 'icon':
       return <ModalContentMixedIcon {...props} />
@@ -116,7 +118,7 @@ function ModalContentMixedMedia(
   }
 }
 
-function ModalContentMixedIcon(props: ModalContentMixedIconProps): JSX.Element {
+function ModalContentMixedIcon(props: ModalContentMixedIconProps): ReactNode {
   return (
     <Box
       marginBottom={SPACING.spacing24}
@@ -140,7 +142,7 @@ function ModalContentMixedIcon(props: ModalContentMixedIconProps): JSX.Element {
 
 function ModalContentMixedSpinner(
   props: ModalContentMixedSpinnerProps
-): JSX.Element {
+): ReactNode {
   return (
     <Box
       marginBottom={SPACING.spacing16}
@@ -157,9 +159,7 @@ function ModalContentMixedSpinner(
   )
 }
 
-function ModalContentMixedImage(
-  props: ModalContentMixedImageProps
-): JSX.Element {
+function ModalContentMixedImage(props: ModalContentMixedImageProps): ReactNode {
   return (
     <img
       src={props.imageUrl}

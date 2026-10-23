@@ -49,7 +49,7 @@ export function CameraSettings({
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
   runId,
-}: CameraSettingsProps): JSX.Element {
+}: CameraSettingsProps): ReactNode {
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
@@ -139,7 +139,7 @@ export function CameraSettings({
   }
 }
 
-function StorageAlmostFullNotification(): JSX.Element {
+function StorageAlmostFullNotification(): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'branded'])
 
   return (
@@ -151,7 +151,7 @@ function StorageAlmostFullNotification(): JSX.Element {
   )
 }
 
-function CameraRequiredNotification(): JSX.Element {
+function CameraRequiredNotification(): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

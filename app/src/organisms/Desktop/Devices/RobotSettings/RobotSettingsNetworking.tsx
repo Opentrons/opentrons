@@ -36,6 +36,7 @@ import {
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface NetworkingProps {
@@ -51,7 +52,7 @@ const LIST_REFRESH_MS = 10000
 export function RobotSettingsNetworking({
   robotName,
   isRobotBusy,
-}: NetworkingProps): JSX.Element {
+}: NetworkingProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const isFlex = useIsFlex(robotName)

@@ -29,14 +29,14 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { SlotHover } from './SlotHover'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface OffDeckThumbnailProps {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   width?: string
 }
-export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
+export function OffDeckThumbnail(props: OffDeckThumbnailProps): ReactNode {
   const { hover, setHover, width = '32.5rem' } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const robotType = useSelector(getRobotType)

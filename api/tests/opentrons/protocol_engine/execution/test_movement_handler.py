@@ -7,9 +7,10 @@ from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
 from opentrons.protocol_engine.execution.gantry_mover import GantryMover
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
@@ -35,12 +36,6 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
 )
 from opentrons.types import DeckSlotName, Mount, MountType, Point
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
@@ -76,7 +71,7 @@ def mock_equipment_handler(decoy: Decoy) -> EquipmentHandler:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     mock_gantry_mover: GantryMover,
@@ -191,6 +186,13 @@ async def test_move_to_well(
     assert result == Point(x=4, y=5, z=6)
 
     decoy.verify(
+        state_store.geometry.raise_if_labware_inaccessible_by_pipette(
+            labware_id="labware-id"
+        ),
+        state_store.labware.raise_if_labware_has_labware_on_top(
+            labware_id="labware-id"
+        ),
+        state_store.labware.raise_if_labware_is_contained(labware_id="labware-id"),
         await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
@@ -200,6 +202,35 @@ async def test_move_to_well(
             is_multi_channel=False,
             destination_is_tip_rack=False,
         ),
+    )
+
+
+async def test_move_to_well_raises_when_labware_is_contained(
+    decoy: Decoy,
+    state_store: StateStore,
+    mock_gantry_mover: GantryMover,
+    subject: MovementHandler,
+) -> None:
+    """It should raise when pipetting to labware that is physically contained."""
+    decoy.when(
+        state_store.labware.raise_if_labware_is_contained(labware_id="labware-id")
+    ).then_raise(
+        errors.LabwareIsContainedError(
+            'Cannot move "collection-plate" because it is currently contained '
+            'inside "collar".'
+        )
+    )
+
+    with pytest.raises(errors.LabwareIsContainedError):
+        await subject.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A1",
+        )
+
+    decoy.verify(
+        await mock_gantry_mover.get_position(pipette_id="pipette-id"),
+        times=0,
     )
 
 
@@ -300,6 +331,13 @@ async def test_move_to_well_from_starting_location(
     assert result == Point(4, 5, 6)
 
     decoy.verify(
+        state_store.geometry.raise_if_labware_inaccessible_by_pipette(
+            labware_id="labware-id"
+        ),
+        state_store.labware.raise_if_labware_has_labware_on_top(
+            labware_id="labware-id"
+        ),
+        state_store.labware.raise_if_labware_is_contained(labware_id="labware-id"),
         await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
         ),
@@ -558,7 +596,7 @@ async def test_retract_axis(
 async def test_check_valid_position(
     decoy: Decoy,
     subject: MovementHandler,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should check for an exception to determine if the position is ok."""
     decoy.when(

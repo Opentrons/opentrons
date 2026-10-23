@@ -43,7 +43,7 @@ import { SelectionLegend } from './SelectionLegend'
 import styles from './tipselectionwizard.module.css'
 import { getViewboxFromSelectedLabware } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
@@ -68,7 +68,7 @@ export function SelectTips(
     primaryNozzle: PrimaryNozzleConfigurationStyle
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('tip_selection')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)

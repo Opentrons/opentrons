@@ -23,7 +23,7 @@ export interface FormGroupProps {
   isPipetteSettingsSlideout?: boolean
 }
 
-export function FormGroup(props: FormGroupProps): JSX.Element {
+export function FormGroup(props: FormGroupProps): ReactNode {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

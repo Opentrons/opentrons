@@ -13,6 +13,7 @@ import {
   getWellSetForMultichannel,
 } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   WellFillByName,
   WellGroup,
@@ -40,7 +41,7 @@ interface WellSelectionProps {
   allowMultiDrag?: boolean
 }
 
-export function WellSelection(props: WellSelectionProps): JSX.Element {
+export function WellSelection(props: WellSelectionProps): ReactNode {
   const {
     definition,
     deselectWells,

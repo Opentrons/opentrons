@@ -4,6 +4,7 @@ import { Flex, SPACING, Tabs } from '@opentrons/components'
 
 import { useFeatureFlag } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 type ProtocolDetailsTab =
@@ -19,7 +20,7 @@ export function ProtocolDetailsTabs({
   mostRecentAnalysis,
   currentTab,
   setCurrentTab,
-}: ProtocolDetailsTabsProps): JSX.Element {
+}: ProtocolDetailsTabsProps): ReactNode {
   const { t, i18n } = useTranslation('protocol_details')
   const enableProtocolStats = useFeatureFlag('protocolStats')
 

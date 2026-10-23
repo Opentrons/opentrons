@@ -32,7 +32,7 @@ export interface ModalProps extends StyleProps {
 /**
  * For Desktop app and Helix (which includes Protocol Designer) use only.
  */
-export const Modal = (props: ModalProps): JSX.Element => {
+export const Modal = (props: ModalProps): ReactNode => {
   const {
     type = 'info',
     onClose,

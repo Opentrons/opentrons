@@ -23,7 +23,7 @@ import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/Si
 import styles from './nozzleandwellwizard.module.css'
 import { getAvailablePrimaryNozzles, getEntireWellSelection } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Channels, WellType } from '@opentrons/components'
 import type {
   ActiveNozzleNumber,
@@ -37,7 +37,7 @@ import type { PipetteShadowProps } from '../TipSelectionWizard/types'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
-  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
+  Record<Channels, (props: PipetteShadowProps) => ReactNode>
 > = {
   [OT2_ROBOT_TYPE]: {
     1: SingleChannelOT2Shadow,
@@ -92,7 +92,7 @@ const getAvailableNozzles = (
 
   return nozzles
 }
-export function NozzleRender(props: NozzleRenderProps): JSX.Element {
+export function NozzleRender(props: NozzleRenderProps): ReactNode {
   const {
     robotType,
     pipetteSpecs,
@@ -119,8 +119,8 @@ export function NozzleRender(props: NozzleRenderProps): JSX.Element {
     stroke: COLORS.grey50,
     x: 0,
     y: 0,
-    width: width,
-    height: height,
+    width,
+    height,
     rotate: !is96Channel,
   }
   const availableNozzlesOptions = getAvailablePrimaryNozzles(

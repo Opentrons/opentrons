@@ -50,6 +50,7 @@ import {
   getWellNameAtClientPoint,
 } from './utils'
 
+import type { ReactNode } from 'react'
 import type { WellMouseEvent, WellType } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
@@ -72,7 +73,7 @@ interface WellSelectorProps {
   robotType: RobotType
 }
 
-export function WellSelector(props: WellSelectorProps): JSX.Element {
+export function WellSelector(props: WellSelectorProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const { deckSetup, propsForFields, stepType, robotType, pipetteSpecs } = props
 

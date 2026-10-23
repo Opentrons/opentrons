@@ -19,7 +19,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -33,7 +33,7 @@ interface PreWetTipProps {
   kind: FlowRateKind
 }
 
-export function PreWetTip(props: PreWetTipProps): JSX.Element {
+export function PreWetTip(props: PreWetTipProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

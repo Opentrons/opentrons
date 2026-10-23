@@ -26,6 +26,7 @@ import { getDefaultMmFromEdge } from '/protocol-designer/components/organisms/Ti
 import { getIsDelayPositionField } from '/protocol-designer/form-types'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
+import type { ReactNode } from 'react'
 import type { PositionSpecs } from '/protocol-designer/components/organisms'
 import type {
   FormData,
@@ -51,7 +52,7 @@ interface PositionFieldProps {
   formData?: FormData
 }
 
-export function PositionField(props: PositionFieldProps): JSX.Element {
+export function PositionField(props: PositionFieldProps): ReactNode {
   const {
     formData,
     labwareId,

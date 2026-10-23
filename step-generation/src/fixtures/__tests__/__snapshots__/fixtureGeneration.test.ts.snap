@@ -18379,6 +18379,7 @@ exports[`snapshot tests > makeContext 1`] = `
       ],
     },
   },
+  "runtimeParameters": {},
   "stagingAreaEntities": {},
   "trashBinEntities": {
     "fixedTrash": {

@@ -49,7 +49,7 @@ export function WellTooltip({
   children,
   ingredNames,
   liquidDisplayColors,
-}: WellTooltipProps): JSX.Element {
+}: WellTooltipProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   const [tooltipState, setTooltipState] =
     useState<TooltipState>(initialTooltipState)

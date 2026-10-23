@@ -32,6 +32,7 @@ export const getModuleSetupSteps = (
       return [
         { section: SECTIONS.UPDATE_FIRMWARE },
         { section: SECTIONS.SELECT_LOCATION },
+        { section: SECTIONS.VERIFY_VACUUM },
         { section: SECTIONS.SUCCESS },
       ]
     default:

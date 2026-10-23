@@ -9,9 +9,12 @@ import { App } from './App'
 import { i18n } from './i18n'
 import {
   AUTH0_DOMAIN,
+  LOCAL_AUTH0_AUDIENCE,
   LOCAL_AUTH0_CLIENT_ID,
   LOCAL_AUTH0_DOMAIN,
+  PROD_AUTH0_AUDIENCE,
   PROD_AUTH0_CLIENT_ID,
+  STAGING_AUTH0_AUDIENCE,
   STAGING_AUTH0_CLIENT_ID,
 } from './resources/constants'
 
@@ -37,6 +40,24 @@ const getDomain = (): string => {
   return _NODE_ENV_ === 'development' ? LOCAL_AUTH0_DOMAIN : AUTH0_DOMAIN
 }
 
+/** Auth0 must issue tokens for the API audience at login, not only on getAccessTokenSilently. */
+const getAuthorizationParams = (): {
+  redirect_uri: string
+  audience?: string
+} => {
+  const redirect_uri = window.location.origin
+  switch (_NODE_ENV_) {
+    case 'development':
+      return { redirect_uri, audience: LOCAL_AUTH0_AUDIENCE }
+    case 'staging':
+      return { redirect_uri, audience: STAGING_AUTH0_AUDIENCE }
+    case 'production':
+      return { redirect_uri, audience: PROD_AUTH0_AUDIENCE }
+    default:
+      return { redirect_uri, audience: STAGING_AUTH0_AUDIENCE }
+  }
+}
+
 if (rootElement != null) {
   const clientId = getClientId()
   const domain = getDomain()
@@ -46,9 +67,7 @@ if (rootElement != null) {
       <Auth0Provider
         clientId={clientId}
         domain={domain}
-        authorizationParams={{
-          redirect_uri: window.location.origin,
-        }}
+        authorizationParams={getAuthorizationParams()}
       >
         <I18nextProvider i18n={i18n}>
           <App />

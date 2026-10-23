@@ -21,6 +21,7 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
 import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
 
 const MAX_SUPPORTED_LABELS = 3
@@ -50,7 +51,7 @@ export function MultiDeckLabelTagBtns({
   colTwoChip,
   colThreePrimaryBtn,
   colThreeSecondaryBtn,
-}: MultiDeckLabelTagBtnsProps): JSX.Element {
+}: MultiDeckLabelTagBtnsProps): ReactNode {
   return (
     <Flex display={DISPLAY_GRID} css={CONTAINER_STYLE}>
       <Flex css={LABEL_CONTAINER_STYLE}>

@@ -14,12 +14,13 @@ import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 import { getTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../types'
 
 interface TiprackFieldProps extends FieldProps {
   pipetteId?: unknown
 }
-export function TiprackField(props: TiprackFieldProps): JSX.Element {
+export function TiprackField(props: TiprackFieldProps): ReactNode {
   const {
     value,
     pipetteId,

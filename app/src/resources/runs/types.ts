@@ -1,13 +1,19 @@
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { TipRackCalibrationData } from '/app/resources/instruments/types'
-import type { INCOMPATIBLE, INEXACT_MATCH, MATCH } from './constants'
+import type { INCOMPATIBLE, MATCH } from './constants'
 
-export type PipetteCompatibility =
-  typeof MATCH | typeof INEXACT_MATCH | typeof INCOMPATIBLE
+export type PipetteCompatibility = typeof MATCH | typeof INCOMPATIBLE
 
 export interface PipetteInfo {
-  pipetteSpecs: PipetteNameSpecs
-  tipRacksForPipette: TipRackCalibrationData[]
   requestedPipetteMatch: PipetteCompatibility
-  pipetteCalDate: string | null
+}
+
+export interface ProtocolCalibrationStatus {
+  complete: boolean
+  reason?:
+    | 'calibrate_deck_failure_reason'
+    | 'calibrate_tiprack_failure_reason'
+    | 'calibrate_pipette_failure_reason'
+    | 'calibrate_gripper_failure_reason'
+    | 'calibrate_module_failure_reason'
+    | 'attach_pipette_failure_reason'
+    | 'attach_gripper_failure_reason'
 }

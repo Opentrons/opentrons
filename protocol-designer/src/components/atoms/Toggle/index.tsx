@@ -10,13 +10,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface ToggleProps {
   isSelected: boolean
   onClick: () => void
   label: string
   disabled?: boolean
 }
-export function Toggle(props: ToggleProps): JSX.Element {
+export function Toggle(props: ToggleProps): ReactNode {
   const { isSelected, onClick, label, disabled = false } = props
   return (
     <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>

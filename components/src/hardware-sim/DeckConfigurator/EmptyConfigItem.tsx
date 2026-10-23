@@ -26,6 +26,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutId,
@@ -45,7 +46,7 @@ interface EmptyConfigItemProps {
   ) => void
 }
 
-export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
+export function EmptyConfigItem(props: EmptyConfigItemProps): ReactNode {
   const {
     deckDefinition,
     handleClickAdd,

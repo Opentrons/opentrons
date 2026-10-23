@@ -6,7 +6,7 @@ import { createLogger } from '../log'
 import type { AppShellUsbDevice } from './types'
 
 const USB_SYS_PATH = '/sys/bus/usb/devices'
-const log = createLogger(new URL('', import.meta.url).pathname)
+const log = createLogger('app-shell-odd/src/usb/devices.ts')
 const USB_PORT_LOCATIONS = [
   ['1.4.4', 'USB-1'],
   ['1.4.3', 'USB-2'],

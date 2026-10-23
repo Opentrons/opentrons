@@ -17,7 +17,7 @@ interface EmptySetupStepProps {
   rightElement?: ReactNode
 }
 
-export function EmptySetupStep(props: EmptySetupStepProps): JSX.Element {
+export function EmptySetupStep(props: EmptySetupStepProps): ReactNode {
   const { title, description, rightElement } = props
   return (
     <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>

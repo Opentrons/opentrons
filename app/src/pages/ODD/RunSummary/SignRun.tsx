@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { StyledText } from '@opentrons/components'
+import { StyledText, Z_INDEX } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
@@ -15,10 +15,8 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrun.module.css'
 
+import type { ReactNode } from 'react'
 import type { DocumentationState } from '@opentrons/react-api-client'
-
-// Below the login (10001) and documentation (1002) modals, which layer above this one.
-const MODAL_Z_INDEX = 1000
 
 export function SignRun({
   runId,
@@ -28,7 +26,7 @@ export function SignRun({
   runId: string
   documentationState: DocumentationState
   onSigned?: () => void
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('access_control')
 
   const robotName = useLocalRobotName() ?? 'no name'
@@ -74,7 +72,7 @@ export function SignRun({
   return (
     <OddModal
       header={{ title: t('sign_protocol_run') }}
-      modalZIndex={MODAL_Z_INDEX}
+      modalZIndex={Z_INDEX.BLOCKING_MODALS}
       key={name}
     >
       <div className={styles.content_container}>

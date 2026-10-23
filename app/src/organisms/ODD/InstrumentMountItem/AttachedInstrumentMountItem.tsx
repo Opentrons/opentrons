@@ -13,7 +13,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { LabeledMount } from './LabeledMount'
 
-import type { ComponentProps, MouseEventHandler } from 'react'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type { InstrumentData, Mount } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 import type { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
@@ -33,7 +33,7 @@ interface AttachedInstrumentMountItemProps {
 
 export function AttachedInstrumentMountItem(
   props: AttachedInstrumentMountItemProps
-): JSX.Element {
+): ReactNode {
   const navigate = useNavigate()
   const { mount, attachedInstrument, setWizardProps } = props
 

@@ -31,12 +31,12 @@ import {
 } from '../../persist'
 import styles from './landing.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 
-export function Landing(): JSX.Element {
+export function Landing(): ReactNode {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)

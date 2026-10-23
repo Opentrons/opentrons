@@ -1,9 +1,11 @@
 import { COLORS } from '../../../../helix-design-system'
 import { DEFAULT_TIP_SIZE } from './constants'
 
+import type { ReactNode } from 'react'
+
 const STROKE_WIDTH = '2'
 
-export function InaccessibleTip(props: { size?: string }): JSX.Element {
+export function InaccessibleTip(props: { size?: string }): ReactNode {
   const { size } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE

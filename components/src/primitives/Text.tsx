@@ -2,14 +2,14 @@ import { createElement } from 'react'
 
 import { withStyleProps } from '../hocs/withStyleProps'
 
-import type { ComponentProps, FC } from 'react'
+import type { ComponentProps, FC, ReactNode } from 'react'
 import type { StyleProps } from './types'
 
 const TextComponent = ({
   as,
   color,
   ...props
-}: ComponentProps<'p'> & { as?: string }): JSX.Element => {
+}: ComponentProps<'p'> & { as?: string }): ReactNode => {
   const Component = as || 'p'
   return createElement(Component, {
     ...props,

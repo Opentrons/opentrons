@@ -73,7 +73,7 @@ export interface TouchInputFieldProps {
 export const TouchInputField = forwardRef<
   HTMLInputElement,
   TouchInputFieldProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const {
     disabled,
     id,

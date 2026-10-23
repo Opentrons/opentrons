@@ -10,6 +10,7 @@ import { DISENGAGED, NOT_PRESENT, PHYSICALLY_ENGAGED } from './constants'
 import { EstopMissingModal } from './EstopMissingModal'
 import { EstopPressedModal } from './EstopPressedModal'
 
+import type { ReactNode } from 'react'
 import type { EstopState } from '@opentrons/api-client'
 
 const ESTOP_CURRENTLY_DISENGAGED_REFETCH_INTERVAL_MS = 10000
@@ -19,7 +20,7 @@ interface EstopTakeoverProps {
   robotName?: string
 }
 
-export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
+export function EstopTakeover({ robotName }: EstopTakeoverProps): ReactNode {
   const [isDismissedModal, setIsDismissedModal] = useState<boolean>(false)
   const [isWaitingForResumeOperation, setIsWatingForResumeOperation] =
     useState<boolean>(false)

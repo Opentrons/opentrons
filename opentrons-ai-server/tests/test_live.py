@@ -114,13 +114,23 @@ def test_get_bad_endpoint_with_bad_auth(client: Client) -> None:
 
 
 @pytest.mark.live
-def test_get_options(client: Client) -> None:
+def test_get_options(client: Client, env: str) -> None:
     """Test the OPTIONS endpoint."""
     response = client.get_options()
     assert response.status_code == 200, "OPTIONS endpoint should return HTTP 200"
-    # This is the shape that makes pre-flight from the client happy.
+    body = response.json()
+
+    allow_origin = body.get("Access-Control-Allow-Origin")
+    assert allow_origin is not None, "Access-Control-Allow-Origin should be set"
+    assert allow_origin != "*", "wildcard origin is invalid with credentialed CORS"
+    allowed_origins = [origin.strip() for origin in allow_origin.split(",") if origin.strip()]
+    assert allowed_origins, "Access-Control-Allow-Origin should list at least one origin"
+    assert all(origin.startswith(("http://", "https://")) for origin in allowed_origins)
+
+    if env.lower() == "local":
+        assert "http://localhost:5173" in allowed_origins
+
     expected_headers = {
-        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": ["GET", "POST", "OPTIONS"],
         "Access-Control-Allow-Headers": [
             "content-type",
@@ -132,7 +142,5 @@ def test_get_options(client: Client) -> None:
         "Access-Control-Expose-Headers": ["content-type"],
         "Access-Control-Max-Age": "600",
     }
-    body = response.json()
-    print(response)
     for header, expected_value in expected_headers.items():
         assert body.get(header) == expected_value, f"{header} should be {expected_value}"

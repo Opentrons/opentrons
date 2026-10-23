@@ -1,8 +1,8 @@
 import { COLORS } from '../../helix-design-system'
 
-import type { SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 
-export function SlotClip(props: SVGProps<SVGPathElement>): JSX.Element {
+export function SlotClip(props: SVGProps<SVGPathElement>): ReactNode {
   return (
     <path
       fill="none"

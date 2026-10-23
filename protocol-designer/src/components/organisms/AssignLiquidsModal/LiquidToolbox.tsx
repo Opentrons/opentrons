@@ -43,7 +43,7 @@ import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { LiquidCard } from './LiquidCard'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { DropdownOption, WellGroup } from '@opentrons/components'
 import type {
   LabwareLiquidState,
@@ -96,7 +96,7 @@ function LiquidToolbox({
   selectedLabwareIds,
   showLiquidLayoutOverlay,
   data,
-}: LiquidToolboxProps): JSX.Element {
+}: LiquidToolboxProps): ReactNode {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -548,7 +548,7 @@ export function LiquidToolboxContainer({
   setShowBadFormState,
   setDefineLiquidModal,
   showLiquidLayoutOverlay,
-}: LiquidToolboxContainerProps): JSX.Element {
+}: LiquidToolboxContainerProps): ReactNode {
   // All selectors moved here
   const liquids = useSelector(getLiquidEntities)
   const multipleSelectedLabwareIds = useSelector(

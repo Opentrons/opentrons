@@ -20,6 +20,7 @@ import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
 
 import { getMaxUiFlowRate } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PathOption } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FlowRateType } from '/protocol-designer/resources/types'
@@ -34,7 +35,7 @@ interface FlowRateFieldProps extends FieldProps {
   showTooltip?: boolean
 }
 
-export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
+export function FlowRateField(props: FlowRateFieldProps): ReactNode {
   const {
     pipetteId,
     flowRateType,
