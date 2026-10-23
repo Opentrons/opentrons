@@ -814,13 +814,13 @@ export interface CommentArgs extends CommonArgs {
 
 export interface CaptureImageArgs extends CommonArgs {
   commandCreatorFnName: 'captureImage'
-  homeBefore: boolean
+  homeBefore: boolean | string
   fileName: string
-  resolution: [Width, Height]
-  zoom: number
-  contrast: number
-  brightness: number
-  saturation: number
+  resolution: [Width | string, Height | string]
+  zoom: number | string
+  contrast: number | string
+  brightness: number | string
+  saturation: number | string
 }
 
 export interface FlexStackerEmptyArgs extends CommonArgs {
