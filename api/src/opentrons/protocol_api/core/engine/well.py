@@ -125,7 +125,7 @@ class WellCore(AbstractWellCore):
 
     def get_top(self, z_offset: float) -> Point:
         """Get the coordinate of the well's top, with a z-offset."""
-        return self._engine_client.state.instrument_interface.get_well_position(
+        return self._engine_client.state.geometry.get_base_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(
@@ -135,7 +135,7 @@ class WellCore(AbstractWellCore):
 
     def get_bottom(self, z_offset: float) -> Point:
         """Get the coordinate of the well's bottom, with a z-offset."""
-        return self._engine_client.state.instrument_interface.get_well_position(
+        return self._engine_client.state.geometry.get_base_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(
@@ -145,7 +145,7 @@ class WellCore(AbstractWellCore):
 
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
-        return self._engine_client.state.instrument_interface.get_well_position(
+        return self._engine_client.state.geometry.get_base_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(origin=WellOrigin.CENTER),

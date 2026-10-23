@@ -185,10 +185,12 @@ class StateView(HasState[State]):
 
     @property
     def liquid_tracking(self) -> LiquidTrackingView:
+        """Get state view selectors for liquid tracking state."""
         return self._liquid_tracking
 
     @property
     def instrument_interface(self) -> InstrumentInterfaceView:
+        """Get state view selectors for instrument interface state."""
         return self._instrument_interface
 
     @property
@@ -531,9 +533,7 @@ class StateStore(StateView, ActionHandler):
         self._geometry = GeometryView(
             config=self._config,
             labware_view=self._labware,
-            well_view=self._wells,
             module_view=self._modules,
-            pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
         )
         self._liquid_tracking = LiquidTrackingView(
