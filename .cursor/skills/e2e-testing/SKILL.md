@@ -128,14 +128,14 @@ Tests run against different environments via `TEST_ENV`:
 
 ### Key Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
+| Variable            | Default | Notes                                 |
+| ------------------- | ------- | ------------------------------------- |
+| `TEST_ENV`          | `local` | `local`, `staging`, `prod`, `sandbox` |
+| `HEADLESS`          | (unset) | `true` / `false`; overrides default   |
+| `SKIP_SERVER_START` | `false` | Skip automatic server build+serve     |
+| `PD_SERVER_URL`     | auto    | Override PD URL                       |
+| `LL_SERVER_URL`     | auto    | Override LL URL                       |
+| `LL_SERVER_PORT`    | `4176`  | Preferred port for LL local server    |
 
 ## Development Commands
 
