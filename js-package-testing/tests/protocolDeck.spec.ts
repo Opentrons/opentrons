@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { test } from '@playwright/test'
 
 test.describe('ProtocolDeck Component', () => {
   test.beforeEach(async ({ page }) => {
