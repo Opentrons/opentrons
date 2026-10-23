@@ -11,7 +11,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useIsFlex } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP,
   ANALYTICS_PROCEED_TO_LABWARE_OFFSETS_SETUP_STEP,
@@ -32,14 +31,12 @@ import {
   useRunHasStarted,
 } from '/app/resources/runs'
 
-import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
-import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
 
 import type { ReactNode } from 'react'
 import type { AnalyticsProtocolProceedButtonText } from '/app/redux/analytics/constants'
-import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { ProtocolCalibrationStatus } from '/app/resources/runs/types'
 
 interface SetupRobotCalibrationProps {
   robotName: string
@@ -81,8 +78,6 @@ export function SetupRobotCalibration({
   })
   const runStatus = runRecord?.data.status ?? null
 
-  const isFlex = useIsFlex(robotName)
-
   let tooltipText: string | null = null
   if (runStatus === RUN_STATUS_STOPPED) {
     tooltipText = t('protocol_run_stopped')
@@ -100,13 +95,7 @@ export function SetupRobotCalibration({
         gridGap={SPACING.spacing16}
         marginY={SPACING.spacing16}
       >
-        {!isFlex ? (
-          <SetupDeckCalibration robotName={robotName} runId={runId} />
-        ) : null}
-        <SetupInstrumentCalibration robotName={robotName} runId={runId} />
-        {!isFlex ? (
-          <SetupTipLengthCalibration robotName={robotName} runId={runId} />
-        ) : null}
+        <SetupInstrumentCalibration runId={runId} />
       </Flex>
       <PrimaryButton
         disabled={!calibrationStatus.complete || runHasStarted}

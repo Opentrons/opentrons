@@ -29,6 +29,7 @@
   align-items: flex-start;
   justify-content: center;
   gap: var(--spacing-2);
+  text-wrap: wrap;
 }
 
 .setting_name {

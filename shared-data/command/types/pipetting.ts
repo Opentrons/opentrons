@@ -336,6 +336,7 @@ interface AddressableOffsetVector {
 }
 export interface DropTipInPlaceParams {
   pipetteId: string
+  homeAfter?: boolean
 }
 
 export interface MoveToAddressableAreaForDropTipParams {
@@ -346,6 +347,7 @@ export interface MoveToAddressableAreaForDropTipParams {
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean
+  ignoreTipConfiguration?: boolean
 }
 export interface BlowoutInPlaceParams {
   pipetteId: string

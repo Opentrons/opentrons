@@ -7,7 +7,7 @@ import type { Height, Width } from '@opentrons/shared-data'
 
 describe('captureImage', () => {
   it('should generate a captureImage command', () => {
-    const invariantContext: any = {}
+    const invariantContext: any = { runtimeParameters: {} }
     const robotInitialState: any = {}
     const args = {
       homeBefore: true,
@@ -20,10 +20,12 @@ describe('captureImage', () => {
     }
     const result = captureImage(args, invariantContext, robotInitialState)
     const res = getSuccessResult(result)
-    expect(res.python).toEqual(`protocol.capture_image()`)
+    expect(res.python).toEqual(
+      `protocol.capture_image(home_before=True, filename="fileName", resolution=(10, 10), zoom=10, contrast=10, brightness=10, saturation=10)`
+    )
   })
-  it('resolves runtime parameters into the command', () => {
-    const invariantContext = {
+  it('resolves homeBefore, fileName, resolution, zoom, contrast, brightness, and saturation when they are runtime parameters', () => {
+    const invariantContext: any = {
       runtimeParameters: {
         home_before: {
           variableName: 'home_before',
@@ -37,14 +39,14 @@ describe('captureImage', () => {
           type: 'string',
           default: 'fileName',
         },
-        image_width: {
-          variableName: 'image_width',
+        width: {
+          variableName: 'width',
           displayName: 'Width',
           type: 'int',
           default: 10,
         },
-        image_height: {
-          variableName: 'image_height',
+        height: {
+          variableName: 'height',
           displayName: 'Height',
           type: 'int',
           default: 10,
@@ -52,43 +54,44 @@ describe('captureImage', () => {
         zoom: {
           variableName: 'zoom',
           displayName: 'Zoom',
-          type: 'int',
+          type: 'float',
           default: 10,
         },
         contrast: {
           variableName: 'contrast',
           displayName: 'Contrast',
-          type: 'int',
+          type: 'float',
           default: 10,
         },
         brightness: {
           variableName: 'brightness',
           displayName: 'Brightness',
-          type: 'int',
+          type: 'float',
           default: 10,
         },
         saturation: {
           variableName: 'saturation',
           displayName: 'Saturation',
-          type: 'int',
+          type: 'float',
           default: 10,
         },
       },
     }
+    const robotInitialState: any = {}
     const result = captureImage(
       {
         homeBefore: 'home_before',
         fileName: 'file_name',
-        resolution: ['image_width', 'image_height'],
+        resolution: ['width', 'height'],
         zoom: 'zoom',
         contrast: 'contrast',
         brightness: 'brightness',
         saturation: 'saturation',
       },
-      invariantContext as any,
-      {} as any
+      invariantContext,
+      robotInitialState
     )
-    expect(result).toEqual({
+    expect(getSuccessResult(result)).toEqual({
       commands: [
         {
           commandType: 'captureImage',
@@ -104,17 +107,24 @@ describe('captureImage', () => {
           },
         },
       ],
-      python: 'protocol.capture_image()',
+      python:
+        'protocol.capture_image(home_before=home_before, filename=file_name, resolution=(width, height), zoom=zoom, contrast=contrast, brightness=brightness, saturation=saturation)',
     })
   })
-  it('returns errors if runtime parameters are not valid', () => {
-    const invariantContext = {
+  it('returns errors if homeBefore, fileName, resolution, zoom, contrast, brightness, and saturation are not valid runtime parameters', () => {
+    const invariantContext: any = {
       runtimeParameters: {
-        mock_rtp: {
-          variableName: 'mock_rtp',
-          displayName: 'mock rtp',
+        mock_bool_rtp: {
+          variableName: 'mock_bool_rtp',
+          displayName: 'mock bool rtp',
           type: 'boolean',
           default: false,
+        },
+        mock_int_rtp: {
+          variableName: 'mock_int_rtp',
+          displayName: 'mock int rtp',
+          type: 'int',
+          default: 1,
         },
         mock_string_rtp: {
           variableName: 'mock_string_rtp',
@@ -124,23 +134,43 @@ describe('captureImage', () => {
         },
       },
     }
+    const robotInitialState: any = {}
     const result = captureImage(
       {
-        homeBefore: 'mock_string_rtp',
-        fileName: 'mock_rtp',
-        resolution: ['mock_string_rtp', 'mock_rtp'],
-        zoom: 'mock_rtp',
+        homeBefore: 'mock_int_rtp',
+        fileName: 'mock_bool_rtp',
+        resolution: ['missing_width', 'mock_string_rtp'],
+        zoom: 'mock_bool_rtp',
+        contrast: 'missing_contrast',
+        brightness: 'mock_string_rtp',
+        saturation: 'mock_bool_rtp',
       },
-      invariantContext as any,
-      {} as any
+      invariantContext,
+      robotInitialState
     )
     expect(getErrorResult(result).errors).toEqual([
       {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_width" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
         message: 'Runtime parameter "mock_string_rtp" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
       },
       {
-        message: 'Runtime parameter "mock_rtp" is missing',
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_contrast" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
       },
       {
@@ -148,11 +178,7 @@ describe('captureImage', () => {
         type: 'INVALID_RUNTIME_PARAMETER',
       },
       {
-        message: 'Runtime parameter "mock_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-      {
-        message: 'Runtime parameter "mock_rtp" is missing',
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
       },
     ])
