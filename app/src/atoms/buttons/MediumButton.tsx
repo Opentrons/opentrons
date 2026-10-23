@@ -19,7 +19,7 @@ import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
-import type { ButtonCategory } from './ODD/SmallButton'
+import type { ButtonCategory } from './SmallButton'
 
 type MediumButtonTypes =
   | 'primary'

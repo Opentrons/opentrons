@@ -30,7 +30,7 @@ import type {
   ButtonCategory,
   IconPlacement,
   SmallButtonTypes,
-} from '/app/atoms/buttons'
+} from '/app/atoms/buttons/SmallButton'
 
 export interface ChildNavigationProps extends StyleProps {
   header: string
