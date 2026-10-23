@@ -3,6 +3,7 @@ import clsx from 'clsx'
 
 import { isntStyleProp, styleProps } from '../../primitives/style-props'
 import { resolveLegacyTextStyle } from './legacyTextStyles'
+import styles from './styledtext.module.css'
 import {
   resolveStyledTextStyles,
   resolveStyledTextTag,
@@ -85,7 +86,12 @@ export function StyledText({
     tag,
     {
       ...forwardedProps,
-      className: clsx(modernStyles?.className, legacyClassName, className),
+      className: clsx(
+        styles.styled_text_reset,
+        modernStyles?.className,
+        legacyClassName,
+        className
+      ),
       style: combinedStyle,
     },
     children
