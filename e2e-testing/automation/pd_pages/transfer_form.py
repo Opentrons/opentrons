@@ -353,7 +353,7 @@ class TransferPage(BasePage):
         Args:
             liquid_class: The liquid class to select like "Aqueous", "Viscous", "Volatile", etc.
         """
-        liquid_class_option = self.page.get_by_text(liquid_class)
+        liquid_class_option = self.page.get_by_text(liquid_class, exact=True)
         liquid_class_option.click()
 
     ### Step 3 transfer form Aspiration and Dispense
@@ -736,6 +736,7 @@ class TransferStepConfig:
     nozzle_config: TransferPage.NozzleConfig = "All nozzles (recommended)"
     partial_count: Optional[int] = None
     primary_nozzle: Optional[str] = None
+    liquid_class: str = "Aqueous"
 
     @classmethod
     def partial_nozzles(
@@ -801,7 +802,7 @@ def add_transfer_step(
     transfer.pipette_path_select(config.path)
     transfer.input_volume(config.volume)
     transfer.transfer_continue_to_next_step()
-    transfer.complete_liquid_class_step()
+    transfer.complete_liquid_class_step(config.liquid_class)
     transfer.complete_advanced_settings_step()
     transfer.save_transfer_with_tip_settings(
         change_tip=config.change_tip,

@@ -523,6 +523,20 @@ def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page, pd_exports_dir: Path
                 drop_location="Waste Chute",
             ),
         ),
+        (
+            "1ch transfer temp→TC Never (reuse manual tip)",
+            TransferStepConfig(
+                pipette=PIPETTE_1CH,
+                tip_rack=TIPRACK_20,
+                source_labware=TEMP_24,
+                dest_labware=TC_96,
+                source_wells="D1",
+                dest_wells="D1",
+                path="Single transfer",
+                volume="20",
+                change_tip="Never",
+            ),
+        ),
         # Never follows adjacent 1ch Once (same single-tip nozzle count).
         (
             "1ch transfer TC→temp Once manual (tips A1)",
@@ -538,20 +552,6 @@ def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page, pd_exports_dir: Path
                 change_tip="Once",
                 tip_tracking=_MANUAL,
                 manual_tips=["A1"],
-            ),
-        ),
-        (
-            "1ch transfer temp→TC Never (reuse manual tip)",
-            TransferStepConfig(
-                pipette=PIPETTE_1CH,
-                tip_rack=TIPRACK_20,
-                source_labware=TEMP_24,
-                dest_labware=TC_96,
-                source_wells="D1",
-                dest_wells="D1",
-                path="Single transfer",
-                volume="20",
-                change_tip="Never",
             ),
         ),
     ]
