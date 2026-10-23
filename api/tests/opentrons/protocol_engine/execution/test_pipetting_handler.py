@@ -328,15 +328,6 @@ async def test_hw_dispense_while_tracking(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_liquid_handling_z_change(
-            labware_id="labware-id",
-            well_name="A1",
-            pipette_id="pipette-id",
-            operation_volume=25.0,
-        )
-    ).then_return(4.544)
-
-    decoy.when(
         mock_state_view.motion.get_critical_point_for_wells_in_labware("labware-id")
     ).then_return(CriticalPoint.XY_CENTER)
 
@@ -409,15 +400,6 @@ async def test_hw_aspirate_while_tracking(
             ),
         )
     )
-
-    decoy.when(
-        mock_state_view.geometry.get_liquid_handling_z_change(
-            labware_id="labware-id",
-            well_name="A1",
-            pipette_id="pipette-id",
-            operation_volume=-25.0,
-        )
-    ).then_return(4.544)
 
     decoy.when(
         mock_state_view.motion.get_critical_point_for_wells_in_labware("labware-id")

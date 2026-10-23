@@ -124,11 +124,13 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
+            "abc", "123", "A3"
+        )
     ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
@@ -210,14 +212,16 @@ async def test_tip_attached_error(
         wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
+            "abc", "123", "A3"
+        )
     ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
     decoy.when(mock_state_view.labware.get_definition("123")).then_return(
         evotips_definition
     )
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
@@ -285,11 +289,13 @@ async def test_stall_error(
         evotips_definition
     )
     decoy.when(
-        mock_state_view.geometry.get_nominal_tip_geometry("abc", "123", "A3")
+        mock_state_view.instrument_interface.get_nominal_tip_geometry(
+            "abc", "123", "A3"
+        )
     ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),

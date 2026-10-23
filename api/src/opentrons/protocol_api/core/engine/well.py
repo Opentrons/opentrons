@@ -125,7 +125,7 @@ class WellCore(AbstractWellCore):
 
     def get_top(self, z_offset: float) -> Point:
         """Get the coordinate of the well's top, with a z-offset."""
-        return self._engine_client.state.geometry.get_well_position(
+        return self._engine_client.state.instrument_interface.get_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(
@@ -135,7 +135,7 @@ class WellCore(AbstractWellCore):
 
     def get_bottom(self, z_offset: float) -> Point:
         """Get the coordinate of the well's bottom, with a z-offset."""
-        return self._engine_client.state.geometry.get_well_position(
+        return self._engine_client.state.instrument_interface.get_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(
@@ -145,7 +145,7 @@ class WellCore(AbstractWellCore):
 
     def get_center(self) -> Point:
         """Get the coordinate of the well's center."""
-        return self._engine_client.state.geometry.get_well_position(
+        return self._engine_client.state.instrument_interface.get_well_position(
             well_name=self._name,
             labware_id=self._labware_id,
             well_location=WellLocation(origin=WellOrigin.CENTER),
@@ -208,14 +208,12 @@ class WellCore(AbstractWellCore):
             raise PipetteNotAttachedError(f"No pipette present on mount {mount}")
         pipette_id = pipette_from_mount.id
         starting_liquid_height = self.current_liquid_height()
-        projected_final_height = (
-            self._engine_client.state.geometry.get_well_height_after_liquid_handling(
-                labware_id=labware_id,
-                well_name=well_name,
-                pipette_id=pipette_id,
-                initial_height=starting_liquid_height,
-                volume=operation_volume,
-            )
+        projected_final_height = self._engine_client.state.liquid_tracking.get_well_height_after_liquid_handling(
+            labware_id=labware_id,
+            well_name=well_name,
+            pipette_id=pipette_id,
+            initial_height=starting_liquid_height,
+            volume=operation_volume,
         )
         return projected_final_height
 
@@ -223,7 +221,7 @@ class WellCore(AbstractWellCore):
         """Return the current liquid height within a well."""
         labware_id = self.labware_id
         well_name = self._name
-        return self._engine_client.state.geometry.get_meniscus_height(
+        return self._engine_client.state.liquid_tracking.get_meniscus_height(
             labware_id=labware_id, well_name=well_name
         )
 
@@ -231,7 +229,7 @@ class WellCore(AbstractWellCore):
         """Return true if liquid has been loaded or probed."""
         labware_id = self.labware_id
         well_name = self._name
-        return self._engine_client.state.geometry.well_has_tracked_liquid(
+        return self._engine_client.state.liquid_tracking.well_has_tracked_liquid(
             labware_id=labware_id, well_name=well_name
         )
 
@@ -239,7 +237,7 @@ class WellCore(AbstractWellCore):
         """Return the current volume in a well."""
         labware_id = self.labware_id
         well_name = self._name
-        return self._engine_client.state.geometry.get_current_well_volume(
+        return self._engine_client.state.liquid_tracking.get_current_well_volume(
             labware_id=labware_id, well_name=well_name
         )
 
@@ -247,7 +245,7 @@ class WellCore(AbstractWellCore):
         """Return the height in a well corresponding to a given volume."""
         labware_id = self.labware_id
         well_name = self._name
-        return self._engine_client.state.geometry.get_well_height_at_volume(
+        return self._engine_client.state.liquid_tracking.get_well_height_at_volume(
             labware_id=labware_id, well_name=well_name, volume=volume
         )
 
@@ -255,6 +253,6 @@ class WellCore(AbstractWellCore):
         """Return the volume contained in a well at any height."""
         labware_id = self.labware_id
         well_name = self._name
-        return self._engine_client.state.geometry.get_well_volume_at_height(
+        return self._engine_client.state.liquid_tracking.get_well_volume_at_height(
             labware_id=labware_id, well_name=well_name, height=height
         )

@@ -193,7 +193,7 @@ async def _execute_common(  # noqa: C901
             well_name=well_name,
             well_location=params.wellLocation,
         )
-        state_view.geometry.validate_probed_height(
+        state_view.instrument_interface.validate_probed_height(
             labware_id=labware_id,
             well_name=well_name,
             pipette_id=pipette_id,
@@ -322,7 +322,7 @@ class LiquidProbeImplementation(
                 well_volume: Union[
                     LiquidTrackingType,
                     update_types.ClearType,
-                ] = self._state_view.geometry.get_well_volume_at_height(
+                ] = self._state_view.liquid_tracking.get_well_volume_at_height(
                     labware_id=params.labwareId,
                     well_name=params.wellName,
                     height=z_pos_or_error,
@@ -394,8 +394,12 @@ class TryLiquidProbeImplementation(
         else:
             z_pos = z_pos_or_error
             try:
-                well_volume = self._state_view.geometry.get_well_volume_at_height(
-                    labware_id=params.labwareId, well_name=params.wellName, height=z_pos
+                well_volume = (
+                    self._state_view.liquid_tracking.get_well_volume_at_height(
+                        labware_id=params.labwareId,
+                        well_name=params.wellName,
+                        height=z_pos,
+                    )
                 )
             except IncompleteLabwareDefinitionError:
                 well_volume = update_types.CLEAR

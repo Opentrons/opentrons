@@ -341,7 +341,7 @@ def test_move_to_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
@@ -471,7 +471,7 @@ def test_pick_up_tip(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
@@ -599,7 +599,7 @@ def test_drop_tip_with_location(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="labware-id",
             well_name="well-name",
             absolute_point=Point(1, 2, 3),
@@ -737,7 +737,7 @@ def test_aspirate_from_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
@@ -852,7 +852,7 @@ def test_aspirate_from_meniscus(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
@@ -962,7 +962,7 @@ def test_blow_out_to_well(
     )
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
@@ -1126,7 +1126,7 @@ def test_dispense_to_well(
     decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
 
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
@@ -2328,7 +2328,7 @@ def test_aspirate_liquid_class_using_volume_config_below_2_28(
     decoy.when(source_well.get_name()).then_return("source-well")
     decoy.when(source_well.get_top(2)).then_return(liquid_probe_start_point)
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="source-labware-id",
             well_name="source-well",
             absolute_point=liquid_probe_start_point,
@@ -2463,7 +2463,7 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
     decoy.when(source_well.get_name()).then_return("source-well")
     decoy.when(source_well.get_top(2)).then_return(liquid_probe_start_point)
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="source-labware-id",
             well_name="source-well",
             absolute_point=liquid_probe_start_point,
@@ -2597,7 +2597,7 @@ def test_aspirate_liquid_class_2_28_and_above_skips_configure_volume(
     decoy.when(source_well.get_name()).then_return("source-well")
     decoy.when(source_well.get_top(2)).then_return(liquid_probe_start_point)
     decoy.when(
-        mock_engine_client.state.geometry.get_relative_well_location(
+        mock_engine_client.state.instrument_interface.get_relative_well_location(
             labware_id="source-labware-id",
             well_name="source-well",
             absolute_point=liquid_probe_start_point,
