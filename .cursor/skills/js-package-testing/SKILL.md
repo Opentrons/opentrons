@@ -1,6 +1,6 @@
 ---
 name: js-package-testing
-description: Vite demo and Playwright + Applitools tests for packed @opentrons JS packages in js-package-testing/. Covers components, shared-data, step-generation, and protocol-visualization. Use for integration testing, package linking, external consumer bootstrap, or visual testing.
+description: Vite demo and Playwright tests for packed @opentrons JS packages in js-package-testing/. Covers components, shared-data, step-generation, and protocol-visualization. Use for integration testing, package linking, external consumer bootstrap, or package render tests.
 ---
 
 # JS package testing
@@ -16,7 +16,7 @@ Reference **external consumer** for four npm packages:
 
 Builds packed artifacts (not live monorepo source), applies the same debt
 patches as `publish.mts` (after `pnpm pack` rewrote catalog/workspace), links
-via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
+via `link:pack/...`, and runs a Vite demo plus Playwright.
 
 **Full external consumer docs:** `js-package-testing/README.md` section "External consumer guide".
 
@@ -34,12 +34,6 @@ via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
 5. Vite: dedupe React, use `cssModulesSideEffect` plugin, `define: { 'process.env': {} }` if needed.
 
 Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app does not install them.
-
-## Applitools
-
-- Set **`APPLITOOLS_API_KEY`** via `.env` in `js-package-testing/` or shell export.
-- App name: **`js-package-testing`** (`playwright.config.ts`).
-- Import **`test`** from `@applitools/eyes-playwright/fixture`; use **`eyes.check()`**.
 
 ## Package linking strategy
 
@@ -101,7 +95,7 @@ js-package-testing/
 | `make setup`                | Build/extract/patch packs, `pnpm install --frozen-lockfile` |
 | `make dev`                  | Run Vite dev server (runs `setup` first)                    |
 | `make test-setup`           | Install Playwright Chromium (`make setup` first)            |
-| `make test`                 | Playwright + Eyes (needs `APPLITOOLS_API_KEY`)              |
+| `make test`                 | Playwright                                                  |
 | `make build-local-packages` | Rebuild and patch `pack/` only                              |
 | `make teardown`             | Remove `pack/` and `node_modules`                           |
 

@@ -125,8 +125,6 @@ Tests run against different environments via `TEST_ENV`:
 | `page`                     | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
 | `browser_context_args`     | session  | Viewport 1280x720, video recording                                                             |
 | `browser_type_launch_args` | session  | Headless/headed, slow_mo                                                                       |
-| `eyes`                     | function | Applitools Eyes session (or None)                                                              |
-| `eyes_singleton`           | session  | Shared Applitools Eyes instance                                                                |
 
 ### Key Environment Variables
 
@@ -138,7 +136,6 @@ Tests run against different environments via `TEST_ENV`:
 | `PD_SERVER_URL`      | auto    | Override PD URL                       |
 | `LL_SERVER_URL`      | auto    | Override LL URL                       |
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
 
 ## Development Commands
 
@@ -254,23 +251,6 @@ self.page.get_by_role("button", name="Submit").click()
 ### Test Markers
 
 Every PD test **must** have `@pytest.mark.pdE2E`. Every LL test **must** have `@pytest.mark.llE2E`. A test cannot have both markers.
-
-## Visual Snapshots (Applitools Eyes)
-
-- Use the `eyes` pytest fixture (exposed via `pytest_plugins = ["eyes"]` in `conftest.py`)
-- `python-dotenv` loads `.env`. Set `APPLITOOLS_API_KEY` to enable
-- In headed mode, `eyes` yields `None` (no visual snapshots)
-
-```python
-from eyes import Eyes
-
-def test_my_feature(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
-    # ... navigate ...
-    if eyes is None:
-        return
-    eyes.check("After navigation")
-    eyes.check_element("Timeline", page.get_by_test_id("TimelineToolbox_scrollContainer"))
-```
 
 ## Common Patterns
 
