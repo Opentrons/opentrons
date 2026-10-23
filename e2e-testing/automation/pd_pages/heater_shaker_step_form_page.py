@@ -61,7 +61,6 @@ class HeaterShakerStepPage(BasePage):
         if is_open != wants_open:
             self._latch_row.first.click()
 
-
     def save_step(self) -> None:
         """Click the Save button to confirm and close the step editor."""
         self.wait_for_visible(self._save_button)

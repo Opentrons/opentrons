@@ -399,7 +399,6 @@ def test_vacuum_module_protocol_execution(page: Page) -> None:
     # Step 25: open HS latch
     editor.add_step("Heater-Shaker")
     _add_heater_shaker_latch_step(page, LidPosition.OPEN)
-    
 
     # Step 26: move deck PCR plate onto HS adapter
     editor.move_labware_with_gripper(DECK_COLLECTION, HS_ADAPTER)

@@ -16,7 +16,17 @@ from .tc_step_form_page import ThermocyclerStepPage
 from .tempdeck_step_form_page import TemperatureStepPage
 from .timeline import Timeline
 from .transfer_form import TransferPage, TransferStepConfig, add_transfer_step, add_transfer_steps
-from .vacuum_step_form_page import (VacuumProfileCycleConfig, VacuumProfileStepConfig, VacuumStepPage, add_vacuum_close_vent, add_vacuum_open_vent, add_vacuum_power_state, add_vacuum_pressure_profile, add_vacuum_pressure_state, add_vacuum_pump_off)
+from .vacuum_step_form_page import (
+    VacuumProfileCycleConfig,
+    VacuumProfileStepConfig,
+    VacuumStepPage,
+    add_vacuum_close_vent,
+    add_vacuum_open_vent,
+    add_vacuum_power_state,
+    add_vacuum_pressure_profile,
+    add_vacuum_pressure_state,
+    add_vacuum_pump_off,
+)
 
 __all__ = [
     "BasePage",
