@@ -241,7 +241,7 @@ def test_vacuum_module_protocol_execution(page: Page) -> None:
     # Starting deck labware (vacuum stack uses recommended Tough PCR collection plate)
     editor.add_labware_and_done("A3", TALL_SPACER, "Adapters", recommended_only=True)
     editor.add_labware_and_done("A3", COLLECTION_PLATE, "Well plates", recommended_only=True)
-    # NOTE: Blocked without SelectLabware amount reset — amount stays at stack length (2) while filter plate stackLimit is 1.
+    # NOTE: Blocked w/o SelectLabware amount reset — amount stays at stack length 2 while filter plate stackLimit is 1.
     # editor.add_labware_and_done("A3", FILTER_PLATE, "Filter Plate", recommended_only=True)
     editor.add_labware_and_done(VACUUM_DOCK, TALL_COLLAR, "Adapters", recommended_only=True)
     editor.add_labware_and_done("A2", TIPRACK_1000, "Tip racks")
