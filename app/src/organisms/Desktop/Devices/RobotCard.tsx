@@ -27,7 +27,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
-  getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'

@@ -6,7 +6,6 @@ import { usePipetteSpecsV2 } from './usePipetteSpecsv2'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type {
   GripperModel,
-  PipetteModel,
   PipetteName,
 } from '@opentrons/shared-data'
 
