@@ -1,9 +1,10 @@
-import { PrimaryButton, ProtocolDeck } from '@opentrons/components'
+import { PrimaryButton, ProtocolDeck, Aler } from '@opentrons/components'
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import Ot2Analysis from './ot2Analysis.json'
 import StackerAnalysis from './StackerAnalysis.json'
+import FlexAnalysisError from './flexAnalysisError.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -15,6 +16,7 @@ import { useState } from 'react'
 
 const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
 const ot2Analysis = Ot2Analysis as unknown as ProtocolAnalysisOutput
+const errorAnalysis = FlexAnalysisError as unknown as ProtocolAnalysisOutput
 
 type DemoPage = 'deck-map' | 'protocol-visualization'
 
@@ -100,38 +102,43 @@ function DeckMapPage(): JSX.Element {
   )
 }
 
+type DemoView = 'flex' | 'ot2' | 'error'
+
+const views: Record<DemoView, { label: string; analysis: ProtocolAnalysisOutput }> = {
+  flex: { label: 'StackerAnalysis', analysis },
+  ot2: { label: 'Ot2Analysis', analysis: ot2Analysis },
+  error: { label: 'FlexAnalysisError', analysis: errorAnalysis },
+}
+
 function VisualizationPage(): JSX.Element {
-  const [showFlex, setShowFlex] = useState<boolean>(true)
+  const [view, setView] = useState<DemoView>('flex')
+  const { label, analysis: currentAnalysis } = views[view]
   return (
     <main className="demo_section protocol_visualization_section">
       <h2>Protocol visualization</h2>
       <div style={{ display: 'flex', gap: '1rem' }}>
-        <PrimaryButton
-          onClick={() => {
-            setShowFlex(true)
-          }}
-        >
-          Flex
-        </PrimaryButton>
-        <PrimaryButton
-          onClick={() => {
-            setShowFlex(false)
-          }}
-        >
-          Ot-2
-        </PrimaryButton>
+        {(Object.keys(views) as DemoView[]).map(key => (
+          <PrimaryButton
+            key={key}
+            variant={key === 'error' ? 'warning' : 'default'}
+            onClick={() => {
+              setView(key)
+            }}
+          >
+            {key === 'ot2' ? 'Ot-2' : key === 'error' ? 'Error' : 'Flex'}
+          </PrimaryButton>
+        ))}
       </div>
       <p>
-        From <code>@opentrons/protocol-visualization</code> using the{' '}
-        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture as the deck map
-        page.
+        From <code>@opentrons/protocol-visualization</code> using the {label}{' '}
+        fixture as the deck map page.
       </p>
       <div
         data-testid="protocol-visualization-container"
         className="protocol_visualization_demo"
       >
         <ProtocolVisualization
-          analysis={showFlex ? analysis : ot2Analysis}
+          analysis={currentAnalysis}
           groupedCommands={null}
           appType="web"
         />

@@ -6,6 +6,7 @@ import {
   Modal,
   PrimaryButton,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import styles from './protocolanalysiserrormodal.module.css'
@@ -30,6 +31,7 @@ export function ProtocolAnalysisErrorModal({
       type="error"
       title={t('protocol_analysis_failure')}
       onClose={onClose}
+      zIndexOverlay={Z_INDEX.MODALS}
     >
       <div className={styles.container}>
         {errors.map(error => (
