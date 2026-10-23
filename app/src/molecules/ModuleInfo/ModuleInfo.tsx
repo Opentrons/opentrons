@@ -8,7 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
+  StyledText,
   RobotCoordsForeignObject,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
@@ -83,22 +83,22 @@ export const ModuleInfo = (props: ModuleInfoProps): ReactNode => {
               marginRight={SPACING.spacing4}
             />
 
-            <LegacyStyledText
+            <StyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
@@ -110,7 +110,7 @@ export const ModuleInfo = (props: ModuleInfoProps): ReactNode => {
           {runHasStarted
             ? t('connection_info_not_available')
             : connectionStatus}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </RobotCoordsForeignObject>
   )

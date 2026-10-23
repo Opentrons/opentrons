@@ -71,15 +71,15 @@ export function MultiDeckLabelTagBtns({
               buttonType="tertiaryHighLight"
               {...colThreeSecondaryBtn}
             />
-            <Btn css={DESKTOP_ONLY_BUTTON} {...colThreeSecondaryBtn}>
-              <StyledText
-                desktopStyle="captionSemiBold"
-                css={
-                  colThreeSecondaryBtn.ariaDisabled
-                    ? DESKTOP_SECONDARY_ARIA_DISABLED
-                    : undefined
-                }
-              >
+            <Btn
+              css={
+                colThreeSecondaryBtn.ariaDisabled
+                  ? [DESKTOP_ONLY_BUTTON, DESKTOP_SECONDARY_ARIA_DISABLED]
+                  : DESKTOP_ONLY_BUTTON
+              }
+              {...colThreeSecondaryBtn}
+            >
+              <StyledText desktopStyle="captionSemiBold">
                 {colThreeSecondaryBtn.buttonText}
               </StyledText>
             </Btn>

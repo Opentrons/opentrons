@@ -2,7 +2,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
+  StyledText,
   SPACING,
 } from '@opentrons/components'
 
@@ -50,7 +50,7 @@ const modules = [
 
 const Template: Story<React.ComponentProps<typeof ModuleIcon>> = args => (
   <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-    <LegacyStyledText>Modules</LegacyStyledText>
+    <StyledText>Modules</StyledText>
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
       {modules.map((module, i) => (
         <ModuleIcon
