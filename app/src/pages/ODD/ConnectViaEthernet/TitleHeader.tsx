@@ -7,10 +7,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,9 +47,9 @@ export function TitleHeader({ title }: TitleHeaderProps): ReactNode {
           <Icon name="back" size="3rem" />
         </Flex>
       </Btn>
-      <LegacyStyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {title}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

@@ -6,10 +6,10 @@ import {
   BORDERS,
   COLORS,
   Flex,
-  LegacyStyledText,
   ModuleIcon,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -113,12 +113,9 @@ function HardwareItem({ hardware }: { hardware: ProtocolHardware }): ReactNode {
   const hardwareName = useHardwareName(hardware, t as TFunction)
 
   let location: JSX.Element = (
-    <LegacyStyledText
-      forwardedAs="p"
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-    >
+    <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
       {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
-    </LegacyStyledText>
+    </StyledText>
   )
   if (hardware.hardwareType === 'module') {
     location = (
@@ -163,7 +160,7 @@ function HardwareItem({ hardware }: { hardware: ProtocolHardware }): ReactNode {
               <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
           ) : null}
-          <LegacyStyledText forwardedAs="p">{hardwareName}</LegacyStyledText>
+          <StyledText forwardedAs="p">{hardwareName}</StyledText>
         </Flex>
       </TableDatum>
     </TableRow>
@@ -181,24 +178,24 @@ export const Hardware = (props: { transferId: string }): ReactNode => {
       <thead>
         <tr>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('location'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('hardware'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>

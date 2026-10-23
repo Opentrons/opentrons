@@ -8,8 +8,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -82,18 +82,12 @@ function ListItem({ itemName, itemValue }: ListItemProps): ReactNode {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.borderRadius8}
     >
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}
-      </LegacyStyledText>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      </StyledText>
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {itemValue}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

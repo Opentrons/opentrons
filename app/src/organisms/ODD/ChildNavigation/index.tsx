@@ -10,10 +10,10 @@ import {
   InlineNotification,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -95,13 +95,13 @@ export function ChildNavigation({
             />
           </IconButton>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           {...headerStyleProps}
         >
           {header}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>

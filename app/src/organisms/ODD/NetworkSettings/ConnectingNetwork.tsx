@@ -8,8 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -41,12 +41,9 @@ export function ConnectingNetwork({ ssid }: ConnectingNetworkProps): ReactNode {
             aria-label="spinner"
             spin
           />
-          <LegacyStyledText
-            forwardedAs="h2"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('connecting_to', { ssid: ssid })}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
     </Flex>

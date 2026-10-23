@@ -15,10 +15,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Tabs,
   truncateString,
   TYPOGRAPHY,
@@ -150,14 +150,14 @@ const QuickTransferHeader = ({
             )}
           </Flex>
           {!isTransferFetching ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <ProtocolDetailsHeaderTitleSkeleton />
           )}
@@ -236,12 +236,12 @@ const Summary = ({ description, date }: SummaryProps): ReactNode => {
       gridGap={SPACING.spacing4}
       paddingBottom={SPACING.spacing24}
     >
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -249,9 +249,9 @@ const Summary = ({ description, date }: SummaryProps): ReactNode => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <StyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</LegacyStyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )

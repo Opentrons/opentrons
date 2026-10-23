@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -115,9 +115,9 @@ export function ChooseCsvFile({
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48}>
           <Flex css={CONTAINER_STYLE}>
-            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+            <StyledText css={HEADER_TEXT_STYLE}>
               {t('csv_files_on_robot')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
@@ -143,9 +143,9 @@ export function ChooseCsvFile({
             </Flex>
           </Flex>
           <Flex css={CONTAINER_STYLE}>
-            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+            <StyledText css={HEADER_TEXT_STYLE}>
               {t('csv_files_on_usb')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {sortedCsvFilesOnUSB.length !== 0 ? (
                 sortedCsvFilesOnUSB.map(csvFilePath => {

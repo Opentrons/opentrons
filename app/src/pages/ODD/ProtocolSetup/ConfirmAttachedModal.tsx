@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -38,9 +38,9 @@ export function ConfirmAttachedModal({
   return (
     <OddModal header={modalHeader} onOutsideClick={onCloseClick}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('confirm_heater_shaker_module_modal_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"

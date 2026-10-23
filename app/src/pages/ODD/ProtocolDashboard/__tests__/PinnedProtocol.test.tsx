@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -102,9 +102,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 11.75rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize32}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight42}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightBold}`)
+    expect(text.className).toMatch(/protocol_name_full/)
   })
 
   it('should display text - half', () => {
@@ -115,9 +113,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 13.25rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(text.className).toMatch(/protocol_name_half/)
   })
 
   it('should display text - regular', () => {
@@ -130,9 +126,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 13.25rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(text.className).toMatch(/protocol_name_regular/)
   })
 
   it('should redirect to protocol details after short click', () => {

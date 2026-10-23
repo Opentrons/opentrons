@@ -7,9 +7,9 @@ import {
   COLORS,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
 
@@ -245,13 +245,13 @@ function NumberWellsSelectedErrorModal({
         setShowNumberWellsSelectedErrorModal(false)
       }}
     >
-      <LegacyStyledText forwardedAs="p">
+      <StyledText forwardedAs="p">
         {t('number_wells_selected_error_learn_more', {
           wellCount,
           selectionUnit,
           selectionUnits,
         })}
-      </LegacyStyledText>
+      </StyledText>
     </OddModal>
   )
 }

@@ -32,13 +32,8 @@
   text-wrap: wrap;
 }
 
-.setting_name {
-  font-weight: 600;
-}
-
 .setting_info {
   color: var(--grey-60);
-  font-weight: 400;
   text-align: left;
 }
 
