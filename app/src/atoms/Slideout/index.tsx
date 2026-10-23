@@ -12,7 +12,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
@@ -186,7 +186,7 @@ export const Slideout = (props: SlideoutProps): ReactNode => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {multiSlideoutSpecs === undefined ? null : (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
@@ -196,7 +196,7 @@ export const Slideout = (props: SlideoutProps): ReactNode => {
                 current: multiSlideoutSpecs.currentStep,
                 max: multiSlideoutSpecs.maxSteps,
               })}
-            </LegacyStyledText>
+            </StyledText>
           )}
           {typeof title === 'string' ? (
             <Flex
@@ -206,13 +206,13 @@ export const Slideout = (props: SlideoutProps): ReactNode => {
               paddingX={SPACING.spacing16}
               marginBottom={SPACING.spacing16}
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {title}
-              </LegacyStyledText>
+              </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn size="1.5rem" onClick={handleClose} aria-label="exit">
                   <Icon name="close" css={CLOSE_ICON_STYLE} />

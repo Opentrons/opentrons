@@ -1,0 +1,19 @@
+.line_clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
+}
+
+.sub_text {
+  margin: 0.125rem 0 0.5rem 0;
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .sub_text {
+    margin: 0.25rem 0 0.5rem 0;
+    font-size: 1.375rem;
+  }
+}

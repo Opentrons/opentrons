@@ -14,7 +14,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   SIZE_1,
   SPACING,
   TYPOGRAPHY,
@@ -130,21 +130,21 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
         >
           <Icon name="circle" color={displayColor} size="1.4rem" />
         </Flex>
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing12}
         >
           {newDisplayName}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           color={COLORS.grey50}
         >
           {description != null ? description : null}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           borderRadius={BORDERS.borderRadius4}
@@ -154,7 +154,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
           marginTop={SPACING.spacing16}
           width="max-content"
         >
-          <LegacyStyledText
+          <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
             color={COLORS.black90}
@@ -163,7 +163,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
               .reduce((prev, curr) => prev + curr, 0)
               .toFixed(1)}{' '}
             {MICRO_LITERS}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -186,19 +186,19 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
                       : '0'
                   }
                 >
-                  <LegacyStyledText
+                  <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
                   >
                     {well.wellName}
-                  </LegacyStyledText>
-                  <LegacyStyledText
+                  </StyledText>
+                  <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
                     color={COLORS.grey60}
                   >
                     {well.volume} {MICRO_LITERS}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               )
             })}
@@ -230,16 +230,16 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
           {newDisplayName}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+        </StyledText>
+        <StyledText forwardedAs="p" color={COLORS.grey50}>
           {description != null ? description : null}
-        </LegacyStyledText>
+        </StyledText>
 
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
@@ -250,7 +250,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
           paddingX={SPACING.spacing8}
           marginTop={SPACING.spacing8}
         >
-          <LegacyStyledText
+          <StyledText
             fontSize={TYPOGRAPHY.fontSizeH4}
             lineHeight={TYPOGRAPHY.lineHeight20}
           >
@@ -258,7 +258,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
               .reduce((prev, curr) => prev + curr, 0)
               .toFixed(1)}{' '}
             {MICRO_LITERS}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -280,19 +280,19 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
                     : '0'
                 }
               >
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginRight={SPACING.spacing4}
                 >
                   {well.wellName}
-                </LegacyStyledText>
-                <LegacyStyledText
+                </StyledText>
+                <StyledText
                   forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                 >
                   {well.volume.toFixed(1)} {MICRO_LITERS}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             )
           })}

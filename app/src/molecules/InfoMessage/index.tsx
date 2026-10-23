@@ -7,7 +7,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
+  StyledText,
   SIZE_1,
   SPACING,
   TYPOGRAPHY,
@@ -43,14 +43,14 @@ export function InfoMessage({ title, body }: InfoMessageProps): ReactNode {
         gridGap={SPACING.spacing4}
         color={COLORS.black90}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         >
           {title}
-        </LegacyStyledText>
+        </StyledText>
         {body != null ? (
-          <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
+          <StyledText forwardedAs="p">{body}</StyledText>
         ) : null}
       </Flex>
     </Flex>

@@ -6,7 +6,7 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
+  StyledText,
   Modal,
   PrimaryButton,
   SPACING,
@@ -36,15 +36,15 @@ export function DesktopAppFallback({ error }: FallbackProps): ReactNode {
     <Modal type="warning" title={t('error_boundary_title')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('error_boundary_desktop_app_description')}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {error.message}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <PrimaryButton
           variant="warning"

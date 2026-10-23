@@ -9,7 +9,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   SPACING,
   truncateString,
 } from '@opentrons/components'
@@ -59,16 +59,16 @@ export function FileUpload({
           padding={SPACING.spacing8}
           css={FILE_UPLOAD_STYLE}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {truncateString(file.name, 34, 19)}
-          </LegacyStyledText>
+          </StyledText>
           <Icon name="close" size="1.5rem" borderRadius="50%" />
         </Flex>
       </Btn>
       {fileError != null ? (
-        <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+        <StyledText forwardedAs="label" color={COLORS.red50}>
           {fileError}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
     </Flex>
   )

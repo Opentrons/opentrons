@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
+  StyledText,
   SPACING,
 } from '@opentrons/components'
 
@@ -35,9 +35,9 @@ export const ControlContainer = (props: ControlContainerProps): ReactNode => {
   const { title, children } = props
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <LegacyStyledText forwardedAs="h6" marginY={SPACING.spacing8}>
+      <StyledText forwardedAs="h6" marginY={SPACING.spacing8}>
         {title}
-      </LegacyStyledText>
+      </StyledText>
       <Flex css={CONTROL_CHILDREN_STYLES}>{children}</Flex>
     </Flex>
   )

@@ -21,7 +21,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
@@ -269,14 +269,13 @@ export function DirectionControl(props: DirectionControlProps): ReactNode {
                   flex="1 1 auto"
                 >
                   {title}
-                  <LegacyStyledText
-                    textAlign={TEXT_ALIGN_LEFT}
-                    alignSelf={ALIGN_STRETCH}
-                    color={COLORS.grey50}
-                    css={TYPOGRAPHY.labelRegular}
-                  >
+                  <StyledText forwardedAs="label"
+ textAlign={TEXT_ALIGN_LEFT}
+ alignSelf={ALIGN_STRETCH}
+ color={COLORS.grey50}
+ >
                     {subtitle}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               </PrimaryButton>
             )

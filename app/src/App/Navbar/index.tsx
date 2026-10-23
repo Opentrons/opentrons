@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 import debounce from 'lodash/debounce'
 
-import { Icon, LegacyStyledText, Link } from '@opentrons/components'
+import { Icon, StyledText, Link } from '@opentrons/components'
 
 import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 import logoSvg from '/app/assets/images/logo_nav.svg'
@@ -48,9 +48,9 @@ export function Navbar({ routes }: { routes: RouteProps[] }): ReactNode {
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }
           >
-            <LegacyStyledText forwardedAs="h3" className={styles.nav_link_text}>
+            <StyledText forwardedAs="h3" className={styles.nav_link_text}>
               {t(name)}
-            </LegacyStyledText>
+            </StyledText>
           </NavLink>
         ))}
       </div>

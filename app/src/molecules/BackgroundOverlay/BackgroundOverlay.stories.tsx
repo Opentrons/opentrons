@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {
   Flex,
-  LegacyStyledText,
+  StyledText,
   PrimaryButton,
   VIEWPORT,
 } from '@opentrons/components'
@@ -36,9 +36,9 @@ const Template: Story<
             setOpenOverlay(true)
           }}
         >
-          <LegacyStyledText as="h4">
+          <StyledText as="h4">
             Click to open the Background Overlay
-          </LegacyStyledText>
+          </StyledText>
         </PrimaryButton>
       )}
     </Flex>

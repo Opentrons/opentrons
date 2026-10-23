@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
+  StyledText,
   RadioButton,
   SPACING,
   TYPOGRAPHY,
@@ -42,13 +42,13 @@ export function ModalContentOneColSimpleButtons(
         height="100%"
       >
         <Flex>
-          <LegacyStyledText
+          <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight={TYPOGRAPHY.lineHeight36}
           >
             {props.headline}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -69,13 +69,13 @@ export function ModalContentOneColSimpleButtons(
             />
           ))}
           {props.subText != null ? (
-            <LegacyStyledText
+            <StyledText
               fontSize={TYPOGRAPHY.fontSize22}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               lineHeight={TYPOGRAPHY.lineHeight28}
             >
               {props.subText}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>
