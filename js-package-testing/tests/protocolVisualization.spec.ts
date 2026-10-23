@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { test } from '@playwright/test'
 
 test.describe('ProtocolVisualization', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,7 +13,7 @@ test.describe('ProtocolVisualization', () => {
     const scrubberTrack = container
       .locator('[class*="track_container"]')
       .first()
-    await scrubberTrack.waitFor({ state: 'attached' })
+    await scrubberTrack.scrollIntoViewIfNeeded()
     const scrubberBox = await scrubberTrack.boundingBox()
     if (scrubberBox == null) {
       throw new Error('Protocol visualization scrubber was not visible')
