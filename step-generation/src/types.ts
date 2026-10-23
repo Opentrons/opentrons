@@ -845,36 +845,36 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
 }
 
 export interface VacuumPumpAdvancedArgs {
-  duration?: number | string
-  ventAfter?: boolean | string
+  duration?: number
+  ventAfter?: boolean
 }
 
 export interface VacuumPumpPressureArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPressure'
-  gaugePressure: number | string
+  gaugePressure: number
 }
 
 export interface VacuumPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPower'
-  percentPower: number | string
+  percentPower: number
 }
 
 export interface VacuumCloseVentSetPumpPressureArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
-  gaugePressure: number | string
+  gaugePressure: number
 }
 
 export interface VacuumCloseVentSetPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
-  percentPower: number | string
+  percentPower: number
 }
 
 export interface VacuumOpenVentArgs extends CommonArgs {
@@ -925,14 +925,14 @@ export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
   profile: VacuumRunProfileParams['steps']
-  ventAfter: boolean | string
+  ventAfter: boolean
 }
 
 export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
   profile: VacuumRunProfileParams['steps']
-  ventAfter: boolean | string
+  ventAfter: boolean
 }
 
 export type VacuumArgs =

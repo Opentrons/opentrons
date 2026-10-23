@@ -1,5 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import {
+  formatPyStr,
   getThermocyclerProfileRepetitionsForPython,
   indentPyLines,
   resolveNumericRuntimeValue,
@@ -87,7 +88,9 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
   const pythonSteps = repetitionsForPython.repeatingProfileSteps
     .map(
       step =>
-        `{"temperature": ${step.celsius}, "hold_time_seconds": ${step.holdSeconds}},`
+        `{${formatPyStr('temperature')}: ${step.celsius}, ${formatPyStr(
+          'hold_time_seconds'
+        )}: ${step.holdSeconds}},`
     )
     .join('\n')
   const formattedPythonSteps = '[\n' + `${indentPyLines(pythonSteps)}` + '\n],'

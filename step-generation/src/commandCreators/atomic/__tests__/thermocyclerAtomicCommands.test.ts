@@ -133,296 +133,6 @@ describe('thermocycler atomic commands', () => {
   }
 
   testCases.forEach(testParams)
-
-  const moduleOnlyCases = [
-    {
-      commandCreator: thermocyclerDeactivateBlock,
-      expectedType: 'thermocycler/deactivateBlock',
-      python: 'mock_thermocycler.deactivate_block()',
-    },
-    {
-      commandCreator: thermocyclerDeactivateLid,
-      expectedType: 'thermocycler/deactivateLid',
-      python: 'mock_thermocycler.deactivate_lid()',
-    },
-    {
-      commandCreator: thermocyclerCloseLid,
-      expectedType: 'thermocycler/closeLid',
-      python: 'mock_thermocycler.close_lid()',
-    },
-    {
-      commandCreator: thermocyclerOpenLid,
-      expectedType: 'thermocycler/openLid',
-      python: 'mock_thermocycler.open_lid()',
-    },
-  ]
-  moduleOnlyCases.forEach(({ commandCreator, expectedType, python }) => {
-    it(`resolves moduleId when it is a string runtime parameter for ${expectedType}`, () => {
-      invariantContext.runtimeParameters = {
-        selected_module: {
-          variableName: 'selected_module',
-          displayName: 'Selected module',
-          type: 'string',
-          default: module,
-        },
-      }
-      const result = commandCreator(
-        { moduleId: 'selected_module' },
-        invariantContext,
-        { labware: {} } as any
-      )
-      expect(result).toEqual({
-        commands: [
-          {
-            commandType: expectedType,
-            key: expect.any(String),
-            params: {
-              moduleId: module,
-            },
-          },
-        ],
-        python,
-      })
-    })
-    it(`returns error if moduleId is not a string runtime parameter for ${expectedType}`, () => {
-      invariantContext.runtimeParameters = {
-        mock_rtp: {
-          variableName: 'mock_rtp',
-          displayName: 'mock rtp',
-          type: 'boolean',
-          default: false,
-        },
-      }
-      const result = commandCreator(
-        { moduleId: 'mock_rtp' },
-        invariantContext,
-        { labware: {} } as any
-      )
-      expect(getErrorResult(result).errors).toEqual([
-        {
-          message: 'Runtime parameter "mock_rtp" is missing',
-          type: 'INVALID_RUNTIME_PARAMETER',
-        },
-      ])
-    })
-  })
-
-  const temperatureCases = [
-    {
-      commandCreator: thermocyclerSetTargetBlockTemperature,
-      expectedType: 'thermocycler/setTargetBlockTemperature',
-      python: 'mock_thermocycler.set_block_temperature(target_temp)',
-    },
-    {
-      commandCreator: thermocyclerSetTargetLidTemperature,
-      expectedType: 'thermocycler/setTargetLidTemperature',
-      python: 'mock_thermocycler.set_lid_temperature(target_temp)',
-    },
-  ]
-  temperatureCases.forEach(({ commandCreator, expectedType, python }) => {
-    it(`resolves moduleId and celsius when they are runtime parameters for ${expectedType}`, () => {
-      invariantContext.runtimeParameters = {
-        selected_module: {
-          variableName: 'selected_module',
-          displayName: 'Selected module',
-          type: 'string',
-          default: module,
-        },
-        target_temp: {
-          variableName: 'target_temp',
-          displayName: 'Target temp',
-          type: 'int',
-          default: temperature,
-        },
-      }
-      const result = commandCreator(
-        {
-          moduleId: 'selected_module',
-          celsius: 'target_temp',
-        },
-        invariantContext,
-        { labware: {} } as any
-      )
-      expect(result).toEqual({
-        commands: [
-          {
-            commandType: expectedType,
-            key: expect.any(String),
-            params: {
-              moduleId: module,
-              celsius: temperature,
-            },
-          },
-        ],
-        python,
-      })
-    })
-    it(`returns errors if moduleId and celsius are not valid runtime parameters for ${expectedType}`, () => {
-      invariantContext.runtimeParameters = {
-        mock_rtp: {
-          variableName: 'mock_rtp',
-          displayName: 'mock rtp',
-          type: 'boolean',
-          default: false,
-        },
-        mock_string_rtp: {
-          variableName: 'mock_string_rtp',
-          displayName: 'mock string rtp',
-          type: 'string',
-          default: 'mock',
-        },
-      }
-      const result = commandCreator(
-        {
-          moduleId: 'mock_rtp',
-          celsius: 'mock_string_rtp',
-        },
-        invariantContext,
-        { labware: {} } as any
-      )
-      expect(getErrorResult(result).errors).toEqual([
-        {
-          message: 'Runtime parameter "mock_rtp" is missing',
-          type: 'INVALID_RUNTIME_PARAMETER',
-        },
-        {
-          message: 'Runtime parameter "mock_string_rtp" is missing',
-          type: 'INVALID_RUNTIME_PARAMETER',
-        },
-      ])
-    })
-  })
-  it('resolves runtime parameters into the command and python', () => {
-    invariantContext.runtimeParameters = {
-      selected_module: {
-        variableName: 'selected_module',
-        displayName: 'Selected module',
-        type: 'string',
-        default: module,
-      },
-      block_temp: {
-        variableName: 'block_temp',
-        displayName: 'Block temp',
-        type: 'int',
-        default: temperature,
-      },
-      hold_time: {
-        variableName: 'hold_time',
-        displayName: 'Hold time',
-        type: 'int',
-        default: holdTime,
-      },
-      block_volume: {
-        variableName: 'block_volume',
-        displayName: 'Block volume',
-        type: 'int',
-        default: volume,
-      },
-      task_name: {
-        variableName: 'task_name',
-        displayName: 'Task name',
-        type: 'string',
-        default: 'profile_task',
-      },
-      repetitions: {
-        variableName: 'repetitions',
-        displayName: 'Repetitions',
-        type: 'int',
-        default: 2,
-      },
-    }
-    const result = thermocyclerStartRunExtendedProfile(
-      {
-        moduleId: 'selected_module',
-        profileElements: [
-          {
-            steps: [{ celsius: 'block_temp', holdSeconds: 'hold_time' }],
-            repetitions: 'repetitions',
-          },
-        ],
-        blockMaxVolumeUl: 'block_volume',
-        taskId: 'task_name',
-      },
-      invariantContext,
-      { labware: {} } as any
-    )
-    expect(result).toEqual({
-      commands: [
-        {
-          commandType: 'thermocycler/startRunExtendedProfile',
-          key: expect.any(String),
-          params: {
-            moduleId: module,
-            taskId: 'profile_task',
-            profileElements: [
-              {
-                steps: [{ celsius: temperature, holdSeconds: holdTime }],
-                repetitions: 2,
-              },
-            ],
-            blockMaxVolumeUl: volume,
-          },
-        },
-      ],
-      python: `task_name = mock_thermocycler.start_execute_profile(
-    [
-        {"temperature": block_temp, "hold_time_seconds": hold_time},
-    ],
-    repetitions,
-    block_max_volume=block_volume,
-)`,
-    })
-  })
-  it('returns errors if profile runtime parameters are not valid', () => {
-    invariantContext.runtimeParameters = {
-      mock_rtp: {
-        variableName: 'mock_rtp',
-        displayName: 'mock rtp',
-        type: 'boolean',
-        default: false,
-      },
-      mock_string_rtp: {
-        variableName: 'mock_string_rtp',
-        displayName: 'mock string rtp',
-        type: 'string',
-        default: 'mock',
-      },
-    }
-    const result = thermocyclerStartRunExtendedProfile(
-      {
-        moduleId: 'mock_rtp',
-        profileElements: [
-          { celsius: 'mock_string_rtp', holdSeconds: 'mock_rtp' },
-        ],
-        blockMaxVolumeUl: 'mock_string_rtp',
-        taskId: 'mock_rtp',
-      },
-      invariantContext,
-      { labware: {} } as any
-    )
-    expect(getErrorResult(result).errors).toEqual([
-      {
-        message: 'Runtime parameter "mock_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-      {
-        message: 'Runtime parameter "mock_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-      {
-        message: 'Runtime parameter "mock_string_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-      {
-        message: 'Runtime parameter "mock_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-      {
-        message: 'Runtime parameter "mock_string_rtp" is missing',
-        type: 'INVALID_RUNTIME_PARAMETER',
-      },
-    ])
-  })
 })
 describe('thermocycler atomic commands with runtime parameters', () => {
   const moduleOnlyTestCases = [
@@ -629,6 +339,12 @@ describe('thermocycler atomic commands with runtime parameters', () => {
       type: 'float',
       default: volume,
     },
+    task_name: {
+      variableName: 'task_name',
+      displayName: 'Task name',
+      type: 'string',
+      default: 'profile_task',
+    },
   }
 
   it('resolves all args for "thermocycler/startRunExtendedProfile" when they are runtime parameters', () => {
@@ -647,6 +363,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
           },
         ],
         blockMaxVolumeUl: 'block_volume',
+        taskId: 'task_name',
       },
       { ...invariantContext, runtimeParameters: profileRuntimeParameters },
       { ...getRobotInitialState(), labware: {} }
@@ -658,6 +375,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
           key: expect.any(String),
           params: {
             moduleId: module,
+            taskId: 'profile_task',
             profileElements: [
               {
                 steps: [{ celsius: temperature, holdSeconds: holdTime }],
@@ -669,7 +387,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
         },
       ],
       python: `
-mock_thermocycler.start_execute_profile(
+task_name = mock_thermocycler.start_execute_profile(
     [
         {"temperature": profile_temperature, "hold_time_seconds": profile_hold_time},
     ],
@@ -733,6 +451,7 @@ mock_thermocycler.start_execute_profile(
           },
         ],
         blockMaxVolumeUl: 'missing_volume',
+        taskId: 'mock_rtp',
       },
       {
         ...invariantContext,
@@ -748,6 +467,10 @@ mock_thermocycler.start_execute_profile(
       { ...getRobotInitialState(), labware: {} }
     )
     expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
       {
         message: 'Runtime parameter "missing_temperature" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
