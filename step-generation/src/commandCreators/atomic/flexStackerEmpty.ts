@@ -1,29 +1,75 @@
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
-import { formatPyStr, uuid } from '../../utils'
+import {
+  pythonRuntimeString,
+  resolveAllowedRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { FlexStackerEmptyCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  ModuleStepGenArgs,
+} from '../../types'
+
+const EMPTY_STRATEGIES = ['manualWithPause', 'logical'] as const
 
 export const flexStackerEmpty: CommandCreator<
-  FlexStackerEmptyCreateCommand['params']
+  ModuleStepGenArgs & {
+    strategy: string
+    message?: string
+    count?: number | string
+  }
 > = (args, invariantContext, prevRobotState) => {
-  const { moduleEntities } = invariantContext
-  const { moduleId, strategy, message, count } = args
-  const flexStackerState = flexStackerStateGetter(prevRobotState, moduleId)
-  if (moduleId == null || moduleEntities[moduleId] == null) {
-    return { errors: [errorCreators.missingModuleError()] }
-  }
-
-  const errors: CommandCreatorError[] = []
-  if (flexStackerState == null) {
-    errors.push(errorCreators.missingModuleError())
-  }
-
-  if (errors.length > 0) {
+  const { strategy, message, count } = args
+  const { moduleEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedStrategy = resolveAllowedRuntimeValue(
+    strategy,
+    EMPTY_STRATEGIES,
+    runtimeParameters
+  )
+  const resolvedMessage =
+    message == null
+      ? undefined
+      : resolveStringRuntimeValue(message, runtimeParameters)
+  const resolvedCount =
+    count == null
+      ? undefined
+      : resolveNumericRuntimeValue(count, runtimeParameters)
+  const rawValues = [args.moduleId, strategy, message, count]
+  const resolvedValues = [
+    moduleId,
+    resolvedStrategy,
+    resolvedMessage,
+    resolvedCount,
+  ]
+  const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] == null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (
+    errors.length > 0 ||
+    moduleId == null ||
+    resolvedStrategy == null ||
+    resolvedMessage === null ||
+    resolvedCount === null
+  ) {
     return { errors }
   }
+
+  const flexStackerState = flexStackerStateGetter(prevRobotState, moduleId)
+  if (moduleEntities[moduleId] == null || flexStackerState == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
   const pythonName = moduleEntities[moduleId].pythonName
+  const pythonMessage =
+    message && resolvedMessage != null
+      ? `message=${pythonRuntimeString(message, resolvedMessage, runtimeParameters)}`
+      : ''
 
   return {
     commands: [
@@ -32,14 +78,12 @@ export const flexStackerEmpty: CommandCreator<
         key: uuid(),
         params: {
           moduleId,
-          strategy: strategy,
-          message: message,
-          count: count,
+          strategy: resolvedStrategy as (typeof EMPTY_STRATEGIES)[number],
+          message: resolvedMessage,
+          count: resolvedCount,
         },
       },
     ],
-    python: `${pythonName}.empty(${
-      args.message ? `message=${formatPyStr(args.message)}` : ''
-    })`,
+    python: `${pythonName}.empty(${pythonMessage})`,
   }
 }

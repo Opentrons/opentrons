@@ -1348,16 +1348,16 @@ export interface PickUpTipStepGenArgs {
   pipetteId: string
   labwareId: string
   wellName: string
-  primaryNozzle: PrimaryNozzleConfigurationStyle
-  nozzles: NozzleConfigurationStyle
-  tipTrackingOption?: TipTrackingOption
+  primaryNozzle: string
+  nozzles: string
+  tipTrackingOption?: string
 }
 
 export interface DropTipStepGenArgs {
   pipette: string
   wellName?: string
   dropTipLocation?: string
-  isReturnTip?: boolean
+  isReturnTip?: boolean | string
 }
 
 export interface DispenseWhileTrackingStepGenArgs {
@@ -1377,7 +1377,7 @@ export interface DispenseInPlaceStepGenArgs {
   flowRate: number | string
   pushOut?: number | string
   correctionVolume?: number | string
-  isAirGap?: boolean
+  isAirGap?: boolean | string
 }
 
 export interface BlowOutInWellStepGenArgs {

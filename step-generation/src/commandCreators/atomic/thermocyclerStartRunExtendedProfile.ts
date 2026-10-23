@@ -26,10 +26,19 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
   const { taskId, profileElements, blockMaxVolumeUl } = args
   const { runtimeParameters } = invariantContext
   const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedTaskId =
+    taskId == null
+      ? taskId
+      : resolveStringRuntimeValue(taskId, runtimeParameters)
   const errors: CommandCreatorError[] = []
   if (moduleId == null) {
     errors.push(
       errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (taskId != null && resolvedTaskId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: taskId })
     )
   }
   const resolveNumber = (value: number | string): number | null => {
@@ -103,7 +112,7 @@ export const thermocyclerStartRunExtendedProfile: CommandCreator<
         key: uuid(),
         params: {
           moduleId,
-          taskId,
+          taskId: resolvedTaskId,
           profileElements:
             resolvedProfileElements as TCStartExtendedProfileParams['profileElements'],
           blockMaxVolumeUl: resolvedBlockMaxVolumeUl ?? undefined,
