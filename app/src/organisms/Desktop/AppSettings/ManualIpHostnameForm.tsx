@@ -8,7 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
+  StyledText,
   SIZE_2,
   SPACING,
   TYPOGRAPHY,
@@ -145,13 +145,13 @@ export function ManualIpHostnameForm({
         </TertiaryButton>
       </FlexForm>
       {formState.errors?.ip != null && (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="label"
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >
           {formState.errors.ip.message}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

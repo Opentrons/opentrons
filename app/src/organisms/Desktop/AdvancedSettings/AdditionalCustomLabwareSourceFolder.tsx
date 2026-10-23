@@ -8,7 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   Link,
   SPACING,
   SPACING_AUTO,
@@ -42,23 +42,22 @@ export function AdditionalCustomLabwareSourceFolder(): ReactNode {
       gridGap={SPACING.spacing40}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing8}
-        >
+        <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+ paddingBottom={SPACING.spacing8}
+ >
           {t('additional_labware_folder_title')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('additional_folder_description')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('additional_folder_location')}
-        </LegacyStyledText>
+        </StyledText>
         {labwarePath !== '' ? (
           <Link
             role="button"
@@ -74,7 +73,7 @@ export function AdditionalCustomLabwareSourceFolder(): ReactNode {
             />
           </Link>
         ) : (
-          <LegacyStyledText forwardedAs="p">{t('no_folder')}</LegacyStyledText>
+          <StyledText forwardedAs="p">{t('no_folder')}</StyledText>
         )}
       </Flex>
       {

@@ -6,7 +6,7 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -39,15 +39,14 @@ export function ShowLabwareOffsetSnippets(): ReactNode {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing8}
-        >
+        <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+ paddingBottom={SPACING.spacing8}
+ >
           {t('show_labware_offset_snippets')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('branded:show_labware_offset_snippets_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="show_link_to_get_labware_offset_data"

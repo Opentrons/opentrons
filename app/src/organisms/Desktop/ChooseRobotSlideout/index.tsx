@@ -30,7 +30,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
+  StyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
@@ -291,13 +291,13 @@ export function ChooseRobotSlideout(
       <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
         {isScanning ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               color={COLORS.grey60}
               marginRight={SPACING.spacing12}
             >
               {t('app_settings:searching')}
-            </LegacyStyledText>
+            </StyledText>
             <Icon name="ot-spinner" spin size="1.25rem" color={COLORS.grey60} />
           </Flex>
         ) : (
@@ -326,12 +326,12 @@ export function ChooseRobotSlideout(
           gridGap={SPACING.spacing8}
         >
           <Icon name="ot-alert" size={SIZE_1} />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('no_available_robots_found')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       ) : (
         filteredHealthy.map(robot => {
@@ -356,7 +356,7 @@ export function ChooseRobotSlideout(
                 registerRobotBusyStatus={registerRobotBusyStatus}
               />
               {runCreationError != null && isSelected && (
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="label"
                   color={COLORS.red60}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -383,7 +383,7 @@ export function ChooseRobotSlideout(
                   ) : (
                     runCreationError
                   )}
-                </LegacyStyledText>
+                </StyledText>
               )}
             </Fragment>
           )
@@ -396,7 +396,7 @@ export function ChooseRobotSlideout(
           textAlign={TYPOGRAPHY.textAlignCenter}
           marginTop={SPACING.spacing24}
         >
-          <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+          <StyledText forwardedAs="p" color={COLORS.grey50}>
             {showIdleOnly
               ? t('unavailable_or_busy_robot_not_listed', {
                   count: unavailableCount + reducerBusyCount,
@@ -404,7 +404,7 @@ export function ChooseRobotSlideout(
               : t('unavailable_robot_not_listed', {
                   count: unavailableCount,
                 })}
-          </LegacyStyledText>
+          </StyledText>
           <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold}>
             {t('view_unavailable_robots')}
           </NavLink>
@@ -529,13 +529,13 @@ export function ChooseRobotSlideout(
                   flexDirection={DIRECTION_COLUMN}
                   key={runtimeParam.variableName}
                 >
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
                     {runtimeParam.displayName}
-                  </LegacyStyledText>
+                  </StyledText>
                   <Flex
                     gridGap={SPACING.spacing8}
                     justifyContent={JUSTIFY_FLEX_START}
@@ -565,16 +565,16 @@ export function ChooseRobotSlideout(
                       label={Boolean(runtimeParam.value) ? t('on') : t('off')}
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {Boolean(runtimeParam.value) ? t('on') : t('off')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="label"
                     paddingTop={SPACING.spacing8}
                   >
                     {runtimeParam.description}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
@@ -601,12 +601,12 @@ export function ChooseRobotSlideout(
                     width="100%"
                     marginBottom={SPACING.spacing16}
                   >
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('csv_file')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
@@ -629,7 +629,7 @@ export function ChooseRobotSlideout(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <LegacyStyledText forwardedAs="p">
+                        <StyledText forwardedAs="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -637,7 +637,7 @@ export function ChooseRobotSlideout(
                               a: <Link color={COLORS.blue55} role="button" />,
                             }}
                           />
-                        </LegacyStyledText>
+                        </StyledText>
                       }
                     />
                   ) : (
