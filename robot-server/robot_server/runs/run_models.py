@@ -1,14 +1,14 @@
 """Request and response models for run resources."""
 
+import json
 from datetime import datetime
-from typing import Annotated, Dict, List, Literal, Optional
+from typing import Annotated, Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from opentrons.protocol_engine import (
+    CommandAdapter,
     CommandIntent,
-    CommandNote,
-    CommandParams,
     CommandStatus,
     CommandType,
     ErrorOccurrence,
@@ -62,30 +62,34 @@ class RunCommandSummary(ResourceModel):
         description="An identifier representing this command as a step in a protocol.",
     )
     commandType: CommandType = Field(..., description="Specific type of command.")
-    createdAt: datetime = Field(..., description="Command creation timestamp")
-    startedAt: Optional[datetime] = Field(
-        None,
-        description="Command execution start timestamp, if started",
+    createdAt: str = Field(
+        ..., description="Command creation timestamp as a JSON string."
     )
-    completedAt: Optional[datetime] = Field(
+    startedAt: Optional[str] = Field(
         None,
-        description="Command execution completed timestamp, if completed",
+        description="Command execution start timestamp, if started, as a JSON string.",
+    )
+    completedAt: Optional[str] = Field(
+        None,
+        description="Command execution completed timestamp, if completed, as a JSON string.",
     )
     status: CommandStatus = Field(..., description="Execution status of the command.")
-    error: Optional[ErrorOccurrence] = Field(
+    error: Optional[dict[str, Any]] = Field(
         None,
-        description="Error occurrence, if status is 'failed'",
+        description="Error occurrence, if status is 'failed', as a JSON dict.",
     )
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
-    params: CommandParams = Field(..., description="Command execution parameters.")
+    params: dict[str, Any] = Field(
+        ..., description="Command execution parameters as a JSON dict."
+    )
     intent: Optional[CommandIntent] = Field(
         None,
         description="Why this command was added to the run.",
     )
-    notes: Optional[List[CommandNote]] = Field(
+    notes: Optional[List[dict[str, Any]]] = Field(
         None,
-        description="Notes pertaining to this command.",
+        description="Notes pertaining to this command as a JSON dict.",
     )
     failedCommandId: Optional[str] = Field(
         None,
@@ -97,6 +101,47 @@ class RunCommandSummary(ResourceModel):
         None,
         description="List of command annotation ids associated with this command.",
     )
+
+    # NOTE: Originally RunCommandSummary contained pydantic instances of Commands and related fields
+    # but in order to lower memory impact the data in this class is primarily passed in from the RunStore
+    # and from the Protocol engine in JSON format. Given this class is used as an HTTPAPI response object
+    # it makes the most sense to maintain those fields as JSON.
+    @classmethod
+    def build_from_json(cls, json_command: str) -> "RunCommandSummary":
+        """Build a RunCommandSummary from a Command is JSON format."""
+        command_dict: dict[str, Any] = json.loads(json_command)
+        # Validate JSON fields
+        try:
+            validated_command = CommandAdapter.validate_python(command_dict)
+            del validated_command
+        except ValidationError:
+            raise
+
+        return RunCommandSummary.model_construct(
+            id=command_dict["id"],
+            key=command_dict["key"],
+            commandType=command_dict["commandType"],
+            intent=CommandIntent(command_dict.get("intent"))
+            if command_dict.get("intent")
+            else None,
+            status=CommandStatus(command_dict["status"]),
+            createdAt=command_dict["createdAt"],
+            startedAt=command_dict.get("startedAt")
+            if command_dict.get("startedAt")
+            else None,
+            completedAt=command_dict.get("completedAt")
+            if command_dict.get("completedAt")
+            else None,
+            params=command_dict["params"],
+            error=command_dict.get("error") if command_dict.get("error") else None,
+            notes=command_dict.get("notes"),
+            failedCommandId=command_dict.get("failedCommandId")
+            if command_dict.get("failedCommandId")
+            else None,
+            commandAnnotationIds=command_dict.get("commandAnnotationIds")
+            if command_dict.get("commandAnnotationIds")
+            else None,
+        )
 
 
 class Run(ResourceModel):

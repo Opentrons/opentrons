@@ -323,27 +323,7 @@ async def get_run_commands(
     recovery_target_command = await run_data_manager.get_recovery_target_command(
         run_id=runId
     )
-
-    data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            notes=c.notes,
-            failedCommandId=c.failedCommandId,
-            commandAnnotationIds=c.commandAnnotationIds
-            if c.commandAnnotationIds
-            else None,
-        )
-        for c in command_slice.commands
-    ]
+    data = [RunCommandSummary.build_from_json(c) for c in command_slice.commands]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,

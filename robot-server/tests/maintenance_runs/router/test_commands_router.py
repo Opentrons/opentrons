@@ -1,5 +1,6 @@
 """Tests for the /maintenance_runs/.../commands routes."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -8,7 +9,7 @@ from decoy import Decoy, matchers
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandSlice,
+    JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -371,7 +372,13 @@ async def test_get_run_commands(
             cursor=None,
             length=42,
         )
-    ).then_return(CommandSlice(commands=[command], cursor=1, total_length=3))
+    ).then_return(
+        JsonCommandSlice(
+            commands=[command.model_dump_json(by_alias=True, exclude_none=True)],
+            cursor=1,
+            total_length=3,
+        )
+    )
 
     result = await get_run_commands(
         runId="run-id",
@@ -386,16 +393,20 @@ async def test_get_run_commands(
             key="command-key",
             commandType="waitForResume",
             intent=pe_commands.CommandIntent.PROTOCOL,
-            createdAt=datetime(year=2021, month=1, day=1),
-            startedAt=datetime(year=2022, month=2, day=2),
-            completedAt=datetime(year=2023, month=3, day=3),
+            createdAt=datetime(year=2021, month=1, day=1).isoformat(),
+            startedAt=datetime(year=2022, month=2, day=2).isoformat(),
+            completedAt=datetime(year=2023, month=3, day=3).isoformat(),
             status=pe_commands.CommandStatus.FAILED,
-            params=pe_commands.WaitForResumeParams(message="hello world"),
-            error=pe_errors.ErrorOccurrence(
-                id="error-id",
-                errorType="PrettyBadError",
-                createdAt=datetime(year=2024, month=4, day=4),
-                detail="Things are not looking good.",
+            params=pe_commands.WaitForResumeParams(message="hello world").model_dump(
+                mode="json"
+            ),
+            error=json.loads(
+                pe_errors.ErrorOccurrence(
+                    id="error-id",
+                    errorType="PrettyBadError",
+                    createdAt=datetime(year=2024, month=4, day=4),
+                    detail="Things are not looking good.",
+                ).model_dump_json(exclude_none=True, by_alias=True)
             ),
             failedCommandId="failed-command-id",
         )
@@ -438,7 +449,7 @@ async def test_get_run_commands_empty(
         await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
-    ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
+    ).then_return(JsonCommandSlice(commands=[], cursor=0, total_length=0))
 
     result = await get_run_commands(
         runId="run-id",

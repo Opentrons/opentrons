@@ -138,6 +138,16 @@ class CommandSlice(BaseModel):
     total_length: int
 
 
+class JsonCommandSlice(BaseModel):
+    """A subset of all commands in state in JSON format."""
+
+    model_config = ConfigDict(frozen=True)
+
+    commands: List[str]
+    cursor: int
+    total_length: int
+
+
 class CommandErrorSlice(BaseModel):
     """A subset of all commands errors in state."""
 
@@ -843,8 +853,8 @@ class CommandView:
 
     def get_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
-        """Get a subset of commands around a given cursor.
+    ) -> JsonCommandSlice:
+        """Get a subset of commands around a given cursor in JSON string format.
 
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command,
@@ -873,7 +883,7 @@ class CommandView:
             start=start, stop=stop, command_ids=command_ids
         )
 
-        return CommandSlice(
+        return JsonCommandSlice(
             commands=commands,
             cursor=start,
             total_length=total_length,

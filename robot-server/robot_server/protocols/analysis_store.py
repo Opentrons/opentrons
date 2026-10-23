@@ -251,6 +251,7 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            result=completed_analysis.result,
         )
         primitive_rtp_resources = self._extract_primitive_run_time_params(
             completed_analysis
@@ -296,6 +297,7 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            result=completed_analysis.result,
         )
         await self._completed_store.make_room_and_add(
             completed_analysis_resource=completed_analysis_resource,

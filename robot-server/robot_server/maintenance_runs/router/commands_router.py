@@ -7,9 +7,7 @@ from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine import (
-    CommandPointer,
-)
+from opentrons.protocol_engine import CommandPointer
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
@@ -289,22 +287,7 @@ async def get_run_commands(
         run_id=runId
     )
 
-    data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            failedCommandId=c.failedCommandId,
-        )
-        for c in command_slice.commands
-    ]
+    data = [RunCommandSummary.build_from_json(c) for c in command_slice.commands]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
