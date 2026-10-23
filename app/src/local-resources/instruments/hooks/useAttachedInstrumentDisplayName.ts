@@ -1,7 +1,6 @@
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
 import { useGripperDisplayName } from './useGripperDisplayName'
-import { usePipetteModelSpecs } from './usePipetteModelSpecs'
 import { usePipetteSpecsV2 } from './usePipetteSpecsv2'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
@@ -36,10 +35,6 @@ export function useAttachedInstrumentDisplayName(
       ? instrument.instrumentName
       : undefined
 
-  const modelDisplayName =
-    usePipetteModelSpecs(
-      (isPipette ? instrument?.instrumentModel : null) as PipetteModel
-    )?.displayName ?? null
   const nameDisplayName =
     usePipetteSpecsV2(
       pipetteName != null && pipetteName.includes('_')
@@ -63,7 +58,6 @@ export function useAttachedInstrumentDisplayName(
   }
 
   return (
-    modelDisplayName ??
     nameDisplayName ??
     ('instrumentName' in instrument ? instrument.instrumentName : null)
   )

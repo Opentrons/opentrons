@@ -245,22 +245,9 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
         i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
     ) ?? null
 
-  const leftFlexDisplayName = useAttachedInstrumentDisplayName(leftPipette)
-  const rightFlexDisplayName = useAttachedInstrumentDisplayName(rightPipette)
+  const leftDisplayName = useAttachedInstrumentDisplayName(leftPipette)
+  const rightDisplayName = useAttachedInstrumentDisplayName(rightPipette)
   const gripperDisplayName = useAttachedInstrumentDisplayName(attachedGripper)
-
-  const leftPipetteModel = pipettesData?.left?.model ?? null
-  const rightPipetteModel = pipettesData?.right?.model ?? null
-  const leftDisplayName = isFlex
-    ? leftFlexDisplayName
-    : leftPipetteModel != null
-      ? (getPipetteModelSpecs(leftPipetteModel)?.displayName ?? '')
-      : null
-  const rightDisplayName = isFlex
-    ? rightFlexDisplayName
-    : rightPipetteModel != null
-      ? (getPipetteModelSpecs(rightPipetteModel)?.displayName ?? '')
-      : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
   // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
