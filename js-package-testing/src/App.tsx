@@ -1,10 +1,10 @@
-import { PrimaryButton, ProtocolDeck, Aler } from '@opentrons/components'
+import { PrimaryButton, ProtocolDeck } from '@opentrons/components'
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import FlexAnalysisError from './flexAnalysisError.json'
 import Ot2Analysis from './ot2Analysis.json'
 import StackerAnalysis from './StackerAnalysis.json'
-import FlexAnalysisError from './flexAnalysisError.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -104,7 +104,10 @@ function DeckMapPage(): JSX.Element {
 
 type DemoView = 'flex' | 'ot2' | 'error'
 
-const views: Record<DemoView, { label: string; analysis: ProtocolAnalysisOutput }> = {
+const views: Record<
+  DemoView,
+  { label: string; analysis: ProtocolAnalysisOutput }
+> = {
   flex: { label: 'StackerAnalysis', analysis },
   ot2: { label: 'Ot2Analysis', analysis: ot2Analysis },
   error: { label: 'FlexAnalysisError', analysis: errorAnalysis },
