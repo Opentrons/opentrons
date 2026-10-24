@@ -8,10 +8,10 @@
 
 .app_container {
   display: flex;
-  flex-direction: column;
+  max-width: 90rem;
   height: 100%;
   box-sizing: border-box;
-  max-width: 90rem;
+  flex-direction: column;
   padding: var(--spacing-16);
 }
 
@@ -83,13 +83,13 @@ body,
 
 .protocol_visualization_demo {
   width: 100%;
-  flex: 1;
   min-height: 0;
+  flex: 1;
 }
 
 .protocol_visualization_section {
   display: flex;
+  min-height: 0;
   flex: 1;
   flex-direction: column;
-  min-height: 0;
 }

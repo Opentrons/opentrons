@@ -69,11 +69,11 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
     copyState === 'copied' ? 'check' : 'copy-text'
   const currentLabel = copyState === 'copied' ? successLabel : label
 
-  const buttonClasses = clsx(styles['copy-button'], className)
+  const buttonClasses = clsx(styles.copy_button, className)
   const containerClasses = clsx(
     label === undefined
-      ? styles['container-without-text']
-      : styles['container-with-text']
+      ? styles.container_without_text
+      : styles.container_with_text
   )
 
   return (
@@ -86,7 +86,7 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
       {...restProps}
     >
       <div className={containerClasses}>
-        <Icon name={currentIconName} className={styles['icon-style']} />
+        <Icon name={currentIconName} className={styles.icon_style} />
         {label !== undefined ? (
           <StyledText desktopStyle="bodyDefaultRegular">
             {currentLabel}
