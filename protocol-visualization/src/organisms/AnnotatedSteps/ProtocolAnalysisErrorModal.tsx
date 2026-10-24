@@ -1,11 +1,13 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { CopyButton } from '../../molecules/CopyButton'
 
 import {
   CodeBlock,
   Modal,
   PrimaryButton,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import styles from './protocolanalysiserrormodal.module.css'
@@ -30,10 +32,18 @@ export function ProtocolAnalysisErrorModal({
       type="error"
       title={t('protocol_analysis_failure')}
       onClose={onClose}
+      zIndexOverlay={Z_INDEX.MODALS}
     >
       <div className={styles.container}>
         {errors.map(error => (
-          <CodeBlock key={error.id}>{error.detail}</CodeBlock>
+          <div key={error.id} className={styles.code_block_container}>
+            <CopyButton
+              value={error.detail}
+              aria-label={t('copy_error')}
+              className={styles.copy_button}
+            />
+            <CodeBlock>{error.detail}</CodeBlock>
+          </div>
         ))}
         <div className={styles.button_container}>
           <PrimaryButton role="button" onClick={onClose}>
