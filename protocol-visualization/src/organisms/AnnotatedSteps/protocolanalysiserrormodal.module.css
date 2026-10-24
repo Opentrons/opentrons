@@ -9,3 +9,14 @@
   flex-direction: row;
   justify-content: flex-end;
 }
+
+.code_block_container {
+  position: relative;
+}
+
+.copy_button {
+  position: absolute;
+  top: var(--spacing-8);
+  right: var(--spacing-12);
+  z-index: 1;
+}
