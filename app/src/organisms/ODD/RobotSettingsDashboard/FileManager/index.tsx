@@ -7,7 +7,7 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { ComplianceReadyFiles } from './ComplianceReadyFiles'
@@ -23,7 +23,7 @@ import { DownloadProtocolRunRecordsWizard } from './FileManagerWizardFlows/Downl
 import { ProtocolRunRecords } from './ProtocolRunRecords'
 
 import type { ComponentProps, ReactNode } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type { SetSettingOption } from '../types'
 
 type FileManagerTab = 'diagnostic' | 'compliance' | 'records'

@@ -19,10 +19,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
 
 import type { ReactNode } from 'react'
-import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
+import type { SmallButtonTypes } from '/app/components/ODD/buttons/SmallButton'
 
 const MAX_SUPPORTED_LABELS = 3
 

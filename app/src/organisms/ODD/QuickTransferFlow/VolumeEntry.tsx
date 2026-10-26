@@ -6,18 +6,18 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TouchInputField,
 } from '@opentrons/components'
 
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { NumericalKeyboard } from '/app/components/ODD/keyboard'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 
 import { ACTIONS, CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'
 
 import type { ComponentProps, Dispatch, ReactNode } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,

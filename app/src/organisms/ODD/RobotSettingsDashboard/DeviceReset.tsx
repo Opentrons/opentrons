@@ -15,15 +15,15 @@ import {
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
 import type { ReactNode } from 'react'
 import type { ResetConfigRequest } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../../../components/ODD/modals/OddModal/types'
 import type { SetSettingOption } from './types'
 
 interface LabelProps {

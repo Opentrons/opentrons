@@ -7,12 +7,12 @@ import {
   Flex,
   SPACING,
   StyledText,
-  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { NumericalKeyboard } from '/app/components/ODD/keyboard'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 

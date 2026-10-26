@@ -17,8 +17,8 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
   ANALYTICS_QUICK_TRANSFER_RUN_NOW,
@@ -37,7 +37,7 @@ import { initializeSummaryState } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type { QuickTransferWizardState } from './types'
 import type { InitialSummaryStateProps } from './utils/getInitialSummaryState'
 

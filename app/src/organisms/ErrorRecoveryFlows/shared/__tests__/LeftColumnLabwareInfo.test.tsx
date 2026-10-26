@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InterventionContent } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 import { i18n } from '/app/i18n'
-import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
@@ -11,7 +11,7 @@ import { LeftColumnLabwareInfo } from '../LeftColumnLabwareInfo'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/InterventionModal/InterventionContent')
+vi.mock('/app/components/ODD/modals/InterventionModal/InterventionContent')
 
 const render = (props: ComponentProps<typeof LeftColumnLabwareInfo>) => {
   return renderWithProviders(<LeftColumnLabwareInfo {...props} />, {

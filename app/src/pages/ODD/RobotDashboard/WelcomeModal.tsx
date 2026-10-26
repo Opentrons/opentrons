@@ -14,9 +14,9 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
-import { OddModal } from '/app/molecules/OddModal'
 import { updateConfigValue } from '/app/redux/config'
 
 import type { ReactNode } from 'react'

@@ -38,7 +38,10 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import {
+  SmallButton,
+  TouchFloatingActionButton,
+} from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'

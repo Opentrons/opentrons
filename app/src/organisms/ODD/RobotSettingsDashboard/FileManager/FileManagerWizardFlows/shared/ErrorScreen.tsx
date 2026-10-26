@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 
 import styles from './shared.module.css'
 

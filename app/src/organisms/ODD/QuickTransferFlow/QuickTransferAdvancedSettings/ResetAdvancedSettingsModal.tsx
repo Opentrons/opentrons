@@ -11,8 +11,8 @@ import {
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import { ACTIONS } from '../constants'
 import { retrieveLiquidClassValues } from '../utils'

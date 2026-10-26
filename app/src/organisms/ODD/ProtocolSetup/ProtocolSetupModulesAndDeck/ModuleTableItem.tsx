@@ -22,13 +22,13 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import {
   getFlexStackerPrepActions,
   getFlexStackerPrepCommands,
 } from '/app/local-resources/modules'
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { OddModal } from '/app/molecules/OddModal'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'

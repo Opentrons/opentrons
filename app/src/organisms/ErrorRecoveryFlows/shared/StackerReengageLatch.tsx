@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import ReengageLatch from '/app/assets/images/flex_stacker_reengage_latch.png'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'

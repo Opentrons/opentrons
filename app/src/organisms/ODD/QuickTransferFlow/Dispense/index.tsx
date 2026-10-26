@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import { ResetAdvancedSettingsModal } from '../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal'
 import { DispenseSettingDetail } from './DispenseSettingDetail'

@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import stackerImage from '/app/assets/images/stacker_shuttle_empty.png'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'

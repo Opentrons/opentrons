@@ -6,9 +6,9 @@ import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { StyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
 import { ErrorContent } from './ErrorContent'
@@ -19,7 +19,7 @@ import type {
   RunError,
   RunStatus,
 } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface RunFailedModalProps {
   runId: string

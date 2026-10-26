@@ -24,7 +24,7 @@ import { SummaryAndSettings } from './SummaryAndSettings'
 import { VolumeEntry } from './VolumeEntry'
 
 import type { ComponentProps, ReactNode } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type { QuickTransferWizardState } from './types'
 
 const initialQuickTransferState: QuickTransferWizardState = {}

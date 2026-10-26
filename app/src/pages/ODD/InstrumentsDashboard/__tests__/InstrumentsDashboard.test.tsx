@@ -93,7 +93,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/organisms/GripperWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/PipetteWizardFlows/ChoosePipette')
-vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/components/ODD/headers/Navigation')
 vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
   useLocalRobotName: vi.fn().mockReturnValue('otie'),
 }))

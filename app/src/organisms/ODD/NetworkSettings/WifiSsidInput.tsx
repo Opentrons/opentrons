@@ -8,11 +8,11 @@ import {
   POSITION_FIXED,
   SPACING,
   StyledText,
-  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'

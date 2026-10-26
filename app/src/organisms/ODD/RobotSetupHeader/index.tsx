@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { InlineNotificationProps } from '@opentrons/components'

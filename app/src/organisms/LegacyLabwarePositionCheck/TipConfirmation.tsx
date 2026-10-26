@@ -14,7 +14,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { i18n } from '/app/i18n'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'

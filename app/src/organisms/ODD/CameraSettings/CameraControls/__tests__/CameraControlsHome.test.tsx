@@ -2,9 +2,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import { CameraControlsHome } from '../CameraControlsHome'
@@ -14,7 +14,7 @@ import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/
 import type { CameraControlsHomeProps } from '../CameraControlsHome'
 
 vi.mock('/app/resources/camera/usePreviewImage')
-vi.mock('/app/organisms/ODD/ChildNavigation')
+vi.mock('/app/components/ODD/headers/ChildNavigation')
 vi.mock('../ImagePreviewModal')
 
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({

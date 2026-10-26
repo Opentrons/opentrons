@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { RobotSettingButton } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 

@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { Z_INDEX } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import { TipSelection } from './TipSelection'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { TipSelectionProps } from './TipSelection'
 
 type TipSelectionModalProps = TipSelectionProps & {

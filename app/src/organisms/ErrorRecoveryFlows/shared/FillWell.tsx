@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DeckMapContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 import { LeftColumnLabwareInfo } from '/app/organisms/ErrorRecoveryFlows/shared/LeftColumnLabwareInfo'
 import { RecoverySingleColumnContentWrapper } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryContentWrapper'
 import { RecoveryFooterButtons } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryFooterButtons'
