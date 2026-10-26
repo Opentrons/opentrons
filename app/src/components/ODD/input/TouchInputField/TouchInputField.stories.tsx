@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-import { DIRECTION_COLUMN } from '../../styles'
-import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { TouchInputField as TouchInputFieldComponent } from './'
+import { DIRECTION_COLUMN, SPACING, VIEWPORT } from '@opentrons/components'
+
+import { TouchInputField as TouchInputFieldComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ChangeEvent, ComponentProps, ReactNode } from 'react'

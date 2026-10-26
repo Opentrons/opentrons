@@ -1,8 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '../'
-import { renderWithProviders } from '../../../testing/utils'
+import { renderWithProviders } from '/app/__testing-utils__'
+
+import { TouchInputField } from '..'
 import styles from '../touchinputfield.module.css'
 
 import type { ComponentProps } from 'react'
