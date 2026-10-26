@@ -28,18 +28,18 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useUpdatedLastRunTime } from '/app/pages/ODD/ProtocolDashboard/hooks'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
-import { LongPressModal } from './LongPressModal'
+import { LongPressModal } from '../../../pages/ODD/ProtocolDashboard/LongPressModal'
+import { OddModal } from '../modals/OddModal'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../modals/OddModal/types'
 
 interface ProtocolCardProps {
   protocol: ProtocolResource

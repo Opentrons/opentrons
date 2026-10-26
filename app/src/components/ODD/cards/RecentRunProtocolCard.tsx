@@ -37,7 +37,7 @@ import {
 import { useCloneRun } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
-import { useRerunnableStatusText } from './hooks'
+import { useRerunnableStatusText } from '../../../organisms/ODD/RobotDashboard/hooks'
 
 import type { ReactNode } from 'react'
 import type { RunData, RunStatus } from '@opentrons/api-client'
