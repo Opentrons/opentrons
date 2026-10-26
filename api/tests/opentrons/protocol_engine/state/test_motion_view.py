@@ -59,6 +59,7 @@ def mock_module_view(decoy: Decoy) -> ModuleView:
 
 @pytest.fixture
 def mock_instrument_interface(decoy: Decoy) -> InstrumentInterfaceView:
+    """Get a mock in the shape of a InstrumentInterfaceView."""
     return decoy.mock(cls=InstrumentInterfaceView)
 
 

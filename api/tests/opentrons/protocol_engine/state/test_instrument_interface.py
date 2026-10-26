@@ -1,35 +1,17 @@
 """Test state getters for retrieving instrumenting interfacing views of state."""
 
-import inspect
-import json
-from datetime import datetime
-from math import isclose
-from os import listdir, path
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, cast
-from unittest.mock import sentinel
+from typing import List, NamedTuple
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import CutoutFixture, DeckDefinitionV5
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
-from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons_shared_data.labware.labware_definition import (
-    AxisAlignedBoundingBox3D,
-    ConicalFrustum,
-    ContainedSpace,
-    ContainmentShape,
     CuboidalFrustum,
-    Extents,
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
-    LabwareDefinition3,
     SphericalSegment,
-    Vector3D,
-    labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.labware_definition import (
     Dimensions as LabwareDimensions,
@@ -40,8 +22,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.labware.labware_definition import (
     Vector3D as LabwareDefinitionVector3D,
 )
-from opentrons_shared_data.labware.types import LabwareUri, LocatingFeatures
-from opentrons_shared_data.module.types import ModuleOrientation
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.types import (
     LiquidClasses as VolumeModes,
@@ -49,117 +30,37 @@ from opentrons_shared_data.pipette.types import (
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
 )
-from opentrons_shared_data.robot.types import (
-    RobotDefinition,
-    mountOffset,
-    paddingOffset,
-)
 
-from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
-from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
 from ..pipette_fixtures import get_default_nozzle_map
-from .command_fixtures import (
-    create_comment_command,
-)
-from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_north_south_slots,
-)
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.actions import (
-    SetDeckConfigurationAction,
-    SucceedCommandAction,
-)
-from opentrons.protocol_engine.commands import Command
-from opentrons.protocol_engine.state import _move_types, geometry
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D as EngineAABB,
 )
 from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaState,
-    AddressableAreaStore,
     AddressableAreaView,
 )
-from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.inner_well_math_utils import (
-    _height_from_volume_circular,
-    _height_from_volume_rectangular,
-    _volume_from_height_circular,
-    _volume_from_height_rectangular,
-    find_height_inner_well_geometry,
-    find_height_user_defined_volumes,
-    find_volume_inner_well_geometry,
-    find_volume_user_defined_volumes,
-)
 from opentrons.protocol_engine.state.instrument_interface import InstrumentInterfaceView
 from opentrons.protocol_engine.state.labware import (
-    LabwareStore,
     LabwareView,
 )
 from opentrons.protocol_engine.state.liquid_tracking import LiquidTrackingView
-from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
 from opentrons.protocol_engine.state.pipettes import (
     BoundingNozzlesOffsets,
     PipetteBoundingBoxOffsets,
-    PipetteStore,
     PipetteView,
     StaticPipetteConfig,
 )
-from opentrons.protocol_engine.state.update_types import (
-    AddressableAreaUsedUpdate,
-    LoadedLabwareUpdate,
-    StateUpdate,
-)
-from opentrons.protocol_engine.state.wells import WellStore, WellView
 from opentrons.protocol_engine.types import (
-    OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
-    WASTE_CHUTE_LOCATION,
-    AddressableArea,
-    AddressableAreaLocation,
-    AddressableOffsetVector,
-    AreaType,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    CurrentWell,
     DeckSlotLocation,
-    DeckType,
-    Dimensions,
     DropTipWellLocation,
     DropTipWellOrigin,
-    GripperMoveType,
-    InStackerHopperLocation,
-    LabwareLocation,
     LabwareOffsetVector,
-    LiquidHandlingWellLocation,
     LoadedLabware,
-    LoadedModule,
     LoadedPipette,
-    LoadedVolumeInfo,
-    ModuleDefinition,
-    ModuleLocation,
-    ModuleModel,
-    ModuleOffsetData,
-    ModuleOffsetVector,
-    NotOnDeckLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnCutoutFixtureLocationSequenceComponent,
-    OnLabwareLocation,
-    OnLabwareLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnModuleLocationSequenceComponent,
-    OnModuleOffsetLocationSequenceComponent,
-    PotentialCutoutFixture,
-    ProbedHeightInfo,
-    ProbedVolumeInfo,
     TipGeometry,
-    WellLiquidInfo,
     WellLocation,
-    WellLocationFunction,
     WellOffset,
     WellOrigin,
 )
@@ -169,10 +70,8 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
 )
 from opentrons.types import (
     DeckSlotName,
-    MeniscusTrackingTarget,
     MountType,
     Point,
-    StagingSlotName,
 )
 
 # TODO refactor this into conftest
@@ -265,6 +164,7 @@ def subject(
     mock_geometry_view: GeometryView,
     mock_liquid_tracking: LiquidTrackingView,
 ) -> InstrumentInterfaceView:
+    """Get an InstrumentInterfaceView with its store dependencies provided."""
     return InstrumentInterfaceView(
         labware_view=mock_labware_view,
         pipette_view=mock_pipette_view,

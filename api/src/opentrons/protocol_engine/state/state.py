@@ -185,10 +185,12 @@ class StateView(HasState[State]):
 
     @property
     def liquid_tracking(self) -> LiquidTrackingView:
+        """Get state view selectors for liquid tracking state."""
         return self._liquid_tracking
 
     @property
     def instrument_interface(self) -> InstrumentInterfaceView:
+        """Get state view selectors for instrument interface state."""
         return self._instrument_interface
 
     @property
