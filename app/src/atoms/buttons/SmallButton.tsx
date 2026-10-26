@@ -189,7 +189,12 @@ export function SmallButton(props: SmallButtonProps): ReactNode {
           </Flex>
         ) : null}
 
-        <StyledText oddStyle="bodyTextSemiBold">{buttonText}</StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          oddStyle="bodyTextSemiBold"
+        >
+          {buttonText}
+        </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
           <Flex
             aria-label={
