@@ -9,7 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { Command, CommandIndex } from '../Command'
+import { Command, CommandIndex } from '/app/molecules/Command'
 
 import type { ReactNode } from 'react'
 import type { CommandTextData } from '@opentrons/components'
@@ -18,7 +18,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { NonSkeletonCommandState } from '../Command'
+import type { NonSkeletonCommandState } from '/app/molecules/Command'
 
 export interface CommandWithIndex {
   index: number | undefined

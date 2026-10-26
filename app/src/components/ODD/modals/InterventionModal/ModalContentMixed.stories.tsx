@@ -1,6 +1,6 @@
 import successIcon from '/app/assets/images/icon_success.png'
 
-import { customViewports } from '../../../../.storybook/preview'
+import { customViewports } from '../../../../../../.storybook/preview'
 import {
   MODAL_CONTENT_MIXED_ICONS,
   ModalContentMixed as ModalContentMixedComponent,
