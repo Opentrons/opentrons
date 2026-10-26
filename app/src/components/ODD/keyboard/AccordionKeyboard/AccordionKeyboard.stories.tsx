@@ -13,7 +13,7 @@ import {
 import { configReducer } from '/app/redux/config/reducer'
 
 import { AccordionKeyboard as AccordionKeyboardComponent } from '.'
-import { FullKeyboard } from '../SoftwareKeyboard'
+import { FullKeyboard } from '../FullKeyboard'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'

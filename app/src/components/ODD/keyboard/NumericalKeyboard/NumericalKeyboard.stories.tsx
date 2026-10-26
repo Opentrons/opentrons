@@ -4,9 +4,10 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   SPACING,
-  TouchInputField,
   VIEWPORT,
 } from '@opentrons/components'
+
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 
 import { NumericalKeyboard } from '.'
 
