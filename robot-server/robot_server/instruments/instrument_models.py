@@ -50,7 +50,8 @@ class _GenericInstrument(BaseModel, Generic[InstrumentModelT, InstrumentDataT]):
         ..., description="Type of instrument- either a pipette or a gripper."
     )
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
-    displayName: str = Field(...,
+    displayName: str = Field(
+        ...,
         description=(
             "Human-readable instrument name from the loaded pipette/gripper definition."
         ),
