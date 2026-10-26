@@ -21,15 +21,13 @@ export function anonymizeInstrumentDisplayName(
 export function useAttachedInstrumentDisplayName(
   instrument: PipetteData | GripperData | null | undefined
 ): string | null {
-  if (instrument == null || !instrument.ok) {
-    return null
-  }
-
   const isOEMMode = useIsOEMMode()
-  const isPipette = instrument.instrumentType === 'pipette'
-  const isGripper = instrument.instrumentType === 'gripper'
+  const isPipette =
+    instrument?.ok === true && instrument.instrumentType === 'pipette'
+  const isGripper =
+    instrument?.ok === true && instrument.instrumentType === 'gripper'
   const pipetteName =
-    isPipette && 'instrumentName' in instrument
+    isPipette && instrument != null && 'instrumentName' in instrument
       ? instrument.instrumentName
       : undefined
 
@@ -42,6 +40,10 @@ export function useAttachedInstrumentDisplayName(
   const gripperFallback = useGripperDisplayName(
     (isGripper ? instrument?.instrumentModel : null) as GripperModel
   )
+
+  if (instrument == null || !instrument.ok) {
+    return null
+  }
 
   if (instrument.displayName != null && instrument.displayName !== '') {
     return anonymizeInstrumentDisplayName(instrument.displayName, isOEMMode)

@@ -227,8 +227,6 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
   const pipettesData = (attachedInstruments?.data ?? []).filter(
     (i): i is PipetteData => i.instrumentType === 'pipette' && i.ok
   )
-  const attachedLeft = (pipettesData ?? []).find(i => i.mount === 'left')
-  const attachedRight = (pipettesData ?? []).find(i => i.mount === 'right')
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
@@ -256,11 +254,6 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
 
       {isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
-          {leftAndRightMountsPipetteDisplayName != null ? (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          ) : null}
           {leftDisplayName != null ? (
             <InstrumentContainer displayName={leftDisplayName} />
           ) : null}
