@@ -60,8 +60,10 @@ Like all Python lists, the lists representing your CSVs are zero-indexed.
 !!! tip
     CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
     
-    You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add `from opentrons.protocol_api import RuntimeParameterRequiredError` at the top of your protocol. Then catch the error like this:
+    You can use a try–except block to work around this and provide the data needed for protocol analysis. First, import the `RuntimeParameterRequiredError` to your protocol. Then catch the error like this:
     ```python
+    from opentrons.protocol_api import RuntimeParameterRequiredError
+
     try:
         parsed_csv = protocol.params.csv_data.parse_as_csv()
     except RuntimeParameterRequiredError:

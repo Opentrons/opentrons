@@ -42,6 +42,7 @@ Each Stacker can hold a labware stack of up to:
 
 You'll need to use [`set_stored_labware()`][opentrons.protocol_api.FlexStackerContext.set_stored_labware] to configure and load the type of labware you want to store in the Stacker.
 
+<!-- test: continue-previous -->
 ```python
 stacker_1.set_stored_labware(
     load_name="opentrons_flex_96_tiprack_200ul",
@@ -125,12 +126,13 @@ If your Stacker will store multiple of the same labware, like 96-well plates, it
 # load labware off deck
 sample_plate = protocol.load_labware(
     load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
-    location=OFF_DECK,
+    location=protocol_api.OFF_DECK,
 )
 ```
 
 Repeat for as many labware as you'll need, like a `media_plate` and `plasmid_plate`. Make sure your labware quantity will fit in the Stacker. Then, use `set_stored_labware_items()` to add them to the Stacker:
 
+<!-- test: syntax-only -->
 ```python
 stacker_1.set_stored_labware_items(
     labware=[sample_plate, media_plate, plasmid_plate]

@@ -9,6 +9,7 @@ This page provides simple, ready-made protocols for Flex and OT-2. Feel free to 
 
 These sample protocols are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use [named arguments](https://en.wikipedia.org/wiki/Named_parameter) instead of positional arguments. For example:
 
+<!-- test: syntax-only -->
 ```python
 # This code uses named arguments
 tiprack_1 = protocol.load_labware(
@@ -482,7 +483,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             pipette.transfer(
                 volume=30,
                 source=row[:11],
-                source=row[1:],
+                dest=row[1:],
                 mix_after=(3, 25)
             )
     ```
