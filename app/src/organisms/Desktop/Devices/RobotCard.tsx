@@ -224,9 +224,6 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
 
   const { data: attachedInstruments, isLoading: isInstrumentsQueryLoading } =
     useInstrumentsQuery({ enabled: isFlex })
-  const pipettesData = (attachedInstruments?.data ?? []).filter(
-    (i): i is PipetteData => i.instrumentType === 'pipette' && i.ok
-  )
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
