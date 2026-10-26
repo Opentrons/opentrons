@@ -10,11 +10,11 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
 
-import { InterventionModal } from '../'
+import { InterventionModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { State } from '/app/redux/types'
-import type { ModalType } from '../'
+import type { ModalType } from '..'
 
 vi.mock('/app/redux/config')
 

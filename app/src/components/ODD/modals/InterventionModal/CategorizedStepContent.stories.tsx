@@ -3,8 +3,9 @@ import { css } from 'styled-components'
 
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 
+import * as Fixtures from '/app/molecules/Command/__fixtures__'
+
 import { CategorizedStepContent, TwoColumn } from '.'
-import * as Fixtures from '../Command/__fixtures__'
 import { StandInContent } from './story-utils/StandIn'
 
 import type { Meta, StoryObj } from '@storybook/react'

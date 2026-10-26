@@ -7,7 +7,7 @@ import {
   VIEWPORT,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import { LoggedOutOverlay } from './index'
 

@@ -1,4 +1,4 @@
-import { DescriptionContent as DescriptionContentComponent } from './'
+import { DescriptionContent as DescriptionContentComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
