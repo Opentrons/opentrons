@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, ListItem, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import styles from './media.module.css'
 
