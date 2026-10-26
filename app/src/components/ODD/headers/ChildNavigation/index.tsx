@@ -17,8 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type {
@@ -30,7 +30,7 @@ import type {
   ButtonCategory,
   IconPlacement,
   SmallButtonTypes,
-} from '/app/atoms/buttons/SmallButton'
+} from '../../buttons/SmallButton'
 
 export interface ChildNavigationProps extends StyleProps {
   header: string

@@ -8,13 +8,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useFullShutdownMutation } from '/app/resources/devices/hooks/useFullShutdownMutation'
 
+import { OddModal } from '../../modals/OddModal'
+
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../../modals/OddModal/types'
 
 interface ShutdownRobotConfirmationModalProps {
   robotName: string
