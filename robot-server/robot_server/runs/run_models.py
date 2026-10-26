@@ -1,8 +1,7 @@
 """Request and response models for run resources."""
 
-import json
 from datetime import datetime
-from typing import Annotated, Any, Dict, List, Literal, Optional
+from typing import Annotated, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
@@ -107,10 +106,9 @@ class RunCommandSummary(ResourceModel):
     @classmethod
     def build_from_json(cls, json_command: str) -> "RunCommandSummary":
         """Build a RunCommandSummary from a Command is JSON format."""
-        command_dict: dict[str, Any] = json.loads(json_command)
         try:
             # Validate JSON fields and build RunCommandSummary
-            validated_command = CommandAdapter.validate_python(command_dict)
+            validated_command = CommandAdapter.validate_json(json_command)
             return RunCommandSummary.model_construct(
                 id=validated_command.id,
                 key=validated_command.key,
@@ -124,6 +122,7 @@ class RunCommandSummary(ResourceModel):
                 error=validated_command.error,
                 failedCommandId=validated_command.failedCommandId,
                 commandAnnotationIds=validated_command.commandAnnotationIds,
+                notes=validated_command.notes,
             )
         except ValidationError:
             raise

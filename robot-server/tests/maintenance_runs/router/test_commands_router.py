@@ -1,6 +1,5 @@
 """Tests for the /maintenance_runs/.../commands routes."""
 
-import json
 from datetime import datetime
 
 import pytest
@@ -393,22 +392,20 @@ async def test_get_run_commands(
             key="command-key",
             commandType="waitForResume",
             intent=pe_commands.CommandIntent.PROTOCOL,
-            createdAt=datetime(year=2021, month=1, day=1).isoformat(),
-            startedAt=datetime(year=2022, month=2, day=2).isoformat(),
-            completedAt=datetime(year=2023, month=3, day=3).isoformat(),
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            completedAt=datetime(year=2023, month=3, day=3),
             status=pe_commands.CommandStatus.FAILED,
-            params=pe_commands.WaitForResumeParams(message="hello world").model_dump(
-                mode="json"
-            ),
-            error=json.loads(
-                pe_errors.ErrorOccurrence(
-                    id="error-id",
-                    errorType="PrettyBadError",
-                    createdAt=datetime(year=2024, month=4, day=4),
-                    detail="Things are not looking good.",
-                ).model_dump_json(exclude_none=True, by_alias=True)
+            params=pe_commands.WaitForResumeParams(message="hello world"),
+            error=pe_errors.ErrorOccurrence(
+                id="error-id",
+                errorType="PrettyBadError",
+                createdAt=datetime(year=2024, month=4, day=4),
+                detail="Things are not looking good.",
             ),
             failedCommandId="failed-command-id",
+            commandAnnotationIds=[],
+            notes=[],
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)

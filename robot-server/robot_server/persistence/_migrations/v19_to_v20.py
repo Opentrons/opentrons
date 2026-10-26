@@ -6,7 +6,6 @@ Summary of changes from schema 19:
   existing result data from "completed_analysis" column, if any.
 """
 
-import json
 from contextlib import ExitStack
 from pathlib import Path
 
