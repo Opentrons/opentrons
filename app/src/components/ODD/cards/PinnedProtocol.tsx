@@ -22,8 +22,8 @@ import {
 
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
-import { useUpdatedLastRunTime } from './hooks'
-import { LongPressModal } from './LongPressModal'
+import { useUpdatedLastRunTime } from '../../../pages/ODD/ProtocolDashboard/hooks'
+import { LongPressModal } from '../../../pages/ODD/ProtocolDashboard/LongPressModal'
 import styles from './pinnedprotocol.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
