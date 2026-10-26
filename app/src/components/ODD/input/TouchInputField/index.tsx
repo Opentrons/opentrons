@@ -1,10 +1,8 @@
 import { forwardRef, useId, useRef } from 'react'
 import clsx from 'clsx'
 
-import { StyledText } from '../../atoms/StyledText'
-import { COLORS } from '../../helix-design-system'
-import { TYPOGRAPHY } from '../../ui-style-constants'
-import { setRefs } from '../../utils'
+import { COLORS, setRefs, StyledText, TYPOGRAPHY } from '@opentrons/components'
+
 import styles from './touchinputfield.module.css'
 
 import type {
