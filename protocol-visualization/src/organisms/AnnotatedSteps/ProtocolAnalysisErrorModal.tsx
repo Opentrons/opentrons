@@ -1,6 +1,5 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { CopyButton } from '../../molecules/CopyButton'
 
 import {
   CodeBlock,
@@ -10,6 +9,7 @@ import {
   Z_INDEX,
 } from '@opentrons/components'
 
+import { CopyButton } from '../../molecules/CopyButton'
 import styles from './protocolanalysiserrormodal.module.css'
 
 import type { ReactNode } from 'react'
