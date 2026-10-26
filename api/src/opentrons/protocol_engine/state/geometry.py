@@ -535,7 +535,6 @@ class GeometryView:
         # labware_pos.z is not necessarily the bottom of the labware.
         return labware_pos.z + z_dim + height_over_labware
 
-    # TODO this can be moved?
     def convert_pick_up_tip_well_location(
         self, well_location: PickUpTipWellLocation
     ) -> WellLocation:

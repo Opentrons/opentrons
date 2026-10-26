@@ -96,7 +96,6 @@ class InstrumentInterfaceView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
-    # TODO spin this out into the base function in geometry
     def get_well_position(
         self,
         labware_id: str,
@@ -155,7 +154,6 @@ class InstrumentInterfaceView:
             )
         return location, dynamic_liquid_tracking
 
-    # TODO: Refactor this as well perhaps
     def get_relative_well_location(
         self,
         labware_id: str,
