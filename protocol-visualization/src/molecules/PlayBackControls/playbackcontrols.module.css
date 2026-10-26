@@ -1,6 +1,6 @@
 .container {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-details);
   right: 0;
   bottom: var(--spacing-32);
   left: 0;
@@ -109,6 +109,10 @@
 }
 
 .icon_button:active {
+  background-color: var(--grey-35);
+}
+
+.icon_button_toggled {
   background-color: var(--grey-35);
 }
 
