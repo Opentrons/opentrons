@@ -1,8 +1,8 @@
 """Characters supported by the ODD software keyboard.
 
-Keep in sync with `app/src/atoms/SoftwareKeyboard/softwareKeyboardCharacters.ts`.
+Keep in sync with `app/src/components/ODD/keyboard/softwareKeyboardCharacters.ts`.
 If `fullKeyboardLayout` or `simple-keyboard-layouts` changes, rerun from `app/`:
-  node src/atoms/SoftwareKeyboard/generateSoftwareKeyboardHanzi.mjs
+  node src/components/ODD/keyboard/generateSoftwareKeyboardHanzi.mjs
 and commit `software_keyboard_hanzi.py`.
 """
 

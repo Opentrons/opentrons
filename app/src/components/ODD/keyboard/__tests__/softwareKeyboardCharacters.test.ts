@@ -1,7 +1,7 @@
 /**
  * If the ODD software keyboard (`fullKeyboardLayout` or simple-keyboard-layouts)
  * is updated, rerun from `app/`:
- *   node src/atoms/SoftwareKeyboard/generateSoftwareKeyboardHanzi.mjs
+ *   node src/components/ODD/keyboard/generateSoftwareKeyboardHanzi.mjs
  * and commit `auth-server/auth_server/users/software_keyboard_hanzi.py`.
  */
 
@@ -22,11 +22,11 @@ import {
 
 const GENERATED_HANZI_PATH = resolve(
   __dirname,
-  '../../../../../auth-server/auth_server/users/software_keyboard_hanzi.py'
+  '../../../../../../auth-server/auth_server/users/software_keyboard_hanzi.py'
 )
 const PYTHON_CHARACTERS_PATH = resolve(
   __dirname,
-  '../../../../../auth-server/auth_server/users/software_keyboard_characters.py'
+  '../../../../../../auth-server/auth_server/users/software_keyboard_characters.py'
 )
 
 function flattenLayoutCandidates(): string {
