@@ -64,6 +64,8 @@ from ..types import (
     PotentialCutoutFixture,
     StagingSlotLocation,
     WellLocation,
+    WellLocationType,
+    WellOffset,
     WellOrigin,
     labware_location_is_off_deck,
     labware_location_is_system,
@@ -78,8 +80,6 @@ from .labware_origin_math.stackup_origin_to_labware_origin import (
     get_stackup_origin_to_labware_origin,
 )
 from .modules import ModuleView
-from .pipettes import PipetteView
-from .wells import WellView
 from opentrons.motion_planning.adjacent_slots_getters import get_north_south_slots
 from opentrons.types import (
     DeckSlotName,
@@ -115,17 +115,13 @@ class GeometryView:
         self,
         config: Config,
         labware_view: LabwareView,
-        well_view: WellView,
         module_view: ModuleView,
-        pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
     ) -> None:
         """Initialize a GeometryView instance."""
         self._config = config
         self._labware = labware_view
-        self._wells = well_view
         self._modules = module_view
-        self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
 
     @cached_property
@@ -513,6 +509,41 @@ class GeometryView:
             y=origin_pos.y + cal_offset.y,
             z=origin_pos.z + cal_offset.z,
         )
+
+    def get_base_well_position(
+        self,
+        labware_id: str,
+        well_name: str,
+        well_location: Optional[WellLocationType] = None,
+    ) -> Point:
+        """Given relative well location in a labware, get absolute position, w/o taking into account liquid tracking."""
+        labware_pos = self.get_labware_position(labware_id)
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_depth = well_def.depth
+
+        offset = WellOffset(x=0, y=0, z=well_depth)
+        if well_location is not None:
+            offset = well_location.offset  # location of the bottom of the well
+            if well_location.origin == WellOrigin.TOP:
+                offset = offset.model_copy(update={"z": offset.z + well_depth})
+            elif well_location.origin == WellOrigin.CENTER:
+                offset = offset.model_copy(update={"z": offset.z + well_depth / 2.0})
+        return Point(
+            x=labware_pos.x + offset.x + well_def.x,
+            y=labware_pos.y + offset.y + well_def.y,
+            z=labware_pos.z + offset.z + well_def.z,
+        )
+
+    def get_relative_well_delta(
+        self,
+        labware_id: str,
+        well_name: str,
+        absolute_point: Point,
+    ) -> Point:
+        """Given absolute position, get relative location of a well in a labware."""
+        well_absolute_point = self.get_base_well_position(labware_id, well_name)
+        delta = absolute_point - well_absolute_point
+        return delta
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         if lw_data.location == WASTE_CHUTE_LOCATION:
