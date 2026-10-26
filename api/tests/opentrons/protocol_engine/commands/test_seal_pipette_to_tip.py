@@ -103,7 +103,9 @@ async def test_success(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        state_view.geometry.get_nominal_tip_geometry("pipette-id", "labware-id", "A3")
+        state_view.instrument_interface.get_nominal_tip_geometry(
+            "pipette-id", "labware-id", "A3"
+        )
     ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
     decoy.when(
@@ -198,7 +200,9 @@ async def test_no_tip_physically_missing_error(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        state_view.geometry.get_nominal_tip_geometry(pipette_id, labware_id, well_name)
+        state_view.instrument_interface.get_nominal_tip_geometry(
+            pipette_id, labware_id, well_name
+        )
     ).then_return(TipGeometry(length=42, diameter=5, volume=300))
 
     decoy.when(
