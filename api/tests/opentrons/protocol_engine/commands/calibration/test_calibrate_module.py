@@ -60,7 +60,9 @@ async def test_calibrate_module_implementation(
         )
     )
     decoy.when(
-        state_view.geometry.get_well_position(labware_id=labware_id, well_name="B1")
+        state_view.instrument_interface.get_well_position(
+            labware_id=labware_id, well_name="B1"
+        )
     ).then_return(Point(x=3, y=2, z=1))
     decoy.when(
         await calibration.calibrate_module(
