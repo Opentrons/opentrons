@@ -121,7 +121,9 @@ class RunCommandSummary(ResourceModel):
                 params=validated_command.params,
                 error=validated_command.error,
                 failedCommandId=validated_command.failedCommandId,
-                commandAnnotationIds=validated_command.commandAnnotationIds,
+                commandAnnotationIds=validated_command.commandAnnotationIds
+                if validated_command.commandAnnotationIds
+                else None,
                 notes=validated_command.notes,
             )
         except ValidationError:
