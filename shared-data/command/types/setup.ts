@@ -158,7 +158,8 @@ export type SetupCreateCommand =
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
   | SetTipStateCreateCommand
-  | CSVWriteRowRuntimeCommand
+  | CreateCSVCreateCommand
+  | CSVWriteRowCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
