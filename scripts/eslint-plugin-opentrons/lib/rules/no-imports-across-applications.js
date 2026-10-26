@@ -25,7 +25,7 @@ function getRelativePath(context) {
   const cwd = context.getCwd()
   const physicalFilename = context.physicalFilename
   const relative = path.relative(cwd, physicalFilename)
-  return relative;
+  return relative
 }
 
 module.exports = {
@@ -73,7 +73,10 @@ module.exports = {
       } else if (isUI(relativePath)) {
         if (node.source.value.includes('/Desktop/')) {
           context.report({ messageId: 'avoidImportingDesktopFromShared', node })
-        } else if (node.source.value.includes('/ODD/')) {
+        } else if (
+          node.source.value.includes('/ODD/') &&
+          !node.source.value.includes('/components')
+        ) {
           context.report({ messageId: 'avoidImportingODDFromShared', node })
         }
       }
