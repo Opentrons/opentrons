@@ -1,8 +1,5 @@
 export { BackButton } from './BackButton'
-export { TouchFloatingActionButton } from './TouchFloatingActionButton'
-export { MediumButton } from './MediumButton'
 export { QuaternaryButton } from './QuaternaryButton'
-export { SmallButton } from './SmallButton'
 export { SubmitPrimaryButton } from './SubmitPrimaryButton'
 export { TertiaryButton } from './TertiaryButton'
 export { ToggleButton } from './ToggleButton'
