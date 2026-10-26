@@ -75,6 +75,12 @@ describe('dispenseInPlace', () => {
         type: 'float',
         default: 1,
       },
+      is_air_gap: {
+        variableName: 'is_air_gap',
+        displayName: 'Is air gap',
+        type: 'boolean',
+        default: true,
+      },
     }
     const result = dispenseInPlace(
       {
@@ -83,6 +89,7 @@ describe('dispenseInPlace', () => {
         flowRate: 'flow_rate',
         pushOut: 'push_out',
         correctionVolume: 'correction_volume',
+        isAirGap: 'is_air_gap',
       },
       invariantContext,
       robotStateWithTip
@@ -99,6 +106,7 @@ describe('dispenseInPlace', () => {
             pushOut: 2,
             correctionVolume: 1,
           },
+          meta: { isAirGap: true },
         },
       ],
       python:
@@ -127,6 +135,7 @@ describe('dispenseInPlace', () => {
         flowRate: 'mock_string_rtp',
         pushOut: 'mock_rtp',
         correctionVolume: 'mock_string_rtp',
+        isAirGap: 'mock_string_rtp',
       },
       invariantContext,
       robotStateWithTip
@@ -146,6 +155,10 @@ describe('dispenseInPlace', () => {
       },
       {
         message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
       },
       {

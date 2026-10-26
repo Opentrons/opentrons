@@ -69,15 +69,33 @@ describe('pickUpTip', () => {
         type: 'string',
         default: 'B1',
       },
+      primary_nozzle: {
+        variableName: 'primary_nozzle',
+        displayName: 'Primary nozzle',
+        type: 'string',
+        default: A1_NOZZLE,
+      },
+      nozzle_style: {
+        variableName: 'nozzle_style',
+        displayName: 'Nozzle style',
+        type: 'string',
+        default: ALL,
+      },
+      tip_tracking: {
+        variableName: 'tip_tracking',
+        displayName: 'Tip tracking',
+        type: 'string',
+        default: MANUAL,
+      },
     }
     const result = pickUpTip(
       {
         pipetteId: 'selected_pipette',
         labwareId: 'selected_tiprack',
         wellName: 'selected_well',
-        primaryNozzle: A1_NOZZLE,
-        nozzles: ALL,
-        tipTrackingOption: MANUAL,
+        primaryNozzle: 'primary_nozzle',
+        nozzles: 'nozzle_style',
+        tipTrackingOption: 'tip_tracking',
       },
       invariantContext,
       robotStateWithTip
@@ -118,8 +136,9 @@ describe('pickUpTip', () => {
         pipetteId: 'mock_rtp',
         labwareId: 'mock_int_rtp',
         wellName: 'mock_rtp',
-        primaryNozzle: A1_NOZZLE,
-        nozzles: ALL,
+        primaryNozzle: 'mock_rtp',
+        nozzles: 'mock_int_rtp',
+        tipTrackingOption: 'mock_rtp',
       },
       invariantContext,
       robotStateWithTip
@@ -131,6 +150,18 @@ describe('pickUpTip', () => {
       },
       {
         message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',
       },
       {
