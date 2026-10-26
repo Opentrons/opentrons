@@ -15,11 +15,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from './constants'
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
-import type { ButtonCategory } from './SmallButton'
+import type { ButtonCategory } from '/app/components/ODD/buttons/SmallButton'
 
 type MediumButtonTypes =
   | 'primary'
