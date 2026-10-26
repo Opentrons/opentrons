@@ -45,7 +45,9 @@ def _update_result_column(
     """Add a new 'result' column to analysis table."""
     select_analyses = sqlalchemy.select(schema_20.analysis_table).order_by(sqlite_rowid)
     for analysis_row in conn.execute(select_analyses).all():
-        result_data = json.loads(analysis_row.completed_analysis)["result"]
+        result_data = sqlalchemy.func.json_extract(
+            analysis_row.completed_analysis, "$.result"
+        )
 
         update_row = (
             sqlalchemy.update(schema_20.analysis_table)

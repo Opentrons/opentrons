@@ -117,7 +117,6 @@ def register_process_types() -> None:
         CommandAnnotation,
         CommandPreconditions,
         CommandSlice,
-        JsonCommandSlice,
         CommandErrorSlice,
         CommandPointer,
         CommandAnnotationsSlice,
@@ -147,6 +146,9 @@ def register_process_types() -> None:
         OpentronsPyroSerializer.register_pydantic_model(command)
     for command_create in get_args(get_args(CommandCreate)[0]):
         OpentronsPyroSerializer.register_pydantic_model(command_create)
+
+    for class_type in [JsonCommandSlice]:
+        OpentronsPyroSerializer.register_class(class_type)
 
 
 def register_all_needed_types() -> None:

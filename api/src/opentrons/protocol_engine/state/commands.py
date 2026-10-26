@@ -138,14 +138,32 @@ class CommandSlice(BaseModel):
     total_length: int
 
 
-class JsonCommandSlice(BaseModel):
+@dataclass(frozen=True)
+class JsonCommandSlice:
     """A subset of all commands in state in JSON format."""
-
-    model_config = ConfigDict(frozen=True)
 
     commands: List[str]
     cursor: int
     total_length: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "JsonCommandSlice") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "commands": obj.commands,
+            "cursor": obj.cursor,
+            "total_length": obj.total_length,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "JsonCommandSlice":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return JsonCommandSlice(
+            commands=data["commands"],
+            cursor=data["cursor"],
+            total_length=data["total_length"],
+        )
 
 
 class CommandErrorSlice(BaseModel):
