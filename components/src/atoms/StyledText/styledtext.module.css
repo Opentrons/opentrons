@@ -32,3 +32,9 @@
     display: none;
   }
 }
+
+/* restore text primitives margin-top and margin-botom */
+
+.styled_text_reset {
+  margin-block: 0;
+}
