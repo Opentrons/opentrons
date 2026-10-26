@@ -25,9 +25,8 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { LPC_HREF } from '/app/local-resources/offsets'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   HANDLE_LW_SUBSTEP,
@@ -38,9 +37,8 @@ import {
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
+import type { ChildNavigationProps } from '/app/components/ODD/headers/ChildNavigation'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
 
 interface LPCContentContainerTertiaryBtnProps {
   onClick: () => void

@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { DescriptionContent } from '/app/molecules/InterventionModal'
+import { DescriptionContent } from '/app/components/ODD/modals/InterventionModal'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import {
   getFlexSlotNameOnly,

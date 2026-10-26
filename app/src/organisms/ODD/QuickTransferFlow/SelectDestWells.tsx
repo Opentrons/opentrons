@@ -14,8 +14,8 @@ import {
 import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { WellSelection } from '/app/organisms/WellSelection'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -34,8 +34,8 @@ import type {
   ReactNode,
   SetStateAction,
 } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { SmallButton } from '/app/components/ODD/buttons'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,

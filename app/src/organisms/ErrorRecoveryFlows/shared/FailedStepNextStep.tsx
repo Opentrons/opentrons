@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { CategorizedStepContent } from '/app/molecules/InterventionModal'
+import { CategorizedStepContent } from '/app/components/ODD/modals/InterventionModal'
 
 import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'

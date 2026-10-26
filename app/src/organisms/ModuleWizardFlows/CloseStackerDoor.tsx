@@ -6,7 +6,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import {
   SimpleWizardBody,

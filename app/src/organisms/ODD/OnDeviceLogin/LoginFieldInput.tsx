@@ -1,7 +1,8 @@
 import { forwardRef, useRef, useState } from 'react'
 
-import { setRefs, TouchInputField } from '@opentrons/components'
+import { setRefs } from '@opentrons/components'
 
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 

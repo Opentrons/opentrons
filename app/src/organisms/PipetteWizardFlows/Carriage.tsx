@@ -3,8 +3,8 @@ import capitalize from 'lodash/capitalize'
 
 import { PrimaryButton, SPACING } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { FLOWS, SECTIONS } from './constants'

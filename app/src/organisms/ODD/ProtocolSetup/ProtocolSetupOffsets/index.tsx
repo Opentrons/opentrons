@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { TouchFloatingActionButton } from '/app/atoms/buttons'
+import { TouchFloatingActionButton } from '/app/components/ODD/buttons'
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
 

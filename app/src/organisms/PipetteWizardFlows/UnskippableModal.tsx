@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { ReactNode } from 'react'

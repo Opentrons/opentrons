@@ -14,11 +14,11 @@ import {
 
 import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'

@@ -10,7 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'

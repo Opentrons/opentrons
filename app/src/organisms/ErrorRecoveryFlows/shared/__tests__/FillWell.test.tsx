@@ -17,7 +17,7 @@ vi.mock('../LeftColumnLabwareInfo', () => ({
     </div>
   )),
 }))
-vi.mock('/app/molecules/InterventionModal/DeckMapContent', () => ({
+vi.mock('/app/components/ODD/modals/InterventionModal/DeckMapContent', () => ({
   DeckMapContent: vi.fn(() => <div>MOCK_RECOVERY_MAP</div>),
 }))
 

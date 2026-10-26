@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 import { LANGUAGES, US_ENGLISH } from '/app/i18n'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'

@@ -20,9 +20,9 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,

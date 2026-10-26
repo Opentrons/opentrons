@@ -34,11 +34,14 @@ import {
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import {
+  OddModal,
+  SmallModalChildren,
+} from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsHeaderTitleSkeleton,
@@ -66,7 +69,7 @@ import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolHeaderProps {

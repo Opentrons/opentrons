@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ListTable, StyledText } from '@opentrons/components'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'

@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

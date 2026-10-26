@@ -22,7 +22,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'

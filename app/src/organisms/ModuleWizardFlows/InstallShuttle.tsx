@@ -14,8 +14,8 @@ import {
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import StackerInstallShuttle from '/app/assets/videos/error-recovery/FlexStacker_InstallShuttle.webm'
-import { SmallButton } from '/app/atoms/buttons'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 

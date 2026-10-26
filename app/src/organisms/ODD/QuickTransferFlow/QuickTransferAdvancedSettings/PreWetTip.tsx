@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 

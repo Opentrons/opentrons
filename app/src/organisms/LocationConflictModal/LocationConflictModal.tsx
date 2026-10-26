@@ -45,9 +45,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
