@@ -119,12 +119,7 @@ export const PipetteWizardFlows = (
   const pipetteWizardSteps = useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty
-          )
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,

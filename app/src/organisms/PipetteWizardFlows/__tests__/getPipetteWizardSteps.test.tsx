@@ -38,12 +38,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.CALIBRATE,
-        LEFT,
-        SINGLE_MOUNT_PIPETTES,
-        false
-      )
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
   it('returns the correct array of info for attach pipette flow single channel', () => {
