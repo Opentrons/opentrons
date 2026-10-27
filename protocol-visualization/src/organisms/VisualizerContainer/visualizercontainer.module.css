@@ -23,3 +23,7 @@
   align-items: center;
   justify-content: flex-end;
 }
+
+.side_column {
+  overflow: auto;
+}

@@ -178,6 +178,7 @@ export function ProtocolVisualization(
           edge="right"
           defaultWidth={INITIAL_WIDTH_PX}
           aria-label={t('left_container')}
+          className={styles.side_column}
         >
           <CommandSteps
             analysis={analysis}
@@ -227,6 +228,7 @@ export function ProtocolVisualization(
             edge="left"
             defaultWidth={INITIAL_WIDTH_PX}
             aria-label={t('right_container')}
+            className={styles.side_column}
           >
             {selectedRunTimeCommand != null ? (
               <StepDetailContainer
