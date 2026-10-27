@@ -35,7 +35,6 @@ import {
 } from '/app/local-resources/maintenance_runs/utils'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
@@ -45,7 +44,6 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { AttachProbe } from './AttachProbe'
-import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
 import { Carriage } from './Carriage'
 import { FLOWS, SECTIONS } from './constants'
@@ -59,7 +57,6 @@ import { MountingPlate } from './MountingPlate'
 import { MountPipette } from './MountPipette'
 import { MovementErrorModal } from './MovementErrorModal'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 import { startCalibrationOnClick } from './utils'
@@ -108,7 +105,6 @@ export const PipetteWizardFlows = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const deckConfig = useNotifyDeckConfigurationQuery()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,15 +123,12 @@ export const PipetteWizardFlows = (
             flowType,
             mount,
             selectedPipette,
-            isGantryEmpty,
-            attachedPipettes,
-            deckConfig
+            isGantryEmpty
           )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount,
-            deckConfig
+            mount
           ),
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -547,7 +540,6 @@ export const PipetteWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
-        deckConfig={deckConfig}
         requiredPipette={requiredPipette}
         documentationState={commandDocState}
       />
@@ -561,7 +553,6 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
-        deckConfig={deckConfig}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
@@ -642,20 +633,6 @@ export const PipetteWizardFlows = (
       exitModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
-    )
-  } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
-    )
-  } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
     )
   }
   const buildWizardOnExit = (): (() => void) => {

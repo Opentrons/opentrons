@@ -16,27 +16,14 @@ import { AttachProbe } from '../AttachProbe'
 import { FLOWS } from '../constants'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
-  const mockDeckConfig = {
-    data: [
-      {
-        cutoutId: 'cutoutD3',
-      } as any,
-    ],
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
@@ -56,7 +43,6 @@ describe('AttachProbe', () => {
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
-      deckConfig: mockDeckConfig,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
