@@ -77,7 +77,9 @@ async def collect_run_log(
         )
 
         command_summaries = [
-            RunCommandSummary.build_from_json(c).model_dump(mode="json", by_alias=True)
+            RunCommandSummary.build_from_json(c).model_dump_json(
+                by_alias=True, exclude_none=True
+            )
             for c in command_slice.commands
         ]
 

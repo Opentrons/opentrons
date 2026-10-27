@@ -298,7 +298,7 @@ async def get_run_commands(
         description="If `true`, return all commands (protocol, setup, fixit)."
         " If `false`, only return safe commands (protocol, setup).",
     ),
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[str, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -323,7 +323,12 @@ async def get_run_commands(
     recovery_target_command = await run_data_manager.get_recovery_target_command(
         run_id=runId
     )
-    data = [RunCommandSummary.build_from_json(c) for c in command_slice.commands]
+    data = [
+        RunCommandSummary.build_from_json(c).model_dump_json(
+            by_alias=True, exclude_none=True
+        )
+        for c in command_slice.commands
+    ]
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
