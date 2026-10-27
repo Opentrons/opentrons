@@ -131,14 +131,13 @@ describe('system-update/from-usb/provider', () => {
       massStorageDeviceFiles: [],
     })
     const progress = vi.fn()
-    vi.when(getLatestMassStorageUpdateFile)
-      .calledWith(['/storage/valid-release.zip'])
-      .thenDo(() =>
+    vi.when(getLatestMassStorageUpdateFile, {
+      onUnmatched: () =>
         provider.teardown().then(() => ({
           path: '/storage/valid-release.zip',
           version: '1.0.0',
-        }))
-      )
+        })),
+    })
     return provider
       .teardown()
       .then(() => expect(provider.scanUpdate(progress)).rejects.toThrow())

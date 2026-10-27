@@ -221,30 +221,22 @@ describe('downloadReleaseFiles', () => {
     directoryWithCleanup(directory => {
       let tempSystemPath = ''
       let tempReleaseNotesPath = ''
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest, _opts) => {
-          tempSystemPath = dest
-          return fs
-            .writeFile(dest, 'this is the contents of the system.zip')
-            .then(() => dest)
-        })
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/releaseNotes.md',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest) => {
-          tempReleaseNotesPath = dest
-          return fs
-            .writeFile(dest, 'this is the contents of the release notes')
-            .then(() => dest)
-        })
+      vi.when(fetchToFile, {
+        onUnmatched: (url, dest) => {
+          if (url === 'http://opentrons.com/ot3-system.zip') {
+            tempSystemPath = dest
+            return fs
+              .writeFile(dest, 'this is the contents of the system.zip')
+              .then(() => dest)
+          }
+          if (url === 'http://opentrons.com/releaseNotes.md') {
+            tempReleaseNotesPath = dest
+            return fs
+              .writeFile(dest, 'this is the contents of the release notes')
+              .then(() => dest)
+          }
+        },
+      })
       const progress = vi.fn()
       return downloadReleaseFiles(
         {
@@ -280,17 +272,12 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should fetch only system zip if only system is available', () =>
     directoryWithCleanup(directory => {
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest, _opts) => {
-          return fs
+      vi.when(fetchToFile, {
+        onUnmatched: (_url, dest) =>
+          fs
             .writeFile(dest, 'this is the contents of the system.zip')
-            .then(() => dest)
-        })
+            .then(() => dest),
+      })
       const progress = vi.fn()
       return downloadReleaseFiles(
         {
@@ -314,24 +301,16 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should tolerate failing to fetch release notes', () =>
     directoryWithCleanup(directory => {
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest, _opts) => {
+      vi.when(fetchToFile, {
+        onUnmatched: (url, dest) => {
+          if (url === 'http://opentrons.com/releaseNotes.md') {
+            return Promise.reject(new Error('oh no!'))
+          }
           return fs
             .writeFile(dest, 'this is the contents of the system.zip')
             .then(() => dest)
-        })
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/releaseNotes.md',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenReject(new Error('oh no!'))
+        },
+      })
       const progress = vi.fn()
       return downloadReleaseFiles(
         {
@@ -357,25 +336,17 @@ describe('downloadReleaseFiles', () => {
   it('should fail if it cannot fetch system zip', () =>
     directoryWithCleanup(directory => {
       let tempReleaseNotesPath = ''
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenReject(new Error('oh no'))
-      vi.when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/releaseNotes.md',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest) => {
+      vi.when(fetchToFile, {
+        onUnmatched: (url, dest) => {
+          if (url === 'http://opentrons.com/ot3-system.zip') {
+            return Promise.reject(new Error('oh no'))
+          }
           tempReleaseNotesPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the release notes')
             .then(() => dest)
-        })
+        },
+      })
       const progress = vi.fn()
       return (
         expect(
@@ -398,30 +369,23 @@ describe('downloadReleaseFiles', () => {
     directoryWithCleanup(directory => {
       const aborter = new AbortController()
       const progressCallback = vi.fn()
-      vi.when(fetchToFile)
-        .calledWith('http://opentrons.com/ot3-system.zip', expect.any(String), {
-          onProgress: progressCallback,
-          signal: aborter.signal,
-        })
-        .thenDo(
-          (_url, dest, options) =>
-            new Promise((resolve, reject) => {
-              if (options?.signal == null) {
-                throw new Error(
-                  'expected fetchToFile to receive an abort signal'
-                )
-              }
-              const { signal } = options
-              const listener = () => {
-                reject(signal.reason)
-              }
-              signal.addEventListener('abort', listener, { once: true })
-              aborter.abort('oh no!')
-              return fs
-                .writeFile(dest, 'this is the contents of the system.zip')
-                .then(() => dest)
-            })
-        )
+      vi.when(fetchToFile, {
+        onUnmatched: (_url, dest, options) =>
+          new Promise((resolve, reject) => {
+            if (options?.signal == null) {
+              throw new Error('expected fetchToFile to receive an abort signal')
+            }
+            const { signal } = options
+            const listener = (): void => {
+              reject(signal.reason)
+            }
+            signal.addEventListener('abort', listener, { once: true })
+            aborter.abort('oh no!')
+            return fs
+              .writeFile(dest, 'this is the contents of the system.zip')
+              .then(() => dest)
+          }),
+      })
       return expect(
         downloadReleaseFiles(
           {

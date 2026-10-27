@@ -143,6 +143,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
   afterEach(() => {
+    nullCurrentRunIdOnceByHostname.clear()
     vi.resetAllMocks()
   })
 
@@ -356,20 +357,28 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
   })
 })
 
+const nullCurrentRunIdOnceByHostname = new Map<string, boolean>()
+
 const provideNullCurrentRunIdFor = (hostname: string): void => {
-  let once = true
-  vi.when(vi.mocked(useCurrentRunId))
-    .calledWith(expect.any(Object), {
-      hostname,
-      requestor: undefined,
-    })
-    .thenDo(options => {
+  nullCurrentRunIdOnceByHostname.set(hostname, true)
+  vi.when(vi.mocked(useCurrentRunId), {
+    onUnmatched: (options, hostConfig): string | null => {
+      const matchedHostname = hostConfig?.hostname
+      if (
+        matchedHostname == null ||
+        !nullCurrentRunIdOnceByHostname.has(matchedHostname) ||
+        hostConfig?.requestor !== undefined
+      ) {
+        return null
+      }
+      const once = nullCurrentRunIdOnceByHostname.get(matchedHostname)
       void (options?.onSuccess != null && once
         ? options.onSuccess({
             links: { current: null },
           } as any)
         : {})
-      once = false
+      nullCurrentRunIdOnceByHostname.set(matchedHostname, false)
       return null
-    })
+    },
+  })
 }

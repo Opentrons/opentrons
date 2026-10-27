@@ -320,25 +320,23 @@ describe('update driver', () => {
     vi.when(getConfig)
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: true })
-    vi.when(fakeProvider.scanUpdate)
-      .calledWith(expect.any(Function))
-      .thenDo(
-        progress =>
-          new Promise(resolve => {
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
-              releaseNotes: null,
-            })
-            resolve({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
-              releaseNotes: null,
-            })
+    vi.when(fakeProvider.scanUpdate, {
+      onUnmatched: progress =>
+        new Promise(resolve => {
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 0,
+            releaseNotes: null,
           })
-      )
+          resolve({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 0,
+            releaseNotes: null,
+          })
+        }),
+    })
     return thisSubject
       .handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
       .then(() => {
@@ -364,25 +362,23 @@ describe('update driver', () => {
   it('checks updates when told to check updates and does not autodownload if the setting is set', () => {
     const thisSubject = subject!
     vi.when(getConfig).calledWith('update').thenReturn(false)
-    vi.when(fakeProvider.scanUpdate)
-      .calledWith(expect.any(Function))
-      .thenDo(
-        progress =>
-          new Promise(resolve => {
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
-              releaseNotes: null,
-            })
-            resolve({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
-              releaseNotes: null,
-            })
+    vi.when(fakeProvider.scanUpdate, {
+      onUnmatched: progress =>
+        new Promise(resolve => {
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 0,
+            releaseNotes: null,
           })
-      )
+          resolve({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 0,
+            releaseNotes: null,
+          })
+        }),
+    })
     return thisSubject
       .handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
       .then(() => {
@@ -410,31 +406,29 @@ describe('update driver', () => {
     vi.when(getConfig)
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: false })
-    vi.when(fakeProvider.scanUpdate)
-      .calledWith(expect.any(Function))
-      .thenDo(
-        progress =>
-          new Promise(resolve => {
-            progress({
-              version: '1.2.3',
-              files: {
-                system: null,
-                releaseNotes: '/some/path/to/releasenotes.md',
-              },
-              downloadProgress: 0,
-              releaseNotes: 'hello',
-            })
-            resolve({
-              version: '1.2.3',
-              files: {
-                system: null,
-                releaseNotes: '/some/path/to/releasenotes.md',
-              },
-              downloadProgress: 0,
-              releaseNotes: 'hello',
-            })
+    vi.when(fakeProvider.scanUpdate, {
+      onUnmatched: progress =>
+        new Promise(resolve => {
+          progress({
+            version: '1.2.3',
+            files: {
+              system: null,
+              releaseNotes: '/some/path/to/releasenotes.md',
+            },
+            downloadProgress: 0,
+            releaseNotes: 'hello',
           })
-      )
+          resolve({
+            version: '1.2.3',
+            files: {
+              system: null,
+              releaseNotes: '/some/path/to/releasenotes.md',
+            },
+            downloadProgress: 0,
+            releaseNotes: 'hello',
+          })
+        }),
+    })
     await thisSubject.handleAction({
       type: 'shell:CHECK_UPDATE',
       meta: { shell: true },
@@ -486,55 +480,53 @@ describe('update driver', () => {
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: true })
     const thisSubject = subject!
-    vi.when(fakeProvider.downloadUpdate)
-      .calledWith(expect.any(Function))
-      .thenDo(
-        progress =>
-          new Promise(resolve => {
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
-              releaseNotes: null,
-            })
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 1,
-              releaseNotes: null,
-            })
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 50,
-              releaseNotes: null,
-            })
-            progress({
-              version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              downloadProgress: 50.1,
-              releaseNotes: null,
-            })
-            progress({
-              version: '1.2.3',
-              files: {
-                system: '/some/path',
-                releaseNotes: '/some/other/path',
-              },
-              downloadProgress: 100,
-              releaseNotes: 'some release notes',
-            })
-            resolve({
-              version: '1.2.3',
-              files: {
-                system: '/some/path',
-                releaseNotes: '/some/other/path',
-              },
-              downloadProgress: 100,
-              releaseNotes: 'some release notes',
-            })
+    vi.when(fakeProvider.downloadUpdate, {
+      onUnmatched: progress =>
+        new Promise(resolve => {
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 0,
+            releaseNotes: null,
           })
-      )
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 1,
+            releaseNotes: null,
+          })
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 50,
+            releaseNotes: null,
+          })
+          progress({
+            version: '1.2.3',
+            files: { system: null, releaseNotes: null },
+            downloadProgress: 50.1,
+            releaseNotes: null,
+          })
+          progress({
+            version: '1.2.3',
+            files: {
+              system: '/some/path',
+              releaseNotes: '/some/other/path',
+            },
+            downloadProgress: 100,
+            releaseNotes: 'some release notes',
+          })
+          resolve({
+            version: '1.2.3',
+            files: {
+              system: '/some/path',
+              releaseNotes: '/some/other/path',
+            },
+            downloadProgress: 100,
+            releaseNotes: 'some release notes',
+          })
+        }),
+    })
     return thisSubject
       .handleAction({
         type: 'robotUpdate:DOWNLOAD_UPDATE',

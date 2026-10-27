@@ -492,41 +492,33 @@ describe('provider.downloadUpdate happy paths', () => {
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(null)
 
-    vi.when(cleanUpAndDownloadReleaseFiles)
-      .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
-        expect.any(Function),
-        expect.any(Object)
-      )
-      .thenDo(
-        (
-          _releaseUrls,
-          _cacheDir,
-          _version,
-          progressCallback,
-          _abortController
-        ) =>
-          new Promise<void>(resolve => {
-            progressCallback({ size: 100, downloaded: 0 })
-            resolve()
-          })
-            .then(
-              () =>
-                new Promise<void>(resolve => {
-                  progressCallback({ size: 100, downloaded: 50 })
-                  resolve()
-                })
-            )
-            .then(
-              () =>
-                new Promise(resolve => {
-                  progressCallback({ size: 100, downloaded: 100 })
-                  resolve(releaseData)
-                })
-            )
-      )
+    vi.when(cleanUpAndDownloadReleaseFiles, {
+      onUnmatched: (
+        _releaseUrls,
+        _cacheDir,
+        _version,
+        progressCallback,
+        _abortController
+      ) =>
+        new Promise<void>(resolve => {
+          progressCallback({ size: 100, downloaded: 0 })
+          resolve()
+        })
+          .then(
+            () =>
+              new Promise<void>(resolve => {
+                progressCallback({ size: 100, downloaded: 50 })
+                resolve()
+              })
+          )
+          .then(
+            () =>
+              new Promise(resolve => {
+                progressCallback({ size: 100, downloaded: 100 })
+                resolve(releaseData)
+              })
+          ),
+    })
     vi.when(downloadReleaseNotes)
       .calledWith(
         'http://opentrons.com/releaseNotes.md',
@@ -740,25 +732,19 @@ describe('provider locking', () => {
         downloadProgress: 100,
       })
       .then(() => {
-        vi.when(getOrDownloadManifest)
-          .calledWith(
-            'http://opentrons.com/releases.json',
-            '/some/random/directory',
-            expect.any(AbortController)
-          )
-          .thenDo(
-            (_manifestUrl, _cacheDirectory, abortController) =>
-              new Promise((resolve, reject) => {
-                abortController.signal.addEventListener(
-                  'abort',
-                  () => {
-                    reject(new LocalAbortError(abortController.signal.reason))
-                  },
-                  { once: true }
-                )
-                provider.lockUpdateCache()
-              })
-          )
+        vi.when(getOrDownloadManifest, {
+          onUnmatched: (_manifestUrl, _cacheDirectory, abortController) =>
+            new Promise((resolve, reject) => {
+              abortController.signal.addEventListener(
+                'abort',
+                () => {
+                  reject(new LocalAbortError(abortController.signal.reason))
+                },
+                { once: true }
+              )
+              provider.lockUpdateCache()
+            }),
+        })
         const progress = vi.fn()
         return expect(provider.scanUpdate(progress))
           .rejects.toThrow()
@@ -812,27 +798,25 @@ describe('provider locking', () => {
     vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(null)
-    vi.when(cleanUpAndDownloadReleaseFiles)
-      .calledWith(
-        expect.any(Object),
-        expect.any(String),
-        expect.any(String),
-        expect.any(Function),
-        expect.any(AbortController)
-      )
-      .thenDo(
-        (_releaseUrls, _cacheDirectory, _version, _progress, abortController) =>
-          new Promise((resolve, reject) => {
-            abortController.signal.addEventListener(
-              'abort',
-              () => {
-                reject(new LocalAbortError(abortController.signal.reason))
-              },
-              { once: true }
-            )
-            provider.lockUpdateCache()
-          })
-      )
+    vi.when(cleanUpAndDownloadReleaseFiles, {
+      onUnmatched: (
+        _releaseUrls,
+        _cacheDirectory,
+        _version,
+        _progress,
+        abortController
+      ) =>
+        new Promise((resolve, reject) => {
+          abortController.signal.addEventListener(
+            'abort',
+            () => {
+              reject(new LocalAbortError(abortController.signal.reason))
+            },
+            { once: true }
+          )
+          provider.lockUpdateCache()
+        }),
+    })
     vi.when(downloadReleaseNotes)
       .calledWith(
         'http://opentrons.com/releaseNotes.md',
