@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -37,10 +36,10 @@ describe('useIsProtocolRunSetupLoading', () => {
         [RUN_ID]: { lpc: {} },
       },
     }
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({ id: 'analysis' } as any)
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
   })
@@ -54,7 +53,7 @@ describe('useIsProtocolRunSetupLoading', () => {
   })
 
   it('is loading while analysis is missing', () => {
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
 

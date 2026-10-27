@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getProvider } from '../provider'
 import { getLatestMassStorageUpdateFile as _getLatestMassStorageUpdateFile } from '../scan-device'
@@ -16,7 +15,7 @@ describe('system-update/from-usb/provider', () => {
     vi.resetAllMocks()
   })
   it('signals available updates when given available updates', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/valid-release.zip'])
       .thenResolve({ path: '/storage/valid-release.zip', version: '1.2.3' })
     const progress = vi.fn()
@@ -41,7 +40,7 @@ describe('system-update/from-usb/provider', () => {
       })
   })
   it('signals no available update when given no available updates', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/blahblah'])
       .thenResolve(null)
     const progress = vi.fn()
@@ -63,7 +62,7 @@ describe('system-update/from-usb/provider', () => {
       })
   })
   it('signals no available update when the scan throws', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/blahblah'])
       .thenReject(new Error('oh no'))
     const progress = vi.fn()
@@ -85,7 +84,7 @@ describe('system-update/from-usb/provider', () => {
       })
   })
   it('signals no available update when the highest version update is the same version as current', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/valid-release.zip'])
       .thenResolve({ path: '/storage/valid-release.zip', version: '1.0.0' })
     const progress = vi.fn()
@@ -132,14 +131,13 @@ describe('system-update/from-usb/provider', () => {
       massStorageDeviceFiles: [],
     })
     const progress = vi.fn()
-    when(getLatestMassStorageUpdateFile)
-      .calledWith(['/storage/valid-release.zip'])
-      .thenDo(() =>
+    vi.when(getLatestMassStorageUpdateFile, {
+      onUnmatched: () =>
         provider.teardown().then(() => ({
           path: '/storage/valid-release.zip',
           version: '1.0.0',
-        }))
-      )
+        })),
+    })
     return provider
       .teardown()
       .then(() => expect(provider.scanUpdate(progress)).rejects.toThrow())
@@ -153,7 +151,7 @@ describe('system-update/from-usb/provider', () => {
       )
   })
   it('will not run two checks at once', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/valid-release.zip'])
       .thenResolve({ path: '/storage/valid-release.zip', version: '1.0.0' })
     const progress = vi.fn()
@@ -176,7 +174,7 @@ describe('system-update/from-usb/provider', () => {
     ]).then(() => expect(getLatestMassStorageUpdateFile).toHaveBeenCalledOnce())
   })
   it('will run a second check after the first ends', () => {
-    when(getLatestMassStorageUpdateFile)
+    vi.when(getLatestMassStorageUpdateFile)
       .calledWith(['/storage/valid-release.zip'])
       .thenResolve({ path: '/storage/valid-release.zip', version: '1.0.0' })
     const progress = vi.fn()

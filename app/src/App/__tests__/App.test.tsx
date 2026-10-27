@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { initializeSentry } from '/app/App/sentry'
@@ -51,13 +50,13 @@ describe('App', () => {
     )
     vi.mocked(initializeSentry).mockImplementation(mockInitSentry)
     vi.mocked(useWindowType).mockReturnValue('desktop-main')
-    when(vi.mocked(getConfig))
+    vi.when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
       .thenReturn(MOCK_STATE.config)
   })
 
   it('renders null before config initializes', () => {
-    when(vi.mocked(getConfig)).calledWith(MOCK_STATE).thenReturn(null)
+    vi.when(vi.mocked(getConfig)).calledWith(MOCK_STATE).thenReturn(null)
     const [{ container }] = render()
     expect(container).toBeEmptyDOMElement()
   })

@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import * as Cfg from '@opentrons/app/src/redux/config'
 import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
@@ -51,7 +50,7 @@ describe('analyzeProtocolSource', () => {
 
   beforeEach(() => {
     dispatch = vi.fn()
-    when(vi.mocked(getConfig)).calledWith('python').thenReturn({
+    vi.when(vi.mocked(getConfig)).calledWith('python').thenReturn({
       pathToPythonOverride: '/some/override/python',
     })
     handleAction = registerProtocolAnalysis(dispatch, mockMainWindow)
@@ -83,8 +82,8 @@ describe('analyzeProtocolSource', () => {
       '/some/custom/labware/directory/fakeLabwareTwo.json',
     ]
 
-    when(vi.mocked(getPythonPath)).calledWith().thenResolve(pythonPath)
-    when(vi.mocked(getValidLabwareFilePaths))
+    vi.when(vi.mocked(getPythonPath)).calledWith().thenResolve(pythonPath)
+    vi.when(vi.mocked(getValidLabwareFilePaths))
       .calledWith()
       .thenResolve(labwarePaths)
 
@@ -102,8 +101,8 @@ describe('analyzeProtocolSource', () => {
     const outputPath = '/path/to/output.json'
     const error = new Error('oh no')
 
-    when(vi.mocked(getPythonPath)).calledWith().thenReject(error)
-    when(vi.mocked(getValidLabwareFilePaths)).calledWith().thenResolve([])
+    vi.when(vi.mocked(getPythonPath)).calledWith().thenReject(error)
+    vi.when(vi.mocked(getValidLabwareFilePaths)).calledWith().thenResolve([])
 
     return analyzeProtocolSource(sourcePath, outputPath).then(() => {
       expect(vi.mocked(writeFailedAnalysis)).toHaveBeenCalledWith(
@@ -119,9 +118,9 @@ describe('analyzeProtocolSource', () => {
     const pythonPath = '/path/to/python'
     const error = new Error('oh no')
 
-    when(vi.mocked(getPythonPath)).calledWith().thenResolve(pythonPath)
-    when(vi.mocked(getValidLabwareFilePaths)).calledWith().thenResolve([])
-    when(vi.mocked(executeAnalyzeCli))
+    vi.when(vi.mocked(getPythonPath)).calledWith().thenResolve(pythonPath)
+    vi.when(vi.mocked(getValidLabwareFilePaths)).calledWith().thenResolve([])
+    vi.when(vi.mocked(executeAnalyzeCli))
       .calledWith(pythonPath, outputPath, [sourcePath])
       .thenReject(error)
 
@@ -134,7 +133,7 @@ describe('analyzeProtocolSource', () => {
   })
 
   it('should open file picker in response to CHANGE_PYTHON_PATH_OVERRIDE and not call dispatch if no directory is returned from showOpenDirectoryDialog', () => {
-    when(vi.mocked(Dialogs.showOpenDirectoryDialog))
+    vi.when(vi.mocked(Dialogs.showOpenDirectoryDialog))
       .calledWith(mockMainWindow)
       .thenResolve([])
     handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
@@ -148,7 +147,7 @@ describe('analyzeProtocolSource', () => {
   })
 
   it('should open file picker in response to CHANGE_PYTHON_PATH_OVERRIDE and call dispatch with directory returned from showOpenDirectoryDialog', () => {
-    when(vi.mocked(Dialogs.showOpenDirectoryDialog))
+    vi.when(vi.mocked(Dialogs.showOpenDirectoryDialog))
       .calledWith(mockMainWindow)
       .thenResolve(['path/to/override'])
     handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
@@ -167,7 +166,7 @@ describe('analyzeProtocolSource', () => {
   })
 
   it('should call openDirectoryInFileExplorer in response to OPEN_PYTHON_DIRECTORY', () => {
-    when(vi.mocked(Dialogs.openDirectoryInFileExplorer))
+    vi.when(vi.mocked(Dialogs.openDirectoryInFileExplorer))
       .calledWith('/some/override/python')
       .thenResolve(null)
     handleAction(ProtocolAnalysis.openPythonInterpreterDirectory())

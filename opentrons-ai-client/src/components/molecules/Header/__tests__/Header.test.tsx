@@ -1,5 +1,5 @@
 import * as auth0 from '@auth0/auth0-react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
@@ -51,13 +51,15 @@ describe('Header', () => {
     expect(mockLogout).toHaveBeenCalled()
   })
 
-  it('should track logout event when log out button is clicked', () => {
+  it('should track logout event when log out button is clicked', async () => {
     render()
     const logoutButton = screen.getByText('Logout')
     fireEvent.click(logoutButton)
-    expect(mockUseTrackEvent).toHaveBeenCalledWith({
-      name: 'user-logout',
-      properties: {},
+    await waitFor(() => {
+      expect(mockUseTrackEvent).toHaveBeenCalledWith({
+        name: 'user-logout',
+        properties: {},
+      })
     })
   })
 })

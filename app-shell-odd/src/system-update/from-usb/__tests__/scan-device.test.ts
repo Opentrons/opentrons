@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getLatestMassStorageUpdateFile } from '../scan-device'
 import { getVersionFromZipIfValid as _getVersionFromZipIfValid } from '../scan-zip'
@@ -13,7 +12,7 @@ describe('system-update/from-usb/scan-device', () => {
     vi.resetAllMocks()
   })
   it('returns the single file passed in', () => {
-    when(getVersionFromZipIfValid)
+    vi.when(getVersionFromZipIfValid)
       .calledWith('/some/random/zip/file.zip')
       .thenResolve({ path: '/some/random/zip/file.zip', version: '0.0.1' })
     return expect(
@@ -23,7 +22,7 @@ describe('system-update/from-usb/scan-device', () => {
   it('returns null if no files are passed in', () =>
     expect(getLatestMassStorageUpdateFile([])).resolves.toBeNull())
   it('returns null if no suitable zips are found', () => {
-    when(getVersionFromZipIfValid)
+    vi.when(getVersionFromZipIfValid)
       .calledWith('/some/random/zip/file.zip')
       .thenReject(new Error('no version found'))
     return expect(
@@ -31,7 +30,7 @@ describe('system-update/from-usb/scan-device', () => {
     ).resolves.toBeNull()
   })
   it('checks only the zip file', () => {
-    when(getVersionFromZipIfValid)
+    vi.when(getVersionFromZipIfValid)
       .calledWith('/some/random/zip/file.zip')
       .thenResolve({ path: '/some/random/zip/file.zip', version: '0.0.1' })
     return expect(
@@ -44,10 +43,10 @@ describe('system-update/from-usb/scan-device', () => {
       .then(() => expect(getVersionFromZipIfValid).toHaveBeenCalledOnce())
   })
   it('returns the highest version', () => {
-    when(getVersionFromZipIfValid)
+    vi.when(getVersionFromZipIfValid)
       .calledWith('higher-version.zip')
       .thenResolve({ path: 'higher-version.zip', version: '1.0.0' })
-    when(getVersionFromZipIfValid)
+    vi.when(getVersionFromZipIfValid)
       .calledWith('lower-version.zip')
       .thenResolve({ path: 'higher-version.zip', version: '1.0.0-alpha.0' })
     return expect(
