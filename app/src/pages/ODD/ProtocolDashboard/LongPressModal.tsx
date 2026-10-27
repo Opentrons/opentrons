@@ -7,10 +7,10 @@ import { useNavigate } from 'react-router-dom'
 import {
   Flex,
   Icon,
-  LegacyStyledText,
   MenuItem,
   MenuList,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
@@ -122,25 +122,25 @@ export function LongPressModal({
             <MenuItem onClick={handleRunClick} key="play-circle">
               <Flex>
                 <Icon name="play-circle" size="1.75rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {t('run_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
             <MenuItem onClick={handlePinClick} key="pin">
               <Flex>
                 <Icon name="pin" size="2.5rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {pinned ? t('unpin_protocol') : t('pin_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
             <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
               <Flex>
                 <Icon name="trash" size="2.5rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {t('delete_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
           </MenuList>,

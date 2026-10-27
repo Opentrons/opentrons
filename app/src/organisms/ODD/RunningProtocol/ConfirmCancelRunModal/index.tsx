@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -73,12 +73,10 @@ export function ConfirmCancelRunModal({
             isActiveRun ? styles.active_run : styles.inactive_run
           }`}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('cancel_run_alert_info_flex')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
-            {t('cancel_run_module_info')}
-          </LegacyStyledText>
+          </StyledText>
+          <StyledText forwardedAs="p">{t('cancel_run_module_info')}</StyledText>
         </div>
         <div className={styles.button_row}>
           <SmallButton

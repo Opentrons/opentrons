@@ -10,8 +10,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -56,7 +56,7 @@ export function LabeledMount(props: LabeledMountProps): ReactNode {
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing24}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TYPOGRAPHY.textAlignLeft}
@@ -65,8 +65,8 @@ export function LabeledMount(props: LabeledMountProps): ReactNode {
             width="15.625rem"
           >
             {isNinetySixChannel ? t('left_right') : t('mount', { side: mount })}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             flex="5"
             forwardedAs="h4"
             color={COLORS.grey60}
@@ -75,7 +75,7 @@ export function LabeledMount(props: LabeledMountProps): ReactNode {
             fontSize={TYPOGRAPHY.fontSize28}
           >
             {instrumentName == null ? t('empty') : instrumentName}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Icon name="more" size="3rem" />
       </Flex>

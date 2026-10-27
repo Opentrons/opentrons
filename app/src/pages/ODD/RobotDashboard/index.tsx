@@ -6,8 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -89,13 +89,13 @@ export function RobotDashboard(): ReactNode {
       contents = (
         <>
           {hasStandardProtocols ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('run_again')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           <RecentRunProtocolCarousel
             recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}

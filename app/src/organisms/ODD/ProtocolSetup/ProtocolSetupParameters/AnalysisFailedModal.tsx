@@ -6,8 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -61,9 +61,7 @@ export function AnalysisFailedModal({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <LegacyStyledText forwardedAs="p">
-            {t('with_the_chosen_value')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="p">{t('with_the_chosen_value')}</StyledText>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.borderRadius8}
@@ -72,14 +70,12 @@ export function AnalysisFailedModal({
             overflowY="auto"
           >
             {errors.map((error, index) => (
-              <LegacyStyledText key={index} forwardedAs="p">
+              <StyledText key={index} forwardedAs="p">
                 {error}
-              </LegacyStyledText>
+              </StyledText>
             ))}
           </Flex>
-          <LegacyStyledText forwardedAs="p">
-            {t('restart_setup_and_try')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="p">{t('restart_setup_and_try')}</StyledText>
         </Flex>
         <SmallButton
           onClick={handleRestartSetup}

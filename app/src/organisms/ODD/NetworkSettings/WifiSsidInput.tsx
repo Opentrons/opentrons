@@ -5,9 +5,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -41,13 +41,13 @@ export function WifiSsidInput({
         gridGap={SPACING.spacing8}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >
           {t('enter_network_name')}
-        </LegacyStyledText>
+        </StyledText>
         <TouchInputField
           ref={inputRef}
           autoFocus

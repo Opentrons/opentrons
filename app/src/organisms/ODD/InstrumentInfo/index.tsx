@@ -9,8 +9,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -195,22 +195,22 @@ function InfoItem(props: InfoItemProps): ReactNode {
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}
     >
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         fontSize={TYPOGRAPHY.fontSize28}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {props.label}
-      </LegacyStyledText>
-      <LegacyStyledText
+      </StyledText>
+      <StyledText
         forwardedAs="h4"
         color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >
         {props.value}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom'
 import {
   Icon,
   InlineNotification,
-  LegacyStyledText,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useLogLevelQuery,
@@ -386,12 +387,12 @@ function FeatureFlags(): ReactNode {
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
-                className={styles.feature_flag_title}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t(`__dev_internal__${flag}`)}
-              </LegacyStyledText>
+              </StyledText>
             </div>
           </div>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />

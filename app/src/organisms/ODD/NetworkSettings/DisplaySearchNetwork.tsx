@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -30,14 +30,14 @@ export function DisplaySearchNetwork(): ReactNode {
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h3"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

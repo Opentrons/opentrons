@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CommandText,
   getCommandTextData,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -95,16 +95,14 @@ export function CurrentRunningProtocolCommand({
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.status_info}>
-          <LegacyStyledText className={styles.status_text}>
+          <StyledText className={styles.status_text}>
             {currentRunStatus}
-          </LegacyStyledText>
-          <LegacyStyledText className={styles.title_text}>
-            {protocolName}
-          </LegacyStyledText>
+          </StyledText>
+          <StyledText className={styles.title_text}>{protocolName}</StyledText>
         </div>
         <div className={styles.timer_info}>
           <RunTimer {...runTimerInfo} style={styles.run_timer} />
-          <LegacyStyledText
+          <StyledText
             style={{
               fontSize: TYPOGRAPHY.fontSize28,
               lineHeight: TYPOGRAPHY.lineHeight36,
@@ -112,7 +110,7 @@ export function CurrentRunningProtocolCommand({
             }}
           >
             {stepCounterCopy}
-          </LegacyStyledText>
+          </StyledText>
         </div>
       </div>
 

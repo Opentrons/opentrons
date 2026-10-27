@@ -10,9 +10,9 @@ import {
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -99,13 +99,13 @@ export function SelectAuthenticationType({
             ))}
           </Flex>
           <Flex marginY={SPACING.spacing24}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               color={COLORS.grey60}
             >
               {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
           <Btn
             display={DISPLAY_FLEX}
@@ -117,13 +117,13 @@ export function SelectAuthenticationType({
             }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('need_another_security_type')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         </Flex>
       </Flex>
