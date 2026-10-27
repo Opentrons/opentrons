@@ -1,7 +1,7 @@
 """Router for /runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Final, Literal, Optional, Union
+from typing import Annotated, Any, Final, Literal, Optional, Union
 
 from fastapi import Depends, Query, status
 
@@ -298,7 +298,7 @@ async def get_run_commands(
         description="If `true`, return all commands (protocol, setup, fixit)."
         " If `false`, only return safe commands (protocol, setup).",
     ),
-) -> PydanticResponse[MultiBody[str, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -324,7 +324,7 @@ async def get_run_commands(
         run_id=runId
     )
     data = [
-        RunCommandSummary.build_from_json(c).model_dump_json(
+        RunCommandSummary.build_from_json(c).model_dump(
             by_alias=True, exclude_none=True
         )
         for c in command_slice.commands

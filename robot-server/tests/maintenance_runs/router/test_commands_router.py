@@ -404,7 +404,7 @@ async def test_get_run_commands(
                 detail="Things are not looking good.",
             ),
             failedCommandId="failed-command-id",
-        ).model_dump_json(by_alias=True, exclude_none=True)
+        ).model_dump(by_alias=True, exclude_none=True)
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.content.links == CommandCollectionLinks(

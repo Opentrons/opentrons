@@ -1,7 +1,7 @@
 """Router for /maintenance_runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
@@ -264,7 +264,7 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
-) -> PydanticResponse[MultiBody[str, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -288,7 +288,7 @@ async def get_run_commands(
     )
 
     data = [
-        RunCommandSummary.build_from_json(c).model_dump_json(
+        RunCommandSummary.build_from_json(c).model_dump(
             by_alias=True, exclude_none=True
         )
         for c in command_slice.commands
