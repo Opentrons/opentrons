@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockIdleUnstartedRun } from '/app/resources/runs/__fixtures__'
 import { formatTimestamp } from '/app/transformations/runs'
@@ -18,12 +17,12 @@ const MOCK_RUN_ID = '1'
 
 describe('useRunCreatedAtTimestamp', () => {
   beforeEach(() => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID)
       .thenReturn({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
-    when(vi.mocked(formatTimestamp))
+    vi.when(vi.mocked(formatTimestamp))
       .calledWith(mockIdleUnstartedRun.createdAt)
       .thenReturn('this is formatted')
   })

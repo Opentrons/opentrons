@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import isEqual from 'lodash/isEqual'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
@@ -57,10 +56,10 @@ describe('GridOffset', () => {
   })
 
   it('should render when fields are visible', () => {
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('FAKE LABWARE NAME SINGULAR')
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
 
@@ -115,7 +114,7 @@ describe('GridOffset', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['gridOffsetX', 'gridOffsetY'], formikConfig.initialValues)
       .thenReturn(true)
 

@@ -2,7 +2,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { fetchToFile as httpFetchToFile } from '../../../http'
 import { directoryWithCleanup } from '../../utils'
@@ -222,7 +221,7 @@ describe('downloadReleaseFiles', () => {
     directoryWithCleanup(directory => {
       let tempSystemPath = ''
       let tempReleaseNotesPath = ''
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
           expect.any(String),
@@ -234,7 +233,7 @@ describe('downloadReleaseFiles', () => {
             .writeFile(dest, 'this is the contents of the system.zip')
             .then(() => dest)
         })
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/releaseNotes.md',
           expect.any(String),
@@ -281,7 +280,7 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should fetch only system zip if only system is available', () =>
     directoryWithCleanup(directory => {
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
           expect.any(String),
@@ -315,7 +314,7 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should tolerate failing to fetch release notes', () =>
     directoryWithCleanup(directory => {
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
           expect.any(String),
@@ -326,7 +325,7 @@ describe('downloadReleaseFiles', () => {
             .writeFile(dest, 'this is the contents of the system.zip')
             .then(() => dest)
         })
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/releaseNotes.md',
           expect.any(String),
@@ -358,14 +357,14 @@ describe('downloadReleaseFiles', () => {
   it('should fail if it cannot fetch system zip', () =>
     directoryWithCleanup(directory => {
       let tempReleaseNotesPath = ''
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
           expect.any(String),
           expect.any(Object)
         )
         .thenReject(new Error('oh no'))
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith(
           'http://opentrons.com/releaseNotes.md',
           expect.any(String),
@@ -399,7 +398,7 @@ describe('downloadReleaseFiles', () => {
     directoryWithCleanup(directory => {
       const aborter = new AbortController()
       const progressCallback = vi.fn()
-      when(fetchToFile)
+      vi.when(fetchToFile)
         .calledWith('http://opentrons.com/ot3-system.zip', expect.any(String), {
           onProgress: progressCallback,
           signal: aborter.signal,

@@ -1,7 +1,6 @@
 import { legacy_configureStore } from 'redux-mock-store'
 import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
@@ -14,7 +13,7 @@ describe('saveStepFormsMulti', () => {
   let store: any
   beforeEach(() => {
     store = mockStore()
-    when(vi.mocked(getBatchEditFieldChanges))
+    vi.when(vi.mocked(getBatchEditFieldChanges))
       .calledWith(expect.anything())
       .thenReturn({ someField: 'someVal' })
   })

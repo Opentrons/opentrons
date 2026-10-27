@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
@@ -118,17 +117,17 @@ const render = (initialState: State = {} as State) => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         ...noModulesProtocol,
         ...MOCK_PROTOCOL_LIQUID_KEY,
       } as any)
-    when(vi.mocked(getMissingSetupSteps))
+    vi.when(vi.mocked(getMissingSetupSteps))
       .calledWith(expect.any(Object), RUN_ID)
       .thenReturn([])
-    when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
+    vi.when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
     })
     vi.mocked(getCameraUsageState).mockReturnValue({
@@ -136,13 +135,13 @@ describe('ProtocolRunSetup', () => {
       recoveryEnabled: true,
       liveStreamEnabled: true,
     })
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         ...noModulesProtocol,
         ...MOCK_PROTOCOL_LIQUID_KEY,
       } as unknown as SharedData.ProtocolAnalysisOutput)
-    when(vi.mocked(useRequiredSetupStepsInOrder))
+    vi.when(vi.mocked(useRequiredSetupStepsInOrder))
       .calledWith({
         runId: RUN_ID,
         protocolAnalysis: expect.any(Object),
@@ -162,14 +161,14 @@ describe('ProtocolRunSetup', () => {
         ],
       })
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectedRobot)
-    when(vi.mocked(useRunCalibrationStatus))
+    vi.when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ complete: true })
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
-    when(vi.mocked(SetupRobotCalibration))
+    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.when(vi.mocked(SetupRobotCalibration))
       .calledWith(
         expect.objectContaining({
           robotName: ROBOT_NAME,
@@ -179,7 +178,7 @@ describe('ProtocolRunSetup', () => {
         expect.anything()
       )
       .thenReturn(<span>Mock SetupRobotCalibration</span>)
-    when(vi.mocked(SetupLabware))
+    vi.when(vi.mocked(SetupLabware))
       .calledWith(
         expect.objectContaining({
           robotName: ROBOT_NAME,
@@ -197,7 +196,7 @@ describe('ProtocolRunSetup', () => {
     vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getRequiredDeckConfig).mockReturnValue([])
-    when(vi.mocked(useUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
@@ -205,10 +204,10 @@ describe('ProtocolRunSetup', () => {
       data: undefined,
       isLoading: false,
     } as any)
-    when(vi.mocked(useRunPipetteInfoByMount))
+    vi.when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })
-    when(vi.mocked(useModuleCalibrationStatus))
+    vi.when(vi.mocked(useModuleCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ complete: true })
     vi.mocked(useLPCFlows).mockReturnValue({
@@ -238,19 +237,19 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders null if robot is null', () => {
-    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn(null)
+    vi.when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn(null)
     const { container } = render()
     expect(container).toBeEmptyDOMElement()
   })
 
   it('renders run loading info screen while analysis is unavailable', () => {
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
-    when(vi.mocked(useRequiredSetupStepsInOrder))
+    vi.when(vi.mocked(useRequiredSetupStepsInOrder))
       .calledWith({ runId: RUN_ID, protocolAnalysis: null })
       .thenReturn({
         orderedSteps: [
@@ -269,10 +268,10 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders run loading info screen while protocol is analyzing', () => {
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
     vi.mocked(useProtocolQuery).mockReturnValue({
@@ -285,13 +284,13 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('shows setup loading when LPC Redux state is missing', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     screen.getByText('Setup loading')
   })
 
   it('does not show setup loading when Flex LPC state exists', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()
   })
@@ -306,7 +305,7 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('does not show run loading while Flex LPC is only initializing', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useLPCFlows).mockReturnValue({
       launchLPC: vi.fn(),
       lpcProps: null,
@@ -319,7 +318,7 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('does not show run loading when offsets are not yet applied locally', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
     render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()
@@ -331,7 +330,7 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders calibration needed when robot calibration not complete', () => {
-    when(vi.mocked(useRunCalibrationStatus))
+    vi.when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ complete: false })
     render()
@@ -351,7 +350,7 @@ describe('ProtocolRunSetup', () => {
       expect(screen.getByTestId('SetupStep_content_expanded')).toBeTruthy()
     })
     it('renders robot calibration setup for Flex', () => {
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
       render(FLEX_LPC_READY_STATE)
 
@@ -387,7 +386,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders view-only info message if run has started', async () => {
-      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+      vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -404,13 +403,13 @@ describe('ProtocolRunSetup', () => {
         'magneticModuleV1',
         'temperatureModuleV1',
       ])
-      when(vi.mocked(useMostRecentCompletedAnalysis))
+      vi.when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
         } as any)
-      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
-      when(vi.mocked(useModuleCalibrationStatus))
+      vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+      vi.when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
     })
@@ -419,9 +418,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders proper copy if robot is Flex and modules are calibrated', () => {
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      when(vi.mocked(useModuleCalibrationStatus))
+      vi.when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: true })
 
@@ -430,9 +429,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders action needed if modules need to be calibrated, homed, etc.', () => {
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      when(vi.mocked(useModuleCalibrationStatus))
+      vi.when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
@@ -442,22 +441,22 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('does not render calibration element if robot is OT-2', () => {
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
 
       render()
       expect(screen.getAllByText('Calibration ready').length).toEqual(1)
     })
 
     it('renders action needed if robot is Flex and modules are not connected', () => {
-      when(vi.mocked(useUnmatchedModulesForProtocol))
+      vi.when(vi.mocked(useUnmatchedModulesForProtocol))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({
           missingModuleIds: ['temperatureModuleV1'],
           remainingAttachedModules: [],
         })
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      when(vi.mocked(useModuleCalibrationStatus))
+      vi.when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
@@ -490,9 +489,9 @@ describe('ProtocolRunSetup', () => {
         },
       ] as any)
       vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      when(vi.mocked(useModuleCalibrationStatus))
+      vi.when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
         .thenReturn({ complete: false })
 
@@ -526,7 +525,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for single module', () => {
-      when(vi.mocked(useMostRecentCompletedAnalysis))
+      vi.when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
@@ -558,9 +557,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
-      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-      when(vi.mocked(useMostRecentCompletedAnalysis))
+      vi.when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
         .thenReturn({
           ...withModulesProtocol,
@@ -585,14 +584,14 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders view-only info message if run has started', async () => {
-      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+      vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
       screen.getByText('Setup is view-only once run has started')
     })
 
     it('renders analysis error message if there is an analysis error', async () => {
-      when(vi.mocked(useProtocolAnalysisErrors))
+      vi.when(vi.mocked(useProtocolAnalysisErrors))
         .calledWith(RUN_ID)
         .thenReturn({
           analysisErrors: [

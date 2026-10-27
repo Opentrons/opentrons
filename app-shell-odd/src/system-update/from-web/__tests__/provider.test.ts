@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { LocalAbortError } from '../../../http'
 import { getProvider } from '../provider'
@@ -60,7 +59,7 @@ describe('provider.scanUpdate happy paths', () => {
     vi.resetAllMocks()
   })
   it('says there is no update if the latest update is in the old production key', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -114,7 +113,7 @@ describe('provider.scanUpdate happy paths', () => {
       })
   })
   it('says there is no update if the latest version is the current version', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -168,7 +167,7 @@ describe('provider.scanUpdate happy paths', () => {
       })
   })
   it('says there is a downloaded update if the latest version is already downloaded', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -184,7 +183,7 @@ describe('provider.scanUpdate happy paths', () => {
           },
         },
       })
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(
         {
           system: 'http://opentrons.com/system.zip',
@@ -244,10 +243,10 @@ describe('provider.scanUpdate happy paths', () => {
       version: 'http://opentrons.com/version.json',
       releaseNotes: 'http://opentrons.com/releaseNotes.md',
     }
-    when(ensureCleanReleaseCacheForVersion)
+    vi.when(ensureCleanReleaseCacheForVersion)
       .calledWith('/some/random/directory/versions', '1.2.3')
       .thenResolve('/some/random/directory/versions/1.2.3')
-    when(downloadReleaseNotes)
+    vi.when(downloadReleaseNotes)
       .calledWith(
         'http://opentrons.com/releaseNotes.md',
         '/some/random/directory/versions/1.2.3',
@@ -257,7 +256,7 @@ describe('provider.scanUpdate happy paths', () => {
         releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
         releaseNotesContent: 'some release notes cool',
       })
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -269,7 +268,7 @@ describe('provider.scanUpdate happy paths', () => {
         },
       })
 
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(null)
 
@@ -316,7 +315,7 @@ describe('provider.downloadUpdate happy paths', () => {
     vi.resetAllMocks()
   })
   it('downloads nothing if there is no update', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -406,7 +405,7 @@ describe('provider.downloadUpdate happy paths', () => {
       ...releaseFiles,
       releaseNotesContent: 'oh look some release notes cool',
     }
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -418,7 +417,7 @@ describe('provider.downloadUpdate happy paths', () => {
         },
       })
 
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(releaseData)
 
@@ -475,10 +474,10 @@ describe('provider.downloadUpdate happy paths', () => {
       ...releaseFiles,
       releaseNotesContent: 'oh look some release notes sweet',
     }
-    when(ensureCleanReleaseCacheForVersion)
+    vi.when(ensureCleanReleaseCacheForVersion)
       .calledWith('/some/random/directory/versions', '1.2.3')
       .thenResolve('/some/random/directory/versions/1.2.3')
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -489,11 +488,11 @@ describe('provider.downloadUpdate happy paths', () => {
           '1.2.3': releaseUrls,
         },
       })
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(null)
 
-    when(cleanUpAndDownloadReleaseFiles)
+    vi.when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
         '/some/random/directory/versions',
@@ -528,7 +527,7 @@ describe('provider.downloadUpdate happy paths', () => {
                 })
             )
       )
-    when(downloadReleaseNotes)
+    vi.when(downloadReleaseNotes)
       .calledWith(
         'http://opentrons.com/releaseNotes.md',
         '/some/random/directory/versions/1.2.3',
@@ -658,7 +657,7 @@ describe('provider locking', () => {
       updateCacheDirectory: '/some/random/directory',
       currentVersion: '1.2.3',
     })
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -712,7 +711,7 @@ describe('provider locking', () => {
       version: 'http://opentrons.com/version.json',
       releaseNotes: 'http://opentrons.com/releaseNotes.md',
     }
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -729,7 +728,7 @@ describe('provider locking', () => {
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
     const releaseData = { ...releaseFiles, releaseNotesContent: 'oh hello' }
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(releaseData)
 
@@ -741,7 +740,7 @@ describe('provider locking', () => {
         downloadProgress: 100,
       })
       .then(() => {
-        when(getOrDownloadManifest)
+        vi.when(getOrDownloadManifest)
           .calledWith(
             'http://opentrons.com/releases.json',
             '/some/random/directory',
@@ -795,11 +794,11 @@ describe('provider locking', () => {
       version: 'http://opentrons.com/version.json',
       releaseNotes: 'http://opentrons.com/releaseNotes.md',
     }
-    when(ensureCleanReleaseCacheForVersion)
+    vi.when(ensureCleanReleaseCacheForVersion)
       .calledWith('/some/random/directory/versions', '1.2.3')
       .thenResolve('/some/random/directory/versions/1.2.3')
 
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -810,10 +809,10 @@ describe('provider locking', () => {
           '1.2.3': releaseUrls,
         },
       })
-    when(getReleaseFilesIfExist)
+    vi.when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(null)
-    when(cleanUpAndDownloadReleaseFiles)
+    vi.when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
         expect.any(Object),
         expect.any(String),
@@ -834,7 +833,7 @@ describe('provider locking', () => {
             provider.lockUpdateCache()
           })
       )
-    when(downloadReleaseNotes)
+    vi.when(downloadReleaseNotes)
       .calledWith(
         'http://opentrons.com/releaseNotes.md',
         '/some/random/directory/versions/1.2.3',
@@ -886,7 +885,7 @@ describe('provider locking', () => {
       })
   })
   it('will not run two scans at once', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',
@@ -922,7 +921,7 @@ describe('provider locking', () => {
     ]).then(() => expect(getOrDownloadManifest).toHaveBeenCalledOnce())
   })
   it('will not run a scan and download at once', () => {
-    when(getOrDownloadManifest)
+    vi.when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
         '/some/random/directory',

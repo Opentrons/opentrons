@@ -1,14 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest'
-import { when } from 'vitest-when'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -54,11 +45,11 @@ describe('CalibrationDataDownload', () => {
 
   beforeEach(() => {
     mockDownloadCalibration.mockClear()
-    when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
+    vi.when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
       downloadCalibration: mockDownloadCalibration,
       isLoading: false,
     })
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   it('renders title and About Calibration description', () => {
@@ -91,7 +82,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button when e-stop is pressed', () => {
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     const downloadButton = screen.getByRole('button', {
       name: 'Download calibration logs',

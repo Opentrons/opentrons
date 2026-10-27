@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -90,7 +89,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     provideNullCurrentRunIdFor(mockConnectableRobot.ip)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
-    when(vi.mocked(useCreateRunFromProtocol))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
@@ -101,7 +100,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
-    when(vi.mocked(useCreateRunFromProtocol))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
         null,
@@ -115,23 +114,23 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataFixture.mostRecentAnalysis,
         expect.any(String)
       )
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         false,
         null
       )
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         expect.any(String)
@@ -359,7 +358,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
 
 const provideNullCurrentRunIdFor = (hostname: string): void => {
   let once = true
-  when(vi.mocked(useCurrentRunId))
+  vi.when(vi.mocked(useCurrentRunId))
     .calledWith(expect.any(Object), {
       hostname,
       requestor: undefined,

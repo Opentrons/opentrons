@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
@@ -50,7 +49,7 @@ describe('useDownloadSelectedRuns', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
-    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     vi.mocked(useAllProtocolsQuery).mockReturnValue({ data: undefined } as any)
     vi.mocked(saveLogs).mockClear()
     vi.mocked(saveLogs).mockImplementation(async ({ paths }) => ({

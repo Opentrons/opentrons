@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
@@ -23,7 +22,7 @@ const formikConfig: FormikConfig<LabwareFields> = {
 
 describe('Footprint', () => {
   beforeEach(() => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['footprintXDimension', 'footprintYDimension'],
         formikConfig.initialValues
@@ -92,7 +91,7 @@ describe('Footprint', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['footprintXDimension', 'footprintYDimension'],
         formikConfig.initialValues

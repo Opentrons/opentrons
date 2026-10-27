@@ -2,7 +2,6 @@
 import { rm } from 'fs-extra'
 import tempy from 'tempy'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import * as Cfg from '../../config'
 import { CONFIG_INITIALIZED, VALUE_UPDATED } from '../../constants'
@@ -80,7 +79,7 @@ describe('update driver manager', () => {
     const thisTd = tempy.directory()
     testDir = thisTd
     dispatch = vi.fn()
-    when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
+    vi.when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
   })
 
   afterEach(() => {
@@ -93,7 +92,7 @@ describe('update driver manager', () => {
   })
 
   it('creates a driver once config is loaded', () => {
-    when(getConfig)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
@@ -106,7 +105,7 @@ describe('update driver manager', () => {
       currentVersion: CURRENT_SYSTEM_VERSION,
     } as WebUpdateSource
     const mockCleanup = vi.fn() as () => Promise<void>
-    when(getWebProvider)
+    vi.when(getWebProvider)
       .calledWith(webDriverPayload)
       .thenReturn({
         source: () => webDriverPayload,
@@ -138,7 +137,7 @@ describe('update driver manager', () => {
   })
 
   it('reloads the web driver when appropriate', () => {
-    when(getConfig)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
@@ -160,7 +159,7 @@ describe('update driver manager', () => {
       ...fakeProvider,
       source: () => ({ channel: 'beta' }) as any as WebUpdateSource,
     }
-    when(getWebProvider)
+    vi.when(getWebProvider)
       .calledWith({
         manifestUrl: FLEX_MANIFEST_URL,
         channel: 'alpha',
@@ -168,7 +167,7 @@ describe('update driver manager', () => {
         currentVersion: CURRENT_SYSTEM_VERSION,
       })
       .thenReturn(fakeProvider)
-    when(getWebProvider)
+    vi.when(getWebProvider)
       .calledWith({
         manifestUrl: FLEX_MANIFEST_URL,
         channel: 'beta',
@@ -189,14 +188,14 @@ describe('update driver manager', () => {
           currentVersion: CURRENT_SYSTEM_VERSION,
         })
         expect(driverManager.getUpdateDriver()).not.toBeNull()
-        when(fakeProvider.teardown).calledWith().thenResolve()
+        vi.when(fakeProvider.teardown).calledWith().thenResolve()
         return driverManager.handleAction({
           type: VALUE_UPDATED,
         } as ConfigValueUpdatedAction)
       })
       .then(() => {
         expect(getWebProvider).toHaveBeenCalledOnce()
-        when(getConfig)
+        vi.when(getConfig)
           .calledWith('update')
           .thenReturn({
             channel: 'beta',
@@ -255,14 +254,14 @@ describe('update driver', () => {
     const thisTd = tempy.directory()
     testDir = thisTd
     dispatch = vi.fn()
-    when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
-    when(getConfig)
+    vi.when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
         automaticallyDownloadUpdates: true,
       } as any as Cfg.Config['update'])
-    when(getWebProvider)
+    vi.when(getWebProvider)
       .calledWith({
         manifestUrl: FLEX_MANIFEST_URL,
         channel: 'alpha',
@@ -318,10 +317,10 @@ describe('update driver', () => {
 
   it('checks updates when told to check updates and autodownloads if the setting is set', () => {
     const thisSubject = subject!
-    when(getConfig)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: true })
-    when(fakeProvider.scanUpdate)
+    vi.when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
@@ -364,8 +363,8 @@ describe('update driver', () => {
   })
   it('checks updates when told to check updates and does not autodownload if the setting is set', () => {
     const thisSubject = subject!
-    when(getConfig).calledWith('update').thenReturn(false)
-    when(fakeProvider.scanUpdate)
+    vi.when(getConfig).calledWith('update').thenReturn(false)
+    vi.when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
@@ -408,10 +407,10 @@ describe('update driver', () => {
   })
   it('does not clear update data if a scan fails because a check is ongoing', async () => {
     const thisSubject = subject!
-    when(getConfig)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: false })
-    when(fakeProvider.scanUpdate)
+    vi.when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
@@ -453,7 +452,7 @@ describe('update driver', () => {
         releaseNotes: 'hello',
       },
     })
-    when(fakeProvider.scanUpdate)
+    vi.when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenReject(new Error('ongoing'))
     await thisSubject.handleAction({
@@ -483,11 +482,11 @@ describe('update driver', () => {
     })
   })
   it('downloads updates when told and no USB updates are present and updates are on', () => {
-    when(getConfig)
+    vi.when(getConfig)
       .calledWith('update')
       .thenReturn({ automaticallyDownloadUpdates: true })
     const thisSubject = subject!
-    when(fakeProvider.downloadUpdate)
+    vi.when(fakeProvider.downloadUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
         progress =>
@@ -592,14 +591,14 @@ describe('update driver', () => {
   })
   it('creates a usb provider when it gets a message that a usb device was added', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -626,14 +625,14 @@ describe('update driver', () => {
   })
   it('does not create a usb provider if it already has one for a path', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',
@@ -641,7 +640,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.first.getUpdateDetails)
+    vi.when(fakeUsbProviders.first.getUpdateDetails)
       .calledWith()
       .thenReturn({
         version: '0.1.2',
@@ -714,14 +713,14 @@ describe('update driver', () => {
   })
   it('tears down a usb provider when it is removed', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -744,7 +743,7 @@ describe('update driver', () => {
           massStorageDeviceRoot: '/some/usb/path',
           massStorageDeviceFiles: ['/some/file', '/some/other/file'],
         })
-        when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
+        vi.when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
         return thisSubject.handleAction({
           type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED',
           payload: { rootPath: '/some/usb/path' },
@@ -757,14 +756,14 @@ describe('update driver', () => {
   })
   it('re-adds a usb provider if it is inserted after being removed', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -787,7 +786,7 @@ describe('update driver', () => {
           massStorageDeviceRoot: '/some/usb/path',
           massStorageDeviceFiles: ['/some/file', '/some/other/file'],
         })
-        when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
+        vi.when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
         return thisSubject.handleAction({
           type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED',
           payload: { rootPath: '/some/usb/path' },
@@ -811,14 +810,14 @@ describe('update driver', () => {
   })
   it('prefers usb updates to web updates', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(fakeUsbProviders.first.getUpdateDetails)
+    vi.when(fakeUsbProviders.first.getUpdateDetails)
       .calledWith()
       .thenReturn({
         version: '0.1.2',
@@ -826,7 +825,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',
@@ -834,7 +833,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeProvider.scanUpdate)
+    vi.when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -887,21 +886,21 @@ describe('update driver', () => {
   })
   it('selects the highest version usb update', () => {
     const thisSubject = subject!
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/usb/path',
         massStorageDeviceFiles: ['/some/file', '/some/other/file'],
       })
       .thenReturn(fakeUsbProviders.first)
-    when(getUsbProvider)
+    vi.when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
         massStorageDeviceRoot: '/some/other/usb/path',
         massStorageDeviceFiles: ['/some/third/file', '/some/fourth/file'],
       })
       .thenReturn(fakeUsbProviders.second)
-    when(fakeUsbProviders.first.scanUpdate)
+    vi.when(fakeUsbProviders.first.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '1.2.3',
@@ -909,7 +908,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.second.scanUpdate)
+    vi.when(fakeUsbProviders.second.scanUpdate)
       .calledWith(expect.any(Function))
       .thenResolve({
         version: '0.1.2',
@@ -917,7 +916,7 @@ describe('update driver', () => {
         releaseNotes: 'some other fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.first.getUpdateDetails)
+    vi.when(fakeUsbProviders.first.getUpdateDetails)
       .calledWith()
       .thenReturn({
         version: '1.2.3',
@@ -925,7 +924,7 @@ describe('update driver', () => {
         releaseNotes: 'some fake notes',
         downloadProgress: 100,
       })
-    when(fakeUsbProviders.second.getUpdateDetails)
+    vi.when(fakeUsbProviders.second.getUpdateDetails)
       .calledWith()
       .thenReturn({
         version: '0.1.2',

@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -74,26 +73,26 @@ describe('RunProgressMeter', () => {
     vi.mocked(InterventionModal).mockReturnValue(
       <div>MOCK_INTERVENTION_MODAL</div>
     )
-    when(useMostRecentCompletedAnalysis)
+    vi.when(useMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .thenReturn(null)
-    when(useNotifyAllCommandsQuery)
+    vi.when(useNotifyAllCommandsQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, {
         pageLength: 1,
       })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
-    when(useCommandQuery)
+    vi.when(useCommandQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, NON_DETERMINISTIC_COMMAND_KEY)
       .thenReturn(mockUseCommandResultNonDeterministic)
     vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
-    when(useLastRunCommand)
+    vi.when(useLastRunCommand)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
       .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(NON_DETERMINISTIC_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })
@@ -135,7 +134,7 @@ describe('RunProgressMeter', () => {
 
   it('should give no step info when run status is idle', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(NON_DETERMINISTIC_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })
@@ -166,7 +165,7 @@ describe('RunProgressMeter', () => {
 
   it('should render no text when run status is completed', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(NON_DETERMINISTIC_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })
@@ -190,7 +189,7 @@ describe('RunProgressMeter', () => {
 
   it('should render no text when the run is cancelled before running', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(NON_DETERMINISTIC_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })
