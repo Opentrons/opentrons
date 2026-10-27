@@ -139,13 +139,17 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to networking tab if robot not connectable', () => {
-    vi.when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
+    vi.when(vi.mocked(useRobot))
+      .calledWith('otie')
+      .thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('Mock RobotSettingsNetworking')
   })
 
   it('redirects to networking tab if feature flags hidden', () => {
-    vi.when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
+    vi.when(vi.mocked(useRobot))
+      .calledWith('otie')
+      .thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/feature-flags')
     screen.getByText('Mock RobotSettingsNetworking')
   })

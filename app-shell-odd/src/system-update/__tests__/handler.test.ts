@@ -188,7 +188,7 @@ describe('update driver manager', () => {
           currentVersion: CURRENT_SYSTEM_VERSION,
         })
         expect(driverManager.getUpdateDriver()).not.toBeNull()
-        vi.when(fakeProvider.teardown).calledWith().thenResolve()
+        vi.when(fakeProvider.teardown).calledWith().thenResolve(undefined)
         return driverManager.handleAction({
           type: VALUE_UPDATED,
         } as ConfigValueUpdatedAction)
@@ -735,7 +735,9 @@ describe('update driver', () => {
           massStorageDeviceRoot: '/some/usb/path',
           massStorageDeviceFiles: ['/some/file', '/some/other/file'],
         })
-        vi.when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
+        vi.when(fakeUsbProviders.first.teardown)
+          .calledWith()
+          .thenResolve(undefined)
         return thisSubject.handleAction({
           type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED',
           payload: { rootPath: '/some/usb/path' },
@@ -778,7 +780,9 @@ describe('update driver', () => {
           massStorageDeviceRoot: '/some/usb/path',
           massStorageDeviceFiles: ['/some/file', '/some/other/file'],
         })
-        vi.when(fakeUsbProviders.first.teardown).calledWith().thenResolve()
+        vi.when(fakeUsbProviders.first.teardown)
+          .calledWith()
+          .thenResolve(undefined)
         return thisSubject.handleAction({
           type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED',
           payload: { rootPath: '/some/usb/path' },

@@ -152,9 +152,11 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
-    vi.when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.mocked(useCloneRun).mockReturnValue({
       cloneRun: mockCloneRun,
       isLoadingRun: false,

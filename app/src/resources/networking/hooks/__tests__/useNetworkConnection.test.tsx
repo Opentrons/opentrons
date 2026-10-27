@@ -54,7 +54,9 @@ describe('useNetworkConnection', () => {
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
 
-    vi.when(useWifiList).calledWith(mockRobotName, 10000).thenReturn(mockWifiList)
+    vi.when(useWifiList)
+      .calledWith(mockRobotName, 10000)
+      .thenReturn(mockWifiList)
     vi.when(useNetworkInterfaces)
       .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: mockWifi, ethernet: mockEthernet })

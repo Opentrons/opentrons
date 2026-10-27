@@ -94,7 +94,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
     vi.when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
       .thenReturn(false)
-    vi.when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(vi.mocked(useIsRobotViewable))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(true)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: mockDeckConfig,
     } as UseQueryResult<DeckConfiguration>)
@@ -171,7 +173,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render not viewable text when robot is not viewable', () => {
-    vi.when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(vi.mocked(useIsRobotViewable))
+      .calledWith(ROBOT_NAME)
+      .thenReturn(false)
     render(props)
     screen.getByText('Robot must be on the network to see deck configuration')
   })

@@ -131,7 +131,9 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(null)
-    vi.when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith('1')
+      .thenReturn(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('1', true)
     )

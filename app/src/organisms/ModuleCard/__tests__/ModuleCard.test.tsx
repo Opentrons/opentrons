@@ -319,7 +319,9 @@ describe('ModuleCard', () => {
       .calledWith()
       .thenReturn({ isRunRunning: false } as any)
     vi.when(useIsFlex).calledWith(props.robotName).thenReturn(true)
-    vi.when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(false)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
     } as unknown as UseQueryResult<DeckConfiguration>)

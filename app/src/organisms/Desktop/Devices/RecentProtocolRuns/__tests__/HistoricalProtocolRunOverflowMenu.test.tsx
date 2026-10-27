@@ -94,9 +94,11 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       isDownloading: false,
     })
 
-    vi.when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.when(useNotifyAllCommandsQuery)
       .calledWith(
         RUN_ID,

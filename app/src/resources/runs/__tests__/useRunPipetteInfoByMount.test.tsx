@@ -134,7 +134,9 @@ describe('useRunPipetteInfoByMount hook', () => {
     vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(null)
-    vi.when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith('1')
+      .thenReturn(null)
     const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: null,

@@ -127,9 +127,11 @@ describe('ProtocolRunSetup', () => {
     vi.when(vi.mocked(getMissingSetupSteps))
       .calledWith(expect.any(Object), RUN_ID)
       .thenReturn([])
-    vi.when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
-      analysisErrors: null,
-    })
+    vi.when(vi.mocked(useProtocolAnalysisErrors))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        analysisErrors: null,
+      })
     vi.mocked(getCameraUsageState).mockReturnValue({
       enabled: false,
       recoveryEnabled: true,

@@ -95,7 +95,9 @@ describe('UpdateRobot', () => {
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.UPGRADE
     )
-    vi.when(vi.mocked(getLocalRobot)).calledWith(MOCK_STATE).thenReturn(mockRobot)
+    vi.when(vi.mocked(getLocalRobot))
+      .calledWith(MOCK_STATE)
+      .thenReturn(mockRobot)
   })
 
   afterEach(() => {

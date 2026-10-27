@@ -60,9 +60,11 @@ describe('ConfirmCancelModal', () => {
       stopRun: mockStopRun,
     } as any)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    vi.when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     props = {

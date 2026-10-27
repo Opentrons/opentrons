@@ -35,7 +35,9 @@ describe('Module Update Banner', () => {
       isTooHot: false,
     }
     vi.when(useIsFlex).calledWith(props.robotName).thenReturn(true)
-    vi.when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(false)
   })
 
   it('enables the updateType and serialNumber to be used as the test ID', () => {
@@ -151,7 +153,9 @@ describe('Module Update Banner', () => {
   })
 
   it('should not render a module setup link when e-stop is pressed ', () => {
-    vi.when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(true)
     render(props)
     expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
