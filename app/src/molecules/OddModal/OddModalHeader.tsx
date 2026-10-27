@@ -6,8 +6,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -55,11 +55,10 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
           />
         ) : null}
         {tagText != null ? <Tag type="default" text={tagText} /> : null}
-        <LegacyStyledText
+        <StyledText
+          forwardedAs="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          fontSize={TYPOGRAPHY.fontSize28}
-          lineHeight={TYPOGRAPHY.lineHeight36}
-          css={{
+          style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -68,7 +67,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
           }}
         >
           {title}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {hasExitIcon && onClick != null ? (
         <Flex

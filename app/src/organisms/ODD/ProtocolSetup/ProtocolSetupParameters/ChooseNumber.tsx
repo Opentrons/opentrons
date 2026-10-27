@@ -5,8 +5,8 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -97,12 +97,9 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <LegacyStyledText
-            forwardedAs="h4"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
+          <StyledText forwardedAs="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
-          </LegacyStyledText>
+          </StyledText>
           <TouchInputField
             ref={inputElementRef}
             autoFocus

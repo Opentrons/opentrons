@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { PlayPauseButton } from '../PlayPauseButton'
 import { StopButton } from '../StopButton'
@@ -29,12 +29,10 @@ export function ProtocolPlayPauseHeader({
   return (
     <div className={styles.container}>
       <div className={styles.status_info}>
-        <LegacyStyledText forwardedAs="h4" className={styles.status_text}>
+        <StyledText forwardedAs="h4" className={styles.status_text}>
           {currentRunStatus}
-        </LegacyStyledText>
-        <LegacyStyledText className={styles.title_text}>
-          {protocolName}
-        </LegacyStyledText>
+        </StyledText>
+        <StyledText className={styles.title_text}>{protocolName}</StyledText>
       </div>
       <div className={styles.controls}>
         <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="2.5rem" />
