@@ -3,9 +3,10 @@
 from datetime import datetime
 from typing import Annotated, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from opentrons.protocol_engine import (
+    CommandAdapter,
     CommandIntent,
     CommandNote,
     CommandParams,
@@ -62,30 +63,34 @@ class RunCommandSummary(ResourceModel):
         description="An identifier representing this command as a step in a protocol.",
     )
     commandType: CommandType = Field(..., description="Specific type of command.")
-    createdAt: datetime = Field(..., description="Command creation timestamp")
+    createdAt: datetime = Field(
+        ..., description="Command creation timestamp as a JSON string."
+    )
     startedAt: Optional[datetime] = Field(
         None,
-        description="Command execution start timestamp, if started",
+        description="Command execution start timestamp, if started, as a JSON string.",
     )
     completedAt: Optional[datetime] = Field(
         None,
-        description="Command execution completed timestamp, if completed",
+        description="Command execution completed timestamp, if completed, as a JSON string.",
     )
     status: CommandStatus = Field(..., description="Execution status of the command.")
     error: Optional[ErrorOccurrence] = Field(
         None,
-        description="Error occurrence, if status is 'failed'",
+        description="Error occurrence, if status is 'failed', as a JSON dict.",
     )
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
-    params: CommandParams = Field(..., description="Command execution parameters.")
+    params: CommandParams = Field(
+        ..., description="Command execution parameters as a JSON dict."
+    )
     intent: Optional[CommandIntent] = Field(
         None,
         description="Why this command was added to the run.",
     )
     notes: Optional[List[CommandNote]] = Field(
         None,
-        description="Notes pertaining to this command.",
+        description="Notes pertaining to this command as a JSON dict.",
     )
     failedCommandId: Optional[str] = Field(
         None,
@@ -97,6 +102,32 @@ class RunCommandSummary(ResourceModel):
         None,
         description="List of command annotation ids associated with this command.",
     )
+
+    @classmethod
+    def build_from_json(cls, json_command: str) -> "RunCommandSummary":
+        """Build a RunCommandSummary from a Command is JSON format."""
+        try:
+            # Validate JSON fields and build RunCommandSummary
+            validated_command = CommandAdapter.validate_json(json_command)
+            return RunCommandSummary.model_construct(
+                id=validated_command.id,
+                key=validated_command.key,
+                commandType=validated_command.commandType,
+                intent=validated_command.intent,
+                status=validated_command.status,
+                createdAt=validated_command.createdAt,
+                startedAt=validated_command.startedAt,
+                completedAt=validated_command.completedAt,
+                params=validated_command.params,
+                error=validated_command.error,
+                failedCommandId=validated_command.failedCommandId,
+                commandAnnotationIds=validated_command.commandAnnotationIds
+                if validated_command.commandAnnotationIds
+                else None,
+                notes=validated_command.notes,
+            )
+        except ValidationError:
+            raise
 
 
 class Run(ResourceModel):

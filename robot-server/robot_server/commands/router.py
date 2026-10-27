@@ -1,6 +1,7 @@
 """Router for top-level /commands endpoints."""
 
-from typing import Annotated, Final, List, Literal, Optional, cast
+import json
+from typing import Annotated, Any, Final, Literal, Optional, cast
 
 from fastapi import Depends, Query, status
 
@@ -152,7 +153,7 @@ async def get_commands_list(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
-) -> PydanticResponse[SimpleMultiBody[StatelessCommand]]:
+) -> PydanticResponse[SimpleMultiBody[dict[str, Any]]]:
     """Get a list of stateless commands.
 
     Arguments:
@@ -163,7 +164,9 @@ async def get_commands_list(
     cmd_slice = await orchestrator.get_command_slice(
         cursor=cursor, length=pageLength, include_fixit_commands=True
     )
-    commands = cast(List[StatelessCommand], cmd_slice.commands)
+    commands: list[dict[str, Any]] = [
+        json.loads(command) for command in cmd_slice.commands
+    ]
     meta = MultiBodyMeta(cursor=cmd_slice.cursor, totalLength=cmd_slice.total_length)
 
     return await PydanticResponse.create(
