@@ -12,7 +12,8 @@ export function ODDTopLevelRedirects(): JSX.Element | null {
   const currentRoute = useLocation()
   if (currentRunId == null && currentRoute.pathname.includes('/runs/')) {
     // '/runs/1234/setup' -> '1234'
-    const lastRunId = /\/runs\/(.*)\//.exec(currentRoute.pathname)?.[1]
+    // eslint-disable-next-line no-useless-escape
+    const lastRunId = /\/runs\/([^\/\s]*)\//.exec(currentRoute.pathname)?.[1]
     if (!!lastRunId) {
       return <CurrentRunRoute currentRunId={lastRunId} />
     }
