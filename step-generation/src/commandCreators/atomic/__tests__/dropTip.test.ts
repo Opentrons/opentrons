@@ -190,9 +190,19 @@ describe('dropTip', () => {
       const result = dropTip(
         {
           pipette: 'p300SingleId',
-          isReturnTip: true,
+          isReturnTip: 'return_tip',
         },
-        invariantContext,
+        {
+          ...invariantContext,
+          runtimeParameters: {
+            return_tip: {
+              variableName: 'return_tip',
+              displayName: 'Return tip',
+              type: 'boolean',
+              default: true,
+            },
+          },
+        },
         robotStateForReturnTip
       )
       const res = getSuccessResult(result)

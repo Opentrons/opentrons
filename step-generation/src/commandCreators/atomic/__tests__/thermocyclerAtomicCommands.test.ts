@@ -339,6 +339,12 @@ describe('thermocycler atomic commands with runtime parameters', () => {
       type: 'float',
       default: volume,
     },
+    task_name: {
+      variableName: 'task_name',
+      displayName: 'Task name',
+      type: 'string',
+      default: 'profile_task',
+    },
   }
 
   it('resolves all args for "thermocycler/startRunExtendedProfile" when they are runtime parameters', () => {
@@ -357,6 +363,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
           },
         ],
         blockMaxVolumeUl: 'block_volume',
+        taskId: 'task_name',
       },
       { ...invariantContext, runtimeParameters: profileRuntimeParameters },
       { ...getRobotInitialState(), labware: {} }
@@ -368,6 +375,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
           key: expect.any(String),
           params: {
             moduleId: module,
+            taskId: 'profile_task',
             profileElements: [
               {
                 steps: [{ celsius: temperature, holdSeconds: holdTime }],
@@ -379,7 +387,7 @@ describe('thermocycler atomic commands with runtime parameters', () => {
         },
       ],
       python: `
-mock_thermocycler.start_execute_profile(
+task_name = mock_thermocycler.start_execute_profile(
     [
         {"temperature": profile_temperature, "hold_time_seconds": profile_hold_time},
     ],
@@ -443,6 +451,7 @@ mock_thermocycler.start_execute_profile(
           },
         ],
         blockMaxVolumeUl: 'missing_volume',
+        taskId: 'mock_rtp',
       },
       {
         ...invariantContext,
@@ -458,6 +467,10 @@ mock_thermocycler.start_execute_profile(
       { ...getRobotInitialState(), labware: {} }
     )
     expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
       {
         message: 'Runtime parameter "missing_temperature" is missing',
         type: 'INVALID_RUNTIME_PARAMETER',

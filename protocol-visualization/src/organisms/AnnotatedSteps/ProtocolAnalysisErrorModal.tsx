@@ -6,8 +6,10 @@ import {
   Modal,
   PrimaryButton,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
+import { CopyButton } from '../../molecules/CopyButton'
 import styles from './protocolanalysiserrormodal.module.css'
 
 import type { ReactNode } from 'react'
@@ -30,10 +32,18 @@ export function ProtocolAnalysisErrorModal({
       type="error"
       title={t('protocol_analysis_failure')}
       onClose={onClose}
+      zIndexOverlay={Z_INDEX.MODALS}
     >
       <div className={styles.container}>
         {errors.map(error => (
-          <CodeBlock key={error.id}>{error.detail}</CodeBlock>
+          <div key={error.id} className={styles.code_block_container}>
+            <CopyButton
+              value={error.detail}
+              aria-label={t('copy_error')}
+              className={styles.copy_button}
+            />
+            <CodeBlock>{error.detail}</CodeBlock>
+          </div>
         ))}
         <div className={styles.button_container}>
           <PrimaryButton role="button" onClick={onClose}>

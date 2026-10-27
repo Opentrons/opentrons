@@ -13,14 +13,12 @@ from automation.pd_pages.flex_stacker import FlexStackerPage
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 from automation.pd_pages.tc_step_form_page import ThermocyclerStepPage
-from automation.pd_pages.timeline import Timeline
 from automation.pd_pages.transfer_form import TransferPage
-from eyes import Eyes
 from utility import create_new_protocol_flow, create_new_protocol_from_landing_page, start_new_create_protocol
 
 
 @pytest.mark.pdE2E
-def test_flex_stacker_deck_configs(page: Page, eyes: Eyes | None) -> None:
+def test_flex_stacker_deck_configs(page: Page) -> None:
     """Test Protocol Designer Flex Stacker Configuration functionality.
 
     Runs different configurations of the Stacker with various modules and fixtures.
@@ -41,11 +39,6 @@ def test_flex_stacker_deck_configs(page: Page, eyes: Eyes | None) -> None:
     deck_config_page.select_slot("D4")
     deck_config_page.select_module("Flex Stacker Module GEN1")
     print("\n✓ Configured 4 Flex Stackers with waste chute and magnetic block")
-
-    if eyes is not None:
-        eyes.check(
-            checkpoint_name="Configured 4 Flex Stackers with waste chute and magnetic block - combo fixture check"
-        )
 
     ## Create new Flex protocol from Create New button,  and configuring 4 stackers without waste chute
     start_new_create_protocol(page)
@@ -103,7 +96,7 @@ def test_flex_stacker_deck_configs(page: Page, eyes: Eyes | None) -> None:
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
+def test_flex_stacker(page: Page) -> None:
     """Test Protocol Designer Flex Stacker behavior in a protocol
 
     E2E test to cover Flex stacker commands in a protocol.
@@ -170,9 +163,6 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     protocol_editor.select_labware_by_name("Opentrons Flex 96 Tip Rack 50 µL", stacker=True, fill_num=4, lid=True)
     plate_reader_page.button_selection("Done")
     print("✓ Replaced labware in stacker with tip racks with lids")
-
-    if eyes is not None:
-        eyes.check(checkpoint_name="Fully configured deck with 2 Stackers and all Modules, Fixtures, and Labware")
 
     ## Begin Flex Stacker step tests
     protocol_editor.add_step("Stacker")
@@ -259,15 +249,5 @@ def test_flex_stacker(page: Page, eyes: Eyes | None) -> None:
     flex_stacker_page.wait_for_save_banner_gone()
 
     print("✓ Store well plate in Stacker C")
-
-    timeline = Timeline(page)
-    timeline.scroll_timeline_to_bottom()
-    if eyes is not None:
-        eyes.check(checkpoint_name="Post run deck state with 2 stackers")
-        # now take a visual snapshot of the timeline element with stitching
-        eyes.check_element(
-            checkpoint_name="Stitched Final Timeline for Stacker Test",
-            element=page.get_by_test_id(timeline.timeline_box_testid),
-        )
 
     print("\n✅ Flex Stacker Configuration and Form Test completed successfully!")
