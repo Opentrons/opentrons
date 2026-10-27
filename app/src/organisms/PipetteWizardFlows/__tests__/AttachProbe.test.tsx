@@ -160,7 +160,7 @@ describe('AttachProbe', () => {
     render(props)
     screen.getByText('Stand back, Flex 96-Channel 1000 µL is calibrating')
     screen.getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+      'The calibration probe will touch the sides of the calibration square in slot B2 to determine its exact position.'
     )
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
