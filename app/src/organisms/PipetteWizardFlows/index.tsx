@@ -77,6 +77,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
+  PipetteWizardStep,
   PipetteWizardStepProps,
   SelectablePipettes,
 } from './types'
@@ -447,7 +448,12 @@ export const PipetteWizardFlows = (
     return null
   }
 
-  const calibrateBaseProps: PipetteWizardStepProps = {
+  // purposefully does not include flowType and mount, as these are passed in via the currentStep
+  // flowType and mount might change depending on the step within a flow
+  const calibrateBaseProps: Omit<
+    PipetteWizardStepProps,
+    keyof PipetteWizardStep
+  > = {
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving: isCommandMutationLoading || isDeleteLoading,
     proceed,
@@ -458,12 +464,10 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
     handleCommandError,
-    flowType,
-    mount,
   }
 
   const startCalibration = startCalibrationOnClick(
-    calibrateBaseProps,
+    { ...calibrateBaseProps, ...currentStep },
     attachedPipettes[mount]?.serialNumber ?? ''
   )
 
