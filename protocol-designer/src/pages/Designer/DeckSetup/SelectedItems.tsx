@@ -2,10 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getModuleDef,
-  getModuleType,
   inferModuleOrientationFromXCoordinate,
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -143,28 +141,27 @@ export const SelectedItems = (props: SelectedItemsProps): ReactNode => {
           in the hopper slot
           */}
           {isSlotAHopper || isVacuumDock ? null : (
-            <Module
-              key={`${transformedModuleModel}_${selectedSlot.slot}_selected`}
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              def={getModuleDef(transformedModuleModel)}
-              orientation={orientation}
-              targetDeckId={null}
-              targetSlotId={null}
-              childrenPositioningMode={
-                getModuleType(transformedModuleModel) ===
-                FLEX_STACKER_MODULE_TYPE
-                  ? 'passThrough'
-                  : 'offsetToSlot'
-              }
-            >
+            <>
+              <Module
+                key={`${transformedModuleModel}_${selectedSlot.slot}_selected`}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                def={getModuleDef(transformedModuleModel)}
+                orientation={orientation}
+                targetDeckId={deckDef.otId}
+                targetSlotId={selectedSlot.slot}
+                childrenPositioningMode="passThrough"
+              />
               <SelectedModuleLabwareRender
                 topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
                 adapterDef={selectedAdapterDef}
                 moduleModel={transformedModuleModel}
                 lidOnDeck={matchingSelectedLidOnDeck}
+                deckDef={deckDef}
+                slotId={selectedSlot.slot}
+                slotPosition={slotPosition}
               />
-            </Module>
+            </>
           )}
           {transformedModuleModel != null ? (
             <ModuleLabel

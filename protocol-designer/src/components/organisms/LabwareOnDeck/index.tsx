@@ -88,7 +88,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
-  const shouldCenter = isLid || centerInSlot
+  const shouldCenter = centerInSlot || isLid
+  const positioningMode =
+    centerInSlot === false || shouldCenter ? 'passThrough' : 'offsetInSlot'
   const wellFill = wellContentsSelectors.wellFillFromWellContents(
     wellContents,
     liquidDisplayColors
@@ -107,7 +109,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
-      positioningMode={shouldCenter ? 'passThrough' : 'offsetInSlot'}
+      positioningMode={positioningMode}
       wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}

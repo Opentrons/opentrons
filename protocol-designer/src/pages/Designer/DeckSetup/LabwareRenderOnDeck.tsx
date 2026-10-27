@@ -1,4 +1,4 @@
-import { LabwareRender } from '@opentrons/components'
+import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -14,7 +14,9 @@ export function LabwareRenderOnDeck(
   const { x, y, labwareDef } = props
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <LabwareRender definition={labwareDef} positioningMode="offsetInSlot" />
+      <CenterLabwareInSlot definition={labwareDef}>
+      <LabwareRender definition={labwareDef} positioningMode="passThrough" />
+      </CenterLabwareInSlot>
     </g>
   )
 }
