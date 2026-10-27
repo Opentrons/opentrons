@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
+import { ResizableContainer } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -16,19 +18,15 @@ import { SlotSpotlightViewer } from '../SlotSpotlightViewer'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { AppType, GroupedCommands } from '../../types'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 1000
 const INITIAL_WIDTH_PX = 230
-const MIN_CENTER_WIDTH_PX = 148
 const MIN_LEFT_COLUMN_WIDTH_PX = 148
 const MIN_RIGHT_COLUMN_WIDTH_PX = 172
 const MAX_COLUMN_WIDTH_PX = 600
-const GUTTER_WIDTH_PX = 16 // left and right gutters
-
-type ResizableColumn = 'left' | 'right'
 
 interface ProtocolVisualizationProps {
   analysis: ProtocolAnalysisOutput
@@ -40,6 +38,7 @@ interface ProtocolVisualizationProps {
 export function ProtocolVisualization(
   props: ProtocolVisualizationProps
 ): ReactNode {
+  const { t } = useTranslation('protocol_visualization')
   const { groupedCommands, analysis, appType } = props
   const createdDate = new Date(analysis.createdAt)
   const { commands, robotType, liquids } = analysis
@@ -48,30 +47,11 @@ export function ProtocolVisualization(
   const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
     INITIAL_MILLISECONDS_PER_FRAME
   )
-  const [isDragging, setIsDragging] = useState<boolean>(false)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
   const [showStepDetails, setShowStepDetails] = useState<boolean>(
     appType !== 'web'
   )
-
-  // for resizable columns
-  const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
-  const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const resizingRef = useRef<ResizableColumn | null>(null)
-  const startXRef = useRef<number>(0)
-  const startWidthRef = useRef<number>(0)
-  const leftWidthRef = useRef<number>(leftWidth)
-  const rightWidthRef = useRef<number>(rightWidth)
-
-  useEffect(() => {
-    leftWidthRef.current = leftWidth
-  }, [leftWidth])
-
-  useEffect(() => {
-    rightWidthRef.current = rightWidth
-  }, [rightWidth])
 
   // temporarily filter out loadCommands and home commands for the PV MVP
   const filteredCommands = commands.filter(
@@ -176,78 +156,6 @@ export function ProtocolVisualization(
     [isThermocyclerAttached, selectedSlot]
   )
 
-  const handleMouseDown = (
-    e: MouseEvent<HTMLDivElement>,
-    column: ResizableColumn
-  ): void => {
-    e.preventDefault()
-    setIsDragging(true)
-    resizingRef.current = column
-    startXRef.current = e.clientX
-    startWidthRef.current = column === 'left' ? leftWidth : rightWidth
-
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-  }
-
-  const handleMouseMove = useCallback((e: globalThis.MouseEvent) => {
-    if (resizingRef.current === null) return
-
-    const containerWidth = containerRef.current?.clientWidth ?? 0
-    if (containerWidth === 0) return
-
-    const deltaX = e.clientX - startXRef.current
-
-    if (resizingRef.current === 'left') {
-      const newWidth = startWidthRef.current + deltaX
-      // calculate the remaining width of the center column
-      const centerWidth =
-        containerWidth - newWidth - rightWidthRef.current - 2 * GUTTER_WIDTH_PX
-
-      if (
-        newWidth >= MIN_LEFT_COLUMN_WIDTH_PX &&
-        newWidth <= MAX_COLUMN_WIDTH_PX &&
-        centerWidth >= MIN_CENTER_WIDTH_PX
-      ) {
-        setLeftWidth(newWidth)
-      }
-    } else if (resizingRef.current === 'right') {
-      const newWidth = startWidthRef.current - deltaX
-      const centerWidth =
-        containerWidth - leftWidthRef.current - newWidth - 2 * GUTTER_WIDTH_PX
-
-      if (
-        newWidth >= MIN_RIGHT_COLUMN_WIDTH_PX &&
-        newWidth <= MAX_COLUMN_WIDTH_PX &&
-        centerWidth >= MIN_CENTER_WIDTH_PX
-      ) {
-        setRightWidth(newWidth)
-      }
-    }
-  }, [])
-
-  const handleMouseUp = useCallback((): void => {
-    setIsDragging(false)
-    resizingRef.current = null
-    window.removeEventListener('mousemove', handleMouseMove)
-    window.removeEventListener('mouseup', handleMouseUp)
-  }, [handleMouseMove])
-
-  const handleMouseMoveRef = useRef(handleMouseMove)
-  const handleMouseUpRef = useRef(handleMouseUp)
-
-  useEffect(() => {
-    handleMouseMoveRef.current = handleMouseMove
-    handleMouseUpRef.current = handleMouseUp
-  }, [handleMouseMove, handleMouseUp])
-
-  useEffect(() => {
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMoveRef.current)
-      window.removeEventListener('mouseup', handleMouseUpRef.current)
-    }
-  }, [])
-
   return (
     <>
       {selectedSlot != null ? (
@@ -263,9 +171,14 @@ export function ProtocolVisualization(
           }}
         />
       ) : null}
-      <div ref={containerRef} className={styles.layout_container}>
-        {/* Left Column is resizable */}
-        <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
+      <div className={styles.layout_container}>
+        <ResizableContainer
+          minWidth={MIN_LEFT_COLUMN_WIDTH_PX}
+          maxWidth={MAX_COLUMN_WIDTH_PX}
+          edge="right"
+          defaultWidth={INITIAL_WIDTH_PX}
+          aria-label={t('left_container')}
+        >
           <CommandSteps
             analysis={analysis}
             currentCommandIndex={filteredSelectedCommandIndex}
@@ -278,14 +191,7 @@ export function ProtocolVisualization(
             milliSecondsPerFrame={milliSecondsPerFrame}
             isGlobalPlaying={isPlaying}
           />
-        </div>
-        {/* Gutter between left & center */}
-        <div
-          className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
-          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-            handleMouseDown(e, 'left')
-          }}
-        />
+        </ResizableContainer>
         <div className={styles.center_column}>
           <DeckView
             filteredCommands={filteredCommands}
@@ -314,18 +220,13 @@ export function ProtocolVisualization(
             />
           </div>
         </div>
-        {/* Gutter between center & right */}
-        <div
-          className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
-          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-            handleMouseDown(e, 'right')
-          }}
-        />
-        {/* Right Column is resizable */}
         {showStepDetails ? (
-          <div
-            className={styles.right_column}
-            style={{ width: `${rightWidth}px` }}
+          <ResizableContainer
+            minWidth={MIN_RIGHT_COLUMN_WIDTH_PX}
+            maxWidth={MAX_COLUMN_WIDTH_PX}
+            edge="left"
+            defaultWidth={INITIAL_WIDTH_PX}
+            aria-label={t('right_container')}
           >
             {selectedRunTimeCommand != null ? (
               <StepDetailContainer
@@ -336,7 +237,7 @@ export function ProtocolVisualization(
                 liquids={liquids}
               />
             ) : null}
-          </div>
+          </ResizableContainer>
         ) : null}
       </div>
     </>
