@@ -6,12 +6,10 @@ import pytest
 from playwright.sync_api import Page
 
 from automation.pd_pages import (
-    MixStepForm,
     ProtocolEditorPage,
     Timeline,
     TransferPage,
     TransferStepConfig,
-    add_mix_step,
     add_transfer_steps,
 )
 from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor

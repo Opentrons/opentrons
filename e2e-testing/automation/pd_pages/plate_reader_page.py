@@ -3,7 +3,8 @@
 import re
 from typing import Literal
 
-from playwright.sync_api import Page, TimeoutError as PlaywrightTimeoutError
+from playwright.sync_api import Page
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from automation.base_page import BasePage
 
@@ -27,7 +28,7 @@ class PlateReaderPage(BasePage):
 
     def dismiss_deck_hardware_modal(self) -> None:
         """Dismiss the deck hardware toast if it appears."""
-        
+
         toast = self.page.get_by_test_id("Toast_info").filter(has_text="We've added your deck hardware!")
         try:
             toast.wait_for(state="visible", timeout=5000)
