@@ -11,6 +11,7 @@ from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
     CalibratePipetteImplementation,
@@ -19,7 +20,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.types import InstrumentOffsetVector
-from opentrons.types import MountType, Point
+from opentrons.types import Mount, MountType, Point
 
 
 @pytest.fixture(autouse=True)
@@ -28,12 +29,32 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
         monkeypatch.setattr(calibration, name, decoy.mock(func=func))
 
 
+def _stub_attached_pipette(
+    decoy: Decoy, hardware_api: HardwareControlAPI, channels: int
+) -> None:
+    pipette = decoy.mock(cls=Pipette)
+    decoy.when(pipette.channels).then_return(channels)
+    decoy.when(hardware_api.hardware_instruments).then_return({Mount.LEFT: pipette})
+
+
 @pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    ("channels", "expected_slot"),
+    [
+        (1, 5),
+        (8, 5),
+        (96, 8),
+    ],
+)
 async def test_calibrate_pipette_implementation(
-    decoy: Decoy, hardware_api: HardwareControlAPI
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    channels: int,
+    expected_slot: int,
 ) -> None:
     """Test Calibration command execution."""
     subject = CalibratePipetteImplementation(hardware_api=hardware_api)
+    _stub_attached_pipette(decoy, hardware_api, channels)
 
     params = CalibratePipetteParams(
         mount=MountType.LEFT,
@@ -41,7 +62,7 @@ async def test_calibrate_pipette_implementation(
 
     decoy.when(
         await calibration.find_pipette_offset(
-            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=5
+            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=expected_slot
         )
     ).then_return(Point(x=3, y=4, z=6))
 
@@ -67,6 +88,7 @@ async def test_calibrate_pipette_does_not_save_during_error(
 ) -> None:
     """Data should not be saved when an error is raised."""
     subject = CalibratePipetteImplementation(hardware_api=hardware_api)
+    _stub_attached_pipette(decoy, hardware_api, channels=1)
 
     params = CalibratePipetteParams(
         mount=MountType.LEFT,
