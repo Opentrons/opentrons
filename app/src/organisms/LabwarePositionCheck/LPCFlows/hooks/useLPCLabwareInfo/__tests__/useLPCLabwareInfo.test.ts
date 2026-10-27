@@ -18,12 +18,6 @@ vi.mock('../getLPCSearchParams')
 vi.mock('/app/resources/labware_offsets')
 vi.mock('/app/resources/runs')
 
-const runningRun = {
-  current: false,
-  id: 'test_id_running',
-  status: RUN_STATUS_RUNNING,
-}
-
 describe('useLPCLabwareInfo', () => {
   const RUN_ID = 'run-123'
   const PROTOCOL_DATA = { commands: [] } as any
@@ -133,11 +127,14 @@ describe('useLPCLabwareInfo', () => {
   })
 
   it('should not enable offset search if run status is not idle', () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
-      .calledWith('test_id_running')
-      .thenReturn({
-        data: { data: { status: runningRun } },
-      } as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          labwareOffsets: MOCK_LEGACY_OFFSETS,
+          status: RUN_STATUS_RUNNING,
+        },
+      },
+    } as any)
 
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({

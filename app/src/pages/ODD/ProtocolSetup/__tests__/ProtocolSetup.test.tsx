@@ -520,7 +520,7 @@ describe('ProtocolSetup', () => {
     )
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByText('Camera'))
-    expect(MockProtocolSetupOffsets).toHaveBeenCalled()
+    expect(MockProtocolSetupCamera).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupCamera/)
   })
 
