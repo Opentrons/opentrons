@@ -136,7 +136,7 @@ def test_flex_stacker(page: Page) -> None:
     plate_reader_page.button_selection("Edit Protocol")
 
     ## Starting deck set up
-    plate_reader_page.dismiss_deck_hardware_modal()
+    plate_reader_page.dimiss_deck_hardware_modal()
     protocol_editor.add_labware_to_slot("hopperD4")
     protocol_editor.select_labware_category_by_name("Well plates")
     protocol_editor.select_labware_by_name("Opentrons Tough 96 Well Plate", True, 40)
