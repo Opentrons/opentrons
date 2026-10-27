@@ -56,7 +56,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const startCalibration = startCalibrationOnClick(props, pipetteId)
 
-  const calSlotNum = is96Channel ? 'B2' : 'C2'
+  const calSlotNum = 'B2'
   let src = pipetteProbe1
   if (is8Channel) {
     src = pipetteProbe8

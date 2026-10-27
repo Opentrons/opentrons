@@ -56,16 +56,8 @@ class CalibratePipetteImplementation(
             "Expected a Pipette mount but Gripper mount was provided."
         )
 
-        pipette = ot3_api.hardware_instruments[ot3_mount.to_mount()]
-        # 96-channel probes B2 (OT-2 slot 8); all other pipettes probe C2 (slot 5).
-        calibration_slot = (
-            DeckSlotName.SLOT_B2.as_int()
-            if pipette is not None and pipette.channels == 96
-            else DeckSlotName.SLOT_C2.as_int()
-        )
-
         pipette_offset = await calibration.find_pipette_offset(
-            hcapi=ot3_api, mount=ot3_mount, slot=calibration_slot
+            hcapi=ot3_api, mount=ot3_mount, slot=DeckSlotName.SLOT_B2.as_int()
         )
 
         await ot3_api.save_instrument_offset(mount=ot3_mount, delta=pipette_offset)
