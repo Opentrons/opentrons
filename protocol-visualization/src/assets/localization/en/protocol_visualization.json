@@ -1,4 +1,7 @@
 {
+  "TEMPERATURE_APPROACHING_TARGET": "Approaching temperature",
+  "TEMPERATURE_AT_TARGET": "Target temperature",
+  "TEMPERATURE_DEACTIVATED": "Deactivated",
   "active": "Active",
   "close": "Close",
   "close_slot_spotlight": "Close slot spotlight",
@@ -57,9 +60,6 @@
   "target_speed": "Target speed",
   "target_temperature": "Target temperature",
   "temperature": "{{temp}} °C",
-  "TEMPERATURE_APPROACHING_TARGET": "Approaching temperature",
-  "TEMPERATURE_AT_TARGET": "Target temperature",
-  "TEMPERATURE_DEACTIVATED": "Deactivated",
   "tip_disposal": "Tip disposal",
   "tip_pickup": "Tip pickup",
   "tips_in_trash": "Tips in trash",
