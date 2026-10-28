@@ -12,9 +12,9 @@ from opentrons.types import Point
 DEFAULT_GENERAL_ARC_Z_MARGIN: Final[float] = 10.0
 DEFAULT_IN_LABWARE_ARC_Z_MARGIN: Final[float] = 5.0
 MINIMUM_Z_MARGIN: Final[float] = 1.0
-# Open/close the jaws this far above the labware stack top, not at homed Z.
-# Opening at home Z keeps the paddles fully spread while they travel,
-# which crashes into a vacuum-module collar on an adjacent slot.
+# Lower to this height above the labware before a restricted pickup open.
+# Opening at homed Z keeps the paddles fully spread on the way down, which
+# crashes into a vacuum module on an adjacent slot.
 GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM: Final[float] = 20.0
 
 
@@ -135,7 +135,6 @@ def get_gripper_labware_movement_waypoints(
     dropoff_speed: Optional[float] = None,
     labware_height_above_grip: float = 0.0,
     restrict_pickup_approach: bool = False,
-    restrict_drop_retract: bool = False,
 ) -> List[GripperMovementWaypointsWithJawStatus]:
     """Get waypoints for moving labware using a gripper."""
     gripper_max_z_home = gripper_home_z - (gripper_home_z_offset or 0)
@@ -143,12 +142,6 @@ def get_gripper_labware_movement_waypoints(
     pickup_hover_z = min(
         gripper_home_z,
         from_labware_center.z
-        + labware_height_above_grip
-        + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM,
-    )
-    drop_hover_z = min(
-        gripper_home_z,
-        to_labware_center.z
         + labware_height_above_grip
         + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM,
     )
@@ -201,32 +194,16 @@ def get_gripper_labware_movement_waypoints(
             ),
         ]
     )
-    if restrict_drop_retract:
-        waypoints_with_jaw_status.extend(
-            [
-                GripperMovementWaypointsWithJawStatus(
-                    position=Point(
-                        to_labware_center.x, to_labware_center.y, drop_hover_z
-                    ),
-                    jaw_open=True,
-                    dropping=True,
-                ),
-                GripperMovementWaypointsWithJawStatus(
-                    position=post_drop_home_pos,
-                    jaw_open=False,
-                    dropping=True,
-                ),
-            ]
+    # Open at the plate, then retract straight to home. A restricted drop
+    # keeps the limited jaw width for that open instead of adding a hover
+    # and a full close before the retract.
+    waypoints_with_jaw_status.append(
+        GripperMovementWaypointsWithJawStatus(
+            position=post_drop_home_pos,
+            jaw_open=True,
+            dropping=True,
         )
-    else:
-        # Gripper ungrips here
-        waypoints_with_jaw_status.append(
-            GripperMovementWaypointsWithJawStatus(
-                position=post_drop_home_pos,
-                jaw_open=True,
-                dropping=True,
-            )
-        )
+    )
     if post_drop_slide_offset is not None:
         # IF it is specified, add one more step after homing the gripper
         waypoints_with_jaw_status.append(

@@ -29,7 +29,6 @@ from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareParams,
     MoveLabwareResult,
     VacuumModuleUnderVacuumMovementError,
-    _has_vacuum_collar_neighbor,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -354,56 +353,6 @@ async def test_gripper_move_labware_implementation(
             sentinel.new_location_validated_for_gripper
         )
     ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")])
-    collar = LoadedLabware(
-        id="collar-id",
-        loadName="collar",
-        definitionUri="opentrons-test/collar/1",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
-        offsetId=None,
-    )
-    adapter = LoadedLabware(
-        id="adapter-id",
-        loadName="adapter",
-        definitionUri="opentrons-test/adapter/1",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C3),
-        offsetId=None,
-    )
-    collar_def = LabwareDefinition2.model_construct(
-        namespace="opentrons-test",
-        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
-            loadName="collar",
-            quirks=["vacuumModuleDock"],
-        ),
-    )
-    adapter_def = LabwareDefinition2.model_construct(
-        namespace="opentrons-test",
-        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
-            loadName="adapter",
-            quirks=[],
-        ),
-    )
-    decoy.when(
-        state_view.geometry.get_north_south_neighbors(
-            sentinel.from_location_validated_for_gripper
-        )
-    ).then_return([collar])
-    decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
-        collar_def
-    )
-    decoy.when(
-        labware_validation.validate_definition_is_vacuum_module_dock(collar_def)
-    ).then_return(True)
-    decoy.when(
-        state_view.geometry.get_north_south_neighbors(
-            sentinel.new_location_validated_for_gripper
-        )
-    ).then_return([adapter])
-    decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
-        adapter_def
-    )
-    decoy.when(
-        labware_validation.validate_definition_is_vacuum_module_dock(adapter_def)
-    ).then_return(False)
 
     result = await subject.execute(data)
     decoy.verify(
@@ -419,7 +368,7 @@ async def test_gripper_move_labware_implementation(
             ),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
-            restrict_pickup_approach=True,
+            restrict_pickup_approach=False,
             restrict_drop_retract=False,
         ),
     )
@@ -502,12 +451,6 @@ async def test_gripper_error(
         state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
     ).then_return(new_location)
     decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
-    decoy.when(
-        state_view.geometry.get_north_south_neighbors(origin_location)
-    ).then_return([])
-    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
-        []
-    )
     params = MoveLabwareParams(
         labwareId=labware_id,
         newLocation=new_location,
@@ -709,12 +652,6 @@ async def test_gripper_move_to_waste_chute_implementation(
     ).then_return(new_location)
     decoy.when(labware_validation.validate_gripper_compatible(labware_def)).then_return(
         True
-    )
-    decoy.when(
-        state_view.geometry.get_north_south_neighbors(from_location)
-    ).then_return([])
-    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
-        []
     )
 
     result = await subject.execute(data)
@@ -1143,8 +1080,6 @@ async def test_move_labware_calls_raise_if_labware_is_contained(
     decoy.when(state_view.geometry.ensure_valid_gripper_location(dest)).then_return(
         dest
     )
-    decoy.when(state_view.geometry.get_north_south_neighbors(origin)).then_return([])
-    decoy.when(state_view.geometry.get_north_south_neighbors(dest)).then_return([])
 
     await subject.execute(data)
 
@@ -1236,10 +1171,6 @@ async def test_movable_adapter_can_move_with_labware_on_top(
     decoy.when(
         state_view.geometry.ensure_valid_gripper_location(new_location)
     ).then_return(new_location)
-    decoy.when(state_view.geometry.get_north_south_neighbors(origin)).then_return([])
-    decoy.when(state_view.geometry.get_north_south_neighbors(new_location)).then_return(
-        []
-    )
 
     await subject.execute(data)
 
@@ -1527,65 +1458,3 @@ async def test_move_labware_raises_when_vacuum_module_pump_engaged(
         match="when the pump is running",
     ):
         await subject.execute(data)
-
-
-def _neighbor(labware_id: str, slot: DeckSlotName) -> LoadedLabware:
-    return LoadedLabware(
-        id=labware_id,
-        loadName=labware_id,
-        definitionUri=f"opentrons-test/{labware_id}/1",
-        location=DeckSlotLocation(slotName=slot),
-        offsetId=None,
-    )
-
-
-def test_has_vacuum_collar_neighbor_true_for_collar(
-    decoy: Decoy, state_view: StateView
-) -> None:
-    """A vacuum-module collar on a north/south neighbor restricts the gripper."""
-    location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
-    collar = _neighbor("collar-id", DeckSlotName.SLOT_A3)
-    collar_def = LabwareDefinition2.model_construct(
-        namespace="opentrons-test",
-        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
-            loadName="collar",
-            quirks=["vacuumModuleDock"],
-        ),
-    )
-    decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
-        [collar]
-    )
-    decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
-        collar_def
-    )
-    decoy.when(
-        labware_validation.validate_definition_is_vacuum_module_dock(collar_def)
-    ).then_return(True)
-
-    assert _has_vacuum_collar_neighbor(location, state_view) is True
-
-
-def test_has_vacuum_collar_neighbor_false_for_non_collar(
-    decoy: Decoy, state_view: StateView
-) -> None:
-    """Non-collar neighbors (96 adapter, riser) do not restrict the gripper."""
-    location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
-    adapter = _neighbor("adapter-id", DeckSlotName.SLOT_A3)
-    adapter_def = LabwareDefinition2.model_construct(
-        namespace="opentrons-test",
-        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
-            loadName="adapter",
-            quirks=[],
-        ),
-    )
-    decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
-        [adapter]
-    )
-    decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
-        adapter_def
-    )
-    decoy.when(
-        labware_validation.validate_definition_is_vacuum_module_dock(adapter_def)
-    ).then_return(False)
-
-    assert _has_vacuum_collar_neighbor(location, state_view) is False
