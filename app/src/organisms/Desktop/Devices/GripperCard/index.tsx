@@ -47,9 +47,7 @@ export function GripperCard({
     useState<GripperWizardFlowType | null>(null)
   const [showAboutGripperSlideout, setShowAboutGripperSlideout] =
     useState<boolean>(false)
-  const gripperDisplayName = useAttachedInstrumentDisplayName(
-    attachedGripper?.ok === true ? attachedGripper : null
-  )
+  const gripperDisplayName = useAttachedInstrumentDisplayName(attachedGripper)
 
   const handleAttach: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
@@ -131,9 +129,7 @@ export function GripperCard({
       subsystemUpdateData == null ? (
         <InstrumentCard
           description={
-            gripperDisplayName != null
-              ? gripperDisplayName
-              : i18n.format(t('shared:empty'), 'capitalize')
+            gripperDisplayName ?? i18n.format(t('shared:empty'), 'capitalize')
           }
           banner={
             attachedGripper?.ok && !isCalibrated ? (

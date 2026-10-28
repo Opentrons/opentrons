@@ -226,17 +226,17 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
     useInstrumentsQuery({ enabled: isFlex })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+      (i): i is GripperData => i.instrumentType === 'gripper'
     ) ?? null
   const leftPipette =
     (attachedInstruments?.data ?? []).find(
       (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+        i.instrumentType === 'pipette' && i.mount === 'left'
     ) ?? null
   const rightPipette =
     (attachedInstruments?.data ?? []).find(
       (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+        i.instrumentType === 'pipette' && i.mount === 'right'
     ) ?? null
 
   const leftDisplayName = useAttachedInstrumentDisplayName(leftPipette)

@@ -14,9 +14,8 @@ export function anonymizeInstrumentDisplayName(
 }
 
 /**
- * Prefer displayName from GET /instruments (loaded def on the robot).
- * Then the v1 model lookup, then v2 specs for the pipette name. A model
- * version newer than pipetteModelSpecs.json still has a product name.
+ * Prefer displayName from the v2 specs for the pipette name.
+ * Then GET /instruments (loaded def on the robot) if that's not found
  */
 export function useAttachedInstrumentDisplayName(
   instrument: PipetteData | GripperData | null | undefined
@@ -29,14 +28,12 @@ export function useAttachedInstrumentDisplayName(
   const pipetteName =
     isPipette && instrument != null && 'instrumentName' in instrument
       ? instrument.instrumentName
-      : undefined
+      : null
 
-  const nameDisplayName =
-    usePipetteSpecsV2(
-      pipetteName != null && pipetteName.includes('_')
-        ? (pipetteName as PipetteName)
-        : undefined
-    )?.displayName ?? null
+  const v2DisplayName =
+    usePipetteSpecsV2(pipetteName)?.displayName ?? null
+
+
   const gripperFallback = useGripperDisplayName(
     (isGripper ? instrument?.instrumentModel : null) as GripperModel
   )
@@ -44,17 +41,14 @@ export function useAttachedInstrumentDisplayName(
   if (instrument == null || !instrument.ok) {
     return null
   }
-
-  if (instrument.displayName != null && instrument.displayName !== '') {
-    return anonymizeInstrumentDisplayName(instrument.displayName, isOEMMode)
-  }
+  const hardwareDisplayName = instrument.displayName != null && instrument.displayName !== '' ? instrument.displayName : null
+  const preferedPipetteName = v2DisplayName?? hardwareDisplayName
 
   if (isGripper) {
     return gripperFallback !== '' ? gripperFallback : null
   }
 
-  return (
-    nameDisplayName ??
-    ('instrumentName' in instrument ? instrument.instrumentName : null)
-  )
+  if (preferedPipetteName != null && preferedPipetteName !== '') {
+    return anonymizeInstrumentDisplayName(preferedPipetteName, isOEMMode)
+  }
 }

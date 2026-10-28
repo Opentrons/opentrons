@@ -15,8 +15,7 @@ export function useIsOEMMode(): boolean {
   // Set `enabled: false` to pull from the cache without actually fetching, to avoid
   // reinitializing the localization provider. The actual fetch happens elsewhere
   // (at the time of writing, in the root OnDeviceDisplayApp component).
-  const settingsQuery = useRobotSettingsQuery({ enabled: false })
-  const settings = settingsQuery?.data?.settings
+  const { settings } = useRobotSettingsQuery({ enabled: false }).data ?? {}
   const isOnDevice = useSelector(getIsOnDevice)
 
   const oemModeSetting =
@@ -24,5 +23,5 @@ export function useIsOEMMode(): boolean {
       (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
     )?.value ?? false
 
-  return Boolean(oemModeSetting && isOnDevice)
+  return oemModeSetting && isOnDevice
 }

@@ -118,10 +118,7 @@ export function FlexPipetteCard({
       refetchInterval: POLL_DURATION_MS,
     }
   )
-  const pipetteDisplayName =
-    useAttachedInstrumentDisplayName(
-      attachedPipette?.ok === true ? attachedPipette : null
-    ) ?? pipetteModelSpecs?.displayName
+  const pipetteDisplayName = useAttachedInstrumentDisplayName(attachedPipette)
   // we should poll for a subsystem update from the time a bad instrument is
   // detected until the update has been done for 5 seconds
   // this gives the instruments endpoint time to start reporting
