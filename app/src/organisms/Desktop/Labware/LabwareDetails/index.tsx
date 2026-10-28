@@ -18,9 +18,9 @@ import {
   getUniqueWellProperties,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { CustomLabwareOverflowMenu } from '/app/components/desktop/cards/LabwareCard/CustomLabwareOverflowMenu'
+import { Slideout } from '/app/components/desktop/Slideout'
 
-import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
 import { Dimensions } from './Dimensions'
 import { Gallery } from './Gallery'
 import { getWellLabel } from './helpers/labels'

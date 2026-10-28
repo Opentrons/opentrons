@@ -10,6 +10,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { GripperCard } from '/app/components/desktop/cards/GripperCard'
+import { FlexPipetteCard } from '/app/components/desktop/cards/PipetteCard/FlexPipetteCard'
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { i18n } from '/app/i18n'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -17,10 +20,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { GripperCard } from '../GripperCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
-import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 
 import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
@@ -33,10 +33,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../GripperCard')
+vi.mock('/app/components/desktop/cards/GripperCard')
 vi.mock('/app/organisms/ModuleCard')
-vi.mock('../PipetteCard/FlexPipetteCard')
-vi.mock('../PipetteCard/PipetteRecalibrationWarning')
+vi.mock('/app/components/desktop/cards/PipetteCard/FlexPipetteCard')
+vi.mock('/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/transformations/instruments')

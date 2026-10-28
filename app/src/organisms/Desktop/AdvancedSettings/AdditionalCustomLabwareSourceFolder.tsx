@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import {
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
   useTrackEvent,
