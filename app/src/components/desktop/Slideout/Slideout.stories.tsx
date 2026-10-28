@@ -31,7 +31,7 @@ const Children = (
       desktopStyle="bodyDefaultSemiBold"
       paddingTop={SPACING.spacing4}
     >
-      {'this is where the slideout body goes'}
+      this is where the slideout body goes
     </StyledText>
 
     <PrimaryButton
@@ -39,7 +39,7 @@ const Children = (
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <StyledText desktopStyle="bodyDefaultRegular">{'btn text'}</StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">btn text</StyledText>
     </PrimaryButton>
   </Fragment>
 )
