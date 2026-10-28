@@ -7,7 +7,7 @@ import {
   DEFAULT_VENDOR_ID,
   fetchSerialPortList,
   SerialPortHttpAgent,
-} from '@opentrons/usb-bridge/node-client'
+} from '@opentrons/node-usb-bridge-client'
 
 import { cloneError } from './cloneError'
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
@@ -22,7 +22,7 @@ import type { AxiosRequestConfig } from 'axios'
 import type { IpcMainInvokeEvent } from 'electron'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
+import type { PortInfo } from '@opentrons/node-usb-bridge-client'
 import type { Action, Dispatch } from './types'
 
 let usbHttpAgent: SerialPortHttpAgent | undefined
