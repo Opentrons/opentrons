@@ -41,21 +41,27 @@ vi.mock('/app/redux/protocol-storage', async importOriginal => {
   }
 })
 
-vi.mock('../ProtocolOverflowMenu', () => ({
-  ProtocolOverflowMenu: vi.fn(() => <div>mock protocol overflow menu</div>),
-}))
+vi.mock(
+  '../../../../organisms/Desktop/ProtocolsLanding/ProtocolOverflowMenu',
+  () => ({
+    ProtocolOverflowMenu: vi.fn(() => <div>mock protocol overflow menu</div>),
+  })
+)
 
-vi.mock('../../ProtocolAnalysisFailure', () => ({
+vi.mock('../../../../organisms/Desktop/ProtocolAnalysisFailure', () => ({
   ProtocolAnalysisFailure: vi.fn(({ errors }: { errors: string[] }) => (
     <div>{errors.join(', ')}</div>
   )),
 }))
 
-vi.mock('../../ProtocolAnalysisFailure/ProtocolAnalysisStale', () => ({
-  ProtocolAnalysisStale: vi.fn(() => <div>mock protocol analysis stale</div>),
-}))
+vi.mock(
+  '../../../../organisms/Desktop/ProtocolAnalysisFailure/ProtocolAnalysisStale',
+  () => ({
+    ProtocolAnalysisStale: vi.fn(() => <div>mock protocol analysis stale</div>),
+  })
+)
 
-vi.mock('../../ProtocolStatusBanner', () => ({
+vi.mock('../../../../organisms/Desktop/ProtocolStatusBanner', () => ({
   ProtocolStatusBanner: vi.fn(() => <div>mock protocol status banner</div>),
 }))
 

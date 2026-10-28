@@ -26,7 +26,7 @@ import {
   getLabwareViewBox,
 } from '@opentrons/shared-data'
 
-import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
+import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../../../../organisms/Desktop/Labware/LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
 import type { ReactNode } from 'react'
@@ -135,7 +135,7 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
       {/* space for custom labware min: 3rem for date */}
       {/* Note kj 06/30/2022 currently this section would not be ideal implementation
         Once the team have an agreement for grid system, we could refactor */}
-      <Box marginTop={`-10px`} paddingRight={SPACING.spacing8}>
+      <Box marginTop="-10px" paddingRight={SPACING.spacing8}>
         {modified != null && filename != null && (
           <Flex
             height="100%"
