@@ -117,17 +117,17 @@ export interface CreateCSVCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface CreateCSVRuntimeCommand
-  extends CommonCommandCreateInfo, CreateCSVCreateCommand {
+  extends CommonCommandRunTimeInfo, CreateCSVCreateCommand {
   result?: {}
 }
 
 export interface CSVWriteRowCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'CSVWriteRow'
+  commandType: 'csvWriteRow'
   params: CSVWriteRowParams
 }
 
 export interface CSVWriteRowRuntimeCommand
-  extends CommonCommandCreateInfo, CSVWriteRowCreateCommand {
+  extends CommonCommandRunTimeInfo, CSVWriteRowCreateCommand {
   result?: {}
 }
 
@@ -309,7 +309,7 @@ interface LoadLiquidClassResult {
 }
 
 interface CreateCSVParams {
-  filename: string
+  fileName: string
   columns: number | null
   title_row: string[] | null
 }

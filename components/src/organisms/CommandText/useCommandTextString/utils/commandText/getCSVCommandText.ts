@@ -1,20 +1,10 @@
 import type {
-  CreateCSVCommand,
-  CSVWriteRowCommand,
+  CreateCSVRuntimeCommand,
+  CSVWriteRowRuntimeCommand,
 } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
-const KEYS_BY_COMMAND_TYPE: {
-  [commandType in RunTimeCommand['commandType']]?: string
-} = {
-  createCSV: 'create_csv',
-  csvWriteRow: 'csv_write_row',
-}
-
-type HandledCommands = Extract<
-  RunTimeCommand,
-  { commandType: keyof typeof KEYS_BY_COMMAND_TYPE }
->
+type HandledCommands = CreateCSVRuntimeCommand | CSVWriteRowRuntimeCommand
 
 type GetCSVCommandText = HandlesCommands<HandledCommands>
 
@@ -25,6 +15,7 @@ export function getCSVCommandText({ command, t }: GetCSVCommandText): string {
     return t('create_csv', {
       filename,
     })
+  } else {
+    return t('csv_write_row')
   }
-  return t(KEYS_BY_COMMAND_TYPE[command.commandType])
 }
