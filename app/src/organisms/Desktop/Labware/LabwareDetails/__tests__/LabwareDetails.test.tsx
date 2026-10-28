@@ -2,12 +2,12 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { CustomLabwareOverflowMenu } from '/app/components/desktop/cards/LabwareCard/CustomLabwareOverflowMenu'
 import { i18n } from '/app/i18n'
 import { useAllLabware } from '/app/local-resources/labware'
 import { mockOpentronsLabwareDetailsDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { LabwareDetails } from '..'
-import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'
 import { Dimensions } from '../Dimensions'
 import { Gallery } from '../Gallery'
 import { ManufacturerDetails } from '../ManufacturerDetails'
@@ -19,7 +19,7 @@ import { WellSpacing } from '../WellSpacing'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/local-resources/labware')
-vi.mock('../../LabwareCard/CustomLabwareOverflowMenu')
+vi.mock('/app/components/desktop/cards/LabwareCard/CustomLabwareOverflowMenu')
 vi.mock('../Dimensions')
 vi.mock('../Gallery')
 vi.mock('../ManufacturerDetails')

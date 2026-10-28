@@ -24,7 +24,8 @@ import {
   Z_INDEX,
 } from '@opentrons/components'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { ProtocolCard } from '/app/components/desktop/cards/ProtocolCard'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
 import {
   getProtocolsDesktopSortKey,
@@ -34,7 +35,6 @@ import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
 import type { MouseEventHandler } from 'react'

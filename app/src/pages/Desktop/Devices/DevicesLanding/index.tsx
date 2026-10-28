@@ -23,10 +23,10 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
+import { RobotCard } from '/app/components/desktop/cards/RobotCard'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
-import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useFeatureFlag } from '/app/redux/config'
 import {

@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'

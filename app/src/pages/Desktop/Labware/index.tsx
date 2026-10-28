@@ -32,9 +32,9 @@ import {
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
 
+import { LabwareCard } from '/app/components/desktop/cards/LabwareCard'
 import { useAllLabware } from '/app/local-resources/labware'
 import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
-import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {

@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
 import type { ReactNode } from 'react'

@@ -9,11 +9,11 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
 import type { ReactNode } from 'react'

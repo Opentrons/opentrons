@@ -11,8 +11,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Slideout } from '/app/atoms/Slideout'
-import { UploadInput } from '/app/molecules/UploadInput'
+import { Slideout } from '/app/components/desktop/Slideout'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import {
   ANALYTICS_ADD_CUSTOM_LABWARE,
   useTrackEvent,

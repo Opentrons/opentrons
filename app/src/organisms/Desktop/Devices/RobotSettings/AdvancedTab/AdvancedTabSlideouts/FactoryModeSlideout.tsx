@@ -22,10 +22,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { MultiSlideout } from '/app/components/desktop/Slideout/MultiSlideout'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { FileUpload } from '/app/molecules/FileUpload'
-import { UploadInput } from '/app/molecules/UploadInput'
 import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 
 import type { ChangeEvent, MouseEventHandler, ReactNode } from 'react'

@@ -10,9 +10,9 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 
+import { Breadcrumbs } from '/app/components/desktop/Breadcrumbs'
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
-import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
 import {
   EmergencyStopContext,

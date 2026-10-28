@@ -5,10 +5,10 @@ import { useDispatch } from 'react-redux'
 import { useMenuHandleClickOutside } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
+import { MediaContainerContent } from '/app/components/desktop/MediaContainerContent'
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
-import { MediaContainerContent } from '/app/molecules/MediaContainerContent'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,

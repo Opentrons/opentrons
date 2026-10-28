@@ -25,9 +25,10 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { LANGUAGES } from '/app/i18n'
 import { ConnectRobotSlideout } from '/app/organisms/Desktop/AppSettings/ConnectRobotSlideout'
 import { PreviousVersionModal } from '/app/organisms/Desktop/AppSettings/PreviousVersionModal'

@@ -17,8 +17,8 @@ import {
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { getScanning, startDiscovery } from '/app/redux/discovery'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'

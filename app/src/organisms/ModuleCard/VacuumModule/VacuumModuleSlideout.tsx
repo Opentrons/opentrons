@@ -20,7 +20,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
-import { Slideout } from '/app/atoms/Slideout'
+import { Slideout } from '/app/components/desktop/Slideout'
 
 import { useVacuumModuleControls } from './hooks/useVacuumModuleControls'
 import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
