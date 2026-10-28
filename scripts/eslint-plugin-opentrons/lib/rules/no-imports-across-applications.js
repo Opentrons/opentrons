@@ -7,6 +7,7 @@ const UI_PATH_FRAGMENTS = [
   '/pages/',
   '/App/',
   '/DesignTokens/',
+  '/components/',
 ]
 
 const isUI = pathStr =>
@@ -26,6 +27,14 @@ function getRelativePath(context) {
   const physicalFilename = context.physicalFilename
   const relative = path.relative(cwd, physicalFilename)
   return relative
+}
+
+/** The desktop/ODD app bootstrap file. It wires global UI styles and keyboards. */
+function isAppEntry(relativePath) {
+  return (
+    relativePath === 'app/src/index.tsx' ||
+    relativePath.endsWith('/app/src/index.tsx')
+  )
 }
 
 module.exports = {
@@ -58,7 +67,8 @@ module.exports = {
         }
       } else if (
         relativePath.includes('/Desktop/') ||
-        relativePath.includes('DesktopApp')
+        relativePath.includes('DesktopApp') ||
+        relativePath.includes('/desktop/')
       ) {
         if (node.source.value.includes('/ODD/')) {
           context.report({
@@ -66,7 +76,7 @@ module.exports = {
             node,
           })
         }
-      } else if (!isUI(relativePath)) {
+      } else if (!isUI(relativePath) && !isAppEntry(relativePath)) {
         if (isUI(node.source.value)) {
           context.report({ messageId: 'avoidImportingUIFromUtils', node })
         }
