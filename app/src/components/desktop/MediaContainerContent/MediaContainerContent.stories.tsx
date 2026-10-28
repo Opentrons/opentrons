@@ -1,6 +1,6 @@
 import { VIEWPORT } from '@opentrons/components'
 
-import { customViewports } from '../../../../.storybook/preview'
+import { customViewports } from '../../../../../.storybook/preview'
 import { MediaContainerContent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'

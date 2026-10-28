@@ -42,7 +42,7 @@ const uploadText = (
     gridGap={SPACING.spacing8}
     alignItems={ALIGN_CENTER}
   >
-    <LegacyStyledText>{'CSV file'}</LegacyStyledText>
+    <LegacyStyledText>CSV file</LegacyStyledText>
     <Icon name="information" size="0.75rem" />
   </Flex>
 )
