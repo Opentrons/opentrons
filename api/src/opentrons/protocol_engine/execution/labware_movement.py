@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 _GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
 # Extra opening beyond labware Y, mm total, used only when a vacuum-module
 # collar is a north/south neighbor. Fully homed open (92 mm) hits that collar.
-_LABWARE_JAW_OPEN_CLEARANCE_MM = 1.5
+_LABWARE_JAW_OPEN_CLEARANCE_MM = 2.5
 
 
 def _jaw_open_width_mm(
