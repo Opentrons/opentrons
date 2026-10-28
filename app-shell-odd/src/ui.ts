@@ -47,7 +47,7 @@ const WINDOW_OPTS = {
     },
     config.webPreferences
   ),
-}
+} as const
 
 const READY_POLL_INTERVAL_MS = 1500
 
