@@ -31,7 +31,7 @@ Opentrons Flex is compatible with the following Opentrons modules:
 
 - The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the Gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
 
-- The [**Vacuum Module**](vacuum.md) is an on-deck, fully automated vacuum filtration, sample purification, and waste extraction system for Opentrons Flex. The Vacuum Module accepts ANSI/SLAS compliant vacuum filtration labware and is fully compatible with the Gripper, Opentrons software, and the Opentrons Python API.
+- The [**Vacuum Module**](vacuum.md) is an on-deck, fully automated vacuum filtration, sample purification, and waste extraction system for Opentrons Flex. The Vacuum Module accepts ANSI/SLAS compliant vacuum filtration labware and is compatible with the Flex Gripper, Opentrons software, and the Opentrons Python API.
 
 Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](../../python-api/modules/concurrent.md) to continue pipetting and other steps in your Flex protocols. 
 
