@@ -160,7 +160,7 @@ export default defineConfig({
         replacement: path.resolve('./discovery-client/src/index.ts'),
       },
       {
-        find: '@opentrons/usb-bridge/node-client',
+        find: '@opentrons/node-usb-bridge-client',
         replacement: path.resolve('./usb-bridge/node-client/src/index.ts'),
       },
       {
