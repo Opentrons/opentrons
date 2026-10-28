@@ -21,14 +21,14 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '../../../../../../discovery-client/src/fixtures'
-import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from '../ErrorRecoveryBanner'
+} from '../../../../organisms/Desktop/Devices/ErrorRecoveryBanner'
+import { RobotOverflowMenu } from '../../../../organisms/Desktop/Devices/RobotOverflowMenu'
+import { RobotStatusHeader } from '../../../../organisms/Desktop/Devices/RobotStatusHeader'
+import { UpdateRobotBanner } from '../../../../organisms/Desktop/UpdateRobotBanner'
 import { RobotCard } from '../RobotCard'
-import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ComponentProps } from 'react'
 import type { State } from '/app/redux/types'
@@ -38,11 +38,11 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/resources/modules')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../../UpdateRobotBanner')
+vi.mock('../../../../organisms/Desktop/UpdateRobotBanner')
 vi.mock('/app/redux/config')
-vi.mock('../RobotOverflowMenu')
-vi.mock('../RobotStatusHeader')
-vi.mock('../ErrorRecoveryBanner')
+vi.mock('../../../../organisms/Desktop/Devices/RobotOverflowMenu')
+vi.mock('../../../../organisms/Desktop/Devices/RobotStatusHeader')
+vi.mock('../../../../organisms/Desktop/Devices/ErrorRecoveryBanner')
 
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
 const MOCK_STATE: State = {

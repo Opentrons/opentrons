@@ -8,7 +8,7 @@ import { BORDERS, COLORS, CURSOR_POINTER, SPACING } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { MiniCard } from '../'
+import { MiniCard } from '..'
 
 import type { ComponentProps } from 'react'
 

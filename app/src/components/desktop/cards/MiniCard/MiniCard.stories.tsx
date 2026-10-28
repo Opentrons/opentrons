@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '../../atoms/Slideout'
+import { Slideout } from '../../Slideout'
 import { MiniCard as MiniCardComponent } from './'
 
 import type { Meta, StoryObj } from '@storybook/react'
