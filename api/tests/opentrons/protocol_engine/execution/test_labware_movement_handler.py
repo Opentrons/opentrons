@@ -38,6 +38,9 @@ from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
 from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
     VacuumModuleMovementFlagger,
 )
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D,
+)
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
@@ -177,8 +180,8 @@ def subject(
 
 
 def test_jaw_open_width_mm() -> None:
-    """Open just enough to clear the labware, clamped to gripper geometry."""
-    assert _jaw_open_width_mm(85.48, 60.0, 92.0) == 84
+    """Open a few mm past the labware, clamped to gripper geometry."""
+    assert _jaw_open_width_mm(85.48, 60.0, 92.0) == 87
     assert _jaw_open_width_mm(94.0, 60.0, 92.0) == 92
     assert _jaw_open_width_mm(108.6, 60.0, 92.0) == 92
     assert _jaw_open_width_mm(108.6, 60.0, 92.6) == 92
@@ -257,7 +260,7 @@ async def test_raise_error_if_gripper_pickup_failed(
         await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),
         await ot3_hardware_api.grip(force_newtons=100),
-        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
             expected_grip_width=100,
@@ -279,9 +282,10 @@ async def test_raise_error_if_gripper_pickup_failed(
             grip_width_uncertainty_narrower=5,
             disable_geometry_grip_check=False,
         ),
-        await ot3_hardware_api.hold_jaw_width(92),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.idle_gripper(),
     )
 
 
@@ -413,7 +417,7 @@ async def test_move_labware_with_gripper(
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[0], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
+            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[1], speed=None
             ),
@@ -429,13 +433,13 @@ async def test_move_labware_with_gripper(
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[4], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[5], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
+            await ot3_hardware_api.idle_gripper(),
         )
     else:
         decoy.verify(
@@ -445,7 +449,7 @@ async def test_move_labware_with_gripper(
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[0], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
+            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[1], speed=None
             ),
@@ -461,19 +465,19 @@ async def test_move_labware_with_gripper(
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[4], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
             await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
             await ot3_hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[5], speed=None
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
+            await ot3_hardware_api.ungrip(),
             await ot3_hardware_api.move_to(
                 mount=gripper,
                 abs_position=expected_waypoints[5] + slide_offset,
                 speed=None,
             ),
-            await ot3_hardware_api.hold_jaw_width(92),
+            await ot3_hardware_api.idle_gripper(),
         )
 
 
@@ -528,6 +532,158 @@ def _stub_gripper_move(
 
 
 @pytest.mark.ot3_only
+async def test_full_jaw_open_for_normal_pickup(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
+) -> None:
+    """A plate-width labware opens the jaw fully when no collar is adjacent."""
+    labware_def.parameters.quirks = []
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
+    from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+    decoy.when(
+        state_store.labware.get_gripper_width_specs(labware_definition=labware_def)
+    ).then_return(GripSpecs(targetY=85.48, uncertaintyNarrower=5, uncertaintyWider=0))
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+    )
+
+    decoy.verify(await ot3_hardware_api.ungrip(), times=2)
+    decoy.verify(
+        await ot3_hardware_api.hold_jaw_width(matchers.Anything()),
+        times=0,
+    )
+    decoy.verify(await ot3_hardware_api.idle_gripper(), times=1)
+
+
+@pytest.mark.ot3_only
+async def test_limited_jaw_open_only_next_to_vacuum_collar(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
+    ot3_hardware_api: OT3API,
+    subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
+) -> None:
+    """North/south collar neighbors keep the jaw a few mm wider than the labware."""
+    labware_def.parameters.quirks = []
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
+    from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    pickup_grip_point, drop_grip_point, _ = _stub_gripper_move(
+        decoy,
+        state_store,
+        thermocycler_plate_lifter,
+        labware_def,
+        from_location,
+        to_location,
+    )
+    decoy.when(
+        state_store.labware.get_gripper_width_specs(labware_definition=labware_def)
+    ).then_return(GripSpecs(targetY=85.48, uncertaintyNarrower=5, uncertaintyWider=0))
+    decoy.when(state_store.labware.get_grip_z(labware_def)).then_return(10.0)
+    decoy.when(
+        state_store.labware.get_extents_around_lw_origin(labware_def)
+    ).then_return(
+        AxisAlignedBoundingBox3D(
+            min_x=0, max_x=127, min_y=0, max_y=85.48, min_z=0, max_z=50
+        )
+    )
+
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=from_location,
+        new_location=to_location,
+        user_pick_up_offset=Point(x=123, y=234, z=345),
+        user_drop_offset=Point(x=111, y=222, z=333),
+        post_drop_slide_offset=None,
+        restrict_pickup_approach=True,
+        restrict_drop_retract=True,
+    )
+
+    gripper = OT3Mount.GRIPPER
+    limited_open = _jaw_open_width_mm(85.48, 60.0, 92.0)
+    pickup_hover_z = 119.5 + 40.0 + 20.0
+
+    def _grip_check() -> Any:
+        return ot3_hardware_api.raise_error_if_gripper_pickup_failed(
+            expected_grip_width=85.48,
+            grip_width_uncertainty_wider=0,
+            grip_width_uncertainty_narrower=5,
+            disable_geometry_grip_check=False,
+        )
+
+    decoy.verify(
+        await ot3_hardware_api.hold_jaw_width(limited_open),
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=pickup_grip_point, speed=None
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        _grip_check(),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(pickup_grip_point.x, pickup_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        _grip_check(),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(drop_grip_point.x, drop_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.grip(force_newtons=100),
+        _grip_check(),
+        await ot3_hardware_api.move_to(
+            mount=gripper, abs_position=drop_grip_point, speed=None
+        ),
+        await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+        await ot3_hardware_api.hold_jaw_width(limited_open),
+        await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(drop_grip_point.x, drop_grip_point.y, 999),
+            speed=None,
+        ),
+        await ot3_hardware_api.hold_jaw_width(limited_open),
+    )
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=gripper,
+            abs_position=Point(
+                pickup_grip_point.x, pickup_grip_point.y, pickup_hover_z
+            ),
+            speed=None,
+        ),
+        times=1,
+    )
+    decoy.verify(await ot3_hardware_api.ungrip(), times=0)
+    assert limited_open == 87
+
+
+@pytest.mark.ot3_only
 async def test_slow_pickup_for_vacuum_module_collar(
     decoy: Decoy,
     state_store: StateStore,
@@ -575,7 +731,7 @@ async def test_slow_pickup_for_vacuum_module_collar(
             abs_position=Point(pickup_grip_point.x, pickup_grip_point.y, 999),
             speed=None,
         ),
-        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.move_to(
             mount=gripper,
             abs_position=pickup_grip_point,
@@ -597,15 +753,15 @@ async def test_slow_pickup_for_vacuum_module_collar(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=drop_grip_point, speed=None
         ),
-        await ot3_hardware_api.hold_jaw_width(92),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+        await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
         await ot3_hardware_api.move_to(
             mount=gripper,
             abs_position=Point(drop_grip_point.x, drop_grip_point.y, 999),
             speed=None,
         ),
-        await ot3_hardware_api.hold_jaw_width(92),
+        await ot3_hardware_api.idle_gripper(),
     )
 
 
