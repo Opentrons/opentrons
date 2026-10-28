@@ -44,7 +44,7 @@ Deck components install directly onto the Flex deck to support labware and diffe
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spacers exploded view, 3mm, 5mm, 7mm, 12mm](../images/spacer-stack.svg "Spacker stack, exploded view")
+![Spacers exploded view, 3mm, 5mm, 7mm, 12mm](../images/spacer-stack.svg "Spacer stack, exploded view")
 <figcaption>Spacers: 3.2 mm, 5.2 mm, 7.25 mm, 12.8 mm</figcaption>
 </figure>
 
@@ -57,7 +57,7 @@ Deck components install directly onto the Flex deck to support labware and diffe
 
 ### Module components
 
-Module components provide the external power, vacuum, data communication, and mechanical items required to run the module. These include the control box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and hex keys.
+Module components provide the external power, vacuum, data communication, and mechanical hardware required to operate the module. These include the control box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and L-shaped hex keys.
 
 <div class="parts-list" markdown>
 
@@ -95,13 +95,13 @@ Module components provide the external power, vacuum, data communication, and me
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spare deck adapter screws, M4 x 10](../images/fasteners-deck.png "Spare deck adapter screws"){ width="50%" }
-<figcaption>(2) Deck adapter screws, M4x10 metric thread</figcaption>
+![Spare deck adapter screws, M4 × 10 mm](../images/fasteners-deck.png "Spare deck adapter screws"){ width="50%" }
+<figcaption>(2) Deck adapter screws,<br>M4 × 10 mm (2.5 mm hex drive)</figcaption>
 </figure>
 
 <figure markdown>
-![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="60%" }
-<figcaption>(6) Manifold screws,<br>7/64" Imperial thread</figcaption>
+![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="50%" }
+<figcaption>(6) Manifold screws,<br>Imperial thread (7/64" hex drive)</figcaption>
 </figure>
 
 </div>
@@ -111,7 +111,7 @@ Module components provide the external power, vacuum, data communication, and me
 Waste collection components connect directly to the manifold base and provide an enclosed liquid routing and storage system. These include the glass carboy, GL80 sealing cap, cap wrench, and vacuum tubing.
 
 * The carboy, cap, and hoses ship with quick-connect fittings installed at the factory.
-* Extra fittings and hose clamps are provided to assemble custom vacuum line lengths if needed.
+* Extra fittings and clamps are provided to assemble custom vacuum hose lengths if needed.
 
 <div class="parts-list" markdown>
 
@@ -145,12 +145,12 @@ Waste collection components connect directly to the manifold base and provide an
 
 <figure markdown>
 ![6 mm vacuum hose](../images/hose-6mm.png "6 mm vacuum hose"){ width="60%" }
-<figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
+<figcaption>(1) 6 mm diameter manifold hose, 2 m</figcaption>
 </figure>
 
 <figure markdown>
 ![9 mm vacuum hose](../images/hose-9mm.png){ width="60%" }
-<figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
+<figcaption>(1) 9 mm diameter control box hose, 2 m</figcaption>
 </figure>
 
 </div>
