@@ -59,7 +59,10 @@ module.exports = {
         relativePath.includes('/ODD/') ||
         relativePath.includes('OnDeviceDisplayApp')
       ) {
-        if (node.source.value.includes('/Desktop/')) {
+        if (
+          node.source.value.includes('/Desktop/') ||
+          node.source.value.includes('/desktop/')
+        ) {
           context.report({
             messageId: 'avoidImportingDesktopFromODD',
             node,
