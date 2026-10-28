@@ -21,12 +21,18 @@ const url = `${config.url.protocol}//${urlPath}`
 
 const WINDOW_OPTS = {
   show: false,
-  useContentSize: true,
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
   minHeight: config.minHeight,
-  frame: false, // hide menubar
+  // this wide variety of arguments is required to get a truly kiosk-style
+  // window with no chrome or border decorations of any kind
+  useContentSize: false,
+  frame: false,
+  hasShadow: false,
+  roundedCorners: false,
+  titleBarStyle: 'hidden',
+  titleBarOverlay: false,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {

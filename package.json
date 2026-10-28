@@ -84,7 +84,7 @@
     "date-fns": "2.30.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "39.1.2",
+    "electron": "45.0.0",
     "electron-builder": "26.16.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "10.1.8",
