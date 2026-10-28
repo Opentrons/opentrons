@@ -21,8 +21,9 @@ The Vacuum Module includes an on-deck adapter and manifold base, modular spacers
 
 The Vacuum Module accepts ANSI/SLAS-compliant vacuum filtration labware. For best performance, Opentrons recommends using tested and verified filter plates. See the [Opentrons Labware Library](https://labware.opentrons.com/) for a complete list of supported filter plates.
 
-!!! note "Gripper compatibility"
-    The Flex Gripper can pick up and move vacuum collars and filter plates. However, the gripper cannot pick up the spacers included with the module. Spacers must be placed on and removed from the manifold base by hand.
+### Gripper compatibility
+
+The Flex Gripper can pick up and move vacuum collars and filter plates. However, the gripper cannot pick up the spacers included with the module. Spacers must be placed on and removed from the manifold base by hand.
 
 ### Deck location
 
