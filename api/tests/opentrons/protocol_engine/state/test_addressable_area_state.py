@@ -6,7 +6,10 @@ implementation detail.
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
-from opentrons.protocol_engine.actions.actions import SetDeckConfigurationAction
+from opentrons.protocol_engine.actions.actions import (
+    AddAddressableAreaAction,
+    SetDeckConfigurationAction,
+)
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaView,
@@ -77,11 +80,11 @@ def test_deck_configuration_setting(
     ]
 
 
-def _ot3_view(
+def _ot3_store(
     ot3_standard_deck_def: DeckDefinitionV5,
     deck_configuration: DeckConfigurationType,
     use_simulated_deck_config: bool,
-) -> AddressableAreaView:
+) -> AddressableAreaStore:
     subject = AddressableAreaStore(
         deck_configuration=deck_configuration,
         config=Config(
@@ -108,7 +111,21 @@ def _ot3_view(
             },
         },
     )
-    return AddressableAreaView(subject.state)
+    return subject
+
+
+def _ot3_view(
+    ot3_standard_deck_def: DeckDefinitionV5,
+    deck_configuration: DeckConfigurationType,
+    use_simulated_deck_config: bool,
+) -> AddressableAreaView:
+    return AddressableAreaView(
+        _ot3_store(
+            ot3_standard_deck_def,
+            deck_configuration,
+            use_simulated_deck_config,
+        ).state
+    )
 
 
 def test_potential_base_slot_for_loaded_staging_area(
@@ -141,6 +158,24 @@ def test_potential_base_slot_when_module_replaces_staging_area(
     )
     assert subject_view.get_potential_addressable_area_base_slot("B4") == (
         DeckSlotName.SLOT_B3
+    )
+
+
+def test_potential_base_slot_when_simulated_deck_rejects_plain_slot(
+    ot3_standard_deck_def: DeckDefinitionV5,
+) -> None:
+    """Analysis rejects plain A4 once the vacuum dock areas are loaded."""
+    subject = _ot3_store(
+        ot3_standard_deck_def,
+        [("cutoutA3", "vacuumModuleV1", None)],
+        use_simulated_deck_config=True,
+    )
+    for area_name in ("vacuumModuleV1A3", "vacuumModuleV1DockA4"):
+        subject.handle_action(AddAddressableAreaAction(addressable_area_name=area_name))
+    subject_view = AddressableAreaView(subject.state)
+
+    assert subject_view.get_potential_addressable_area_base_slot("A4") == (
+        DeckSlotName.SLOT_A3
     )
 
 

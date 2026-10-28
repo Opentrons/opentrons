@@ -412,7 +412,8 @@ class AddressableAreaView:
         Uses the loaded area when it is on the deck. When a module fixture has
         replaced the plain name, reads the cutout from the deck definition, so
         a later module that mounts on column 4 is found on whatever cutout
-        provides that area.
+        provides that area. Analysis uses a simulated deck, which rejects the
+        plain name as incompatible with the module fixture instead of missing.
         """
         try:
             return self.get_addressable_area_base_slot(addressable_area_name)
@@ -420,6 +421,7 @@ class AddressableAreaView:
             AreaNotInDeckConfigurationError,
             AddressableAreaDoesNotExistError,
             CutoutDoesNotExistError,
+            IncompatibleAddressableAreaError,
         ):
             try:
                 cutout_id, _ = (
