@@ -44,18 +44,9 @@ Deck components install directly onto the Flex deck to support labware and diffe
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short spacer, 27 mm](../images/spacer-short.svg "Short spacer, 27 mm")
-<figcaption>(1) Short spacer, 27 mm</figcaption>
+![Spacers exploded view, 3mm, 5mm, 7mm, 12mm](../images/spacer-stack.svg "Spacker stack, exploded view")
+<figcaption>Spacers: 3.2 mm, 5.2 mm, 7.25 mm, 12.8 mm</figcaption>
 </figure>
-
-<figure markdown>
-![Tall spacer, 34 mm](../images/spacer-tall.svg "Tall spacer, 34 mm")
-<figcaption>(1) Tall spacer, 34 mm</figcaption>
-</figure>
-
-</div>
-
-<div class="parts-list" markdown>
 
 <figure markdown>
 ![Vacuum manifold base](../images/vacuum-module-base.svg "Manifold base")
@@ -122,16 +113,25 @@ Waste collection components connect directly to the manifold base and provide an
 * The carboy, cap, and hoses ship with quick-connect fittings installed at the factory.
 * Extra fittings and hose clamps are provided to assemble custom vacuum line lengths if needed.
 
+<div class="parts-list" markdown>
+
 <figure markdown>
-![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="55%" }
+![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap")
 <figcaption>(1) Carboy, 2L</figcaption>
 </figure>
+
+<figure markdown>
+![Widemouth GL80 blue polypropylene carboy cap](../images/carboy-cap.png "GL80 carboy cap"){ width="50%" }
+<figcaption>(1) Carboy cap, GL80</figcaption>
+</figure>
+
+</div>
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Widemouth GL80 blue polypropylene carboy cap](../images/carboy-cap.png "GL80 carboy cap"){ width="90%" }
-<figcaption>(1) Carboy cap, GL80</figcaption>
+![Magnetic hose clip](../images/hose-clip.svg){ width="80%" }
+<figcaption>(1) Magnetic hose clip</figcaption>
 </figure>
 
 <figure markdown>
@@ -144,12 +144,12 @@ Waste collection components connect directly to the manifold base and provide an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![6 mm vacuum hose](../images/hose-6mm.png "6 mm vacuum hose"){ width="70%" }
+![6 mm vacuum hose](../images/hose-6mm.png "6 mm vacuum hose"){ width="60%" }
 <figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 <figure markdown>
-![9 mm vacuum hose](../images/hose-9mm.png){ width="70%" }
+![9 mm vacuum hose](../images/hose-9mm.png){ width="60%" }
 <figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
@@ -174,7 +174,7 @@ The control box houses the vacuum pump, air/water separator, electronics, and po
   <tbody>
     <tr>
       <td><strong>Dimensions</strong></td>
-      <td>225 mm L x 200 mm W x 278 mm H (&asymp; 9" L x 8" W x 11" H)</td>
+      <td>227 mm L x 200 mm W x 278 mm H<br>(&asymp; 9" L x 8" W x 11" H)</td>
     </tr>
     <tr>
       <td><strong>Weight</strong></td>
@@ -196,6 +196,14 @@ The control box houses the vacuum pump, air/water separator, electronics, and po
           <li>Absolute pressure: 1,013 mbar (sea level ambient) to ~132 mbar.</li>
         </ul>
       </td>
+    </tr>
+    <tr>
+      <td><strong>Noise level</strong></td>
+      <td>63 dB</td>
+    </tr>
+    <tr>
+      <td><strong>Use location</td>
+      <td>For indoor use only. Not rated for outdoor use or wet locations.</td>
     </tr>
   </tbody>
 </table>
@@ -278,7 +286,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>Slow-blow (time-delay)</li>
-          <li>8 A, 250 V</li>
+          <li>T 8 A, 250 V</li>
         </ul>
           <strong>Warning:</strong> Do not attempt to replace the fuse unless at the direction of Opentrons Support.
       </td>
@@ -299,7 +307,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td><strong>Over-voltage</strong></td>
       <td>
         <ul>
-          <li>Category III (OVC III)</li>
+          <li>Category II (OVC II)</li>
           <li>Protection Type: Shutdown output voltage; requires re-powering to recover.</li>
         </ul>
       </td>
