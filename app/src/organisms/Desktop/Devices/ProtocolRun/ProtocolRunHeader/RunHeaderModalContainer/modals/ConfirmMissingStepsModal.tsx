@@ -28,11 +28,12 @@ export interface ConfirmMissingStepsModalProps {
   onConfirmClick: () => void
   missingSteps: StepKey[]
   isRunStarting: boolean
+  offsetCount: number
 }
 export const ConfirmMissingStepsModal = (
   props: ConfirmMissingStepsModalProps
 ): JSX.Element | null => {
-  const { missingSteps, onCloseClick, onConfirmClick, isRunStarting } = props
+  const { missingSteps, onCloseClick, onConfirmClick, isRunStarting, offsetCount } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const confirmAttached = (): void => {
@@ -51,7 +52,7 @@ export const ConfirmMissingStepsModal = (
     const i18nKey = isMissingLPCStep
       ? 'you_havent_confirmed_lpc_missing'
       : 'you_havent_confirmed'
-    return t(i18nKey, { missingSteps: formattedSteps })
+    return t(i18nKey, { missingSteps: formattedSteps, count: offsetCount })
   }
 
   return (
