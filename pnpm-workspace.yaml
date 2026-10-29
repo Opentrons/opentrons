@@ -13,29 +13,11 @@ packages:
   - 'step-generation'
   - 'api-client'
   - 'react-api-client'
-  - 'usb-bridge/node-client'
-  - 'js-package-testing'
+  - 'usb-bridge/*'
 
-onlyBuiltDependencies:
-  - electron
-  - electron-winstaller
-  - esbuild
-  - '@serialport/bindings-cpp'
-  - usb
-  - '@sentry/cli'
-  - sharp
+blockExoticSubdeps: False
 
 minimumReleaseAge: 10080 # 1 week
-
-minimumReleaseAgeExclude:
-  # https://github.com/electron-userland/electron-builder/releases/tag/electron-builder%4026.16.1
-  # for https://github.com/electron-userland/electron-builder/issues/10167
-  - electron-builder
-  - builder-util
-  - dmg-builder
-  - app-builder-lib
-  - electron-publish
-  - electron-builder-squirrel-windows
 
 fetchTimeout: 60000
 
@@ -53,3 +35,16 @@ catalogs:
     react: 18.2.0
     react-dom: 18.2.0
     '@types/react-dom': 18.2.0
+
+allowBuilds:
+  '@sentry/cli': true
+  '@serialport/bindings-cpp': true
+  aws-sdk: true
+  browser-tabs-lock: true
+  core-js: true
+  core-js-pure: true
+  electron-winstaller: true
+  es5-ext: true
+  esbuild: true
+  styled-components: true
+  usb: true
