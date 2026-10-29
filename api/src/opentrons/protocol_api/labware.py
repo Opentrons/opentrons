@@ -748,7 +748,7 @@ class Labware:
 
         return labware
 
-    @requires_version(2, 31)
+    @requires_version(2, 30)
     def load_adapter(
         self,
         name: str,
