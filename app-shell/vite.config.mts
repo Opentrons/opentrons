@@ -80,7 +80,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
         '@opentrons/discovery-client': path.resolve(
           '../discovery-client/src/index.ts'
         ),
-        '@opentrons/usb-bridge/node-client': path.resolve(
+        '@opentrons/node-usb-bridge-client': path.resolve(
           '../usb-bridge/node-client/src/index.ts'
         ),
         '@opentrons/shared-data/labware/fixtures/3': path.resolve(
