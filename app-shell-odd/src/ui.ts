@@ -24,7 +24,11 @@ const WINDOW_OPTS = {
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
-  minHeight: config.minHeight,
+  // for reasons that currently escape me, we have to have a 20px
+  // vertical margin available here even if the height target is set
+  // to exactly what we want. when running, the app is in fact 600px
+  // tall anyway.
+  minHeight: config.minHeight - 20,
   // this wide variety of arguments is required to get a truly kiosk-style
   // window with no chrome or border decorations of any kind
   useContentSize: false,
