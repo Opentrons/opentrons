@@ -368,6 +368,8 @@ async def test_gripper_move_labware_implementation(
             ),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -464,6 +466,8 @@ async def test_gripper_error(
             user_pick_up_offset=Point(),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         )
     ).then_raise(underlying_exception)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
@@ -662,6 +666,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             user_pick_up_offset=Point(1, 2, 3),
             user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -1066,6 +1072,14 @@ async def test_move_labware_calls_raise_if_labware_is_contained(
         state_view.geometry.ensure_location_not_occupied(data.newLocation, None, lw_def)
     ).then_return(data.newLocation)
     decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+    origin = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    dest = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(origin)).then_return(
+        origin
+    )
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(dest)).then_return(
+        dest
+    )
 
     await subject.execute(data)
 
@@ -1150,6 +1164,13 @@ async def test_movable_adapter_can_move_with_labware_on_top(
             data.newLocation, None, movable_def
         )
     ).then_return(data.newLocation)
+    origin = ModuleLocation(moduleId="vacuum-module-id")
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(origin)).then_return(
+        origin
+    )
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(new_location)
+    ).then_return(new_location)
 
     await subject.execute(data)
 

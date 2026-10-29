@@ -276,6 +276,7 @@ class LegacyProtocolCore(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
             ModuleFixtureLocation,

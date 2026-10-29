@@ -63,6 +63,10 @@ from .command_fixtures import (
 )
 from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
 from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_west_slots,
+    get_north_south_slots,
+)
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.actions import (
     SetDeckConfigurationAction,
@@ -111,6 +115,7 @@ from opentrons.protocol_engine.state.wells import WellStore, WellView
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
     AddressableArea,
     AddressableAreaLocation,
     AddressableOffsetVector,
@@ -5079,6 +5084,264 @@ def test_get_parent_from_location_raises_when_not_on_deck(
 
     with pytest.raises(errors.LabwareNotOnDeckError):
         subject.get_parent_from_location(SYSTEM_LOCATION)
+
+
+def _stub_labware_on_slot(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    *,
+    labware_id: str,
+    slot: DeckSlotName,
+) -> LoadedLabware:
+    labware = LoadedLabware(
+        id=labware_id,
+        loadName="labware",
+        definitionUri="test/labware/1",
+        location=DeckSlotLocation(slotName=slot),
+        offsetId=None,
+    )
+    decoy.when(mock_labware_view.get_all()).then_return([labware])
+    decoy.when(mock_labware_view.get(labware_id)).then_return(labware)
+    return labware
+
+
+@pytest.mark.parametrize(
+    "location",
+    [
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_B3),
+        AddressableAreaLocation(addressableAreaName="magneticBlockV1B3"),
+    ],
+)
+def test_get_north_south_neighbors_when_labware_adjacent(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+    location: DeckSlotLocation | AddressableAreaLocation,
+) -> None:
+    """Labware on a north/south neighbor is returned."""
+    labware = _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=DeckSlotName.SLOT_A3,
+    )
+
+    assert subject.get_north_south_neighbors(location) == [labware]
+
+
+def test_get_north_south_neighbors_module_location(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """A module location resolves to its slot before finding north/south neighbors."""
+    decoy.when(mock_module_view.get_provided_addressable_area("mag-block")).then_return(
+        "magneticBlockV1B3"
+    )
+    labware = _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=DeckSlotName.SLOT_A3,
+    )
+
+    assert subject.get_north_south_neighbors(ModuleLocation(moduleId="mag-block")) == [
+        labware
+    ]
+
+
+def test_get_north_south_neighbors_labware_on_module(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Labware sitting on a module is a neighbor of the module's north/south slots."""
+    labware = LoadedLabware(
+        id="neighbor-id",
+        loadName="labware",
+        definitionUri="test/labware/1",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId=None,
+    )
+    decoy.when(mock_labware_view.get_all()).then_return([labware])
+    decoy.when(mock_labware_view.get("neighbor-id")).then_return(labware)
+    decoy.when(mock_module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_A3)
+    )
+
+    assert subject.get_north_south_neighbors(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+    ) == [labware]
+
+
+def test_get_north_south_neighbors_empty_for_same_slot(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Labware in the query slot itself is not a neighbor."""
+    _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="same-slot-id",
+        slot=DeckSlotName.SLOT_A3,
+    )
+
+    assert (
+        subject.get_north_south_neighbors(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_A3)
+        )
+        == []
+    )
+
+
+def test_get_north_south_neighbors_empty_for_unrelated_slot(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Labware that is not north/south of the query location is omitted."""
+    _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=DeckSlotName.SLOT_A3,
+    )
+
+    assert (
+        subject.get_north_south_neighbors(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+        )
+        == []
+    )
+
+
+def test_get_north_south_neighbors_empty_for_staging_labware(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Labware on a staging slot is not a north/south deck neighbor."""
+    labware = LoadedLabware(
+        id="stacker-labware-id",
+        loadName="labware",
+        definitionUri="test/labware/1",
+        location=AddressableAreaLocation(addressableAreaName="B4"),
+        offsetId=None,
+    )
+    decoy.when(mock_labware_view.get_all()).then_return([labware])
+    decoy.when(mock_labware_view.get("stacker-labware-id")).then_return(labware)
+
+    assert (
+        subject.get_north_south_neighbors(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+        )
+        == []
+    )
+
+
+@pytest.mark.parametrize(
+    "location",
+    [
+        AddressableAreaLocation(addressableAreaName="B4"),
+        AddressableAreaLocation(addressableAreaName="flexStackerModuleV1B4"),
+        AddressableAreaLocation(addressableAreaName="gripperWasteChute"),
+        WASTE_CHUTE_LOCATION,
+    ],
+)
+def test_get_north_south_neighbors_empty_for_non_deck_location(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+    location: LabwareLocation,
+) -> None:
+    """Staging, stacker, and off-deck locations have no north/south deck neighbors."""
+    _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=DeckSlotName.SLOT_A3,
+    )
+
+    assert subject.get_north_south_neighbors(location) == []
+
+
+def test_get_north_south_neighbors_empty_without_labware(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """An empty deck has no north/south neighbors."""
+    decoy.when(mock_labware_view.get_all()).then_return([])
+
+    assert (
+        subject.get_north_south_neighbors(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+        )
+        == []
+    )
+
+
+def _flex_north_south_neighbors(slot: DeckSlotName) -> list[DeckSlotName]:
+    return [
+        DeckSlotName.from_primitive(n).to_ot3_equivalent()
+        for n in get_north_south_slots(slot.as_int())
+    ]
+
+
+def _flex_east_west_neighbors(slot: DeckSlotName) -> list[DeckSlotName]:
+    return [
+        DeckSlotName.from_primitive(n).to_ot3_equivalent()
+        for n in get_east_west_slots(slot.as_int())
+    ]
+
+
+@pytest.mark.parametrize(
+    "move_slot,neighbor",
+    [
+        (slot, neighbor)
+        for slot in DeckSlotName.ot3_slots()
+        for neighbor in _flex_north_south_neighbors(slot)
+    ],
+)
+def test_get_north_south_neighbors_all_flex_ns_pairs(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+    move_slot: DeckSlotName,
+    neighbor: DeckSlotName,
+) -> None:
+    """Every Flex north/south pair includes labware on the neighboring slot."""
+    labware = _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=neighbor,
+    )
+
+    assert subject.get_north_south_neighbors(DeckSlotLocation(slotName=move_slot)) == [
+        labware
+    ]
+
+
+@pytest.mark.parametrize(
+    "move_slot,neighbor",
+    [
+        (slot, neighbor)
+        for slot in DeckSlotName.ot3_slots()
+        for neighbor in _flex_east_west_neighbors(slot)
+    ],
+)
+def test_get_north_south_neighbors_empty_for_east_west_pairs(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+    move_slot: DeckSlotName,
+    neighbor: DeckSlotName,
+) -> None:
+    """Labware east or west of the query slot is omitted."""
+    _stub_labware_on_slot(
+        decoy,
+        mock_labware_view,
+        labware_id="neighbor-id",
+        slot=neighbor,
+    )
+
+    assert subject.get_north_south_neighbors(DeckSlotLocation(slotName=move_slot)) == []
 
 
 @pytest.mark.parametrize("use_mocks", [False])
