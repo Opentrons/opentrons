@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Chip, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { handleEnableCRSWizard } from '/app/organisms/Desktop/EnableCRSWizard'
 
 import styles from './index.module.css'

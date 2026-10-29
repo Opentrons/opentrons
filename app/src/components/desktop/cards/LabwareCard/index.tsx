@@ -26,7 +26,8 @@ import {
   getLabwareViewBox,
 } from '@opentrons/shared-data'
 
-import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
+import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '/app/organisms/Desktop/Labware/LabwareDetails/Gallery'
+
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
 import type { ReactNode } from 'react'

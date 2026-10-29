@@ -21,7 +21,7 @@ import {
   Z_INDEX,
 } from '@opentrons/components'
 
-import { Divider } from '../structure'
+import { Divider } from '/app/atoms/structure'
 
 import type { ReactElement, ReactNode } from 'react'
 

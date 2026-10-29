@@ -39,8 +39,8 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import {
   getFlexStackerPrepActions,
   getFlexStackerPrepCommands,

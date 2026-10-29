@@ -7,7 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 
-import { GripperCard } from '../'
+import { GripperCard } from '..'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 
 import type { ComponentProps } from 'react'

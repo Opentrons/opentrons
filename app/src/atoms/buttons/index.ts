@@ -1,7 +1,5 @@
 export { BackButton } from './BackButton'
-export { QuaternaryButton } from './QuaternaryButton'
 export { SubmitPrimaryButton } from './SubmitPrimaryButton'
-export { TertiaryButton } from './TertiaryButton'
 export { ToggleButton } from './ToggleButton'
 export { TextOnlyButton } from './TextOnlyButton'
 export { TouchControlButton } from './TouchControlButton'

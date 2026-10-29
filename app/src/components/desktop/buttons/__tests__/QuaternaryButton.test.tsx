@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { QuaternaryButton } from '..'
+import { QuaternaryButton } from '../QuaternaryButton'
 
 import type { ComponentProps } from 'react'
 

@@ -18,9 +18,8 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { Slideout } from '/app/components/desktop/Slideout'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-
-import { Slideout } from '../../atoms/Slideout'
 
 import type { AttachedModule } from '@opentrons/api-client'
 

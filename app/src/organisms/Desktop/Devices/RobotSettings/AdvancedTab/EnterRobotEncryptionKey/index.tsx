@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { LegacyStyledText, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 
 import styles from './index.module.css'

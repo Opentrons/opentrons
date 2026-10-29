@@ -38,17 +38,17 @@ import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
-} from './ErrorRecoveryBanner'
-import styles from './notificationstack.module.css'
-import { ReachableBanner } from './ReachableBanner'
-import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
-import { RobotOverflowMenu } from './RobotOverflowMenu'
-import { RobotStatusHeader } from './RobotStatusHeader'
-import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
+} from '../../../organisms/Desktop/Devices/ErrorRecoveryBanner'
+import styles from '../../../organisms/Desktop/Devices/notificationstack.module.css'
+import { ReachableBanner } from '../../../organisms/Desktop/Devices/ReachableBanner'
+import { RobotOutOfStorageNotification } from '../../../organisms/Desktop/Devices/RobotOutOfStorageNotification'
+import { RobotOverflowMenu } from '../../../organisms/Desktop/Devices/RobotOverflowMenu'
+import { RobotStatusHeader } from '../../../organisms/Desktop/Devices/RobotStatusHeader'
+import { SignAndDownloadRunBanner } from '../../../organisms/Desktop/Devices/SignAndDownloadRunBanner/SignAndDownloadRunBanner'
+import { UpdateRobotBanner } from '../../../organisms/Desktop/UpdateRobotBanner'
 
 import type { ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'

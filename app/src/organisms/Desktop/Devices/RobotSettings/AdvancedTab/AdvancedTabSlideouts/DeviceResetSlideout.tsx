@@ -21,8 +21,8 @@ import {
 } from '@opentrons/components'
 import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
 
-import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useRobot } from '/app/redux-resources/robots'
 import { UNREACHABLE } from '/app/redux/discovery'

@@ -9,7 +9,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { DeckInfoLabelTextTag } from '/app/molecules/DeckInfoLabelTextTag'
+import { DeckInfoLabelTextTag } from '/app/components/desktop/ListItems/DeckInfoLabelTextTag'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 

@@ -12,7 +12,8 @@ import {
   usePostLogLevelMutation,
 } from '@opentrons/react-api-client'
 
-import { TertiaryButton, ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'

@@ -27,7 +27,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { QuaternaryButton } from '/app/atoms/buttons'
+import { QuaternaryButton } from '/app/components/desktop/buttons/QuaternaryButton'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,

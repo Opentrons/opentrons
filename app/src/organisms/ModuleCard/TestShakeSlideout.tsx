@@ -32,9 +32,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton } from '/app/atoms/buttons'
-import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 

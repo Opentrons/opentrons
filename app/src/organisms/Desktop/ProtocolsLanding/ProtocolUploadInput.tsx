@@ -12,7 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { UploadInput } from '/app/molecules/UploadInput'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,

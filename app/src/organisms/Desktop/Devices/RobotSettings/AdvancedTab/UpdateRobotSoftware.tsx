@@ -19,8 +19,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'

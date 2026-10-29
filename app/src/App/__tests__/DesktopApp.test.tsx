@@ -3,9 +3,9 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { Breadcrumbs } from '/app/components/desktop/Breadcrumbs'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '/app/LocalizationProvider'
-import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
@@ -30,7 +30,7 @@ import type { LocalizationProviderProps } from '/app/LocalizationProvider'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/LocalizationProvider')
-vi.mock('/app/organisms/Desktop/Breadcrumbs')
+vi.mock('/app/components/desktop/Breadcrumbs')
 vi.mock('/app/organisms/Desktop/SystemLanguagePreferenceModal')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
