@@ -2,6 +2,7 @@ import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   getEncryptedCACertificates,
@@ -32,7 +33,7 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 describe('useHandleRobotCertImport', async () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
   beforeEach(() => {
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     const queryClient = new QueryClient()
     const clientProvider: FunctionComponent<{
       children: ReactNode
@@ -49,7 +50,7 @@ describe('useHandleRobotCertImport', async () => {
     vi.resetAllMocks()
   })
   it('should result in success when all its calls succeed', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -69,7 +70,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -77,7 +78,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenResolve(true)
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -95,7 +96,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallPlaintextRobotCertificate))
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
       .calledWith({ certificateData: 'asdfasdf' })
       .thenResolve(true)
     const onSuccessfulImport = vi.fn()
@@ -114,7 +115,7 @@ describe('useHandleRobotCertImport', async () => {
     await waitFor(() => expect(onSuccessfulImport).toHaveBeenCalled())
   })
   it('should result in success when the older password matches', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -140,7 +141,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -148,7 +149,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('wrong password'))
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'oooooooo',
@@ -156,7 +157,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenResolve(true)
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -174,7 +175,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallPlaintextRobotCertificate))
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
       .calledWith({ certificateData: 'asdfasdf' })
       .thenResolve(true)
     const onSuccessfulImport = vi.fn()
@@ -193,7 +194,7 @@ describe('useHandleRobotCertImport', async () => {
     await waitFor(() => expect(onSuccessfulImport).toHaveBeenCalled())
   })
   it('should notify failure when getting the encrypted certs fails', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenReject({
         message: 'oh no',
@@ -218,7 +219,7 @@ describe('useHandleRobotCertImport', async () => {
     expect(result.current.passwordError).toEqual('oh no')
   })
   it('should notify failure when installing the main certificate fails and there is no secondary', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -238,7 +239,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -265,7 +266,7 @@ describe('useHandleRobotCertImport', async () => {
     )
   })
   it('should notify failure when installing the main certificate fails and the secondary fails', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -291,7 +292,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -299,7 +300,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('bad password sucka'))
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'iuiuiuiu',
@@ -326,7 +327,7 @@ describe('useHandleRobotCertImport', async () => {
     )
   })
   it('should notify failure when installing certificate succeed but the plaintext fetch fails', async () => {
-    vi.when(vi.mocked(getEncryptedCACertificates))
+    when(vi.mocked(getEncryptedCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -352,7 +353,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -361,7 +362,7 @@ describe('useHandleRobotCertImport', async () => {
       })
       .thenResolve(true)
 
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenReject(new Error('Bad SSL connection'))
     const onSuccessfulImport = vi.fn()
@@ -382,7 +383,7 @@ describe('useHandleRobotCertImport', async () => {
   })
   it('should not install next certificate if it does not exist', async () =>
     async () => {
-      vi.when(vi.mocked(getEncryptedCACertificates))
+      when(vi.mocked(getEncryptedCACertificates))
         .calledWith(HOST_CONFIG)
         .thenResolve({
           data: {
@@ -402,7 +403,7 @@ describe('useHandleRobotCertImport', async () => {
           headers: {},
           config: {},
         })
-      vi.when(vi.mocked(tryInstallEncryptedRobotCertificate))
+      when(vi.mocked(tryInstallEncryptedRobotCertificate))
         .calledWith({
           password: 'password',
           certificateData: 'asdfasdf',
@@ -410,7 +411,7 @@ describe('useHandleRobotCertImport', async () => {
           iterations: 10,
         })
         .thenResolve(true)
-      vi.when(vi.mocked(getPlaintextCACertificates))
+      when(vi.mocked(getPlaintextCACertificates))
         .calledWith(HOST_CONFIG)
         .thenResolve({
           data: {

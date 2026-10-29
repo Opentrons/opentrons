@@ -1,6 +1,7 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
@@ -67,7 +68,7 @@ const render = (path = '/') => {
 
 describe('RobotSettings', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn(mockConnectableRobot)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
@@ -101,7 +102,7 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to device details if robot is unreachable', () => {
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn(mockUnreachableRobot)
     render('/devices/otie/robot-settings/calibration')
@@ -109,13 +110,13 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to device details if robot is null', () => {
-    vi.when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('mock device details')
   })
 
   it('does NOT redirect to device details if robot is null but a robot update session is active', () => {
-    vi.when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
     vi.mocked(getRobotUpdateSession).mockReturnValue({
       robotName: 'some robot',
       fileInfo: null,
@@ -131,7 +132,7 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to device details if robot is reachable but server is down', () => {
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn({ ...mockReachableRobot, serverHealthStatus: 'notOk' })
     render('/devices/otie/robot-settings/calibration')
@@ -139,17 +140,13 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to networking tab if robot not connectable', () => {
-    vi.when(vi.mocked(useRobot))
-      .calledWith('otie')
-      .thenReturn(mockReachableRobot)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('Mock RobotSettingsNetworking')
   })
 
   it('redirects to networking tab if feature flags hidden', () => {
-    vi.when(vi.mocked(useRobot))
-      .calledWith('otie')
-      .thenReturn(mockReachableRobot)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/feature-flags')
     screen.getByText('Mock RobotSettingsNetworking')
   })

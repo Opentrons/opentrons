@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { when } from 'vitest-when'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRunHasStarted } from '/app/resources/runs'
@@ -36,7 +38,7 @@ describe('ModuleInfo', () => {
       isAttached: false,
       physicalPort: null,
     }
-    vi.when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(false)
+    when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(false)
   })
 
   it('should show module not connected', () => {
@@ -69,7 +71,7 @@ describe('ModuleInfo', () => {
       isAttached: true,
       runId: MOCK_RUN_ID,
     }
-    vi.when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(true)
+    when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(true)
     render(props)
     expect(screen.queryByText('Connected')).toBeNull()
     screen.getByText('Connection info not available once run has started')

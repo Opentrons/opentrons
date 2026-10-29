@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -32,7 +33,7 @@ describe('SetupCalibrationItem', () => {
   }
 
   beforeEach(() => {
-    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
   })
 
   afterEach(() => {
@@ -46,7 +47,7 @@ describe('SetupCalibrationItem', () => {
     screen.getByRole('button', { name: 'stub button' })
   })
   it('renders calibrated date if there is no subtext', () => {
-    vi.when(vi.mocked(formatTimestamp))
+    when(vi.mocked(formatTimestamp))
       .calledWith('Thursday, September 9, 2021')
       .thenReturn('09/09/2021 00:00:00')
     render({
@@ -59,7 +60,7 @@ describe('SetupCalibrationItem', () => {
     screen.getByText('Not calibrated yet')
   })
   it('renders calibration data not available if run has started', () => {
-    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
     screen.getByText('Calibration data not available once run has started')
   })

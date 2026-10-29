@@ -6,9 +6,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -189,7 +189,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
@@ -212,7 +212,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />

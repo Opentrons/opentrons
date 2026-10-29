@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -43,7 +44,7 @@ let mockTrackEvent: Mock
 describe('BackToTopButton', () => {
   beforeEach(() => {
     mockTrackEvent = vi.fn()
-    vi.when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
     vi.mocked(useRobot).mockReturnValue({
       ...mockConnectableRobot,
       health: {

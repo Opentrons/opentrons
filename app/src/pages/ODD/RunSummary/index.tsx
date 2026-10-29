@@ -582,7 +582,6 @@ export function RunSummary(): ReactNode {
                     stoppedAt,
                     completedAt,
                   }}
-                  style={DURATION_TEXT_STYLE}
                 />
               </SummaryDatum>
               <SummaryDatum>
@@ -705,12 +704,6 @@ const SummaryDatum = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   width: max-content;
 `
-const DURATION_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-`
-
 const RETURN_TO_CLICKED_STYLE = css`
   background-color: ${COLORS.blue40};
   &:focus {

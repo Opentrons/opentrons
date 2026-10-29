@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { BaseDeck, LabwareInfoOverlay } from '@opentrons/components'
 import {
@@ -95,7 +96,7 @@ describe('SetupLabwareMap', () => {
     vi.mocked(BaseDeck).mockReturnValue(<div>mock baseDeck</div>)
 
     vi.mocked(LabwareInfoOverlay).mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
-    vi.when(vi.mocked(LabwareInfoOverlay))
+    when(vi.mocked(LabwareInfoOverlay))
       .calledWith(expect.objectContaining({ definition: fixtureTiprack300ul }))
       .thenReturn(
         <div>
@@ -179,10 +180,10 @@ describe('SetupLabwareMap', () => {
       },
     ])
 
-    vi.when(vi.mocked(getModuleDef))
+    when(vi.mocked(getModuleDef))
       .calledWith(mockMagneticModule.model)
       .thenReturn(mockMagneticModule as any)
-    vi.when(vi.mocked(getModuleDef))
+    when(vi.mocked(getModuleDef))
       .calledWith(mockTCModule.model)
       .thenReturn(mockTCModule as any)
 

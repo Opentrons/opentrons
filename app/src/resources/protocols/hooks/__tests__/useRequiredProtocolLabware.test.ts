@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -21,7 +22,7 @@ vi.mock('@opentrons/react-api-client')
 
 describe('useRequiredProtocolLabware', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(useProtocolQuery))
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
@@ -30,12 +31,12 @@ describe('useRequiredProtocolLabware', () => {
           },
         },
       } as UseQueryResult<Protocol>)
-    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, {
         enabled: true,
       })
@@ -57,7 +58,7 @@ describe('useRequiredProtocolLabware', () => {
   })
 
   it('should return empty array when there is no match with protocol id', () => {
-    vi.when(vi.mocked(useProtocolQuery))
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {

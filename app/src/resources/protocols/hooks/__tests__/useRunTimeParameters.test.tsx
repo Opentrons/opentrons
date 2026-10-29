@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -17,14 +18,14 @@ vi.mock('@opentrons/react-api-client')
 
 describe('useRunTimeParameters', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(useProtocolQuery))
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
         },
       } as UseQueryResult<Protocol>)
-    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
       .thenReturn({
         data: PROTOCOL_ANALYSIS,

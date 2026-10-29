@@ -187,7 +187,6 @@ describe('SkipToNextStep', () => {
   })
 
   it('renders the appropriate inline notification', () => {
-    renderSkipToNextStep(props)
     expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'alert',

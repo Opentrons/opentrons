@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -112,7 +113,7 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
     )
-    vi.when(useIsFlex).calledWith('otie').thenReturn(false)
+    when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
       <div>mock EnableStatusLight</div>
     )
@@ -170,7 +171,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render LegacySettings section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock LegacySettings Section')).toBeNull()
   })
@@ -196,7 +197,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render ShortTrashBin section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock ShortTrashBin Section')).toBeNull()
   })
@@ -217,7 +218,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UsageSettings for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock UsageSettings Section')).toBeNull()
   })
@@ -228,7 +229,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UseOlderAspirateBehavior section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(
       screen.queryByText('Mock UseOlderAspirateBehavior Section')
@@ -241,7 +242,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render EnableStatusLight section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('mock EnableStatusLight')
   })
@@ -254,7 +255,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render DisableStackerSensors section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock DisableStackerSensors Section')
   })
@@ -267,7 +268,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render DisableVacuumModuleWasteDetection section for Flex', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock DisableVacuumModuleWasteDetection Section')
   })

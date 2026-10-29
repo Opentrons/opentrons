@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { mockApiHeaterShaker, RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -102,17 +103,17 @@ describe('ProtocolSetupModulesAndDeck', () => {
   beforeEach(() => {
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
-    vi.when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
-    vi.when(vi.mocked(getProtocolModulesInfo))
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDef)
       .thenReturn([])
-    vi.when(vi.mocked(getAttachedProtocolModuleMatches))
+    when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith([], [], [])
       .thenReturn([])
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getLocalRobot).mockReturnValue({
@@ -129,7 +130,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
     } as unknown as UseQueryResult<DeckConfiguration>)
-    vi.when(vi.mocked(useRunCalibrationStatus))
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         complete: true,
@@ -177,7 +178,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
 
   it('should render module information when a protocol has module - connected', () => {
     // TODO: connected not location conflict
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(calibratedMockApiHeaterShaker as any, mockProtocolModuleInfo)
       .thenReturn({
         missingModuleIds: [],
@@ -196,7 +197,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
 
   it('should render module information when a protocol has module - disconnected', () => {
     // TODO: disconnected not location conflict
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .thenReturn({
         missingModuleIds: [],
@@ -214,7 +215,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
 
   it('should render module information with calibrate button when a protocol has module', async () => {
     // TODO: not location conflict
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .thenReturn({
         missingModuleIds: [],
@@ -237,10 +238,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
       complete: false,
       reason: 'attach_pipette_failure_reason',
     }
-    vi.when(vi.mocked(useRunCalibrationStatus))
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn(ATTACH_FIRST as any)
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .thenReturn({
         missingModuleIds: [],
@@ -262,10 +263,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
       complete: false,
       reason: 'calibrate_pipette_failure_reason',
     }
-    vi.when(vi.mocked(useRunCalibrationStatus))
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn(CALIBRATE_FIRST as any)
-    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .thenReturn({
         missingModuleIds: [],

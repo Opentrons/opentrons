@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -31,14 +31,14 @@ export function OffDeckLabwareList(
 
   return (
     <>
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         margin={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing8}`}
       >
         {t('additional_off_deck_labware')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
         {offDeckItems.map((offDeckGroup, index) => (
           <LabwareListItem

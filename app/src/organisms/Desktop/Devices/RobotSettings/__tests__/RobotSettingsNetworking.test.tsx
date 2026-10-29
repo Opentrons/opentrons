@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -105,7 +106,7 @@ describe('RobotSettingsNetworking', () => {
       error: null,
       status: 'idle',
     } as any)
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
         {
@@ -117,22 +118,22 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    vi.when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
       wifi: initialMockWifi,
       ethernet: initialMockEthernet,
     })
 
-    vi.when(useWifiList).calledWith(ROBOT_NAME, 10000).thenReturn(mockWifiList)
+    when(useWifiList).calledWith(ROBOT_NAME, 10000).thenReturn(mockWifiList)
 
-    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
-    vi.when(useIsRobotBusy).calledWith({ poll: true }).thenReturn(false)
-    vi.when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsRobotBusy).calledWith({ poll: true }).thenReturn(false)
+    when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(false)
     vi.mocked(DisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   it('should render title and description for OT-2', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
     render()
     screen.getByText('Wi-Fi - foo')
     screen.getByText('Wired USB')
@@ -152,8 +153,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render title and description for Flex', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
-    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     screen.getByText('Wi-Fi - foo')
     screen.getByText('Ethernet')
@@ -168,9 +169,9 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render USB connection message for Flex when connected via USB', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
-    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.when(getRobotAddressesByName)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
         {
@@ -184,7 +185,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi mock data and ethernet mock data for OT-2', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
     render()
     screen.getByText('Wi-Fi - foo')
     screen.getByText('Wired USB')
@@ -213,17 +214,17 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi mock data and ethernet info not rendered for OT-2', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
     const mockWiFi = {
       ipAddress: '1.2.3.4',
       subnetMask: '255.255.255.123',
       macAddress: '00:00:00:00:00:00',
       type: INTERFACE_WIFI,
     }
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith(ROBOT_NAME, 5000)
       .thenReturn({ wifi: mockWiFi, ethernet: null })
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
         {
@@ -260,11 +261,11 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: INTERFACE_ETHERNET,
     }
-    vi.when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
       wifi: null,
       ethernet: mockWiredUSB,
     })
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
         {
@@ -272,7 +273,7 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     render()
 
     screen.getByText('Wired USB')
@@ -295,11 +296,11 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi and Wired USB are not connected for OT-2', () => {
-    vi.when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
       wifi: null,
       ethernet: null,
     })
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     render()
 
     expect(screen.queryByText('Wireless IP')).not.toBeInTheDocument()
@@ -317,7 +318,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render the right links to external resource and internal resource for OT-2', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     const usbExternalLink =
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'
@@ -331,8 +332,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
-    vi.when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     expect(screen.queryByText('mock disconnect modal')).toBeNull()
     fireEvent.click(
@@ -342,8 +343,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
-    vi.when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
     render({ isRobotBusy: true })
 
     expect(
@@ -352,8 +353,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should not render connected check circles when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
-    vi.when(getRobotAddressesByName)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn(mockWifiList)
+    when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
         {
@@ -393,9 +394,9 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should not render disabled Disconnect from Wi-Fi button when e-stop is pressed', () => {
-    vi.when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
-    vi.when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
+    when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     expect(
       screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })

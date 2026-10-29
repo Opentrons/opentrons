@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   fixture96Plate,
@@ -32,7 +33,7 @@ describe('Labware', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    vi.when(vi.mocked(useRequiredProtocolLabware))
+    when(vi.mocked(useRequiredProtocolLabware))
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {

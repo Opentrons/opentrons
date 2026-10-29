@@ -5,8 +5,8 @@ import { format } from 'date-fns'
 import {
   COLORS,
   Icon,
-  LegacyStyledText,
   Link,
+  StyledText,
   Tooltip,
   TOOLTIP_TOP_START,
   TYPOGRAPHY,
@@ -78,9 +78,9 @@ export function LabwareDetails(props: LabwareDetailsProps): ReactNode {
   const slideoutHeader = (
     <div className={styles.slideout_header_container}>
       <div className={styles.slideout_header_content}>
-        <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {displayName}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           onClick={props.onClose}
           role="button"
@@ -92,19 +92,16 @@ export function LabwareDetails(props: LabwareDetailsProps): ReactNode {
       {!isCustomDefinition && (
         <div className={styles.brand_def_container}>
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
-          <LegacyStyledText
-            forwardedAs="label"
-            className={styles.brand_def_text}
-          >
+          <StyledText forwardedAs="label" className={styles.brand_def_text}>
             {t('branded:opentrons_def')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
       )}
       {modified != null && filename != null && (
         <div className={styles.last_updated_container}>
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+          <StyledText forwardedAs="label" color={COLORS.grey50}>
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
-          </LegacyStyledText>
+          </StyledText>
           <CustomLabwareOverflowMenu
             filename={filename}
             onDelete={props.onClose}
@@ -118,7 +115,7 @@ export function LabwareDetails(props: LabwareDetailsProps): ReactNode {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <div className={styles.api_name_container}>
-        <LegacyStyledText forwardedAs="h6">{t('api_name')}</LegacyStyledText>
+        <StyledText forwardedAs="h6">{t('api_name')}</StyledText>
         <Link
           className={styles.api_name_link}
           onClick={handleCopy}

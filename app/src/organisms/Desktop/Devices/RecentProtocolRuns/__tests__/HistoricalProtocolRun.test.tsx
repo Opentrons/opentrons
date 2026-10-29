@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -64,7 +65,7 @@ describe('RecentProtocolRuns', () => {
     vi.mocked(HistoricalProtocolRunOverflowMenu).mockReturnValue(
       <div>mock HistoricalProtocolRunOverflowMenu</div>
     )
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith('fakeRunId', {
         staleTime: Infinity,
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
@@ -167,7 +167,7 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{ block: <StyledText forwardedAs="p" /> }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

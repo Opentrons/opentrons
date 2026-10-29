@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
@@ -96,7 +96,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): ReactNode {
     <Trans
       t={t}
       i18nKey="carefully_move_labware"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <StyledText forwardedAs="p" /> }}
     />
   )
   return (
@@ -119,7 +119,7 @@ export function HomeGantryBeforeRetry(props: RecoveryContentProps): ReactNode {
     <Trans
       t={t}
       i18nKey="take_necessary_actions_home"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <StyledText forwardedAs="p" /> }}
     />
   )
   const secondaryBtnOnClick = (): Promise<void> =>

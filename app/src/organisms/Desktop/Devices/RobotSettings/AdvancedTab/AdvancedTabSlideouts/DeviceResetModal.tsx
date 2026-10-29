@@ -6,11 +6,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
@@ -68,9 +68,9 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing24}>
+            <StyledText forwardedAs="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
               <Link
                 role="button"
@@ -98,13 +98,13 @@ export function DeviceResetModal({
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
             {t('branded:connection_lost_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton
               onClick={closeModal}

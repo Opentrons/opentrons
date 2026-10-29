@@ -101,7 +101,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText className={styles.title_text}>{protocolName}</StyledText>
         </div>
         <div className={styles.timer_info}>
-          <RunTimer {...runTimerInfo} style={styles.run_timer} />
+          <RunTimer {...runTimerInfo} className={styles.run_timer} />
           <StyledText
             style={{
               fontSize: TYPOGRAPHY.fontSize28,

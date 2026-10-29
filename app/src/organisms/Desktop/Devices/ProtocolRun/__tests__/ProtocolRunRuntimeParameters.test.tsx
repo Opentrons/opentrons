@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { InfoScreen } from '@opentrons/components'
 
@@ -115,12 +116,12 @@ describe('ProtocolRunRuntimeParameters', () => {
       runId: RUN_ID,
     }
     vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: { data: mockSucceededRun },
@@ -132,7 +133,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -162,7 +163,7 @@ describe('ProtocolRunRuntimeParameters', () => {
         },
       ],
     } as CompletedProtocolAnalysis)
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -179,7 +180,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -211,7 +212,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -221,7 +222,7 @@ describe('ProtocolRunRuntimeParameters', () => {
           },
         },
       } as any)
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         runTimeParameters: [] as RunTimeParameter[],
@@ -238,7 +239,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render mock InfoScreen component when RunTimeParameters are empty', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         runTimeParameters: [] as RunTimeParameter[],
@@ -250,7 +251,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {

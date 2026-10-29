@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -184,9 +184,9 @@ export function RenameRobotSlideout({
             {t('rename_robot_prefer_usb_connection')}
           </Banner>
         )}
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('rename_robot_input_limitation_detail')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
           <Controller
             control={control}
@@ -206,13 +206,13 @@ export function RenameRobotSlideout({
               />
             )}
           />
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+          <StyledText forwardedAs="label" color={COLORS.grey50}>
             {t('characters_max')}
-          </LegacyStyledText>
+          </StyledText>
           {errors.newRobotName != null ? (
-            <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+            <StyledText forwardedAs="label" color={COLORS.red50}>
               {errors.newRobotName.message}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>

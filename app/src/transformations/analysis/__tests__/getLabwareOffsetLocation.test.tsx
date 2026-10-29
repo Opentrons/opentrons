@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   getLabwareDefURI,
@@ -60,7 +61,7 @@ describe('getLabwareOffsetLocation', () => {
   })
   it('should return just the slot name if the labware is not on top of a module or adapter', () => {
     const MOCK_SLOT = '2'
-    vi.when(vi.mocked(getLabwareLocation))
+    when(vi.mocked(getLabwareLocation))
       .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
       .thenReturn({ slotName: MOCK_SLOT })
 
@@ -74,7 +75,7 @@ describe('getLabwareOffsetLocation', () => {
     ).toEqual({ slotName: MOCK_SLOT })
   })
   it('should return null if the location is off deck', () => {
-    vi.when(vi.mocked(getLabwareLocation))
+    when(vi.mocked(getLabwareLocation))
       .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
       .thenReturn('offDeck')
 
@@ -88,10 +89,10 @@ describe('getLabwareOffsetLocation', () => {
     ).toEqual(null)
   })
   it('should return the slot name and module model if the labware is on top of a module', () => {
-    vi.when(vi.mocked(getLabwareLocation))
+    when(vi.mocked(getLabwareLocation))
       .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
       .thenReturn({ moduleId: TCIdInProtocol })
-    vi.when(vi.mocked(getModuleInitialLoadInfo))
+    when(vi.mocked(getModuleInitialLoadInfo))
       .calledWith(TCIdInProtocol, MOCK_COMMANDS)
       .thenReturn({ location: { slotName: MOCK_SLOT } } as any)
 

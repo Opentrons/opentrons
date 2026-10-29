@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -48,7 +49,7 @@ describe('useRunControls hook', () => {
     const mockResumeRunFromRecovery = vi.fn()
     const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
-    vi.when(useRunActionMutations)
+    when(useRunActionMutations)
       .calledWith(
         mockPausedRun.id,
         ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
@@ -67,7 +68,7 @@ describe('useRunControls hook', () => {
         isResumeRunFromRecoveryActionLoading: false,
         isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
       })
-    vi.when(useCloneRun)
+    when(useCloneRun)
       .calledWith(mockPausedRun.id, {
         onSuccess: undefined,
         triggerAnalysis: true,
@@ -93,11 +94,11 @@ describe('useRunControls hook', () => {
 
 describe('useCurrentRunStatus hook', () => {
   beforeEach(() => {
-    vi.when(useCurrentRunId).calledWith().thenReturn(RUN_ID_2)
+    when(useCurrentRunId).calledWith().thenReturn(RUN_ID_2)
   })
 
   it('returns the run status of the current run', async () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: {
@@ -129,7 +130,7 @@ describe('useRunErrors hook', () => {
           "ErrorResponse [line 40]: /dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
       },
     ]
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: {
@@ -145,7 +146,7 @@ describe('useRunErrors hook', () => {
   })
 
   it('returns no errors if no errors present', async () => {
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: {

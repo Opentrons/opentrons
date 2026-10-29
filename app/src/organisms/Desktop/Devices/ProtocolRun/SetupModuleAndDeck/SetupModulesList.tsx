@@ -13,8 +13,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Tooltip,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
@@ -290,21 +290,21 @@ export function ModulesListItem({
         }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('view_setup_instructions')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Btn>
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         marginLeft={SPACING.spacing20}
         color={COLORS.grey50}
       >
         {t('no_usb_connection_required')}
-      </LegacyStyledText>
+      </StyledText>
     )
   }
 
@@ -453,12 +453,13 @@ export function ModulesListItem({
               alt={`Image of a ${fixtureDisplayName}`}
             />
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing20}
               >
                 {fixtureDisplayName}
-              </LegacyStyledText>
+              </StyledText>
               {subText}
             </Flex>
           </Flex>
@@ -467,11 +468,11 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               {getModuleDeckLabel(moduleType, slotName)}
-            </LegacyStyledText>
+            </StyledText>
             {portDisplay != null ? (
-              <LegacyStyledText forwardedAs="p">{portDisplay}</LegacyStyledText>
+              <StyledText forwardedAs="p">{portDisplay}</StyledText>
             ) : null}
           </Flex>
           <Flex
@@ -496,9 +497,9 @@ export function ModulesListItem({
                     setShowLocationConflictModal(true)
                   }}
                 >
-                  <LegacyStyledText forwardedAs="label" cursor="pointer">
+                  <StyledText forwardedAs="label" cursor="pointer">
                     {t('resolve')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (

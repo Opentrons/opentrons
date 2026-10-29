@@ -8,11 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -156,9 +156,9 @@ export const HeaterShakerIsRunningModal = (
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
-      <LegacyStyledText fontSize={TYPOGRAPHY.fontSizeP}>
+      <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
         {t('continue_shaking_protocol_start_prompt')}
-      </LegacyStyledText>
+      </StyledText>
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton

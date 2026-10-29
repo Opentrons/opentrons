@@ -5,8 +5,8 @@ import {
   Banner,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -26,20 +26,17 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="UnMatchedModuleWarning_title"
         >
           {t('extra_module_attached')}
-        </LegacyStyledText>
+        </StyledText>
 
-        <LegacyStyledText
-          forwardedAs="p"
-          data-testid="UnMatchedModuleWarning_body"
-        >
+        <StyledText forwardedAs="p" data-testid="UnMatchedModuleWarning_body">
           {`${t('module_mismatch_body')}.`}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Banner>
   )

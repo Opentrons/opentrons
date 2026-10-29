@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -77,7 +78,7 @@ describe('RobotSettingsCalibration', () => {
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
     vi.mocked(getRequestById).mockReturnValue(null)
-    vi.when(useIsFlex).calledWith('otie').thenReturn(false)
+    when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(CalibrationDataDownload).mockReturnValue(
       <div>Mock CalibrationDataDownload</div>
@@ -119,14 +120,14 @@ describe('RobotSettingsCalibration', () => {
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock RobotSettingsPipetteOffsetCalibration')
   })
 
   it('render a Module Calibration component', () => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock RobotSettingsModuleCalibration')
   })

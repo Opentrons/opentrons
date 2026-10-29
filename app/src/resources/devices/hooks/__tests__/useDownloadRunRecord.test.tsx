@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
@@ -56,7 +57,7 @@ describe('useDownloadRunRecord', () => {
     onError = vi.fn()
     vi.mocked(saveFileFromUrl).mockReset()
     vi.mocked(saveFileFromUrl).mockResolvedValue('/tmp/downloads')
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     vi.mocked(useAllProtocolsQuery).mockReturnValue({
       data: {
         data: [{ id: 'protocol-1', metadata: { protocolName: 'My Protocol' } }],

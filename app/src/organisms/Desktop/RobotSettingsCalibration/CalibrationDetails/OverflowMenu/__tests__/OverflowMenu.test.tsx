@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -81,7 +82,7 @@ describe('OverflowMenu', () => {
     })
 
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     vi.mocked(isFlexPipette).mockReturnValue(false)
   })
 
@@ -138,7 +139,7 @@ describe('OverflowMenu', () => {
   })
 
   it('should make overflow menu disabled when e-stop is pressed', () => {
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(
       screen.getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')

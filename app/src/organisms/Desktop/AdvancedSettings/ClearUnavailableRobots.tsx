@@ -12,11 +12,11 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -74,9 +74,9 @@ export function ClearUnavailableRobots(): ReactNode {
               title={t('clear_unavailable_robots')}
               onClose={cancelExit}
             >
-              <LegacyStyledText forwardedAs="p">
+              <StyledText forwardedAs="p">
                 {t('clearing_cannot_be_undone')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 flexDirection={DIRECTION_ROW}
                 paddingTop={SPACING.spacing32}
@@ -115,15 +115,16 @@ export function ClearUnavailableRobots(): ReactNode {
         gridGap={SPACING.spacing40}
       >
         <Box>
-          <LegacyStyledText
-            css={TYPOGRAPHY.h3SemiBold}
+          <StyledText
+            forwardedAs="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {t('clear_unavail_robots')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('clear_robots_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Box>
         <TertiaryButton
           marginLeft={SPACING_AUTO}

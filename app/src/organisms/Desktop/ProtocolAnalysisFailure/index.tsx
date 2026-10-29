@@ -11,11 +11,11 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   OVERFLOW_AUTO,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
@@ -64,10 +64,10 @@ export function ProtocolAnalysisFailure(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('protocol_analysis_failure')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="reanalyze_or_view_error"
@@ -87,7 +87,7 @@ export function ProtocolAnalysisFailure(
               ),
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {showErrorDetails
         ? createPortal(

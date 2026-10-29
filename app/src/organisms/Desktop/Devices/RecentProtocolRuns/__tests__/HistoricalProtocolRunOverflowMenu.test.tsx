@@ -2,6 +2,7 @@ import { MemoryRouter } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useDeleteRunImages } from '@opentrons/react-api-client'
 
@@ -94,12 +95,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       isDownloading: false,
     })
 
-    vi.when(useTrackProtocolRunEvent)
-      .calledWith(RUN_ID, ROBOT_NAME)
-      .thenReturn({
-        trackProtocolRunEvent: mockTrackProtocolRunEvent,
-      })
-    vi.when(useNotifyAllCommandsQuery)
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
+    when(useNotifyAllCommandsQuery)
       .calledWith(
         RUN_ID,
         {
@@ -111,7 +110,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       .thenReturn({
         data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
       } as unknown as UseQueryResult<CommandsData>)
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
       run: { id: RUN_ID } as RunData,
       robotName: ROBOT_NAME,
@@ -120,7 +119,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       deleteRun: vi.fn(),
       isDeletingRun: false,
     }
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectableRobot)
 
@@ -174,7 +173,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
   })
 
   it('should make overflow menu disabled when e-stop is pressed', () => {
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(screen.getByRole('button')).toBeDisabled()
   })

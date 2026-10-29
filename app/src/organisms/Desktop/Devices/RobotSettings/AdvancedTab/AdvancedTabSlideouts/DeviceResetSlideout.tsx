@@ -13,10 +13,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
@@ -127,21 +127,21 @@ export function DeviceResetSlideout({
             marginRight={SPACING.spacing8}
             color={COLORS.yellow60}
           />
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('resets_cannot_be_undone')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('clear_all_data')}
-            </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p" marginY={SPACING.spacing8}>
+            </StyledText>
+            <StyledText forwardedAs="p" marginY={SPACING.spacing8}>
               {t('clear_all_stored_data_description')}
-            </LegacyStyledText>
+            </StyledText>
             <CheckboxField
               onChange={() => {
                 setDisplayedOptions(
@@ -161,15 +161,15 @@ export function DeviceResetSlideout({
         </Flex>
         <Divider marginY={SPACING.spacing16} />
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('clear_individual_data')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('device_reset_slideout_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             marginTop={SPACING.spacing20}
             flexDirection={DIRECTION_COLUMN}
@@ -182,9 +182,12 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom="0.625rem"
               >
-                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  forwardedAs="p"
+                >
                   {t('robot_calibration_data')}
-                </LegacyStyledText>
+                </StyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -236,9 +239,12 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom={SPACING.spacing8}
               >
-                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  forwardedAs="p"
+                >
                   {t('protocol_run_data')}
-                </LegacyStyledText>
+                </StyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -273,13 +279,13 @@ export function DeviceResetSlideout({
               </Flex>
             </Box>
             <Box>
-              <LegacyStyledText
+              <StyledText
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 forwardedAs="p"
-                css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('boot_scripts')}
-              </LegacyStyledText>
+              </StyledText>
               <CheckboxField
                 onChange={() => {
                   const options = cloneDeep(displayedOptions)
@@ -291,13 +297,13 @@ export function DeviceResetSlideout({
               />
             </Box>
             <Box>
-              <LegacyStyledText
+              <StyledText
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 forwardedAs="p"
-                css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('ssh_public_keys')}
-              </LegacyStyledText>
+              </StyledText>
               <CheckboxField
                 onChange={() => {
                   const options = cloneDeep(displayedOptions)

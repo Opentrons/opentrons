@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { mockThermocyclerGen2 } from '@opentrons/api-client'
 
@@ -114,7 +115,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isRunIdle: false,
       isRunTerminal: false,
     })
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
@@ -208,7 +209,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
   })
 
   it('should be disabled when e-stop button is pressed', () => {
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(
       screen.getByLabelText('ModuleCalibrationOverflowMenu')

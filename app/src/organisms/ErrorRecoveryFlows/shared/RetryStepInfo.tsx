@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
@@ -44,7 +44,7 @@ export function RetryStepInfo(
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText forwardedAs="p" />,
+          block: <StyledText forwardedAs="p" />,
         }}
       />
     )

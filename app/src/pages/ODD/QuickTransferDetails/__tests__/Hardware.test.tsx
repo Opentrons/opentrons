@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -33,7 +34,7 @@ describe('Hardware', () => {
     props = {
       transferId: MOCK_PROTOCOL_ID,
     }
-    vi.when(vi.mocked(useRequiredProtocolHardware))
+    when(vi.mocked(useRequiredProtocolHardware))
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn({
         requiredProtocolHardware: [

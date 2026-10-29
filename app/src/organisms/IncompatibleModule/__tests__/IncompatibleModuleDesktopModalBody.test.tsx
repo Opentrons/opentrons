@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -15,7 +16,7 @@ import type { ComponentProps } from 'react'
 vi.mock('/app/redux-resources/robots')
 
 const getRenderer = (isFlex: boolean) => {
-  vi.when(useIsFlex).calledWith('otie').thenReturn(isFlex)
+  when(useIsFlex).calledWith('otie').thenReturn(isFlex)
   return (props: ComponentProps<typeof IncompatibleModuleDesktopModalBody>) => {
     return renderWithProviders(
       <IncompatibleModuleDesktopModalBody {...props} />,

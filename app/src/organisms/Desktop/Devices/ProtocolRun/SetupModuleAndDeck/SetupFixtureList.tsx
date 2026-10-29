@@ -13,8 +13,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -213,12 +213,13 @@ export function FixtureListItem({
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
             >
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing20}
               >
                 {fixtureDisplayName}
-              </LegacyStyledText>
+              </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
                 css={css`
@@ -233,15 +234,15 @@ export function FixtureListItem({
                   setShowSetupInstructionsModal(true)
                 }}
               >
-                <LegacyStyledText marginLeft={SPACING.spacing4} forwardedAs="p">
+                <StyledText marginLeft={SPACING.spacing4} forwardedAs="p">
                   {t('protocol_setup:view_setup_instructions')}
-                </LegacyStyledText>
+                </StyledText>
               </Btn>
             </Flex>
           </Flex>
-          <LegacyStyledText forwardedAs="p" width="15%">
+          <StyledText forwardedAs="p" width="15%">
             {displayLocation}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             width="15%"
             flexDirection={DIRECTION_COLUMN}
@@ -257,9 +258,9 @@ export function FixtureListItem({
                     : setShowNotConfiguredModal(true)
                 }}
               >
-                <LegacyStyledText forwardedAs="label" cursor="pointer">
+                <StyledText forwardedAs="label" cursor="pointer">
                   {t('protocol_setup:resolve')}
-                </LegacyStyledText>
+                </StyledText>
               </TertiaryButton>
             ) : null}
           </Flex>

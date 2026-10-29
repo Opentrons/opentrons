@@ -1,6 +1,7 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   RUN_STATUS_AWAITING_RECOVERY,
@@ -100,7 +101,7 @@ const render = (path = '/') => {
 
 describe('RunningProtocol', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -116,17 +117,17 @@ describe('RunningProtocol', () => {
         },
       } as any)
     vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
-    vi.when(vi.mocked(useTrackProtocolRunEvent))
+    when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({
         trackProtocolRunEvent: vi.fn(),
       })
-    vi.when(vi.mocked(useProtocolAnalysesQuery))
+    when(vi.mocked(useProtocolAnalysesQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
       .thenReturn({
         data: { data: [PROTOCOL_ANALYSIS] },
       } as UseQueryResult<ProtocolAnalyses>)
-    vi.when(vi.mocked(useProtocolQuery))
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({
         data: {
@@ -142,7 +143,7 @@ describe('RunningProtocol', () => {
       stoppedAt: '',
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
-    vi.when(vi.mocked(useRunActionMutations))
+    when(vi.mocked(useRunActionMutations))
       .calledWith(RUN_ID, ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
       .thenReturn({
         playRun: mockPlayRun,
@@ -157,10 +158,10 @@ describe('RunningProtocol', () => {
         isResumeRunFromRecoveryActionLoading: false,
         isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
       })
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
-    vi.when(vi.mocked(useNotifyAllCommandsQuery))
+    when(vi.mocked(useNotifyAllCommandsQuery))
       .calledWith(RUN_ID, {
         pageLength: 1,
       })
@@ -168,7 +169,7 @@ describe('RunningProtocol', () => {
     vi.mocked(useLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
     } as RunCommandSummary)
-    vi.when(vi.mocked(useFeatureFlag))
+    when(vi.mocked(useFeatureFlag))
       .calledWith('enableRunNotes')
       .thenReturn(true)
     vi.mocked(ErrorRecoveryFlows).mockReturnValue(
@@ -193,14 +194,14 @@ describe('RunningProtocol', () => {
   })
 
   it('should render Skeleton when robotSideAnalysis does not have data', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(null)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(RunningProtocolSkeleton)).toHaveBeenCalled()
   })
   it('should render the canceling run modal when run status is stop requested', () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -228,10 +229,10 @@ describe('RunningProtocol', () => {
   })
 
   it('should render open door alert modal, when run status is blocked by open door', () => {
-    vi.when(vi.mocked(useIsDoorOpen))
+    when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(DOOR_RESULT)
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -239,7 +240,7 @@ describe('RunningProtocol', () => {
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
-    vi.when(vi.mocked(useIsDoorOpen))
+    when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(DOOR_RESULT)
     vi.mocked(useProtocolQuery).mockReturnValue({
@@ -253,7 +254,7 @@ describe('RunningProtocol', () => {
   })
 
   it('should render open stacker door alert modal, when run staus is blocked by open stacker door', () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -266,7 +267,7 @@ describe('RunningProtocol', () => {
       isDoorOpen: true,
       moduleDoorLocation: 'A4',
     }
-    vi.when(vi.mocked(useIsDoorOpen))
+    when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockOpenStacker)
     vi.mocked(useProtocolQuery).mockReturnValue({
@@ -280,7 +281,7 @@ describe('RunningProtocol', () => {
   })
 
   it('should render open unconfigured stacker door alert modal, when run staus is blocked by open stacker door not in the deck config', () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -293,7 +294,7 @@ describe('RunningProtocol', () => {
       isDoorOpen: true,
       moduleDoorLocation: NOT_CONFIGURED,
     }
-    vi.when(vi.mocked(useIsDoorOpen))
+    when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockUnconfiguredOpenStacker)
     vi.mocked(useProtocolQuery).mockReturnValue({
@@ -307,7 +308,7 @@ describe('RunningProtocol', () => {
   })
 
   it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,
@@ -328,7 +329,7 @@ describe('RunningProtocol', () => {
   })
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
-    vi.when(vi.mocked(useNotifyRunQuery))
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
         refetchInterval: 5000,

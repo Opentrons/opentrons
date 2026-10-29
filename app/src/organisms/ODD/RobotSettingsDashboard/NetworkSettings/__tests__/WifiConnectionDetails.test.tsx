@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -59,11 +60,11 @@ describe('WifiConnectionDetails', () => {
     vi.mocked(getLocalRobot).mockReturnValue({
       name: ROBOT_NAME,
     } as any)
-    vi.when(useNetworkInterfaces).calledWith(ROBOT_NAME).thenReturn({
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME).thenReturn({
       wifi: initialMockWifi,
       ethernet: null,
     })
-    vi.when(useWifiList).calledWith(ROBOT_NAME, 5000).thenReturn([])
+    when(useWifiList).calledWith(ROBOT_NAME, 5000).thenReturn([])
     vi.mocked(NetworkDetailsModal).mockReturnValue(
       <div>mock NetworkDetailsModal</div>
     )

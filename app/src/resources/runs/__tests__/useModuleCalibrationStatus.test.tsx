@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { mockMagneticModuleGen2, mockVacuumModule } from '@opentrons/api-client'
 
@@ -86,8 +87,8 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if OT-2', () => {
-    vi.when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(false)
-    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(false)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({})
 
@@ -100,8 +101,8 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if no modules needed', () => {
-    vi.when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
-    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({})
 
@@ -114,8 +115,8 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if offset date exists', () => {
-    vi.when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
-    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         magneticModuleId: {
@@ -137,8 +138,8 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration needed if offset date does not exist', () => {
-    vi.when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
-    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         magneticModuleId: {
@@ -162,8 +163,8 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if vacuum module is connected', () => {
-    vi.when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
-    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         vacuumModuleId: {

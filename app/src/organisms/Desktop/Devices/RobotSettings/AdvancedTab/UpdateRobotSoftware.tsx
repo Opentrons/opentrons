@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
   SPACING_AUTO,
   StyledText,
@@ -106,15 +105,16 @@ export function UpdateRobotSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box width="70%">
-          <LegacyStyledText
-            css={TYPOGRAPHY.pSemiBold}
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
             {t('update_robot_software')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+          </StyledText>
+          <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
             {t('branded:update_robot_software_description')}
-          </LegacyStyledText>
+          </StyledText>
           <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
             {t('branded:update_robot_software_link')}
           </ExternalLink>

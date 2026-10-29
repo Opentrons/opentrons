@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { when } from 'vitest-when'
+
 import { INTERFACE_WIFI, mockWifiNetwork } from '@opentrons/api-client'
 import {
   DocumentedMutationError,
@@ -80,13 +82,13 @@ describe('DisconnectModal', () => {
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation()
     )
-    vi.when(useWifiList)
+    when(useWifiList)
       .calledWith(ROBOT_NAME)
       .thenReturn([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith(ROBOT_NAME)
       .thenReturn({ wifi: MOCK_WIFI, ethernet: null })
-    vi.when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
+    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
   })
 
   it('renders disconnect modal title, body, and buttons', () => {
@@ -114,7 +116,7 @@ describe('DisconnectModal', () => {
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation({ status: 'loading' })
     )
-    vi.when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockReachableRobot)
+    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockReachableRobot)
     render()
 
     screen.getByText('Disconnected from Wi-Fi')
@@ -143,7 +145,7 @@ describe('DisconnectModal', () => {
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation({ status: 'loading' })
     )
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith(ROBOT_NAME)
       .thenReturn({
         wifi: { ...MOCK_WIFI, ipAddress: null },

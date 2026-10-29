@@ -9,11 +9,11 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -128,20 +128,20 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {showDisconnectError ? (
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+          <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {disconnectMutation.error != null &&
             'message' in disconnectMutation.error
               ? disconnectMutation.error.message
               : t('shared:unknown_error')}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
-        </LegacyStyledText>
+        </StyledText>
         {showDisconnectError ? (
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+          <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {t('branded:general_error_message')}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           {isDisconnected ? (

@@ -4,9 +4,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,37 +47,37 @@ export const AboutPipetteSlideout = (
       <Flex flexDirection={DIRECTION_COLUMN}>
         {firmwareVersion != null && (
           <>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
-            </LegacyStyledText>
-            <LegacyStyledText
+            </StyledText>
+            <StyledText
               forwardedAs="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
               {firmwareVersion}
-            </LegacyStyledText>
+            </StyledText>
           </>
         )}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="p"
           paddingTop={SPACING.spacing4}
           data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
         >
           {pipetteId}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Slideout>
   )

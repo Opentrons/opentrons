@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   fixtureTiprack300ul,
@@ -64,7 +65,7 @@ const mockRobotIp = 'fakeRobotIp'
 
 describe('useOffsetCandidatesForAnalysis', () => {
   beforeEach(() => {
-    vi.when(useAllHistoricOffsets)
+    when(useAllHistoricOffsets)
       .calledWith({ hostname: mockRobotIp }, { enabled: true })
       .thenReturn([
         mockFirstDupCandidate,
@@ -72,10 +73,10 @@ describe('useOffsetCandidatesForAnalysis', () => {
         mockSecondCandidate,
         mockFirstCandidate,
       ])
-    vi.when(useAllHistoricOffsets)
+    when(useAllHistoricOffsets)
       .calledWith(null, { enabled: true })
       .thenReturn([])
-    vi.when(getLegacyLabwareLocationCombos)
+    when(getLegacyLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
       .thenReturn([
         {
@@ -95,7 +96,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
           definitionUri: 'thirdFakeDefURI',
         },
       ])
-    vi.when(getLoadedLabwareDefinitionsByUri)
+    when(getLoadedLabwareDefinitionsByUri)
       .calledWith(expect.any(Array))
       .thenReturn({
         firstFakeDefURI: mockLabwareDef,

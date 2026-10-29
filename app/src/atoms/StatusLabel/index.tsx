@@ -6,8 +6,8 @@ import {
   COLORS,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -61,13 +61,13 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
             ) : null}
           </Icon>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
           color={textColor ?? COLORS.blue60}
         >
           {capitalizeStatus ? capitalize(status) : status}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useHoverTooltip } from '@opentrons/components'
 import { usePostLogMessageMutation } from '@opentrons/react-api-client'
@@ -78,18 +79,18 @@ const render = () => {
 
 describe('SetupLabware', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(getModuleTypesThatRequireExtraAttention))
+    when(vi.mocked(getModuleTypesThatRequireExtraAttention))
       .calledWith(expect.anything())
       .thenReturn([])
 
-    vi.when(vi.mocked(useUnmatchedModulesForProtocol))
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
 
-    vi.when(vi.mocked(useRunCalibrationStatus))
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         complete: true,

@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useMostRecentRunId } from '../useMostRecentRunId'
 import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'
@@ -12,7 +13,7 @@ describe('useMostRecentRunId hook', () => {
   })
 
   it('should return the first run if any runs exist', async () => {
-    vi.when(vi.mocked(useNotifyAllRunsQuery))
+    when(vi.mocked(useNotifyAllRunsQuery))
       .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: [{ id: 'some_run_id' }] } } as any)
 
@@ -22,7 +23,7 @@ describe('useMostRecentRunId hook', () => {
   })
 
   it('should return null if no runs exist', async () => {
-    vi.when(vi.mocked(useNotifyAllRunsQuery))
+    when(vi.mocked(useNotifyAllRunsQuery))
       .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: [] } } as any)
 
@@ -31,7 +32,7 @@ describe('useMostRecentRunId hook', () => {
     expect(result.current).toBeNull()
   })
   it('should return null if no run data exists', async () => {
-    vi.when(vi.mocked(useNotifyAllRunsQuery))
+    when(vi.mocked(useNotifyAllRunsQuery))
       .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: null } } as any)
 

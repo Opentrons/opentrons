@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useInstrumentsQuery,
@@ -43,7 +44,7 @@ describe('useDownloadCalibrationData', () => {
       </Provider>
     )
     mockTrackEvent = vi.fn()
-    vi.when(useTrackEvent).calledWith().thenReturn(mockTrackEvent)
+    when(useTrackEvent).calledWith().thenReturn(mockTrackEvent)
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)

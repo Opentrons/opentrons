@@ -1,5 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
 import { fixtureTiprack300ul, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -80,7 +81,7 @@ describe('LabwareMapView', () => {
         innerProps: {},
       },
     ]
-    vi.when(vi.mocked(BaseDeck))
+    when(vi.mocked(BaseDeck))
       .calledWith({
         robotType: FLEX_ROBOT_TYPE,
         deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),

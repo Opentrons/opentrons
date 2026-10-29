@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { DeckConfigurator } from '@opentrons/components'
 import {
@@ -91,12 +92,10 @@ describe('DeviceDetailsDeckConfiguration', () => {
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {},
     } as any)
-    vi.when(vi.mocked(useIsEstopNotDisengaged))
+    when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
       .thenReturn(false)
-    vi.when(vi.mocked(useIsRobotViewable))
-      .calledWith(ROBOT_NAME)
-      .thenReturn(true)
+    when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: mockDeckConfig,
     } as UseQueryResult<DeckConfiguration>)
@@ -162,7 +161,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render disabled deck configurator when e-stop is pressed', () => {
-    vi.when(vi.mocked(useIsEstopNotDisengaged))
+    when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
       .thenReturn(true)
     vi.mocked(DeckConfigurator).mockReturnValue(
@@ -173,9 +172,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render not viewable text when robot is not viewable', () => {
-    vi.when(vi.mocked(useIsRobotViewable))
-      .calledWith(ROBOT_NAME)
-      .thenReturn(false)
+    when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(false)
     render(props)
     screen.getByText('Robot must be on the network to see deck configuration')
   })

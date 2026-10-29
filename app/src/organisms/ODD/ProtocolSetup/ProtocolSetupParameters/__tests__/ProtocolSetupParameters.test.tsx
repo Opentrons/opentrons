@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { COLORS } from '@opentrons/components'
 import {
@@ -75,10 +76,10 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
     vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
-    vi.when(vi.mocked(useCreateProtocolAnalysisMutation))
+    when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createProtocolAnalysis: mockCreateProtocolAnalysis } as any)
-    vi.when(vi.mocked(useCreateRunMutation))
+    when(vi.mocked(useCreateRunMutation))
       .calledWith(
         ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
         expect.anything(),
@@ -86,7 +87,7 @@ describe('ProtocolSetupParameters', () => {
         ['confirm_parameters']
       )
       .thenReturn({ createRun: mockCreateRun } as any)
-    vi.when(vi.mocked(useUploadCsvFileMutation))
+    when(vi.mocked(useUploadCsvFileMutation))
       .calledWith(
         ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
         expect.anything(),

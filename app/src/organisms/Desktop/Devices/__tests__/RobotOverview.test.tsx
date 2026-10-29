@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -127,7 +128,7 @@ describe('RobotOverview', () => {
     vi.mocked(RobotOverviewOverflowMenu).mockReturnValue(
       <div>mock RobotOverviewOverflowMenu</div>
     )
-    vi.when(getRobotModelByName)
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('OT-2')
     vi.mocked(getConfig).mockReturnValue({
@@ -155,7 +156,7 @@ describe('RobotOverview', () => {
   })
 
   it('renders a Flex image', () => {
-    vi.when(getRobotModelByName)
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('Opentrons Flex')
     render(props)

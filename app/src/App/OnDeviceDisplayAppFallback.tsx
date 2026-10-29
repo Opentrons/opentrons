@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { useSentryReport } from '/app/App/hooks/useSentryReport'
@@ -56,9 +56,9 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('branded:error_boundary_description')}
-        </LegacyStyledText>
+        </StyledText>
         <MediumButton
           width="100%"
           buttonType="alert"

@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   mockHeaterShaker,
@@ -93,20 +94,20 @@ describe('SetupModulesList', () => {
     }
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
     vi.mocked(UnMatchedModuleWarning).mockReturnValue(
       <div>mock unmatched module Banner</div>
     )
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    vi.when(useRunCalibrationStatus).calledWith(ROBOT_NAME, RUN_ID).thenReturn({
+    when(useRunCalibrationStatus).calledWith(ROBOT_NAME, RUN_ID).thenReturn({
       complete: true,
     })
 
@@ -166,7 +167,7 @@ describe('SetupModulesList', () => {
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
@@ -198,7 +199,7 @@ describe('SetupModulesList', () => {
   })
 
   it('should render a thermocycler module that is connected but not calibrated, OT3', async () => {
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
@@ -228,13 +229,13 @@ describe('SetupModulesList', () => {
   })
 
   it('should render disabled button when pipette and module are not calibrated', () => {
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    vi.when(useRunCalibrationStatus).calledWith(ROBOT_NAME, RUN_ID).thenReturn({
+    when(useRunCalibrationStatus).calledWith(ROBOT_NAME, RUN_ID).thenReturn({
       complete: false,
       reason: 'calibrate_pipette_failure_reason',
     })
@@ -259,7 +260,7 @@ describe('SetupModulesList', () => {
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
@@ -291,13 +292,13 @@ describe('SetupModulesList', () => {
   })
 
   it('should render the MoaM component when Moam is attached and robot is OT2', () => {
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: OT2_ROBOT_TYPE } as DiscoveredRobot)
     vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
       <div>mock Moam modal</div>
     )
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
@@ -306,7 +307,7 @@ describe('SetupModulesList', () => {
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
     const dupModHub = 2
-    vi.when(useModuleRenderInfoForProtocolById)
+    when(useModuleRenderInfoForProtocolById)
       .calledWith(RUN_ID)
       .thenReturn({
         [mockMagneticModule.moduleId]: {
@@ -352,7 +353,7 @@ describe('SetupModulesList', () => {
     screen.getByText('mock Moam modal')
   })
   it('should render the module unmatching banner', () => {
-    vi.when(useUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: ['moduleId'],

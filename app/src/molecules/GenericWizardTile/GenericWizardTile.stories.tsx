@@ -4,10 +4,10 @@ import { legacy_createStore } from 'redux'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   ModalShell,
   PrimaryButton,
   SPACING,
+  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 
@@ -47,20 +47,20 @@ const Template: Story<
   </Provider>
 )
 const body = (
-  <LegacyStyledText as="p">
+  <StyledText as="p">
     {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     }
-  </LegacyStyledText>
+  </StyledText>
 )
 const rightHandBody = (
   <Flex flexDirection={DIRECTION_COLUMN}>
-    <LegacyStyledText as="h1">{'You will need:'}</LegacyStyledText>
-    <LegacyStyledText as="p" marginTop={SPACING.spacing16}>
+    <StyledText as="h1">{'You will need:'}</StyledText>
+    <StyledText as="p" marginTop={SPACING.spacing16}>
       {'this'}
-    </LegacyStyledText>
-    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
-    <LegacyStyledText as="p">{'and this'}</LegacyStyledText>
+    </StyledText>
+    <StyledText as="p">{'and this'}</StyledText>
+    <StyledText as="p">{'and this'}</StyledText>
   </Flex>
 )
 const skeleton = (

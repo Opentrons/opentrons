@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -41,7 +42,7 @@ describe('useNotifyDataReady', () => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     vi.mocked(appShellListener).mockClear()
-    vi.when(vi.mocked(useFeatureFlag))
+    when(vi.mocked(useFeatureFlag))
       .calledWith('forceHttpPolling')
       .thenReturn(false)
   })
@@ -251,7 +252,7 @@ describe('useNotifyDataReady', () => {
   })
 
   it('should not utilize notifications if the feature flag is set to true', () => {
-    vi.when(vi.mocked(useFeatureFlag))
+    when(vi.mocked(useFeatureFlag))
       .calledWith('forceHttpPolling')
       .thenReturn(true)
 

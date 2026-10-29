@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { getPlaintextCACertificates } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
@@ -23,7 +24,7 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 describe('useHandleRobotCertImport', async () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
   beforeEach(() => {
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     const queryClient = new QueryClient()
     const clientProvider: FunctionComponent<{
       children: ReactNode
@@ -36,7 +37,7 @@ describe('useHandleRobotCertImport', async () => {
     vi.resetAllMocks()
   })
   it('should fetch ok when the query succeeds', async () => {
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -54,7 +55,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallPlaintextRobotCertificate))
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
       .calledWith({ certificateData: 'asdfasdf' })
       .thenResolve(true)
     const { result } = renderHook(() => useRotateRobotCerts(), { wrapper })
@@ -62,7 +63,7 @@ describe('useHandleRobotCertImport', async () => {
     expect(vi.mocked(tryInstallPlaintextRobotCertificate)).toHaveBeenCalled()
   })
   it('should not error when install fails ', async () => {
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -80,7 +81,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    vi.when(vi.mocked(tryInstallPlaintextRobotCertificate))
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
       .calledWith({ certificateData: 'asdfasdf' })
       .thenReject(new Error('oh no'))
     const { result } = renderHook(() => useRotateRobotCerts(), { wrapper })
@@ -88,7 +89,7 @@ describe('useHandleRobotCertImport', async () => {
     expect(vi.mocked(tryInstallPlaintextRobotCertificate)).toHaveBeenCalled()
   })
   it('should end early and not error if there is no next cert', async () => {
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenResolve({
         data: {
@@ -110,7 +111,7 @@ describe('useHandleRobotCertImport', async () => {
     ).not.toHaveBeenCalled()
   })
   it('should end early and not error if the fetch fails', async () => {
-    vi.when(vi.mocked(getPlaintextCACertificates))
+    when(vi.mocked(getPlaintextCACertificates))
       .calledWith(HOST_CONFIG)
       .thenReject(new Error('oh no'))
     const { result } = renderHook(() => useRotateRobotCerts(), { wrapper })

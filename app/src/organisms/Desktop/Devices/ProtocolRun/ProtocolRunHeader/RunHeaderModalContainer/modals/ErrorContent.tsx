@@ -8,10 +8,10 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
-  LegacyStyledText,
   OVERFLOW_AUTO,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -33,10 +33,7 @@ export function ErrorContent({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isSingleError
           ? t('error_info', {
               errorType: errors[0].errorType,
@@ -49,11 +46,11 @@ export function ErrorContent({
             : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
                 count: errors.length,
               })}
-      </LegacyStyledText>
+      </StyledText>
       <Flex css={ERROR_MESSAGE_STYLE}>
         {' '}
         {errors.map((error, index) => (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             textAlign={TYPOGRAPHY.textAlignLeft}
             key={index}
@@ -62,7 +59,7 @@ export function ErrorContent({
             {isSingleError
               ? error.detail
               : `${error.errorCode}: ${error.detail}`}
-          </LegacyStyledText>
+          </StyledText>
         ))}
       </Flex>
     </Flex>

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { useDispatch, useStore } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -60,7 +61,7 @@ describe('useDownloadSelectedLogPeriods', () => {
 
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useStore).mockReturnValue(mockStore as any)
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     mockDispatch.mockClear()
     vi.mocked(waitForStoreCondition).mockReset()
   })

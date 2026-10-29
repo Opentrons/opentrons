@@ -8,10 +8,10 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -56,7 +56,7 @@ export const SecureLabwareModal = (
                 )}`}
                 components={{
                   block: (
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="p"
                       marginBottom={SPACING.spacing4}
                       marginRight="3.625rem"
@@ -79,9 +79,9 @@ export const SecureLabwareModal = (
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <LegacyStyledText forwardedAs="p" marginRight="3.625rem">
+            <StyledText forwardedAs="p" marginRight="3.625rem">
               {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
-            </LegacyStyledText>
+            </StyledText>
             <img
               src={secureTCLatchImage}
               width="288px"

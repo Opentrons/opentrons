@@ -1,11 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import {
-  COLORS,
-  Flex,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { COLORS, Flex, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
 import { useQuickProtocolDetailsForRun } from '/app/resources/runs'
 
@@ -25,21 +20,18 @@ export function RunHeaderProtocolName({
     <Flex>
       {protocolKey != null ? (
         <Link to={`/protocols/${protocolKey}`}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h2"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.blue50}
           >
             {displayName}
-          </LegacyStyledText>
+          </StyledText>
         </Link>
       ) : (
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {displayName}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

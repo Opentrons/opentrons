@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
@@ -117,8 +118,8 @@ const PROTOCOL_DETAILS_INCOMPATIBLE = {
 
 describe('useRunPipetteInfoByMount hook', () => {
   beforeEach(() => {
-    vi.when(vi.mocked(useIsOEMMode)).calledWith().thenReturn(false)
-    vi.when(vi.mocked(useInstrumentsQuery))
+    when(vi.mocked(useIsOEMMode)).calledWith().thenReturn(false)
+    when(vi.mocked(useInstrumentsQuery))
       .calledWith()
       .thenReturn({
         data: {
@@ -131,12 +132,10 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return empty mounts when protocol details not found', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(null)
-    vi.when(vi.mocked(useStoredProtocolAnalysis))
-      .calledWith('1')
-      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
     const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: null,
@@ -145,10 +144,10 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return run pipette info by mount for matches', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS_COMPATIBLE.protocolData as any)
-    vi.when(vi.mocked(useStoredProtocolAnalysis))
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn(
         PROTOCOL_DETAILS_COMPATIBLE as any as SharedData.ProtocolAnalysisOutput
@@ -164,10 +163,10 @@ describe('useRunPipetteInfoByMount hook', () => {
     })
   })
   it('should return run pipette info by mount for non matches', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS_INCOMPATIBLE.protocolData as any)
-    vi.when(vi.mocked(useStoredProtocolAnalysis))
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn(
         PROTOCOL_DETAILS_INCOMPATIBLE as any as SharedData.ProtocolAnalysisOutput

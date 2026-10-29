@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -27,7 +28,7 @@ const render = () => {
 
 describe('PreventRobotCaching', () => {
   beforeEach(() => {
-    vi.when(getConfig).calledWith(MOCK_STATE).thenReturn(MOCK_STATE.config)
+    when(getConfig).calledWith(MOCK_STATE).thenReturn(MOCK_STATE.config)
   })
 
   it('should render text and toggle button', () => {

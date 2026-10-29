@@ -8,6 +8,7 @@ import {
   it,
   vi,
 } from 'vitest'
+import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -53,11 +54,11 @@ describe('CalibrationDataDownload', () => {
 
   beforeEach(() => {
     mockDownloadCalibration.mockClear()
-    vi.when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
+    when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
       downloadCalibration: mockDownloadCalibration,
       isLoading: false,
     })
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   it('renders title and About Calibration description', () => {
@@ -90,7 +91,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button when e-stop is pressed', () => {
-    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     const downloadButton = screen.getByRole('button', {
       name: 'Download calibration logs',

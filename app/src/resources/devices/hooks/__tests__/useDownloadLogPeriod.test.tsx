@@ -1,6 +1,7 @@
 import { useDispatch, useStore } from 'react-redux'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -45,7 +46,7 @@ describe('useDownloadLogPeriod', () => {
   beforeEach(() => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useStore).mockReturnValue(mockStore as any)
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     mockDispatch.mockClear()
     vi.mocked(waitForStoreCondition).mockReset()
     vi.mocked(waitForStoreCondition).mockResolvedValue({
@@ -59,7 +60,7 @@ describe('useDownloadLogPeriod', () => {
   })
 
   it('should not dispatch when there is no host', async () => {
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(null)
+    when(vi.mocked(useHost)).calledWith().thenReturn(null)
     const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
 
     await result.current.downloadLogPeriod()

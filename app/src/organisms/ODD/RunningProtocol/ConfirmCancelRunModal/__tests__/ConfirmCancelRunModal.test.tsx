@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -62,11 +63,9 @@ describe('ConfirmCancelRunModal', () => {
       stopRun: mockStopRun,
     } as any)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    vi.when(useTrackProtocolRunEvent)
-      .calledWith(RUN_ID, ROBOT_NAME)
-      .thenReturn({
-        trackProtocolRunEvent: mockTrackProtocolRunEvent,
-      })
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     vi.mocked(CancelingRunModal).mockReturnValue(
       <div>mock CancelingRunModal</div>
     )

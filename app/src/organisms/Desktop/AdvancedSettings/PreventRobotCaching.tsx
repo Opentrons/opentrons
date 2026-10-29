@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,26 +27,27 @@ export function PreventRobotCaching(): ReactNode {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('prevent_robot_caching')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="prevent_robot_caching_description"
             components={{
               strong: (
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="span"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 />
               ),
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="disable_robot_cache"

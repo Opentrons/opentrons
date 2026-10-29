@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
@@ -37,7 +38,7 @@ describe('useIsRobotViewable hook', () => {
   })
 
   it('returns false when given an unreachable robot name', () => {
-    vi.when(vi.mocked(getDiscoverableRobotByName))
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockUnreachableRobot)
 
@@ -47,7 +48,7 @@ describe('useIsRobotViewable hook', () => {
   })
 
   it('returns false when given a reachable robot name', () => {
-    vi.when(vi.mocked(getDiscoverableRobotByName))
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockReachableRobot)
 
@@ -59,7 +60,7 @@ describe('useIsRobotViewable hook', () => {
   })
 
   it('returns true when given a connectable robot name', () => {
-    vi.when(vi.mocked(getDiscoverableRobotByName))
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockConnectableRobot)
 

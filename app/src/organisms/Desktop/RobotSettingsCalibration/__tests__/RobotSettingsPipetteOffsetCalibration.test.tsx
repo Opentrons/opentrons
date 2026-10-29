@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -41,7 +42,7 @@ const render = (
 
 describe('RobotSettingsPipetteOffsetCalibration', () => {
   beforeEach(() => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(false)
+    when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: null,
@@ -52,7 +53,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
   })
 
   it('renders a title and description - Pipette Calibrations', () => {
-    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    when(useIsFlex).calledWith('otie').thenReturn(true)
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,

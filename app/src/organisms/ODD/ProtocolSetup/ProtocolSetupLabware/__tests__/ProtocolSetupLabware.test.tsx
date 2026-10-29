@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useCreateLiveCommandMutation,
@@ -94,10 +95,10 @@ describe('ProtocolSetupLabware', () => {
       reportModuleCommand: vi.fn(),
     } as any)
     mockCreateLiveCommand.mockResolvedValue(null)
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRecentAnalysis)
-    vi.when(vi.mocked(getProtocolModulesInfo))
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRecentAnalysis, ot3StandardDeckDef as any)
       .thenReturn(mockProtocolModuleInfo)
     vi.mocked(useDocumentationState).mockReturnValue(

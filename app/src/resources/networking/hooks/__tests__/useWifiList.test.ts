@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 import { useWifiQuery } from '@opentrons/react-api-client'
@@ -23,11 +24,11 @@ const mockWifiNetwork: WifiNetwork = {
 
 describe('useWifiList', () => {
   beforeEach(() => {
-    vi.when(useRobot).calledWith(null).thenReturn(null)
+    when(useRobot).calledWith(null).thenReturn(null)
   })
 
   it('returns empty list if unavailable', () => {
-    vi.when(useWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
       .thenReturn({
         data: {},
@@ -36,7 +37,7 @@ describe('useWifiList', () => {
     expect(wifiList).toEqual([])
   })
   it('getWifiList returns wifiList from state', () => {
-    vi.when(useWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
       .thenReturn({
         data: { list: [mockWifiNetwork] },
@@ -45,7 +46,7 @@ describe('useWifiList', () => {
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList dedupes duplicate SSIDs', () => {
-    vi.when(useWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
       .thenReturn({
         data: { list: [mockWifiNetwork, mockWifiNetwork] },
@@ -54,7 +55,7 @@ describe('useWifiList', () => {
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList sorts by active then ssid', () => {
-    vi.when(useWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
       .thenReturn({
         data: {
@@ -73,7 +74,7 @@ describe('useWifiList', () => {
     ])
   })
   it('getWifiList sorts by active then ssid then dedupes', () => {
-    vi.when(useWifiQuery)
+    when(useWifiQuery)
       .calledWith(expect.anything(), null)
       .thenReturn({
         data: {

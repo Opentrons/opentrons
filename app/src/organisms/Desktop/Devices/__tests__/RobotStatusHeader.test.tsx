@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -67,20 +68,20 @@ describe('RobotStatusHeader', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({} as any)
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as any)
-    vi.when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith('fakeRunId', { staleTime: Infinity })
       .thenReturn({
         data: {
           data: { protocolId: 'fakeProtocolId' },
         },
       } as any)
-    vi.when(useProtocolQuery)
+    when(useProtocolQuery)
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as any)
-    vi.when(useProtocolQuery)
+    when(useProtocolQuery)
       .calledWith('fakeProtocolId', { staleTime: Infinity })
       .thenReturn({
         data: {
@@ -89,10 +90,10 @@ describe('RobotStatusHeader', () => {
           },
         },
       } as any)
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
       .thenReturn([
         {
@@ -111,10 +112,10 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders the model of robot and robot name - OT-3', () => {
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
       .thenReturn([
         {
@@ -144,7 +145,7 @@ describe('RobotStatusHeader', () => {
 
   it('renders a running protocol banner when a protocol is running', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('fakeRunId')
-    vi.when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_RUNNING)
+    when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_RUNNING)
 
     render(props)
 
@@ -157,7 +158,7 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders an ethernet icon when connected by wifi and ethernet', () => {
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
@@ -170,7 +171,7 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders a wifi icon when only connected by wifi', () => {
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
@@ -188,13 +189,13 @@ describe('RobotStatusHeader', () => {
   })
 
   it('does not render a wifi or ethernet icon when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
-    vi.when(useNetworkInterfaces)
+    when(useNetworkInterfaces)
       .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
       })
-    vi.when(getRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
       .thenReturn([])
     render(props)

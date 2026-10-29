@@ -16,10 +16,10 @@ import {
   DropdownMenu,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
@@ -174,26 +174,24 @@ export function GeneralSettings(): ReactNode {
               />
             )}
             <Box width="65%">
-              <LegacyStyledText
-                css={TYPOGRAPHY.h3SemiBold}
+              <StyledText
+                forwardedAs="h3"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingBottom={SPACING.spacing8}
               >
                 {t('software_version')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                forwardedAs="p"
-                paddingBottom={SPACING.spacing8}
-              >
+              </StyledText>
+              <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
                 {CURRENT_VERSION}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
+              </StyledText>
+              <StyledText forwardedAs="p">
                 {t('shared:view_latest_release_notes')}
                 <Link
                   external
                   href={GITHUB_LINK}
                   css={TYPOGRAPHY.linkPSemiBold}
                 >{` ${t('shared:github')}`}</Link>
-              </LegacyStyledText>
+              </StyledText>
             </Box>
             {updateAvailable ? (
               <TertiaryButton
@@ -206,20 +204,20 @@ export function GeneralSettings(): ReactNode {
                 {t('view_software_update')}
               </TertiaryButton>
             ) : (
-              <LegacyStyledText
+              <StyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
                 color={COLORS.grey60}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}
-              </LegacyStyledText>
+              </StyledText>
             )}
           </Flex>
           <Box width="70%">
-            <LegacyStyledText forwardedAs="p" paddingY={SPACING.spacing8}>
+            <StyledText forwardedAs="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
-            </LegacyStyledText>
+            </StyledText>
           </Box>
           <Box>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -239,24 +237,28 @@ export function GeneralSettings(): ReactNode {
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing24} />
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('software_update')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('automatically_download_updates')}
-            </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
+            </StyledText>
+            <StyledText forwardedAs="p">
               {t('when_enabled_updates_are_downloaded_automatically')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
           <ToggleButton
             label={ENABLE_UPDATE_AUTODOWNLOAD}
@@ -271,9 +273,7 @@ export function GeneralSettings(): ReactNode {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText forwardedAs="p">
-            {t('branded:receive_alert')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="p">{t('branded:receive_alert')}</StyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing16}
@@ -287,12 +287,13 @@ export function GeneralSettings(): ReactNode {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText
-            css={TYPOGRAPHY.h3SemiBold}
+          <StyledText
+            forwardedAs="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing8}
           >
             {t('connect_ip')}
-          </LegacyStyledText>
+          </StyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             onClick={() => {
@@ -311,15 +312,16 @@ export function GeneralSettings(): ReactNode {
               gridGap={SPACING.spacing24}
             >
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-                <LegacyStyledText
-                  css={TYPOGRAPHY.h3SemiBold}
+                <StyledText
+                  forwardedAs="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   paddingBottom={SPACING.spacing8}
                 >
                   {t('app_language_preferences')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p">
+                </StyledText>
+                <StyledText forwardedAs="p">
                   {t('app_language_description')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <DropdownMenu
                 filterOptions={LANGUAGES}

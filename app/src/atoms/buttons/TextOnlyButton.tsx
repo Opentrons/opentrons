@@ -39,11 +39,15 @@ export function TextOnlyButton({
   ...styleProps
 }: TextOnlyButtonProps): ReactNode {
   return (
-    <Btn onClick={onClick} disabled={disabled} {...styleProps}>
+    <Btn
+      onClick={onClick}
+      disabled={disabled}
+      css={disabled ? GO_BACK_BUTTON_DISABLED_STYLE : GO_BACK_BUTTON_STYLE}
+      {...styleProps}
+    >
       <StyledText
         desktopStyle="bodyDefaultSemiBold"
         oddStyle="bodyTextSemiBold"
-        css={disabled ? GO_BACK_BUTTON_DISABLED_STYLE : GO_BACK_BUTTON_STYLE}
       >
         {buttonText}
       </StyledText>

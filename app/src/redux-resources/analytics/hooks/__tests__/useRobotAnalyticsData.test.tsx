@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
@@ -52,7 +53,7 @@ describe('useRobotAnalyticsData hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    vi.when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
+    when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
     vi.mocked(getRobotApiVersion).mockReturnValue(ROBOT_VERSION)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: { settings: ROBOT_SETTINGS },
@@ -73,7 +74,7 @@ describe('useRobotAnalyticsData hook', () => {
   })
 
   it('returns robot analytics data when robot exists', () => {
-    vi.when(vi.mocked(useRobot))
+    when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn({
         ...mockConnectableRobot,

@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   mockTemperatureModuleGen2,
@@ -118,22 +119,20 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       mockTemperatureModuleGen2,
       mockThermocycler,
     ])
-    vi.when(vi.mocked(useStoredProtocolAnalysis))
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS as unknown as ProtocolAnalysisOutput)
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
     vi.mocked(getProtocolModulesInfo).mockReturnValue([TEMPERATURE_MODULE_INFO])
   })
 
   it('should return no module render info when protocol details not found', () => {
-    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(null)
-    vi.when(vi.mocked(useStoredProtocolAnalysis))
-      .calledWith('1')
-      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('1', true)
     )

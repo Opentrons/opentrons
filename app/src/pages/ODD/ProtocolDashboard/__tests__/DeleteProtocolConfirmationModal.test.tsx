@@ -1,5 +1,6 @@
 import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { getProtocol } from '@opentrons/api-client'
 import {
@@ -55,8 +56,8 @@ describe('DeleteProtocolConfirmationModal', () => {
       protocolId: PROTOCOL_ID,
       setShowDeleteConfirmationModal: mockFunc,
     }
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
-    vi.when(vi.mocked(useProtocolQuery))
+    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
@@ -65,7 +66,7 @@ describe('DeleteProtocolConfirmationModal', () => {
           },
         },
       } as any)
-    vi.when(vi.mocked(useToaster)).calledWith().thenReturn({
+    when(vi.mocked(useToaster)).calledWith().thenReturn({
       makeSnackbar: mockMakeSnackbar,
       makeToast: vi.fn(),
       eatToast: vi.fn(),
@@ -99,7 +100,7 @@ describe('DeleteProtocolConfirmationModal', () => {
   })
 
   it('should call a mock function when tapping delete button', async () => {
-    vi.when(vi.mocked(getProtocol))
+    when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, PROTOCOL_ID)
       .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },

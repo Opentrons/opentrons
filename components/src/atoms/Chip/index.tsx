@@ -5,7 +5,7 @@ import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { LegacyStyledText } from '../StyledText'
+import { StyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
@@ -152,9 +152,13 @@ export function Chip(props: ChipProps): ReactNode {
           ) : null}
         </Icon>
       ) : null}
-      <LegacyStyledText css={TEXT_STYLE(chipSize)} color={chipProps.textColor}>
+      <StyledText
+        forwardedAs="p"
+        css={TEXT_STYLE(chipSize)}
+        color={chipProps.textColor}
+      >
         {text}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

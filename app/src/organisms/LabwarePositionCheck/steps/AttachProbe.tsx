@@ -2,7 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
-import { AnimationVideo, LegacyStyledText } from '@opentrons/components'
+import { AnimationVideo, StyledText } from '@opentrons/components'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
@@ -79,7 +79,7 @@ export function AttachProbe(props: LPCWizardContentProps): ReactNode {
               i18nKey={probei18nString()}
               values={{ mount }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
                 strong: <strong />,
               }}

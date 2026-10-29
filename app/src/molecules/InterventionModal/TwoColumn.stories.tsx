@@ -3,7 +3,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
+  StyledText,
 } from '@opentrons/components'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
@@ -52,7 +52,7 @@ interface TextProps {
 }
 function Text({ text }: TextProps): JSX.Element | null {
   const hasComponent = text != null && text.length > 0
-  return hasComponent ? <LegacyStyledText>{text}</LegacyStyledText> : null
+  return hasComponent ? <StyledText>{text}</StyledText> : null
 }
 
 interface ImageProps {

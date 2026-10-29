@@ -8,9 +8,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -23,6 +23,8 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { useCurrentRobotName } from '/app/redux/robot-auth'
 
+import styles from './firmwareupdatemodal.module.css'
+
 import type { ReactNode } from 'react'
 import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
@@ -34,23 +36,6 @@ interface FirmwareUpdateModalProps {
   isOnDevice: boolean
   onUnauthorized?: () => void
 }
-
-const DESCRIPTION_STYLE = css`
-  ${TYPOGRAPHY.h1Default}
-  margin-top: ${SPACING.spacing8};
-  margin-bottom: ${SPACING.spacing24};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightBold};
-    font-size: ${TYPOGRAPHY.fontSize32};
-    margin-top: ${SPACING.spacing4};
-    margin-bottom: ${SPACING.spacing32};
-    margin-left: 4.5rem;
-    margin-right: 4.5rem;
-    text-align: ${TYPOGRAPHY.textAlignCenter};
-    line-height: ${TYPOGRAPHY.lineHeight42};
-  }
-`
 const MODAL_STYLE = css`
   align-items: ${ALIGN_CENTER};
   flex-direction: ${DIRECTION_COLUMN};
@@ -179,9 +164,13 @@ export const FirmwareUpdateModal = (
           color={COLORS.green60}
         />
       )}
-      <LegacyStyledText css={DESCRIPTION_STYLE}>
+      <StyledText
+        forwardedAs="h1"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        className={styles.description}
+      >
         {firmwareText ?? 'Checking for updates...'}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

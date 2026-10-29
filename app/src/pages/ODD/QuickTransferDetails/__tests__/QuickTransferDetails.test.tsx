@@ -1,6 +1,7 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useCreateRunMutation,
@@ -118,7 +119,7 @@ describe('ODDQuickTransferDetails', () => {
         status: 'completed',
       },
     } as any)
-    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(useScrollPosition).mockReturnValue({
       isScrolled: false,
       scrollRef: {} as any,

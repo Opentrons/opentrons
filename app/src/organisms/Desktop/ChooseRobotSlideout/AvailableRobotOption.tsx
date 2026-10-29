@@ -3,15 +3,14 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
-import { css } from 'styled-components'
 
 import {
   Box,
   COLORS,
   Icon,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
@@ -137,14 +136,14 @@ export function AvailableRobotOptionComponent(
             [styles.details_with_chip]: isComplianceReady,
           })}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h6"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {robotModel}
-          </LegacyStyledText>
+          </StyledText>
           <Box maxWidth="9.5rem">
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -159,7 +158,7 @@ export function AvailableRobotOptionComponent(
                   marginBottom: `-${SPACING.spacing4}`,
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
           </Box>
           {isComplianceReady ? (
             <div className={styles.compliance_chip}>
@@ -182,16 +181,11 @@ export function AvailableRobotOptionComponent(
         ) : null}
       </MiniCard>
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="label"
           color={COLORS.red60}
           marginBottom={SPACING.spacing8}
-          css={css`
-            & > a {
-              color: ${COLORS.red60};
-              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-            }
-          `}
+          className={styles.version_mismatch_label}
         >
           <Trans
             t={t}
@@ -200,7 +194,7 @@ export function AvailableRobotOptionComponent(
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
     </>
   )
