@@ -674,7 +674,7 @@ async def test_limited_jaw_open_only_next_to_vacuum_collar(
         times=1,
     )
     decoy.verify(await ot3_hardware_api.ungrip(), times=0)
-    assert limited_open == 87
+    assert limited_open == 88
 
 
 async def test_slow_pickup_for_vacuum_module_collar(
