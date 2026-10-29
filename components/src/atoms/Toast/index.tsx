@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Btn, Flex, Link } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -21,7 +21,7 @@ import type {
   ThemedCssFunction,
 } from 'styled-components'
 import type { ReactNode } from 'react'
-import type { IconName, IconProps } from '../../icons'
+import type { IconName, IconProps } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 export const SUCCESS_TOAST: 'success' = 'success'

@@ -1,13 +1,13 @@
 import { memo } from 'react'
 import styled, { css } from 'styled-components'
 
-import { CheckboxField } from '../../atoms/CheckboxField'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { CheckboxField } from '../../helix/checkboxes/CheckboxField'
+import { InputField } from '../../helix/input/InputField'
 import { Flex } from '../../primitives'
 import { CURSOR_POINTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
-import { InputField } from '..//InputField'
 
 import type {
   ChangeEvent,

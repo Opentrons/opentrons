@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -11,7 +11,7 @@ import {
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
-import type { IconProps } from '../../icons'
+import type { IconProps } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 export type BannerType =

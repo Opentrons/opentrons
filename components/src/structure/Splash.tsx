@@ -1,11 +1,11 @@
 /** A full-page icon in a muted color */
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './splash.module.css'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '../icons'
+import type { IconName } from '../helix/icons'
 
 export interface SplashProps {
   /** optional alternative icon name. Defaults to 'logo'. */

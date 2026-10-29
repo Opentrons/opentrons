@@ -1,6 +1,6 @@
-import { TertiaryButton } from '../../atoms/buttons'
-import { ListItem } from '../../atoms/ListItem/index'
 import { StyledText } from '../../atoms/StyledText'
+import { TertiaryButton } from '../../helix/buttons/TertiaryButton'
+import { ListItem } from '../../helix/ListItem/index'
 import { Flex } from '../../primitives'
 import {
   ALIGN_CENTER,

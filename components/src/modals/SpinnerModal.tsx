@@ -1,9 +1,9 @@
 // titled modal page component
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
+import { Overlay } from '../helix/modals'
 import styles from './modals.module.css'
-import { Overlay } from './Overlay'
 
 import type { ReactNode } from 'react'
 

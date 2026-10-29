@@ -1,4 +1,6 @@
-import { Box, COLORS, SPACING } from '../..'
+import { COLORS } from '../../helix-design-system'
+import { Box } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
 
 import type { ComponentProps, ReactNode } from 'react'
 
