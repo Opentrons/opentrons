@@ -231,12 +231,12 @@ function AttachedInstruments(props: { robotName: string }): ReactNode {
   const leftPipette =
     (attachedInstruments?.data ?? []).find(
       (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.mount === 'left'
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
     ) ?? null
   const rightPipette =
     (attachedInstruments?.data ?? []).find(
       (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.mount === 'right'
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
     ) ?? null
 
   const leftDisplayName = useAttachedInstrumentDisplayName(leftPipette)

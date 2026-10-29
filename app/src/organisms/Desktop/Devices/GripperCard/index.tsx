@@ -47,7 +47,9 @@ export function GripperCard({
     useState<GripperWizardFlowType | null>(null)
   const [showAboutGripperSlideout, setShowAboutGripperSlideout] =
     useState<boolean>(false)
-  const gripperDisplayName = useAttachedInstrumentDisplayName(attachedGripper)
+  const gripperDisplayName = useAttachedInstrumentDisplayName(
+    attachedGripper?.ok ? attachedGripper : null
+  )
 
   const handleAttach: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)

@@ -27,8 +27,8 @@ export function useAttachedInstrumentDisplayName(
     instrument?.ok === true && instrument.instrumentType === 'gripper'
   const pipetteName =
     isPipette && instrument != null && 'instrumentName' in instrument
-      ? instrument.instrumentName
-      : null
+      ? (instrument.instrumentName as PipetteName)
+      : undefined
 
   const v2DisplayName = usePipetteSpecsV2(pipetteName)?.displayName ?? null
 
@@ -49,7 +49,7 @@ export function useAttachedInstrumentDisplayName(
     return gripperFallback !== '' ? gripperFallback : null
   }
 
-  if (preferedPipetteName != null && preferedPipetteName !== '') {
-    return anonymizeInstrumentDisplayName(preferedPipetteName, isOEMMode)
-  }
+  return preferedPipetteName != null && preferedPipetteName !== ''
+    ? anonymizeInstrumentDisplayName(preferedPipetteName, isOEMMode)
+    : null
 }
