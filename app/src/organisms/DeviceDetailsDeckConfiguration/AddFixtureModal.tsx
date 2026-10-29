@@ -21,9 +21,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
-import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
 import {
@@ -46,7 +46,7 @@ import type {
   DeckConfiguration,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000

@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StyledText, TouchInputField } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard/NumericalKeyboard'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { NumericalKeyboard } from '/app/components/ODD/keyboard/NumericalKeyboard'
 
-import { ChildNavigation } from '../../ChildNavigation'
 import { parseNumericalInput } from '../../utils/parseNumericalInput'
 import styles from './compliance_ready_settings.module.css'
 import { MAX_C_INT } from './constants'

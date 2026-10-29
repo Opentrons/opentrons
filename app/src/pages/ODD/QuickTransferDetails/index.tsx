@@ -30,10 +30,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import { SmallModalChildren } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsHeaderTitleSkeleton,

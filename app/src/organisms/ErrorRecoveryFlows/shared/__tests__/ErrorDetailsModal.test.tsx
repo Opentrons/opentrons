@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { InlineNotification } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { i18n } from '/app/i18n'
-import { OddModal } from '/app/molecules/OddModal'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import {
@@ -32,7 +32,7 @@ vi.mock('react-dom', () => ({
   ...vi.importActual('react-dom'),
   createPortal: vi.fn((element, container) => element),
 }))
-vi.mock('/app/molecules/OddModal', () => ({
+vi.mock('/app/components/ODD/modals/OddModal', () => ({
   OddModal: vi.fn(({ children }) => <div>{children}</div>),
 }))
 

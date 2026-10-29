@@ -8,7 +8,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 
 import { FailedStepNextStep } from './FailedStepNextStep'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'

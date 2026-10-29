@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { Account } from '/app/pages/ODD/Account'
 import { useEditAccountHandlers } from '/app/resources/auth/hooks/useEditAccountHandlers'
 import { usePasswordComplexity } from '/app/resources/auth/hooks/usePasswordComplexity'
 
-import { ChildNavigation } from '../../../ChildNavigation'
 import { CreateUserFlow } from './CreateUserFlow'
 import styles from './user_management_settings.module.css'
 import { UserRow } from './UserRow'

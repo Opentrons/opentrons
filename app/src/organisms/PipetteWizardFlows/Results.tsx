@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   SimpleWizardBody,

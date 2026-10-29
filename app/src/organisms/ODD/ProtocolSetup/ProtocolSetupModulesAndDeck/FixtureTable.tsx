@@ -22,7 +22,7 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'

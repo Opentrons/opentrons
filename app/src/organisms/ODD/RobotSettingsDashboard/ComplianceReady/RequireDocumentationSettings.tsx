@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { ChildNavigation } from '../../ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+
 import styles from './compliance_ready_settings.module.css'
 import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from './constants'
 import { NumericSettingPage } from './NumericSettingPage'

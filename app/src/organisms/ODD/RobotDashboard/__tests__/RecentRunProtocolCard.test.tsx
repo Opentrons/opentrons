@@ -12,6 +12,7 @@ import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { Skeleton } from '/app/atoms/Skeleton'
+import { RecentRunProtocolCard } from '/app/components/ODD/cards/RecentRunProtocolCard'
 import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
@@ -21,7 +22,6 @@ import {
 import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
-import { RecentRunProtocolCard } from '../'
 import { useRerunnableStatusText } from '../hooks'
 
 import type { ComponentProps } from 'react'

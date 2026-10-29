@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

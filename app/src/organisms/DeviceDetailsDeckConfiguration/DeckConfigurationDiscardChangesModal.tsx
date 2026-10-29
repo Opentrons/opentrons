@@ -9,11 +9,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void

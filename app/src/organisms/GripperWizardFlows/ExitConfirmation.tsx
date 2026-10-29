@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

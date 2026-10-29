@@ -19,11 +19,11 @@ import {
   useGetModulesNeedingSetup,
   useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
 } from '/app/App/hooks/useGetModulesNeedingSetup'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ModalContentOneColSimpleButtons } from '/app/components/ODD/modals/InterventionModal'
 import { i18n } from '/app/i18n'
 import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,

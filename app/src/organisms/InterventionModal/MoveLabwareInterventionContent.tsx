@@ -15,7 +15,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+import { InterventionInfo } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { getRunCurrentLabwareInfo } from '../ErrorRecoveryFlows/hooks/useDeckMapUtils'

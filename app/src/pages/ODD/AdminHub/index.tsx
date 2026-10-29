@@ -8,8 +8,8 @@ import {
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ComplianceReadySettings } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/ComplianceReadySettings'
 import { SettingsListButton } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/SettingsListButton'
 import { UserManagement } from '/app/organisms/ODD/RobotSettingsDashboard/ComplianceReady/UserManagement/UserManagement'

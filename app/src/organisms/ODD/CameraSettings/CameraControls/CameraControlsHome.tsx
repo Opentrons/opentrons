@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Icon, ListButton, StyledText } from '@opentrons/components'
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from '../preferences.module.css'

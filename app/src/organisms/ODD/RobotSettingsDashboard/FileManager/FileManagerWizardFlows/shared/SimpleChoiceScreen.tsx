@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import styles from './shared.module.css'
 

@@ -14,7 +14,7 @@ import {
 
 import stackerReleaseLatchAnimation from '/app/assets/videos/error-recovery/FlexStacker_ReleaseLatch.webm'
 import gripperReleaseAnimation from '/app/assets/videos/error-recovery/Gripper_Release.webm'
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'

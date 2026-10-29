@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, Flex, MoveLabwareOnDeck } from '@opentrons/components'
 
-import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DeckMapContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RECOVERY_MAP } from '../constants'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
@@ -10,7 +13,7 @@ import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
 import type { ComponentProps } from 'react'
-import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import type { InterventionContent } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 import type { RecoveryContentProps } from '../types'
 
 export function TwoColLwInfoAndDeck(

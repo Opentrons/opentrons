@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
-import { ChildNavigation } from '../../ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+
 import styles from './compliance_ready_settings.module.css'
 import { ToggleSetting } from './ToggleSetting'
 

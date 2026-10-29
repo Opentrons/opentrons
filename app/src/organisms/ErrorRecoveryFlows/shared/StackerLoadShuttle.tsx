@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import InstallShuttle from '/app/assets/videos/error-recovery/FlexStacker_InstallShuttle.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'

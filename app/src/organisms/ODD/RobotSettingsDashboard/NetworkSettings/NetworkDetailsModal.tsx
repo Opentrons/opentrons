@@ -13,10 +13,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void

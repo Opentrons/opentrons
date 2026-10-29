@@ -14,11 +14,11 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface TakeoverModalProps {
   title: string

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,

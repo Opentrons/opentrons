@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Chip, SPACING } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'

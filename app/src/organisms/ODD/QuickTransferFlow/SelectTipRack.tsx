@@ -12,13 +12,13 @@ import {
   LABWAREV2_DO_NOT_LIST,
 } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
 import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,

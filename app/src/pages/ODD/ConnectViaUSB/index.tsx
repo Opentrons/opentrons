@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

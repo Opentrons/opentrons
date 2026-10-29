@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { ReactNode } from 'react'

@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { IconButton } from '/app/atoms/buttons/IconButton'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,

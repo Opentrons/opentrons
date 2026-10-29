@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import styles from './shared.module.css'
 

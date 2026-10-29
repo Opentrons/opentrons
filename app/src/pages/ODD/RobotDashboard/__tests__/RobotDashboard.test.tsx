@@ -3,8 +3,8 @@ import { act, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { i18n } from '/app/i18n'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
@@ -30,7 +30,7 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ODD/RobotDashboard/EmptyRecentRun')
 vi.mock('/app/organisms/ODD/RobotDashboard/RecentRunProtocolCarousel')
-vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/components/ODD/headers/Navigation')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/redux/config')
 vi.mock('../WelcomeModal')

@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { InterventionModal } from '/app/molecules/InterventionModal'
+import { InterventionModal } from '/app/components/ODD/modals/InterventionModal'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { ReactNode } from 'react'

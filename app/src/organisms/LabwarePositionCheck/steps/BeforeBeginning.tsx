@@ -3,7 +3,10 @@ import { useSelector } from 'react-redux'
 
 import { LegacyStyledText } from '@opentrons/components'
 
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 

@@ -11,12 +11,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '../../../components/ODD/modals/OddModal/types'
 
 interface RobotSystemVersionModalProps {
   version: string

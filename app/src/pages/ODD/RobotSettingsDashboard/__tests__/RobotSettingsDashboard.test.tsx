@@ -14,9 +14,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   Devices,
@@ -86,7 +86,7 @@ vi.mock('/app/redux/robot-update', async importOriginal => {
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
-vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/components/ODD/headers/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')

@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { StepMeter, StyledText } from '@opentrons/components'
 
-import { ChildNavigation } from '../../../ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+
 import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'

@@ -12,8 +12,8 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
-import { OddModal } from '/app/molecules/OddModal'
 import {
   getDisabledWellFillFromLabwareId,
   getDisabledWellGroupForLiquidId,

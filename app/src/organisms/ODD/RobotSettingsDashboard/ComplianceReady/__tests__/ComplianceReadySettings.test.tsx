@@ -49,7 +49,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
     useLogout: vi.fn(),
   }
 })
-vi.mock('/app/atoms/SoftwareKeyboard/NumericalKeyboard', () => ({
+vi.mock('/app/components/ODD/keyboard/NumericalKeyboard', () => ({
   NumericalKeyboard: () => <div>mock numerical keyboard</div>,
 }))
 

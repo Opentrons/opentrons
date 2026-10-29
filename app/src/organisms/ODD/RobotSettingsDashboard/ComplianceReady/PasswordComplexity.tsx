@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth'
 import {
   isValidPasswordComplexityMinimumLength,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
 } from '/app/resources/auth/helpers'
 
-import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
 import {
   DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,

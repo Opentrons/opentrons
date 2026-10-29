@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { NOT_CONFIGURED } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import type { ReactNode } from 'react'

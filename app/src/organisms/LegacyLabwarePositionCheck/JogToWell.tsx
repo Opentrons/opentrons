@@ -39,7 +39,7 @@ import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labwa
 import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
 import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
 import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'

@@ -11,7 +11,7 @@ import { PasswordChange } from '../PasswordChange'
 import type { ComponentProps } from 'react'
 import type { AuthSettingsData } from '@opentrons/api-client'
 
-vi.mock('/app/atoms/SoftwareKeyboard/NumericalKeyboard', () => ({
+vi.mock('/app/components/ODD/keyboard/NumericalKeyboard', () => ({
   NumericalKeyboard: () => <div>mock numerical keyboard</div>,
 }))
 

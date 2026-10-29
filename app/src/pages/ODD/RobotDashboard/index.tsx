@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Navigation } from '/app/organisms/ODD/Navigation'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,

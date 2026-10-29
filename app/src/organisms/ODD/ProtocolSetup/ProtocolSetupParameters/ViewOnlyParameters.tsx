@@ -6,7 +6,7 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 

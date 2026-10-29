@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 

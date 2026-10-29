@@ -25,7 +25,7 @@ import {
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {

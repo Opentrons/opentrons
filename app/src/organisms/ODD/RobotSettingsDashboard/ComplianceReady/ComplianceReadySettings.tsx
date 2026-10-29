@@ -10,8 +10,8 @@ import {
   usePatchRobotServerAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useLogout } from '/app/redux/robot-auth'
 
 import { AdminActions } from './AdminActions'

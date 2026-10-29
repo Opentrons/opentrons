@@ -20,17 +20,17 @@ import {
   SPACING,
   StepMeter,
   StyledText,
-  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import {
   AlphanumericKeyboard,
   getInvalidCharForKeyboard,
-} from '/app/atoms/SoftwareKeyboard'
+} from '/app/components/ODD/keyboard'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
