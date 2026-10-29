@@ -60,7 +60,6 @@ from opentrons.protocol_engine.types import (
     NextTipInfo,
     NozzleLayoutConfigurationType,
     PickUpTipWellLocation,
-    WellLocationFunction,
 )
 from opentrons.protocol_engine.types.automatic_tip_selection import (
     NoTipAvailable,
@@ -271,11 +270,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.LIQUID_HANDLING,
                 meniscus_tracking=meniscus_tracking,
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
@@ -295,11 +293,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 (
                     end_well_location,
                     _,
-                ) = self._engine_client.state.geometry.get_relative_well_location(
+                ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
                     labware_id=labware_id,
                     well_name=well_name,
                     absolute_point=end_location.point,
-                    location_type=WellLocationFunction.LIQUID_HANDLING,
                     meniscus_tracking=end_meniscus_tracking,
                 )
                 final_location = end_location
@@ -412,11 +409,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 dynamic_liquid_tracking,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.LIQUID_HANDLING,
                 meniscus_tracking=meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
@@ -436,11 +432,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 (
                     end_well_location,
                     _,
-                ) = self._engine_client.state.geometry.get_relative_well_location(
+                ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
                     labware_id=labware_id,
                     well_name=well_name,
                     absolute_point=end_location.point,
-                    location_type=WellLocationFunction.LIQUID_HANDLING,
                     meniscus_tracking=end_meniscus_tracking,
                 )
                 assert isinstance(end_well_location, LiquidHandlingWellLocation)
@@ -526,15 +521,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 raise ValueError("Trash Bin and Waste Chute have no Wells.")
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
-
-            (
-                well_location,
-                _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            well_location = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.BASE,
             )
 
             pipette_movement_conflict.check_safe_for_pipette_movement(
@@ -636,14 +626,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
 
-        (
-            well_location,
-            _,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
-            location_type=WellLocationFunction.PICK_UP_TIP,
+        well_location = (
+            self._engine_client.state.instrument_interface.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                pick_up_tip=True,
+            )
         )
         pipette_movement_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=self._engine_client.state,
@@ -697,14 +686,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         scrape_tips = False
 
         if location is not None:
-            (
-                relative_well_location,
-                _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            relative_well_location = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.DROP_TIP,
             )
 
             well_location = DropTipWellLocation(
@@ -855,11 +840,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             (
                 well_location,
                 _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.LIQUID_HANDLING,
                 meniscus_tracking=location._meniscus_tracking,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
@@ -921,14 +905,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
-        (
-            well_location,
-            _,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
-            labware_id=labware_id,
-            well_name=well_name,
-            absolute_point=location.point,
-            location_type=WellLocationFunction.PICK_UP_TIP,
+        well_location = (
+            self._engine_client.state.instrument_interface.get_relative_well_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                absolute_point=location.point,
+                pick_up_tip=True,
+            )
         )
         assert isinstance(well_location, PickUpTipWellLocation)
         self._engine_client.execute_command(
@@ -946,14 +929,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         labware_id = well_core.labware_id
 
         if location is not None:
-            (
-                relative_well_location,
-                _,
-            ) = self._engine_client.state.geometry.get_relative_well_location(
+            relative_well_location = self._engine_client.state.instrument_interface.get_relative_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                location_type=WellLocationFunction.BASE,
             )
 
             well_location = DropTipWellLocation(
@@ -1008,12 +987,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         (
             well_location,
-            dynamic_tracking,
-        ) = self._engine_client.state.geometry.get_relative_well_location(
+            _,
+        ) = self._engine_client.state.instrument_interface.get_relative_liquid_handling_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
-            location_type=WellLocationFunction.LIQUID_HANDLING,
+            meniscus_tracking=None,
         )
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
@@ -2122,7 +2101,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Given a tip rack, return the maximum allowed volume that can be aspirated with the pipette's current volume mode."""
         return min(
             self.get_max_volume(),
-            self._engine_client.state.geometry.get_nominal_tip_geometry(
+            self._engine_client.state.instrument_interface.get_nominal_tip_geometry(
                 pipette_id=self.pipette_id,
                 labware_id=tip_rack.labware_id,
                 well_name=None,
@@ -2133,11 +2112,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self, tip_rack: LabwareCore, volume: float
     ) -> float:
         """Given a tip rack and the volume to handle, return the maximum allowed volume for the pipette, taking volume mode into consideration."""
-        max_tip_volume = self._engine_client.state.geometry.get_nominal_tip_geometry(
-            pipette_id=self.pipette_id,
-            labware_id=tip_rack.labware_id,
-            well_name=None,
-        ).volume
+        max_tip_volume = (
+            self._engine_client.state.instrument_interface.get_nominal_tip_geometry(
+                pipette_id=self.pipette_id,
+                labware_id=tip_rack.labware_id,
+                well_name=None,
+            ).volume
+        )
 
         # Get the volume mode that the pipette will be in for transferring the given volume, disregarding the current volume mode of the pipette
         volume_mode = self._engine_client.state.pipettes.get_volume_mode_from_volume(

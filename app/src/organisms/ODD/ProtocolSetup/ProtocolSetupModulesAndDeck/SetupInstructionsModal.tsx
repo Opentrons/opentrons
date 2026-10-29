@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,20 +47,20 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('branded:setup_instructions_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {INSTRUCTIONS_URL}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
         <img

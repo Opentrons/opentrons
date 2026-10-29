@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -42,8 +41,8 @@ describe('useDownloadRobotLogs', () => {
       directory: '/tmp/downloads',
       succeededPaths: ['/logs/api.log', '/logs/serial.log'],
     })
-    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({
         ...mockConnectableRobot,
@@ -66,7 +65,7 @@ describe('useDownloadRobotLogs', () => {
   })
 
   it('reports canDownload false when the robot is unreachable', () => {
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockUnreachableRobot)
 
@@ -95,7 +94,7 @@ describe('useDownloadRobotLogs', () => {
   })
 
   it('rejects when the robot cannot download', async () => {
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockUnreachableRobot)
 

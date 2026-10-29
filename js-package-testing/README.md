@@ -9,8 +9,7 @@ A Vite app and Playwright suite for exercising **packed** builds of:
 
 The demo app includes two pages: a **Deck map** page built with
 **ProtocolDeck** from `@opentrons/components`, and a **Protocol visualization**
-page built with `@opentrons/protocol-visualization`. Visual regression uses
-**Applitools Eyes**, not committed screenshots.
+page built with `@opentrons/protocol-visualization`.
 
 This project is the **reference external consumer**. It installs the four
 packages the way another app would (pack, patch manifests, link, install peer
@@ -203,7 +202,7 @@ Local dev does **not** use monorepo `workspace:*` links to source. The Makefile:
 That is as close as we get to `npm install @opentrons/components@X` without
 hitting the registry on every dev run. The demo app's `dependencies` list only
 what an external app must install (React, i18n, the four packages). Test tooling
-(Vite, Playwright, Applitools) stays in `devDependencies`.
+(Vite, Playwright) stays in `devDependencies`.
 
 ### Known limitations
 
@@ -218,26 +217,11 @@ what an external app must install (React, i18n, the four packages). Test tooling
 - **Legacy CI tag publishes** for `components@*` / `shared-data@*` tags may not
   match `publish.mts` output. Prefer `publish.mts` for all four packages.
 
-## Applitools Eyes
-
-Visual checks use [`@applitools/eyes-playwright`](https://www.npmjs.com/package/@applitools/eyes-playwright) with the fixture-based `eyes.check()` API. Baselines and diffs live in Applitools, not in this repo.
-
-### Setup
-
-1. Log in to Applitools and copy an API key from the [API keys page](https://applitools.com/app/settings/api-keys).
-2. Put the key in the environment. Easiest: copy [`.env.example`](.env.example) to **`.env`** in `js-package-testing/` (gitignored). [`playwright.config.ts`](playwright.config.ts) runs `import 'dotenv/config'` first, so **`make test`**, **`pnpm test`**, and **`pnpm exec playwright test`** load `.env` when run from this directory.
-
-   You can still `export APPLITOOLS_API_KEY=...` in the shell; values already set are not overwritten by `.env`.
-
-3. Run tests (`make test`). Checkpoints are recorded under the Eyes app name **`js-package-testing`** ([`playwright.config.ts`](playwright.config.ts) `eyesConfig.appName`).
-
-### Reports
+## Reports
 
 ```bash
 pnpm exec playwright show-report
 ```
-
-Use the Applitools UI to accept or reject visual changes when baselines need updating.
 
 ## Quick start
 
@@ -267,7 +251,6 @@ make teardown setup dev
 
 1. `make setup-js` at the monorepo root (required for packing `shared-data`, `step-generation`, `components`, and `protocol-visualization`; see Quick start).
 2. Install pnpm (see above).
-3. Set `APPLITOOLS_API_KEY` before visual tests.
 
 ## Make targets
 
@@ -292,7 +275,7 @@ Vite dev server, production build, and preview.
 
 ### `make test` / `make test-setup`
 
-Playwright + Eyes (needs API key). `test-setup` installs Chromium; run after `make setup`.
+Playwright. `test-setup` installs Chromium; run after `make setup`.
 
 ### `make teardown` / `make clean-local-packages`
 
@@ -353,7 +336,7 @@ js-package-testing/
 
 **Runtime (`dependencies`):** the four `@opentrons/*` packages (via `link:pack/...`), React 18.2, `react-i18next` 14, `i18next`, and `@fontsource/public-sans`. These mirror what an external app must install.
 
-**Dev-only (`devDependencies`):** Vite, Playwright, Applitools, TypeScript, and test typings. Library runtime deps (`styled-components`, `redux`, etc.) are bundled inside the published packages and are not listed here.
+**Dev-only (`devDependencies`):** Vite, Playwright, TypeScript, and test typings. Library runtime deps (`styled-components`, `redux`, etc.) are bundled inside the published packages and are not listed here.
 
 After upgrading Playwright, run `make test-setup` or `pnpm exec playwright install chromium` so browser binaries match.
 

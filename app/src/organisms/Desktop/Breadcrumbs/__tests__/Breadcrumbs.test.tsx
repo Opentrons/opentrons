@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
@@ -95,15 +94,15 @@ describe('Breadcrumbs', () => {
     mockAccessControlEnabled(false)
     vi.mocked(useAccountIconInitial).mockReturnValue({ showIcon: false })
 
-    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
-    when(useRunCreatedAtTimestamp).calledWith(RUN_ID).thenReturn(CREATED_AT)
-    when(getStoredProtocol)
+    vi.when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
+    vi.when(useRunCreatedAtTimestamp).calledWith(RUN_ID).thenReturn(CREATED_AT)
+    vi.when(getStoredProtocol)
       .calledWith({} as State, PROTOCOL_KEY)
       .thenReturn(storedProtocolDataFixture)
-    when(getIsOnDevice)
+    vi.when(getIsOnDevice)
       .calledWith({} as State)
       .thenReturn(false)
-    when(getProtocolDisplayName)
+    vi.when(getProtocolDisplayName)
       .calledWith(
         storedProtocolDataFixture.protocolKey,
         storedProtocolDataFixture.srcFileNames,
@@ -130,7 +129,7 @@ describe('Breadcrumbs', () => {
   })
 
   it('does not render devices breadcrumb when in on device mode', () => {
-    when(getIsOnDevice)
+    vi.when(getIsOnDevice)
       .calledWith({} as State)
       .thenReturn(true)
     render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)

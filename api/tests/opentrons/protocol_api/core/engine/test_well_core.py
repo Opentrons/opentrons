@@ -139,7 +139,7 @@ def test_get_top(
 ) -> None:
     """It should get a well top."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -156,7 +156,7 @@ def test_get_bottom(
 ) -> None:
     """It should get a well bottom."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -173,7 +173,7 @@ def test_get_center(
 ) -> None:
     """It should get a well center."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(origin=WellOrigin.CENTER),
@@ -207,13 +207,13 @@ def test_get_meniscus(
 ) -> None:
     """Get meniscus coordinates."""
     decoy.when(
-        mock_engine_client.state.geometry.get_meniscus_height(
+        mock_engine_client.state.liquid_tracking.get_meniscus_height(
             labware_id="labware-id",
             well_name="well-name",
         )
     ).then_return(1.23)
     decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(
@@ -292,7 +292,7 @@ def test_current_liquid_height(
     """Make sure current_liquid_height returns the correct meniscus value or raises an error."""
     fake_meniscus_height = 2222.2
     decoy.when(
-        mock_engine_client.state.geometry.get_meniscus_height(
+        mock_engine_client.state.liquid_tracking.get_meniscus_height(
             labware_id="labware-id", well_name="well-name"
         )
     ).then_return(fake_meniscus_height)
@@ -300,7 +300,7 @@ def test_current_liquid_height(
 
     # make sure that WellCore propagates a LiquidHeightUnknownError
     decoy.when(
-        mock_engine_client.state.geometry.get_meniscus_height(
+        mock_engine_client.state.liquid_tracking.get_meniscus_height(
             labware_id="labware-id", well_name="well-name"
         )
     ).then_raise(LiquidHeightUnknownError())
@@ -315,7 +315,7 @@ def test_current_liquid_volume(
     """Make sure current_liquid_volume returns the correct value or raises an error."""
     fake_volume = 2222.2
     decoy.when(
-        mock_engine_client.state.geometry.get_current_well_volume(
+        mock_engine_client.state.liquid_tracking.get_current_well_volume(
             labware_id="labware-id", well_name="well-name"
         )
     ).then_return(fake_volume)
@@ -323,7 +323,7 @@ def test_current_liquid_volume(
 
     # make sure that WellCore propagates a LiquidVolumeUnknownError
     decoy.when(
-        mock_engine_client.state.geometry.get_current_well_volume(
+        mock_engine_client.state.liquid_tracking.get_current_well_volume(
             labware_id="labware-id", well_name="well-name"
         )
     ).then_raise(LiquidVolumeUnknownError())
@@ -375,7 +375,7 @@ def test_estimate_liquid_height_after_pipetting(
     fake_final_height = 10000000
     decoy.when(subject.current_liquid_height()).then_return(initial_liquid_height)
     decoy.when(
-        mock_engine_client.state.geometry.get_well_height_after_liquid_handling(
+        mock_engine_client.state.liquid_tracking.get_well_height_after_liquid_handling(
             labware_id="labware-id",
             well_name="well-name",
             pipette_id="pipette-id",
@@ -405,7 +405,7 @@ def test_from_center_cartesian(
 ) -> None:
     """It should get the relative point from the center of a well."""
     decoy.when(
-        mock_engine_client.state.geometry.get_well_position(
+        mock_engine_client.state.geometry.get_base_well_position(
             labware_id="labware-id",
             well_name="well-name",
             well_location=WellLocation(origin=WellOrigin.CENTER),

@@ -9,8 +9,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -107,12 +107,12 @@ export const Liquids = (props: { protocolId: string }): ReactNode => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
-                    </LegacyStyledText>
-                    <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+                    </StyledText>
+                    <StyledText forwardedAs="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
                 </Flex>
               </TableDatum>

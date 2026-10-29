@@ -4,8 +4,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -48,7 +48,7 @@ export function ShutdownRobotConfirmationModal({
           components={{
             bold: <strong />,
             span: (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 data-testid="turn_off_robot_confirmation_description"
               />

@@ -9,8 +9,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -58,19 +58,16 @@ export function OpenDoorAlertModal(props: OpenDoorModalProps): ReactNode {
           alignItems={ALIGN_CENTER}
           width="100%"
         >
-          <LegacyStyledText
-            forwardedAs="h4"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <StyledText forwardedAs="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {doorHeader}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             forwardedAs="p"
             textAlign={TYPOGRAPHY.textAlignCenter}
             color={COLORS.grey60}
           >
             {doorText}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
     </OddModal>,

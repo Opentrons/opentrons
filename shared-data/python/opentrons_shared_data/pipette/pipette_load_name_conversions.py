@@ -1,6 +1,6 @@
 import re
 from functools import lru_cache
-from typing import List, Literal, Optional, Tuple, Union, cast
+from typing import List, Literal, Optional, Tuple, Union
 
 from .pipette_definition import (
     PipetteModelVersionType,
@@ -10,8 +10,6 @@ from .types import (
     PipetteChannelType,
     PipetteGenerationType,
     PipetteModel,
-    PipetteModelMajorVersionType,
-    PipetteModelMinorVersionType,
     PipetteModelType,
     PipetteName,
     PipetteOEMType,
@@ -104,9 +102,9 @@ def version_from_string(version: str) -> PipetteVersionType:
 
     """
     version_list = [v for v in re.split("\\.|[v]", version) if v]
-    major = cast(PipetteModelMajorVersionType, int(version_list[0]))
+    major = int(version_list[0])
     if len(version_list) > 1:
-        minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+        minor = int(version_list[1])
     else:
         minor = 0
     return PipetteVersionType(major, minor)
@@ -166,7 +164,7 @@ def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersi
         paths_to_validate / channel_from_pipette_name / model_from_pipette_name
     )
 
-    highest_minor_version: PipetteModelMinorVersionType = 0
+    highest_minor_version: int = 0
 
     for version_file in version_paths.iterdir():
         version_list = version_file.stem.split("_")
@@ -176,13 +174,10 @@ def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersi
         # Check if the major version matches the expected major version
         if major_version == str(major_version_from_pipette_name):
             minor_version_int = int(minor_version)
-            minor_version_lit: PipetteModelMinorVersionType = cast(
-                PipetteModelMinorVersionType, minor_version_int
-            )
 
             # Update the highest minor version if this version is higher
-            if highest_minor_version < minor_version_lit:
-                highest_minor_version = minor_version_lit
+            if highest_minor_version < minor_version_int:
+                highest_minor_version = minor_version_int
 
     return PipetteVersionType(major_version_from_pipette_name, highest_minor_version)
 

@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
@@ -23,7 +22,7 @@ describe('WellSpacing', () => {
       onSubmit: vi.fn(),
     }
 
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['gridSpacingX', 'gridSpacingY'], expect.any(Object))
       .thenReturn(false)
   })
@@ -34,10 +33,10 @@ describe('WellSpacing', () => {
 
   it('should render when fields are visible', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('FAKE LABWARE NAME SINGULAR')
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
 
@@ -75,7 +74,7 @@ describe('WellSpacing', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['gridSpacingX', 'gridSpacingY'], formikConfig.initialValues)
       .thenReturn(true)
     const { container } = render(wrapInFormik(<WellSpacing />, formikConfig))

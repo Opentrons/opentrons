@@ -1,7 +1,6 @@
 // app-shell self-update tests
 import { EventEmitter } from 'events'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 
@@ -86,7 +85,7 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    when(Cfg.getConfig)
+    vi.when(Cfg.getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'dev',
@@ -107,7 +106,7 @@ describe('update', () => {
     })
   })
   it('automatically downloads updates if enabled', () => {
-    when(Cfg.getConfig)
+    vi.when(Cfg.getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'dev',
@@ -133,7 +132,7 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with no available update', () => {
-    when(Cfg.getConfig)
+    vi.when(Cfg.getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'dev',
@@ -151,7 +150,7 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with error', () => {
-    when(Cfg.getConfig)
+    vi.when(Cfg.getConfig)
       .calledWith('update')
       .thenReturn({
         channel: 'dev',

@@ -7,11 +7,6 @@ from typing import Any, Callable, Dict, Generator
 import pytest
 import requests
 
-from opentrons.calibration_storage.ot2 import (
-    clear_pipette_offset_calibrations,
-    clear_tip_length_calibration,
-)
-
 from .dev_server import DevServer
 from .robot_client import RobotClient
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
@@ -110,8 +105,6 @@ def _clean_server_state(base_url: str) -> None:
             await _delete_all_protocols(robot_client)
             await _delete_all_data_files(robot_client)
 
-            await _delete_all_sessions(robot_client)
-
             await _reset_deck_configuration(robot_client)
             await _reset_error_recovery_settings(robot_client)
             await _delete_client_data(robot_client)
@@ -144,13 +137,6 @@ async def _delete_all_data_files(robot_client: RobotClient) -> None:
         await robot_client.delete_data_file(file_id)
 
 
-async def _delete_all_sessions(robot_client: RobotClient) -> None:
-    all_sessions_response = await robot_client.get_sessions()
-    session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
-    for session_id in session_ids:
-        await robot_client.delete_session(session_id)
-
-
 async def _delete_client_data(robot_client: RobotClient) -> None:
     await robot_client.delete_all_client_data()
 
@@ -165,9 +151,3 @@ async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
 
 async def _delete_labware_offsets(robot_client: RobotClient) -> None:
     await robot_client.delete_all_labware_offsets()
-
-
-@pytest.fixture
-def clean_ot2_calibrations(server_temp_directory: str) -> None:
-    clear_tip_length_calibration()
-    clear_pipette_offset_calibrations()

@@ -10,7 +10,6 @@ import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLang
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { GeneralSettings } from '/app/pages/Desktop/AppSettings/GeneralSettings'
-import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
@@ -34,7 +33,6 @@ vi.mock('/app/LocalizationProvider')
 vi.mock('/app/organisms/Desktop/Breadcrumbs')
 vi.mock('/app/organisms/Desktop/SystemLanguagePreferenceModal')
 vi.mock('/app/pages/Desktop/AppSettings/GeneralSettings')
-vi.mock('/app/pages/Desktop/Devices/CalibrationDashboard')
 vi.mock('/app/pages/Desktop/Devices/DeviceDetails')
 vi.mock('/app/pages/Desktop/Devices/DevicesLanding')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolsLanding')
@@ -71,9 +69,6 @@ const render = (path = '/') => {
 
 describe('DesktopApp', () => {
   beforeEach(() => {
-    vi.mocked(CalibrationDashboard).mockReturnValue(
-      <div>Mock CalibrationDashboard</div>
-    )
     vi.mocked(DeviceDetails).mockReturnValue(<div>Mock DeviceDetails</div>)
     vi.mocked(DevicesLanding).mockReturnValue(<div>Mock DevicesLanding</div>)
     vi.mocked(ProtocolsLanding).mockReturnValue(
@@ -135,11 +130,6 @@ describe('DesktopApp', () => {
   it('renders a RobotSettings component from /devices/:robotName/robot-settings/:robotSettingsTab', () => {
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('Mock RobotSettings')
-  })
-
-  it('renders a CalibrationDashboard component from /devices/:robotName/robot-settings/calibration/dashboard', () => {
-    render('/devices/otie/robot-settings/calibration/dashboard')
-    screen.getByText('Mock CalibrationDashboard')
   })
 
   it('renders a ProtocolsLanding component from /protocols', () => {

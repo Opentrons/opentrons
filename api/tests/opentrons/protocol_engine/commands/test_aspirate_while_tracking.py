@@ -109,7 +109,7 @@ async def test_aspirate_while_tracking_implementation(
         flowRate=1.234,
     )
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
@@ -117,7 +117,7 @@ async def test_aspirate_while_tracking_implementation(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id=stateupdateLabware,
             well_name=stateupdateWell,
             well_location=well_location,
@@ -127,7 +127,7 @@ async def test_aspirate_while_tracking_implementation(
     ).then_return(Point(1, 2, 3))
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -306,7 +306,7 @@ async def test_aspirate_raises_volume_error(
         True
     )
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=well_location,
@@ -385,14 +385,14 @@ async def test_overpressure_error(
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             "funky-labware", "funky-well", "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -417,7 +417,7 @@ async def test_overpressure_error(
     decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id="funky-labware",
             well_name="funky-well",
             well_location=well_location,

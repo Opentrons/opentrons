@@ -61,7 +61,6 @@ setup: setup-js setup-py
 # front-end dependencies handled by pnpm
 .PHONY: setup-js
 setup-js:
-	pnpm config set network-timeout 60000
 	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
@@ -69,7 +68,6 @@ setup-js:
 # front-end dependencies install for CI
 .PHONY: setup-js-ci
 setup-js-ci:
-	pnpm config set network-timeout 60000
 	pnpm install --frozen-lockfile
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup

@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -47,8 +46,8 @@ const render = (path = '/') => {
 
 describe('DeviceDetails', () => {
   beforeEach(() => {
-    when(useRobot).calledWith('otie').thenReturn(null)
-    when(getScanning)
+    vi.when(useRobot).calledWith('otie').thenReturn(null)
+    vi.when(getScanning)
       .calledWith({} as State)
       .thenReturn(false)
     vi.mocked(useParams).mockReturnValue({ robotName: 'otie' })
@@ -61,7 +60,7 @@ describe('DeviceDetails', () => {
   })
 
   it('renders null when a robot is not found and discovery client is scanning', () => {
-    when(getScanning)
+    vi.when(getScanning)
       .calledWith({} as State)
       .thenReturn(true)
     render('/devices/otie')
@@ -72,7 +71,7 @@ describe('DeviceDetails', () => {
   })
 
   it('renders a RobotOverview when a robot is found and syncs clock', () => {
-    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    vi.when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
     render('/devices/otie')
 
     expect(vi.mocked(RobotOverview)).toHaveBeenCalled()
@@ -80,13 +79,13 @@ describe('DeviceDetails', () => {
   })
 
   it('renders InstrumentsAndModules when a robot is found', () => {
-    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    vi.when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
     render('/devices/otie')
     expect(vi.mocked(InstrumentsAndModules)).toHaveBeenCalled()
   })
 
   it('renders RecentProtocolRuns when a robot is found', () => {
-    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    vi.when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
     vi.mocked(useParams).mockReturnValue({
       robotName: 'otie',
       deviceDetailsTab: 'run-history',

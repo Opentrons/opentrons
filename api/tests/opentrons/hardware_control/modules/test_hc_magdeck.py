@@ -4,7 +4,7 @@ from typing import AsyncGenerator
 import pytest
 
 from . import require_live_data_real_string
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.magdeck import MagDeck
 from opentrons.hardware_control.modules.types import (

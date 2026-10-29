@@ -8,7 +8,7 @@ from decoy import Decoy, matchers
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandSlice,
+    JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -371,7 +371,13 @@ async def test_get_run_commands(
             cursor=None,
             length=42,
         )
-    ).then_return(CommandSlice(commands=[command], cursor=1, total_length=3))
+    ).then_return(
+        JsonCommandSlice(
+            commands=[command.model_dump_json(by_alias=True, exclude_none=True)],
+            cursor=1,
+            total_length=3,
+        )
+    )
 
     result = await get_run_commands(
         runId="run-id",
@@ -398,7 +404,7 @@ async def test_get_run_commands(
                 detail="Things are not looking good.",
             ),
             failedCommandId="failed-command-id",
-        )
+        ).model_dump(by_alias=True, exclude_none=True)
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.content.links == CommandCollectionLinks(
@@ -438,7 +444,7 @@ async def test_get_run_commands_empty(
         await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
-    ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
+    ).then_return(JsonCommandSlice(commands=[], cursor=0, total_length=0))
 
     result = await get_run_commands(
         runId="run-id",

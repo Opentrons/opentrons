@@ -12,7 +12,7 @@ from decoy import Decoy
 from fastapi import Response
 from fastapi.responses import FileResponse, StreamingResponse
 
-from opentrons.protocol_engine import CommandSlice
+from opentrons.protocol_engine import JsonCommandSlice
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine import types as pe_types
 from opentrons.types import DeckSlotName
@@ -99,8 +99,12 @@ async def _stub_run_record_for_download(
     decoy.when(await run_data_manager.get(run_id)).then_return(mock_run_record)
 
     command = _make_home_command()
-    empty_slice = CommandSlice(commands=[], cursor=0, total_length=1)
-    full_slice = CommandSlice(commands=[command], cursor=0, total_length=1)
+    empty_slice = JsonCommandSlice(commands=[], cursor=0, total_length=1)
+    full_slice = JsonCommandSlice(
+        commands=[command.model_dump_json(by_alias=True, exclude_none=True)],
+        cursor=0,
+        total_length=1,
+    )
     decoy.when(
         await run_data_manager.get_commands_slice(
             run_id=run_id,

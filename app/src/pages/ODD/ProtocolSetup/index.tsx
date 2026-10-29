@@ -14,10 +14,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -646,20 +646,20 @@ function PrepareToRun({
           >
             {!isLoading ? (
               <>
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {t('prepare_to_run')}
-                </LegacyStyledText>
-                <LegacyStyledText
+                </StyledText>
+                <StyledText
                   forwardedAs="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {truncateString(protocolName, 100)}
-                </LegacyStyledText>
+                </StyledText>
               </>
             ) : (
               <ProtocolSetupTitleSkeleton />

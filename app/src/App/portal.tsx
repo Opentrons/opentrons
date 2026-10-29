@@ -40,7 +40,7 @@ export function ModalPortalRoot(): ReactNode {
 export function TopPortalRoot(): ReactNode {
   return (
     <Box
-      zIndex={Z_INDEX.MODALS}
+      zIndex={Z_INDEX.BLOCKING_MODALS}
       id={TOP_PORTAL_ID}
       data-testid={TOP_PORTAL_ID}
     />

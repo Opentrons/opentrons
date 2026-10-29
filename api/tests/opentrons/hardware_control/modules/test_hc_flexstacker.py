@@ -28,7 +28,7 @@ from opentrons.drivers.flex_stacker.types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.flex_stacker import (
     HOME_OFFSET_MD,

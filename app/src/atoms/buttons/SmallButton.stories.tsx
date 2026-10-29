@@ -1,6 +1,6 @@
 import { VIEWPORT } from '@opentrons/components'
 
-import { SmallButton } from './'
+import { SmallButton } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

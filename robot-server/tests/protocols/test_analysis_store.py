@@ -406,6 +406,7 @@ async def test_update_adds_rtp_values_to_completed_store(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
@@ -591,6 +592,7 @@ async def test_save_initialization_failed_analysis(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.NOT_OK.value,
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)

@@ -6,10 +6,10 @@ import {
   Icon,
   InlineNotification,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -51,12 +51,9 @@ export function RobotSetupHeader({
             <Icon name="back" size="3rem" color={COLORS.black90} />
           </Btn>
         ) : null}
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
-        </LegacyStyledText>
+        </StyledText>
         {onClickButton != null && buttonText != null ? (
           <SmallButton
             buttonCategory="rounded"

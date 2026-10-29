@@ -12,8 +12,8 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
@@ -103,7 +103,7 @@ export function DisplayWifiList({
                 }}
               >
                 <Icon name="wifi" size="2.5rem" />
-                <LegacyStyledText forwardedAs="h4">{nw.ssid}</LegacyStyledText>
+                <StyledText forwardedAs="h4">{nw.ssid}</StyledText>
               </Btn>
             ))
           : null}
@@ -121,9 +121,7 @@ export function DisplayWifiList({
           gridGap={SPACING.spacing4}
         >
           <Icon name="plus" size="2.5rem" color={COLORS.black90} />
-          <LegacyStyledText forwardedAs="h4">
-            {t('join_other_network')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="h4">{t('join_other_network')}</StyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
       </Flex>

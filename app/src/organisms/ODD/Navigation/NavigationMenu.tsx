@@ -8,10 +8,10 @@ import {
   COLORS,
   Flex,
   Icon,
-  LegacyStyledText,
   MenuItem,
   MenuList,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -107,13 +107,13 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
                 size="2.5rem"
               />
             )}
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('home_gantry')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="restart" onClick={handleRestart}>
@@ -124,13 +124,13 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
               color={COLORS.black90}
               aria-label="restart_icon"
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('robot_controls:restart_label')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         {isFlex ? (
@@ -142,13 +142,13 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
                 color={COLORS.black90}
                 aria-label="power-off_icon"
               />
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing12}
               >
                 {t('robot_controls:turn_off_label')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </MenuItem>
         ) : null}
@@ -160,13 +160,13 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('deck_configuration')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="light" onClick={toggleLights}>
@@ -177,7 +177,7 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
               color={COLORS.black90}
               aria-label="light_icon"
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
@@ -186,7 +186,7 @@ export function NavigationMenu(props: NavigationMenuProps): ReactNode {
                 t(lightsOn ? 'lights_off' : 'lights_on'),
                 'capitalize'
               )}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
       </MenuList>

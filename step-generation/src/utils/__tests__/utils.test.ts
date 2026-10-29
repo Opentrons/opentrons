@@ -1,7 +1,6 @@
 // todo(mm, 2025-12-12): Rename this file to something that reflects the part of utils/ that it's testing.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   fixture96Plate as _fixture96Plate,
@@ -841,7 +840,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
   })
 
   it('should return true when there is tall labware next to a heater shaker', () => {
-    when(getIsLabwareAboveHeight)
+    vi.when(getIsLabwareAboveHeight)
       .calledWith(fakeLabwareDef, MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM)
       .thenReturn(true)
     expect(
@@ -849,7 +848,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
     ).toBe(true)
   })
   it('should return false when there is NO tall labware', () => {
-    when(getIsLabwareAboveHeight)
+    vi.when(getIsLabwareAboveHeight)
       .calledWith(
         expect.any(Object),
         MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
@@ -861,7 +860,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
   })
   it('should return false when there is NO labware next to a heater shaker', () => {
     labwareState.labwareId.stack = ['labwareId', '9']
-    when(getIsLabwareAboveHeight)
+    vi.when(getIsLabwareAboveHeight)
       .calledWith(
         expect.any(Object),
         MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM

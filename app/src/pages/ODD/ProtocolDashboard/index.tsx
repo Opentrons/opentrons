@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Z_INDEX,
 } from '@opentrons/components'
 import {
@@ -194,13 +194,13 @@ export function ProtocolDashboard({
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
-              </LegacyStyledText>
+              </StyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}

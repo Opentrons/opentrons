@@ -15,10 +15,11 @@ from typing import (
 from opentrons import config
 from opentrons.protocol_engine import (
     Command,
+    CommandAdapter,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
+    JsonCommandSlice,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
@@ -48,6 +49,7 @@ from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
 from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.persistence.pydantic import json_to_pydantic
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
 
@@ -518,7 +520,7 @@ class RunDataManager:
         cursor: Optional[int],
         length: int,
         include_fixit_commands: bool,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
@@ -534,11 +536,12 @@ class RunDataManager:
             run_id == self._run_orchestrator_store.current_run_id
             and not await self._run_orchestrator_store.get_commands_deleted()
         ):
-            return await self._run_orchestrator_store.get_command_slice(
+            commands_slice = await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
                 include_fixit_commands=include_fixit_commands,
             )
+            return commands_slice
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
@@ -778,7 +781,7 @@ class RunDataManager:
         )
         if not command_slice.commands:
             return None
-        command = command_slice.commands[-1]
+        command = json_to_pydantic(CommandAdapter, command_slice.commands[-1])
 
         return (
             CommandPointer(

@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -27,7 +26,7 @@ vi.mock('../IncompatibleModuleODDModalBody')
 vi.mock('../IncompatibleModuleDesktopModalBody')
 
 const getRenderer = (incompatibleModules: AttachedModule[]) => {
-  when(useIncompatibleModulesAttached)
+  vi.when(useIncompatibleModulesAttached)
     .calledWith(expect.anything())
     .thenReturn(incompatibleModules)
   vi.mocked(IncompatibleModuleODDModalBody).mockReturnValue(

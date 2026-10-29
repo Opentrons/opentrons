@@ -1,6 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockRunningRun } from '/app/resources/runs/__fixtures__'
 import { useNotifyAllRunsQuery } from '/app/resources/runs/useNotifyAllRunsQuery'
@@ -31,7 +30,7 @@ const MOCK_RUN_EARLIER: RunData = {
 }
 
 describe('useHistoricRunDetails', () => {
-  when(useNotifyAllRunsQuery)
+  vi.when(useNotifyAllRunsQuery)
     .calledWith({}, undefined, undefined)
     .thenReturn(
       mockSuccessQueryResults({
@@ -50,7 +49,7 @@ describe('useHistoricRunDetails', () => {
     })
   })
   it('returns historical run details with newest first to specific host', async () => {
-    when(useNotifyAllRunsQuery)
+    vi.when(useNotifyAllRunsQuery)
       .calledWith({}, undefined, { hostname: 'fakeIp' })
       .thenReturn(
         mockSuccessQueryResults({

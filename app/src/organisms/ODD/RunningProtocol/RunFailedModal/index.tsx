@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -96,9 +96,9 @@ export function RunFailedModal({
             runStatus={runStatus}
           />
         </div>
-        <LegacyStyledText forwardedAs="p" className={styles.contact_text}>
+        <StyledText forwardedAs="p" className={styles.contact_text}>
           {t('branded:contact_information')}
-        </LegacyStyledText>
+        </StyledText>
         <SmallButton
           width="100%"
           buttonType="alert"

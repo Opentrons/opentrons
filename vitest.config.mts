@@ -177,6 +177,11 @@ export default defineConfig({
         find: /^\/app\/(?!src\/)/,
         replacement: path.resolve('./app/src/') + '/',
       },
+      // vitest 5 needs this prioritized before /src since they live outside it
+      {
+        find: /^\/protocol-designer\/fixtures\//,
+        replacement: path.resolve('./protocol-designer/fixtures/') + '/',
+      },
       {
         find: /^\/protocol-designer\/(?!src\/)/,
         replacement: path.resolve('./protocol-designer/src/') + '/',

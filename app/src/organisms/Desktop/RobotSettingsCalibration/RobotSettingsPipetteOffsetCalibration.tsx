@@ -13,7 +13,6 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { usePipetteOffsetCalibrations } from '../Devices/hooks'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
@@ -37,7 +36,6 @@ export function RobotSettingsPipetteOffsetCalibration({
   const { data: instrumentsData } = useInstrumentsQuery({
     enabled: isFlex,
   })
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const attachedPipettesFromInstrumentsQuery =
     useAttachedPipettesFromInstrumentsQuery()
   const ot3AttachedLeftPipetteOffsetCal =
@@ -46,12 +44,9 @@ export function RobotSettingsPipetteOffsetCalibration({
     attachedPipettesFromInstrumentsQuery.right?.data?.calibratedOffset ?? null
 
   let showPipetteOffsetCalItems = false
-  if (!isFlex && pipetteOffsetCalibrations != null) {
-    showPipetteOffsetCalItems = true
-  } else if (
-    isFlex &&
-    (ot3AttachedLeftPipetteOffsetCal != null ||
-      ot3AttachedRightPipetteOffsetCal != null)
+  if (
+    ot3AttachedLeftPipetteOffsetCal != null ||
+    ot3AttachedRightPipetteOffsetCal != null
   ) {
     showPipetteOffsetCalItems = true
   }

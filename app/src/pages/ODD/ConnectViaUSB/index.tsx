@@ -11,11 +11,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StepMeter,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
@@ -67,12 +67,9 @@ export function ConnectViaUSB(): ReactNode {
             </Flex>
           </Btn>
           <Flex>
-            <LegacyStyledText
-              forwardedAs="h2"
-              fontWeight={TYPOGRAPHY.fontWeightBold}
-            >
+            <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
               {t('usb')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
         {isConnected ? (
@@ -93,19 +90,16 @@ export function ConnectViaUSB(): ReactNode {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <LegacyStyledText
-                  as="h3"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                >
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('successfully_connected')}
-                </LegacyStyledText>
-                <LegacyStyledText
+                </StyledText>
+                <StyledText
                   as="h4"
                   color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('branded:find_your_robot')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </Flex>
             <MediumButton
@@ -133,26 +127,23 @@ export function ConnectViaUSB(): ReactNode {
               gridGap={SPACING.spacing4}
               justifyContent={JUSTIFY_CENTER}
             >
-              <LegacyStyledText
-                as="h3"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('no_connection_found')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
               >
-                <LegacyStyledText as="h4" color={COLORS.grey60}>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_1')}
-                </LegacyStyledText>
-                <LegacyStyledText as="h4" color={COLORS.grey60}>
+                </StyledText>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_2')}
-                </LegacyStyledText>
-                <LegacyStyledText as="h4" color={COLORS.grey60}>
+                </StyledText>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('branded:connect_via_usb_description_3')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </Flex>
           </Flex>

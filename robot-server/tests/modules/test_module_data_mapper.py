@@ -3,8 +3,8 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.drivers.rpi_drivers.types import PortGroup
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.usb.types import PortGroup
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     FlexStackerStatus,

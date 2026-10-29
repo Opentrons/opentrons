@@ -1,5 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import {
+  resolveBooleanRuntimeValue,
   resolveNumericRuntimeValue,
   resolveStringRuntimeValue,
   uuid,
@@ -16,8 +17,11 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceStepGenArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { isAirGap } = args
   const { runtimeParameters } = invariantContext
+  const isAirGap =
+    args.isAirGap == null
+      ? undefined
+      : resolveBooleanRuntimeValue(args.isAirGap, runtimeParameters)
   const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
   const volume = resolveNumericRuntimeValue(args.volume, runtimeParameters)
   const flowRate = resolveNumericRuntimeValue(args.flowRate, runtimeParameters)
@@ -35,6 +39,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceStepGenArgs> = (
     args.flowRate,
     args.pushOut,
     args.correctionVolume,
+    args.isAirGap,
   ]
   const resolvedValues = [
     pipetteId,
@@ -42,6 +47,7 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceStepGenArgs> = (
     flowRate,
     pushOut,
     correctionVolume,
+    isAirGap,
   ]
   const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
     typeof value === 'string' && resolvedValues[i] == null

@@ -1,0 +1,15 @@
+.protocol_name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+
+.protocol_name_full {
+  -webkit-line-clamp: 1;
+}
+
+.protocol_name_half,
+.protocol_name_regular {
+  -webkit-line-clamp: 2;
+}

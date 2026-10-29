@@ -37,4 +37,7 @@ export const Z_INDEX = {
 
   /** Login toasts - for specific notifications shown during login */
   LOGIN_TOASTS: 106,
+
+  /** Encryption key modal */
+  ENCRYPTION_KEY_MODAL: 110,
 }

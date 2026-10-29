@@ -16,10 +16,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Tabs,
   truncateString,
   TYPOGRAPHY,
@@ -145,14 +145,14 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <ProtocolDetailsHeaderTitleSkeleton />
           )}
@@ -232,24 +232,21 @@ const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
         overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -257,9 +254,9 @@ const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <StyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</LegacyStyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )
@@ -482,13 +479,13 @@ export function ProtocolDetails(): JSX.Element | null {
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
                     onClick={() => {

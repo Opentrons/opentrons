@@ -55,7 +55,7 @@ export function RobotCertImportModal(
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
-      zIndexOverlay={Z_INDEX.COMPLIANCE_MODALS}
+      zIndexOverlay={Z_INDEX.ENCRYPTION_KEY_MODAL}
     >
       <div className={styles.robot_cert_import_container}>
         <div className={styles.text_block}>

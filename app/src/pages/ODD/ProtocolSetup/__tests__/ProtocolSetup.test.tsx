@@ -1,12 +1,10 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockHeaterShaker, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
-  useAllPipetteOffsetCalibrationsQuery,
   useCamera,
   useCreateProtocolAnalysisMutation,
   useInstrumentsQuery,
@@ -255,10 +253,10 @@ describe('ProtocolSetup', () => {
         robot_serial: ROBOT_SERIAL_NUMBER,
       },
     } as any)
-    when(vi.mocked(useRobotType))
+    vi.when(vi.mocked(useRobotType))
       .calledWith(ROBOT_NAME)
       .thenReturn(FLEX_ROBOT_TYPE)
-    when(vi.mocked(useRunControls))
+    vi.when(vi.mocked(useRunControls))
       .calledWith(
         RUN_ID,
         undefined,
@@ -280,16 +278,16 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockEmptyAnalysis,
     } as any)
-    when(vi.mocked(useRunCreatedAtTimestamp))
+    vi.when(vi.mocked(useRunCreatedAtTimestamp))
       .calledWith(RUN_ID)
       .thenReturn(CREATED_AT)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockEmptyAnalysis, flexDeckDefV5 as any)
       .thenReturn([])
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(vi.mocked(getDeckDefFromRobotType))
+    vi.when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
       .thenReturn(flexDeckDefV5 as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
@@ -302,7 +300,7 @@ describe('ProtocolSetup', () => {
       },
     } as any)
     vi.mocked(useCamera).mockReturnValue({ data: {} } as any)
-    when(vi.mocked(useProtocolAnalysisErrors))
+    vi.when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
@@ -314,27 +312,24 @@ describe('ProtocolSetup', () => {
         analysisSummaries: [{ id: 'fake-analysis-id', status: 'completed' }],
       },
     }
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({ data: protocolRecord } as any)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
       .thenReturn({ data: protocolRecord } as any)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, undefined)
       .thenReturn({ data: protocolRecord } as any)
-    when(vi.mocked(useInstrumentsQuery))
+    vi.when(vi.mocked(useInstrumentsQuery))
       .calledWith()
       .thenReturn({
         data: {
           data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
         },
       } as any)
-    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
-      .calledWith()
-      .thenReturn({ data: { data: [] } } as any)
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
-    when(vi.mocked(useIsDoorOpen))
+    vi.when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockDoorStatus)
     vi.mocked(useModulesQuery).mockReturnValue({
@@ -343,18 +338,18 @@ describe('ProtocolSetup', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<SharedData.DeckConfiguration>)
-    when(vi.mocked(useToaster))
+    vi.when(vi.mocked(useToaster))
       .calledWith()
       .thenReturn({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
-    when(vi.mocked(useTrackProtocolRunEvent))
+    vi.when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
 
-    when(vi.mocked(useCameraAnalytics))
+    vi.when(vi.mocked(useCameraAnalytics))
       .calledWith({ source: 'runRecord', robotType: 'OT-3 Standard' })
       .thenReturn({
         reportCameraSettings: vi.fn(),
@@ -419,10 +414,10 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
@@ -458,10 +453,10 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
@@ -473,10 +468,10 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup`)
@@ -492,7 +487,7 @@ describe('ProtocolSetup', () => {
         runTimeParameters: mockRunTimeParameterData,
       },
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(
         {
           ...mockRobotSideAnalysis,
@@ -501,7 +496,7 @@ describe('ProtocolSetup', () => {
         flexDeckDefV5 as any
       )
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
@@ -525,7 +520,7 @@ describe('ProtocolSetup', () => {
     )
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByText('Camera'))
-    expect(MockProtocolSetupOffsets).toHaveBeenCalled()
+    expect(MockProtocolSetupCamera).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupCamera/)
   })
 
@@ -534,10 +529,10 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
@@ -620,7 +615,7 @@ describe('ProtocolSetup', () => {
       isDoorOpen: true,
       moduleDoorLocation: null,
     }
-    when(vi.mocked(useIsDoorOpen))
+    vi.when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
@@ -638,7 +633,7 @@ describe('ProtocolSetup', () => {
       isDoorOpen: true,
       moduleDoorLocation: NOT_CONFIGURED,
     }
-    when(vi.mocked(useIsDoorOpen))
+    vi.when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
@@ -654,10 +649,10 @@ describe('ProtocolSetup', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(vi.mocked(getProtocolModulesInfo))
+    vi.when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
-    when(vi.mocked(getUnmatchedModulesForProtocol))
+    vi.when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIncompleteInstrumentCount).mockReturnValue(0)
@@ -687,10 +682,10 @@ describe('ProtocolSetup', () => {
         analysisSummaries: [],
       },
     }
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({ data: protocolRecord } as any)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, true)
       .thenReturn({ data: protocolRecord } as any)
 

@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -82,21 +82,21 @@ export function WelcomeModal({
             width="454px"
             height="128px"
           />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_to_your_dashboard')}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_modal_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <SmallButton buttonText={t('shared:next')} onClick={handleCloseModal} />
       </Flex>

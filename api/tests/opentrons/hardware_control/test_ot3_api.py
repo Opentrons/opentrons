@@ -101,8 +101,8 @@ from opentrons.hardware_control.modules import (
     VacuumModule,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.ot3_calibration import DeckCalibration
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,

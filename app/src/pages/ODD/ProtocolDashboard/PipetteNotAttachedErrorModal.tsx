@@ -4,8 +4,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -37,9 +37,9 @@ export const PipetteNotAttachedErrorModal = (
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
+        <StyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('branded:attach_a_pipette_for_quick_transfer')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"

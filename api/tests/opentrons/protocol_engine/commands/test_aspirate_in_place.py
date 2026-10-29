@@ -104,7 +104,7 @@ async def test_aspirate_in_place_implementation(
         flowRate=1.234,
     )
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_store.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
@@ -112,7 +112,7 @@ async def test_aspirate_in_place_implementation(
     ).then_return(2)
 
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_store.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -271,7 +271,7 @@ async def test_overpressure_error(
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_store.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id",
@@ -279,7 +279,7 @@ async def test_overpressure_error(
     ).then_return(2)
 
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_store.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id"
         )
     ).then_return(["A3", "A4"])

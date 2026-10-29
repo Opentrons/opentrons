@@ -23,9 +23,9 @@ from ..protocol_engine import (
     CommandCreate,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     DeckType,
     ErrorOccurrence,
+    JsonCommandSlice,
     ProtocolEngine,
     StateSummary,
 )
@@ -301,7 +301,7 @@ class RunOrchestrator(AbstractRunCoordinator):
 
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:

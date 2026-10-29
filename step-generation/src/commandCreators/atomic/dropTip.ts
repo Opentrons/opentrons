@@ -1,5 +1,9 @@
 import * as errorCreators from '../../errorCreators'
-import { resolveStringRuntimeValue, uuid } from '../../utils'
+import {
+  resolveBooleanRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -17,8 +21,11 @@ export const dropTip: CommandCreator<DropTipStepGenArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { isReturnTip } = args
   const { runtimeParameters } = invariantContext
+  const isReturnTip =
+    args.isReturnTip == null
+      ? undefined
+      : resolveBooleanRuntimeValue(args.isReturnTip, runtimeParameters)
   const pipette = resolveStringRuntimeValue(args.pipette, runtimeParameters)
   const dropTipLocation =
     args.dropTipLocation == null
@@ -28,8 +35,13 @@ export const dropTip: CommandCreator<DropTipStepGenArgs> = (
     args.wellName == null
       ? undefined
       : resolveStringRuntimeValue(args.wellName, runtimeParameters)
-  const rawValues = [args.pipette, args.dropTipLocation, args.wellName]
-  const resolvedValues = [pipette, dropTipLocation, wellName]
+  const rawValues = [
+    args.pipette,
+    args.dropTipLocation,
+    args.wellName,
+    args.isReturnTip,
+  ]
+  const resolvedValues = [pipette, dropTipLocation, wellName, isReturnTip]
   const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
     typeof value === 'string' && resolvedValues[i] == null
       ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]

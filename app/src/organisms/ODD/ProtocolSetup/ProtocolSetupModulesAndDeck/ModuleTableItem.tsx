@@ -9,9 +9,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
@@ -252,14 +252,14 @@ export function ModuleTableItem({
         )
       case 'calibrationBlocked':
         return (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {calibrationStatus?.reason === 'attach_pipette_failure_reason'
               ? t('calibration_required_attach_pipette_first')
               : t('calibration_required_calibrate_pipette_first')}
-          </LegacyStyledText>
+          </StyledText>
         )
       case 'needsCalibration':
         return (
@@ -322,14 +322,14 @@ export function ModuleTableItem({
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {comboFixtureId != null
               ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
           <RobotInfoLabel

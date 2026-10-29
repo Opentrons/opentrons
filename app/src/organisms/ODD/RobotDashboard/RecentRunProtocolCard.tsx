@@ -18,9 +18,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -247,23 +247,23 @@ export function ProtocolWithLastRun({
         )}
       </Flex>
       <Flex width="100%" height="14rem">
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
           fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight42}
           css={PROTOCOL_TEXT_STYLE}
         >
           {protocolName}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
-      <LegacyStyledText
+      <StyledText
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.grey60}
       >
         {buildLastRunCopy()}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

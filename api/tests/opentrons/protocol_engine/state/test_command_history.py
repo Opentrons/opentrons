@@ -117,8 +117,8 @@ def test_get_slice(command_history: CommandHistory) -> None:
     command_history._add("1", command_entry_2)
     command_history._add("2", command_entry_3)
     assert command_history.get_slice(1, 3) == [
-        command_entry_2.command,
-        command_entry_3.command,
+        command_entry_2.command.model_dump_json(exclude_none=True, by_alias=True),
+        command_entry_3.command.model_dump_json(exclude_none=True, by_alias=True),
     ]
 
 
@@ -314,5 +314,5 @@ def test_get_slice_with_filtered_list(command_history: CommandHistory) -> None:
     command_history._add("2", command_entry_3)
     filtered_list = ["0", "1"]
     assert command_history.get_slice(1, 3, command_ids=filtered_list) == [
-        command_entry_2.command,
+        command_entry_2.command.model_dump_json(exclude_none=True, by_alias=True),
     ]

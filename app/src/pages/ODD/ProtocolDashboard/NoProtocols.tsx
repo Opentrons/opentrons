@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -33,17 +33,17 @@ export function NoProtocols(): ReactNode {
         width="284px"
         height="166px"
       />
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('nothing_here_yet')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="h4" color={COLORS.grey60}>
+      </StyledText>
+      <StyledText forwardedAs="h4" color={COLORS.grey60}>
         {t('branded:send_a_protocol_to_store')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

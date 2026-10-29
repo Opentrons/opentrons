@@ -13,11 +13,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -230,27 +230,27 @@ export function ProtocolCard(props: ProtocolCardProps): ReactNode {
         {isRequiredCSV ? (
           <Chip type="warning" text={t('requires_csv')} background={false} />
         ) : null}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           opacity={isPendingAnalysis ? 0.7 : 1}
         >
           {protocolName}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           color={COLORS.grey60}
           whiteSpace={textWrap(updatedLastRun)}
         >
           {updatedLastRun}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace={NO_WRAP}>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+        <StyledText forwardedAs="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
-        </LegacyStyledText>
+        </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
@@ -283,7 +283,7 @@ export function ProtocolCard(props: ProtocolCardProps): ReactNode {
                   i18nKey={t('error_analyzing', { protocolName })}
                   components={{
                     block: (
-                      <LegacyStyledText
+                      <StyledText
                         forwardedAs="p"
                         css={css`
                           display: -webkit-box;
@@ -299,9 +299,9 @@ export function ProtocolCard(props: ProtocolCardProps): ReactNode {
                   }}
                 />
 
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {t('branded:delete_protocol_from_app')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteProtocol}

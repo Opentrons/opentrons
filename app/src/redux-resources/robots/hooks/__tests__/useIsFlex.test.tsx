@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getRobotModelByName } from '/app/redux/discovery'
 
@@ -33,7 +32,7 @@ describe('useIsFlex hook', () => {
   })
 
   it('returns false when given a robot name that does not have a discoverable model', () => {
-    when(vi.mocked(getRobotModelByName))
+    vi.when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(null)
 
@@ -43,7 +42,7 @@ describe('useIsFlex hook', () => {
   })
 
   it('returns true when given a discoverable OT-3 robot name with a model', () => {
-    when(vi.mocked(getRobotModelByName))
+    vi.when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn('OT-3 Classic')
 
@@ -54,7 +53,7 @@ describe('useIsFlex hook', () => {
     expect(result.current).toEqual(true)
   })
   it('returns true when given a discoverable OT-3 robot name with an Opentrons Flex model', () => {
-    when(vi.mocked(getRobotModelByName))
+    vi.when(vi.mocked(getRobotModelByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn('Opentrons Flex')
 

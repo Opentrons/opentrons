@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  LegacyStyledText,
   StepMeter,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -43,23 +43,23 @@ export function NetworkSetupMenu(): ReactNode {
       <StepMeter totalSteps={6} currentStep={1} />
       <div className={styles.container}>
         <div className={styles.title_row}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('choose_network_type')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
         <div className={styles.description_row}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('branded:network_setup_menu_description')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
         <div className={styles.card_button_row}>
           {NetworkSetupOptions.map(networkOption => (

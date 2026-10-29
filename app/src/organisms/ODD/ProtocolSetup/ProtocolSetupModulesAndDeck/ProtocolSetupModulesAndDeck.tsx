@@ -8,8 +8,8 @@ import {
   Flex,
   InlineNotification,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -162,13 +162,11 @@ export function ProtocolSetupModulesAndDeck({
                 lineHeight={TYPOGRAPHY.lineHeight28}
                 paddingX={SPACING.spacing24}
               >
-                <LegacyStyledText flex="3.5 0 0">
+                <StyledText flex="3.5 0 0">
                   {i18n.format(t('deck_hardware'), 'titleCase')}
-                </LegacyStyledText>
-                <LegacyStyledText flex="2 0 0">
-                  {t('location')}
-                </LegacyStyledText>
-                <LegacyStyledText flex="4 0 0"> {t('status')}</LegacyStyledText>
+                </StyledText>
+                <StyledText flex="2 0 0">{t('location')}</StyledText>
+                <StyledText flex="4 0 0"> {t('status')}</StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 {hasModules ? (

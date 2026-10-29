@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  useAllSessionsQuery,
   useCurrentAllSubsystemUpdatesQuery,
   useEstopQuery,
 } from '@opentrons/react-api-client'
@@ -14,7 +13,7 @@ import { useIsRobotBusy } from '../useIsRobotBusy'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryResult } from 'react-query'
-import type { Runs, Sessions } from '@opentrons/api-client'
+import type { Runs } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
@@ -31,9 +30,6 @@ const mockEstopStatus = {
 
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
-    vi.mocked(useAllSessionsQuery).mockReturnValue({
-      data: {},
-    } as UseQueryResult<Sessions, Error>)
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
@@ -69,12 +65,7 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(true)
   })
 
-  it('returns true when sessions are not empty', () => {
-    const result = useIsRobotBusy({ poll: false })
-    expect(result).toBe(true)
-  })
-
-  it('returns false when current runId is null and sessions are empty', () => {
+  it('returns false when current runId is null', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
@@ -82,18 +73,6 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
-          sessionType: 'calibrationCheck',
-          createParams: {},
-        },
-      ],
-      links: {},
-    } as unknown as UseQueryResult<Sessions, Error>)
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
@@ -106,18 +85,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
-          sessionType: 'calibrationCheck',
-          createParams: {},
-        },
-      ],
-      links: {},
-    } as unknown as UseQueryResult<Sessions, Error>)
+
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
@@ -131,18 +99,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
-          sessionType: 'calibrationCheck',
-          createParams: {},
-        },
-      ],
-      links: {},
-    } as unknown as UseQueryResult<Sessions, Error>)
+
     const mockEngagedStatus = {
       data: {
         ...mockEstopStatus.data,
@@ -152,37 +109,6 @@ describe('useIsRobotBusy', () => {
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
     const result = useIsRobotBusy()
     expect(result).toBe(true)
-  })
-  it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
-    vi.mocked(useIsFlex).mockReturnValue(false)
-    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
-      data: {
-        links: {
-          current: null,
-        },
-      },
-    } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
-          sessionType: 'calibrationCheck',
-          createParams: {},
-        },
-      ],
-      links: {},
-    } as unknown as UseQueryResult<Sessions, Error>)
-    const mockEngagedStatus = {
-      data: {
-        ...mockEstopStatus.data,
-        status: 'physicallyEngaged',
-      },
-    }
-    vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
-    const result = useIsRobotBusy()
-    expect(result).toBe(false)
   })
 
   it('returns true when a maintenance run exists', () => {

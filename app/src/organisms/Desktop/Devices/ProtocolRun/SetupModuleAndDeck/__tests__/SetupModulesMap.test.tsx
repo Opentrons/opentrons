@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -102,7 +101,7 @@ describe('SetupModulesMap', () => {
     props = {
       runId: MOCK_RUN_ID,
     }
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(MOCK_RUN_ID)
       .thenReturn({
         commands: [],
@@ -150,7 +149,7 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(vi.mocked(ModuleInfo))
+    vi.when(vi.mocked(ModuleInfo))
       .calledWith(
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
@@ -205,7 +204,7 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(vi.mocked(ModuleInfo))
+    vi.when(vi.mocked(ModuleInfo))
       .calledWith(
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
@@ -218,7 +217,7 @@ describe('SetupModulesMap', () => {
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
-    when(vi.mocked(ModuleInfo))
+    vi.when(vi.mocked(ModuleInfo))
       .calledWith(
         expect.objectContaining({
           moduleModel: mockTCModule.model,
@@ -281,7 +280,7 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(vi.mocked(ModuleInfo))
+    vi.when(vi.mocked(ModuleInfo))
       .calledWith(
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
@@ -294,7 +293,7 @@ describe('SetupModulesMap', () => {
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
-    when(vi.mocked(ModuleInfo))
+    vi.when(vi.mocked(ModuleInfo))
       .calledWith(
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,

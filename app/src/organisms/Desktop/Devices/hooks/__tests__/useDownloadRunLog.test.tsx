@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getCommands, getProtocol, getRun } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
@@ -38,8 +37,8 @@ describe('useDownloadRunLog', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     makeToast = vi.fn()
-    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    when(vi.mocked(useToaster))
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(vi.mocked(useToaster))
       .calledWith()
       .thenReturn({
         makeToast,

@@ -190,8 +190,8 @@ export function SmallButton(props: SmallButtonProps): ReactNode {
         ) : null}
 
         <StyledText
-          oddStyle="bodyTextSemiBold"
           desktopStyle="bodyDefaultSemiBold"
+          oddStyle="bodyTextSemiBold"
         >
           {buttonText}
         </StyledText>

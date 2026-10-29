@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -35,8 +34,10 @@ describe('Module Update Banner', () => {
       serialNumber: 'test_number',
       isTooHot: false,
     }
-    when(useIsFlex).calledWith(props.robotName).thenReturn(true)
-    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
+    vi.when(useIsFlex).calledWith(props.robotName).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(false)
   })
 
   it('enables the updateType and serialNumber to be used as the test ID', () => {
@@ -152,13 +153,15 @@ describe('Module Update Banner', () => {
   })
 
   it('should not render a module setup link when e-stop is pressed ', () => {
-    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(true)
     render(props)
     expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
   it('should not render a module setup link if the robot is an OT-2', () => {
-    when(useIsFlex).calledWith(props.robotName).thenReturn(false)
+    vi.when(useIsFlex).calledWith(props.robotName).thenReturn(false)
     render(props)
     expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
