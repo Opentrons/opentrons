@@ -19,6 +19,7 @@ import {
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -145,7 +146,7 @@ export const RunPreviewComponent = (
       height="65vh"
       width="100%"
       overflowY={OVERFLOW_SCROLL}
-      gridGap={SPACING.spacing8}
+      gridGap={SPACING.spacing4}
       padding={SPACING.spacing16}
     >
       <>
@@ -156,11 +157,17 @@ export const RunPreviewComponent = (
           >
             {t('run_preview')}
           </LegacyStyledText>
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
-            {t('steps_total', { count: commands.length })}
-          </LegacyStyledText>
+          <Tag
+            type="default"
+            text={t('steps_total', { count: commands.length })}
+            shrinkToContent
+          />
         </Flex>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText
+          forwardedAs="p"
+          marginBottom={SPACING.spacing8}
+          color={COLORS.grey60}
+        >
           {t('preview_of_protocol_steps')}
         </LegacyStyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
