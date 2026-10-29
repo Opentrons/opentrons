@@ -102,7 +102,7 @@ describe('FlexPipetteCard', () => {
         instrumentName: 'p1000_96',
         subsystem: 'pipette_left',
         mount: 'left',
-        instrumentModel: 'p50_single_v3.5',
+        instrumentModel: 'p1000_96_v3.5',
         displayName: mockLeftSpecs.displayName,
         serialNumber: '123',
         firmwareVersion: '12',
