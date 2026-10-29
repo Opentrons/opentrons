@@ -10,9 +10,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -213,7 +213,7 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
@@ -227,7 +227,7 @@ function FixtureTableItem({
                   partialRequiredCutoutFixtureId ??
                     compatibleCutoutFixtureIds?.[0]
                 )}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
           <RobotInfoLabel deckLabel={displayLocation} />

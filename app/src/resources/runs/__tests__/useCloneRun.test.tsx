@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useCreateProtocolAnalysisMutation,
@@ -32,8 +31,8 @@ describe('useCloneRun hook', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
 
   beforeEach(() => {
-    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_NO_RTP)
       .thenReturn({
         data: {
@@ -64,7 +63,7 @@ describe('useCloneRun hook', () => {
           },
         },
       } as any)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_RTP)
       .thenReturn({
         data: {
@@ -119,7 +118,7 @@ describe('useCloneRun hook', () => {
       },
     ] as any
 
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_DUPLICATE_OFFSETS)
       .thenReturn({
         data: {
@@ -132,7 +131,7 @@ describe('useCloneRun hook', () => {
         },
       } as any)
 
-    when(vi.mocked(useCreateRunMutation))
+    vi.when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({

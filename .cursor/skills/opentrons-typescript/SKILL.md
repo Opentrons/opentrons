@@ -232,10 +232,9 @@ width: 15rem;
 
 ### Framework
 
-- **Vitest 2.1.9** (not Jest) — `vi.fn()`, `vi.mock()`, `vi.mocked()`
+- **Vitest 5** (not Jest) — `vi.fn()`, `vi.mock()`, `vi.mocked()`, `vi.when()` for conditional mocking
 - **@testing-library/react 16.3.0** — `screen`, `fireEvent`, `renderHook`
 - **@testing-library/user-event 14.6.1**
-- **vitest-when 0.5.0** for conditional mocking
 - **jsdom** test environment (global `vitest.config.mts`)
 
 ### Test File Structure

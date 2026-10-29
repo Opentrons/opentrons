@@ -1,7 +1,6 @@
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   INTERFACE_ETHERNET,
@@ -55,8 +54,10 @@ describe('useNetworkConnection', () => {
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
 
-    when(useWifiList).calledWith(mockRobotName, 10000).thenReturn(mockWifiList)
-    when(useNetworkInterfaces)
+    vi.when(useWifiList)
+      .calledWith(mockRobotName, 10000)
+      .thenReturn(mockWifiList)
+    vi.when(useNetworkInterfaces)
       .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: mockWifi, ethernet: mockEthernet })
   })
@@ -74,7 +75,7 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only wifi is connected and ethernet is connected', () => {
-    when(useNetworkInterfaces)
+    vi.when(useNetworkInterfaces)
       .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: mockWifi, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
@@ -87,7 +88,7 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only ethernet is connected', () => {
-    when(useNetworkInterfaces)
+    vi.when(useNetworkInterfaces)
       .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: null, ethernet: mockEthernet })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
@@ -99,7 +100,7 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - wifi and ethernet are not connected', () => {
-    when(useNetworkInterfaces)
+    vi.when(useNetworkInterfaces)
       .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: null, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {

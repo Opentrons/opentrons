@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
@@ -232,19 +232,19 @@ export function DeviceReset({
                   isSelected={isOptionSelected}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="p"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {optionText}
-                    </LegacyStyledText>
+                    </StyledText>
                     {subText != null ? (
-                      <LegacyStyledText
+                      <StyledText
                         forwardedAs="p"
                         color={isOptionSelected ? COLORS.white : COLORS.grey60}
                       >
                         {subText}
-                      </LegacyStyledText>
+                      </StyledText>
                     ) : null}
                   </Flex>
                 </OptionLabel>
@@ -281,13 +281,13 @@ export function DeviceReset({
             isSelected={isEveryOptionSelected(resetOptions)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('clear_all_stored_data')}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 forwardedAs="p"
                 color={
                   isEveryOptionSelected(resetOptions)
@@ -296,7 +296,7 @@ export function DeviceReset({
                 }
               >
                 {t('clear_all_stored_data_description')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </OptionLabel>
         </Flex>
@@ -340,9 +340,9 @@ export const ConfirmClearDataModal = ({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('confirm_device_reset_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

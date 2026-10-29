@@ -9,8 +9,8 @@ from opentrons.config import (
 from opentrons.protocol_engine import (
     Command,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
+    JsonCommandSlice,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
@@ -217,7 +217,7 @@ class MaintenanceRunDataManager:
         run_id: str,
         cursor: Optional[int],
         length: int,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of maintenance run commands.
 
         Args:

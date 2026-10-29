@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
@@ -57,13 +56,13 @@ describe('SetupRobotCalibration', () => {
   }
 
   beforeEach(() => {
-    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+    vi.when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
     vi.mocked(SetupInstrumentCalibration).mockReturnValue(
       <div>Mock SetupInstrumentCalibration</div>
     )
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -112,7 +111,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('does not call the expandStep function on click if run has started', () => {
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
     const button = screen.getByRole('button', {
       name: 'Proceed to deck hardware',

@@ -14,12 +14,12 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
   StepMeter,
+  StyledText,
   TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -222,14 +222,14 @@ export function RobotNameEditor(): ReactNode {
                 </Btn>
               </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h2"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {isUnboxingFlowOngoing
                     ? t('name_your_robot')
                     : t('rename_robot')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
                 {Boolean(isNaming) ? (
@@ -263,14 +263,14 @@ export function RobotNameEditor(): ReactNode {
               width="100%"
             >
               {isUnboxingFlowOngoing ? (
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
-                </LegacyStyledText>
+                </StyledText>
               ) : null}
               <Controller
                 control={control}
@@ -294,21 +294,21 @@ export function RobotNameEditor(): ReactNode {
                 )}
               />
             </Flex>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}
-            </LegacyStyledText>
+            </StyledText>
             {errors.newRobotName != null ? (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.red50}
               >
                 {errors.newRobotName.message}
-              </LegacyStyledText>
+              </StyledText>
             ) : null}
           </Flex>
 

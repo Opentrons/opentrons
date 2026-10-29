@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -60,9 +60,7 @@ export function ConfirmSetupStepsCompleteModal({
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
-          {buildMissingStepsCopy()}
-        </LegacyStyledText>
+        <StyledText forwardedAs="p">{buildMissingStepsCopy()}</StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"

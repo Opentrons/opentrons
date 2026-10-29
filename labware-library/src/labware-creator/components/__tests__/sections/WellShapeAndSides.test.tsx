@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { displayAsTube, getLabwareName } from '../../../utils'
@@ -28,13 +27,13 @@ describe('WellShapeAndSides', () => {
   })
 
   it('should render with the correct information', () => {
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('FAKE LABWARE NAME SINGULAR')
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
-    when(vi.mocked(displayAsTube))
+    vi.when(vi.mocked(displayAsTube))
       .calledWith(formikConfig.initialValues)
       .thenReturn(false)
 
@@ -58,7 +57,7 @@ describe('WellShapeAndSides', () => {
   })
 
   it('should render tubes when labware that should displayAsTube is selected', () => {
-    when(vi.mocked(displayAsTube))
+    vi.when(vi.mocked(displayAsTube))
       .calledWith(formikConfig.initialValues)
       .thenReturn(true)
 

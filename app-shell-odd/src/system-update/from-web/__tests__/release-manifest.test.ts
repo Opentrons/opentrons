@@ -1,7 +1,6 @@
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
 import { describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { fetchJson as _fetchJson } from '../../../http'
 import { directoryWithCleanup } from '../../utils'
@@ -137,7 +136,7 @@ describe('getOrDownloadManifest', () => {
         JSON.stringify(localManifest)
       )
         .then(() => {
-          when(fetchJson)
+          vi.when(fetchJson)
             .calledWith(
               'http://opentrons.com/releases.json',
               expect.any(Object)
@@ -158,7 +157,7 @@ describe('getOrDownloadManifest', () => {
         JSON.stringify(localManifest)
       )
         .then(() => {
-          when(fetchJson)
+          vi.when(fetchJson)
             .calledWith(
               'http://opentrons.com/releases.json',
               expect.any(Object)
@@ -174,7 +173,7 @@ describe('getOrDownloadManifest', () => {
     ))
   it('should reject if no manifest is available', () =>
     directoryWithCleanup(directory => {
-      when(fetchJson)
+      vi.when(fetchJson)
         .calledWith('http://opentrons.com/releases.json', expect.any(Object))
         .thenReject(new Error('oh no!'))
       return expect(

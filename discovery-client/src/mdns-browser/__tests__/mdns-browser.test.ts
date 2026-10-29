@@ -1,7 +1,6 @@
 import isEqual from 'lodash/isEqual'
 import Mdns from 'mdns-js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { createMdnsBrowser } from '..'
 import {
@@ -91,14 +90,14 @@ describe('mdns browser', () => {
   })
 
   it('checks that the mDNS browser is bound to network interfaces on an 5 second interval', () => {
-    when(getBrowserInterfaces).calledWith(mockBaseBrowser).thenReturn([])
+    vi.when(getBrowserInterfaces).calledWith(mockBaseBrowser).thenReturn([])
 
     // return new system interfaces on the second poll
     vi.mocked(getSystemInterfaces).mockReturnValue([
       { name: 'en1', address: '192.168.1.1' },
     ])
 
-    when(compareInterfaces)
+    vi.when(compareInterfaces)
       .calledWith([], [{ name: 'en1', address: '192.168.1.1' }])
       .thenReturn({
         interfacesMatch: false,

@@ -126,6 +126,7 @@ def _completed_analysis_resource(
             errors=[],
             liquids=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
 
@@ -216,6 +217,7 @@ async def test_get_summaries_by_protocol(
             errors=[],
             liquids=[],
         ),
+        result=AnalysisResult.NOT_OK.value,
     )
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     await subject.make_room_and_add(ok_resource, [], [])
@@ -570,6 +572,7 @@ async def test_raise_error_on_analysis_parsing_error(
         "protocol_id": "protocol-id",
         "analyzer_version": "123",
         "completed_analysis": unparseable_analysis,
+        "result": "ok",
     }
     # Set up the database with an unparseable analysis
     statement = analysis_table.insert().values(analysis_resource_blob)

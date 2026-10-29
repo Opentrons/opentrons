@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useRobot } from '/app/redux-resources/robots'
 import {
@@ -58,7 +57,7 @@ describe('useTrackProtocolRunEvent hook', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(getAppLanguage).mockReturnValue('en-US')
 
-    when(vi.mocked(useProtocolRunAnalyticsData))
+    vi.when(vi.mocked(useProtocolRunAnalyticsData))
       .calledWith(RUN_ID, mockConnectableRobot)
       .thenReturn({
         getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
@@ -99,7 +98,7 @@ describe('useTrackProtocolRunEvent hook', () => {
   })
 
   it('trackProtocolRunEvent calls trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
-    when(vi.mocked(useProtocolRunAnalyticsData))
+    vi.when(vi.mocked(useProtocolRunAnalyticsData))
       .calledWith('errorId', mockConnectableRobot)
       .thenReturn({
         getProtocolRunAnalyticsData: () =>

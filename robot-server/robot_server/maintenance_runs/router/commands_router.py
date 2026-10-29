@@ -1,15 +1,13 @@
 """Router for /maintenance_runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine import (
-    CommandPointer,
-)
+from opentrons.protocol_engine import CommandPointer
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
@@ -266,7 +264,7 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -290,18 +288,8 @@ async def get_run_commands(
     )
 
     data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            failedCommandId=c.failedCommandId,
+        RunCommandSummary.build_from_json(c).model_dump(
+            by_alias=True, exclude_none=True
         )
         for c in command_slice.commands
     ]
