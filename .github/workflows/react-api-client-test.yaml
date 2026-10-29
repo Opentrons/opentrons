@@ -57,7 +57,7 @@ jobs:
       - name: 'setup-js-ci'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
+          pnpm config set cache-dir ./.pnpm-cache
           make setup-js-ci
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov

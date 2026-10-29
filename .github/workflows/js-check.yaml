@@ -72,7 +72,7 @@ jobs:
         id: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
+          pnpm config set cache-dir ${{ github.workspace }}/.pnpm-cache
           make setup-js-ci
         # Use the if to run all the lint checks even of some fail
         shell: bash

@@ -122,7 +122,7 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
+          pnpm config set cache-dir ./.pnpm-cache
           make setup-js-ci
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
@@ -240,7 +240,7 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
+          pnpm config set cache-dir ./.pnpm-cache
           make setup-js-ci
       - name: 'build typescript'
         run: make build-ts
