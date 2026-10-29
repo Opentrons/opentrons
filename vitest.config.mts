@@ -67,6 +67,9 @@ export default defineConfig({
       ...configDefaults.exclude,
       '**/node_modules/**',
       '**/dist/**',
+      // pnpm stores a symlink to js-package-testing here (for its link: deps),
+      // which would otherwise escape the js-package-testing exclusion below.
+      '**/.pnpm-store/**',
       '**/js-package-testing/**',
       '**/lib/**',
       '**/js-package-testing/tests/**',
