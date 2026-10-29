@@ -96,12 +96,12 @@ Module components provide the external power, vacuum, data communication, and me
 
 <figure markdown>
 ![Spare deck adapter screws, M4 × 10 mm](../images/fasteners-deck.png "Spare deck adapter screws"){ width="50%" }
-<figcaption>(2) Deck adapter screws,<br>M4 × 10 mm (2.5 mm hex drive)</figcaption>
+<figcaption>(2) Deck adapter screws, 2.5 mm hex drive</figcaption>
 </figure>
 
 <figure markdown>
 ![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="50%" }
-<figcaption>(6) Manifold screws,<br>Imperial thread (7/64" hex drive)</figcaption>
+<figcaption>(6) Manifold screws, 7/64" hex drive (Imperial thread)</figcaption>
 </figure>
 
 </div>
