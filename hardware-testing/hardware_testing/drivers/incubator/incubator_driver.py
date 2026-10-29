@@ -40,6 +40,12 @@ class IncubatorModule:
                 print(f"Connection Open")
         except Exception as e:
             raise e
+    
+    def disconnect(self) -> None:
+        """Disconnect communication ports."""
+        if self.connection.is_open:
+            self.connection.reset_output_buffer()
+            self.connection.close()
 
     def get_sensor_state(self):
         self.connection.reset_output_buffer()
@@ -71,7 +77,6 @@ class IncubatorModule:
         reading = True
         while reading:
             data = self.connection.readline().decode("utf-8").strip()
-            print(f"Data: {data}")
             if data != "":
                 return data
             else:
