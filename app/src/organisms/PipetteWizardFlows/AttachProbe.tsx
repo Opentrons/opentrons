@@ -5,19 +5,20 @@ import {
   AnimationVideo,
   Banner,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import {
   getPipetteAnimations,
   isWasteChuteOnDeck,
@@ -111,10 +112,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         }
       >
         {isExiting ? undefined : (
-          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <LegacyStyledText css={IN_PROGRESS_STYLE}>
+          <Flex
+            marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}
+            css={IN_PROGRESS_STYLE}
+          >
+            <StyledText forwardedAs="p">
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         )}
       </SimpleWizardInProgressBody>
@@ -130,7 +134,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })}
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -139,7 +143,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
+          </WizardBodyText>
           {is96Channel && !isWasteChuteOnDeck(deckConfig) && (
             <Banner
               type="warning"

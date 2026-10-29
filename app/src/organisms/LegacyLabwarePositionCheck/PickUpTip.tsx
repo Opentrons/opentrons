@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   getLabwareDefinitionsFromCommands,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -128,7 +128,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />
@@ -451,7 +451,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                   : 'ensure_nozzle_position_desktop'
               }
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
               values={{

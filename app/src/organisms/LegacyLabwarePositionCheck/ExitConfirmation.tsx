@@ -10,12 +10,12 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
   SIZE_3,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -69,9 +69,9 @@ export const ExitConfirmation = (props: ExitConfirmationProps): ReactNode => {
                 ? t('remove_probe_before_exit')
                 : t('exit_screen_title')}
             </ConfirmationHeader>
-            <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing8}>
+            <StyledText forwardedAs="p" marginTop={SPACING.spacing8}>
               {t('exit_screen_subtitle')}
-            </LegacyStyledText>
+            </StyledText>
           </>
         )}
       </Flex>

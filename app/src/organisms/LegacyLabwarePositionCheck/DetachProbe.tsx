@@ -1,19 +1,14 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, SPACING } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -33,15 +28,6 @@ const VIDEO_STYLE = css`
   padding-top: ${SPACING.spacing4};
   width: 100%;
   min-height: 18rem;
-`
-
-const StyledBody = styled(LegacyStyledText)`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
 `
 
 interface DetachProbeProps extends DetachProbeStep {
@@ -152,7 +138,9 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
         </AnimationVideo>
       }
       bodyText={
-        <StyledBody>{i18n.format(t('remove_probe'), 'capitalize')}</StyledBody>
+        <WizardBodyText>
+          {i18n.format(t('remove_probe'), 'capitalize')}
+        </WizardBodyText>
       }
       proceedButtonText={t('confirm_detached')}
       proceed={handleProbeDetached}

@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   mockHeaterShaker,
@@ -315,13 +316,11 @@ describe('ModuleCard', () => {
     })
     mockUpdateModuleAsync.mockResolvedValue({})
     mockUpdateModuleMutation()
-    vi.when(useRunStatuses)
+    when(useRunStatuses)
       .calledWith()
       .thenReturn({ isRunRunning: false } as any)
-    vi.when(useIsFlex).calledWith(props.robotName).thenReturn(true)
-    vi.when(useIsEstopNotDisengaged)
-      .calledWith(props.robotName)
-      .thenReturn(false)
+    when(useIsFlex).calledWith(props.robotName).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
     } as unknown as UseQueryResult<DeckConfiguration>)
@@ -418,7 +417,7 @@ describe('ModuleCard', () => {
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {
-    vi.when(useRunStatuses)
+    when(useRunStatuses)
       .calledWith()
       .thenReturn({ isRunRunning: true } as any)
     render({

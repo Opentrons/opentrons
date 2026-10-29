@@ -6,8 +6,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -145,7 +145,7 @@ export const ThermocyclerModuleSlideout = (
         />
       }
     >
-      <LegacyStyledText
+      <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -156,20 +156,20 @@ export const ThermocyclerModuleSlideout = (
           min: tempRanges.min,
           max: tempRanges.max,
         })}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
-        </LegacyStyledText>
+        </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
             title={`${String(module.moduleModel)}_${String(isSecondaryTemp)}`}

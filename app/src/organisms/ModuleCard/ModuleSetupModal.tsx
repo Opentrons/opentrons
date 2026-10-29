@@ -7,11 +7,11 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -112,9 +112,9 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): ReactNode => {
             marginRight="3.625rem"
             width="50%"
           >
-            <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
+            <StyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
               {t('branded:setup_instructions_description')}
-            </LegacyStyledText>
+            </StyledText>
             <Link
               external
               css={TYPOGRAPHY.linkPSemiBold}

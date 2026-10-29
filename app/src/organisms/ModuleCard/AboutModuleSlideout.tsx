@@ -11,9 +11,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -63,12 +63,12 @@ export const AboutModuleSlideout = (
           onClick={onCloseClick}
           data-testid={`AboutModuleSlideout_btn_${module.serialNumber}`}
         >
-          <LegacyStyledText
+          <StyledText
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
             {t('shared:close')}
-          </LegacyStyledText>
+          </StyledText>
         </PrimaryButton>
       }
     >
@@ -103,23 +103,23 @@ export const AboutModuleSlideout = (
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${String(module.moduleModel)}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
-            </LegacyStyledText>
-            <LegacyStyledText
+            </StyledText>
+            <StyledText
               forwardedAs="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
               {module.firmwareVersion}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
@@ -128,14 +128,14 @@ export const AboutModuleSlideout = (
           )}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="p"
           paddingTop={SPACING.spacing4}
           data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
           {module.serialNumber}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Slideout>
   )

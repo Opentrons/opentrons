@@ -1,12 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText, SPACING } from '@opentrons/components'
+import { SPACING } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -67,18 +68,13 @@ export const MountingPlate = (
             t={t}
             i18nKey="attach_mounting_plate_instructions"
             components={{
-              block: (
-                <LegacyStyledText
-                  css={BODY_STYLE}
-                  marginBottom={SPACING.spacing16}
-                />
-              ),
+              block: <WizardBodyText marginBottom={SPACING.spacing16} />,
             }}
           />
         ) : (
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             {t('detach_mounting_plate_instructions')}
-          </LegacyStyledText>
+          </WizardBodyText>
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}

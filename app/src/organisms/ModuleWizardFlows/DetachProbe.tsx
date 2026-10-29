@@ -1,31 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, Flex, SPACING } from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import type { ReactNode } from 'react'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 export function DetachProbe(
   props: ModuleSetupWizardRequiresPipetteStepProps
@@ -63,9 +48,7 @@ export function DetachProbe(
         </Flex>
       }
       bodyText={
-        <LegacyStyledText css={BODY_STYLE}>
-          {t('detach_probe_description')}
-        </LegacyStyledText>
+        <WizardBodyText>{t('detach_probe_description')}</WizardBodyText>
       }
       proceedButtonText={t('complete_calibration')}
       proceed={proceed}
