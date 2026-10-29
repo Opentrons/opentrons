@@ -2,7 +2,6 @@ import { useDispatch } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useAccessControlEnabledQuery,
@@ -137,10 +136,10 @@ describe('RobotSettingsDashboard', () => {
     return newLevel
   }
   beforeEach(() => {
-    when(useLogLevelQuery)
+    vi.when(useLogLevelQuery)
       .calledWith()
       .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
-    when(usePostLogLevelMutation)
+    vi.when(usePostLogLevelMutation)
       .calledWith(expect.anything())
       .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)

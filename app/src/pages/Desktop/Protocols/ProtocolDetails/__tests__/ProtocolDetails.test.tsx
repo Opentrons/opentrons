@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -47,7 +46,7 @@ const render = (path = '/') => {
 
 describe('ProtocolDetails', () => {
   beforeEach(() => {
-    when(vi.mocked(getStoredProtocol))
+    vi.when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
       .thenReturn(storedProtocolData)
   })
@@ -71,7 +70,7 @@ describe('ProtocolDetails', () => {
   })
 
   it('should redirect to protocols landing if there is no protocol', () => {
-    when(vi.mocked(getStoredProtocol))
+    vi.when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
       .thenReturn(null)
     render('/protocols')

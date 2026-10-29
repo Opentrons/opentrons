@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -70,8 +69,8 @@ describe('InstrumentsAndModules', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   afterEach(() => {
@@ -94,7 +93,7 @@ describe('InstrumentsAndModules', () => {
     expect(vi.mocked(ModuleCard)).toHaveBeenCalled()
   })
   it('renders gripper and flex pipette cards when a robot is Flex', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
 
     render(props)
     expect(vi.mocked(GripperCard)).toHaveBeenCalled()
@@ -108,7 +107,7 @@ describe('InstrumentsAndModules', () => {
     )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
@@ -134,7 +133,7 @@ describe('InstrumentsAndModules', () => {
     expect(vi.mocked(PipetteRecalibrationWarning)).toHaveBeenCalled()
   })
   it('fetches instruments and modules on short poll for flex', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(useModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
     expect(useInstrumentsQuery).toHaveBeenCalledWith({

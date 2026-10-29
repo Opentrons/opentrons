@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useEstopQuery } from '@opentrons/react-api-client'
 
@@ -39,7 +38,7 @@ const mockNotPresentStatus = {
 
 describe('useIsEstopNotDisengaged', () => {
   beforeEach(() => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useEstopQuery).mockReturnValue({
       data: mockEstopStatus,
       error: null,
@@ -74,7 +73,7 @@ describe('useIsEstopNotDisengaged', () => {
     expect(isEstopNotDisengaged).toBe(true)
   })
   it('should return false when a robot is OT-2', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
     vi.mocked(useEstopQuery).mockReturnValue({
       data: mockPhysicallyEngagedStatus,
     } as any)

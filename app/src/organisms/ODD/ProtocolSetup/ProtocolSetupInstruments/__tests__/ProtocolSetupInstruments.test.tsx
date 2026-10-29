@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
@@ -57,7 +56,7 @@ const render = () => {
 describe('ProtocolSetupInstruments', () => {
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRecentAnalysis)
     vi.mocked(useInstrumentsQuery).mockReturnValue({

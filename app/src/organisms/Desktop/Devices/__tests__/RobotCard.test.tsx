@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -105,7 +104,7 @@ describe('RobotCard', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(getRobotModelByName)
+    vi.when(getRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
       .thenReturn('Opentrons Flex')
     vi.mocked(ErrorRecoveryBanner).mockReturnValue(

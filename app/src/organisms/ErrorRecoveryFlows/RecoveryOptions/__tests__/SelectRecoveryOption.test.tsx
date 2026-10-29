@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -78,34 +77,34 @@ describe('SelectRecoveryOption', () => {
       getRecoveryOptionCopy: mockGetRecoveryOptionCopy,
     }
 
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, expect.any(String))
       .thenReturn('Retry step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, ERROR_KINDS.TIP_DROP_FAILED)
       .thenReturn('Retry dropping tip')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE, expect.any(String))
       .thenReturn('Cancel run')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
         expect.any(String)
       )
       .thenReturn('Manually fill well and skip to next step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with same tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
         expect.any(String)
       )
       .thenReturn('Skip to next step with same tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.HOME_AND_RETRY.ROUTE, expect.any(String))
       .thenReturn('Home gantry and retry')
   })
@@ -279,61 +278,61 @@ describe('RecoveryOptions', () => {
       isOnDevice: true,
     }
 
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, expect.any(String))
       .thenReturn('Retry step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_STEP.ROUTE, ERROR_KINDS.TIP_DROP_FAILED)
       .thenReturn('Retry dropping tip')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.CANCEL_RUN.ROUTE, expect.any(String))
       .thenReturn('Cancel run')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with new tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
         expect.any(String)
       )
       .thenReturn('Manually fill well and skip to next step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE, expect.any(String))
       .thenReturn('Retry with same tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
         expect.any(String)
       )
       .thenReturn('Skip to next step with same tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE,
         expect.any(String)
       )
       .thenReturn('Skip to next step with new tips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE, expect.any(String))
       .thenReturn('Ignore error and skip to next step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE, expect.any(String))
       .thenReturn('Manually move labware and skip to next step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
         expect.any(String)
       )
       .thenReturn('Manually replace labware on deck and retry step')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(RECOVERY_MAP.HOME_AND_RETRY.ROUTE, expect.any(String))
       .thenReturn('Home gantry and retry')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
         expect.any(String)
       )
       .thenReturn('manually_load_labware_into_shuttle_and_skips')
-    when(mockGetRecoveryOptionCopy)
+    vi.when(mockGetRecoveryOptionCopy)
       .calledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
         expect.any(String)

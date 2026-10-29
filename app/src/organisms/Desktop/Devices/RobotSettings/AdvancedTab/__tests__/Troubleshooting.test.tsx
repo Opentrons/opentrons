@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { act, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -77,16 +76,16 @@ describe('RobotSettings Troubleshooting', () => {
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
-    when(useLogLevelQuery)
+    vi.when(useLogLevelQuery)
       .calledWith()
       .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
-    when(usePostLogLevelMutation)
+    vi.when(usePostLogLevelMutation)
       .calledWith(expect.anything())
       .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     props = {
       robotName: ROBOT_NAME,
     }
-    when(useRobot)
+    vi.when(useRobot)
       .calledWith(ROBOT_NAME)
       .thenReturn({
         ...mockConnectableRobot,
@@ -95,8 +94,8 @@ describe('RobotSettings Troubleshooting', () => {
           logs: ['/logs/api.log'],
         },
       } as typeof mockConnectableRobot)
-    when(useHost).calledWith().thenReturn(HOST_CONFIG)
-    when(useToaster)
+    vi.when(useHost).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(useToaster)
       .calledWith()
       .thenReturn({
         makeToast: MOCK_MAKE_TOAST,
@@ -111,7 +110,7 @@ describe('RobotSettings Troubleshooting', () => {
   })
 
   it('should be disabled when logs are not available', () => {
-    when(useRobot).calledWith('otie').thenReturn(mockUnreachableRobot)
+    vi.when(useRobot).calledWith('otie').thenReturn(mockUnreachableRobot)
     render(props)
     const downloadLogsButton = screen.getByRole('button', {
       name: 'Download logs',

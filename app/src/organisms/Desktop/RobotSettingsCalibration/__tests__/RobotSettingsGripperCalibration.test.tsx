@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -48,7 +47,7 @@ describe('RobotSettingsGripperCalibration', () => {
   beforeEach(() => {
     vi.mocked(formatLastCalibrated).mockReturnValue('last calibrated 1/2/3')
     vi.mocked(GripperWizardFlows).mockReturnValue(<>Mock Wizard Flow</>)
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
       gripper: mockGripperData,
       robotName: ROBOT_NAME,
@@ -108,7 +107,7 @@ describe('RobotSettingsGripperCalibration', () => {
   })
 
   it('overflow menu is disabled when e-stop button is pressed', () => {
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(
       screen.getByRole('button', {
