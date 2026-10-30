@@ -14,8 +14,8 @@ export function anonymizeInstrumentDisplayName(
 }
 
 /**
- * Prefer displayName from the v2 specs for the pipette name.
- * Then GET /instruments (loaded def on the robot) if that's not found
+ * Prefer displayName given by robot server then fall back to v2 specs if not present.
+ * This can happen if a robot is on an older robot server before the extra element was added to the response.
  */
 export function useAttachedInstrumentDisplayName(
   instrument: PipetteData | GripperData | null | undefined
@@ -43,7 +43,7 @@ export function useAttachedInstrumentDisplayName(
     instrument.displayName != null && instrument.displayName !== ''
       ? instrument.displayName
       : null
-  const preferedPipetteName = v2DisplayName ?? hardwareDisplayName
+  const preferedPipetteName = hardwareDisplayName?? v2DisplayName
 
   if (isGripper) {
     return gripperFallback !== '' ? gripperFallback : null
