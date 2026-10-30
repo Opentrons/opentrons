@@ -8,7 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { OnDeviceLogin } from '..'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type * as ReactI18next from 'react-i18next'
 import type { LoginStep } from '..'
 
@@ -35,7 +35,7 @@ function renderLogin(
   const { initialStep = 'username', ...rest } = props
   const onStepChange = vi.fn()
 
-  function Wrapper(): JSX.Element {
+  function Wrapper(): ReactNode {
     const [step, setStep] = useState<LoginStep>(initialStep)
 
     const handleStepChange = (next: LoginStep): void => {

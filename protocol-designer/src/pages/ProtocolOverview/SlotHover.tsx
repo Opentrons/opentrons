@@ -24,7 +24,7 @@ import {
 
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
@@ -40,7 +40,7 @@ interface SlotHoverProps {
   robotType: RobotType
 }
 
-export function SlotHover(props: SlotHoverProps): JSX.Element | null {
+export function SlotHover(props: SlotHoverProps): ReactNode {
   const { hover, setHover, slotId, slotPosition, robotType } = props
   const deckSetup = useSelector(getInitialDeckSetup)
   const { additionalEquipmentOnDeck, modules } = deckSetup
@@ -53,7 +53,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
   const columnFourLocations = Object.values(additionalEquipmentOnDeck)
     .filter(ae => ae.name === 'stagingArea')
-    ?.map(ae => ae.location as string)
+    ?.map(ae => ae.location)
 
   Object.values(modules).reduce<string[]>((acc, module) => {
     if (getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE) {

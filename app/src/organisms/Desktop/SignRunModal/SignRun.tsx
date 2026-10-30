@@ -11,6 +11,7 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -23,6 +24,7 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrunmodal.module.css'
 
+import type { ReactNode } from 'react'
 import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface SignRunModalProps {
@@ -37,7 +39,7 @@ export function SignRunModal({
   robotName,
   documentationState,
   onSigned,
-}: SignRunModalProps): JSX.Element {
+}: SignRunModalProps): ReactNode {
   const { t } = useTranslation('access_control')
 
   const [signed, setSigned] = useState(false)
@@ -111,7 +113,7 @@ export function SignRunModal({
     <Modal
       title={t('sign_protocol_run')}
       closeOnOutsideClick={false}
-      zIndexOverlay={1000}
+      zIndexOverlay={Z_INDEX.LOGIN_MODAL}
       childrenPadding="var(--spacing-24)"
       footer={footer}
     >

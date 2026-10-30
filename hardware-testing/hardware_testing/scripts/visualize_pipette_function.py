@@ -1,9 +1,9 @@
 """Visualize Pipette Function."""
+
 import argparse
 import asyncio
 from math import pi as PI
 from typing import Optional
-from pathlib import Path
 
 try:
     import matplotlib.pyplot as plt  # type: ignore[import]
@@ -21,13 +21,13 @@ from opentrons.calibration_storage.types import (
 from opentrons.config.robot_configs import default_pipette_offset
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
-    mutable_configurations,
+    load_data,
 )
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
-from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette import model_config
@@ -125,8 +125,11 @@ async def _main(length: int) -> None:
         pipette_model = pipette_load_name.convert_pipette_model(
             cast(PipetteModel, model)
         )
-        configurations = mutable_configurations.load_with_mutable_configurations(
-            pipette_model, Path("fake/path"), "testiId"
+        configurations = load_data.load_definition(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
+            pipette_model.oem_type,
         )
         pip_cal_obj = PipetteOffsetByPipetteMount(
             offset=Point(*default_pipette_offset()),

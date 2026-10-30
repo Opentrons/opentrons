@@ -38,6 +38,7 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
@@ -61,7 +62,7 @@ interface ChooseModuleToConfigureModalProps {
 
 export const ChooseModuleToConfigureModal = (
   props: ChooseModuleToConfigureModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     handleConfigureModule,
     onCloseClick,
@@ -302,7 +303,7 @@ interface NoUnconfiguredModulesProps {
   isOnDevice: boolean
   robotName: string
 }
-function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
+function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): ReactNode {
   const {
     moduleDisplayName,
     configuredModuleMatches,

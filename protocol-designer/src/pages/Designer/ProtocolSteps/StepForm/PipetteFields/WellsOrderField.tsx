@@ -16,6 +16,7 @@ import {
 
 import { WellOrderModal } from '/protocol-designer/components/organisms'
 
+import type { ReactNode } from 'react'
 import type { WellOrderOption } from '/protocol-designer/form-types'
 import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldProps } from '../types'
@@ -31,7 +32,7 @@ export interface WellsOrderFieldProps {
   padding?: string
 }
 
-export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
+export function WellsOrderField(props: WellsOrderFieldProps): ReactNode {
   const {
     firstValue,
     secondValue,
@@ -93,16 +94,18 @@ export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
           </StyledText>
         </ListButton>
       </Flex>
-      <WellOrderModal
-        prefix={prefix}
-        closeModal={handleClose}
-        isOpen={isModalOpen}
-        updateValues={updateValues}
-        firstValue={firstValue}
-        secondValue={secondValue}
-        firstName={firstName}
-        secondName={secondName}
-      />
+      {isModalOpen ? (
+        <WellOrderModal
+          prefix={prefix}
+          closeModal={handleClose}
+          isOpen={isModalOpen}
+          updateValues={updateValues}
+          firstValue={firstValue}
+          secondValue={secondValue}
+          firstName={firstName}
+          secondName={secondName}
+        />
+      ) : null}
     </>
   )
 }

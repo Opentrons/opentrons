@@ -13,12 +13,14 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -36,7 +38,7 @@ export function ModuleCalibrationOverflowMenu({
   attachedModule,
   formattedPipetteOffsetCalibrations,
   robotName,
-}: ModuleCalibrationOverflowMenuProps): JSX.Element {
+}: ModuleCalibrationOverflowMenuProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'robot_calibration',
@@ -83,7 +85,7 @@ export function ModuleCalibrationOverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}
-          zIndex="5"
+          zIndex={Z_INDEX.MENUS}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

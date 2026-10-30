@@ -4,6 +4,8 @@ import { InlineNotification } from '@opentrons/components'
 
 import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSigningOrDownloadingRequired'
 
+import type { ReactNode } from 'react'
+
 const COPY_BY_BANNER_TYPE = {
   signing: {
     headingKey: 'signature_required',
@@ -23,7 +25,7 @@ export interface SignAndDownloadRunBannerProps {
 
 export function SignAndDownloadRunBanner({
   robotName,
-}: SignAndDownloadRunBannerProps): JSX.Element | null {
+}: SignAndDownloadRunBannerProps): ReactNode {
   const { t } = useTranslation('access_control')
 
   const { isSigningRequired, isDownloadingRequired, onLinkClick } =

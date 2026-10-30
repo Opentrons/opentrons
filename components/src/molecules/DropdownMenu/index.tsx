@@ -20,6 +20,7 @@ import {
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  Z_INDEX,
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
@@ -27,7 +28,7 @@ import { LiquidIcon } from '../LiquidIcon'
 import { RobotInfoLabel } from '../RobotInfoLabel'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { FocusEventHandler, MouseEvent } from 'react'
+import type { FocusEventHandler, MouseEvent, ReactNode } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -89,7 +90,7 @@ export interface DropdownMenuProps {
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
 
-export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
+export function DropdownMenu(props: DropdownMenuProps): ReactNode {
   const {
     filterOptions,
     onClick,
@@ -352,7 +353,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
               <Fragment key={`${option.name}-${index}`}>
                 <MenuItem
                   disabled={option.disabled}
-                  zIndex={3}
+                  zIndex={Z_INDEX.MENUS}
                   key={`${option.name}-${index}`}
                   onClick={e => {
                     onClick(option.value)
@@ -427,7 +428,7 @@ const MENU_ITEM_CONTAINER_STYLE = (
   dropdownPosition: Omit<MenuPlacement, 'auto'>
 ): FlattenSimpleInterpolation => css`
   position: ${POSITION_ABSOLUTE};
-  z-index: 3;
+  z-index: ${Z_INDEX.MENUS};
   width: ${width};
   flex-direction: ${DIRECTION_COLUMN};
   border-radius: ${BORDERS.borderRadius8};

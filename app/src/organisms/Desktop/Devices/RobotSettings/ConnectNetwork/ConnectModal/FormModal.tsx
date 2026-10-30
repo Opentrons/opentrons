@@ -12,6 +12,7 @@ import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'
 import { TextField } from './TextField'
 
+import type { ReactNode } from 'react'
 import type { Control } from 'react-hook-form'
 import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 
@@ -50,7 +51,7 @@ export interface FormModalProps {
   control: Control<ConnectFormValues, any>
 }
 
-export const FormModal = (props: FormModalProps): JSX.Element => {
+export const FormModal = (props: FormModalProps): ReactNode => {
   const { id, network, fields, isValid, onCancel, control } = props
   const { t } = useTranslation(['device_settings', 'shared'])
 

@@ -9,6 +9,7 @@ import {
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { FieldPropsByName } from '../../types'
 
 interface ProfileSettingsProps {
@@ -16,7 +17,7 @@ interface ProfileSettingsProps {
   showFormErrors: boolean
   focusedField?: string | null
 }
-export function ProfileSettings(props: ProfileSettingsProps): JSX.Element {
+export function ProfileSettings(props: ProfileSettingsProps): ReactNode {
   const { propsForFields } = props
 
   const { t } = useTranslation(['application', 'form'])

@@ -3,10 +3,17 @@ import { useSelector } from 'react-redux'
 
 import { DeckLabelSet } from '@opentrons/components'
 
+import {
+  VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+  VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+} from '/protocol-designer/constants'
+
 import { selectors } from '../../labware-ingred/selectors'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
+import { getIsVacuumCollar } from './DeckSetup/utils'
 
+import type { ReactNode } from 'react'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -30,7 +37,7 @@ interface LabwareLabelProps {
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
 }
-export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
+export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
   const {
     labwareDef,
     position,
@@ -51,8 +58,8 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       text: greaterThan1
         ? `${labelText} (${selectedTopLabware.amount})`
         : labelText,
-      isSelected: isSelected,
-      isLast: isLast,
+      isSelected,
+      isLast,
       isZoomed: terminalItemId === START_TERMINAL_ITEM_ID,
     },
     ...nestedLabwareInfo,
@@ -68,6 +75,13 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
     labwareDef.parameters.loadName === 'opentrons_flex_deck_riser' &&
     nestedLabwareInfo.length === 0
 
+  const isVacuumCollar = getIsVacuumCollar(labwareDef)
+  const [vacuumCollarAdjustmentX, vacuumCollarAdjustmentY] = isVacuumCollar
+    ? [
+        VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+        VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+      ]
+    : [0, 0]
   return (
     <DeckLabelSet
       ref={labelContainerRef}
@@ -75,9 +89,15 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       x={
         position[0] +
         labwareDef.cornerOffsetFromSlot.x -
-        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
+        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0) +
+        vacuumCollarAdjustmentX
       }
-      y={position[1] + labwareDef.cornerOffsetFromSlot.y - labelContainerHeight}
+      y={
+        position[1] +
+        labwareDef.cornerOffsetFromSlot.y -
+        labelContainerHeight +
+        vacuumCollarAdjustmentY
+      }
       width={labwareDef.dimensions.xDimension}
       height={
         labwareDef.dimensions.yDimension -

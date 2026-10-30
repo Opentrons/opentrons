@@ -14,6 +14,8 @@ import {
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface DataFilesInfoBannerProps {
   hasImages: boolean
   hasCsvFiles: boolean
@@ -24,7 +26,7 @@ export function DataFilesInfoBanner({
   hasCsvFiles,
   hasImages,
   robotName,
-}: DataFilesInfoBannerProps): JSX.Element {
+}: DataFilesInfoBannerProps): ReactNode {
   const navigate = useNavigate()
   const { t } = useTranslation('run_details')
 
@@ -68,7 +70,7 @@ export function DataFilesInfoBanner({
         <Link
           textDecoration={TEXT_DECORATION_UNDERLINE}
           onClick={() => {
-            navigate(`/devices/${robotName}/#recent-protocol-runs`)
+            navigate(`/devices/${robotName}/run-history`)
           }}
         >
           {t('view_recent_runs')}

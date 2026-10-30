@@ -13,11 +13,27 @@ import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 
 import { ErrorContents } from './ErrorContents'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandCreatorError } from '@opentrons/step-generation'
 import type { MakeAlert } from './types'
 
-function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
+const makeAlert: MakeAlert = (alertType, data, key) => (
+  <Banner
+    type={alertType === 'error' ? 'error' : 'warning'}
+    key={`${alertType}:${key}`}
+    width="100%"
+  >
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <StyledText desktopStyle="bodyDefaultSemiBold">{data.title}</StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {data.description}
+      </StyledText>
+    </Flex>
+  </Banner>
+)
+
+function TimelineAlertsComponent(props: StyleProps): ReactNode {
   const { t } = useTranslation('alert')
 
   const timeline = useSelector(getRobotStateTimeline)
@@ -38,21 +54,6 @@ function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
   if (timelineErrors.length === 0) {
     return null
   }
-
-  const makeAlert: MakeAlert = (alertType, data, key) => (
-    <Banner
-      type={alertType === 'error' ? 'error' : 'warning'}
-      key={`${alertType}:${key}`}
-      width="100%"
-    >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">{data.title}</StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {data.description}
-        </StyledText>
-      </Flex>
-    </Banner>
-  )
 
   return (
     <Flex {...props}>

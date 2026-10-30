@@ -29,10 +29,10 @@ import {
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { selectors as uiModuleSelectors } from '/protocol-designer/ui/modules'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function PauseTools(props: StepFormProps): JSX.Element {
+export function PauseTools(props: StepFormProps): ReactNode {
   const { propsForFields, setShowFormErrors } = props
 
   const tempModuleLabwareOptions = useSelector(

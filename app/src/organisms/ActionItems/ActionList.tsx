@@ -13,6 +13,7 @@ import {
 import { ActionItem } from './ActionItem'
 import styles from './actionlist.module.css'
 
+import type { ReactNode } from 'react'
 import type { CommandTextData } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -23,7 +24,7 @@ export const ActionList = ({
 }: {
   actionsToDocument: DocumentedAction[]
   className?: string
-}): JSX.Element => {
+}): ReactNode => {
   const allRunTimeCommands = actionsToDocument.filter(isRunTimeCommand)
   const { data: maintenanceRun } = useNotifyCurrentMaintenanceRun()
   const currentRunId = useCurrentRunId()

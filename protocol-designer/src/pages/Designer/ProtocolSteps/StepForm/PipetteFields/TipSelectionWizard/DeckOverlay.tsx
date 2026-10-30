@@ -1,8 +1,9 @@
 import { COLORS } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { DeckDefinition } from '@opentrons/shared-data'
 
-export function DeckOverlay(props: { deckDef: DeckDefinition }): JSX.Element {
+export function DeckOverlay(props: { deckDef: DeckDefinition }): ReactNode {
   const { deckDef } = props
   return (
     <rect

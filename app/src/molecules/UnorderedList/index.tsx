@@ -12,7 +12,7 @@ interface UnorderedListProps {
   items: ReactNode[]
 }
 
-export function UnorderedList(props: UnorderedListProps): JSX.Element {
+export function UnorderedList(props: UnorderedListProps): ReactNode {
   const { items } = props
   return (
     <ul>

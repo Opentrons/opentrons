@@ -17,7 +17,7 @@ interface MaintenanceRunTakeoverProps {
 
 export function MaintenanceRunTakeover({
   children,
-}: MaintenanceRunTakeoverProps): JSX.Element {
+}: MaintenanceRunTakeoverProps): ReactNode {
   return (
     <MaintenanceRunStatusProvider>
       <MaintenanceRunTakeoverModal>{children}</MaintenanceRunTakeoverModal>
@@ -31,7 +31,7 @@ interface MaintenanceRunTakeoverModalProps {
 
 export function MaintenanceRunTakeoverModal(
   props: MaintenanceRunTakeoverModalProps
-): JSX.Element {
+): ReactNode {
   const { i18n, t } = useTranslation(['shared', 'branded'])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showConfirmTerminateModal, setShowConfirmTerminateModal] =

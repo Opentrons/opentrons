@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.aspirate_while_tracking import (
     AspirateWhileTrackingImplementation,
     AspirateWhileTrackingParams,
@@ -44,7 +44,7 @@ from opentrons.types import Point
 def subject(
     pipetting: PipettingHandler,
     state_view: StateView,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_command_note_adder: CommandNoteAdder,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
@@ -87,7 +87,7 @@ async def test_aspirate_while_tracking_implementation(
     pipetting: PipettingHandler,
     movement: MovementHandler,
     state_view: StateView,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_command_note_adder: CommandNoteAdder,
     subject: AspirateWhileTrackingImplementation,
     location: CurrentPipetteLocation | None,
@@ -236,7 +236,7 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
     state_view: StateView,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     subject: AspirateWhileTrackingImplementation,
 ) -> None:
     """Should raise an exception for not ready to aspirate."""

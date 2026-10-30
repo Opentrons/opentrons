@@ -12,6 +12,8 @@ import { initializeSentry } from './resources/sentry'
 
 import '@opentrons/components/styles/global'
 
+import type { ReactNode } from 'react'
+
 // initialize Redux
 const store = configureStore()
 initialize(store)
@@ -26,7 +28,7 @@ const container = document.getElementById('root')
 if (container == null) throw new Error('Failed to find the root element')
 const root = ReactDOM.createRoot(container)
 
-const RootComponent = (): JSX.Element => {
+const RootComponent = (): ReactNode => {
   return (
     <>
       <GlobalStyle />

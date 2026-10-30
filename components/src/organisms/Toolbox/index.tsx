@@ -33,7 +33,7 @@ export interface ToolboxProps extends StyleProps {
   secondaryHeaderButton?: JSX.Element
 }
 
-export function Toolbox(props: ToolboxProps): JSX.Element {
+export function Toolbox(props: ToolboxProps): ReactNode {
   const {
     title,
     children,

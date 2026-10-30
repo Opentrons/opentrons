@@ -68,7 +68,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
 /*
   ListItem is used in ODD and helix
 **/
-export function ListItem(props: ListItemProps): JSX.Element {
+export function ListItem(props: ListItemProps): ReactNode {
   const { type, children, onClick, onMouseEnter, onMouseLeave, ...styleProps } =
     props
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]

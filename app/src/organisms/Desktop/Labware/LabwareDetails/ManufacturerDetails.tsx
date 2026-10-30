@@ -13,6 +13,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { LabwareBrand } from '@opentrons/shared-data'
 
 export interface ManufacturerDetailsProps {
@@ -21,7 +22,7 @@ export interface ManufacturerDetailsProps {
 
 export function ManufacturerDetails(
   props: ManufacturerDetailsProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_details')
   const { brand } = props
   const { brand: brandName, brandId, links } = brand

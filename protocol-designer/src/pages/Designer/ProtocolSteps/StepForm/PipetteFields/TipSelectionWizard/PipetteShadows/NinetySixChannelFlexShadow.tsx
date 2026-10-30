@@ -1,10 +1,11 @@
 import styles from '../tipselectionwizard.module.css'
 
+import type { ReactNode } from 'react'
 import type { PipetteShadowProps } from '../types'
 
 export function NinetySixChannelFlexShadow(
   props: PipetteShadowProps
-): JSX.Element {
+): ReactNode {
   const { x, y, width, height, fill, stroke, rotate } = props
   const transform = rotate
     ? `rotate(180, ${x + width / 2}, ${y + height / 2})`

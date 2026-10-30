@@ -14,6 +14,7 @@ import {
   truncateString,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
 
 interface FileCardProps {
@@ -23,7 +24,7 @@ interface FileCardProps {
   setRunTimeParametersOverrides?: (rtpOverrides: RunTimeParameter[]) => void
 }
 
-export function FileCard(props: FileCardProps): JSX.Element {
+export function FileCard(props: FileCardProps): ReactNode {
   const {
     error,
     fileRunTimeParameter,

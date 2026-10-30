@@ -1,6 +1,7 @@
 import { i18n } from '/app/i18n'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/accessControl/types'
 
 export const PipetteFlowActionText = ({
@@ -11,7 +12,7 @@ export const PipetteFlowActionText = ({
   action: PipetteWizardFlowAction
   t: TFunction
   className?: string
-}): JSX.Element => {
+}): ReactNode => {
   const { flowType, pipette, mount, pipetteInfo, step } = action
   const mountName = mount === 'left' ? t('left_mount') : t('right_mount')
   const flowTypeText =

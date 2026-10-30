@@ -24,11 +24,12 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { FixitCommandTypeUtils } from '/app/organisms/DropTipWizardFlows'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
-export function ManageTips(props: RecoveryContentProps): JSX.Element {
+export function ManageTips(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
 
   routeAlternativelyIfNoPipette(props)

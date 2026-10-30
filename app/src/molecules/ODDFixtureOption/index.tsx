@@ -11,7 +11,7 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface ODDFixtureOptionProps {
   onClickHandler: MouseEventHandler
@@ -20,7 +20,7 @@ interface ODDFixtureOptionProps {
   secondaryButtonText?: string
   buttonText: string
 }
-export function ODDFixtureOption(props: ODDFixtureOptionProps): JSX.Element {
+export function ODDFixtureOption(props: ODDFixtureOptionProps): ReactNode {
   const {
     onClickHandler,
     optionName,

@@ -21,7 +21,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -35,7 +35,7 @@ interface TipPositionEntryProps {
   kind: FlowRateKind // TODO: rename flowRateKind to be generic
 }
 
-export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
+export function TipPositionEntry(props: TipPositionEntryProps): ReactNode {
   const { onBack, state, dispatch, kind } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

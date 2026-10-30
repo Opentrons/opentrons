@@ -18,7 +18,7 @@ export function SimpleWizardBody(
   > & {
     children?: ReactNode
   }
-): JSX.Element {
+): ReactNode {
   const { children, ...rest } = props
   return (
     <SimpleWizardBodyContainer {...rest}>

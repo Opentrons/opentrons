@@ -1,6 +1,6 @@
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // todo(mm, 2025-05-16):
@@ -13,7 +13,7 @@ type Props = Omit<ComponentProps<typeof LabwareRender>, 'definition'> & {
 }
 
 /** Avoid boilerplate for viewbox-based-on-labware-dimensions */
-export function SingleLabware(props: Props): JSX.Element {
+export function SingleLabware(props: Props): ReactNode {
   return (
     <RobotWorkSpace
       viewBox={`0 0 ${props.definition.dimensions.xDimension} ${props.definition.dimensions.yDimension}`}

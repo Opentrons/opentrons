@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import errno
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
@@ -10,10 +11,28 @@ from serial.serialutil import (  # type: ignore[import-untyped]
 
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
-from opentrons.drivers.asyncio.communication.errors import SerialException
+from opentrons.drivers.asyncio.communication.errors import (
+    FailedCommand,
+    SerialException,
+)
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 
 log = logging.getLogger(__name__)
+
+_EXPECTED_DISCONNECT_ERRNOS = {errno.EIO, errno.ENODEV, errno.ENXIO}
+
+
+def _is_expected_disconnect_io_error(exc: BaseException) -> bool:
+    """Return whether ``exc`` is a typical unplug / vanished-port I/O error."""
+    if isinstance(exc, PySerialSerialException):
+        return True
+    if isinstance(exc, OSError) and exc.errno in _EXPECTED_DISCONNECT_ERRNOS:
+        return True
+    try:
+        import termios
+    except ImportError:
+        return False
+    return isinstance(exc, termios.error)
 
 
 class Reader(ABC):
@@ -117,8 +136,14 @@ class Poller:
     def _error_callback(self, exc: Exception) -> None:
         try:
             self._reader.on_error(exc)
-        except Exception:
-            log.exception("Exception in reader callback")
+        except Exception as callback_error:
+            if _is_expected_disconnect_io_error(callback_error):
+                log.warning(
+                    "Reader cleanup failed after serial disconnect: %s",
+                    callback_error,
+                )
+            else:
+                log.exception("Exception in reader callback")
 
     def _complete_all(
         self, exc: Exception | None, previous: List["asyncio.Future[None]"]
@@ -140,8 +165,12 @@ class Poller:
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)
             self._complete_all(e, previous_waiters)
+        except FailedCommand as se:
+            log.info("Module reported an error during poll: %s", se)
+            self._error_callback(se)
+            self._complete_all(se, previous_waiters)
         except (SerialException, PySerialSerialException) as se:
-            log.error(f"Polling gcode error: {se}")
+            log.warning("Polling failed: %s", se)
             self._error_callback(se)
             self._complete_all(se, previous_waiters)
         except Exception as e:

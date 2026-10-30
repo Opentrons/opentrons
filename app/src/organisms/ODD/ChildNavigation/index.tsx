@@ -65,7 +65,7 @@ export function ChildNavigation({
   ariaDisabled = false,
   headerStyleProps,
   ...styleProps
-}: ChildNavigationProps): JSX.Element {
+}: ChildNavigationProps): ReactNode {
   return (
     <Flex
       alignItems={ALIGN_CENTER}

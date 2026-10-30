@@ -17,7 +17,7 @@ interface SelectionRectProps {
   customWidth?: number
 }
 
-export function SelectionRect(props: SelectionRectProps): JSX.Element {
+export function SelectionRect(props: SelectionRectProps): ReactNode {
   const {
     onSelectionMove,
     onSelectionDone,

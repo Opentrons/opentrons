@@ -1,10 +1,10 @@
 """opentrons.protocol_api.module_geometry: classes and functions for modules
 as deck objects
 
-This module provides things like :py:class:`ModuleGeometry` and
-:py:func:`load_module` to create and manipulate module objects as geometric
+This module provides things like `ModuleGeometry` and
+`load_module()` to create and manipulate module objects as geometric
 objects on the deck (as opposed to calling commands on them, which is handled
-by :py:mod:`.module_contexts`)
+by `module_contexts`)
 """
 
 from __future__ import annotations
@@ -86,10 +86,10 @@ class ModuleGeometry:
 
         Note that modules do not currently have a concept of calibration apart
         from calibration of labware on top of the module. The practical result
-        of this is that if the module parent :py:class:`.Location` is
+        of this is that if the module parent [`Location`][opentrons.types.Location] is
         incorrect, then a correct calibration of one labware on the deck would
         be incorrect on the module, and vice-versa. Currently, the way around
-        this would be to correct the :py:class:`.Location` so that the
+        this would be to correct the [`Location`][opentrons.types.Location] so that the
         calibrated labware is targeted accurately in both positions.
 
         :param display_name: A human-readable display name of only the module
@@ -104,7 +104,7 @@ class ModuleGeometry:
         :param parent: A location representing location of the front left of
                        the outside of the module (usually the front-left corner
                        of a slot on the deck).
-        :type parent: :py:class:`.Location`
+        :type parent: [`Location`][opentrons.types.Location]
         """
         self._parent = parent
         self._module_type = module_type
@@ -157,14 +157,14 @@ class ModuleGeometry:
     @property
     def location(self) -> Location:
         """
-        :return: a :py:class:`.Location` representing the top of the module
+        :return: a [`Location`][opentrons.types.Location] representing the top of the module
         """
         return self._location
 
     @property
     def labware_offset(self) -> Point:
         """
-        :return: a :py:class:`.Point` representing the transformation
+        :return: a [`Point`][opentrons.types.Point] representing the transformation
         between the critical point of the module and the critical
         point of its contained labware
         """
@@ -200,10 +200,10 @@ class ThermocyclerGeometry(ModuleGeometry):
 
         Note that modules do not currently have a concept of calibration apart
         from calibration of labware on top of the module. The practical result
-        of this is that if the module parent :py:class:`.Location` is
+        of this is that if the module parent [`Location`][opentrons.types.Location] is
         incorrect, then a correct calibration of one labware on the deck would
         be incorrect on the module, and vice-versa. Currently, the way around
-        this would be to correct the :py:class:`.Location` so that the
+        this would be to correct the [`Location`][opentrons.types.Location] so that the
         calibrated labware is targeted accurately in both positions.
 
         :param display_name: A human-readable display name of only the module
@@ -218,10 +218,10 @@ class ThermocyclerGeometry(ModuleGeometry):
         :param parent: A location representing location of the front left of
                        the outside of the module (usually the front-left corner
                        of a slot on the deck).
-        :type parent: :py:class:`.Location`
+        :type parent: [`Location`][opentrons.types.Location]
         :param configuration: Used to specify the slot configuration of
                               the Thermocycler. It should by of type
-                              :py:class:`.ThermocyclerConfiguration` and can
+                              `ThermocyclerConfiguration` and can
                               either be FULL or SEMI.
         """
         super().__init__(

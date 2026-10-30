@@ -42,7 +42,9 @@ async def test_schema_15_persistence_migrates_boolean_settings_to_v16() -> None:
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=_PORT, persistence_directory=persistence_dir) as server:
+        with DevServer(
+            is_ot3=True, port=_PORT, persistence_directory=persistence_dir
+        ) as server:
             server.start()
             await robot_client.wait_until_ready(_STARTUP_TIMEOUT)
 

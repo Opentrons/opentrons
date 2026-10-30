@@ -2,6 +2,7 @@ import { COLORS, Icon, StyledText } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 
+import type { ReactNode } from 'react'
 import type { AnalysisError } from '@opentrons/shared-data'
 
 interface ProtocolAnalysisErrorsContentProps {
@@ -16,7 +17,7 @@ interface ProtocolAnalysisErrorsContentProps {
 
 export function ProtocolAnalysisErrorsContent(
   props: ProtocolAnalysisErrorsContentProps
-): JSX.Element {
+): ReactNode {
   const {
     errors,
     onShowErrorDetails,

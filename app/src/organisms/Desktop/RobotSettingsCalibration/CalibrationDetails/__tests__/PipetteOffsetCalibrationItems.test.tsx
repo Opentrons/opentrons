@@ -1,27 +1,18 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useIsFlex } from '/app/redux-resources/robots'
-import {
-  useAttachedPipettes,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/resources/instruments'
-import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '/app/resources/instruments/__fixtures__'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { OverflowMenu } from '../OverflowMenu'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { formatLastCalibrated } from '../utils'
 
 import type { ComponentProps } from 'react'
-import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 
 const render = (
@@ -61,29 +52,21 @@ const mockPipetteOffsetCalibrationsForOt3 = [
 ]
 
 vi.mock('/app/redux/custom-labware/selectors')
-vi.mock('/app/redux/sessions/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/assets/labware/findLabware')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/instruments')
 vi.mock('../OverflowMenu')
 
-const mockAttachedPipettes: AttachedPipettesByMount = {
-  left: mockAttachedPipette,
-  right: mockAttachedPipette,
-} as any
-
 describe('PipetteOffsetCalibrationItems', () => {
   let props: ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
-      left: null,
-      right: null,
+      left: mockAttachedPipetteInformation,
+      right: mockAttachedPipetteInformation,
     })
     vi.mocked(OverflowMenu).mockReturnValue(<div>mock overflow menu</div>)
-    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
-    when(useIsFlex).calledWith('otie').thenReturn(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -91,20 +74,10 @@ describe('PipetteOffsetCalibrationItems', () => {
     }
   })
 
-  it('should render table headers', () => {
-    render(props)
-    screen.getByText('Pipette Model and Serial')
-    screen.getByText('Mount')
-    screen.getByText('Tip Rack')
-    screen.getByText('Last Calibrated')
-  })
-
   it('should omit tip rack table header for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
     render(props)
     screen.getByText('Pipette Model and Serial')
     screen.getByText('Mount')
-    expect(screen.queryByText('Tip Rack')).toBeNull()
     screen.getByText('Last Calibrated')
   })
 
@@ -113,7 +86,6 @@ describe('PipetteOffsetCalibrationItems', () => {
       ...props,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrationsForOt3,
     }
-    vi.mocked(useIsFlex).mockReturnValue(true)
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,

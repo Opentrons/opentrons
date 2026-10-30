@@ -1,8 +1,9 @@
 import styles from '../tipselectionwizard.module.css'
 
+import type { ReactNode } from 'react'
 import type { PipetteShadowProps } from '../types'
 
-export function EightChannelOT2Shadow(props: PipetteShadowProps): JSX.Element {
+export function EightChannelOT2Shadow(props: PipetteShadowProps): ReactNode {
   const { x, y, width, height, fill, stroke } = props
   return (
     <svg

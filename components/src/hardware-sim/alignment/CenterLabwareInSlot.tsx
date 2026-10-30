@@ -6,7 +6,7 @@ import {
   SLOT_RENDER_WIDTH,
 } from '@opentrons/shared-data'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export type CenterLabwareInSlotProps = PropsWithChildren<{
@@ -20,7 +20,7 @@ export type CenterLabwareInSlotProps = PropsWithChildren<{
  */
 export function CenterLabwareInSlot(
   props: CenterLabwareInSlotProps
-): JSX.Element {
+): ReactNode {
   const { definition, children } = props
 
   const { minX, minY, maxX, maxY } = getLabwareViewBox(definition)

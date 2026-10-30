@@ -10,6 +10,10 @@ from opentrons_shared_data.errors.exceptions import EnumeratedError
 from ..actions import Action, FinishTaskAction
 from ..actions.action_handler import ActionHandler
 from ..commands import CommandStatus
+from ..commands.background_task_recovery import (
+    running_wait_for_tasks_covers_command,
+    running_wait_for_tasks_covers_task,
+)
 from ..commands.vacuum_module.recovery import (
     VacuumModuleAssociatedCommandRecoveryResolver,
 )
@@ -77,6 +81,9 @@ class AssociatedCommandErrorRecoveryOrchestrator(ActionHandler):
             )
             if command_id is None:
                 continue
+            if running_wait_for_tasks_covers_command(self._state_store, command_id):
+                # waitForTasks is the recoverable command; do not fail the start_*.
+                return True
             if self._try_fail_associated_command(
                 resolver=resolver,
                 command_id=command_id,
@@ -90,6 +97,8 @@ class AssociatedCommandErrorRecoveryOrchestrator(ActionHandler):
     ) -> None:
         command_id = self._state_store.tasks.get_originating_command_id(task_id)
         if command_id is None:
+            return
+        if running_wait_for_tasks_covers_task(self._state_store, task_id):
             return
 
         for resolver in self._resolvers:

@@ -13,7 +13,7 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface DeviceResetProps {
   updateIsExpanded: (
@@ -26,7 +26,7 @@ interface DeviceResetProps {
 export function DeviceReset({
   updateIsExpanded,
   isRobotBusy,
-}: DeviceResetProps): JSX.Element {
+}: DeviceResetProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {

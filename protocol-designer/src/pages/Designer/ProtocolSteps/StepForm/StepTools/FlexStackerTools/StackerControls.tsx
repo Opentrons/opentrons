@@ -18,6 +18,7 @@ import {
 
 import styles from './flexstackertools.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   FlexStackerFormType,
   FormData,
@@ -32,7 +33,7 @@ interface StackerControlsProps {
   isStackerEmptyEnabled: boolean
 }
 
-export function StackerControls(props: StackerControlsProps): JSX.Element {
+export function StackerControls(props: StackerControlsProps): ReactNode {
   const {
     formData,
     propsForFields,

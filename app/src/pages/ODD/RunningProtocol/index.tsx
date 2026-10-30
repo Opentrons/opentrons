@@ -55,6 +55,7 @@ import {
 
 import styles from './runningprotocol.module.css'
 
+import type { ReactNode } from 'react'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   CurrentRunningProtocolCommandProps,
@@ -75,7 +76,7 @@ const SCREEN_ORDER: ScreenOption[] = [
   'ImageGallery',
 ]
 
-export function RunningProtocol(): JSX.Element {
+export function RunningProtocol(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -296,7 +297,7 @@ type CurrentOptionViewProps = CurrentRunningProtocolCommandProps &
 function CurrentOptionView({
   currentOption,
   ...rest
-}: CurrentOptionViewProps): JSX.Element {
+}: CurrentOptionViewProps): ReactNode {
   useToastOnErrorImage(rest.runId)
 
   switch (currentOption) {

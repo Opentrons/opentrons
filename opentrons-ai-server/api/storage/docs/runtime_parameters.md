@@ -10,7 +10,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.18"
+    "apiLevel": "2.28"
 }
 
 
@@ -90,7 +90,7 @@ metadata = {
     "protocolName": "Golden RTP Examples",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.18"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 description: str = "Reused description for all parameters."
 unit: str = "unit"

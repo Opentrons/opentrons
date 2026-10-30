@@ -16,6 +16,8 @@ import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/en
 
 import styles from './robot_encryption_key_modal.module.css'
 
+import type { ReactNode } from 'react'
+
 const BACKUP_REFETCH_TIME_MS = 1000
 
 export function refetchTimeForPassword(now: Date, validUntil: Date): number {
@@ -26,7 +28,7 @@ function RobotEncryptionKeyModalElement({
   clearClientData,
 }: {
   clearClientData: () => void
-}): JSX.Element {
+}): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const modal = useModal()
 
@@ -117,7 +119,7 @@ function RobotEncryptionKeyModalElement({
   )
 }
 
-export const RobotEncryptionKeyModal = NiceModal.create((): JSX.Element => {
+export const RobotEncryptionKeyModal = NiceModal.create((): ReactNode => {
   const { clearClientData } = useUpdateClientDataEncryptionKeys()
   const robotName = useLocalRobotName()
 

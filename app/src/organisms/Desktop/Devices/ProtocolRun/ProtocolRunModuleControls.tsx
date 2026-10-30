@@ -14,6 +14,7 @@ import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 interface PipetteStatus {
@@ -75,7 +76,7 @@ interface ProtocolRunModuleControlsProps {
 export const ProtocolRunModuleControls = ({
   robotName,
   runId,
-}: ProtocolRunModuleControlsProps): JSX.Element => {
+}: ProtocolRunModuleControlsProps): ReactNode => {
   const { t } = useTranslation('protocol_setup')
   const {
     attachPipetteRequired,

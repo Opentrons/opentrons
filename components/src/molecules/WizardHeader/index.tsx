@@ -5,6 +5,8 @@ import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import styles from './wizardheader.module.css'
 
+import type { ReactNode } from 'react'
+
 interface WizardHeaderProps {
   title: string
   onExit?: (() => void) | null
@@ -17,7 +19,7 @@ interface WizardHeaderProps {
   isExiting?: boolean
 }
 
-export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
+export const WizardHeader = (props: WizardHeaderProps): ReactNode => {
   const {
     totalSteps,
     currentStep,

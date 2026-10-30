@@ -17,7 +17,7 @@ nav:
       - Magnetic Module: modules/magnetic-module.md
       - Temperature Module: modules/temperature-module.md
       - Thermocycler Module: modules/thermocycler.md
-      - Vacuum Module: modules/vacuum.md
+      # - Vacuum Module: modules/vacuum.md
       - Concurrent Module Actions: modules/concurrent.md
       - Loading Multiple Modules of the Same Type: modules/multiple-same-type.md
   - Deck Slots: deck-slots.md
@@ -75,7 +75,7 @@ nav:
         - Magnetic Module: reference/magnetic-module.md
         - Temperature Module: reference/temperature-module.md
         - Thermocycler: reference/thermocycler.md
-        - Vacuum Module: reference/vacuum.md
+        # - Vacuum Module: reference/vacuum.md
       - Useful Types: reference/types.md
       - Execute and Simulate: reference/execute-simulate.md
 

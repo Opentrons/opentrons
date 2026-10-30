@@ -1,5 +1,3 @@
-import startCase from 'lodash/startCase'
-
 import {
   getFlexNameConversion,
   getLabwareDisplayName,
@@ -14,10 +12,8 @@ import {
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
-  ROBOT_FIELD_NAME,
   TWO_PIPETTES,
 } from '/ai-client/components/organisms/InstrumentsSection'
-import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
 
 import { getOnlyLatestDefs } from './labware'
 
@@ -25,15 +21,6 @@ import type { UseFormWatch } from 'react-hook-form'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { CreateProtocolFormData } from '/ai-client/pages/CreateProtocol'
 import type { CreatePrompt } from '/ai-client/resources/types'
-
-export function generatePromptPreviewProtocolFormatItems(
-  watch: UseFormWatch<CreateProtocolFormData>,
-  t: any
-): string[] {
-  const { protocol_format = 'Python' } = watch()
-
-  return [protocol_format]
-}
 
 export function generatePromptPreviewApplicationItems(
   watch: UseFormWatch<CreateProtocolFormData>,
@@ -255,15 +242,8 @@ export function generatePromptPreviewRuntimeParametersItems(
   t: any
 ): string[] {
   const { runtime_parameters } = watch()
-  const protocolFormat = watch(PROTOCOL_FORMAT)
-  const robotType = watch(ROBOT_FIELD_NAME)
 
-  // Only show in preview if Protocol is Python and robot is Flex
-  if (
-    protocolFormat !== PYTHON ||
-    robotType !== OPENTRONS_FLEX ||
-    !runtime_parameters
-  ) {
+  if (!runtime_parameters) {
     return []
   }
 
@@ -278,10 +258,6 @@ export function generatePromptPreviewData(
   items: string[]
 }> {
   return [
-    {
-      title: t('protocol_format_title'),
-      items: generatePromptPreviewProtocolFormatItems(watch, t),
-    },
     {
       title: t('application_title'),
       items: generatePromptPreviewApplicationItems(watch, t),
@@ -318,8 +294,7 @@ export function generateChatPrompt(
   t: any,
   setCreateProtocolChatAtom: (
     args_0: CreatePrompt | ((prev: CreatePrompt) => CreatePrompt)
-  ) => void,
-  isPdProtocolGenerationEnabled: boolean = false
+  ) => void
 ): string {
   const robotType = t(values.instruments.robot)
   const scientificApplication = `- ${t(
@@ -426,23 +401,13 @@ export function generateChatPrompt(
   const fixtureSection =
     values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
 
-  const runtimeParametersSection =
-    values.protocol_format === PYTHON &&
-    values.instruments.robot === OPENTRONS_FLEX &&
-    values.runtime_parameters
-      ? `\n\n${t(
-          'runtime_parameters_title'
-        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
-      : ''
+  const runtimeParametersSection = values.runtime_parameters
+    ? `\n\n${t(
+        'runtime_parameters_title'
+      )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+    : ''
 
-  const prompt = `${
-    values.protocol_format === PYTHON
-      ? t('create_protocol_prompt_robot', { robotType }) + '\n'
-      : t('create_protocol_pd_prompt_robot', {
-          format: startCase(values.protocol_format),
-          robotType,
-        }) + '\n'
-  }
+  const prompt = `${t('create_protocol_prompt_robot', { robotType }) + '\n'}
 
 
 ${t('application_title')}:\n${scientificApplication}
@@ -486,14 +451,6 @@ ${t(
     liquids: values.liquids,
     runtimeParameters: values.runtime_parameters,
     steps: Array.isArray(values.steps) ? values.steps : [values.steps],
-    fake:
-      !isPdProtocolGenerationEnabled &&
-      values.protocol_format === 'Protocol Designer',
-    fakeKey:
-      !isPdProtocolGenerationEnabled &&
-      values.protocol_format === 'Protocol Designer'
-        ? 'pd serial diliution'
-        : undefined,
   })
 
   return prompt

@@ -22,7 +22,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
@@ -59,7 +59,7 @@ export function FlexPipetteCard({
   robotName,
   isRunActive,
   isEstopNotDisengaged,
-}: FlexPipetteCardProps): JSX.Element {
+}: FlexPipetteCardProps): ReactNode {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
 
   const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =

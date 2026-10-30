@@ -31,9 +31,10 @@ import {
   getUnreachableRobots,
 } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ClearUnavailableRobots(): JSX.Element {
+export function ClearUnavailableRobots(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const { makeToast } = useToaster()

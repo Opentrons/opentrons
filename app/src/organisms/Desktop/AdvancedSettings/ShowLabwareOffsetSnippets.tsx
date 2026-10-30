@@ -17,9 +17,10 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function ShowLabwareOffsetSnippets(): JSX.Element {
+export function ShowLabwareOffsetSnippets(): ReactNode {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const isLabwareOffsetCodeSnippetsOn = useSelector(

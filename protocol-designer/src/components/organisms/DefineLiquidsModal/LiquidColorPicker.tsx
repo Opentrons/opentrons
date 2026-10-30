@@ -5,7 +5,7 @@ import { Flex, POSITION_ABSOLUTE } from '@opentrons/components'
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 import type { ColorResult } from '@uiw/react-color'
-import type { RefObject } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import type { Ingredient } from '@opentrons/step-generation'
 
@@ -21,7 +21,7 @@ export function LiquidColorPicker({
   control,
   color,
   setValue,
-}: LiquidColorPickerProps): JSX.Element {
+}: LiquidColorPickerProps): ReactNode {
   return (
     <Flex
       position={POSITION_ABSOLUTE}

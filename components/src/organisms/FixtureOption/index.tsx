@@ -9,7 +9,7 @@ import {
 } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface FixtureOptionProps {
   onClickHandler: MouseEventHandler
@@ -18,7 +18,7 @@ interface FixtureOptionProps {
   secondaryButtonText?: string
   buttonText: string
 }
-export function FixtureOption(props: FixtureOptionProps): JSX.Element {
+export function FixtureOption(props: FixtureOptionProps): ReactNode {
   const {
     onClickHandler,
     optionName,

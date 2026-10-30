@@ -1,6 +1,8 @@
 import { COLORS } from '../../../helix-design-system'
 
-export function OpentronsUniversalFlatAdapter(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OpentronsUniversalFlatAdapter(): ReactNode {
   return (
     <svg>
       <path

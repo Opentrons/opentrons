@@ -15,6 +15,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { getMissingTips } from '../../utils/getMissingTips'
 import styles from './tippickupslot.module.css'
 
+import type { ReactNode } from 'react'
 import type { TipType } from '@opentrons/components'
 import type { RobotState } from '@opentrons/step-generation'
 import type { LabwareEntityExtended } from '../../DeckView'
@@ -24,7 +25,7 @@ interface TipPickupSlotProps {
   robotState: RobotState
 }
 
-export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
+export function TipPickupSlot(props: TipPickupSlotProps): ReactNode {
   const { tiprackEntity, robotState } = props
   const { t } = useTranslation('protocol_visualization')
   const { id, def, nickName } = tiprackEntity

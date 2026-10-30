@@ -7,9 +7,10 @@ import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerLoadShuttle(props: RecoveryContentProps): JSX.Element {
+export function StackerLoadShuttle(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   const { routeUpdateActions } = props

@@ -2,74 +2,27 @@ import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import {
-  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
-  getLoadedLabwareDefinitionsByUri,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '/app/redux/calibration/pipette-offset/__fixtures__'
-import {
-  mockTipLengthCalibration1,
-  mockTipLengthCalibration2,
-} from '/app/redux/calibration/tip-length/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettes,
-} from '/app/resources/instruments'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
+  mockPipetteData1Channel,
+  mockPipetteData8Channel,
 } from '/app/resources/instruments/__fixtures__'
+import { useIsOEMMode } from '/app/resources/robot-settings'
 
-import { modifiedSimpleV6Protocol as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
+import { v6WithTwoPipettes as _uncastedModifiedSimpleV6Protocol } from '../__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useRunPipetteInfoByMount } from '../useRunPipetteInfoByMount'
 
 import type * as SharedData from '@opentrons/shared-data'
-import type { PipetteInfo } from '/app/resources/runs/types'
 
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof SharedData>()
-  return {
-    ...actualSharedData,
-    getPipetteNameSpecs: vi.fn(),
-    getLoadedLabwareDefinitionsByUri: vi.fn(),
-  }
-})
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useMostRecentCompletedAnalysis')
-vi.mock('/app/resources/instruments')
 vi.mock('/app/resources/analysis')
+vi.mock('/app/resources/robot-settings')
 
-const PIPETTE_CALIBRATIONS = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
-    tipLength: mockTipLengthCalibration1,
-  },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
-    tipLength: mockTipLengthCalibration2,
-  },
-}
-
-const ATTACHED_PIPETTES = {
-  left: mockLeftProtoPipette,
-  right: mockRightProtoPipette,
-}
-
-const TIP_LENGTH_CALIBRATIONS = [
-  mockTipLengthCalibration1,
-  mockTipLengthCalibration2,
-]
-
-const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition
-const modifiedSimpleV6Protocol = {
+const simpleV6Compatible = {
   ..._uncastedModifiedSimpleV6Protocol,
   labware: [
     {
@@ -100,47 +53,82 @@ const modifiedSimpleV6Protocol = {
   pipettes: [
     {
       id: 'pipetteId',
-      pipetteName: 'p10_single',
+      pipetteName: 'p1000_single_flex',
+    },
+    {
+      id: 'pipetteId2',
+      pipetteName: 'p1000_multi_flex',
     },
   ],
 } as any as SharedData.ProtocolAnalysisOutput
 
-const PROTOCOL_DETAILS = {
+const simpleV6Incompatible = {
+  ..._uncastedModifiedSimpleV6Protocol,
+  labware: [
+    {
+      id: ' trashId',
+      displayName: 'Trash',
+      definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+      loadName: 'opentrons_1_trash_1100ml_fixed',
+    },
+    {
+      id: 'tipRackId',
+      displayName: 'Opentrons OT-2 96 Tip Rack 10 µL',
+      definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
+      loadName: 'opentrons_96_tiprack_10ul',
+    },
+    {
+      id: 'sourcePlateId',
+      displayName: 'Source Plate',
+      definitionUri: 'example/plate/1',
+      loadName: 'plate',
+    },
+    {
+      id: 'destPlateId',
+      displayName: 'Sample Collection Plate',
+      definitionUri: 'example/plate/1',
+      loadName: 'plate',
+    },
+  ],
+  pipettes: [
+    {
+      id: 'pipetteId',
+      pipetteName: 'p1000_multi_flex',
+    },
+    {
+      id: 'pipetteId2',
+      pipetteName: 'p1000_multi_flex',
+    },
+  ],
+} as any as SharedData.ProtocolAnalysisOutput
+
+const PROTOCOL_DETAILS_COMPATIBLE = {
   displayName: 'fake protocol',
-  protocolData: modifiedSimpleV6Protocol,
+  protocolData: simpleV6Compatible,
   protocolKey: 'fakeProtocolKey',
-  robotType: 'OT-2 Standard' as const,
+  robotType: 'Flex Standard' as const,
+}
+
+const PROTOCOL_DETAILS_INCOMPATIBLE = {
+  displayName: 'fake protocol',
+  protocolData: simpleV6Incompatible,
+  protocolKey: 'fakeProtocolKey',
+  robotType: 'Flex Standard' as const,
 }
 
 describe('useRunPipetteInfoByMount hook', () => {
   beforeEach(() => {
-    when(vi.mocked(useAttachedPipetteCalibrations))
+    when(vi.mocked(useIsOEMMode)).calledWith().thenReturn(false)
+    when(vi.mocked(useInstrumentsQuery))
       .calledWith()
-      .thenReturn(PIPETTE_CALIBRATIONS)
-    when(vi.mocked(useAttachedPipettes))
-      .calledWith()
-      .thenReturn(ATTACHED_PIPETTES)
-    when(vi.mocked(useAllTipLengthCalibrationsQuery))
-      .calledWith()
-      .thenReturn({ data: { data: TIP_LENGTH_CALIBRATIONS } } as any)
-    when(vi.mocked(useMostRecentCompletedAnalysis))
-      .calledWith('1')
-      .thenReturn(PROTOCOL_DETAILS.protocolData as any)
-    when(vi.mocked(useStoredProtocolAnalysis))
-      .calledWith('1')
-      .thenReturn(
-        PROTOCOL_DETAILS as unknown as SharedData.ProtocolAnalysisOutput
-      )
-    when(vi.mocked(getPipetteNameSpecs))
-      .calledWith('p10_single')
       .thenReturn({
-        displayName: 'P10 Single-Channel GEN1',
-      } as SharedData.PipetteNameSpecs)
-    when(vi.mocked(getLoadedLabwareDefinitionsByUri))
-      .calledWith(
-        _uncastedModifiedSimpleV6Protocol.commands as SharedData.RunTimeCommand[]
-      )
-      .thenReturn(_uncastedModifiedSimpleV6Protocol.labwareDefinitions as {})
+        data: {
+          data: [mockPipetteData1Channel, mockPipetteData8Channel],
+          meta: {} as any,
+        },
+        isSuccess: true,
+        status: 'success',
+      } as any)
   })
 
   it('should return empty mounts when protocol details not found', () => {
@@ -155,26 +143,42 @@ describe('useRunPipetteInfoByMount hook', () => {
     })
   })
 
-  it('should return run pipette info by mount', () => {
+  it('should return run pipette info by mount for matches', () => {
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith('1')
+      .thenReturn(PROTOCOL_DETAILS_COMPATIBLE.protocolData as any)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith('1')
+      .thenReturn(
+        PROTOCOL_DETAILS_COMPATIBLE as any as SharedData.ProtocolAnalysisOutput
+      )
     const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: {
-        id: 'pipetteId',
-        pipetteName: 'p10_single',
+        requestedPipetteMatch: 'match',
+      },
+      right: {
+        requestedPipetteMatch: 'match',
+      },
+    })
+  })
+  it('should return run pipette info by mount for non matches', () => {
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith('1')
+      .thenReturn(PROTOCOL_DETAILS_INCOMPATIBLE.protocolData as any)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith('1')
+      .thenReturn(
+        PROTOCOL_DETAILS_INCOMPATIBLE as any as SharedData.ProtocolAnalysisOutput
+      )
+    const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
+    expect(result.current).toStrictEqual({
+      left: {
         requestedPipetteMatch: 'incompatible',
-        pipetteCalDate: null,
-        pipetteSpecs: {
-          displayName: 'P10 Single-Channel GEN1',
-        },
-        tipRacksForPipette: [
-          {
-            displayName: 'Opentrons OT-2 96 Tip Rack 10 µL',
-            lastModifiedDate: null,
-            tipRackDef: tiprack10ul,
-          },
-        ],
-      } as unknown as PipetteInfo,
-      right: null,
+      },
+      right: {
+        requestedPipetteMatch: 'match',
+      },
     })
   })
 })

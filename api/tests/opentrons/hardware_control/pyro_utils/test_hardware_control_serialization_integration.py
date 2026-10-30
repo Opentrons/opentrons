@@ -1,6 +1,5 @@
 """Tests to enforce serialization for dataclasses from the hardware api layer."""
 
-import asyncio
 import enum
 import inspect
 import socket
@@ -9,7 +8,7 @@ from dataclasses import is_dataclass
 from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Dict, get_args, get_type_hints
+from typing import Any, Dict, get_args, get_origin, get_type_hints
 
 import pytest
 from decoy import Decoy
@@ -33,8 +32,8 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 import opentrons.calibration_storage.types as calibration_types
 import opentrons.config.types as config_types
 import opentrons.drivers.flex_stacker.types as stacker_types
-import opentrons.drivers.rpi_drivers.types as rpi_types
 import opentrons.drivers.types as driver_types
+import opentrons.drivers.usb.types as rpi_types
 import opentrons.drivers.vacuum_module.types as vac_types
 import opentrons.hardware_control.dev_types as dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration as instr_calibration_types
@@ -56,6 +55,7 @@ from opentrons.drivers.vacuum_module.simulator import (
     SimulatingDriver as VacuumModuleSimulatingDriver,
 )
 from opentrons.hardware_control import ThreadManager, modules
+from opentrons.hardware_control.instruments import AbstractInstrument, Gripper
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.modules import (
     AbsorbanceReader,
@@ -70,7 +70,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     SimulatingModule,
 )
-from opentrons.hardware_control.ot3_calibration import OT3Transforms
+from opentrons.hardware_control.ot3_calibration import DeckCalibration, OT3Transforms
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
@@ -79,7 +79,6 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     HARDWARE_PYDANTIC_PACKAGES,
     register_hardware_types,
 )
-from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import DoorState
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
@@ -109,42 +108,6 @@ def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
         else:
             decoy.when(mock_get_ff()).then_return(False)
         monkeypatch.setattr(feature_flags, name, mock_get_ff)
-
-
-@pytest.fixture
-def ot3_hardware_api(request: pytest.FixtureRequest) -> OT3API:
-    """Real OT3API backed by the software simulator, bound to a dedicated event loop.
-
-    Pyro serves OT3API by binding class methods to the core object
-    (``MethodType(OT3API.method, core_obj)``), so ``decoy.when`` stubs on a mock
-    instance do not replace method bodies. A simulator-backed API provides the
-    ``_backend``, pipette/gripper handlers, and positions those methods expect.
-    """
-    request.node.add_marker("ot3_only")
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        loop = asyncio.new_event_loop()
-
-        def _event_loop() -> None:
-            asyncio.set_event_loop(loop)
-            loop.run_forever()
-
-        loop_thread = threading.Thread(target=_event_loop, daemon=True)
-        loop_thread.start()
-
-        fut = asyncio.run_coroutine_threadsafe(
-            OT3API.build_hardware_simulator(
-                loop=loop,
-                strict_attached_instruments=False,
-            ),
-            loop,
-        )
-        api = fut.result(timeout=120)
-        api._door_state = DoorState.CLOSED
-        return api
-    except ImportError:
-        return None  # type: ignore[return-value]
 
 
 @pytest.fixture
@@ -300,6 +263,9 @@ async def _setup_and_validate_modules_on_OT3API_and_nameserver(
         name_server_ready,
     )
 
+    # Mock out the gripper
+    wrapped_api._gripper_handler.gripper = decoy.mock(cls=Gripper)
+
     # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
     # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
     modules_list_NO_MAG_BLOCK = tuple(
@@ -399,6 +365,110 @@ def _collect_exposed_types(  # noqa: C901
     return class_list
 
 
+def _find_exposed_instruments(  # noqa: C901
+    original_class: type,
+    acpo_instance: Any,
+) -> dict[str, type]:
+    """Collect AbstractInstrument APIs exposed by an ACPO and return the class and function associated with it."""
+    exposed_instruments: dict[str, type] = {}
+    proxy: pyro.Proxy = acpo_instance._proxy
+    proxy._pyroBind()  # type: ignore
+    pyro_methods = ["get_pyro_async_methods", "get_pyro_attributes_with_proxy_result"]
+
+    def _resolve_type_hints(obj: Any, attr_name: str) -> dict[str, Any]:
+        try:
+            return get_type_hints(obj)
+        except Exception as e:
+            raise ValueError(
+                f"Could not resolve type hints for {original_class.__name__}.{attr_name}: {e}"
+            ) from e
+
+    def _is_abstract_instrument(annotation: type) -> type | None:
+        # Recursively check if the type annotation is an AbstractInstrument
+        try:
+            if issubclass(annotation, AbstractInstrument):
+                return annotation
+        except TypeError:
+            pass
+        # Filter for wrappers like List/Optional
+        origin = get_origin(annotation)
+        args = get_args(annotation)
+
+        if origin is not None and args:
+            # Check any of the inner type arguments recursively
+            for arg in args:
+                possible_instr = _is_abstract_instrument(arg)
+                if possible_instr:
+                    return possible_instr
+        return None
+
+    # Scrape the exposed methods
+    for method in proxy._pyroMethods:
+        if method in pyro_methods:
+            continue
+        if not hasattr(original_class, method):
+            continue
+        original_class_method = getattr(original_class, method)
+        hints = _resolve_type_hints(original_class_method, method)
+        if "return" in hints:
+            possible_instr = _is_abstract_instrument(hints["return"])
+            if possible_instr:
+                exposed_instruments[method] = possible_instr
+    # Scrape the exposed properties
+    for attribute in proxy._pyroAttrs:
+        if attribute in pyro_methods:
+            continue
+        original_class_attribute = getattr(original_class, attribute)
+        hints = _resolve_type_hints(original_class_attribute.fget, attribute)
+        if "return" in hints:
+            possible_instr = _is_abstract_instrument(hints["return"])
+            if possible_instr:
+                exposed_instruments[attribute] = possible_instr
+
+    return exposed_instruments
+
+
+async def test_instrument_proxy_coverage(
+    decoy: Decoy,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_driver: SimulatingDriver,
+    tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
+    hs_reader_mocked_driver: modules.heater_shaker.HeaterShakerReader,
+    td_reader_mocked_driver: modules.tempdeck.TempDeckReader,
+    vm_reader_mocked_driver: modules.vacuum_module.VacuumModuleReader,
+    ar_reader_mocked_driver: modules.absorbance_reader.AbsorbanceReaderReader,
+    st_reader_mocked_driver: modules.flex_stacker.FlexStackerReader,
+    mock_feature_flags: None,
+) -> None:
+    """Test will check if the instrument APIs exposed by the OT3API are properly tagged as proxies."""
+    ot3api_async_instance = await _setup_and_validate_modules_on_OT3API_and_nameserver(
+        decoy,
+        ot3_hardware,
+        mock_driver,
+        tc_reader_mocked_driver,
+        hs_reader_mocked_driver,
+        td_reader_mocked_driver,
+        vm_reader_mocked_driver,
+        ar_reader_mocked_driver,
+        st_reader_mocked_driver,
+        mock_feature_flags,
+    )
+
+    # Collect exposed AbstractInstruments from the OT3API
+    instruments = _find_exposed_instruments(
+        original_class=OT3API,
+        acpo_instance=ot3api_async_instance,
+    )
+    pyro_methods: list[str] = getattr(
+        ot3api_async_instance, "get_pyro_attributes_with_proxy_result"
+    )
+
+    # Assert that we don't have any exposed AbstractInstruments that aren't wrapped as a Proxy
+    # NOTE: If this test fails it means we added a new AbstractInstrument and need to update the other serialization tests!
+    assert all(any(key in method for method in pyro_methods) for key in instruments)
+    # todo(chb: 2026-10-30): Expand this test to verify the type coming back from ACPO calls matches the original class type
+
+
 async def test_serialization_coverage(
     decoy: Decoy,
     ot3_hardware: ThreadManager[OT3API],
@@ -448,6 +518,14 @@ async def test_serialization_coverage(
         )
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
+
+    # Collect classes from the Gripper API
+    class_cover_list = class_cover_list + _collect_exposed_types(
+        original_class=Gripper,
+        acpo_instance=ot3api_async_instance.hardware_gripper,
+        type_qualifier="dataclass_namedtuple",
+    )
+    class_cover_list = list(set(class_cover_list))
 
     for item in class_cover_list:
         if hasattr(item, "to_pyro_dict") and hasattr(item, "from_pyro_dict"):
@@ -565,6 +643,14 @@ async def test_enum_registration_coverage(
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
 
+    # Collect classes from the Gripper API
+    class_cover_list = class_cover_list + _collect_exposed_types(
+        original_class=Gripper,
+        acpo_instance=ot3api_async_instance.hardware_gripper,
+        type_qualifier="enum",
+    )
+    class_cover_list = list(set(class_cover_list))
+
     # This test uses <= because the `find_enums_in_packages` crawler is actually finding more enums than there are
     # exposed via the Pyro interface. We just want to make sure all the exposed ones are in that registry.
     assert set(class_cover_list) <= set(hardware_registry_class_list)
@@ -619,6 +705,13 @@ async def test_pydantic_registration_coverage(
         )
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
+
+    # Collect classes from the Gripper API
+    class_cover_list = class_cover_list + _collect_exposed_types(
+        original_class=Gripper,
+        acpo_instance=ot3api_async_instance.hardware_gripper,
+        type_qualifier="pydantic",
+    )
 
     # This test uses <= because the `find_pydantic_classes_in_packages` crawler is actually finding more pydantic models than
     # there are exposed via the Pyro interface. We just want to make sure all the exposed ones are in that registry.

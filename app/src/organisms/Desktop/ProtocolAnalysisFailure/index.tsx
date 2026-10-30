@@ -23,7 +23,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolAnalysisFailureProps {
@@ -33,7 +33,7 @@ interface ProtocolAnalysisFailureProps {
 
 export function ProtocolAnalysisFailure(
   props: ProtocolAnalysisFailureProps
-): JSX.Element {
+): ReactNode {
   const { errors, protocolKey } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const dispatch = useDispatch<Dispatch>()

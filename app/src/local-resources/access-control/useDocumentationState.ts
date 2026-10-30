@@ -86,7 +86,6 @@ export function useDocumentationState(
     ) => {
       let username = usernameOverride ?? usernameRef.current
       if (username == null || username.length === 0) {
-        console.log('calling requireLogin', currentRobotName)
         const loginResult = await requireLogin({
           robotName: currentRobotName ?? '',
         })

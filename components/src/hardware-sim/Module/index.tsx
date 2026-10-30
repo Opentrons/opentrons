@@ -120,7 +120,7 @@ const statusInfoFlexProps = {
   paddingBottom: SPACING_1,
 }
 
-export const Module = (props: Props): JSX.Element => {
+export const Module = (props: Props): ReactNode => {
   const {
     def,
     x,

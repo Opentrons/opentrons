@@ -14,6 +14,8 @@ import {
   truncateString,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 const FILE_UPLOAD_STYLE = css`
 &:hover > svg {
   background: ${COLORS.black90}${COLORS.opacity20HexCode};
@@ -40,7 +42,7 @@ export function FileUpload({
   file,
   fileError,
   handleClick,
-}: FileUploadProps): JSX.Element {
+}: FileUploadProps): ReactNode {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Btn

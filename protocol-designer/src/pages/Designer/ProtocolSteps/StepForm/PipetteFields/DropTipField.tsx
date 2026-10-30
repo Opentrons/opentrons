@@ -8,6 +8,7 @@ import {
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
@@ -21,7 +22,7 @@ interface DropTipFieldProps extends FieldProps {
   tiprackDefUri: string
 }
 
-export function DropTipField(props: DropTipFieldProps): JSX.Element {
+export function DropTipField(props: DropTipFieldProps): ReactNode {
   const { value: dropdownItem, updateValue, tiprackDefUri } = props
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)

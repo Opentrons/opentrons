@@ -11,6 +11,7 @@ import { getPasswordComplexityError } from '/app/resources/auth'
 import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
@@ -60,7 +61,7 @@ export function OnDeviceLogin({
   onUsernameSubmit,
   onValidateNewPassword,
   passwordComplexity,
-}: OnDeviceLoginProps): JSX.Element {
+}: OnDeviceLoginProps): ReactNode {
   const { t } = useTranslation(['shared', 'access_control'])
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null

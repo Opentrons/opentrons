@@ -5,6 +5,7 @@ import startCase from 'lodash/startCase'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -28,6 +29,7 @@ import {
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareCardProps {
@@ -35,7 +37,7 @@ export interface LabwareCardProps {
   onClick: () => void
 }
 
-export function LabwareCard(props: LabwareCardProps): JSX.Element {
+export function LabwareCard(props: LabwareCardProps): ReactNode {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName
@@ -57,6 +59,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       role="link"
       backgroundColor={COLORS.white}
       color={COLORS.black90}
+      borderRadius={BORDERS.borderRadius8}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
       height="auto"

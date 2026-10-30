@@ -8,6 +8,7 @@ import { useNotifyImageFileQuery } from '/app/resources/dataFiles/useNotifyImage
 
 import styles from './protocolrunrecords.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 import type { CsvFileParameter, ProtocolResource } from '@opentrons/shared-data'
 
@@ -80,7 +81,7 @@ const getRunRecordDrawerFiles = (args: {
   ]
 }
 
-export function RunRecordDrawer(props: RunRecordDrawerProps): JSX.Element {
+export function RunRecordDrawer(props: RunRecordDrawerProps): ReactNode {
   const { run, runProtocol } = props
   const { t } = useTranslation('device_details')
   const { data: runImages } = useNotifyImageFileQuery(run.id)

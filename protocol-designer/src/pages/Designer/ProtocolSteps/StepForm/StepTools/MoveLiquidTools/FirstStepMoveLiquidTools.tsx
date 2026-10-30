@@ -17,6 +17,7 @@ import {
 } from '../../PipetteFields'
 import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -28,7 +29,7 @@ interface FirstStepMoveLiquidToolsProps {
 export function FirstStepMoveLiquidTools({
   propsForFields,
   formData,
-}: FirstStepMoveLiquidToolsProps): JSX.Element {
+}: FirstStepMoveLiquidToolsProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const pipettes = useSelector(getPipetteEntities)
   const additionalEquipmentEntities = useSelector(

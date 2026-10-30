@@ -22,6 +22,8 @@ const EXPECTED_VALID_QUIRKS = [
   'vacuumModuleDock',
   'providesStackingDefault',
   'filterPlate',
+  'vacuumSpacer',
+  'vacuumSpacerSeat',
 ]
 
 describe('check quirks for all labware defs', () => {

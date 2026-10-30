@@ -6,11 +6,11 @@ import { AlertModal } from '@opentrons/components'
 import { BottomButtonBar } from './BottomButtonBar'
 import styles from './styles.module.css'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 type Props = ComponentProps<typeof AlertModal>
 
-export function ScrollableAlertModal(props: Props): JSX.Element {
+export function ScrollableAlertModal(props: Props): ReactNode {
   return (
     <AlertModal
       {...omit(props, 'buttons', 'children')}

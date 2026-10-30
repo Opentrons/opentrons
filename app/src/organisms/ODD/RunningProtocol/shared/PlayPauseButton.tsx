@@ -11,6 +11,7 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 
 const PLAY_PAUSE_BUTTON_STYLE = css`
@@ -56,7 +57,7 @@ export function PlayPauseButton({
   buttonSize = '12.5rem',
   iconSize = '5rem',
   runStatus,
-}: PlayPauseButtonProps): JSX.Element {
+}: PlayPauseButtonProps): ReactNode {
   const isRunning = runStatus === RUN_STATUS_RUNNING
   const iconName = isRunning ? 'pause' : 'play'
   return (

@@ -29,10 +29,11 @@ import { getRobotUpdateSession } from '/app/redux/robot-update'
 
 import styles from './robotsettings.module.css'
 
+import type { ReactNode } from 'react'
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
-export function RobotSettings(): JSX.Element {
+export function RobotSettings(): ReactNode {
   const { robotName } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams

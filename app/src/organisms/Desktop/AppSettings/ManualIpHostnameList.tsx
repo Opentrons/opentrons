@@ -6,6 +6,7 @@ import { getViewableRobots } from '/app/redux/discovery'
 
 import { ManualIpHostnameItem } from './ManualIpHostnameItem'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 interface IpHostnameListProps {
@@ -18,7 +19,7 @@ export function ManualIpHostnameList({
   mostRecentAddition,
   setMostRecentAddition,
   setMostRecentDiscovered,
-}: IpHostnameListProps): JSX.Element {
+}: IpHostnameListProps): ReactNode {
   const candidates = useSelector((state: State) => {
     const results = getConfig(state)?.discovery.candidates
     return typeof results === 'string' ? [].concat(results) : results

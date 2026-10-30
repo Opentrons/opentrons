@@ -18,6 +18,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -40,7 +41,7 @@ interface WasteChuteConfigItemProps {
 
 export function WasteChuteConfigFixture(
   props: WasteChuteConfigItemProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

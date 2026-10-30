@@ -3,12 +3,11 @@
   min-width: 0;
   height: 100%;
   box-sizing: border-box;
-  padding: var(--spacing-12);
 }
 
 .handle {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-details);
   top: 0;
   bottom: 0;
   width: 0.5rem;
@@ -32,6 +31,6 @@
   bottom: 0;
   left: 3px;
   width: 2px;
-  background-color: var(--blue-50);
+  background-color: var(--grey-40);
   content: '';
 }

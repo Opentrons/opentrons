@@ -4,11 +4,12 @@ import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePosition
 
 import { LPCWizardFlex } from './LPCWizardFlex'
 
+import type { ReactNode } from 'react'
 import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 
 export function LPCWizardContainer(
   props: LegacySupportLPCFlowsProps
-): JSX.Element {
+): ReactNode {
   switch (props.robotType) {
     case FLEX_ROBOT_TYPE:
       return <LPCWizardFlex {...props} />

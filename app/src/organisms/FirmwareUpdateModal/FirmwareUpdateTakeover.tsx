@@ -14,11 +14,12 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
 
+import type { ReactNode } from 'react'
 import type { InstrumentData, Subsystem } from '@opentrons/api-client'
 
 const POLL_INTERVAL_MS = 5000
 
-export function FirmwareUpdateTakeover(): JSX.Element {
+export function FirmwareUpdateTakeover(): ReactNode {
   const [showUpdateNeededModal, setShowUpdateNeededModal] =
     useState<boolean>(false)
   const [initiatedSubsystemUpdate, setInitiatedSubsystemUpdate] =

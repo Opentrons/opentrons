@@ -13,6 +13,7 @@ from . import (
     test_vent,
     test_pump_basic,
     test_vacuum_functional,
+    test_waste_detection,
 )
 
 
@@ -26,6 +27,7 @@ class TestSection(enum.Enum):
     VENT = "VENT"
     PUMP_BASIC = "PUMP_BASIC"
     VACUUM_FUNCTIONAL = "VACUUM_FUNCTIONAL"
+    WASTE_DETECTION = "WASTE_DETECTION"
 
 
 @dataclass
@@ -65,6 +67,10 @@ TESTS = [
         TestSection.VACUUM_FUNCTIONAL,
         test_vacuum_functional.run,
     ),
+    (
+        TestSection.WASTE_DETECTION,
+        test_waste_detection.run,
+    ),
 ]
 
 
@@ -100,6 +106,10 @@ def build_report(test_name: str) -> CSVReport:
             CSVSection(
                 title=TestSection.VACUUM_FUNCTIONAL.value,
                 lines=test_vacuum_functional.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.WASTE_DETECTION.value,
+                lines=test_waste_detection.build_csv_lines(),
             ),
         ],
     )

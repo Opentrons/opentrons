@@ -16,6 +16,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -38,7 +39,7 @@ interface AbsorbanceReaderItemProps {
 
 export function AbsorbanceReaderItem(
   props: AbsorbanceReaderItemProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

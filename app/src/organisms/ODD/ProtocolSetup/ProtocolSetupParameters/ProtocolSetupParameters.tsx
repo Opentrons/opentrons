@@ -35,6 +35,7 @@ import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 import { ResetValuesModal } from './ResetValuesModal'
 
+import type { ReactNode } from 'react'
 import type { FileData } from '@opentrons/api-client'
 import type {
   ChoiceParameter,
@@ -56,7 +57,7 @@ interface ProtocolSetupParametersProps {
 export function ProtocolSetupParameters({
   protocolId,
   runTimeParameters,
-}: ProtocolSetupParametersProps): JSX.Element {
+}: ProtocolSetupParametersProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
   const host = useHost()

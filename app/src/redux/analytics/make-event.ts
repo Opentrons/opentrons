@@ -1,18 +1,11 @@
 // redux action types to analytics events map
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import * as Alerts from '../alerts'
 import * as CustomLabware from '../custom-labware'
 import * as RobotUpdate from '../robot-update/constants'
-import * as Sessions from '../sessions'
-import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as SystemInfo from '../system-info'
 import * as Constants from './constants'
-import {
-  getAnalyticsSessionExitDetails,
-  getBuildrootAnalyticsData,
-  getSessionInstrumentAnalyticsData,
-} from './selectors'
+import { getBuildrootAnalyticsData } from './selectors'
 
 import type { Action, State } from '../types'
 import type { AnalyticsEvent } from './types'
@@ -155,8 +148,8 @@ export function makeEvent(
           ? {
               superProperties: {
                 ...systemInfoProps,
-                // anonymize IP address so analytics profile can't be mapped to more
-                // specific Intercom support profile
+                // anonymize IP address so analytics profile can't be mapped to a
+                // specific user/install
                 'U2E IPv4 Address': Boolean(
                   systemInfoProps['U2E IPv4 Address']
                 ),
@@ -164,58 +157,6 @@ export function makeEvent(
             }
           : null
       )
-    }
-
-    case Sessions.CREATE_SESSION_COMMAND: {
-      switch (action.payload.command.command) {
-        case sharedCalCommands.EXIT: {
-          const sessionDetails = getAnalyticsSessionExitDetails(
-            state,
-            action.payload.robotName,
-            action.payload.sessionId
-          )
-          return Promise.resolve(
-            sessionDetails != null
-              ? {
-                  name: `${sessionDetails.sessionType}Exit`,
-                  properties: {
-                    step: sessionDetails.step,
-                    robotType: OT2_ROBOT_TYPE,
-                  },
-                }
-              : null
-          )
-        }
-        case sharedCalCommands.LOAD_LABWARE: {
-          const commandData = action.payload.command.data
-          if (commandData != null) {
-            const instrData = getSessionInstrumentAnalyticsData(
-              state,
-              action.payload.robotName,
-              action.payload.sessionId
-            )
-            return Promise.resolve(
-              instrData != null
-                ? {
-                    name: `${instrData.sessionType}TipRackSelect`,
-                    properties: {
-                      pipetteModel: instrData.pipetteModel,
-                      tipRackDisplayName:
-                        'tiprackDefinition' in commandData
-                          ? commandData.tiprackDefinition.metadata.displayName
-                          : null,
-                      robotType: OT2_ROBOT_TYPE,
-                    },
-                  }
-                : null
-            )
-          } else {
-            return Promise.resolve(null)
-          }
-        }
-        default:
-          return Promise.resolve(null)
-      }
     }
 
     case Alerts.ALERT_DISMISSED: {
@@ -229,26 +170,6 @@ export function makeEvent(
       }
 
       return Promise.resolve(null)
-    }
-
-    case Constants.ANALYTICS_PIPETTE_OFFSET_STARTED: {
-      return Promise.resolve({
-        name: 'pipetteOffsetCalibrationStarted',
-        properties: {
-          ...action.payload,
-          robotType: OT2_ROBOT_TYPE,
-        },
-      })
-    }
-
-    case Constants.ANALYTICS_TIP_LENGTH_STARTED: {
-      return Promise.resolve({
-        name: 'tipLengthCalibrationStarted',
-        properties: {
-          ...action.payload,
-          robotType: OT2_ROBOT_TYPE,
-        },
-      })
     }
 
     case Constants.ANALYTICS_RESOURCE_MONITOR_REPORT: {

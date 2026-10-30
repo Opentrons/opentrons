@@ -145,6 +145,7 @@ async def test_load_orchestrator(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(run_orchestrator)
     await subject.load_orchestrator(
@@ -243,6 +244,7 @@ async def test_analyze(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
     subject = ProtocolAnalyzer(
@@ -325,7 +327,7 @@ async def test_analyze(
             analysis_id="analysis-id",
             robot_type=robot_type,
             run_time_parameters=[bool_parameter],
-            commands=[analysis_command],
+            commands=None,
             labware=[analysis_labware],
             modules=[],
             pipettes=[analysis_pipette],
@@ -385,6 +387,7 @@ async def test_analyze_updates_pending_on_error(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
 

@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
@@ -13,17 +12,12 @@ import {
 } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
-import { useIsFlex } from '/app/redux-resources/robots'
-import { getCustomLabwareDefinitions } from '/app/redux/custom-labware'
-import {
-  useAttachedPipettes,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '/app/resources/instruments'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
+import { formatLastCalibrated } from './utils'
 
-import type { State } from '/app/redux/types'
+import type { ReactNode } from 'react'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
@@ -58,40 +52,28 @@ export function PipetteOffsetCalibrationItems({
   robotName,
   isRobotBusy,
   formattedPipetteOffsetCalibrations,
-}: PipetteOffsetCalibrationItemsProps): JSX.Element {
+}: PipetteOffsetCalibrationItemsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
-  const customLabwareDefs = useSelector((state: State) => {
-    return getCustomLabwareDefinitions(state)
-  })
-  const attachedPipettesFromPipetteQuery = useAttachedPipettes()
-  const attachedPipetteFromInstrumentQuery =
+  const attachedPipettesFromInstrumentQuery =
     useAttachedPipettesFromInstrumentsQuery()
-  const isFlex = useIsFlex(robotName)
-  const attachedPipettes = isFlex
-    ? attachedPipetteFromInstrumentQuery
-    : attachedPipettesFromPipetteQuery
 
   const is96Attached =
-    // @ts-expect-error isFlex is a type narrower but not recognized as one
-    isFlex && attachedPipettes?.[LEFT]?.instrumentName === 'p1000_96'
+    attachedPipettesFromInstrumentQuery?.[LEFT]?.instrumentName === 'p1000_96'
   return (
     <StyledTable>
       <thead>
         <tr>
           <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
           <StyledTableHeader>{t('mount')}</StyledTableHeader>
-          {/* omit tip rack column for Flex */}
-          {isFlex ? null : (
-            <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
-          )}
           <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
       <tbody css={BODY_STYLE}>
         {formattedPipetteOffsetCalibrations.map(
           (calibration, index) =>
-            attachedPipettes?.[calibration.mount] != null && (
+            attachedPipettesFromInstrumentQuery?.[calibration.mount] !=
+              null && (
               <StyledTableRow key={index}>
                 <StyledTableCell>
                   <LegacyStyledText forwardedAs="p">
@@ -109,17 +91,6 @@ export function PipetteOffsetCalibrationItems({
                     {is96Attached ? t('both') : calibration.mount}
                   </LegacyStyledText>
                 </StyledTableCell>
-                {isFlex ? null : (
-                  <StyledTableCell>
-                    <LegacyStyledText forwardedAs="p">
-                      {calibration.tiprack != null &&
-                        getDisplayNameForTipRack(
-                          calibration.tiprack,
-                          customLabwareDefs
-                        )}
-                    </LegacyStyledText>
-                  </StyledTableCell>
-                )}
                 <StyledTableCell>
                   <Flex alignItems={ALIGN_CENTER}>
                     {calibration.lastCalibrated != null &&
@@ -151,11 +122,8 @@ export function PipetteOffsetCalibrationItems({
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
                     pipetteName={
-                      isFlex
-                        ? (attachedPipetteFromInstrumentQuery[calibration.mount]
-                            ?.instrumentName ?? null)
-                        : (attachedPipettesFromPipetteQuery[calibration.mount]
-                            ?.name ?? null)
+                      attachedPipettesFromInstrumentQuery[calibration.mount]
+                        ?.instrumentName ?? null
                     }
                   />
                 </StyledTableCell>

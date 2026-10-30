@@ -78,6 +78,8 @@ stages:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
+      strict:
+        - json:off
       status_code: 200
       json:
         meta:

@@ -13,6 +13,8 @@ import { renderWithProviders } from '../../../../../../testing/utils'
 import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
 import { getUnsafeCommandText } from '../getUnsafeCommandText'
 
+import type { ReactNode } from 'react'
+
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareDisplayLocation')
 
@@ -39,7 +41,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getUnsafeCommandText({
     command,

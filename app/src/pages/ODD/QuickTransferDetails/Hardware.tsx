@@ -31,6 +31,7 @@ import {
 import { useRequiredProtocolHardware } from '/app/resources/protocols'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   ProtocolHardware,
   ProtocolPipette,
@@ -106,11 +107,7 @@ const useHardwareName = (
   }
 }
 
-function HardwareItem({
-  hardware,
-}: {
-  hardware: ProtocolHardware
-}): JSX.Element {
+function HardwareItem({ hardware }: { hardware: ProtocolHardware }): ReactNode {
   const { t, i18n } = useTranslation(['protocol_details', 'deck_configuration'])
 
   const hardwareName = useHardwareName(hardware, t as TFunction)
@@ -173,7 +170,7 @@ function HardwareItem({
   )
 }
 
-export const Hardware = (props: { transferId: string }): JSX.Element => {
+export const Hardware = (props: { transferId: string }): ReactNode => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
     props.transferId
   )

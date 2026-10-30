@@ -1,4 +1,6 @@
-export function FlexStacker(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function FlexStacker(): ReactNode {
   // The given SVG is visually a little misaligned from where we expect it to be.
   // Translate it, by eye, to compensate.
   return (
@@ -9,7 +11,7 @@ export function FlexStacker(): JSX.Element {
 }
 
 // The unadjusted SVG, straight from design.
-function UnadjustedSVG(): JSX.Element {
+function UnadjustedSVG(): ReactNode {
   return (
     <svg
       width="374"

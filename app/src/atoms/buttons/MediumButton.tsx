@@ -38,7 +38,7 @@ interface MediumButtonProps extends StyleProps {
   onClick: MouseEventHandler
 }
 
-export function MediumButton(props: MediumButtonProps): JSX.Element {
+export function MediumButton(props: MediumButtonProps): ReactNode {
   const {
     buttonText,
     buttonType = 'primary',

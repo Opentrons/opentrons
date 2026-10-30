@@ -38,7 +38,7 @@ interface SmallButtonProps extends StyleProps {
   ariaDisabled?: boolean
 }
 
-export function SmallButton(props: SmallButtonProps): JSX.Element {
+export function SmallButton(props: SmallButtonProps): ReactNode {
   const {
     buttonType = 'primary',
     buttonText,

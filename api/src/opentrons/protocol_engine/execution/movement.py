@@ -91,6 +91,11 @@ class MovementHandler:
         self._state_store.labware.raise_if_labware_has_labware_on_top(
             labware_id=labware_id
         )
+
+        # Block pipette access to labware that is physically contained inside
+        # another labware (e.g. a collection plate inside a vacuum collar).
+        self._state_store.labware.raise_if_labware_is_contained(labware_id=labware_id)
+
         await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )

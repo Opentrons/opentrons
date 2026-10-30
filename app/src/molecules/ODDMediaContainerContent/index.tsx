@@ -7,6 +7,8 @@ import { Skeleton } from '/app/atoms/Skeleton'
 
 import styles from './media.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface ODDMEdiaContainerContentProps {
   leftPrimaryText: string
   centerPrimaryText: string
@@ -18,7 +20,7 @@ export interface ODDMEdiaContainerContentProps {
 
 export function ODDMediaContainerContent(
   props: ODDMEdiaContainerContentProps
-): JSX.Element {
+): ReactNode {
   const {
     leftPrimaryText,
     centerPrimaryText,

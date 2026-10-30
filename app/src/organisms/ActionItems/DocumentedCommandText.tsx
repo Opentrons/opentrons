@@ -1,5 +1,6 @@
 import { useCommandTextString } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { CommandTextData } from '@opentrons/components'
 import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
 
@@ -13,7 +14,7 @@ export function DocumentedCommandText({
   allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData
   className?: string
-}): JSX.Element {
+}): ReactNode {
   const commandInfo = useCommandTextString({
     command: action,
     allRunDefs,

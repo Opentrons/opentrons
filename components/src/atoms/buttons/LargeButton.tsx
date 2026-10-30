@@ -147,7 +147,7 @@ interface LargeButtonProps extends StyleProps {
   ariaDisabled?: boolean
 }
 
-export function LargeButton(props: LargeButtonProps): JSX.Element {
+export function LargeButton(props: LargeButtonProps): ReactNode {
   const {
     buttonType = 'primary',
     buttonText,

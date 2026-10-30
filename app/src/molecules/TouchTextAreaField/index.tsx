@@ -9,6 +9,7 @@ import type {
   ComponentPropsWithoutRef,
   CSSProperties,
   MouseEventHandler,
+  ReactNode,
 } from 'react'
 
 type NativeTextareaProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'title'>
@@ -42,7 +43,7 @@ interface TouchTextAreaFieldProps extends NativeTextareaProps {
 export const TouchTextAreaField = forwardRef<
   HTMLTextAreaElement,
   TouchTextAreaFieldProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const {
     label,
     error,

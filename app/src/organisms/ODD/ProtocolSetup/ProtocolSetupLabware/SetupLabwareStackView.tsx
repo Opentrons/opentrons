@@ -29,6 +29,7 @@ import { ODDBackButton } from '/app/molecules/ODDBackButton'
 
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareByLiquidId,
@@ -58,7 +59,7 @@ export function SetupLabwareStackView({
   stackedItems,
   labwareByLiquidId,
   mostRecentAnalysis,
-}: SetupLabwareStackViewProps): JSX.Element {
+}: SetupLabwareStackViewProps): ReactNode {
   const labwareDefinitionsByURI = useMemo(
     () => getLabwareDefinitionsByURIForProtocol(mostRecentAnalysis.commands),
     [mostRecentAnalysis]

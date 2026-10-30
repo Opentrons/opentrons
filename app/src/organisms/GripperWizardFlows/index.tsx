@@ -42,6 +42,7 @@ import { GRIPPER_FLOW_ACTIONS, GRIPPER_FLOW_FINISH_ACTIONS } from './types'
 import { UnmountGripper } from './UnmountGripper'
 
 import type { AxiosError } from 'axios'
+import type { ReactNode } from 'react'
 import type { UseMutateFunction } from 'react-query'
 import type {
   CommandData,
@@ -64,7 +65,7 @@ interface MaintenanceRunManagerProps {
 }
 export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
-): JSX.Element {
+): ReactNode {
   const { flowType, closeFlow, attachedGripper } = props
 
   const flowName = GRIPPER_FLOW_ACTIONS[flowType]

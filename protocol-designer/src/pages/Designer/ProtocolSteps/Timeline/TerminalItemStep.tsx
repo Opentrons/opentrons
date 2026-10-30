@@ -28,6 +28,7 @@ import {
 
 import { ConnectedStepContainer } from './ConnectedStepContainer'
 
+import type { ReactNode } from 'react'
 import type { TerminalItemId } from '/protocol-designer/steplist'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type {
@@ -40,7 +41,7 @@ export interface TerminalItemStepProps {
   sidebarWidth: number
 }
 
-export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
+export function TerminalItemStep(props: TerminalItemStepProps): ReactNode {
   const { id, sidebarWidth } = props
   const { t } = useTranslation('protocol_steps')
   const hovered = useSelector(getHoveredTerminalItemId) === id

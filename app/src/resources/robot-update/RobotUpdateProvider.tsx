@@ -12,7 +12,7 @@ export interface RobotUpdateProviderProps {
  */
 export function RobotUpdateProvider({
   children,
-}: RobotUpdateProviderProps): JSX.Element {
+}: RobotUpdateProviderProps): ReactNode {
   const { startUpdate } = useRobotUpdateOrchestrator()
 
   return (

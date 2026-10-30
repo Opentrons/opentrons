@@ -35,7 +35,7 @@ export function SetupStep({
   toggleExpanded,
   children,
   rightElement,
-}: SetupStepProps): JSX.Element {
+}: SetupStepProps): ReactNode {
   return (
     <div className={styles.container}>
       <Btn textAlign={TYPOGRAPHY.textAlignLeft}>

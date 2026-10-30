@@ -1,6 +1,7 @@
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachingModuleAction } from '@opentrons/react-api-client/src/accessControl/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
@@ -12,7 +13,7 @@ export const AttachModuleActionText = ({
   action: AttachingModuleAction
   t: TFunction
   className?: string
-}): JSX.Element => {
+}): ReactNode => {
   const moduleName = getModuleDisplayName(
     action.module.moduleModel as ModuleModel
   )

@@ -4,7 +4,7 @@ import { Icon, StyledText } from '@opentrons/components'
 
 import styles from './passwordvisibilitytoggle.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 interface PasswordVisibilityToggleProps {
   /** Whether the password is currently visible (i.e. input type="text"). */
@@ -23,7 +23,7 @@ export function PasswordVisibilityToggle({
   isVisible,
   onToggle,
   iconOnly = false,
-}: PasswordVisibilityToggleProps): JSX.Element {
+}: PasswordVisibilityToggleProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const iconName = isVisible ? 'eye-slash' : 'eye'
 

@@ -36,7 +36,7 @@ import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface SlotInformationProps {
@@ -137,7 +137,7 @@ interface StackInfoListProps {
   items: string[]
 }
 
-function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
+function StackInfoList({ title, items }: StackInfoListProps): ReactNode {
   const countMap = items.reduce((acc: Record<string, number>, item) => {
     acc[item] = (acc[item] || 0) + 1
     return acc
@@ -179,7 +179,7 @@ interface StackInfoProps {
   stackInformation?: string
 }
 
-function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
+function StackInfo({ title, stackInformation }: StackInfoProps): ReactNode {
   const { t } = useTranslation('shared')
   const breakPointSize = useDeckSetupWindowBreakPoint()
   const pathLocation = useLocation()

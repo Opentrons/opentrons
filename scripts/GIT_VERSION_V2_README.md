@@ -8,6 +8,7 @@
 
 1. **Protocol Designer** – configured via `createGitVersionToolkit({ project: 'protocol-designer' })` inside `protocol-designer/vite.config.mts`
 2. **Labware Library** – configured via `createGitVersionToolkit({ project: 'labware-library' })` inside `labware-library/vite.config.mts`
+3. **Docs (MkDocs)** – a Python port of `generateBuildInfoHtml` in `docs/scripts/generate_build_info.py`, invoked from `docs/hooks.py` on `on_post_build`. Docs CI is Python-only, so it does not import this module. Docs releases are **not** semver, so this port does not resolve a version; see [Docs Tag Resolution](#docs-tag-resolution).
 
 ### Key Features
 
@@ -19,7 +20,7 @@
 
 ### Tag Priority and Semver Rules
 
-For any supported project (Protocol Designer and Labware Library today):
+For the semver projects (Protocol Designer and Labware Library):
 
 - **Version comparison**: Tags are compared using semantic versioning (semver) rules
   - Stable releases take precedence over prerelease versions of the same version (e.g., `8.6.0` > `8.6.0-beta.1`)
@@ -61,13 +62,30 @@ When production and staging tags have the exact same version, the production pre
 5. **No tags available**
    - If no matching tags are found, log an error and return `0.0.0-dev`.
 
+## Docs Tag Resolution
+
+Docs releases are datestamp tags, not semver, and the format has changed over time:
+
+- `mkdocs-2026-09-01` and `staging-mkdocs-2026-09-01` (current)
+- `mkdocs-20251210` (no separators)
+- `MKDOCS-202508210900` (uppercase, with time)
+
+Because these do not parse as semver, `docs/scripts/generate_build_info.py` does not compare versions at all. It runs `git tag --merged HEAD` over the four patterns (`mkdocs-*`, `MKDOCS-*`, `staging-mkdocs-*`, `staging-MKDOCS-*`), sorts by tag creation date, and reports the newest tag name verbatim as **Latest Docs Tag**. Production tags outrank staging tags created at the same time. When no docs tag is reachable from `HEAD`, that field shows `untagged`.
+
+The page header shows the branch being built (the PR source branch in GitHub Actions, otherwise the local branch, otherwise the short SHA), not the inherited release tag. Sandbox and local builds therefore describe the content under review; the reachable docs tag stays a regular field.
+
+Sorting by date rather than by tag name is what keeps mixed formats correct: parsing these names as versions silently discards the dashed tags and makes an old tag like `mkdocs-20251210` look like the newest release.
+
+Because ancestry is checked with `--merged HEAD`, the docs workflow checks out with `fetch-depth: 0`.
+
 ## Build Info HTML Generation
 
 The script automatically generates a comprehensive build information page at `dist/info/index.html` during the build process. This page can be accessed at `/info/` on deployed sites.
 
 ### What's Included
 
-- **Build Details**: Version, timestamp, build date, Node version, platform
+- **Build Details**: Version (Designer/Labware) or latest docs tag (Docs), timestamp, build date, runtime, platform
+- **Docs header**: Branch name for the build under review, not the inherited release tag
 - **Git Information**: Branch, commit SHA, author, message, tags at `HEAD`
 - **GitHub Actions Info** (CI builds only):
   - Quick links to workflow run, PR, compare view, branch/tag
@@ -82,8 +100,10 @@ The script automatically generates a comprehensive build information page at `di
 
 - Protocol Designer (local): `http://localhost:5178/info/` — available during `make serve`
 - Labware Library (local): `http://localhost:5173/info/` — served by `make serve`
+- Docs (local): `http://127.0.0.1:8000/info/` — written on every MkDocs `build` / `serve` rebuild
 - Protocol Designer (production): `https://designer.opentrons.com/info/`
 - Labware Library (production): `https://labware.opentrons.com/info/`
+- Docs (production): `https://docs.opentrons.com/info/`
 
 ## Testing Results
 
@@ -125,3 +145,4 @@ Equivalent scenarios apply to Labware Library, substituting `labware-library@` a
 
 - **Protocol Designer**: `protocol-designer/vite.config.mts` registers a Vite plugin that invokes `generateBuildInfoHtml` after bundling, ensuring `/info/index.html` ships with every build.
 - **Labware Library**: `labware-library/vite.config.mts` wires the same helper into its build so both the creator and main surfaces expose `/info/index.html`.
+- **Docs**: `docs/hooks.py` writes `site/info/index.html` after MkDocs build. `/info/` is not in the MkDocs nav.

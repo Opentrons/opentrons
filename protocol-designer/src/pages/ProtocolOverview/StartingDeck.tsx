@@ -21,7 +21,7 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../types'
 
@@ -33,7 +33,7 @@ interface StartingDeckProps {
 export function StartingDeck({
   robotType,
   setShowMaterialsListModal,
-}: StartingDeckProps): JSX.Element {
+}: StartingDeckProps): ReactNode {
   const [isOffDeck, setIsOFfDeck] = useState<boolean>(false)
 
   return (
@@ -54,7 +54,7 @@ interface StartingDeckHeaderProps {
   setShowMaterialsListModal: Dispatch<SetStateAction<boolean>>
 }
 
-function StartingDeckHeader(props: StartingDeckHeaderProps): JSX.Element {
+function StartingDeckHeader(props: StartingDeckHeaderProps): ReactNode {
   const { isOffDeck, setIsOffDeck, setShowMaterialsListModal } = props
   const { t } = useTranslation(['protocol_overview', 'starting_deck_state'])
   const onDeckString = t('starting_deck_state:onDeck')
@@ -99,7 +99,7 @@ interface StartingDeckBodyProps {
   robotType: RobotType
 }
 
-function StartingDeckBody(props: StartingDeckBodyProps): JSX.Element {
+function StartingDeckBody(props: StartingDeckBodyProps): ReactNode {
   const { isOffDeck, robotType } = props
   const [hover, setHover] = useState<DeckSlot | string | null>(null)
   const { labware: labwaresOnDeck } = useSelector(getInitialDeckSetup)

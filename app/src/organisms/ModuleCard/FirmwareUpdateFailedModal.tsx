@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 
 interface FirmwareUpdateFailedModalProps {
@@ -24,7 +25,7 @@ interface FirmwareUpdateFailedModalProps {
 }
 export const FirmwareUpdateFailedModal = (
   props: FirmwareUpdateFailedModalProps
-): JSX.Element => {
+): ReactNode => {
   const { onCloseClick, module, errorMessage } = props
   const { t } = useTranslation(['device_details', 'shared'])
 

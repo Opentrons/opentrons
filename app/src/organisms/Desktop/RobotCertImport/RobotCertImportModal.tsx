@@ -6,6 +6,7 @@ import {
   Modal,
   PrimaryButton,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
@@ -13,13 +14,15 @@ import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/en
 import styles from './robot_cert_import.module.css'
 import { useHandleRobotCertImport } from './useHandleRobotCertImport'
 
+import type { ReactNode } from 'react'
+
 export interface RobotCertImportModalProps {
   onClose: () => unknown
 }
 
 export function RobotCertImportModal(
   props: RobotCertImportModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['device_settings'])
   const { requestKeyDisplay, clearKeyDisplay } =
     useUpdateClientDataEncryptionKeys()
@@ -46,14 +49,13 @@ export function RobotCertImportModal(
       </PrimaryButton>
     </div>
   )
-  // TODO(jj): fix z-index
   return (
     <Modal
       title={t('robot_encryption_key')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
-      zIndexOverlay={10000}
+      zIndexOverlay={Z_INDEX.ENCRYPTION_KEY_MODAL}
     >
       <div className={styles.robot_cert_import_container}>
         <div className={styles.text_block}>

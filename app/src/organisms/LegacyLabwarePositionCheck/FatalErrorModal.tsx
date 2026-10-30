@@ -25,6 +25,8 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { i18n } from '/app/i18n'
 
+import type { ReactElement, ReactNode } from 'react'
+
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {
   errorMessage: string
@@ -36,7 +38,7 @@ interface FatalErrorModalProps extends FatalErrorProps {
   isOnDevice: boolean
 }
 
-export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
+export function FatalErrorModal(props: FatalErrorModalProps): ReactElement {
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   const { onClose, isOnDevice } = props
   return createPortal(
@@ -65,7 +67,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   )
 }
 
-export function FatalError(props: FatalErrorProps): JSX.Element {
+export function FatalError(props: FatalErrorProps): ReactNode {
   const { errorMessage, shouldUseMetalProbe, onClose } = props
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   return (

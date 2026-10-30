@@ -1411,7 +1411,7 @@ class VacuumModuleUnknownError(RoboticsControlError):
         )
 
 
-class VacuumModulePressureNotReachedError(RoboticsControlError):
+class VacuumModulePressureNotReachedError(RoboticsInteractionError):
     """An error indicating that the target pressure was not reached in the vacuum module."""
 
     def __init__(
@@ -1451,7 +1451,7 @@ class VacuumModulePressureNotReachedError(RoboticsControlError):
         )
 
 
-class VacuumModuleWasteFullError(RoboticsControlError):
+class VacuumModuleWasteFullError(RoboticsInteractionError):
     """An error indicating that the vacuum module waste container is full."""
 
     def __init__(

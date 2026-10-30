@@ -14,6 +14,7 @@ import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { DropTipFooterButtons } from '/app/organisms/DropTipWizardFlows/shared'
 
+import type { ReactNode } from 'react'
 import type { ModuleLocation } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from '/app/organisms/DropTipWizardFlows/types'
 
@@ -24,7 +25,7 @@ export function ChooseDeckLocation({
   goBackRunValid,
   currentRoute,
   isOnDevice,
-}: DropTipWizardContainerProps): JSX.Element {
+}: DropTipWizardContainerProps): ReactNode {
   const { moveToAddressableArea } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
   const [selectedLocation, setSelectedLocation] = useState<ModuleLocation>()

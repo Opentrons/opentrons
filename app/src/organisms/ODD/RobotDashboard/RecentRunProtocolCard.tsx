@@ -39,6 +39,7 @@ import { useMissingProtocolHardware } from '/app/transformations/commands'
 
 import { useRerunnableStatusText } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -89,7 +90,7 @@ export function ProtocolWithLastRun({
   runData,
   protocolData,
   isProtocolFetching,
-}: ProtocolWithLastRunProps): JSX.Element {
+}: ProtocolWithLastRunProps): ReactNode {
   const { t, i18n } = useTranslation('device_details')
   const {
     missingProtocolHardware,

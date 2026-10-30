@@ -17,9 +17,10 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function IncludeProtocolSourceInRunDownload(): JSX.Element {
+export function IncludeProtocolSourceInRunDownload(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const includeProtocolSourceInRunDownload = useSelector(

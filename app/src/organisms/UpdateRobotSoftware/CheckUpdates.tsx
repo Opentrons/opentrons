@@ -13,7 +13,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function CheckUpdates(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function CheckUpdates(): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
     <Flex

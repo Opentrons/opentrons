@@ -247,10 +247,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 [Pipette Flow Rates][pipette-flow-rates].
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
-            end_location (Location): Tells the robot to move from the specified `location` to the specified
+            end_location (Location): Tells the Flex to move the pipette from the specified `location` to the specified
                 `end_location` while aspirating liquid. When this argument is used, the
                 `location` and `end_location` must both be a
-                [`Location`][opentrons.types.Location].
+                [`Location`][opentrons.types.Location]. Raises an error if used with an OT-2 pipette.
             movement_delay (float, optional): Time in seconds to delay after the pipette starts aspirating and before it begins moving
                 from the `location` to the `end_location`. This option is only valid when using `end_location`. When this
                 argument is used, the pipette will wait the specified time
@@ -483,10 +483,10 @@ class InstrumentContext(publisher.CommandPublisher):
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
 
-            end_location (`Location`): Tells the robot to move from the specified `location` to the specified
+            end_location (`Location`): Tells the Flex to move from the specified `location` to the specified
                 `end_location` while dispensing liquid held in the pipette. When this
                 argument is used, the `location` and `end_location` must both be a
-                [`Location`][opentrons.types.Location].
+                [`Location`][opentrons.types.Location]. Raises an error if used with an OT-2 pipette.
 
             movement_delay (float): Time in seconds to delay after the pipette starts dispensing and before it begins moving from the `location` to the `end_location`.
                 This option is only valid when using `end_location`. When this argument
@@ -863,6 +863,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
+
+        Only available for Opentrons Flex pipettes, and raises an error if used with an OT-2 pipette.
 
         See [dynamic mix][dynamic-mix] for examples.
 

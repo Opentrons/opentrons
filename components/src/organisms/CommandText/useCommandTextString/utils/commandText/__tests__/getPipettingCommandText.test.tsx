@@ -16,6 +16,8 @@ import { getLoadedLabware } from '../../getLoadedLabware'
 import { getWellRange } from '../../getWellRange'
 import { getPipettingCommandText } from '../getPipettingCommandText'
 
+import type { ReactNode } from 'react'
+
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getFinalLabwareLocation')
 vi.mock('../../getWellRange')
@@ -37,7 +39,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getPipettingCommandText({
     command,

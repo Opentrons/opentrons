@@ -18,6 +18,8 @@ import {
 
 import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 interface RecoveryFooterButtonProps {
   primaryBtnOnClick: () => void
   primaryBtnTextOverride?: string
@@ -72,7 +74,7 @@ function RecoveryGoBackButton({
   )
 }
 
-function PrimaryButtonGroup(props: RecoveryFooterButtonProps): JSX.Element {
+function PrimaryButtonGroup(props: RecoveryFooterButtonProps): ReactNode {
   const {
     tertiaryBtnOnClick,
     tertiaryBtnText,
@@ -115,7 +117,7 @@ function RecoveryPrimaryBtn({
   primaryBtnOnClick,
   primaryBtnDisabled,
   primaryBtnTextOverride,
-}: RecoveryFooterButtonProps): JSX.Element {
+}: RecoveryFooterButtonProps): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -161,7 +163,7 @@ function RecoveryTertiaryBtn({
   tertiaryBtnOnClick,
   tertiaryBtnText,
   tertiaryBtnDisabled,
-}: RecoveryFooterButtonProps): JSX.Element {
+}: RecoveryFooterButtonProps): ReactNode {
   const tertiaryBtnDefaultOnClick = (): null => null
 
   return (
@@ -188,7 +190,7 @@ const STICKY_FOOTER_STYLE = css`
   position: ${POSITION_STICKY};
   bottom: 0;
   background-color: ${COLORS.white};
-  z-index: 1;
+  z-index: var(--z-index-base);
 `
 
 const PRESSED_LOADING_STATE = css`

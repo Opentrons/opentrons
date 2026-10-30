@@ -1,6 +1,6 @@
 import { getModuleParentOriginToChildSlotOrigin } from '@opentrons/shared-data'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type { ModuleDefinition } from '@opentrons/shared-data'
 
 export type AlignToModuleChildSlotProps = PropsWithChildren<{
@@ -28,7 +28,7 @@ export type AlignToModuleChildSlotProps = PropsWithChildren<{
  */
 export function AlignToModuleChildSlot(
   props: AlignToModuleChildSlotProps
-): JSX.Element {
+): ReactNode {
   const { deckId, slotId, moduleDefinition, children } = props
   const { x, y } = getModuleParentOriginToChildSlotOrigin(
     deckId,

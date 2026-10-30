@@ -88,7 +88,7 @@ import {
   makeSingleEditFieldProps,
 } from './utils'
 
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type {
   FormData,
@@ -139,7 +139,7 @@ interface StepFormToolboxProps {
   handleSave: () => void
 }
 
-export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
+export function StepFormToolbox(props: StepFormToolboxProps): ReactNode {
   const {
     formData,
     focusHandlers,

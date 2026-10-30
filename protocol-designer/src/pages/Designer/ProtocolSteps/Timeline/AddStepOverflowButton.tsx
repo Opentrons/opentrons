@@ -11,6 +11,7 @@ import {
 
 import { stepIconsByType } from '/protocol-designer/form-types'
 
+import type { ReactNode } from 'react'
 import type { StepType } from '/protocol-designer/form-types'
 
 export interface AddStepOverflowButtonProps {
@@ -22,7 +23,7 @@ export interface AddStepOverflowButtonProps {
 
 export function AddStepOverflowButton(
   props: AddStepOverflowButtonProps
-): JSX.Element {
+): ReactNode {
   const { onClick, stepType, isFirstStep = false, isLastStep = false } = props
   const { t, i18n } = useTranslation(['tooltip', 'application'])
 

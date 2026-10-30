@@ -11,7 +11,7 @@ export function RobotEncryptionKeyTakeover({
   children,
 }: {
   children: ReactNode
-}): JSX.Element {
+}): ReactNode {
   const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys({
     refetchInterval: 1000,
   })

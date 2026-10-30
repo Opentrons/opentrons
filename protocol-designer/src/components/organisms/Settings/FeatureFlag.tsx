@@ -13,13 +13,14 @@ import {
 import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
 import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
 
+import type { ReactNode } from 'react'
 import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 interface FeatureFlagProps {
   flags: Partial<Record<FlagTypes, boolean | null | undefined>>
 }
 
-export function FeatureFlag({ flags }: FeatureFlagProps): JSX.Element {
+export function FeatureFlag({ flags }: FeatureFlagProps): ReactNode {
   const { t } = useTranslation('shared')
   const dispatch = useDispatch()
   const getDescription = (flag: FlagTypes): string => {

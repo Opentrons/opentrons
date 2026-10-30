@@ -5,6 +5,7 @@ import { getTopLocationInStack } from '@opentrons/step-generation'
 import { getHoveredStepLabware } from '../../ui/steps'
 import { LabwareLabel } from './LabwareLabel'
 
+import type { ReactNode } from 'react'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../step-forms'
 
@@ -14,9 +15,7 @@ interface HighlightLabwareProps {
   isZoomed: boolean
 }
 
-export function HighlightLabware(
-  props: HighlightLabwareProps
-): JSX.Element | null {
+export function HighlightLabware(props: HighlightLabwareProps): ReactNode {
   const { labwareOnDeck, position, isZoomed } = props
   const hoveredLabware = useSelector(getHoveredStepLabware)
   const highlighted = hoveredLabware.includes(

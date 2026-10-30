@@ -8,6 +8,7 @@ import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/en
 import styles from './robot_encryption_key_setting_option.module.css'
 import { RobotEncryptionKeyModal } from './RobotEncryptionKeyModal'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface RobotEncryptionKeySettingOptionProps {
@@ -16,7 +17,7 @@ interface RobotEncryptionKeySettingOptionProps {
 
 export function RobotEncryptionKeySettingOption({
   setCurrentOption,
-}: RobotEncryptionKeySettingOptionProps): JSX.Element {
+}: RobotEncryptionKeySettingOptionProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { requestKeyDisplay } = useUpdateClientDataEncryptionKeys()
   const showPasswordModal = (): void => {

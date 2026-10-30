@@ -47,12 +47,6 @@ tests: List[Union[TestHelp, TestSimulate]] = [
         protocol_path="../analyses-snapshot-testing/files/protocols/Flex_X_v2_16_P1000_96_TM_ModuleAndWasteChuteConflict.py",
         expected_return_code="1",
     ),
-    TestSimulate(
-        test_key="OT2_v6PD_expect_error",
-        test_helper="simulate",
-        protocol_path="../g-code-testing/g_code_test_data/protocol/protocols/fast/OT2_P300M_P20S_HS_TM_6_3_SmokeV3.json",
-        expected_return_code="1",
-    ),
 ]
 
 

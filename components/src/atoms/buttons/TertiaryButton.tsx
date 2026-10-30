@@ -4,7 +4,7 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 const BASE_STYLES = css`
   border-radius: ${BORDERS.borderRadiusFull};
@@ -99,6 +99,6 @@ const StyledTertiaryButton = styled(Btn)<{
 export function TertiaryButton({
   buttonType,
   ...props
-}: TertiaryButtonProps): JSX.Element {
+}: TertiaryButtonProps): ReactNode {
   return <StyledTertiaryButton $buttonType={buttonType} {...props} />
 }

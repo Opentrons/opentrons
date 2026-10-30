@@ -9,10 +9,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 // These headers are special-cased by design and do not follow the Design system's ListTable headers.
 // The headers largely mimic the column styling of the child components rendered
 // in the ListTable associated with these headers.
-export function OffsetTableHeaders(): JSX.Element {
+export function OffsetTableHeaders(): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   return (

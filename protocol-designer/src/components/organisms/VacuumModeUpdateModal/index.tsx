@@ -9,6 +9,8 @@ import {
 
 import styles from './vacuummodeupdatemodal.module.css'
 
+import type { ReactNode } from 'react'
+
 interface VacuumModeUpdateModalProps {
   onConfirm: () => void
   onClose: () => void
@@ -16,7 +18,7 @@ interface VacuumModeUpdateModalProps {
 
 export function VacuumModeUpdateModal(
   props: VacuumModeUpdateModalProps
-): JSX.Element {
+): ReactNode {
   const { onConfirm, onClose } = props
   const { t } = useTranslation(['modal', 'shared'])
 

@@ -8,7 +8,7 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import type { ChangeEventHandler, ForwardedRef } from 'react'
+import type { ChangeEventHandler, ForwardedRef, ReactNode } from 'react'
 
 export interface UploadKeyInputProps {
   robotName: string
@@ -32,7 +32,7 @@ const HiddenInput = styled.input`
 const UploadKeyInputComponent = (
   props: UploadKeyInputProps,
   ref: ForwardedRef<HTMLInputElement>
-): JSX.Element => {
+): ReactNode => {
   const { label, onUpload, onCancel, robotName } = props
 
   const documentationState = useDocumentationState(undefined, robotName)

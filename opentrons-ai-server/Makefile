@@ -70,32 +70,27 @@ gen-env:
 unit-test: ensure-synced-api-docs
 	$(pytest) tests -m unit
 
-.PHONY: gen-requirements
-gen-requirements:
-	@echo "Generating requirements.txt from uv.lock..."
-	uv export --no-hashes --no-dev -o requirements.txt
-
 ENV ?= local
 TAG ?=
 
 .PHONY: deploy
-deploy: gen-requirements sync-api-docs
+deploy: sync-api-docs
 	@echo "Deploying to environment: $(ENV)"
 	$(python) deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: build-only
-build-only: gen-requirements sync-api-docs
+build-only: sync-api-docs
 	@echo "Building Docker image only for environment: $(ENV)"
 	$(python) deploy.py --build-only --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: dry-deploy
-dry-deploy: gen-requirements sync-api-docs
+dry-deploy: sync-api-docs
 	@echo "Dry run deploying to environment: $(ENV)"
 	@echo "Data is retrieved from AWS but no changes are made"
 	$(python) deploy.py --dry --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: prompted-deploy
-prompted-deploy: gen-requirements sync-api-docs
+prompted-deploy: sync-api-docs
 	$(python) deploy.py
 
 .PHONY: print-client-settings-vars
@@ -121,12 +116,10 @@ IMAGE_NAME=ai-server-local
 CONTAINER_NAME=ai-server-container
 ENV_FILE=.env
 
-CACHEBUST := $(shell date +%s)
-
 .PHONY: build
-build: gen-requirements sync-api-docs
+build: sync-api-docs
 	# Use repo root as context; synced API docs live under api/storage/api_docs/docs/v2
-	cd .. && docker build --build-arg CACHEBUST=$(CACHEBUST) -t $(IMAGE_NAME) -f opentrons-ai-server/Dockerfile .
+	cd .. && docker build -t $(IMAGE_NAME) -f opentrons-ai-server/Dockerfile .
 
 .PHONY: run
 run:
@@ -134,7 +127,7 @@ run:
 	docker logs -f $(CONTAINER_NAME)
 
 .PHONY: clean
-clean: gen-requirements
+clean:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 

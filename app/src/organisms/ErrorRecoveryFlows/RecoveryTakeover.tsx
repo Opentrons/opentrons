@@ -20,6 +20,7 @@ import {
 } from './constants'
 import { RecoveryInterventionModal } from './shared'
 
+import type { ReactNode } from 'react'
 import type {
   ClientDataRecovery,
   UseUpdateClientDataRecoveryResult,
@@ -32,7 +33,7 @@ export function RecoveryTakeover(props: {
   runStatus: ErrorRecoveryFlowsProps['runStatus']
   robotName: string
   isOnDevice: boolean
-}): JSX.Element {
+}): ReactNode {
   const { runStatus } = props
   const { t } = useTranslation('error_recovery')
   const { clearClientData } = useUpdateClientDataRecovery()
@@ -79,7 +80,7 @@ interface RecoveryTakeoverProps {
 
 export function RecoveryTakeoverComponent(
   props: RecoveryTakeoverProps
-): JSX.Element {
+): ReactNode {
   return props.isOnDevice ? (
     <RecoveryTakeoverODD {...props} />
   ) : (
@@ -91,7 +92,7 @@ export function RecoveryTakeoverODD({
   title,
   clearClientData,
   isRunStatusAwaitingRecovery,
-}: RecoveryTakeoverProps): JSX.Element {
+}: RecoveryTakeoverProps): ReactNode {
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   return (
@@ -110,7 +111,7 @@ export function RecoveryTakeoverDesktop({
   robotName,
   clearClientData,
   isRunStatusAwaitingRecovery,
-}: RecoveryTakeoverProps): JSX.Element {
+}: RecoveryTakeoverProps): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   const buildTitleHeadingDesktop = (): JSX.Element => {

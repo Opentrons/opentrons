@@ -15,32 +15,17 @@ import {
   POSITION_RELATIVE,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useDeleteCalibrationMutation,
-} from '@opentrons/react-api-client'
-import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
-import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
-import {
-  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-  useTrackEvent,
-} from '/app/redux/analytics'
-import { saveFileFromBuffer } from '/app/redux/shell/remote'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
-import { ConfirmDeleteCalibrationModal } from './ConfirmDeleteCalibrationModal'
-
-import type { MouseEvent } from 'react'
-import type { DeleteCalRequestParams } from '@opentrons/api-client'
+import type { MouseEvent, ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
-import type { PipetteName } from '@opentrons/shared-data'
 import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
 
 interface OverflowMenuProps {
@@ -58,24 +43,20 @@ export function OverflowMenu({
   robotName,
   isRobotBusy,
   mount,
-  serialNumber,
   pipetteName,
-  tiprackDefURI = null,
-}: OverflowMenuProps): JSX.Element {
+}: OverflowMenuProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'shared',
     'robot_calibration',
   ])
 
-  const [showDeleteCalModal, setShowDeleteCalModal] = useState(false)
   const [showPipetteWizardFlows, setShowPipetteWizardFlows] =
     useState<boolean>(false)
   const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
     SINGLE_MOUNT_PIPETTES
   )
 
-  const doTrackEvent = useTrackEvent()
   const {
     menuOverlay,
     handleOverflowClick,
@@ -88,106 +69,22 @@ export function OverflowMenu({
       setShowOverflowMenu(false)
     },
   })
-  const pipetteOffsetCalibrations =
-    useAllPipetteOffsetCalibrationsQuery().data?.data
 
-  const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
-  const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
       ?.last_modified ?? null
 
-  const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
-    p => p.mount === mount && p.pipette === serialNumber
-  )
-  const applicableTipLengthCal = tipLengthCalibrations?.find(
-    cal => cal.pipette === serialNumber && cal.uri === tiprackDefURI
-  )
-
-  const calibrationPresent =
-    calType === 'pipetteOffset'
-      ? applicablePipetteOffsetCal != null
-      : applicableTipLengthCal != null
   const handleRecalibrate = (e: MouseEvent): void => {
     e.preventDefault()
-    if (
-      !isRobotBusy &&
-      isPipetteForFlex &&
-      calType === 'pipetteOffset' &&
-      pipetteName != null
-    ) {
+    if (!isRobotBusy && calType === 'pipetteOffset' && pipetteName != null) {
       setShowPipetteWizardFlows(true)
     }
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
-  const handleDownload = (e: MouseEvent): void => {
-    e.preventDefault()
-    doTrackEvent({
-      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-      properties: {},
-    })
-
-    if (calType === 'pipetteOffset') {
-      void saveFileFromBuffer({
-        name: `opentrons-${robotName}-pipette-offset-calibration.json`,
-        buffer: new TextEncoder().encode(
-          JSON.stringify(pipetteOffsetCalibrations)
-        ).buffer,
-      }).catch((error: unknown) => {
-        if (!isFileSaveCanceledError(error)) {
-          throw error
-        }
-      })
-    } else if (calType === 'tipLength') {
-      void saveFileFromBuffer({
-        name: `opentrons-${robotName}-tip-length-calibration.json`,
-        buffer: new TextEncoder().encode(JSON.stringify(tipLengthCalibrations))
-          .buffer,
-      }).catch((error: unknown) => {
-        if (!isFileSaveCanceledError(error)) {
-          throw error
-        }
-      })
-    }
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  }
-
-  const { deleteCalibration } = useDeleteCalibrationMutation()
-
-  const handleDeleteCalibration = (): void => {
-    let params: DeleteCalRequestParams
-    if (calType === 'pipetteOffset') {
-      if (applicablePipetteOffsetCal == null) return
-      params = {
-        calType,
-        mount,
-        pipette_id: applicablePipetteOffsetCal.pipette,
-      }
-    } else {
-      if (applicableTipLengthCal == null) return
-      params = {
-        calType,
-        tiprack_uri: applicableTipLengthCal.uri,
-        pipette_id: applicableTipLengthCal.pipette,
-      }
-    }
-
-    deleteCalibration(params)
-    setShowDeleteCalModal(false)
-  }
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      {showDeleteCalModal && (
-        <ConfirmDeleteCalibrationModal
-          onDelete={handleDeleteCalibration}
-          toggleModal={() => {
-            setShowDeleteCalModal(!showDeleteCalModal)
-          }}
-        />
-      )}
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
         aria-label={`CalibrationOverflowMenu_button_${calType}`}
@@ -211,7 +108,7 @@ export function OverflowMenu({
         <Flex
           ref={calsOverflowWrapperRef}
           whiteSpace={NO_WRAP}
-          zIndex={10}
+          zIndex={Z_INDEX.MENUS}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
@@ -220,51 +117,20 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {isPipetteForFlex ? (
-            <MenuItem
-              onClick={handleRecalibrate}
-              css={css`
-                border-radius: ${BORDERS.borderRadius8};
-              `}
-              disabled={isRobotBusy}
-              aria-label={`CalibrationOverflowMenu_button_calibrate`}
-            >
-              {t(
-                ot3PipCal == null
-                  ? 'robot_calibration:calibrate_pipette'
-                  : 'robot_calibration:recalibrate_pipette'
-              )}
-            </MenuItem>
-          ) : (
-            <>
-              <MenuItem
-                onClick={handleDownload}
-                disabled={!calibrationPresent}
-                css={css`
-                  border-radius: ${BORDERS.borderRadius8}
-                    ${BORDERS.borderRadius8} 0 0;
-                `}
-              >
-                {t('download_calibration_data')}
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setShowDeleteCalModal(true)
-                  setShowOverflowMenu(
-                    currentShowOverflowMenu => !currentShowOverflowMenu
-                  )
-                }}
-                disabled={!calibrationPresent}
-                css={css`
-                  border-radius: 0 0 ${BORDERS.borderRadius8}
-                    ${BORDERS.borderRadius8};
-                `}
-              >
-                {t('robot_calibration:delete_calibration_data')}
-              </MenuItem>
-            </>
-          )}
+          <MenuItem
+            onClick={handleRecalibrate}
+            css={css`
+              border-radius: ${BORDERS.borderRadius8};
+            `}
+            disabled={isRobotBusy}
+            aria-label={`CalibrationOverflowMenu_button_calibrate`}
+          >
+            {t(
+              ot3PipCal == null
+                ? 'robot_calibration:calibrate_pipette'
+                : 'robot_calibration:recalibrate_pipette'
+            )}
+          </MenuItem>
         </Flex>
       ) : null}
       {menuOverlay}

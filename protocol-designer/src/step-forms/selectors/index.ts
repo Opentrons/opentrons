@@ -705,6 +705,7 @@ export const getInvariantContext: Selector<BaseState, InvariantContext> =
         wasteChuteEntities,
         stagingAreaEntities,
         gripperEntities,
+        runtimeParameters: {},
         config: {
           OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
         },

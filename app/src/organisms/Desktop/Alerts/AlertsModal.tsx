@@ -14,7 +14,7 @@ import { useRemoveActiveAppUpdateToast } from '.'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { AlertId } from '/app/redux/alerts/types'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -22,7 +22,7 @@ interface AlertsModalProps {
   toastIdRef: MutableRefObject<string | null>
 }
 
-export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
+export function AlertsModal({ toastIdRef }: AlertsModalProps): ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
   const { t, i18n } = useTranslation(['app_settings', 'branded'])

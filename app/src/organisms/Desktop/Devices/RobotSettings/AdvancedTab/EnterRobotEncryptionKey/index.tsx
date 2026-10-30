@@ -10,7 +10,9 @@ import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/Rob
 
 import styles from './index.module.css'
 
-export function EnterRobotEncryptionKey(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function EnterRobotEncryptionKey(): ReactNode {
   const { t } = useTranslation('device_settings')
   const [showModal, setShowRobotCertImportModal] = useState(false)
 

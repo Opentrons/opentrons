@@ -2,6 +2,8 @@ import { css } from 'styled-components'
 
 import { BORDERS, Box, COLORS } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface SkeletonProps {
   width: string
   height: string
@@ -10,7 +12,7 @@ interface SkeletonProps {
   borderRadius?: string
   fixedBackground?: boolean
 }
-export const Skeleton = (props: SkeletonProps): JSX.Element => {
+export const Skeleton = (props: SkeletonProps): ReactNode => {
   const { width, height, backgroundSize, borderRadius, fixedBackground } = props
   const SKELETON_STYLE = css`
     border-radius: ${borderRadius ?? BORDERS.borderRadius8};
