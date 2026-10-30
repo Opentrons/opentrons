@@ -21,8 +21,6 @@ import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
@@ -36,16 +34,6 @@ const render = (props: ComponentProps<typeof BeforeBeginning>) => {
 }
 
 describe('BeforeBeginning', () => {
-  const mockDeckConfig = {
-    data: [
-      {
-        cutoutId: 'cutoutD3',
-      } as any,
-    ],
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
@@ -65,7 +53,6 @@ describe('BeforeBeginning', () => {
       isOnDevice: false,
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
-      deckConfig: mockDeckConfig,
       documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
