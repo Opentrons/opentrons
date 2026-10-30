@@ -20,11 +20,11 @@ import { getIsOnDevice } from '/app/redux/config'
 import { ToasterContext } from './ToasterContext'
 
 import type { ReactNode } from 'react'
-import type { SnackbarProps } from '@opentrons/components'
 import type {
+  SnackbarProps,
   ToastProps,
   ToastType,
-} from '@opentrons/components/src/atoms/Toast'
+} from '@opentrons/components'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {
