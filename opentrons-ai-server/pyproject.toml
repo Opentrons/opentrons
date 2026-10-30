@@ -17,11 +17,12 @@ dependencies = [
     "structlog==24.4.0",
     "asgi-correlation-id==4.3.3",
     "gspread==6.1.4",
-    "google-auth==2.36.0",
+    "google-auth==2.43.0",
     "google-auth-oauthlib==1.2.1",
     "anthropic==0.120.2",
-    "weave==0.51.54",
+    "weave[anthropic,wandb]==0.53.13",
     "nh3==0.3.7",
+    "wandb==0.31.0",
 ]
 
 [project.optional-dependencies]
