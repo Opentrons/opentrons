@@ -31,7 +31,7 @@ import {
 } from '@opentrons/shared-data'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
-import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { InstrumentContainer } from '/app/components/adhoc/desktop/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'

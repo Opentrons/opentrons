@@ -19,7 +19,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'

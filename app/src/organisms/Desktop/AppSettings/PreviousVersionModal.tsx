@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 
 import type { ReactNode } from 'react'
 

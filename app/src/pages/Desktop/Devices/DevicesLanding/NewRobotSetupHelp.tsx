@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 
 import styles from './newrobotsetuphelp.module.css'
 

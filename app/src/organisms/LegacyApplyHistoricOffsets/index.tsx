@@ -23,7 +23,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'

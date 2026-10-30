@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
 

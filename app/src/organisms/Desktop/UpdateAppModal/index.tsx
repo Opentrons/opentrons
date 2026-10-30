@@ -21,7 +21,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import {
   applyShellUpdate,

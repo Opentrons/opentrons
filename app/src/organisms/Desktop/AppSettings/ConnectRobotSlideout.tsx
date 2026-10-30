@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { Divider } from '/app/components/adhoc/shared/structure'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { getScanning, startDiscovery } from '/app/redux/discovery'

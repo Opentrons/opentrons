@@ -19,7 +19,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ReactQueryDevtools } from '/app/App/tools'
-import { SleepScreen } from '/app/atoms/SleepScreen'
+import { SleepScreen } from '/app/components/adhoc/ODD/SleepScreen'
 import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'

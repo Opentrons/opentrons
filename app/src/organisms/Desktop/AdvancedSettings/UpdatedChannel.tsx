@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SelectField } from '/app/atoms/SelectField'
+import { SelectField } from '/app/components/adhoc/desktop/SelectField'
 import {
   getUpdateChannel,
   getUpdateChannelOptions,
@@ -19,7 +19,7 @@ import {
 } from '/app/redux/config'
 
 import type { ComponentProps, ReactNode } from 'react'
-import type { SelectOption } from '/app/atoms/SelectField/Select'
+import type { SelectOption } from '/app/components/adhoc/desktop/SelectField/Select'
 import type { Dispatch } from '/app/redux/types'
 
 export function UpdatedChannel(): ReactNode {

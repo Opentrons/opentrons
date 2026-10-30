@@ -13,6 +13,7 @@ interface InstrumentContainerProps {
   id?: string
 }
 
+// TODO (jj, 2026-10-29): This component should be replaced with a Helix tag component
 export const InstrumentContainer = (
   props: InstrumentContainerProps
 ): ReactNode => {

@@ -18,7 +18,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { ReactNode } from 'react'

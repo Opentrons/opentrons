@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { CONTEXT_MENU } from '@opentrons/components'
 
-import { SelectField } from '/app/atoms/SelectField'
+import { SelectField } from '/app/components/adhoc/desktop/SelectField'
 
 import { NetworkActionLabel, NetworkOptionLabel } from './NetworkOptionLabel'
 
