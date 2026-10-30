@@ -988,6 +988,9 @@ export function ProtocolSetup(): ReactNode {
   const offsetSource = useSelector(selectOffsetSource(runId))
   const storageInfo = useRobotStorageInfo()
   useInitializeCameraState(runId)
+  const totalOffsets = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -1071,6 +1074,7 @@ export function ProtocolSetup(): ReactNode {
         <ConfirmSetupStepsCompleteModal
           onCloseClick={cancelExitMissingStepsConfirmation}
           missingSteps={missingSteps}
+          offsetCount={totalOffsets}
           onConfirmClick={() => {
             runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol
               ? confirmAttachment()
