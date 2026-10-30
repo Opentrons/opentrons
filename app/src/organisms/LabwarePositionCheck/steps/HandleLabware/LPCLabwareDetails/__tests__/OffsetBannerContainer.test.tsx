@@ -30,7 +30,7 @@ vi.mock('react-redux', async () => {
   }
 })
 
-vi.mock('/app/atoms/InlineNotification')
+vi.mock('/app/components/adhoc/shared/InlineNotification')
 vi.mock('/app/redux/protocol-runs', () => ({
   selectIsAnyOffsetHardCoded: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),

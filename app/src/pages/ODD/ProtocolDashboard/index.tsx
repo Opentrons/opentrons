@@ -24,6 +24,8 @@ import {
   SmallButton,
   TouchFloatingActionButton,
 } from '/app/components/ODD/buttons'
+import { ProtocolCard } from '/app/components/ODD/cards/ProtocolCard'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
 import {
@@ -33,8 +35,6 @@ import {
 } from '/app/redux/config'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import { ProtocolCard } from '../../../components/ODD/cards/ProtocolCard'
-import { Navigation } from '../../../components/ODD/headers/Navigation'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
 import { NoProtocols } from './NoProtocols'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
