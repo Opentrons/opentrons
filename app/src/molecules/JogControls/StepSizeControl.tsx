@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { TouchControlButton } from '/app/components/adhoc/shared/buttons/TouchControlButton'
 
 import { ControlContainer } from './ControlContainer'
 

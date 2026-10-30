@@ -12,7 +12,7 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import type { MouseEventHandler, ReactNode } from 'react'

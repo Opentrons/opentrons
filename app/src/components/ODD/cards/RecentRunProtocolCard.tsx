@@ -28,7 +28,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
 import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

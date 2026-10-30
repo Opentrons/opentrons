@@ -14,7 +14,6 @@ import {
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
 import { getIsOnDevice } from '/app/redux/config'
@@ -24,6 +23,7 @@ import { useAccountIconInitial } from '/app/resources/access-control/useAccountI
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
+import { AccountIconButton } from '../buttons/AccountIconButton'
 import styles from './breadcrumbs.module.css'
 
 import type { ComponentProps, ReactNode } from 'react'
