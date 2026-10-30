@@ -22,7 +22,7 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import { TextOnlyButton } from '/app/atoms/buttons'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'

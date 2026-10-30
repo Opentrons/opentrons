@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { TouchControlButton } from '/app/components/adhoc/shared/buttons/TouchControlButton'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 
 import styles from './cameracontrols.module.css'

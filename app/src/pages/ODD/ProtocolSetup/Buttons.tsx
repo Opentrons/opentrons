@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'

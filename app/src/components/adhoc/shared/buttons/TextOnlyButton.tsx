@@ -32,6 +32,10 @@ interface TextOnlyButtonProps extends StyleProps {
   disabled?: boolean
 }
 
+// TODO (jj, 2026-10-29): this component is weird.
+// It doesn't match the styling of the Helix textbutton figma component, but its used in its place on desktop.
+// On the ODD, in the figma designs, the correct button is a broken link.
+// someone should figure this out.
 export function TextOnlyButton({
   onClick,
   buttonText,

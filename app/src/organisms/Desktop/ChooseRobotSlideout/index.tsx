@@ -46,7 +46,7 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { MultiSlideout } from '/app/components/desktop/Slideout/MultiSlideout'
 import { UploadInput } from '/app/components/desktop/UploadInput'

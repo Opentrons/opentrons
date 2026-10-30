@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 
 import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'

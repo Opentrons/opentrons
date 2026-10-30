@@ -45,6 +45,7 @@ interface ToggleButtonProps extends StyleProps {
   onClick?: (e: MouseEvent) => unknown
 }
 
+// TODO (jj, 2026-10-29): This component should be replaced with a Helix toggle button component
 export const ToggleButton = (props: ToggleButtonProps): ReactNode => {
   const { label, toggledOn, disabled, size, ...buttonProps } = props
   const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'

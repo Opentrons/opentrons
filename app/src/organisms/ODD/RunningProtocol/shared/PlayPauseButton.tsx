@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
 
 import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'

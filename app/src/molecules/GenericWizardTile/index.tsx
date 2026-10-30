@@ -21,7 +21,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { TextOnlyButton } from '/app/atoms/buttons'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'

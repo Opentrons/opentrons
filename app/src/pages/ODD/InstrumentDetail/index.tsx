@@ -18,7 +18,7 @@ import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { BackButton } from '/app/atoms/buttons/BackButton'
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
 import {
   useGripperDisplayName,
   usePipetteModelSpecs,

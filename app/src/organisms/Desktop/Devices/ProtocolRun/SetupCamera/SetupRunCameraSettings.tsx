@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './setupcamera.module.css'
