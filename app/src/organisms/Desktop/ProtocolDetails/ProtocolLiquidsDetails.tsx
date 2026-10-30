@@ -11,7 +11,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   LiquidIcon,
   SPACING,
   StyledText,
@@ -98,12 +97,12 @@ export const ProtocolLiquidsDetails = (
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {i18n.format(t('liquids_not_in_protocol'), 'capitalize')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
     </Flex>

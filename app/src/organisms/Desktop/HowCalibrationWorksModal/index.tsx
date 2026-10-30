@@ -8,10 +8,10 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -40,9 +40,9 @@ export function HowCalibrationWorksModal({
       maxHeight="28.125rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
           {t('robot_cal_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ExternalLink
           href={ROBOT_CAL_HELP_ARTICLE}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -57,14 +57,14 @@ export function HowCalibrationWorksModal({
           />
         </Box>
         {/* deck calibration */}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('deck_calibration_title')}
-        </LegacyStyledText>
+        </StyledText>
         <CalibrationSteps
           description={t('deck_cal_description')}
           steps={[
@@ -72,27 +72,27 @@ export function HowCalibrationWorksModal({
             t('deck_cal_description_bullet_2'),
           ]}
         />
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('tip_length_cal_title')}
-        </LegacyStyledText>
+        </StyledText>
         <CalibrationSteps
           description={t('tip_length_cal_description')}
           steps={[t('tip_length_cal_description_bullet')]}
         />
         {/* pipette offset calibration */}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
         >
           {t('pipette_offset_cal')}
-        </LegacyStyledText>
+        </StyledText>
         <CalibrationSteps
           description={t('pipette_offset_cal_description')}
           steps={[
@@ -128,9 +128,9 @@ function CalibrationSteps({
 }: CalibrationStepsProps): ReactNode {
   return (
     <Box marginTop={SPACING.spacing4}>
-      <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+      <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
         {description}
-      </LegacyStyledText>
+      </StyledText>
       <ul>
         {steps.map(step => (
           <li
@@ -139,7 +139,7 @@ function CalibrationSteps({
             `}
             key={step}
           >
-            <LegacyStyledText forwardedAs="p">{step}</LegacyStyledText>
+            <StyledText forwardedAs="p">{step}</StyledText>
           </li>
         ))}
       </ul>

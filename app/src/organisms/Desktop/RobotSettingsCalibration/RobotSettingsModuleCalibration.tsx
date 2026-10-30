@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,15 +35,12 @@ export function RobotSettingsModuleCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('module_calibration')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">
+      </StyledText>
+      <StyledText forwardedAs="p">
         {t('module_calibration_description')}
-      </LegacyStyledText>
+      </StyledText>
       {attachedModules.length > 0 ? (
         <ModuleCalibrationItems
           attachedModules={attachedModules}
@@ -54,9 +51,9 @@ export function RobotSettingsModuleCalibration({
           isRobotBusy={isRobotBusy}
         />
       ) : (
-        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
+        <StyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_modules_attached')}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

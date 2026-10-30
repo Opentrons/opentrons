@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Chip,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   SPACING,
@@ -11,8 +12,6 @@ import {
 import {
   MODULE_INFO_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_CONTAINER_STYLE,
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
@@ -50,7 +49,7 @@ export const ThermocyclerModuleData = (
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="thermocycler_module_data_lid"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+        <StyledText forwardedAs="h3" color={COLORS.grey60}>
           {t('tc_lid')}
         </StyledText>
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
@@ -77,15 +76,12 @@ export const ThermocyclerModuleData = (
               data-testid="lidTempStatus"
             />
           </Flex>
-          <StyledText
-            css={MODULE_INFO_DETAIL_TEXT_STYLE}
-            title="lid_target_temp"
-          >
+          <StyledText forwardedAs="h3" title="lid_target_temp">
             {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
               temp: data.lidTargetTemperature,
             })}
           </StyledText>
-          <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE} title="lid_temp">
+          <StyledText forwardedAs="h3" title="lid_temp">
             {t('current_temp', { temp: data.lidTemperature })}
           </StyledText>
         </Flex>
@@ -94,7 +90,7 @@ export const ThermocyclerModuleData = (
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="thermocycler_module_data_block"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+        <StyledText forwardedAs="h3" color={COLORS.grey60}>
           {t('tc_block')}
         </StyledText>
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
@@ -108,18 +104,12 @@ export const ThermocyclerModuleData = (
             textTransform="capitalize"
             data-testid="blockStatus"
           />
-          <StyledText
-            css={MODULE_INFO_DETAIL_TEXT_STYLE}
-            title="tc_target_temp"
-          >
+          <StyledText forwardedAs="h3" title="tc_target_temp">
             {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
               temp: data.targetTemperature,
             })}
           </StyledText>
-          <StyledText
-            css={MODULE_INFO_DETAIL_TEXT_STYLE}
-            title="tc_current_temp"
-          >
+          <StyledText forwardedAs="h3" title="tc_current_temp">
             {t('current_temp', { temp: data.currentTemperature })}
           </StyledText>
         </Flex>

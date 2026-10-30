@@ -8,9 +8,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -145,13 +145,13 @@ export function ManualIpHostnameForm({
         </TertiaryButton>
       </FlexForm>
       {formState.errors?.ip != null && (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="label"
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >
           {formState.errors.ip.message}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

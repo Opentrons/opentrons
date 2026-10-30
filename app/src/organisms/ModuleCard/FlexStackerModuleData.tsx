@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, Flex, StyledText } from '@opentrons/components'
+import { Chip, COLORS, Flex, StyledText } from '@opentrons/components'
 
 import {
   MODULE_INFO_CONTAINER_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
@@ -60,7 +59,7 @@ export function FlexStackerModuleData(
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_door_data"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+        <StyledText forwardedAs="h3" color={COLORS.grey60}>
           {t('flex_stacker_door_status')}
         </StyledText>
         <Chip
@@ -75,7 +74,7 @@ export function FlexStackerModuleData(
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="stacker_shuttle_data"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+        <StyledText forwardedAs="h3" color={COLORS.grey60}>
           {t('flex_stacker_shuttle_status')}
         </StyledText>
         <Chip

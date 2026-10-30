@@ -2,8 +2,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -30,7 +30,8 @@ export function SmallModalChildren(props: SmallModalChildrenProps): ReactNode {
         width="100%"
         whiteSpace="break-spaces"
       >
-        <LegacyStyledText
+        <StyledText
+          forwardedAs="p"
           color={COLORS.black90}
           fontSize={TYPOGRAPHY.fontSize28}
           fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -38,8 +39,9 @@ export function SmallModalChildren(props: SmallModalChildrenProps): ReactNode {
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {header}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
+          forwardedAs="p"
           color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -47,7 +49,7 @@ export function SmallModalChildren(props: SmallModalChildrenProps): ReactNode {
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {subText}
-        </LegacyStyledText>
+        </StyledText>
 
         <Flex marginTop={SPACING.spacing32}>
           <SmallButton

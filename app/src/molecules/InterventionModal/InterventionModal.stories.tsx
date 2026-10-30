@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
 
@@ -38,11 +38,9 @@ type Story = StoryObj<typeof InterventionModalComponent>
 export const ErrorIntervention: Story = {
   args: {
     type: 'error',
-    titleHeading: <LegacyStyledText as="h3">Oh no, an error!</LegacyStyledText>,
+    titleHeading: <StyledText as="h3">Oh no, an error!</StyledText>,
     iconName: 'alert-circle',
-    children: (
-      <LegacyStyledText as="p">{"Here's some error content"}</LegacyStyledText>
-    ),
+    children: <StyledText as="p">{"Here's some error content"}</StyledText>,
   },
 }
 
@@ -50,12 +48,8 @@ export const InterventionRequiredIntervention: Story = {
   args: {
     type: 'intervention-required',
     titleHeading: (
-      <LegacyStyledText as="h3">
-        Looks like theres something to do
-      </LegacyStyledText>
+      <StyledText as="h3">Looks like theres something to do</StyledText>
     ),
-    children: (
-      <LegacyStyledText as="p">{"You've got to intervene!"}</LegacyStyledText>
-    ),
+    children: <StyledText as="p">{"You've got to intervene!"}</StyledText>,
   },
 }

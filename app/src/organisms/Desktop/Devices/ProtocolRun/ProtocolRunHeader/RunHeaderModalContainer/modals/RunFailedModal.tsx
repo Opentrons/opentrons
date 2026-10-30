@@ -9,11 +9,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -110,9 +110,9 @@ export function RunFailedModal({
           isSingleError={!!highestPriorityError}
           runStatus={runStatus}
         />
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('branded:run_failed_modal_description_desktop')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           marginTop={SPACING.spacing32}
           flexDirection={DIRECTION_ROW}

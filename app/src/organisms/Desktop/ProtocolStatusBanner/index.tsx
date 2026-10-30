@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
+import { Banner, SPACING, StyledText } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
@@ -16,7 +16,7 @@ export function ProtocolStatusBanner(): ReactNode {
       iconMarginLeft={SPACING.spacing4}
       marginRight={SPACING.spacing24}
     >
-      <LegacyStyledText>{t('csv_file_required')}</LegacyStyledText>
+      <StyledText>{t('csv_file_required')}</StyledText>
     </Banner>
   )
 }

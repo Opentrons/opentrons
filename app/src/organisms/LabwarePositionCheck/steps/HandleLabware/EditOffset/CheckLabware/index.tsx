@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -219,7 +218,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText forwardedAs="p" />,
+                  block: <StyledText forwardedAs="p" />,
                   bold: <strong />,
                 }}
               />
@@ -311,7 +310,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

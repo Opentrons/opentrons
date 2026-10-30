@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   getLabwareDefinitionsFromCommands,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -196,7 +196,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       tOptions={{ labware: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />
@@ -213,7 +213,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
@@ -238,7 +238,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
@@ -508,7 +508,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

@@ -5,8 +5,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,13 +28,10 @@ export function WellCount(props: WellCountProps): ReactNode {
       alignItems={ALIGN_CENTER}
       marginBottom={SPACING.spacing16}
     >
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t(wellLabel)} {t('count')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">{count}</LegacyStyledText>
+      </StyledText>
+      <StyledText forwardedAs="p">{count}</StyledText>
     </Flex>
   )
 }

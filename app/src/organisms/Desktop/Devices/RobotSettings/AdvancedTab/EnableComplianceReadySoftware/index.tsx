@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
+import { Chip, StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -30,9 +30,12 @@ export function EnableComplianceReadySoftware(props: Props): ReactNode {
     <div className={styles.container}>
       <div className={styles.text_container}>
         <div className={styles.title_row}>
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('crs_title')}
-          </LegacyStyledText>
+          </StyledText>
           {isCRSEnabledQuerySuccessful ? (
             <Chip
               chipSize="small"
@@ -42,9 +45,7 @@ export function EnableComplianceReadySoftware(props: Props): ReactNode {
             />
           ) : null}
         </div>
-        <LegacyStyledText forwardedAs="p">
-          {t('crs_description')}
-        </LegacyStyledText>
+        <StyledText forwardedAs="p">{t('crs_description')}</StyledText>
       </div>
       <TertiaryButton
         onClick={() => {

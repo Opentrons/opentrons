@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import clsx from 'clsx'
 import { css } from 'styled-components'
 
 import {
@@ -10,17 +11,18 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
+
+import styles from './simplewizardbodycontent.module.css'
 
 import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -42,41 +44,6 @@ interface Props {
 }
 
 const BACKGROUND_SIZE = '47rem'
-
-const HEADER_STYLE = css`
-  ${TYPOGRAPHY.h1Default};
-  margin-top: ${SPACING.spacing24};
-  margin-bottom: ${SPACING.spacing8};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-  padding: 0 ${SPACING.spacing32};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: ${SPACING.spacing40};
-  }
-`
-
-const ERROR_HEADER_STYLE = css`
-  ${HEADER_STYLE};
-  margin-top: ${SPACING.spacing40};
-`
-
-const SUBHEADER_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  margin-left: 6.25rem;
-  margin-right: 6.25rem;
-  margin-bottom: ${SPACING.spacing32};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-  min-height: 1.75rem;
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    line-height: ${TYPOGRAPHY.lineHeight36};
-    margin-left: 4.5rem;
-    margin-right: 4.5rem;
-  }
-`
 
 const FLEX_SPACING_STYLE = css`
   height: 1.75rem;
@@ -166,15 +133,16 @@ export function SimpleWizardBodyContent(props: Props): ReactNode {
                 marginBottom={SPACING.spacing24}
               />
             )}
-            <LegacyStyledText
-              css={isSuccess ? HEADER_STYLE : ERROR_HEADER_STYLE}
+            <StyledText
+              forwardedAs="h1"
+              className={clsx(isSuccess ? styles.header : styles.error_header)}
             >
               {header}
-            </LegacyStyledText>
+            </StyledText>
             {subHeader != null ? (
-              <LegacyStyledText css={SUBHEADER_STYLE}>
+              <StyledText forwardedAs="p" className={styles.subheader}>
                 {subHeader}
-              </LegacyStyledText>
+              </StyledText>
             ) : (
               <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
             )}

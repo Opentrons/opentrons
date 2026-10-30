@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -10,8 +10,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -65,6 +65,10 @@ const CARD_BUTTON_TEXT_STYLE = css`
   -webkit-line-clamp: 3;
 `
 
+const CardButtonDescription = styled(StyledText)`
+  ${CARD_BUTTON_TEXT_STYLE}
+`
+
 interface CardButtonProps {
   /**  Header text should be less than 2 words.  */
   title: string
@@ -99,28 +103,27 @@ export function CardButton(props: CardButtonProps): ReactNode {
         color={disabled ? COLORS.grey50 : COLORS.blue50}
       />
       <Flex marginTop={SPACING.spacing16}>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex
         marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >
-        <LegacyStyledText
+        <CardButtonDescription
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.grey50 : COLORS.black90}
-          css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
-        </LegacyStyledText>
+        </CardButtonDescription>
       </Flex>
     </Btn>
   )

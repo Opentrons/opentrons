@@ -1,0 +1,22 @@
+.go_back_text {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
+  color: var(--grey-50);
+}
+
+.go_back_text:hover {
+  opacity: 70%;
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .go_back_text {
+    font-size: var(--font-size-22);
+    font-weight: var(--font-weight-semi-bold);
+    line-height: var(--line-height-28);
+  }
+
+  .go_back_text:hover {
+    opacity: 100%;
+  }
+}

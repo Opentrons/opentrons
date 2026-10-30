@@ -8,9 +8,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
@@ -36,30 +36,22 @@ export function ManufacturerDetails(
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText forwardedAs="h6">
-            {t('manufacturer')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
-            {manufacturerValue}
-          </LegacyStyledText>
+          <StyledText forwardedAs="h6">{t('manufacturer')}</StyledText>
+          <StyledText forwardedAs="p">{manufacturerValue}</StyledText>
           {links != null &&
             links.length > 0 &&
             links.map((href, index) => (
-              <LegacyStyledText forwardedAs="p" key={index}>
+              <StyledText forwardedAs="p" key={index}>
                 <Link href={href} external>
                   website <Icon height="10px" name="open-in-new" />
                 </Link>
-              </LegacyStyledText>
+              </StyledText>
             ))}
         </Flex>
         {brandId != null && brandId.length > 0 && (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="h6">
-              {t('manufacturer_number')}
-            </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
-              {brandId.join(', ')}
-            </LegacyStyledText>
+            <StyledText forwardedAs="h6">{t('manufacturer_number')}</StyledText>
+            <StyledText forwardedAs="p">{brandId.join(', ')}</StyledText>
           </Flex>
         )}
       </Flex>

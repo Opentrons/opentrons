@@ -2,8 +2,8 @@ import {
   BORDERS,
   COLORS,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
@@ -26,9 +26,9 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing2}
       width="max-content"
     >
-      <LegacyStyledText forwardedAs="p" id={id}>
+      <StyledText forwardedAs="p" id={id}>
         {displayName}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

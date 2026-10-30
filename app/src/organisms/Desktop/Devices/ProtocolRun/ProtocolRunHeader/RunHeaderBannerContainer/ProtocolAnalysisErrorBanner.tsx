@@ -9,10 +9,10 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -45,10 +45,8 @@ export function ProtocolAnalysisErrorBanner(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
-          {t('protocol_analysis_failed')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">{t('protocol_analysis_failed')}</StyledText>
+        <StyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="view_analysis_error_details"
@@ -63,7 +61,7 @@ export function ProtocolAnalysisErrorBanner(
               ),
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {showErrorDetails
         ? createPortal(
@@ -73,9 +71,9 @@ export function ProtocolAnalysisErrorBanner(
               onClose={handleToggleDetails}
             >
               {errors.map((error, index) => (
-                <LegacyStyledText forwardedAs="p" key={index}>
+                <StyledText forwardedAs="p" key={index}>
                   {error?.detail}
-                </LegacyStyledText>
+                </StyledText>
               ))}
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton

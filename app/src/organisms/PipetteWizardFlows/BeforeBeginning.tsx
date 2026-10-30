@@ -1,13 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  Banner,
-  DIRECTION_COLUMN,
-  Flex,
-  LegacyStyledText,
-  SPACING,
-} from '@opentrons/components'
+import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -15,6 +9,7 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
@@ -22,7 +17,6 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
 import {
-  BODY_STYLE,
   CALIBRATION_PROBE,
   FLOWS,
   HEX_SCREWDRIVER,
@@ -271,7 +265,7 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <LegacyStyledText css={BODY_STYLE} />,
+                block: <WizardBodyText />,
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&

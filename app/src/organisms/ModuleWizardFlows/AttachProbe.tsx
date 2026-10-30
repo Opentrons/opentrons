@@ -1,20 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Banner,
-  Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, Banner, Flex, SPACING } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
@@ -29,14 +21,6 @@ interface AttachProbeProps extends ModuleSetupWizardRequiresPipetteStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
 }
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 export function AttachProbe(props: AttachProbeProps): ReactNode {
   const {
@@ -156,7 +140,7 @@ export function AttachProbe(props: AttachProbeProps): ReactNode {
       }
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             <Trans
               t={t}
               i18nKey="pipette_wizard_flows:install_probe"
@@ -165,7 +149,7 @@ export function AttachProbe(props: AttachProbeProps): ReactNode {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
+          </WizardBodyText>
 
           {wasteChuteConflictWith96Channel && (
             <Banner

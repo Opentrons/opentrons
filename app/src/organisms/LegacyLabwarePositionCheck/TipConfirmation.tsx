@@ -8,10 +8,10 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -64,9 +64,9 @@ export function TipConfirmation(props: TipConfirmationProps): ReactNode {
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+      <StyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}

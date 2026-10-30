@@ -8,8 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -59,19 +59,16 @@ export function UpdateSoftware({ updateType }: UpdateSoftwareProps): ReactNode {
         gridGap={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey60}
         >
           {renderText()}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

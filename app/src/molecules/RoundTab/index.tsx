@@ -4,9 +4,10 @@ import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  LegacyStyledText,
+  Flex,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -88,9 +89,11 @@ export function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
-        {tabName}
-      </LegacyStyledText>
+      <Flex css={disabledRoundTabStyling} {...targetProps}>
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {tabName}
+        </StyledText>
+      </Flex>
       {tabDisabledReason != null ? (
         <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
       ) : null}

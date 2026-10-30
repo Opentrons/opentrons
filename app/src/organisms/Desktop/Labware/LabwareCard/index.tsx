@@ -14,10 +14,10 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -85,9 +85,9 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
       <Box marginRight={SPACING.spacing16}>
-        <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {displayCategory}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       {/* labware info */}
       <Box>
@@ -96,11 +96,11 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box>
-            <LegacyStyledText forwardedAs="h3">{displayName}</LegacyStyledText>
+            <StyledText forwardedAs="h3">{displayName}</StyledText>
             {isCustomDefinition ? (
-              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+              <StyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('custom_def')}
-              </LegacyStyledText>
+              </StyledText>
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
@@ -108,26 +108,23 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
                   name="check-decagram"
                   height=".7rem"
                 />
-                <LegacyStyledText
-                  forwardedAs="label"
-                  marginLeft={SPACING.spacing4}
-                >
+                <StyledText forwardedAs="label" marginLeft={SPACING.spacing4}>
                   {t('branded:opentrons_def')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             )}
           </Box>
           <Box paddingTop={SPACING.spacing16}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.grey60}
             >
               {t('api_name')}
-            </LegacyStyledText>
+            </StyledText>
 
             <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-              <LegacyStyledText forwardedAs="p">{apiName}</LegacyStyledText>
+              <StyledText forwardedAs="p">{apiName}</StyledText>
             </Box>
           </Box>
         </Flex>
@@ -145,12 +142,12 @@ export function LabwareCard(props: LabwareCardProps): ReactNode {
           >
             <CustomLabwareOverflowMenu filename={filename} />
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
-              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+              <StyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('date_added')}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+              </StyledText>
+              <StyledText forwardedAs="label" color={COLORS.grey50}>
                 {format(new Date(modified), 'MM/dd/yyyy')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </Flex>
         )}

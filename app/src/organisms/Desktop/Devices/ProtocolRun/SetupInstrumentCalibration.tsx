@@ -4,8 +4,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -54,9 +54,13 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
+      <StyledText
+        forwardedAs="p"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        color={COLORS.black90}
+      >
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
-      </LegacyStyledText>
+      </StyledText>
       {PIPETTE_MOUNTS.map((mount, index) => {
         return (
           <SetupFlexPipetteCalibrationItem

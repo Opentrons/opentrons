@@ -9,9 +9,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
@@ -181,21 +181,21 @@ export const StatRow = (props: StatRowProps): ReactNode => {
   return (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginX={SPACING.spacing16}
         >
           {displayName}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey50}
           marginX={SPACING.spacing16}
         >
           {description}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
@@ -206,12 +206,9 @@ export const StatRow = (props: StatRowProps): ReactNode => {
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
           {datum}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

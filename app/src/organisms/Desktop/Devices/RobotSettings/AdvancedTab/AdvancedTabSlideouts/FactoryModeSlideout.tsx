@@ -9,10 +9,10 @@ import {
   Flex,
   Icon,
   InputField,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -252,38 +252,42 @@ export function FactoryModeSlideout({
       {currentStep === 2 ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText
-              css={TYPOGRAPHY.pSemiBold}
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingBottom={SPACING.spacing4}
             >
               {t('oem_mode')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing6}>
               <ToggleButton
                 label="oem_mode_toggle"
                 toggledOn={toggleValue}
                 onClick={handleToggleClick}
               />
-              <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing4}>
+              <StyledText forwardedAs="p" marginBottom={SPACING.spacing4}>
                 {toggleValue ? t('on') : t('off')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               {t('branded:oem_mode_description')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
           {toggleValue ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
-                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  forwardedAs="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('upload_custom_logo')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p">
+                </StyledText>
+                <StyledText forwardedAs="p">
                   {t('upload_custom_logo_description')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p">
+                </StyledText>
+                <StyledText forwardedAs="p">
                   {t('upload_custom_logo_dimensions')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               {file == null ? (
                 <UploadInput
@@ -292,7 +296,7 @@ export function FactoryModeSlideout({
                     handleChooseFile(file)
                   }}
                   dragAndDropText={
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       <Trans
                         t={t}
                         i18nKey="shared:drag_and_drop"
@@ -300,7 +304,7 @@ export function FactoryModeSlideout({
                           a: <Link color={COLORS.blue55} role="button" />,
                         }}
                       />
-                    </LegacyStyledText>
+                    </StyledText>
                   }
                 />
               ) : (

@@ -12,10 +12,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -114,13 +114,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       {uploadText != null ? (
         <>
           {typeof uploadText === 'string' ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               textAlign={TYPOGRAPHY.textAlignCenter}
               marginTop={SPACING.spacing16}
             >
               {uploadText}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <>{uploadText}</>
           )}

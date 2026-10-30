@@ -1,15 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, Flex, SPACING } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getCalibrationAdapterLoadName,
@@ -27,6 +19,7 @@ import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
@@ -43,15 +36,6 @@ interface PlaceAdapterProps extends ModuleSetupWizardRequiresPipetteStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
 }
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 export function PlaceAdapter(props: PlaceAdapterProps): ReactNode {
   const {
@@ -246,17 +230,11 @@ export function PlaceAdapter(props: PlaceAdapterProps): ReactNode {
         }
         bodyText={
           attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_heater_shaker')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush_heater_shaker')}</WizardBodyText>
           ) : attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_thermocycler')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush_thermocycler')}</WizardBodyText>
           ) : (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush')}</WizardBodyText>
           )
         }
         proceedButtonText={t('confirm_placement')}

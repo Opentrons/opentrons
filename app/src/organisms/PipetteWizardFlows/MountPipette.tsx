@@ -4,7 +4,6 @@ import {
   Banner,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
 } from '@opentrons/components'
@@ -14,10 +13,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { Skeleton } from '/app/atoms/Skeleton'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -64,11 +64,11 @@ export const MountPipette = (props: MountPipetteProps): ReactNode => {
   } else {
     bodyText = (
       <>
-        <LegacyStyledText css={BODY_STYLE}>
+        <WizardBodyText>
           {isSingleMountPipette
             ? t('align_the_connector')
             : t('hold_pipette_carefully')}
-        </LegacyStyledText>
+        </WizardBodyText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"

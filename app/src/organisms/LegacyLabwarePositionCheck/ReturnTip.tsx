@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   getLabwareDefinitionsFromCommands,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -81,7 +81,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
       components={{
         bold: (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />

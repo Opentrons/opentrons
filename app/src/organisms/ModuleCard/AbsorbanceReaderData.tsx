@@ -2,10 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, Flex, StyledText } from '@opentrons/components'
 
-import {
-  MODULE_INFO_DETAIL_CONTAINER_STYLE,
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-} from './constants'
+import { MODULE_INFO_DETAIL_CONTAINER_STYLE } from './constants'
 
 import type { AbsorbanceReaderModule } from '@opentrons/api-client'
 import type { ChipType } from '@opentrons/components'
@@ -55,10 +52,7 @@ export const AbsorbanceReaderData = (
         textTransform="capitalize"
         data-testid="abs_module_status"
       />
-      <StyledText
-        css={MODULE_INFO_DETAIL_TEXT_STYLE}
-        data-testid="abs_module_data"
-      >
+      <StyledText forwardedAs="h3" data-testid="abs_module_data">
         {t('abs_reader_lid_status', {
           status: lidDisplayStatus,
         })}

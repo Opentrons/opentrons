@@ -4,10 +4,10 @@ import capitalize from 'lodash/capitalize'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   ListItem,
   OVERFLOW_SCROLL,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -32,9 +32,9 @@ export function IncompatibleModuleODDModalBody({
   return (
     <OddModal header={incompatibleModuleHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
           <Trans t={t} i18nKey="remove_before_running_protocol" />
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           overflowY={OVERFLOW_SCROLL}
           flexDirection={DIRECTION_COLUMN}
@@ -43,13 +43,13 @@ export function IncompatibleModuleODDModalBody({
         >
           {modules.map(module => (
             <ListItem key={module.id} type="default">
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 key={module.id}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {getModuleDisplayName(module.moduleModel)}
-              </LegacyStyledText>
+              </StyledText>
             </ListItem>
           ))}
         </Flex>

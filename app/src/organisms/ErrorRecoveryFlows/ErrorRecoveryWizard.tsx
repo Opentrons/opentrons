@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import { CURSOR_POINTER, StyledText } from '@opentrons/components'
 
@@ -135,9 +134,7 @@ export function ErrorRecoveryComponent(props: RecoveryContentProps): ReactNode {
     <StyledText
       oddStyle="bodyTextSemiBold"
       desktopStyle="bodyDefaultSemiBold"
-      css={css`
-        cursor: ${CURSOR_POINTER};
-      `}
+      cursor={CURSOR_POINTER}
     >
       {t('view_error_details')}
     </StyledText>

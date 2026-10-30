@@ -8,8 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,12 +46,9 @@ export function NoUpdateFound(props: NoUpdateFoundProps): ReactNode {
           color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('software_is_up_to_date')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}

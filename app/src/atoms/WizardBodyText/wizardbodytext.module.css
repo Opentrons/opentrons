@@ -1,0 +1,13 @@
+/* Matches wizard BODY_STYLE: TYPOGRAPHY.pRegular + ODD bump */
+.body {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .body {
+    font-size: 1.275rem;
+    line-height: 1.75rem;
+  }
+}

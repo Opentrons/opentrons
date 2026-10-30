@@ -2,10 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, Flex, StyledText } from '@opentrons/components'
 
-import {
-  MODULE_INFO_DETAIL_CONTAINER_STYLE,
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-} from './constants'
+import { MODULE_INFO_DETAIL_CONTAINER_STYLE } from './constants'
 
 import type { TemperatureStatus } from '@opentrons/api-client'
 
@@ -38,12 +35,12 @@ export const TemperatureModuleData = (
         iconName="connection-status"
         textTransform="capitalize"
       />
-      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+      <StyledText forwardedAs="h3">
         {t(targetTemp == null ? 'na_temp' : 'target_temp', {
           temp: targetTemp,
         })}
       </StyledText>
-      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+      <StyledText forwardedAs="h3">
         {t('current_temp', { temp: currentTemp })}
       </StyledText>
     </Flex>

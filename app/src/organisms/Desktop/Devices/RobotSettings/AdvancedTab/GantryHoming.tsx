@@ -5,8 +5,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
@@ -41,21 +41,24 @@ export function GantryHoming({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
+      <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('usage_settings')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
           width="70%"
         >
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('gantry_homing')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('gantry_homing_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <ToggleButton
           label="gantry_homing"

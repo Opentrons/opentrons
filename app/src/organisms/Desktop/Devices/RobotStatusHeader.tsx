@@ -14,7 +14,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   StyledText,
@@ -88,15 +87,12 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
         }}
         gridGap={SPACING.spacing8}
       >
-        <LegacyStyledText
-          forwardedAs="label"
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-        >
+        <StyledText forwardedAs="label" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'

@@ -15,11 +15,11 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -124,12 +124,9 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
@@ -137,12 +134,12 @@ function TouchscreenModal({
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('estop')}
-          </LegacyStyledText>
+          </StyledText>
           <Chip
             type={isEngaged ? 'error' : 'success'}
             text={isEngaged ? t('engaged') : t('disengaged')}
@@ -218,9 +215,9 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+        <StyledText forwardedAs="p" color={COLORS.grey60}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}

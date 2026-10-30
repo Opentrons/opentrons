@@ -5,8 +5,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -87,7 +87,7 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider robotName={robotName}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="liquid_damages_this_pipette"
@@ -98,7 +98,7 @@ const TipsAttachedModal = NiceModal.create(
                   mount: <strong />,
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
             <Flex gridGap={SPACING.spacing8}>
               <SmallButton
                 flex="1"

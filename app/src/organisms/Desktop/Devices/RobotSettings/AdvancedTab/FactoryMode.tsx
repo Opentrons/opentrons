@@ -5,9 +5,9 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -35,12 +35,9 @@ export function FactoryMode({
       marginTop={SPACING.spacing24}
     >
       <Box width="70%">
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('factory_mode')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <TertiaryButton
         disabled={isRobotBusy || sn == null}

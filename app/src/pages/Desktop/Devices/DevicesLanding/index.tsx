@@ -14,11 +14,11 @@ import {
   Icon,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -105,7 +105,7 @@ export function DevicesLanding(): ReactNode {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText forwardedAs="h1">{t('devices')}</LegacyStyledText>
+        <StyledText forwardedAs="h1">{t('devices')}</StyledText>
         <NewRobotSetupHelp />
       </Flex>
       {showSearchBar ? (
@@ -183,9 +183,7 @@ function DevicesLoadingState(): ReactNode {
       marginTop="10vh"
       marginBottom="10vh"
     >
-      <LegacyStyledText forwardedAs="h1">
-        {t('looking_for_robots')}
-      </LegacyStyledText>
+      <StyledText forwardedAs="h1">{t('looking_for_robots')}</StyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"

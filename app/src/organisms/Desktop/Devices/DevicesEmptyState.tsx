@@ -10,12 +10,12 @@ import {
   FONT_WEIGHT_REGULAR,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   PrimaryButton,
   SPACING,
   SPACING_5,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -40,14 +40,14 @@ export function DevicesEmptyState(): ReactNode {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
       <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
           paddingBottom={SPACING.spacing16}
           marginTop="20vh"
         >
           {t('no_robots_found')}
-        </LegacyStyledText>
+        </StyledText>
         <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}

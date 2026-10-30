@@ -4,9 +4,9 @@ import {
   ALIGN_CENTER,
   Flex,
   Icon,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
@@ -53,7 +53,7 @@ export function DownloadCsvFileLink(
       }}
     >
       <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-        <LegacyStyledText forwardedAs="p">{t('download')}</LegacyStyledText>
+        <StyledText forwardedAs="p">{t('download')}</StyledText>
         <Icon name="download" size="1rem" />
       </Flex>
     </Link>

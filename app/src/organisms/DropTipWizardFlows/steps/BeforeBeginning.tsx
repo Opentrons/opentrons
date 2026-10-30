@@ -15,7 +15,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -178,7 +177,7 @@ function DropTipOption({
       >
         <source src={videoSrc} />
       </AnimationVideo>
-      <LegacyStyledText forwardedAs="h3">{text}</LegacyStyledText>
+      <StyledText forwardedAs="h3">{text}</StyledText>
     </Flex>
   )
 }

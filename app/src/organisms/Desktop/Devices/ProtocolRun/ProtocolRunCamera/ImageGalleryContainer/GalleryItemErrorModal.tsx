@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Icon,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -57,9 +57,9 @@ export function GalleryItemErrorModal({
     <Modal {...buildModalProps()}>
       <div className={styles.error_container}>
         <ErrorContent erroredCommand={erroredCommand} />
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('branded:run_failed_modal_description_desktop')}
-        </LegacyStyledText>
+        </StyledText>
         <div className={styles.error_footer_container}>
           <Link css={TYPOGRAPHY.linkPSemiBold} onClick={handleDownloadClick}>
             <div className={styles.error_icon_container}>
@@ -86,12 +86,9 @@ export function ErrorContent({
     <div className={styles.error_content_container}>
       <div className={styles.error_message_container}>
         {erroredCommand?.error != null && (
-          <LegacyStyledText
-            forwardedAs="p"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
+          <StyledText forwardedAs="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {`${erroredCommand.error.errorCode}: ${erroredCommand.error.detail}`}
-          </LegacyStyledText>
+          </StyledText>
         )}
       </div>
     </div>

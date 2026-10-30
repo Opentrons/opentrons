@@ -15,7 +15,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
-  LegacyStyledText,
   ModalShell,
   PipetteRender,
   PrimaryButton,
@@ -23,6 +22,7 @@ import {
   RobotWorkSpace,
   SecondaryButton,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
@@ -222,16 +222,16 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   flexDirection={DIRECTION_COLUMN}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   header={
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="h4"
-                      css={css`
-                        font-weight: ${TYPOGRAPHY.fontWeightBold};
-                        font-size: ${TYPOGRAPHY.fontSize28};
-                        line-height: ${TYPOGRAPHY.lineHeight36};
-                      `}
+                      fontWeight={TYPOGRAPHY.fontWeightBold}
+                      style={{
+                        fontSize: TYPOGRAPHY.fontSize28,
+                        lineHeight: TYPOGRAPHY.lineHeight36,
+                      }}
                     >
                       {t('move_to_a1_position')}
-                    </LegacyStyledText>
+                    </StyledText>
                   }
                   footer={
                     <SmallButton

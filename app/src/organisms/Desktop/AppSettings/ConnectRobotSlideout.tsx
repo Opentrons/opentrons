@@ -9,10 +9,10 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -78,12 +78,12 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('branded:ip_description_second')}
-        </LegacyStyledText>
+        </StyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
@@ -92,9 +92,9 @@ export function ConnectRobotSlideout({
           {t('connect_ip_link')}
         </ExternalLink>
         <Divider marginY={SPACING.spacing24} />
-        <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold} forwardedAs="p">
           {t('add_ip_hostname')}
-        </LegacyStyledText>
+        </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
@@ -104,26 +104,26 @@ export function ConnectRobotSlideout({
         >
           {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 color={COLORS.grey50}
                 marginRight={SPACING.spacing8}
               >
                 {t('searching')}
-              </LegacyStyledText>{' '}
+              </StyledText>{' '}
               <Icon name="ot-spinner" size="1.25rem" spin />
             </Flex>
           ) : (
             [
               mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
                 <>
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="p"
                     color={COLORS.grey50}
                     marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}
-                  </LegacyStyledText>
+                  </StyledText>
                   {displayLinkButton(t('shared:try_again') as string)}
                 </>
               ) : (
