@@ -19,7 +19,7 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import successIcon from '/app/assets/images/icon_success.png'
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import {
