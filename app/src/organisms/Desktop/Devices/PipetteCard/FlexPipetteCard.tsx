@@ -11,6 +11,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import {
   DropTipWizardFlows,
@@ -117,7 +118,9 @@ export function FlexPipetteCard({
       refetchInterval: POLL_DURATION_MS,
     }
   )
-  const pipetteDisplayName = pipetteModelSpecs?.displayName
+  const pipetteDisplayName = useAttachedInstrumentDisplayName(
+    attachedPipette?.ok ? attachedPipette : null
+  )
   // we should poll for a subsystem update from the time a bad instrument is
   // detected until the update has been done for 5 seconds
   // this gives the instruments endpoint time to start reporting

@@ -1,7 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import {
+  useCurrentSubsystemUpdateQuery,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -42,7 +45,8 @@ describe('FlexPipetteCard', () => {
         instrumentName: 'pipette',
         subsystem: 'pipette_left',
         mount: 'left',
-        instrumentModel: 'p50_single_v3.1',
+        instrumentModel: 'p50_single_v3.5',
+        displayName: mockLeftSpecs.displayName,
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
@@ -62,6 +66,9 @@ describe('FlexPipetteCard', () => {
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: { settings: [] },
+    } as any)
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
@@ -95,7 +102,8 @@ describe('FlexPipetteCard', () => {
         instrumentName: 'p1000_96',
         subsystem: 'pipette_left',
         mount: 'left',
-        instrumentModel: 'p50_single_v3.1',
+        instrumentModel: 'p1000_96_v3.5',
+        displayName: mockLeftSpecs.displayName,
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
@@ -127,7 +135,8 @@ describe('FlexPipetteCard', () => {
         instrumentName: 'pipette',
         subsystem: 'pipette_left',
         mount: 'left',
-        instrumentModel: 'p50_single_v3.1',
+        instrumentModel: 'p50_single_v3.5',
+        displayName: mockLeftSpecs.displayName,
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
@@ -156,7 +165,8 @@ describe('FlexPipetteCard', () => {
         instrumentName: 'pipette',
         subsystem: 'pipette_left',
         mount: 'left',
-        instrumentModel: 'p50_single_v3.1',
+        instrumentModel: 'p50_single_v3.5',
+        displayName: mockLeftSpecs.displayName,
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
