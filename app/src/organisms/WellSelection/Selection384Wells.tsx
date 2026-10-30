@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { IconButton } from '/app/atoms/buttons/IconButton'
+import { SimpleIconButton } from '/app/components/ODD/buttons/SimpleIconButton'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
@@ -313,7 +313,7 @@ interface ButtonControlsProps {
   minusDisabled: boolean
   plusDisabled: boolean
 }
-
+// TODO (jj, 2026-10-29): SimpleIconButton is an ODD component. We should replace this on desktop.
 function ButtonControls(props: ButtonControlsProps): ReactNode {
   const { channels, handleMinus, handlePlus, minusDisabled, plusDisabled } =
     props
@@ -332,14 +332,14 @@ function ButtonControls(props: ButtonControlsProps): ReactNode {
           )}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing16} height="6.5rem">
-          <IconButton
+          <SimpleIconButton
             disabled={minusDisabled}
             onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
-          <IconButton
+          <SimpleIconButton
             disabled={plusDisabled}
             onClick={handlePlus}
             iconName="plus"

@@ -6,7 +6,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { SubmitPrimaryButton } from '..'
+import { SubmitPrimaryButton } from '../SubmitPrimaryButton'
 
 import type { ComponentProps } from 'react'
 
