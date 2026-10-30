@@ -17,7 +17,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'

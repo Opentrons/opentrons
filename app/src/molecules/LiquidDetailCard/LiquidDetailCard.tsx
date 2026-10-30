@@ -24,7 +24,7 @@ import {
   MICRO_LITERS,
 } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
   useTrackEvent,

@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { ReactNode } from 'react'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'

@@ -11,7 +11,7 @@ import {
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { RecentRunProtocolCard } from '/app/components/ODD/cards/RecentRunProtocolCard'
 import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -39,7 +39,7 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/atoms/Skeleton')
+vi.mock('/app/components/adhoc/shared/Skeleton')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/analytics')

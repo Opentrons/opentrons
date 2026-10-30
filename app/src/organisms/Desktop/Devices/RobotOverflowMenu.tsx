@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, removeRobot } from '/app/redux/discovery'

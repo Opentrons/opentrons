@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { NAV_BAR_WIDTH } from '/app/App/constants'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { CommandIcon } from '/app/molecules/Command'
 import {

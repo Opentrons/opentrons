@@ -28,7 +28,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
   useTrackEvent,

@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure/Divider'
+import { Divider } from '/app/components/adhoc/shared/structure/Divider'
 
 import type { ReactNode } from 'react'
 import type { RobotInfoLabelProps } from '@opentrons/components'

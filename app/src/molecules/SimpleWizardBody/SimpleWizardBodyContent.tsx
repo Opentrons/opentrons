@@ -19,7 +19,7 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { ReactNode } from 'react'

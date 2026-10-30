@@ -38,7 +38,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 

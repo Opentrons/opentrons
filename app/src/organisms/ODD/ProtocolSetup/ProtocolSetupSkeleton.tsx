@@ -8,7 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
 import type { ReactNode } from 'react'
 

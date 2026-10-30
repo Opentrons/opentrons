@@ -1,6 +1,6 @@
 import { BORDERS } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
 import styles from './skeletonforslotdetail.module.css'
 

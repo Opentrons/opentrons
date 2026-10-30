@@ -16,7 +16,7 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { isInsufficientScopeError } from '/app/local-resources/access-control/utils'
 import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 
 import { LabwareDetailOverflowMenu } from './LabwareDetailOverflowMenu'

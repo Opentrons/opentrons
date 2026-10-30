@@ -13,7 +13,7 @@ import {
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'

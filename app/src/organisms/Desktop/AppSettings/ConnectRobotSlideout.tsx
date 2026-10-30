@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { getScanning, startDiscovery } from '/app/redux/discovery'
 
