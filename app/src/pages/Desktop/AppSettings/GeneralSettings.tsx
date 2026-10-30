@@ -25,8 +25,8 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/components/adhoc/shared/structure'
 import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { LANGUAGES } from '/app/i18n'

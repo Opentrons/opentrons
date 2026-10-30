@@ -37,7 +37,7 @@ import {
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { InstrumentContainer } from '/app/components/adhoc/desktop/InstrumentContainer'
 import { Divider } from '/app/components/adhoc/shared/structure'
 
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
