@@ -25,8 +25,8 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { StatusLabel } from '/app/atoms/StatusLabel'
 import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
+import { StatusLabel } from '/app/components/desktop/chips/StatusLabel'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
