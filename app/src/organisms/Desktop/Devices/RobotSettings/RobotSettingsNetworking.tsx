@@ -19,7 +19,7 @@ import {
 
 import { getModalPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,

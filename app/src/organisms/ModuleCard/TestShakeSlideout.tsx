@@ -32,7 +32,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'

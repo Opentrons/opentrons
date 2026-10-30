@@ -22,7 +22,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { RobotCard } from '/app/components/desktop/cards/RobotCard'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'

@@ -11,7 +11,7 @@ import {
   Z_INDEX,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'

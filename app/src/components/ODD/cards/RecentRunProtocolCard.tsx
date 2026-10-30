@@ -29,7 +29,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,

@@ -15,7 +15,7 @@ import {
   Tag,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure/Divider'
+import { Divider } from '/app/components/adhoc/shared/structure/Divider'
 
 import styles from './interventioninfo.module.css'
 

@@ -8,7 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
 import { PlayPauseButton } from '../shared/PlayPauseButton'
 import { StopButton } from '../shared/StopButton'
