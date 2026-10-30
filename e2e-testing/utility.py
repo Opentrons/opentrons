@@ -114,21 +114,54 @@ def _dismiss_migration_modal(page: Page, *, timeout: int = 15000) -> None:
         print("Migration modal did not appear, proceeding with test.")
 
 
-def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+def create_new_protocol_from_landing_page(
+    pipette: str,
+    gripper: bool,
+    tc: bool,
+    waste_chute: bool,
+    page: Page,
+    *,
+    volume: str = "50 µL",
+    tip_racks: list[str] | None = None,
+) -> None:
     """Create a new protocol from the landing page."""
     landing = LandingPage(page)
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
 
     landing.click_create_protocol()
-    create_new_protocol_flow(pipette, gripper, tc, waste_chute, page)
+    create_new_protocol_flow(
+        pipette,
+        gripper,
+        tc,
+        waste_chute,
+        page,
+        volume=volume,
+        tip_racks=tip_racks,
+    )
 
 
-def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+def create_new_protocol_flow(
+    pipette: str,
+    gripper: bool,
+    tc: bool,
+    waste_chute: bool,
+    page: Page,
+    *,
+    volume: str = "50 µL",
+    tip_racks: list[str] | None = None,
+) -> None:
     page.get_by_text("Add a pipette").click()
     page.get_by_text(pipette).click()
-    page.get_by_text("50 µL").click()
-    page.locator("label").filter(has=page.get_by_text(re.compile(r"^Tip Rack 50 µL$"))).first.click()
+    page.get_by_text(volume).click()
+    selected_tip_racks = tip_racks
+    if selected_tip_racks is None:
+        # Default matches the historical 50 µL pipette path.
+        volume_match = re.search(r"(\d+)\s*µL", volume)
+        tip_volume = volume_match.group(1) if volume_match else "50"
+        selected_tip_racks = [f"Tip Rack {tip_volume} µL"]
+    for tip_rack in selected_tip_racks:
+        page.locator("label").filter(has=page.get_by_text(re.compile(rf"^{re.escape(tip_rack)}$"))).first.click()
     page.get_by_role("button", name="Save").click()
     page.get_by_text("Yes", exact=True).click()
     if gripper:
