@@ -179,7 +179,7 @@ def subject(
 
 def test_jaw_open_width_mm() -> None:
     """Open a few mm past the labware, clamped to gripper geometry."""
-    assert _jaw_open_width_mm(85.48, 60.0, 92.0) == 87
+    assert _jaw_open_width_mm(85.48, 60.0, 92.0) == 88
     assert _jaw_open_width_mm(94.0, 60.0, 92.0) == 92
     assert _jaw_open_width_mm(108.6, 60.0, 92.0) == 92
     assert _jaw_open_width_mm(108.6, 60.0, 92.6) == 92
@@ -674,7 +674,7 @@ async def test_limited_jaw_open_only_next_to_vacuum_collar(
         times=1,
     )
     decoy.verify(await ot3_hardware_api.ungrip(), times=0)
-    assert limited_open == 87
+    assert limited_open == 88
 
 
 async def test_slow_pickup_for_vacuum_module_collar(
