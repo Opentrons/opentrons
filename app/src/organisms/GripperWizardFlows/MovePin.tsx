@@ -53,6 +53,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     errorMessage,
     setErrorMessage,
     isExiting,
+    selectedSlot,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -92,8 +93,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   commandType: 'calibration/calibrateGripper' as const,
                   params:
                     jaw === 'rear' && frontJawOffset != null
-                      ? { jaw, otherJawOffset: frontJawOffset }
-                      : { jaw },
+                      ? {
+                          jaw,
+                          otherJawOffset: frontJawOffset,
+                          slot: selectedSlot,
+                        }
+                      : { jaw, slot: selectedSlot },
                 },
                 waitUntilComplete: true,
               })
@@ -245,7 +250,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         }
         body={
           errorMessage == null && !isExiting
-            ? t('calibration_pin_touching', { slot: 'C2' })
+            ? t('calibration_pin_touching', { slot: selectedSlot })
             : null
         }
         alternativeSpinner={

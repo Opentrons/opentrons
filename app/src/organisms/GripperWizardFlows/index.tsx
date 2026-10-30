@@ -31,6 +31,8 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { DEFAULT_CALIBRATION_SLOT } from '../PipetteWizardFlows/constants'
+import { SelectCalibrationSlot } from '../PipetteWizardFlows/SelectCalibrationSlot'
 import { BeforeBeginning } from './BeforeBeginning'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -53,6 +55,7 @@ import type {
 } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
+import type { CalibrationDeckSlot } from '../PipetteWizardFlows/types'
 import type { GripperWizardFlowType } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -280,6 +283,9 @@ export const GripperWizard = (
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [frontJawOffset, setFrontJawOffset] = useState<Vector3D | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<CalibrationDeckSlot>(
+    DEFAULT_CALIBRATION_SLOT
+  )
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
@@ -327,6 +333,7 @@ export const GripperWizard = (
     chainRunCommands: chainMaintenanceRunCommands,
     setErrorMessage,
     errorMessage,
+    selectedSlot,
   }
   let onExit
   if (currentStep == null) return null
@@ -365,6 +372,17 @@ export const GripperWizard = (
         createMaintenanceRun={createMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
         documentationState={commandDocState}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.SELECT_SLOT) {
+    onExit = confirmExit
+    modalContent = (
+      <SelectCalibrationSlot
+        header={t('select_deck_slot')}
+        selectedSlot={selectedSlot}
+        setSelectedSlot={setSelectedSlot}
+        proceed={handleProceed}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {

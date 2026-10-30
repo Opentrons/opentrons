@@ -46,6 +46,7 @@ describe('MovePin', () => {
         errorMessage={null}
         setErrorMessage={mockSetErrorMessage}
         isExiting={false}
+        selectedSlot="B2"
         {...props}
       />,
       { i18nInstance: i18n }
@@ -86,7 +87,7 @@ describe('MovePin', () => {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
-        params: { jaw: 'front' },
+        params: { jaw: 'front', slot: 'B2' },
       },
       waitUntilComplete: true,
     })
@@ -127,6 +128,30 @@ describe('MovePin', () => {
   it('renders correct loader for move pin to front jaw', () => {
     render({ isRobotMoving: true })
     screen.getByText('Stand back, gripper is calibrating')
+    screen.getByText(
+      'The calibration pin will touch the calibration square in slot B2 to determine its exact position.'
+    )
+  })
+
+  it('sends the selected slot in the calibrate command', async () => {
+    render({ selectedSlot: 'C2' })
+    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
+    await new Promise(resolve => setTimeout(resolve))
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
+      command: {
+        commandType: 'calibration/calibrateGripper',
+        params: { jaw: 'front', slot: 'C2' },
+      },
+      waitUntilComplete: true,
+    })
+  })
+
+  it('uses the selected slot in in-progress copy', () => {
+    render({ isRobotMoving: true, selectedSlot: 'C2' })
+    screen.getByText(
+      'The calibration pin will touch the calibration square in slot C2 to determine its exact position.'
+    )
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
@@ -163,6 +188,7 @@ describe('MovePin', () => {
         params: {
           jaw: 'rear',
           otherJawOffset: { x: 0, y: 0, z: 0 },
+          slot: 'B2',
         },
       },
       waitUntilComplete: true,
