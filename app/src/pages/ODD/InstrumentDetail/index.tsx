@@ -17,7 +17,6 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { BackButton } from '/app/atoms/buttons/BackButton'
 import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
 import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import {
@@ -27,6 +26,7 @@ import {
 import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
+import { BackButton } from './BackButton'
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
 import type { ReactNode } from 'react'

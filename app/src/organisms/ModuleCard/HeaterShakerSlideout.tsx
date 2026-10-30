@@ -17,9 +17,9 @@ import {
   HS_TEMP_MAX,
 } from '@opentrons/shared-data'
 
-import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { SubmitPrimaryButton } from '/app/organisms/ModuleCard/SubmitPrimaryButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { MouseEventHandler } from 'react'

@@ -3,7 +3,7 @@ import clamp from 'lodash/clamp'
 
 import { StyledText } from '@opentrons/components'
 
-import { IconButton } from '/app/atoms/buttons/IconButton'
+import { SimpleIconButton } from '/app/components/ODD/buttons/SimpleIconButton'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
@@ -54,7 +54,7 @@ export function CameraTileSetting({
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">{subtext}</StyledText>
         <div className={styles.tile_setting_container}>
-          <IconButton
+          <SimpleIconButton
             disabled={adjustedValue === LOWEST_VALUE}
             onClick={() => {
               handleClick('down')
@@ -70,7 +70,7 @@ export function CameraTileSetting({
               />
             ))}
           </div>
-          <IconButton
+          <SimpleIconButton
             disabled={adjustedValue === HIGHEST_VALUE}
             onClick={() => {
               handleClick('up')

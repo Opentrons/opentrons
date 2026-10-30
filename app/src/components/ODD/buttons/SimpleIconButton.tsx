@@ -9,16 +9,16 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from './constants'
+import { ODD_FOCUS_VISIBLE } from '../../adhoc/shared/buttons/constants'
 
 import type { ComponentProps, ReactNode } from 'react'
 
-interface IconButtonProps extends ComponentProps<typeof Btn> {
+interface SimpleIconButtonProps extends ComponentProps<typeof Btn> {
   iconName: ComponentProps<typeof Icon>['name']
   hasBackground?: boolean
 }
 
-export function IconButton(props: IconButtonProps): ReactNode {
+export function SimpleIconButton(props: SimpleIconButtonProps): ReactNode {
   const { iconName, hasBackground = false, ...buttonProps } = props
   return (
     <Btn
