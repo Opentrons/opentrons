@@ -22,7 +22,12 @@ import {
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  RIGHT,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
@@ -35,6 +40,7 @@ import {
 } from '/app/local-resources/maintenance_runs/utils'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
@@ -46,7 +52,7 @@ import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { AttachProbe } from './AttachProbe'
 import { BeforeBeginning } from './BeforeBeginning'
 import { Carriage } from './Carriage'
-import { FLOWS, SECTIONS } from './constants'
+import { DEFAULT_CALIBRATION_SLOT, FLOWS, SECTIONS } from './constants'
 import { DetachPipette } from './DetachPipette'
 import { DetachProbe } from './DetachProbe'
 import { ExitModal } from './ExitModal'
@@ -58,6 +64,7 @@ import { MountPipette } from './MountPipette'
 import { MovementErrorModal } from './MovementErrorModal'
 import { ProbeNotAttached } from './ProbeNotAttached'
 import { Results } from './Results'
+import { SelectCalibrationSlot } from './SelectCalibrationSlot'
 import { UnskippableModal } from './UnskippableModal'
 import { startCalibrationOnClick } from './utils'
 
@@ -73,6 +80,7 @@ import type {
   PipetteMount,
 } from '@opentrons/shared-data'
 import type {
+  CalibrationDeckSlot,
   PipetteWizardFlow,
   PipetteWizardStep,
   PipetteWizardStepProps,
@@ -116,19 +124,49 @@ export const PipetteWizardFlows = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
+  const [selectedSlot, setSelectedSlot] = useState<CalibrationDeckSlot>(
+    DEFAULT_CALIBRATION_SLOT
+  )
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+  const is96Channel =
+    selectedPipette === NINETY_SIX_CHANNEL ||
+    attachedPipettes[mount]?.data.channels === 96 ||
+    attachedPipettes[LEFT]?.data.channels === 96 ||
+    (memoizedPipetteInfo?.some(
+      pipette =>
+        pipette.pipetteName === 'p1000_96' || pipette.pipetteName === 'p200_96'
+    ) ??
+      false)
+  const isWasteChuteOnDeck = deckConfig.some(cc =>
+    WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId)
+  )
+  const forceB2 = is96Channel && isWasteChuteOnDeck
+
+  useEffect(() => {
+    if (forceB2) {
+      setSelectedSlot(DEFAULT_CALIBRATION_SLOT)
+    }
+  }, [forceB2])
 
   const pipetteWizardSteps = useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            !forceB2
+          )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount
+            mount,
+            !forceB2
           ),
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [forceB2]
   )
   const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
@@ -452,6 +490,7 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
     handleCommandError,
+    selectedSlot,
   }
 
   const startCalibration = startCalibrationOnClick(
@@ -543,6 +582,19 @@ export const PipetteWizardFlows = (
         documentationState={commandDocState}
       />
     )
+  } else if (currentStep.section === SECTIONS.SELECT_SLOT) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <SelectCalibrationSlot
+        header={t('select_deck_slot')}
+        selectedSlot={selectedSlot}
+        setSelectedSlot={setSelectedSlot}
+        proceed={proceed}
+        isOnDevice={isOnDevice}
+      />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     onExit = confirmExit
     modalContent = showConfirmExit ? (
@@ -552,6 +604,7 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
+        showWasteChuteWarning={forceB2}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {

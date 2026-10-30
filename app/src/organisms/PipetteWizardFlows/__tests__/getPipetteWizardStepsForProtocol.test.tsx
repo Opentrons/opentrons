@@ -8,6 +8,7 @@ import {
 } from '/app/resources/instruments/__fixtures__'
 
 import { FLOWS, SECTIONS } from '../constants'
+import { insertSelectSlotBeforeAttachProbe } from '../getPipetteWizardSteps'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
 
 import type { LoadedPipette } from '@opentrons/shared-data'
@@ -68,7 +69,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
         RIGHT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the calibration flow when the attached 96-channel pipette needs calibration', () => {
     const mockFlowSteps = [
@@ -100,7 +101,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipetteInfo,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when the attached pipette needs to be switched out for single mount', () => {
     const mockFlowSteps = [
@@ -148,7 +149,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipettesInProtocolMulti as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
 
   it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount on left', () => {
@@ -212,7 +213,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipettesInProtocolNotEmpty as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount on right', () => {
     const mockFlowSteps = [
@@ -275,7 +276,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipettesInProtocolOnRight as any,
         RIGHT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when the attached pipette on left mount needs to be switched out for 96-channel', () => {
     const mockFlowSteps = [
@@ -338,7 +339,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipetteInfo as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when the attached pipette on right mount needs to be switched out for 96-channel', () => {
     const mockFlowSteps = [
@@ -401,7 +402,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipetteInfo as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel', () => {
     const mockFlowSteps = [
@@ -478,7 +479,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipetteInfo as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when gantry is empty and a single mount needs to be attached', () => {
     const mockFlowSteps = [
@@ -520,7 +521,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mockPipettesInProtocolNotEmpty as any,
         LEFT
       )
-    ).toStrictEqual(mockFlowSteps)
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
   })
   it('returns the correct array of info when gantry is empty and 96-channel needs to be attached', () => {
     const mockFlowSteps = [
@@ -571,6 +572,35 @@ describe('getPipetteWizardStepsForProtocol', () => {
         { left: null, right: null },
         mockPipetteInfo as any,
         LEFT
+      )
+    ).toStrictEqual(insertSelectSlotBeforeAttachProbe(mockFlowSteps))
+  })
+  it('skips the slot picker when includeSlotSelect is false', () => {
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.CALIBRATE },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: mock96ChannelAttachedPipetteInformation, right: null },
+        mockPipetteInfo,
+        LEFT,
+        false
       )
     ).toStrictEqual(mockFlowSteps)
   })

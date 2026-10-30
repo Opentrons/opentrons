@@ -51,6 +51,7 @@ describe('BeforeBeginning', () => {
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
+      selectedSlot: 'B2',
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,

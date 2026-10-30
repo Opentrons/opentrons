@@ -44,6 +44,7 @@ describe('MountPipette', () => {
       isFetching: false,
       setFetching: vi.fn(),
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
     vi.mocked(CheckPipetteButton).mockReturnValue(
       <div>mock check pipette button</div>

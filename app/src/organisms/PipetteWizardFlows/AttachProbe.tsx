@@ -3,7 +3,9 @@ import { css } from 'styled-components'
 
 import {
   AnimationVideo,
+  DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
@@ -23,6 +25,7 @@ import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
+  showWasteChuteWarning?: boolean
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -45,6 +48,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isExiting,
     isOnDevice,
     flowType,
+    selectedSlot,
+    showWasteChuteWarning = false,
   } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
@@ -56,7 +61,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const startCalibration = startCalibrationOnClick(props, pipetteId)
 
-  const calSlotNum = 'B2'
+  const calSlotNum = selectedSlot
   let src = pipetteProbe1
   if (is8Channel) {
     src = pipetteProbe8
@@ -115,18 +120,26 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <LegacyStyledText css={BODY_STYLE}>
-          <Trans
-            t={t}
-            i18nKey={'install_probe'}
-            values={{ location: probeLocation }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </LegacyStyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <LegacyStyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey={'install_probe'}
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </LegacyStyledText>
+          {showWasteChuteWarning ? (
+            <InlineNotification
+              type="alert"
+              message={t('waste_chute_96_channel_must_use_b2')}
+            />
+          ) : null}
+        </Flex>
       }
-      proceedButtonText={t('begin_calibration')}
+      proceedButtonText={t('continue')}
       proceed={startCalibration}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />

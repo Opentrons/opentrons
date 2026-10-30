@@ -43,6 +43,7 @@ describe('AttachProbe', () => {
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -54,7 +55,7 @@ describe('AttachProbe', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    const proceedBtn = screen.getByRole('button', { name: 'Begin calibration' })
+    const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
@@ -84,7 +85,7 @@ describe('AttachProbe', () => {
           },
           {
             commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
+            params: { mount: 'left', slot: 'B2' },
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
@@ -181,7 +182,7 @@ describe('AttachProbe', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -210,7 +211,7 @@ describe('AttachProbe', () => {
           },
           {
             commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
+            params: { mount: 'left', slot: 'B2' },
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
@@ -233,5 +234,51 @@ describe('AttachProbe', () => {
       flowType: FLOWS.ATTACH,
     }
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
+  })
+
+  it('sends the selected slot in the calibrate command', async () => {
+    props = {
+      ...props,
+      selectedSlot: 'C2',
+    }
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left', slot: 'C2' },
+          },
+        ]),
+        false
+      )
+    })
+  })
+
+  it('uses the selected slot in in-progress copy', () => {
+    props = {
+      ...props,
+      selectedSlot: 'C2',
+      isRobotMoving: true,
+    }
+    render(props)
+    screen.getByText(
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+    )
+  })
+
+  it('shows the waste chute warning only when requested', () => {
+    render(props)
+    expect(
+      screen.queryByText(
+        'If the Waste Chute is installed, 96-channel pipette calibration must be performed in slot B2.'
+      )
+    ).not.toBeInTheDocument()
+
+    render({ ...props, showWasteChuteWarning: true })
+    screen.getByText(
+      'If the Waste Chute is installed, 96-channel pipette calibration must be performed in slot B2.'
+    )
   })
 })
