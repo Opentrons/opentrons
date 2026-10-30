@@ -43,7 +43,7 @@ export function useAttachedInstrumentDisplayName(
     instrument.displayName != null && instrument.displayName !== ''
       ? instrument.displayName
       : null
-  const preferedPipetteName = hardwareDisplayName?? v2DisplayName
+  const preferedPipetteName = hardwareDisplayName ?? v2DisplayName
 
   if (isGripper) {
     return gripperFallback !== '' ? gripperFallback : null
