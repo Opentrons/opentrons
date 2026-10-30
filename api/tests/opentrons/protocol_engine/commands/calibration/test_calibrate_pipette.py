@@ -41,7 +41,7 @@ async def test_calibrate_pipette_implementation(
 
     decoy.when(
         await calibration.find_pipette_offset(
-            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=5
+            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=8
         )
     ).then_return(Point(x=3, y=4, z=6))
 
@@ -74,7 +74,7 @@ async def test_calibrate_pipette_does_not_save_during_error(
 
     decoy.when(
         await calibration.find_pipette_offset(
-            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=5
+            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=8
         )
     ).then_raise(EarlyCapacitiveSenseTrigger())
 

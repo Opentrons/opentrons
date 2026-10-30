@@ -28,6 +28,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from ..errors import (
     LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
+    LabwareNotOnDeckError,
     LabwareOffsetDoesNotExistError,
     NotSupportedOnRobotType,
     VacuumModuleStillUnderVacuumError,
@@ -58,8 +59,12 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_north_south_slots,
+    get_north_south_staging_slots,
+)
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, LabwareMovementHandler, RunControlHandler
@@ -77,13 +82,39 @@ def _remove_default(s: dict[str, Any]) -> None:
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
-def _has_vacuum_collar_neighbor(
-    location: LabwareLocation, state_view: StateView
-) -> bool:
-    """Return True if a north/south neighbor is a vacuum module collar."""
-    for labware in state_view.geometry.get_north_south_neighbors(location):
-        lw_def = state_view.labware.get_definition(labware_id=labware.id)
-        if labware_validation.validate_definition_is_vacuum_module_dock(lw_def):
+def _has_vacuum_neighbor(location: LabwareLocation, state_view: StateView) -> bool:
+    """Return True if a north/south neighbor holds a vacuum module."""
+    try:
+        parent = state_view.geometry.get_parent_from_location(location)
+        slot = fixture_validation.get_slot_name_from_addressable_area(parent)
+    except (LabwareNotOnDeckError, ValueError, TypeError):
+        return False
+
+    if isinstance(slot, StagingSlotName):
+        neighbors: list[DeckSlotName | StagingSlotName] = list(
+            get_north_south_staging_slots(slot)
+        )
+    elif isinstance(slot, DeckSlotName):
+        neighbors = [
+            DeckSlotName.from_primitive(slot_id).to_ot3_equivalent()
+            for slot_id in get_north_south_slots(slot.as_int())
+        ]
+    else:
+        return False
+
+    for neighbor in neighbors:
+        if isinstance(neighbor, StagingSlotName):
+            deck_slot = (
+                state_view.addressable_areas.get_potential_addressable_area_base_slot(
+                    neighbor.id
+                )
+            )
+            if deck_slot is None:
+                continue
+        else:
+            deck_slot = neighbor
+        module = state_view.modules.get_by_slot(deck_slot)
+        if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
             return True
     return False
 
@@ -440,10 +471,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
                 )
-            validated_current_loc = (
-                self._state_view.geometry.ensure_valid_gripper_location(
-                    current_labware.location
-                )
+            validated_cur_loc = self._state_view.geometry.ensure_valid_gripper_location(
+                current_labware.location
             )
 
             if module_location_error:
@@ -480,20 +509,15 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     immediate_destination_location_sequence
                 )
 
-            # Restrict gripper pick-up / drop-off if placing labware on slots
-            # with wide neighbor labware like the vacuum module collar.
-            restrict_pick = _has_vacuum_collar_neighbor(
-                validated_current_loc, self._state_view
-            )
-            restrict_drop = _has_vacuum_collar_neighbor(
-                validated_new_loc, self._state_view
-            )
-
+            # Narrow the jaws when a vacuum module is north or south of the labware,
+            # including the staging column. B4's north is the dock on A4.
+            restrict_pick = _has_vacuum_neighbor(validated_cur_loc, self._state_view)
+            restrict_drop = _has_vacuum_neighbor(validated_new_loc, self._state_view)
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
                     labware_id=params.labwareId,
-                    current_location=validated_current_loc,
+                    current_location=validated_cur_loc,
                     new_location=validated_new_loc,
                     user_pick_up_offset=user_pick_up_offset,
                     user_drop_offset=user_drop_offset,

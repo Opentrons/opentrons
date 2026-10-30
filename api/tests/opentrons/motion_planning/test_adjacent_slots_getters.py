@@ -14,7 +14,10 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
     get_north_slot,
     get_north_south_slots,
+    get_north_south_staging_slots,
+    get_north_staging_slot,
     get_south_slot,
+    get_south_staging_slot,
     get_surrounding_slots,
     get_west_of_staging_slot,
     get_west_slot,
@@ -100,6 +103,47 @@ def test_get_north_south_slots(
 def test_get_adjacent_slots(slot: int, expected_adjacent: List[int]) -> None:
     """It should return a list of adjacent slots."""
     assert sorted(get_adjacent_slots(slot)) == sorted(expected_adjacent)
+
+
+@pytest.mark.parametrize(
+    argnames=["slot", "expected_north", "expected_south", "expected_both"],
+    argvalues=[
+        (
+            StagingSlotName.SLOT_A4,
+            None,
+            StagingSlotName.SLOT_B4,
+            [StagingSlotName.SLOT_B4],
+        ),
+        (
+            StagingSlotName.SLOT_B4,
+            StagingSlotName.SLOT_A4,
+            StagingSlotName.SLOT_C4,
+            [StagingSlotName.SLOT_A4, StagingSlotName.SLOT_C4],
+        ),
+        (
+            StagingSlotName.SLOT_C4,
+            StagingSlotName.SLOT_B4,
+            StagingSlotName.SLOT_D4,
+            [StagingSlotName.SLOT_B4, StagingSlotName.SLOT_D4],
+        ),
+        (
+            StagingSlotName.SLOT_D4,
+            StagingSlotName.SLOT_C4,
+            None,
+            [StagingSlotName.SLOT_C4],
+        ),
+    ],
+)
+def test_get_north_south_staging_slots(
+    slot: StagingSlotName,
+    expected_north: Optional[StagingSlotName],
+    expected_south: Optional[StagingSlotName],
+    expected_both: List[StagingSlotName],
+) -> None:
+    """It should return the staging slots north and south in column 4."""
+    assert get_north_staging_slot(slot) == expected_north
+    assert get_south_staging_slot(slot) == expected_south
+    assert get_north_south_staging_slots(slot) == expected_both
 
 
 @pytest.mark.parametrize(

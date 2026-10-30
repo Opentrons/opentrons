@@ -10,7 +10,6 @@
   "attach_pip": "安装移液器",
   "attach_pipette": "安装{{mount}}移液器",
   "attach_probe": "安装校准探头",
-  "attach_wastechute": "重新连接外置垃圾槽",
   "backmost": "最后面的",
   "before_you_begin": "开始之前",
   "begin_calibration": "开始校准",
@@ -50,7 +49,6 @@
   "hold_pipette_carefully": "用手扶住移液器防止掉落。对准对接孔，安装移液器。使用螺丝刀拧紧前面的四个螺丝，确保稳固连接。",
   "how_to_reattach": "<block>将右侧移液器支架推到Z轴的顶部。然后拧紧移液器支架右上方的固定螺丝。</block><block>拧紧固定螺丝后，右侧移液器安装位应不能再自由上下移动。</block>",
   "install_probe": "从存放位置取出校准探头。确保其锁套旋钮已拧松。将校准探头对准移液器<bold>{{location}}</bold>位置，然后向上轻推并压到顶部。拧紧锁套旋钮。用手轻触探头测试是否稳固。",
-  "install_waste_chute": "将外置垃圾槽连接到甲板适配器",
   "loose_detach": "松开螺丝并拆卸",
   "move_gantry_to_front": "将龙门架移至前方",
   "must_detach_mounting_plate": "在使用其他移液器之前，您必须卸下安装板并重新连接移液器支架z轴板。我们不建议在完成前退出此过程。",
@@ -89,10 +87,8 @@
   "unscrew_and_detach": "拧松螺丝并卸下安装板",
   "unscrew_at_top": "<block>拧松z轴板右上角的固定螺丝。这将解除右侧移液器支架的锁定，使其能够自由上下移动。</block>",
   "unscrew_carriage": "拧松Z轴板螺丝",
-  "waste_chute_attach_warning": "重新连接外置垃圾槽以匹配当前的桌面配置。",
   "waste_chute_error": "在校准前请取出外置垃圾槽。",
   "waste_chute_warning": "如果安装了外置垃圾槽，移液器将会与其发生碰撞。",
-  "waste_chute_warning_probe": "如果外置垃圾槽已安装，请在继续之前将其从甲板适配器中移除。",
   "wrong_pip": "安装了错误的设备",
   "z_axis_still_attached": "Z轴板螺丝仍然处于锁定状态"
 }

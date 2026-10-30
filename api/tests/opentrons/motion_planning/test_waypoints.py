@@ -351,7 +351,7 @@ def test_get_gripper_labware_movement_waypoint_with_slide() -> None:
 
 
 def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
-    """Near a vacuum module, open jaws only close to the labware."""
+    """A restricted pickup approaches close to the labware, then drops straight home."""
     height_above_grip = 40.0
     result = get_gripper_labware_movement_waypoints(
         from_labware_center=Point(101, 102, 119.5),
@@ -359,11 +359,9 @@ def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
         gripper_home_z=999,
         post_drop_slide_offset=None,
         restrict_pickup_approach=True,
-        restrict_drop_retract=True,
         labware_height_above_grip=height_above_grip,
     )
     pickup_hover_z = 119.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
-    drop_hover_z = 219.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
     assert result == [
         GripperMovementWaypointsWithJawStatus(Point(101, 102, 999), False, False),
         GripperMovementWaypointsWithJawStatus(
@@ -373,8 +371,5 @@ def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
         GripperMovementWaypointsWithJawStatus(Point(101, 102, 999), False, False),
         GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), False, False),
         GripperMovementWaypointsWithJawStatus(Point(201, 202, 219.5), False, False),
-        GripperMovementWaypointsWithJawStatus(
-            Point(201, 202, drop_hover_z), True, True
-        ),
-        GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), False, True),
+        GripperMovementWaypointsWithJawStatus(Point(201, 202, 999), True, True),
     ]

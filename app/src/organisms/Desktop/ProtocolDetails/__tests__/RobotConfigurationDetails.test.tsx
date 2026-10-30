@@ -96,7 +96,7 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('robot')
+    screen.getByText('Robot')
     screen.getByText('OT-2')
   })
 
@@ -111,7 +111,7 @@ describe('RobotConfigurationDetails', () => {
       robotType: FLEX_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('robot')
+    screen.getByText('Robot')
     screen.getByText('Opentrons Flex')
   })
 
@@ -126,9 +126,9 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('left mount')
+    screen.getByText('Left mount')
     screen.getByText('P10 Single-Channel GEN1')
-    screen.getByText('right mount')
+    screen.getByText('Right mount')
     screen.getByText('empty')
   })
 
@@ -143,9 +143,9 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('left mount')
+    screen.getByText('Left mount')
     screen.getByText('P10 Single-Channel GEN1')
-    screen.getByText('right mount')
+    screen.getByText('Right mount')
     screen.getByText('empty')
   })
 
@@ -160,7 +160,7 @@ describe('RobotConfigurationDetails', () => {
       robotType: FLEX_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('extension mount')
+    screen.getByText('Extension mount')
   })
 
   it('should not render extension mount section when robotType is OT-2', () => {
@@ -174,7 +174,7 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     render(props)
-    expect(screen.queryByText('extension mount')).not.toBeInTheDocument()
+    expect(screen.queryByText('Extension mount')).not.toBeInTheDocument()
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {
@@ -204,7 +204,7 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
     render(props)
-    screen.getByText('right mount')
+    screen.getByText('Right mount')
     screen.getAllByText('Loading...')
   })
 

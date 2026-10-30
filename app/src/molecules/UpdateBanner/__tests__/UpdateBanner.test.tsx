@@ -105,9 +105,7 @@ describe('Module Update Banner', () => {
       attachPipetteRequired: true,
     }
     render(props)
-    screen.getByText(
-      'Module setup required. Attach a pipette before running module setup.'
-    )
+    screen.getByText('Attach a pipette before running module setup.')
     expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
@@ -118,9 +116,7 @@ describe('Module Update Banner', () => {
       calibratePipetteRequired: true,
     }
     render(props)
-    screen.getByText(
-      'Module setup required. Calibrate pipette before running module setup.'
-    )
+    screen.getByText('Calibrate pipette before running module setup.')
     expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
