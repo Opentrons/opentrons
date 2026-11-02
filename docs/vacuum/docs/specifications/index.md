@@ -147,13 +147,13 @@ Waste collection components connect directly to the manifold base and provide an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![6 mm vacuum hose](../images/hose-6mm.png "6 mm vacuum hose"){ width="60%" }
-<figcaption>(1) 6 mm diameter manifold hose, 2 m</figcaption>
+![6 mm vacuum hose](../images/hose-6mm.svg "6 mm vacuum hose"){ width="50%" }
+<figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 <figure markdown>
-![9 mm vacuum hose](../images/hose-9mm.png){ width="60%" }
-<figcaption>(1) 9 mm diameter control box hose, 2 m</figcaption>
+![9 mm vacuum hose](../images/hose-9mm.svg){ width="50%"}
+<figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 </div>
