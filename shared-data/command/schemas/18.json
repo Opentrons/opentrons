@@ -776,6 +776,11 @@
           "$ref": "#/$defs/Vec3f",
           "description": "If an offset for the other probe is already found, then specifying it here will enable the CalibrateGripper command to complete the calibration process by calculating the total offset and saving it to disk. If this param is not specified then the command will only find and return the offset for the specified probe.",
           "title": "Otherjawoffset"
+        },
+        "slot": {
+          "$ref": "#/$defs/DeckSlotName",
+          "default": "B2",
+          "description": "Deck slot whose calibration square to probe."
         }
       },
       "required": ["jaw"],
@@ -885,6 +890,11 @@
         "mount": {
           "$ref": "#/$defs/MountType",
           "description": "Instrument mount to calibrate."
+        },
+        "slot": {
+          "$ref": "#/$defs/DeckSlotName",
+          "default": "B2",
+          "description": "Deck slot whose calibration square to probe."
         }
       },
       "required": ["mount"],
