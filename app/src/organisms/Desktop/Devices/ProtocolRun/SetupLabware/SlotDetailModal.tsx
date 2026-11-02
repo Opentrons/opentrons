@@ -25,13 +25,14 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
-import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
+
+import { LabwareStackContents } from '../../../../../components/adhoc/shared/LabwareStackContents'
+import { LiquidCardList } from '../../../../../components/adhoc/shared/LiquidDetailCard'
 
 import type {
   CompletedProtocolAnalysis,

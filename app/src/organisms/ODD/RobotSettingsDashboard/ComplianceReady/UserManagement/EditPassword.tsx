@@ -7,12 +7,12 @@ import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import {
   getPasswordComplexityError,
   mapSetNewPasswordError,
 } from '/app/resources/auth'
 
+import { PasswordVisibilityToggle } from '../../../../../components/adhoc/shared/PasswordVisibilityToggle'
 import styles from './user_management_settings.module.css'
 
 import type { TFunction } from 'i18next'

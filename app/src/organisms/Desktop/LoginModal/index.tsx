@@ -25,7 +25,6 @@ import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
@@ -34,6 +33,7 @@ import {
 } from '/app/resources/auth'
 import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 
+import { PasswordVisibilityToggle } from '../../../components/adhoc/shared/PasswordVisibilityToggle'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 

@@ -14,7 +14,6 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
@@ -23,6 +22,8 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
+
+import { ModuleInfo } from '../../../../../components/adhoc/shared/ModuleInfo'
 
 import type { ModuleOnDeck } from '@opentrons/components'
 

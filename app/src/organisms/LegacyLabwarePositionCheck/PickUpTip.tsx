@@ -19,10 +19,10 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import { UnorderedList } from '/app/molecules/UnorderedList'
 import { getIsOnDevice } from '/app/redux/config'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 
+import { UnorderedList } from '../../components/adhoc/shared/UnorderedList'
 import { JogToWell } from './JogToWell'
 import { PrepareSpace } from './PrepareSpace'
 import { RobotMotionLoader } from './RobotMotionLoader'

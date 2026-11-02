@@ -12,6 +12,7 @@ interface UnorderedListProps {
   items: ReactNode[]
 }
 
+// TODO(jj, 2026-11-02): Replace with Helix listtable component
 export function UnorderedList(props: UnorderedListProps): ReactNode {
   const { items } = props
   return (

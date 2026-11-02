@@ -44,7 +44,6 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -80,6 +79,7 @@ import {
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
+import { RunTimer } from '../../../components/adhoc/shared/RunTimer'
 import { SignRun } from './SignRun'
 
 import type { ReactNode } from 'react'

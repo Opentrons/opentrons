@@ -1,7 +1,7 @@
 import { Chip, RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { MultiDeckLabelTagBtns as MultiDeckLabelTagBtnsComponent } from '.'
-import { customViewports } from '../../../../.storybook/preview'
+import { customViewports } from '../../../../../../.storybook/preview'
 
 import type { Meta, Story } from '@storybook/react'
 

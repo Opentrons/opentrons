@@ -3,7 +3,8 @@ import { useRef, useState } from 'react'
 import { InputField } from '@opentrons/components'
 
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
+
+import { PasswordVisibilityToggle } from '../../../../../../components/adhoc/shared/PasswordVisibilityToggle'
 
 import type { ChangeEvent, FocusEvent, JSX } from 'react'
 

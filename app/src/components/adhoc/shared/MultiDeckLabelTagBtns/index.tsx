@@ -45,6 +45,7 @@ export interface MultiDeckLabelTagBtnsProps {
   colThreeSecondaryBtn?: MultiDeckLabelTagBtn
 }
 
+// TODO(jj, 2026-11-02): Split this into desktop and ODD components
 export function MultiDeckLabelTagBtns({
   colOneDeckInfoLabels,
   colTwoTag,

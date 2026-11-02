@@ -7,10 +7,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
+import { RunTimer } from '../../../../components/adhoc/shared/RunTimer'
 import { PlayPauseButton } from '../shared/PlayPauseButton'
 import { StopButton } from '../shared/StopButton'
 import styles from './currentrunningcommand.module.css'

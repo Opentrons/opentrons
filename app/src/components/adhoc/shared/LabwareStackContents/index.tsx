@@ -34,6 +34,7 @@ interface LabwareStackContentsProps extends StyleProps {
   setSelectedLabware: Dispatch<SetStateAction<LabwareInStack>>
 }
 
+// TODO(jj, 2026-11-02): Split this into desktop and ODD components
 export function LabwareStackContents(
   props: LabwareStackContentsProps
 ): ReactNode {

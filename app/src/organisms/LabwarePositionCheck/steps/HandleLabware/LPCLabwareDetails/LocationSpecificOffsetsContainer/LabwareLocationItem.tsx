@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 
 import { BORDERS, COLORS, Flex, RESPONSIVENESS } from '@opentrons/components'
 
-import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
@@ -17,6 +16,8 @@ import {
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
+
+import { MultiDeckLabelTagBtns } from '../../../../../../components/adhoc/shared/MultiDeckLabelTagBtns'
 
 import type { ReactNode } from 'react'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
