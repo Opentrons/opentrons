@@ -17,7 +17,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { FLOWS, SECTIONS } from './constants'
-import { getPipetteAnimations, startCalibrationOnClick } from './utils'
+import { getPipetteAnimations } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
 
@@ -32,6 +32,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     mount,
     isRobotMoving,
     goBack,
+    proceed,
     isExiting,
     isOnDevice,
     flowType,
@@ -46,7 +47,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
-  const startCalibration = startCalibrationOnClick(props, pipetteId)
 
   const calSlotNum = selectedSlot
   let src = pipetteProbe1
@@ -141,7 +141,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         </Flex>
       }
       proceedButtonText={t('continue')}
-      proceed={startCalibration}
+      proceed={proceed}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

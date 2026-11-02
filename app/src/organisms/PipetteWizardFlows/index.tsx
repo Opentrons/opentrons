@@ -586,12 +586,18 @@ export const PipetteWizardFlows = (
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
+    ) : calibrateBaseProps.isRobotMoving ? (
+      <AttachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        isExiting={isExiting}
+      />
     ) : (
       <SelectCalibrationSlot
         header={t('select_deck_slot')}
         selectedSlot={selectedSlot}
         setSelectedSlot={setSelectedSlot}
-        proceed={proceed}
+        proceed={startCalibration}
         isOnDevice={isOnDevice}
       />
     )
@@ -603,6 +609,7 @@ export const PipetteWizardFlows = (
       <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
+        proceed={forceB2 ? startCalibration : proceed}
         isExiting={isExiting}
         showWasteChuteWarning={forceB2}
       />
@@ -702,9 +709,9 @@ export const PipetteWizardFlows = (
     <WizardHeader
       title={memoizedWizardTitle}
       currentStep={
-        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+        progressBarForCalError ? currentStepIndex : currentStepIndex + 1
       }
-      totalSteps={totalStepCount}
+      totalSteps={totalStepCount + 1}
       onExit={buildWizardOnExit()}
       exitDisabled={isCommandMutationLoading || isFetchingPipettes}
     />

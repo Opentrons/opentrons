@@ -1,7 +1,7 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
-import { insertSelectSlotBeforeAttachProbe } from './getPipetteWizardSteps'
+import { insertSelectSlotAfterAttachProbe } from './getPipetteWizardSteps'
 
 import type { Mount } from '@opentrons/api-client'
 import type { LoadedPipette } from '@opentrons/shared-data'
@@ -430,21 +430,21 @@ export const getPipetteWizardStepsForProtocol = (
 
   if (requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName) {
     // return calibration flow if correct pipette is attached
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       calibrateAlreadyAttachedPipetteOn(mount),
       includeSlotSelect
     )
   }
   if (!ninetySixChannelRequested && ninetySixChannelAttached) {
     // 96-channel pipette attached and need to attach single mount pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       detachNinetySixAndAttachSingleMountOn(mount),
       includeSlotSelect
     )
   }
   if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
     // Single mount pipette attached and need to attach new single mount pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       detachSingleMountAndAttachSingleMountOn(mount),
       includeSlotSelect
     )
@@ -455,7 +455,7 @@ export const getPipetteWizardStepsForProtocol = (
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to both mounts and need to attach 96-channel pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       detachTwoSingleMountsAndAttachNinetySix(),
       includeSlotSelect
     )
@@ -466,7 +466,7 @@ export const getPipetteWizardStepsForProtocol = (
     attachedPipettes[RIGHT] == null
   ) {
     // Single mount pipette attached to left mount and need to attach 96-channel pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       detachSingleMountOnLeftAndAttachNinetySix(),
       includeSlotSelect
     )
@@ -477,20 +477,20 @@ export const getPipetteWizardStepsForProtocol = (
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to right mount and need to attach 96-channel pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       detachSingleMountOnRightAndAttachNinetySix(),
       includeSlotSelect
     )
   }
   if (ninetySixChannelRequested) {
     // Gantry empty and need to attach 96-channel pipette
-    return insertSelectSlotBeforeAttachProbe(
+    return insertSelectSlotAfterAttachProbe(
       fromEmptyGantryAttachNinetySix(),
       includeSlotSelect
     )
   }
   // Gantry empty and need to attach single mount pipette
-  return insertSelectSlotBeforeAttachProbe(
+  return insertSelectSlotAfterAttachProbe(
     fromEmptyMountAttachSingleMountOn(mount),
     includeSlotSelect
   )

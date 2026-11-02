@@ -10,7 +10,7 @@ import {
 import { FLOWS, SECTIONS } from '../constants'
 import {
   getPipetteWizardSteps,
-  insertSelectSlotBeforeAttachProbe,
+  insertSelectSlotAfterAttachProbe,
 } from '../getPipetteWizardSteps'
 
 import type { PipetteWizardStep } from '../types'
@@ -24,12 +24,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.SELECT_SLOT,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
@@ -104,12 +104,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.SELECT_SLOT,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -186,12 +186,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.SELECT_SLOT,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -289,12 +289,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.SELECT_SLOT,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -322,12 +322,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.SELECT_SLOT,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
@@ -349,8 +349,8 @@ describe('getPipetteWizardSteps', () => {
   })
 })
 
-describe('insertSelectSlotBeforeAttachProbe', () => {
-  it('inserts SELECT_SLOT immediately before each ATTACH_PROBE', () => {
+describe('insertSelectSlotAfterAttachProbe', () => {
+  it('inserts SELECT_SLOT immediately after each ATTACH_PROBE', () => {
     const steps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -369,18 +369,18 @@ describe('insertSelectSlotBeforeAttachProbe', () => {
       },
     ] as PipetteWizardStep[]
 
-    expect(insertSelectSlotBeforeAttachProbe(steps)).toStrictEqual([
+    expect(insertSelectSlotAfterAttachProbe(steps)).toStrictEqual([
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
-      { section: SECTIONS.SELECT_SLOT, mount: LEFT, flowType: FLOWS.CALIBRATE },
       {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
+      { section: SECTIONS.SELECT_SLOT, mount: LEFT, flowType: FLOWS.CALIBRATE },
       {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
@@ -398,6 +398,6 @@ describe('insertSelectSlotBeforeAttachProbe', () => {
       },
     ] as PipetteWizardStep[]
 
-    expect(insertSelectSlotBeforeAttachProbe(steps, false)).toStrictEqual(steps)
+    expect(insertSelectSlotAfterAttachProbe(steps, false)).toStrictEqual(steps)
   })
 })

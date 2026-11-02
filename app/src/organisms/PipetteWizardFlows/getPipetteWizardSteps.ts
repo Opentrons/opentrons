@@ -9,7 +9,7 @@ import type {
   SelectablePipettes,
 } from './types'
 
-export function insertSelectSlotBeforeAttachProbe(
+export function insertSelectSlotAfterAttachProbe(
   steps: PipetteWizardStep[],
   includeSlotSelect: boolean = true
 ): PipetteWizardStep[] {
@@ -20,12 +20,12 @@ export function insertSelectSlotBeforeAttachProbe(
   return steps.flatMap(step =>
     step.section === SECTIONS.ATTACH_PROBE
       ? [
+          step,
           {
             section: SECTIONS.SELECT_SLOT,
             mount: step.mount,
             flowType: step.flowType,
           },
-          step,
         ]
       : [step]
   )
@@ -234,5 +234,5 @@ export const getPipetteWizardSteps = (
   if (steps == null) {
     return null
   }
-  return insertSelectSlotBeforeAttachProbe(steps, includeSlotSelect)
+  return insertSelectSlotAfterAttachProbe(steps, includeSlotSelect)
 }
