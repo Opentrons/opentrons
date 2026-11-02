@@ -8,8 +8,8 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { RobotMotionLoader } from './RobotMotionLoader'
 

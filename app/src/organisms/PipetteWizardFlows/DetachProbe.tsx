@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'

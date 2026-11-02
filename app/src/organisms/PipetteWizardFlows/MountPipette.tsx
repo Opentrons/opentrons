@@ -12,9 +12,9 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { SECTIONS } from './constants'

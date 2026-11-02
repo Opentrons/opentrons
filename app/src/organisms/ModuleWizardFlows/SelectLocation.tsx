@@ -29,8 +29,8 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 
