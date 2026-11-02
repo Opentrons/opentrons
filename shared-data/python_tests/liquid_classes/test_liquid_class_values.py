@@ -14,7 +14,7 @@ def _get_all_liquid_classes() -> List[str]:
         for deffile in (
             get_shared_data_root() / "liquid-class" / "definitions" / "1"
         ).iterdir()
-        if deffile.suffix == ".json"
+        if deffile.is_dir()
     ]
 
 
