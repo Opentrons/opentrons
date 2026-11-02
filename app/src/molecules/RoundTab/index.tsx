@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  Flex,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
