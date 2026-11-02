@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import { AnimationVideo, Flex, SPACING } from '@opentrons/components'
 
@@ -8,6 +7,8 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+
+import styles from './wizardvideo.module.css'
 
 import type { ReactNode } from 'react'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
@@ -37,12 +38,7 @@ export function DetachProbe(
       header={i18n.format(t('detach_probe'), 'capitalize')}
       rightHandBody={
         <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-          <AnimationVideo
-            css={css`
-              max-width: 100%;
-              max-height: 100%;
-            `}
-          >
+          <AnimationVideo className={styles.animation_video}>
             <source src={pipetteDetachProbeVideoSource} />
           </AnimationVideo>
         </Flex>

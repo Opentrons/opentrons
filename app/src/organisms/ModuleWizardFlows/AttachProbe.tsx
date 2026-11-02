@@ -12,6 +12,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+import styles from './wizardvideo.module.css'
 
 import type { ReactNode } from 'react'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
@@ -128,12 +129,7 @@ export function AttachProbe(props: AttachProbeProps): ReactNode {
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={
         <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-          <AnimationVideo
-            css={css`
-              max-width: 100%;
-              max-height: 100%;
-            `}
-          >
+          <AnimationVideo className={styles.animation_video}>
             <source src={pipetteAttachProbeVideoSource} />
           </AnimationVideo>
         </Flex>

@@ -26,6 +26,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
+import styles from './wizardvideo.module.css'
 
 import type { ReactNode } from 'react'
 import type { CommandData } from '@opentrons/api-client'
@@ -218,12 +219,7 @@ export function PlaceAdapter(props: PlaceAdapterProps): ReactNode {
         }
         rightHandBody={
           <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
+            <AnimationVideo className={styles.animation_video}>
               <source src={attachAdapterVideoSrc} />
             </AnimationVideo>
           </Flex>
