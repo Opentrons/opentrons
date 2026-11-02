@@ -19,11 +19,9 @@ describe('useProtocolDropTipModal', () => {
 
   beforeEach(() => {
     props = {
-      areTipsAttached: true,
+      hasPipetteWithTip: true,
       enableDTWiz: vi.fn(),
-      isRunCurrent: true,
       onSkipAndHome: vi.fn(),
-      currentRunId: 'MOCK_ID',
       pipetteInfo: {
         pipetteId: '123',
         pipetteName: 'MOCK_NAME',
@@ -51,24 +49,23 @@ describe('useProtocolDropTipModal', () => {
     })
   })
 
-  it('should update showDTModal when areTipsAttached changes', () => {
+  it('should update showDTModal when hasPipetteWithTip changes', () => {
     const { result, rerender } = renderHook(() =>
       useProtocolDropTipModal(props)
     )
 
     expect(result.current.showModal).toBe(true)
 
-    props.areTipsAttached = false
+    props.hasPipetteWithTip = false
     rerender()
 
     expect(result.current.showModal).toBe(false)
   })
 
-  it('should not show modal when isRunCurrent is false', () => {
-    props.isRunCurrent = false
+  it('should show modal when the run is no longer current if a pipette still has a tip', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
-    expect(result.current.showModal).toBe(false)
+    expect(result.current.showModal).toBe(true)
   })
 
   it('should call homePipettes when onDTModalSkip is called', () => {
