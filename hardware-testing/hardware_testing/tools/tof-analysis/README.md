@@ -18,6 +18,13 @@ By default the baseline is generated without filtering, which means using all
 python3 tof_analysis.py generate --dataframe <dataframe_path_csv> [--output-file <baseline_path_json>] [options]
 ```
 
+`--output-file` can be the module definition. The tool updates `TOFSensorBaseline` in that file and leaves every other field as it is.
+
+```bash
+python3 tof_analysis.py generate --dataframe <dataframe_path_csv> \
+  --output-file ../../../../shared-data/module/definitions/3/flexStackerModuleV1.json
+```
+
 The format for the JSON file is as followed, where the `TOFSensorBaseline` object
 holds the `version` and axis `X` and `Z`, the axis then holds the platform
 `extend` and `retract` for each axis. Each platform then holds a python dict string

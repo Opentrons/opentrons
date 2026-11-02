@@ -46,6 +46,11 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             f"tof-{TOFSensor.Z}-histogram-tiprack",
             [bool, str, CSVResult, str],
         ),
+        # One empty histogram per sensor and platform position, for later baselines.
+        CSVLine("tof-X-histogram-empty-extend", [CSVResult, str]),
+        CSVLine("tof-X-histogram-empty-retract", [CSVResult, str]),
+        CSVLine("tof-Z-histogram-empty-extend", [CSVResult, str]),
+        CSVLine("tof-Z-histogram-empty-retract", [CSVResult, str]),
     ]
     return lines
 
@@ -142,6 +147,27 @@ async def test_tof_sensors_labware_detection(
     )
 
 
+async def record_empty_captures(
+    stacker: FlexStacker, report: CSVReport, section: str
+) -> None:
+    """Record one empty histogram at each sensor and platform position.
+
+    Platform position is the X carriage, matching the baseline CSV. Z stays retracted.
+    """
+    print("Recording empty histograms at X and Z, extend and retract.")
+    for direction in (Direction.RETRACT, Direction.EXTEND):
+        await stacker.home_axis(StackerAxis.X, direction)
+        for sensor in (TOFSensor.X, TOFSensor.Z):
+            print(f"Recording empty {sensor.name} {str(direction)}.")
+            histogram = await stacker._driver.get_tof_histogram(sensor)
+            histogram_string = convert_histogram_bins_to_csv_string(histogram.bins)
+            report(
+                section,
+                f"tof-{sensor.name}-histogram-empty-{str(direction)}",
+                [CSVResult.PASS, histogram_string],
+            )
+
+
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     print("Homing stacker X and Z axis.")
@@ -153,6 +179,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     ui.get_user_ready(
         "Make sure there is NO labware in the stacker tower or gripper position"
     )
+    await record_empty_captures(stacker, report, section)
+
     print("Getting runtime baseline.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     runtime_baseline_z = await create_runtime_baseline(stacker, TOFSensor.Z)

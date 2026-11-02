@@ -151,10 +151,11 @@ def create_baseline(
 ) -> Dict[int, List[float]]:
     """Generate a TOF sensor baseline given multiple histogram readings.
 
-    Baseline must be robust against variation the "no labware" reading of ANY
-    stacker should always be below the "baseline". For each bin, we calculate
-    the Mean and Standard Deviation (STD) of the samples. We then create the
-    "baseline": Baseline = Mean + deviation x Standard Deviation
+    Baseline must be robust against variation. The "no labware" reading of ANY
+    stacker should always be at or below the baseline. For each bin, calculate
+    the Mean and Standard Deviation (STD) of the samples, then:
+
+    Baseline = max(Mean + deviation x Standard Deviation, highest sample)
 
     @param histogram: a list of tof histogram measurements denoted as dicts of zone to bins.
     @param std: the standard deviation to use when calculating baseline, defaults to 6.
@@ -182,8 +183,10 @@ def create_baseline(
             for bins in bins_dict.values():  # type: ignore
                 mean = sum(bins) / len(bins)  # type: ignore
                 std = statistics.pstdev(bins)  # type: ignore
-                threshold = float("%.2f" % (mean + (std * deviation)))  # type: ignore
-                baseline[zone].append(threshold)
+                # Floor at the highest empty sample so a reading in this set
+                # cannot come back as labware.
+                threshold = max(mean + (std * deviation), max(bins))  # type: ignore
+                baseline[zone].append(float("%.2f" % threshold))
 
         assert (
             len(baseline) == zone_count
@@ -221,7 +224,10 @@ def read_filtered_data(
                     continue
 
                 bins = list(row[start_index : start_index + bin_count])
-                measurements[axis][platform][stacker][sample].update(
+                # Date + sample is one capture. Sample numbers restart every
+                # run, so keying on sample alone keeps only the last run.
+                capture = (row.Date, sample)
+                measurements[axis][platform][stacker][capture].update(
                     {zone: bins, "lw": labware}
                 )
 
@@ -362,13 +368,114 @@ def plot_baseline(args: argparse.Namespace) -> None:
                 fig.show()
 
 
+def _patch_baseline_text(
+    raw: str,
+    definition: Dict[str, Any],
+    baselines: Dict[str, Any],
+    version: Any,
+) -> Any:
+    """Replace platform baseline strings without reformatting the file.
+
+    Returns the updated text, or None when the file is not already a module
+    definition with one string per platform.
+    """
+    try:
+        tof = definition["uniqueModuleData"]["TOFSensorBaseline"]
+    except (KeyError, TypeError):
+        return None
+    if not isinstance(tof, dict):
+        return None
+
+    updated = raw
+    for axis, data in baselines.items():
+        platforms = tof.get(axis.upper())
+        if not isinstance(platforms, dict):
+            return None
+        for platform, baseline in data.items():
+            old = platforms.get(platform)
+            if not isinstance(old, str):
+                return None
+            old_entry = f'"{platform}": {json.dumps(old)}'
+            new_entry = f'"{platform}": {json.dumps(str(baseline))}'
+            if updated.count(old_entry) != 1:
+                return None
+            updated = updated.replace(old_entry, new_entry, 1)
+
+    new_version = version if version is not None else tof.get("version")
+    old_version = tof.get("version")
+    if (
+        new_version is not None
+        and old_version is not None
+        and new_version != old_version
+    ):
+        old_entry = f'"version": {old_version}'
+        new_entry = f'"version": {new_version}'
+        if updated.count(old_entry) != 1:
+            return None
+        updated = updated.replace(old_entry, new_entry, 1)
+    return updated, new_version or old_version
+
+
+def _write_baseline_file(
+    path: str, baselines: Dict[str, Any], version: Any
+) -> Tuple[str, Any]:
+    """Write baselines into a module definition or a small baseline JSON file."""
+    if not os.path.exists(path):
+        print(f"Creating {path}")
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump({}, file)
+
+    with open(path, "r", encoding="utf-8") as file:
+        raw = file.read()
+    definition = json.loads(raw) if raw.strip() else {}
+    patched = _patch_baseline_text(raw, definition, baselines, version)
+    if patched is not None:
+        updated, used_version = patched
+        with open(path, "w", encoding="utf-8") as file:
+            file.write(updated)
+        return "patched", used_version
+
+    unique_module_data = definition.setdefault("uniqueModuleData", {})
+    tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
+    if tof_sensor_baseline.get("version") is None:
+        x_baseline = tof_sensor_baseline.get("X", "{}")
+        z_baseline = tof_sensor_baseline.get("Z", "{}")
+        tof_sensor_baseline = {
+            "version": 1,
+            "X": {"extend": x_baseline, "retract": x_baseline},
+            "Z": {"extend": z_baseline, "retract": z_baseline},
+        }
+
+    used_version = version or tof_sensor_baseline["version"]
+    tof_sensor_baseline["version"] = used_version
+    for axis, data in baselines.items():
+        axis_name = axis.upper()
+        tof_sensor_baseline.setdefault(axis_name, {})
+        for platform, baseline in data.items():
+            tof_sensor_baseline[axis_name][platform] = str(baseline)
+
+    unique_module_data["TOFSensorBaseline"] = tof_sensor_baseline
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(definition, file, indent=2)
+        file.write("\n")
+    return "rewritten", used_version
+
+
 def generate_baseline(args: argparse.Namespace) -> None:
     """Generates a new baseline given the dataframe."""
     config = parse_common_args(args)
 
     deviations = config["std"]
-    if len(deviations) > 4:
-        sys.exit(f"ERROR: --std cannot be greater than 4, provided {deviations}.")
+    # One value applies to every axis/platform. Four values are
+    # X-Extend, X-Retract, Z-Extend, Z-Retract.
+    if len(deviations) == 1:
+        deviations = deviations * 4
+    elif len(deviations) != 4:
+        sys.exit(
+            "ERROR: --std must be 1 value applied to every axis/platform, "
+            "or 4 values in order X-Extend, X-Retract, Z-Extend, Z-Retract. "
+            f"Provided {deviations}."
+        )
 
     zone_count_x = len(config["zone_list_x"])
     zone_count_z = len(config["zone_list_z"])
@@ -380,20 +487,22 @@ def generate_baseline(args: argparse.Namespace) -> None:
         f" ZonesX={config['zone_list_x']}, ZonesZ={config['zone_list_z']}, Bins={config['bins_list']}\n"
     )
 
-    measurements, sample_count = read_filtered_data(args.dataframe, config)
+    measurements, zone_rows = read_filtered_data(args.dataframe, config)
     aggregate_zones = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # type: ignore
     baselines = defaultdict(dict)  # type: ignore
+    histogram_count = 0
     for axis, platform_data in measurements.items():
         zone_count = zone_count_x if axis == "x" else zone_count_z
         for platform, sample_data in platform_data.items():
-            for _, sample in sample_data.items():
-                for zone, bins in list(sample.values())[0].items():
-                    aggregate_zones[axis][platform][zone].append(bins)
+            for captures in sample_data.values():
+                histogram_count += len(captures)
+                for zone_map in captures.values():
+                    for zone, bins in zone_map.items():
+                        if zone == "lw":
+                            continue
+                        aggregate_zones[axis][platform][zone].append(bins)
 
-            # Generate baseline
             zone_data = dict(aggregate_zones[axis][platform])
-            # Remove added keys
-            zone_data.pop("lw")
             deviation = _get_value_from_index(deviations, axis, platform)
             baseline = create_baseline(zone_data, zone_count, bin_count, deviation)
             baselines[axis][platform] = baseline
@@ -403,47 +512,21 @@ def generate_baseline(args: argparse.Namespace) -> None:
 
     output_file = config["output_file"]
     baseline_version = config["baseline_version"]
+    write_mode = None
 
     if output_file:
-        if not os.path.exists(output_file):
-            print(f"Creating {output_file}")
-            with open(output_file, "w", encoding="utf-8") as f:
-                json.dump({}, f)
-
         print(f"Saving baseline data to - {output_file}.\n")
-        with open(output_file, "r+") as file:
-            definition = json.load(file)
-            unique_module_data = definition.get("uniqueModuleData", {})
-            tof_sensor_baseline = unique_module_data.get("TOFSensorBaseline", {})
-
-            if tof_sensor_baseline.get("version") is None:
-                x_baseline = tof_sensor_baseline.get("X", "{}")
-                z_baseline = tof_sensor_baseline.get("Z", "{}")
-                tof_sensor_baseline = {
-                    "version": 1,
-                    "X": {"extend": x_baseline, "retract": x_baseline},
-                    "Z": {"extend": z_baseline, "retract": z_baseline},
-                }
-
-            baseline_version = baseline_version or tof_sensor_baseline["version"]
-
-            for axis, data in baselines.items():
-                axis = axis.upper()
-                for platform, baseline in data.items():
-                    tof_sensor_baseline[axis][platform] = str(baseline)
-
-            definition["uniqueModuleData"] = {"TOFSensorBaseline": tof_sensor_baseline}
-
-            file.seek(0)
-            json.dump(definition, file, indent=2)
-            file.truncate()
+        write_mode, baseline_version = _write_baseline_file(
+            output_file, baselines, baseline_version
+        )
 
     print(
-        f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {sample_count} Samples ---------------\n"
+        f"\n--------------- GENERATED BASELINE V{baseline_version} FROM {histogram_count} Histograms ({zone_rows} Zone Rows) ---------------\n"
     )
-    print(
-        "NOTE: If this is a definition JSON file, format it by running `make format-js` from top-level.\n"
-    )
+    if write_mode == "rewritten":
+        print(
+            "NOTE: The output file was rewritten. If it is a module definition, format it with `make format-js` from the repo root.\n"
+        )
 
     for axis, data in baselines.items():
         for platform, baseline in data.items():
@@ -465,6 +548,7 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
 
     detected_labware = defaultdict(list)  # type: ignore
     undetected_labware = defaultdict(set)  # type: ignore
+    labware_names = set()
     measurements, samples_count = read_filtered_data(args.dataframe, config)
     for baseline_path in args.baseline:
         if not os.path.exists(baseline_path):
@@ -508,11 +592,14 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                         measurements.get(axis, {}).get(platform, {}).items()
                     ):
                         for sample, data in samples.items():
+                            labware_names.add(data["lw"])
                             detected = False
                             for zone in set(
                                 config["zone_list_x"] + config["zone_list_z"]
                             ):
                                 if not is_valid_row(axis, platform, zone, config):
+                                    continue
+                                if zone not in baseline[axis][platform]:
                                     continue
                                 baseline_data = baseline[axis][platform][zone]
                                 raw_data = data[zone]
@@ -581,20 +668,34 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                     figures[axis].show()
 
     print("\n---------------- RESULT -------------- \n")
-    print("ZONES DETECTED\n")
-    for stacker, samples in detected_labware.items():
-        for sample in samples:
-            axis = sample["axis"]
-            platform = sample["platform"]
-            zone = sample["zone"]
-            bin = sample["bin"]
-            value = sample["raw_data_value"]
-            base = sample["baseline_value"]
-            delta = sample["delta"]
-            lw = sample["labware"]
+    if detected_labware:
+        print("ZONES DETECTED\n")
+        for stacker, samples in detected_labware.items():
+            for sample in samples:
+                axis = sample["axis"]
+                platform = sample["platform"]
+                zone = sample["zone"]
+                bin = sample["bin"]
+                value = sample["raw_data_value"]
+                base = sample["baseline_value"]
+                delta = sample["delta"]
+                lw = sample["labware"]
+                print(
+                    f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
+                )
+
+    # Empty captures are named "baseline". Not detecting them is the correct state.
+    if labware_names == {"baseline"}:
+        detections = sum(len(hits) for hits in detected_labware.values())
+        if detections == 0:
             print(
-                f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
+                f"\nSUCCESS: all {samples_count} samples are baseline and none were detected.\n"
             )
+        else:
+            print(
+                f"\nFAILED: {detections} baseline samples were detected as labware.\n"
+            )
+        return
 
     print("\nZONES NOT DETECTED\n")
     for stacker, samples in undetected_labware.items():
@@ -613,7 +714,7 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
     if all_detected:
         print("\nSUCCESS: ALL SAMPLES DETECTED!\n")
     else:
-        print("\nFAULED: SOME SAMPLES NOT DETECTED!\n")
+        print("\nFAILED: SOME SAMPLES NOT DETECTED!\n")
 
 
 def main(args: argparse.Namespace) -> None:
@@ -662,7 +763,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output-file",
-        help="The output file of the generated baseline, prints to stdout if ommited.",
+        help="JSON file to write the baseline into. Pass flexStackerModuleV1.json to update\n"
+        "its TOFSensorBaseline in place and leave the rest of the definition unchanged.\n"
+        "Prints to stdout if omitted.",
     )
     parser.add_argument(
         "-a",
@@ -704,8 +807,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--std",
-        help="Standard devition to use when creating a baseline."
-        "This can be up to 4 values whose index correspond to each axis-platform combo."
+        help="Standard deviation to use when creating a baseline. "
+        "Pass 1 value to apply it to every axis/platform, or 4 values in order "
         "X-Extend, X-Retract, Z-Extend, Z-Retract.",
         type=int,
         default=[DEFAULT_STD] * 4,
