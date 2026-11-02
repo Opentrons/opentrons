@@ -1,5 +1,5 @@
-import { SimpleWizardInProgressBody } from '../SimpleWizardBody'
-import { InProgressModal as InProgressModalComponent } from './'
+import { InProgressModal as InProgressModalComponent } from '.'
+import { SimpleWizardInProgressBody } from '../wizards/SimpleWizardBody'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

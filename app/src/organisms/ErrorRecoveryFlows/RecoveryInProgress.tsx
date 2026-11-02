@@ -11,8 +11,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { InProgressModal } from '/app/molecules/InProgressModal'
-
+import { InProgressModal } from '../../components/adhoc/shared/InProgressModal'
 import { RECOVERY_MAP } from './constants'
 
 import type { ReactNode } from 'react'
