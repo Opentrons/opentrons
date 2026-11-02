@@ -13,7 +13,7 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
   SECTIONS,
 } from '../constants'
-import { MovePin } from '../MovePin'
+import { calibrateGripperJaw, MovePin } from '../MovePin'
 
 import type { ComponentProps } from 'react'
 import type { CommandData } from '@opentrons/api-client'
@@ -62,44 +62,11 @@ describe('MovePin', () => {
     vi.resetAllMocks()
   })
 
-  it('clicking confirm proceed calls proceed with correct callbacks', async () => {
+  it('clicking continue on insert pin only proceeds', () => {
     render()
-    const begin = screen.getByRole('button', { name: 'Begin calibration' })
-    fireEvent.click(begin)
-    await new Promise((resolve, reject) => setTimeout(resolve))
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
-      maintenanceRunId: 'fakeRunId',
-      command: {
-        commandType: 'home',
-        params: { axes: ['extensionZ', 'extensionJaw'] },
-      },
-      waitUntilComplete: true,
-    })
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
-      maintenanceRunId: 'fakeRunId',
-      command: {
-        commandType: 'home',
-        params: { skipIfMountPositionOk: 'extension' },
-      },
-      waitUntilComplete: true,
-    })
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
-      maintenanceRunId: 'fakeRunId',
-      command: {
-        commandType: 'calibration/calibrateGripper',
-        params: { jaw: 'front', slot: 'B2' },
-      },
-      waitUntilComplete: true,
-    })
-    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
-      maintenanceRunId: 'fakeRunId',
-      command: {
-        commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'extension' },
-      },
-      waitUntilComplete: true,
-    })
-    await expect(mockProceed).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(mockProceed).toHaveBeenCalled()
+    expect(mockCreateRunCommand).not.toHaveBeenCalled()
   })
 
   it('clicking go back calls back on moving pin from front to rear jaw', () => {
@@ -122,7 +89,7 @@ describe('MovePin', () => {
     screen.getByText(
       'Take the calibration pin from its storage location. Magnetically attach the pin to the hole on the underside of the front gripper jaw.'
     )
-    screen.getByRole('button', { name: 'Begin calibration' })
+    screen.getByRole('button', { name: 'Continue' })
   })
 
   it('renders correct loader for move pin to front jaw', () => {
@@ -133,9 +100,20 @@ describe('MovePin', () => {
     )
   })
 
-  it('sends the selected slot in the calibrate command', async () => {
-    render({ selectedSlot: 'C2' })
-    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
+  it('sends the selected slot in the front jaw calibrate helper', async () => {
+    const proceed = vi.fn()
+    const setErrorMessage = vi.fn()
+    const setFrontJawOffset = vi.fn()
+    calibrateGripperJaw({
+      maintenanceRunId: mockRunId,
+      createRunCommand: mockCreateRunCommand,
+      setErrorMessage,
+      proceed,
+      jaw: 'front',
+      selectedSlot: 'C2',
+      frontJawOffset: null,
+      setFrontJawOffset,
+    })
     await new Promise(resolve => setTimeout(resolve))
     expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       maintenanceRunId: 'fakeRunId',
@@ -145,6 +123,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
+    expect(proceed).toHaveBeenCalled()
   })
 
   it('uses the selected slot in in-progress copy', () => {

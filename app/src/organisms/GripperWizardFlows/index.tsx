@@ -34,11 +34,15 @@ import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { DEFAULT_CALIBRATION_SLOT } from '../PipetteWizardFlows/constants'
 import { SelectCalibrationSlot } from '../PipetteWizardFlows/SelectCalibrationSlot'
 import { BeforeBeginning } from './BeforeBeginning'
-import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
+import {
+  GRIPPER_FLOW_TYPES,
+  MOVE_PIN_TO_FRONT_JAW,
+  SECTIONS,
+} from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { MountGripper } from './MountGripper'
-import { MovePin } from './MovePin'
+import { calibrateGripperJaw, MovePin } from './MovePin'
 import { Success } from './Success'
 import { GRIPPER_FLOW_ACTIONS, GRIPPER_FLOW_FINISH_ACTIONS } from './types'
 import { UnmountGripper } from './UnmountGripper'
@@ -376,12 +380,34 @@ export const GripperWizard = (
     )
   } else if (currentStep.section === SECTIONS.SELECT_SLOT) {
     onExit = confirmExit
-    modalContent = (
+    const startFrontJawCalibration = (): void => {
+      if (sharedProps.maintenanceRunId == null) {
+        return
+      }
+      calibrateGripperJaw({
+        maintenanceRunId: sharedProps.maintenanceRunId,
+        createRunCommand,
+        setErrorMessage,
+        proceed: handleProceed,
+        jaw: 'front',
+        selectedSlot,
+        frontJawOffset,
+        setFrontJawOffset,
+      })
+    }
+    modalContent = isRobotMoving ? (
+      <MovePin
+        section={SECTIONS.MOVE_PIN}
+        movement={MOVE_PIN_TO_FRONT_JAW}
+        {...sharedProps}
+        {...{ setFrontJawOffset, frontJawOffset, createRunCommand, isExiting }}
+      />
+    ) : (
       <SelectCalibrationSlot
         header={t('select_deck_slot')}
         selectedSlot={selectedSlot}
         setSelectedSlot={setSelectedSlot}
-        proceed={handleProceed}
+        proceed={startFrontJawCalibration}
         isOnDevice={isOnDevice}
       />
     )

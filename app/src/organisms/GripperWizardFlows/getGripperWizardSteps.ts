@@ -19,8 +19,8 @@ export const getGripperWizardSteps = (
     case GRIPPER_FLOW_TYPES.RECALIBRATE: {
       return [
         { section: SECTIONS.BEFORE_BEGINNING },
-        { section: SECTIONS.SELECT_SLOT },
         { section: SECTIONS.MOVE_PIN, movement: MOVE_PIN_TO_FRONT_JAW },
+        { section: SECTIONS.SELECT_SLOT },
         {
           section: SECTIONS.MOVE_PIN,
           movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -38,8 +38,8 @@ export const getGripperWizardSteps = (
         { section: SECTIONS.MOUNT_GRIPPER },
         { section: SECTIONS.FIRMWARE_UPDATE },
         { section: SECTIONS.SUCCESS, successfulAction: SUCCESSFULLY_ATTACHED },
-        { section: SECTIONS.SELECT_SLOT },
         { section: SECTIONS.MOVE_PIN, movement: MOVE_PIN_TO_FRONT_JAW },
+        { section: SECTIONS.SELECT_SLOT },
         {
           section: SECTIONS.MOVE_PIN,
           movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
