@@ -24,7 +24,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
   Link as LinkComponent,
   NO_WRAP,
   OVERFLOW_WRAP_ANYWHERE,
@@ -32,6 +31,7 @@ import {
   ProtocolDeck,
   SecondaryButton,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -400,13 +400,13 @@ export function ChooseProtocolSlideoutComponent(
                   flexDirection={DIRECTION_COLUMN}
                   key={runtimeParam.variableName}
                 >
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
                     {runtimeParam.displayName}
-                  </LegacyStyledText>
+                  </StyledText>
                   <Flex
                     gridGap={SPACING.spacing8}
                     justifyContent={JUSTIFY_FLEX_START}
@@ -440,18 +440,15 @@ export function ChooseProtocolSlideoutComponent(
                       }
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {Boolean(runtimeParam.value)
                         ? t('protocol_details:on')
                         : t('protocol_details:off')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
-                  <LegacyStyledText
-                    forwardedAs="label"
-                    paddingTop={SPACING.spacing8}
-                  >
+                  <StyledText forwardedAs="label" paddingTop={SPACING.spacing8}>
                     {runtimeParam.description}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               )
             } else if (runtimeParam.type === 'csv_file') {
@@ -475,15 +472,15 @@ export function ChooseProtocolSlideoutComponent(
                     width="100%"
                     marginBottom={SPACING.spacing16}
                   >
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('protocol_details:csv_file')}
-                    </LegacyStyledText>
-                    <LegacyStyledText forwardedAs="p">
+                    </StyledText>
+                    <StyledText forwardedAs="p">
                       {t('protocol_details:csv_required')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
                   {runtimeParam.file == null ? (
                     <UploadInput
@@ -506,7 +503,7 @@ export function ChooseProtocolSlideoutComponent(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <LegacyStyledText forwardedAs="p">
+                        <StyledText forwardedAs="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"
@@ -520,7 +517,7 @@ export function ChooseProtocolSlideoutComponent(
                               ),
                             }}
                           />
-                        </LegacyStyledText>
+                        </StyledText>
                       }
                     />
                   ) : (
@@ -800,7 +797,7 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
                       borderRadius={SPACING.spacing8}
                     />
                   )}
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -809,7 +806,7 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
                       ?.protocolName ??
                       first(storedProtocol.srcFileNames) ??
                       storedProtocol.protocolKey}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Box>
                 {(runCreationError != null ||
                   missingAnalysisData ||
@@ -831,7 +828,7 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
               </MiniCard>
             </Flex>
             {runCreationError != null && isSelected ? (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="label"
                 color={COLORS.red60}
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -858,10 +855,10 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
                 ) : (
                   runCreationError
                 )}
-              </LegacyStyledText>
+              </StyledText>
             ) : null}
             {requiresCsvRunTimeParameter && isSelected ? (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
@@ -870,10 +867,10 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
                 marginBottom={SPACING.spacing8}
               >
                 {t('csv_required_for_analysis')}
-              </LegacyStyledText>
+              </StyledText>
             ) : null}
             {missingAnalysisData && isSelected ? (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="label"
                 color={COLORS.yellow60}
                 overflowWrap="anywhere"
@@ -901,7 +898,7 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
                     }}
                   />
                 }
-              </LegacyStyledText>
+              </StyledText>
             ) : null}
           </Fragment>
         )
@@ -923,15 +920,15 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
       `}
     >
       <Icon size="1.25rem" name="ot-alert" color={COLORS.grey30} />
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginTop={SPACING.spacing8}
         role="heading"
       >
         {t('no_protocols_found')}
-      </LegacyStyledText>
-      <LegacyStyledText
+      </StyledText>
+      <StyledText
         forwardedAs="p"
         marginTop={SPACING.spacing8}
         textAlign={TYPOGRAPHY.textAlignCenter}
@@ -943,7 +940,7 @@ function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
             navlink: <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />,
           }}
         />
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

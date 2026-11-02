@@ -8,11 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
@@ -89,12 +89,10 @@ export function ConfirmCancelModal(props: ConfirmCancelModalProps): ReactNode {
       title={t('cancel_run_modal_heading')}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <LegacyStyledText forwardedAs="p">
-          {cancelRunAlertInfo}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+        <StyledText forwardedAs="p">{cancelRunAlertInfo}</StyledText>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           {isCanceling ? null : (
             <Link

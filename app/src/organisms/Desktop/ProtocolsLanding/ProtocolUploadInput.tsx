@@ -7,9 +7,9 @@ import {
   DIRECTION_COLUMN,
   ERROR_TOAST,
   Flex,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { UploadInput } from '/app/molecules/UploadInput'
@@ -73,7 +73,7 @@ export function ProtocolUploadInput(
         }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             <Trans
               t={t}
               i18nKey="shared:drag_and_drop"
@@ -81,7 +81,7 @@ export function ProtocolUploadInput(
                 a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
-          </LegacyStyledText>
+          </StyledText>
         }
       />
     </Flex>

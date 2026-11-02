@@ -11,10 +11,10 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -118,10 +118,14 @@ export const UnmountGripper = (
           onClick={() => {
             setShowGripperStillDetected(false)
           }}
+          css={GO_BACK_BUTTON_TEXT_STYLE}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -151,9 +155,9 @@ export const UnmountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('hold_gripper_and_loosen_screws')}
-        </LegacyStyledText>
+        </StyledText>
       }
       proceedButtonText={t('continue')}
       proceed={handleContinue}

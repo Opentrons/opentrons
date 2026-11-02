@@ -10,10 +10,10 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -62,9 +62,9 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
         {t('module_error')}
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText forwardedAs="p" marginRight={SPACING.spacing4}>
+          <StyledText forwardedAs="p" marginRight={SPACING.spacing4}>
             {t('view')}
-          </LegacyStyledText>
+          </StyledText>
           <Btn
             textAlign={ALIGN_START}
             fontSize={TYPOGRAPHY.fontSizeP}
@@ -73,12 +73,12 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             }}
             aria-label="view_error_details"
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               {t('error_details')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         </Flex>
       </Flex>
@@ -95,16 +95,11 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {errorDetails != null ? (
-                  <LegacyStyledText forwardedAs="p">
-                    {errorDetails}
-                  </LegacyStyledText>
+                  <StyledText forwardedAs="p">{errorDetails}</StyledText>
                 ) : null}
-                <LegacyStyledText
-                  forwardedAs="p"
-                  marginBottom={SPACING.spacing16}
-                >
+                <StyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
                   {t('branded:module_error_contact_support')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <PrimaryButton

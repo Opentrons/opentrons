@@ -8,10 +8,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -48,23 +48,24 @@ export function OverridePathToPython(): ReactNode {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('override_path_to_python')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:opentrons_app_will_use_interpreter')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('override_path')}
-        </LegacyStyledText>
+        </StyledText>
         {pathToPythonInterpreter !== null ? (
           <Link
             role="button"
@@ -80,9 +81,7 @@ export function OverridePathToPython(): ReactNode {
             />
           </Link>
         ) : (
-          <LegacyStyledText forwardedAs="p">
-            {t('no_specified_folder')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="p">{t('no_specified_folder')}</StyledText>
         )}
       </Box>
       {pathToPythonInterpreter !== null ? (

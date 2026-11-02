@@ -12,12 +12,12 @@ import {
   getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   ModalHeader,
   ModalShell,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -102,9 +102,9 @@ export function LegacyApplyHistoricOffsets(
         label={
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               {t(noOffsetData ? 'legacy_no_offset_data' : 'apply_offset_data')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         }
       />
@@ -147,7 +147,7 @@ export function LegacyApplyHistoricOffsets(
                     i18nKey={'robot_has_no_offsets_from_previous_runs'}
                     components={{
                       block: (
-                        <LegacyStyledText
+                        <StyledText
                           forwardedAs="p"
                           marginBottom={SPACING.spacing8}
                         />
@@ -155,9 +155,9 @@ export function LegacyApplyHistoricOffsets(
                     }}
                   />
                 ) : (
-                  <LegacyStyledText forwardedAs="p">
+                  <StyledText forwardedAs="p">
                     {t('robot_has_offsets_from_previous_runs')}
-                  </LegacyStyledText>
+                  </StyledText>
                 )}
                 <ExternalLink
                   marginTop={noOffsetData ? '0px' : SPACING.spacing8}

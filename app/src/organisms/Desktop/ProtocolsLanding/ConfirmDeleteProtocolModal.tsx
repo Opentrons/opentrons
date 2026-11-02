@@ -5,11 +5,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -31,9 +31,9 @@ export function ConfirmDeleteProtocolModal(
       title={t('delete_this_protocol')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('this_protocol_will_be_trashed')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           <Link
             role="button"

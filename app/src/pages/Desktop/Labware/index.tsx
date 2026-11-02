@@ -18,13 +18,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   MenuItem,
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useOnClickOutside,
@@ -160,12 +160,12 @@ export function Labware(): ReactNode {
           alignItems={ALIGN_CENTER}
           paddingBottom={SPACING.spacing24}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
             <SecondaryButton
               onClick={() => {
@@ -200,9 +200,13 @@ export function Labware(): ReactNode {
             title={t('category')}
           />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <LegacyStyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.grey50}
+            >
               {t('shared:sort_by')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -211,8 +215,9 @@ export function Labware(): ReactNode {
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
@@ -221,7 +226,7 @@ export function Labware(): ReactNode {
                 {sortBy === 'alphabetical'
                   ? t('shared:alphabetical')
                   : t('shared:reverse')}
-              </LegacyStyledText>
+              </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
@@ -278,13 +283,13 @@ export function Labware(): ReactNode {
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing32}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}
-          </LegacyStyledText>
+          </StyledText>
 
           <Link
             external

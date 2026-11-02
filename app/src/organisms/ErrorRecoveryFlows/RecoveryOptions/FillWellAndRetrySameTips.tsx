@@ -5,9 +5,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
@@ -83,7 +83,7 @@ export function SkipToNextStep(
           t={t}
           i18nKey="robot_will_not_check_for_liquid"
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <StyledText forwardedAs="p" />,
           }}
         />
         <InlineNotification

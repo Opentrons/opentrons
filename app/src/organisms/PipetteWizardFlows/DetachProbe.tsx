@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
-
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 
 import type { ReactNode } from 'react'
@@ -41,9 +40,9 @@ export const DetachProbe = (props: DetachProbeProps): ReactNode => {
         channel,
       })}
       bodyText={
-        <LegacyStyledText css={BODY_STYLE}>
+        <WizardBodyText>
           {i18n.format(t('remove_probe'), 'capitalize')}
-        </LegacyStyledText>
+        </WizardBodyText>
       }
       proceedButtonText={
         errorMessage != null ? t('exit_cal') : t('complete_cal')

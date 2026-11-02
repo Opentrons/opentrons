@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -40,12 +40,12 @@ export function FeatureFlags(): ReactNode {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t(`__dev_internal__${flag}`)}
-            </LegacyStyledText>
+            </StyledText>
             <ToggleButton
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}

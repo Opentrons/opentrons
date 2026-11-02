@@ -9,8 +9,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -40,7 +40,7 @@ describe('UploadInput', () => {
   it('renders text when passing them as props', () => {
     const mockUploadText = (
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-        <LegacyStyledText>{'CSV file'}</LegacyStyledText>
+        <StyledText>{'CSV file'}</StyledText>
         <Icon name="information" size="0.75rem" data-testid="mockIcon" />
       </Flex>
     )

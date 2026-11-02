@@ -8,10 +8,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
   Tooltip,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
@@ -109,9 +109,9 @@ export function OT2SetupLPC(props: SetupLabwarePositionCheckProps): ReactNode {
           justifyContent={JUSTIFY_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
       <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>

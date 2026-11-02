@@ -1,16 +1,11 @@
 import { useState } from 'react'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import {
-  LegacyStyledText,
-  TYPOGRAPHY,
-  useInterval,
-} from '@opentrons/components'
+import { StyledText, useInterval } from '@opentrons/components'
 
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 
-import type { CSSProp } from 'styled-components'
 import type { ReactNode } from 'react'
 
 export function RunTimer({
@@ -18,13 +13,13 @@ export function RunTimer({
   startedAt,
   stoppedAt,
   completedAt,
-  style,
+  className,
 }: {
   runStatus: string | null
   startedAt: string | null
   stoppedAt: string | null
   completedAt: string | null
-  style?: CSSProp
+  className?: string
 }): ReactNode {
   const [now, setNow] = useState(Date())
   useInterval(
@@ -44,8 +39,8 @@ export function RunTimer({
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
   return (
-    <LegacyStyledText css={style != null ? style : TYPOGRAPHY.pRegular}>
+    <StyledText forwardedAs="p" className={className}>
       {runTime}
-    </LegacyStyledText>
+    </StyledText>
   )
 }

@@ -11,11 +11,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
@@ -88,19 +88,19 @@ export function FatalError(props: FatalErrorProps): ReactNode {
         {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
       </ErrorHeader>
       {shouldUseMetalProbe ? (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textAlign={TEXT_ALIGN_CENTER}
         >
           {t('remove_probe_before_exit')}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
-      <LegacyStyledText forwardedAs="p" textAlign={TEXT_ALIGN_CENTER}>
+      <StyledText forwardedAs="p" textAlign={TEXT_ALIGN_CENTER}>
         {t('branded:help_us_improve_send_error_report', {
           support_email: SUPPORT_EMAIL,
         })}
-      </LegacyStyledText>
+      </StyledText>
       <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}

@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -308,13 +308,14 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
         >
           {title}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{description}</StyledText>
       </Box>
       <ToggleButton
         label={title}

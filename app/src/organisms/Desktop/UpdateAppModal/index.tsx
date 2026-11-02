@@ -13,12 +13,12 @@ import {
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   ReleaseNotes,
   SecondaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
@@ -184,9 +184,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): ReactNode {
             alignItems={ALIGN_CENTER}
             padding={SPACING.spacing48}
           >
-            <LegacyStyledText>
+            <StyledText>
               {downloading ? t('download_update') : t('restarting_app')}
-            </LegacyStyledText>
+            </StyledText>
             <ProgressBar
               percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}

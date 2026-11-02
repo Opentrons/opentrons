@@ -8,9 +8,9 @@ import {
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -226,7 +226,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
               }}
             />
           }

@@ -6,9 +6,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -87,23 +87,29 @@ export const SetupModuleAndDeck = ({
               marginLeft={SPACING.spacing20}
               marginBottom={SPACING.spacing12}
             >
-              <LegacyStyledText css={TYPOGRAPHY.labelSemiBold} width="45%">
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                width="45%"
+              >
                 {i18n.format(t('deck_hardware'), 'capitalize')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                css={TYPOGRAPHY.labelSemiBold}
+              </StyledText>
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('location')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                css={TYPOGRAPHY.labelSemiBold}
+              </StyledText>
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('status')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}

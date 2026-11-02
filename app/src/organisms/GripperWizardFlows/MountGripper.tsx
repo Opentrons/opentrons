@@ -11,10 +11,10 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -109,10 +109,14 @@ export const MountGripper = (
           onClick={() => {
             setShowUnableToDetect(false)
           }}
+          css={GO_BACK_BUTTON_STYLE}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -142,9 +146,9 @@ export const MountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('attached_gripper_and_screw_in')}
-        </LegacyStyledText>
+        </StyledText>
       }
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}

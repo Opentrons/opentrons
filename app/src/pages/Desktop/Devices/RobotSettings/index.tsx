@@ -6,8 +6,8 @@ import { Navigate, useParams } from 'react-router-dom'
 import {
   Banner,
   FLEX_MAX_CONTENT,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
@@ -153,9 +153,9 @@ export function RobotSettingsComponent({
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
-              <LegacyStyledText forwardedAs="p">
+              <StyledText forwardedAs="p">
                 {t('some_robot_controls_are_not_available')}
-              </LegacyStyledText>
+              </StyledText>
             </Banner>
           )}
         </div>

@@ -10,8 +10,8 @@ import {
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -178,13 +178,13 @@ export function MediumButton(props: MediumButtonProps): ReactNode {
           size={SPACING.spacing40}
         />
       )}
-      <LegacyStyledText
+      <StyledText
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight36}
       >
         {buttonText}
-      </LegacyStyledText>
+      </StyledText>
     </Btn>
   )
 }

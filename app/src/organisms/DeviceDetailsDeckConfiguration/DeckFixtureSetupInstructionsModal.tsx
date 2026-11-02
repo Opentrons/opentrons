@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
@@ -65,12 +65,12 @@ export function DeckFixtureSetupInstructionsModal({
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <LegacyStyledText forwardedAs="p">
+              <StyledText forwardedAs="p">
                 {t('deck_fixture_setup_modal_top_description')}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
+              </StyledText>
+              <StyledText forwardedAs="p">
                 {t('branded:deck_fixture_setup_modal_bottom_description')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
 
             <Flex>
@@ -90,12 +90,12 @@ export function DeckFixtureSetupInstructionsModal({
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing16}
                 >
-                  <LegacyStyledText forwardedAs="p">
+                  <StyledText forwardedAs="p">
                     {t('deck_fixture_setup_modal_top_description')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
+                  </StyledText>
+                  <StyledText forwardedAs="p">
                     {t('deck_fixture_setup_modal_bottom_description_desktop')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
                 <ExternalLink href={SETUP_INSTRUCTION_URL}>
                   {t('deck_fixture_setup_instructions')}

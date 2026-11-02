@@ -1,12 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 
-import { LegacyStyledText, PrimaryButton, SPACING } from '@opentrons/components'
+import { PrimaryButton, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -63,12 +64,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             flowType === FLOWS.ATTACH ? 'unscrew_at_top' : 'how_to_reattach'
           }
           components={{
-            block: (
-              <LegacyStyledText
-                css={BODY_STYLE}
-                marginBottom={SPACING.spacing16}
-              />
-            ),
+            block: <WizardBodyText marginBottom={SPACING.spacing16} />,
           }}
         />
       }

@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -56,11 +55,11 @@ export const JogToPosition = ({
           >
             {t('position_the_pipette')}
           </StyledText>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {currentRoute === DT_ROUTES.BLOWOUT
               ? t('position_and_blowout')
               : t('position_and_drop_tip')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
       <Flex

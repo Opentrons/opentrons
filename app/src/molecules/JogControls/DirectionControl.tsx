@@ -21,10 +21,10 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TEXT_ALIGN_LEFT,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -269,14 +269,14 @@ export function DirectionControl(props: DirectionControlProps): ReactNode {
                   flex="1 1 auto"
                 >
                   {title}
-                  <LegacyStyledText
+                  <StyledText
+                    forwardedAs="label"
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
                     color={COLORS.grey50}
-                    css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               </PrimaryButton>
             )

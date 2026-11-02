@@ -242,7 +242,8 @@ export function LabwareListItem(
           <RobotInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
-            css={TYPOGRAPHY.pSemiBold}
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`slot_info_${slotInfo}`}
           >
             {slotInfo}

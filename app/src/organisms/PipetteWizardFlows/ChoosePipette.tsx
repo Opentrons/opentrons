@@ -19,12 +19,12 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
@@ -239,9 +239,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="h1">
-                {t('choose_pipette')}
-              </LegacyStyledText>
+              <StyledText forwardedAs="h1">{t('choose_pipette')}</StyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -258,13 +256,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     height="150.99px"
                     alt={singleMount}
                   />
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -278,13 +276,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     height="151.2px"
                     alt={bothMounts}
                   />
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>

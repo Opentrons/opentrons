@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   COLORS,
@@ -7,10 +6,8 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   PrimaryButton,
-  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -21,15 +18,6 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 interface SuccessProps extends ModuleSetupWizardMaybePipetteStepProps {
   setSelectedModule: (module: AttachedModule | null) => void

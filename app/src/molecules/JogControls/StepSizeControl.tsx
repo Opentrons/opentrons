@@ -108,11 +108,17 @@ export function StepSizeControl(props: StepSizeControlProps): ReactNode {
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <StyledIcon name="jump-size" width="1.2rem" />
-            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('jump_size')}</StyledText>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('jump_size')}
+            </StyledText>
           </Flex>
           <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.grey60}
-            css={TYPOGRAPHY.bodyTextSemiBold}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
             {JUMP_SIZE_SUBTITLE}

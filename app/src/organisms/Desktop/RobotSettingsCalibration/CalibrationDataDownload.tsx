@@ -6,9 +6,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -53,17 +53,14 @@ export function CalibrationDataDownload({
       gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          forwardedAs="h3"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('about_calibration_title')}
-        </LegacyStyledText>
+        </StyledText>
         <Trans
           t={t}
           i18nKey="about_calibration_description_ot3"
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <StyledText forwardedAs="p" />,
           }}
         />
         <Link

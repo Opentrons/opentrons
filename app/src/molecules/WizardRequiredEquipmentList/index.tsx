@@ -12,9 +12,9 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { labwareImages } from '@opentrons/shared-data'
@@ -53,14 +53,14 @@ export function WizardRequiredEquipmentList(
     >
       {isOnDevice ? (
         <>
-          <LegacyStyledText
+          <StyledText
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="1.5rem"
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
@@ -73,13 +73,13 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <LegacyStyledText
+                <StyledText
                   fontSize={TYPOGRAPHY.fontSize20}
                   paddingY={SPACING.spacing12}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {requiredEquipmentProps.displayName}
-                </LegacyStyledText>
+                </StyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
@@ -92,13 +92,13 @@ export function WizardRequiredEquipmentList(
         </>
       ) : (
         <>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </LegacyStyledText>
+          </StyledText>
           <Divider />
           {equipmentList.map(requiredEquipmentProps => (
             <RequiredEquipmentCard
@@ -107,13 +107,13 @@ export function WizardRequiredEquipmentList(
             />
           ))}
           {footer != null ? (
-            <LegacyStyledText
+            <StyledText
               marginTop={SPACING.spacing8}
               forwardedAs="label"
               color={COLORS.grey60}
             >
               {footer}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </>
       )}
@@ -165,11 +165,11 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): ReactNode {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_AROUND}
         >
-          <LegacyStyledText forwardedAs="p">{displayName}</LegacyStyledText>
+          <StyledText forwardedAs="p">{displayName}</StyledText>
           {subtitle != null ? (
-            <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+            <StyledText forwardedAs="p" color={COLORS.grey50}>
               {subtitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>

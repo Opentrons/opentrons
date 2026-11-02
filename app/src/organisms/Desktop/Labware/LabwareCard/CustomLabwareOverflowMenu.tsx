@@ -12,7 +12,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   MenuItem,
   Modal,
   NO_WRAP,
@@ -21,6 +20,7 @@ import {
   POSITION_RELATIVE,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
@@ -130,14 +130,18 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <LegacyStyledText css={TYPOGRAPHY.linkPSemiBold}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.blue50}
+            >
               {t('open_labware_creator')}
               <Icon
                 name="open-in-new"
                 height="10px"
                 marginLeft={SPACING.spacing6}
               />
-            </LegacyStyledText>
+            </StyledText>
           </MenuItem>
         </Flex>
       )}
@@ -149,12 +153,10 @@ export function CustomLabwareOverflowMenu(
             onClose={handleCancelModal}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="p">
-                {t('def_moved_to_trash')}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
+              <StyledText forwardedAs="p">{t('def_moved_to_trash')}</StyledText>
+              <StyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
                 {t('cannot-run-python-missing-labware')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 justifyContent={JUSTIFY_FLEX_END}
                 alignItems={ALIGN_CENTER}

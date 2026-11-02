@@ -1,7 +1,7 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
@@ -52,7 +52,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): ReactNode {
             <Trans
               t={t}
               i18nKey="labware_position_check_description"
-              components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+              components={{ block: <StyledText forwardedAs="p" /> }}
             />
           }
         />

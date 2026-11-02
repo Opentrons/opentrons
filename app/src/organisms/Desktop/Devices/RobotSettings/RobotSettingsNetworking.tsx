@@ -11,9 +11,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   SecondaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -119,13 +119,13 @@ export function RobotSettingsNetworking({
             }
             data-testid="RobotSettings_Networking_wifi_icon"
           />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('wifi')}
             {ssid != null && ` - ${ssid}`}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
           <Flex
@@ -158,28 +158,37 @@ export function RobotSettingsNetworking({
           {wifi?.ipAddress != null ? (
             <Flex gridGap={SPACING.spacing16}>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  forwardedAs="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('wireless_ip')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                </StyledText>
+                <StyledText forwardedAs="p" color={COLORS.grey50}>
                   {wifi.ipAddress}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  forwardedAs="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('wireless_subnet_mask')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                </StyledText>
+                <StyledText forwardedAs="p" color={COLORS.grey50}>
                   {wifi.subnetMask}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  forwardedAs="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   {t('wireless_mac_address')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                </StyledText>
+                <StyledText forwardedAs="p" color={COLORS.grey50}>
                   {wifi.macAddress}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </Flex>
           ) : null}
@@ -203,12 +212,12 @@ export function RobotSettingsNetworking({
             marginRight={SPACING.spacing12}
             data-testid="RobotSettings_Networking_usb_icon"
           />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {isFlex ? t('ethernet') : t('wired_usb')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
           <Flex gridGap={SPACING.spacing16}>
@@ -218,42 +227,51 @@ export function RobotSettingsNetworking({
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  <StyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
                     {t('wired_ip')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  </StyledText>
+                  <StyledText forwardedAs="p" color={COLORS.grey50}>
                     {ethernet?.ipAddress}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  <StyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
                     {t('wired_subnet_mask')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  </StyledText>
+                  <StyledText forwardedAs="p" color={COLORS.grey50}>
                     {ethernet?.subnetMask}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                 >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  <StyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >
                     {t('wired_mac_address')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  </StyledText>
+                  <StyledText forwardedAs="p" color={COLORS.grey50}>
                     {ethernet?.macAddress}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               </>
             ) : (
-              <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+              <StyledText forwardedAs="p" color={COLORS.grey50}>
                 {isFlex
                   ? t('not_connected_via_ethernet')
                   : t('not_connected_via_wired_usb')}
-              </LegacyStyledText>
+              </StyledText>
             )}
           </Flex>
           {isFlex ? null : (
@@ -264,13 +282,13 @@ export function RobotSettingsNetworking({
               <ExternalLink href={HELP_CENTER_URL}>
                 {t('wired_usb_description')}
               </ExternalLink>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 marginTop={SPACING.spacing16}
                 marginBottom={SPACING.spacing8}
               >
                 {t('usb_to_ethernet_description')}
-              </LegacyStyledText>
+              </StyledText>
               <Link to="/app-settings/advanced" css={TYPOGRAPHY.linkPSemiBold}>
                 {t('go_to_advanced_settings')}
               </Link>
@@ -298,19 +316,19 @@ export function RobotSettingsNetworking({
                 marginRight={SPACING.spacing12}
                 data-testid="RobotSettings_Networking_wifi_icon"
               />
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h3"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('usb')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <Box paddingLeft="3.75rem">
-              <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+              <StyledText forwardedAs="p" color={COLORS.grey50}>
                 {isFlexConnectedViaUSB
                   ? t('directly_connected_to_this_computer')
                   : t('not_connected_via_usb')}
-              </LegacyStyledText>
+              </StyledText>
             </Box>
           </>
         ) : null}

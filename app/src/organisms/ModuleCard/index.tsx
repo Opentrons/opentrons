@@ -54,11 +54,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import {
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
-  MODULE_INFO_SUB_CONTAINER_STYLE,
-} from './constants'
+import { MODULE_INFO_SUB_CONTAINER_STYLE } from './constants'
 import { ErrorInfo } from './ErrorInfo'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from './FlexStackerModuleData'
@@ -428,8 +424,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : (
               <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
                 <StyledText
+                  forwardedAs="h3"
+                  color={COLORS.grey60}
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  css={MODULE_INFO_HEADER_TEXT_STYLE}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -449,7 +446,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                       color={COLORS.grey60}
                     />
                   </Flex>
-                  <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+                  <StyledText forwardedAs="h3">
                     {getModuleDisplayName(module.moduleModel)}
                   </StyledText>
                 </Flex>

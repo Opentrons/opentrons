@@ -1,0 +1,14 @@
+.description {
+  margin-top: var(--spacing-8);
+  margin-bottom: var(--spacing-24);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .description {
+    margin: var(--spacing-4) 4.5rem var(--spacing-32);
+    font-size: var(--font-size-32);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-42);
+    text-align: center;
+  }
+}

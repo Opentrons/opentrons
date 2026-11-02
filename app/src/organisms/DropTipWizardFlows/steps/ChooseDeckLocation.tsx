@@ -4,7 +4,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -71,7 +70,7 @@ export function ChooseDeckLocation({
               t={t}
               i18nKey={buildBodyText()}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
               }}
             />
           </StyledText>

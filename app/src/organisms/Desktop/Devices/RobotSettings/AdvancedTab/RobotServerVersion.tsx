@@ -8,9 +8,9 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -54,40 +54,41 @@ export function RobotServerVersion({
       ) : null}
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box width="70%">
-          <LegacyStyledText
-            css={TYPOGRAPHY.pSemiBold}
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing4}
           >
             {t('robot_server_version')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
+          </StyledText>
+          <StyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
-          </LegacyStyledText>
+          </StyledText>
           {isFlex ? (
-            <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
+            <StyledText forwardedAs="p" paddingBottom={SPACING.spacing4}>
               {t('branded:robot_server_version_ot3_description')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('shared:view_latest_release_notes')}
             <Link
               external
               href={GITHUB_LINK}
               css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
-          </LegacyStyledText>
+          </StyledText>
         </Box>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="label"
               color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}
-            </LegacyStyledText>
+            </StyledText>
             <TertiaryButton
               onClick={() => {
                 handleUpdateBuildroot(robot)

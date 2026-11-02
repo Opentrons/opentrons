@@ -7,8 +7,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Z_INDEX,
 } from '@opentrons/components'
 import {
@@ -88,7 +88,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
   const modalContent = (
     <OddModal header={updateNeededHeader} modalZIndex={Z_INDEX.BLOCKING_MODALS}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"
@@ -100,7 +100,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
               bold: <strong />,
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
         <SmallButton
           onClick={() => {
             if (!ensureCanUpdate()) {

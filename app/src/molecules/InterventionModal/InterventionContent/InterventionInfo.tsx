@@ -10,14 +10,14 @@ import {
   RESPONSIVENESS,
   RobotInfoLabel,
   SPACING,
-  SPACING_1,
   SPACING_2,
   StyledText,
   Tag,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure/Divider'
+
+import styles from './interventioninfo.module.css'
 
 import type { ReactNode } from 'react'
 import type { RobotInfoLabelProps } from '@opentrons/components'
@@ -58,7 +58,7 @@ export function InterventionInfo(props: InterventionInfoProps): ReactNode {
         <StyledText
           oddStyle="bodyTextBold"
           desktopStyle="bodyDefaultSemiBold"
-          css={LINE_CLAMP_STYLE}
+          className={styles.line_clamp}
         >
           {props.labwareNickname ?? props.labwareName}
         </StyledText>
@@ -68,14 +68,7 @@ export function InterventionInfo(props: InterventionInfoProps): ReactNode {
               oddStyle="hidden"
               desktopStyle="bodyDefaultRegular"
               color={COLORS.grey60}
-              css={css`
-                ${LINE_CLAMP_STYLE}
-                margin: 0.125rem 0 ${SPACING_2} 0;
-                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                  font-size: ${TYPOGRAPHY.fontSize22};
-                  margin: ${SPACING_1} 0 ${SPACING_2} 0;
-                }
-              `}
+              className={`${styles.line_clamp} ${styles.sub_text}`}
             >
               {props.subText}
             </StyledText>
@@ -191,13 +184,4 @@ const CARD_STYLE = css`
     background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadius8};
   }
-`
-
-const LINE_CLAMP_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 2;
 `
