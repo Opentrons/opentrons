@@ -38,6 +38,8 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
+import styles from './protocolrunruntimeparameters.module.css'
+
 import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -212,11 +214,11 @@ const StyledTableRowComponent = (
   return (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
-        <ParameterNameText forwardedAs="p">
+        <StyledText forwardedAs="p" className={styles.parameter_name}>
           {parameter.type === 'csv_file'
             ? t('csv_file')
             : parameter.displayName}
-        </ParameterNameText>
+        </StyledText>
         {parameter.description != null ? (
           <>
             <Flex
@@ -243,11 +245,11 @@ const StyledTableRowComponent = (
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_CENTER}
         >
-          <ParameterValueText forwardedAs="p">
+          <StyledText forwardedAs="p" className={styles.parameter_value}>
             {parameter.type === 'csv_file'
               ? (parameter.file?.name ?? '')
               : formatRunTimeParameterValue(parameter, t)}
-          </ParameterValueText>
+          </StyledText>
           {parameter.type === 'csv_file' ||
           parameter.default !== parameter.value ? (
             <Chip
@@ -302,18 +304,4 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
     props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
-`
-
-const ParameterNameText = styled(StyledText)`
-  display: inline;
-  padding-right: 8px;
-`
-
-const ParameterValueText = styled(StyledText)`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  overflow-wrap: anywhere;
 `

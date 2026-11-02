@@ -40,7 +40,7 @@ export function DeckInfoLabelTextTag({
           .map(label => label)}
       </Flex>
       <StyledText
-        className={styles.text}
+        className={styles.col_two_text}
         oddStyle="bodyTextRegular"
         desktopStyle="bodyDefaultRegular"
       >

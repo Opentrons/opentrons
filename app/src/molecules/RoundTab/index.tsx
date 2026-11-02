@@ -89,11 +89,11 @@ export function RoundTab({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
-      <Flex css={disabledRoundTabStyling} {...targetProps}>
+      <div css={disabledRoundTabStyling} {...targetProps}>
         <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {tabName}
         </StyledText>
-      </Flex>
+      </div>
       {tabDisabledReason != null ? (
         <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
       ) : null}

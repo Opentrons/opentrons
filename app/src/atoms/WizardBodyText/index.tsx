@@ -8,10 +8,6 @@ import type { ComponentProps } from 'react'
 
 export type WizardBodyTextProps = ComponentProps<typeof StyledText>
 
-/**
- * Wizard step body copy with shared desktop/ODD typography.
- * Prefer this over `styled(StyledText)` for BODY_STYLE.
- */
 export function WizardBodyText({
   className,
   ...props

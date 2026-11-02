@@ -7,7 +7,7 @@
 
 @media (height = 600px) and (width = 1024px) {
   .body {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-28);
   }
 }
