@@ -44,6 +44,7 @@ export {
   LARGE_STEP_SIZE_MM,
 }
 
+// TODO(jj, 2026-11-02): Split this into desktop and ODD components
 export function JogControls(props: JogControlsProps): ReactNode {
   const {
     jog,

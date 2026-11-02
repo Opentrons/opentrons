@@ -12,7 +12,8 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { JogControls } from '/app/molecules/JogControls'
+
+import { JogControls } from '../../../../../../components/adhoc/shared/JogControls'
 
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'

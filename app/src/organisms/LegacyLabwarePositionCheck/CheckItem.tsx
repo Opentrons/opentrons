@@ -46,8 +46,8 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
+import type { Jog } from '../../components/adhoc/shared/JogControls/types'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,

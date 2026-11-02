@@ -40,8 +40,8 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
 } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls'
 import type { useChainRunCommands } from '/app/resources/runs'
+import type { Jog } from '../../../components/adhoc/shared/JogControls'
 import type { RegisterPositionAction } from '../types'
 
 export const INTERVAL_MS = 3000

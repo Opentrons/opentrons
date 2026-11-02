@@ -25,8 +25,12 @@ import type {
   PipetteModelSpecs,
   RunCommandError,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '../../../components/adhoc/shared/JogControls/types'
 import type {
   DropTipFlowsRoute,
   FixitCommandTypeUtils,

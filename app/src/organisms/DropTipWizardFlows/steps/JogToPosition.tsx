@@ -9,8 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { JogControls } from '/app/molecules/JogControls'
-
+import { JogControls } from '../../../components/adhoc/shared/JogControls'
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 

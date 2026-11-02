@@ -23,7 +23,6 @@ import {
 
 import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { JogControls } from '/app/molecules/JogControls'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
@@ -39,6 +38,8 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
+
+import { JogControls } from '../../../../../../components/adhoc/shared/JogControls'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

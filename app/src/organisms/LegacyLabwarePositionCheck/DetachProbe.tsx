@@ -16,8 +16,8 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
+import type { Jog } from '../../components/adhoc/shared/JogControls/types'
 import type {
   DetachProbeStep,
   RegisterPositionAction,
