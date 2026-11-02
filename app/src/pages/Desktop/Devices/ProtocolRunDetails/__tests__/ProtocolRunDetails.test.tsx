@@ -6,7 +6,6 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
@@ -28,6 +27,7 @@ import {
 } from '/app/resources/runs'
 
 import { ProtocolRunDetails } from '..'
+import { mockRobotSideAnalysis } from '../../../../../components/adhoc/shared/Command/__fixtures__'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 

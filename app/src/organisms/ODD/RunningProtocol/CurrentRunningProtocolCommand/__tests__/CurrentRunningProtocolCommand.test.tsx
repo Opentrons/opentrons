@@ -6,11 +6,11 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
 import { CurrentRunningProtocolCommand } from '..'
+import { mockRobotSideAnalysis } from '../../../../../components/adhoc/shared/Command/__fixtures__'
 
 import type { ComponentProps } from 'react'
 

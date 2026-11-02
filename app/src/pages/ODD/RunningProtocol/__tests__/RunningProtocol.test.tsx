@@ -17,7 +17,6 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
 import {
@@ -50,6 +49,7 @@ import {
 } from '/app/resources/runs'
 
 import { RunningProtocol } from '..'
+import { mockRobotSideAnalysis } from '../../../../components/adhoc/shared/Command/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'

@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
 
-import * as Fixtures from '/app/molecules/Command/__fixtures__'
+import * as Fixtures from '/app/components/adhoc/shared/Command/__fixtures__'
 
 import { CategorizedStepContent, TwoColumn } from '.'
 import { StandInContent } from './story-utils/StandIn'

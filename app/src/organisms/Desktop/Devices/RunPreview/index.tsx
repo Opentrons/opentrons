@@ -26,7 +26,6 @@ import {
 import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/components/adhoc/shared/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import { CommandIcon } from '/app/molecules/Command'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
@@ -34,6 +33,8 @@ import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '/app/resources/runs'
+
+import { CommandIcon } from '../../../../components/adhoc/shared/Command'
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
