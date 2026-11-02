@@ -8,13 +8,57 @@ import {
 } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from '../constants'
-import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
+import {
+  getPipetteWizardSteps,
+  insertSelectSlotAfterAttachProbe,
+} from '../getPipetteWizardSteps'
 
 import type { PipetteWizardStep } from '../types'
 
 describe('getPipetteWizardSteps', () => {
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, SINGLE_MOUNT_PIPETTES, false)
+    ).toStrictEqual(mockCalibrateFlowSteps)
+  })
+  it('skips the slot picker when includeSlotSelect is false', () => {
+    expect(
+      getPipetteWizardSteps(
+        FLOWS.CALIBRATE,
+        LEFT,
+        SINGLE_MOUNT_PIPETTES,
+        false,
+        false
+      )
+    ).toStrictEqual([
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
@@ -35,11 +79,7 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
-    ] as PipetteWizardStep[]
-
-    expect(
-      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, SINGLE_MOUNT_PIPETTES, false)
-    ).toStrictEqual(mockCalibrateFlowSteps)
+    ] as PipetteWizardStep[])
   })
   it('returns the correct array of info for attach pipette flow single channel', () => {
     const mockAttachPipetteFlowSteps = [
@@ -65,6 +105,11 @@ describe('getPipetteWizardSteps', () => {
       },
       {
         section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -142,6 +187,11 @@ describe('getPipetteWizardSteps', () => {
       },
       {
         section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.SELECT_SLOT,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -244,6 +294,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -272,6 +327,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
@@ -286,5 +346,58 @@ describe('getPipetteWizardSteps', () => {
     expect(
       getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
     ).toStrictEqual(mockCalibrateFlowSteps)
+  })
+})
+
+describe('insertSelectSlotAfterAttachProbe', () => {
+  it('inserts SELECT_SLOT immediately after each ATTACH_PROBE', () => {
+    const steps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(insertSelectSlotAfterAttachProbe(steps)).toStrictEqual([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      { section: SECTIONS.SELECT_SLOT, mount: LEFT, flowType: FLOWS.CALIBRATE },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ])
+  })
+
+  it('returns the original steps when includeSlotSelect is false', () => {
+    const steps = [
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(insertSelectSlotAfterAttachProbe(steps, false)).toStrictEqual(steps)
   })
 })

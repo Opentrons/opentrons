@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
@@ -43,9 +43,10 @@ describe('AttachProbe', () => {
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
   })
-  it('returns the correct information, buttons work as expected', async () => {
+  it('returns the correct information, buttons work as expected', () => {
     render(props)
     screen.getByText('Attach calibration probe')
     screen.getByText(
@@ -54,49 +55,10 @@ describe('AttachProbe', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    const proceedBtn = screen.getByRole('button', { name: 'Begin calibration' })
+    const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
-    await waitFor(() => {
-      expect(props.chainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'verifyTipPresence',
-            params: {
-              pipetteId: 'abc',
-              expectedState: 'present',
-              followSingularSensor: 'primary',
-            },
-          },
-        ],
-        false
-      )
-    })
-    await waitFor(() => {
-      expect(props.chainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'home',
-            params: { axes: ['leftZ'] },
-          },
-          {
-            commandType: 'home',
-            params: { skipIfMountPositionOk: 'left' },
-          },
-          {
-            commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
-          },
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: 'left' },
-          },
-        ],
-        false
-      )
-    })
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).not.toHaveBeenCalled()
 
     const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
@@ -168,7 +130,7 @@ describe('AttachProbe', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('renders the correct text when is on device', async () => {
+  it('renders the correct text when is on device', () => {
     props = {
       ...props,
       isOnDevice: true,
@@ -181,48 +143,9 @@ describe('AttachProbe', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
-    await waitFor(() => {
-      expect(props.chainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'verifyTipPresence',
-            params: {
-              pipetteId: 'abc',
-              expectedState: 'present',
-              followSingularSensor: 'primary',
-            },
-          },
-        ],
-        false
-      )
-    })
-    await waitFor(() => {
-      expect(props.chainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'home',
-            params: { axes: ['leftZ'] },
-          },
-          {
-            commandType: 'home',
-            params: { skipIfMountPositionOk: 'left' },
-          },
-          {
-            commandType: 'calibration/calibratePipette',
-            params: { mount: 'left' },
-          },
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: 'left' },
-          },
-        ],
-        false
-      )
-    })
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).not.toHaveBeenCalled()
     fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -233,5 +156,31 @@ describe('AttachProbe', () => {
       flowType: FLOWS.ATTACH,
     }
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
+  })
+
+  it('uses the selected slot in in-progress copy', () => {
+    props = {
+      ...props,
+      selectedSlot: 'C2',
+      isRobotMoving: true,
+    }
+    render(props)
+    screen.getByText(
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+    )
+  })
+
+  it('shows the waste chute warning only when requested', () => {
+    render(props)
+    expect(
+      screen.queryByText(
+        'If the Waste Chute is installed, 96-channel pipette calibration must be performed in slot B2.'
+      )
+    ).not.toBeInTheDocument()
+
+    render({ ...props, showWasteChuteWarning: true })
+    screen.getByText(
+      'If the Waste Chute is installed, 96-channel pipette calibration must be performed in slot B2.'
+    )
   })
 })

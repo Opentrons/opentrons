@@ -29,7 +29,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.types import Vec3f
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture(autouse=True)
@@ -59,7 +59,32 @@ async def test_calibrate_gripper(
     params = CalibrateGripperParams(jaw=params_probe)
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            hardware_api, probe=expected_hc_probe
+            hardware_api, probe=expected_hc_probe, slot=8
+        )
+    ).then_return(Point(1.1, 2.2, 3.3))
+
+    result = await subject.execute(params)
+    assert result == SuccessData(
+        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3)),
+    )
+
+
+@pytest.mark.ot3_only
+async def test_calibrate_gripper_uses_provided_slot(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    _mock_ot3_calibration: None,
+) -> None:
+    """It should probe the requested deck slot."""
+    subject = CalibrateGripperImplementation(hardware_api=hardware_api)
+
+    params = CalibrateGripperParams(
+        jaw=CalibrateGripperParamsJaw.FRONT,
+        slot=DeckSlotName.SLOT_C2,
+    )
+    decoy.when(
+        await ot3_calibration.calibrate_gripper_jaw(
+            hardware_api, probe=GripperProbe.FRONT, slot=5
         )
     ).then_return(Point(1.1, 2.2, 3.3))
 
@@ -90,7 +115,7 @@ async def test_calibrate_gripper_saves_calibration(
     saved_delta_captor = matchers.Captor()
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            hardware_api, probe=GripperProbe.REAR
+            hardware_api, probe=GripperProbe.REAR, slot=8
         )
     ).then_return(Point(1.1, 2.2, 3.3))
     decoy.when(
@@ -119,7 +144,7 @@ async def test_calibrate_gripper_does_not_save_during_error(
 
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            hardware_api, probe=GripperProbe.REAR
+            hardware_api, probe=GripperProbe.REAR, slot=8
         )
     ).then_raise(EarlyCapacitiveSenseTrigger())
 

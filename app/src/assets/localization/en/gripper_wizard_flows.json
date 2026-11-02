@@ -31,6 +31,7 @@
   "remove_labware_to_get_started_recalibrating": "<block>To get started, <strong>remove all labware from the deck</strong> and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration pin is included with the gripper and should be stored on its right side above the jaws.</block>",
   "remove_probe": "Unlock the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
   "return_pin_error": "<bold>Return the calibration pin to its storage location before exiting.</bold> <block>{{error}}</block>",
+  "select_deck_slot": "Select a deck slot to calibrate the gripper.",
   "stand_back_gripper_is_calibrating": "Stand back, gripper is calibrating",
   "try_again": "Try again",
   "unable_to_detect_gripper": "Unable to detect Gripper"

@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
@@ -10,7 +10,10 @@ import {
   getIsGantryEmpty,
   getPipetteAnimations,
   getPipetteAnimations96,
+  startCalibrationOnClick,
 } from '../utils'
+
+import type { PipetteWizardStepProps } from '../types'
 
 describe('getIsGantryEmpty', () => {
   it('should return true when no pipettes attached', () => {
@@ -273,5 +276,42 @@ describe('getPipetteAnimations96', () => {
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
     )
+  })
+})
+
+describe('startCalibrationOnClick', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('sends the selected slot in the calibrate command', async () => {
+    const chainRunCommands = vi.fn().mockResolvedValue(undefined)
+    const proceed = vi.fn()
+    const handleCommandError = vi.fn()
+    const onClick = startCalibrationOnClick(
+      {
+        chainRunCommands,
+        proceed,
+        handleCommandError,
+        mount: LEFT,
+        selectedSlot: 'C2',
+      } as unknown as PipetteWizardStepProps,
+      'abc'
+    )
+
+    onClick()
+
+    await waitFor(() => {
+      expect(chainRunCommands).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left', slot: 'C2' },
+          },
+        ]),
+        false
+      )
+    })
+    expect(proceed).toHaveBeenCalled()
   })
 })

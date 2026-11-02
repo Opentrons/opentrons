@@ -1,12 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText, SPACING } from '@opentrons/components'
+import { SPACING, StyledText } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -52,11 +52,18 @@ export const MountingPlate = (
   }
   return (
     <GenericWizardTile
-      header={t(
-        flowType === FLOWS.ATTACH
-          ? 'attach_mounting_plate'
-          : 'unscrew_and_detach'
-      )}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t(
+            flowType === FLOWS.ATTACH
+              ? 'attach_mounting_plate'
+              : 'unscrew_and_detach'
+          )}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.MOUNTING_PLATE,
         flowType,
@@ -68,17 +75,21 @@ export const MountingPlate = (
             i18nKey="attach_mounting_plate_instructions"
             components={{
               block: (
-                <LegacyStyledText
-                  css={BODY_STYLE}
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  oddStyle="bodyTextRegular"
                   marginBottom={SPACING.spacing16}
                 />
               ),
             }}
           />
         ) : (
-          <LegacyStyledText css={BODY_STYLE}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="bodyTextRegular"
+          >
             {t('detach_mounting_plate_instructions')}
-          </LegacyStyledText>
+          </StyledText>
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}

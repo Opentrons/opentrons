@@ -35,6 +35,7 @@ describe('Carriage', () => {
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
   })
 
