@@ -30,6 +30,7 @@ from .create_protocol_context import (
     ProtocolEngineCoreRequiredError,
     create_protocol_context,
 )
+from .csv_context import CSVContext
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
 from .instrument_context import InstrumentContext
@@ -83,6 +84,7 @@ __all__ = [
     "Liquid",
     "LiquidClass",
     "Parameters",
+    "CSVContext",
     # Partial Tip types
     "COLUMN",
     "PARTIAL_COLUMN",
