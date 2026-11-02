@@ -19,9 +19,10 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import { ODDFixtureOption } from '../../components/adhoc/ODD/ODDFixtureOption'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

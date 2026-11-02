@@ -9,18 +9,18 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolSetupCamera } from '..'
+import { ODDBackButton } from '../../../../../components/adhoc/ODD/ODDBackButton'
 
 import type { Mock } from 'vitest'
 import type { ProtocolSetupCameraProps } from '..'
 
 vi.mock('/app/organisms/ODD/CameraSettings')
-vi.mock('/app/molecules/ODDBackButton')
+vi.mock('/app/components/adhoc/ODD/ODDBackButton')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')

@@ -12,7 +12,6 @@ import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -23,6 +22,7 @@ import {
   updateCameraStreamEnablement,
 } from '/app/redux/protocol-runs'
 
+import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
 import styles from './setupcamera.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'

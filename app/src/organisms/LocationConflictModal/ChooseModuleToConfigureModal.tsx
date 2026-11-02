@@ -31,10 +31,10 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
+import { ODDFixtureOption } from '../../components/adhoc/ODD/ODDFixtureOption'
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'

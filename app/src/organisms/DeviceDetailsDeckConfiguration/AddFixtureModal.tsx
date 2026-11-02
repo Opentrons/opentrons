@@ -23,9 +23,9 @@ import {
 
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import { ODDFixtureOption } from '../../components/adhoc/ODD/ODDFixtureOption'
 import {
   getFixtureOptions,
   getModuleOptions,

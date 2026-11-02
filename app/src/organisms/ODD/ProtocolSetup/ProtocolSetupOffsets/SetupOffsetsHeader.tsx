@@ -5,7 +5,6 @@ import { Chip, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
   appliedOffsetsToRun,
@@ -13,6 +12,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { useUpdateClientLPC } from '/app/resources/client_data'
 
+import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
 import styles from './setupoffsetsheader.module.css'
 
 import type { ReactNode } from 'react'
