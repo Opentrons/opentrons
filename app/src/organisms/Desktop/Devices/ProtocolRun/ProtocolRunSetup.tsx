@@ -28,7 +28,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
-import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
@@ -69,6 +68,7 @@ import {
 import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
+import { InfoMessage } from './InfoMessage'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'

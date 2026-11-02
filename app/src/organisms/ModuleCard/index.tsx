@@ -43,7 +43,6 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -69,6 +68,7 @@ import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { UpdateBanner } from './UpdateBanner'
 import {
   getModuleCalibrationRequired,
   getModuleCardImage,

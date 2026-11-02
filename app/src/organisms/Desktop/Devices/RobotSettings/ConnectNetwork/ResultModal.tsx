@@ -2,9 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { AlertModal, SpinnerModal } from '@opentrons/components'
 
-import { ErrorModal } from '/app/molecules/modals'
-
 import { DISCONNECT } from './constants'
+import { ErrorModal } from './modals'
 
 import type { ReactNode } from 'react'
 import type { NetworkChangeType } from './types'
