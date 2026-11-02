@@ -34,7 +34,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     goBack,
     proceed,
     isExiting,
-    isOnDevice,
     flowType,
     selectedSlot,
     showWasteChuteWarning = false,
@@ -87,19 +86,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 pipetteName: displayName,
               })
         }
-      >
-        {isExiting ? undefined : (
-          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              oddStyle="bodyTextRegular"
-              textAlign="center"
-            >
-              {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </StyledText>
-          </Flex>
-        )}
-      </SimpleWizardInProgressBody>
+        body={
+          isExiting
+            ? undefined
+            : t('calibration_probe_touching', { slotNumber: calSlotNum })
+        }
+      />
     )
   }
 
