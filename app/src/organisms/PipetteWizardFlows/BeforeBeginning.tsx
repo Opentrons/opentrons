@@ -24,20 +24,16 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   PIPETTE,
 } from './constants'
-import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
+import { getIsGantryEmpty } from './utils'
 
 import type { AxiosError } from 'axios'
-import type { UseMutateFunction, UseQueryResult } from 'react-query'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
-import type {
-  CreateCommand,
-  DeckConfiguration,
-  LoadedPipette,
-} from '@opentrons/shared-data'
+import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
@@ -49,7 +45,6 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   >
   isCreateLoading: boolean
   createdMaintenanceRunId: string | null
-  deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
   documentationState: DocumentationState
 }
@@ -71,7 +66,6 @@ export const BeforeBeginning = (
     requiredPipette,
     maintenanceRunId,
     createdMaintenanceRunId,
-    deckConfig,
     documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
@@ -118,12 +112,6 @@ export const BeforeBeginning = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       bodyTranslationKey = 'remove_labware_to_get_started'
-      if (
-        selectedPipette === NINETY_SIX_CHANNEL &&
-        isWasteChuteOnDeck(deckConfig)
-      ) {
-        equipmentList.push(hexScrewdriverWithSubtitle)
-      }
       break
     }
     case FLOWS.ATTACH: {

@@ -31,6 +31,7 @@ export interface GripperData {
   }
   firmwareVersion?: string
   instrumentModel: string
+  displayName?: string
   instrumentType: 'gripper'
   mount: 'extension'
   serialNumber: string
@@ -52,6 +53,7 @@ export interface PipetteData {
   firmwareVersion?: string
   instrumentName: string
   instrumentModel: PipetteModel
+  displayName?: string
   instrumentType: 'pipette'
   mount: Mount
   serialNumber: string

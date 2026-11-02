@@ -111,6 +111,26 @@ export interface SetTipStateRunTimeCommand
   result?: {}
 }
 
+export interface CreateCSVCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'createCSV'
+  params: CreateCSVParams
+}
+
+export interface CreateCSVRuntimeCommand
+  extends CommonCommandRunTimeInfo, CreateCSVCreateCommand {
+  result?: {}
+}
+
+export interface CSVWriteRowCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'csvWriteRow'
+  params: CSVWriteRowParams
+}
+
+export interface CSVWriteRowRuntimeCommand
+  extends CommonCommandRunTimeInfo, CSVWriteRowCreateCommand {
+  result?: {}
+}
+
 export type SetupRunTimeCommand =
   | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
@@ -123,6 +143,8 @@ export type SetupRunTimeCommand =
   | LoadLidRunTimeCommand
   | LoadLidStackRunTimeCommand
   | SetTipStateRunTimeCommand
+  | CreateCSVRuntimeCommand
+  | CSVWriteRowRuntimeCommand
 
 export type SetupCreateCommand =
   | ConfigureNozzleLayoutCreateCommand
@@ -136,6 +158,8 @@ export type SetupCreateCommand =
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
   | SetTipStateCreateCommand
+  | CreateCSVCreateCommand
+  | CSVWriteRowCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
@@ -282,6 +306,16 @@ interface LiquidClassRecord {
 
 interface LoadLiquidClassResult {
   liquidClassId: string
+}
+
+interface CreateCSVParams {
+  fileName: string
+  columns: number | null
+  title_row: string[] | null
+}
+
+interface CSVWriteRowParams {
+  row: string[]
 }
 
 export type PartialNozzles8Channel = 2 | 3 | 4 | 5 | 6 | 7

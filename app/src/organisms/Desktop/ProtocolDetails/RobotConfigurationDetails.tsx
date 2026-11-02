@@ -202,7 +202,7 @@ export const RobotConfigurationDetails = (
         <>
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
-            label={t('shared:extension_mount')}
+            label={t('extension_mount')}
             item={isLoading ? loadingText : extensionMountItem}
           />
         </>

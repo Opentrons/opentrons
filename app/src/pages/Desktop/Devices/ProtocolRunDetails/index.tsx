@@ -273,7 +273,7 @@ function PageContents(props: PageContentsProps): ReactNode {
         makeHandleJumpToStep={makeHandleJumpToStep}
         isCloning={isPendingRerunLoading}
       />
-      <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
+      <Flex gridGap={SPACING.spacing4} marginBottom={SPACING.spacing12}>
         <SetupTab
           robotName={robotName}
           runId={runId}

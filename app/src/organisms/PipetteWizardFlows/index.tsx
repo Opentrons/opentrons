@@ -35,7 +35,6 @@ import {
 } from '/app/local-resources/maintenance_runs/utils'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
@@ -45,7 +44,6 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { AttachProbe } from './AttachProbe'
-import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
 import { Carriage } from './Carriage'
 import { FLOWS, SECTIONS } from './constants'
@@ -59,7 +57,6 @@ import { MountingPlate } from './MountingPlate'
 import { MountPipette } from './MountPipette'
 import { MovementErrorModal } from './MovementErrorModal'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 import { startCalibrationOnClick } from './utils'
@@ -77,6 +74,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
+  PipetteWizardStep,
   PipetteWizardStepProps,
   SelectablePipettes,
 } from './types'
@@ -108,7 +106,6 @@ export const PipetteWizardFlows = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const deckConfig = useNotifyDeckConfigurationQuery()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,19 +120,11 @@ export const PipetteWizardFlows = (
   const pipetteWizardSteps = useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty,
-            attachedPipettes,
-            deckConfig
-          )
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount,
-            deckConfig
+            mount
           ),
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -447,7 +436,12 @@ export const PipetteWizardFlows = (
     return null
   }
 
-  const calibrateBaseProps: PipetteWizardStepProps = {
+  // purposefully does not include flowType and mount, as these are passed in via the currentStep
+  // flowType and mount might change depending on the step within a flow
+  const calibrateBaseProps: Omit<
+    PipetteWizardStepProps,
+    keyof PipetteWizardStep
+  > = {
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving: isCommandMutationLoading || isDeleteLoading,
     proceed,
@@ -458,12 +452,10 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
     handleCommandError,
-    flowType,
-    mount,
   }
 
   const startCalibration = startCalibrationOnClick(
-    calibrateBaseProps,
+    { ...calibrateBaseProps, ...currentStep },
     attachedPipettes[mount]?.serialNumber ?? ''
   )
 
@@ -547,7 +539,6 @@ export const PipetteWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
-        deckConfig={deckConfig}
         requiredPipette={requiredPipette}
         documentationState={commandDocState}
       />
@@ -561,7 +552,6 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
-        deckConfig={deckConfig}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
@@ -642,20 +632,6 @@ export const PipetteWizardFlows = (
       exitModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
-    )
-  } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
-    )
-  } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
     )
   }
   const buildWizardOnExit = (): (() => void) => {

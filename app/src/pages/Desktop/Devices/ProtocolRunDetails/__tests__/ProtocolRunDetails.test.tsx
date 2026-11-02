@@ -165,7 +165,7 @@ describe('ProtocolRunDetails', () => {
 
     screen.getByText('Setup')
     screen.getByText('Module Controls')
-    screen.getByText('Run Preview')
+    screen.getByText('Run Log')
     screen.getByText('Camera')
   })
 
@@ -179,7 +179,7 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     // Setup stays mounted (hidden) on other tabs.
@@ -190,7 +190,7 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const setupTab = screen.getByText('Setup')
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     screen.getByText('Mock ProtocolRunSetup')
@@ -286,14 +286,14 @@ describe('ProtocolRunDetails', () => {
     screen.getByText('Setup')
     screen.getByText('Parameters')
     screen.getByText('Module Controls')
-    screen.getByText('Run Preview')
+    screen.getByText('Run Log')
   })
 
   it('renders protocol run parameters when the parameters tab is clicked', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const parametersTab = screen.getByText('Parameters')
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     expect(screen.queryByText('Mock ProtocolRunRuntimeParameters')).toBeFalsy()

@@ -132,7 +132,7 @@
     "stylelint-config-idiomatic-order": "10.0.0",
     "stylelint-config-standard": "39.0.1",
     "typescript": "5.3.3",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "vitest": "5.0.5",
     "wait-on": "^9.0.5"
   }
