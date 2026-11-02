@@ -10,7 +10,6 @@ import {
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { RoundTab } from '/app/molecules/RoundTab'
 import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { Peripherals } from '/app/organisms/Desktop/Devices/Peripherals'
@@ -20,6 +19,7 @@ import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeck
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
 import { useIsRobotBusy, useIsRobotViewable } from '/app/redux-resources/robots'
 
+import { RoundTab } from '../../../../components/adhoc/desktop/RoundTab'
 import styles from '../DeviceDetails/devicedetails.module.css'
 
 import type { ReactNode } from 'react'

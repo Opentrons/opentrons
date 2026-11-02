@@ -12,7 +12,6 @@ import {
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
@@ -27,6 +26,7 @@ import { getDevtoolsEnabled } from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 
+import { RoundTab } from '../../../../components/adhoc/desktop/RoundTab'
 import styles from './robotsettings.module.css'
 
 import type { ReactNode } from 'react'

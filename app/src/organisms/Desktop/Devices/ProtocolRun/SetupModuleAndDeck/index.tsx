@@ -14,7 +14,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import {
@@ -27,6 +26,7 @@ import {
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
 
+import { useToggleGroup } from '../../../../../components/adhoc/desktop/ToggleGroup/useToggleGroup'
 import { SetupFixtureList } from './SetupFixtureList'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupModulesMap } from './SetupModulesMap'
