@@ -57,7 +57,7 @@ Deck components install directly onto the Flex deck to support labware and diffe
 
 ### Module components
 
-Module components provide the external power, vacuum, data communication, and mechanical hardware required to operate the module. These include the control box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and L-shaped hex keys.
+Module components provide the external power, vacuum, data communication, and mechanical hardware required to operate the module. These include the control box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and related tools.
 
 <div class="parts-list" markdown>
 
@@ -96,14 +96,17 @@ Module components provide the external power, vacuum, data communication, and me
 
 <figure markdown>
 ![Spare deck adapter screws, M4 × 10 mm](../images/fasteners-deck.png "Spare deck adapter screws"){ width="50%" }
-<figcaption>(2) Deck adapter screws, 2.5 mm hex drive</figcaption>
+<figcaption>(2) Deck adapter screws, 2.5 mm </figcaption>
 </figure>
 
 <figure markdown>
 ![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="50%" }
-<figcaption>(6) Manifold screws, 7/64" hex drive (Imperial thread)</figcaption>
+<figcaption>(6) Manifold screws, 7/64" (Imperial thread)</figcaption>
 </figure>
 
+<figure markdown>
+![7/64" Allen key for manifold base](../images/allen-key.png){ width="40%" }
+<figcaption>(1) 7/64" hex screwdriver</figcaption>
 </div>
 
 ### Waste collection components
