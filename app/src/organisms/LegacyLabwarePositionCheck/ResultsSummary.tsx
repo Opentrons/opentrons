@@ -32,8 +32,8 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { LabwareOffsetSnippet } from '/app/components/desktop/chips/LabwareOffsetSnippet'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import {

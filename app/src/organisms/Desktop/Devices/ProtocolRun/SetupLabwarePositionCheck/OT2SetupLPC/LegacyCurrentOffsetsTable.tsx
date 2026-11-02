@@ -20,7 +20,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/components/desktop/chips/LabwareOffsetSnippet'
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'

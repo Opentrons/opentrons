@@ -21,7 +21,7 @@ import type {
   LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetSnippetProps } from '/app/molecules/LabwareOffsetSnippet'
+import type { LabwareOffsetSnippetProps } from '..'
 
 // Returns all copy for all load commands.
 export function buildLoadCommandCopy(
