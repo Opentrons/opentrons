@@ -32,8 +32,8 @@ import {
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
+import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 
 import type { ReactNode } from 'react'

@@ -14,10 +14,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { i18n } from '/app/i18n'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { ReactNode } from 'react'

@@ -4,14 +4,14 @@ import { Trans, useTranslation } from 'react-i18next'
 import { COLORS, StyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 
-import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 
+import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import {
   CAL_PIN_LOADNAME,
   CALIBRATION_PIN_DISPLAY_NAME,

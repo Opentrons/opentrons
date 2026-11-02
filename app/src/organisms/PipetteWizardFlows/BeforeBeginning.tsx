@@ -10,12 +10,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
+import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import {
   CALIBRATION_PROBE,
   FLOWS,

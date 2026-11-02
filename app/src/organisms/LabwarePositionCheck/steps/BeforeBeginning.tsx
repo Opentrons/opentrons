@@ -7,8 +7,9 @@ import {
   DescriptionContent,
   TwoColumn,
 } from '/app/components/ODD/modals/InterventionModal'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+
+import { WizardRequiredEquipmentList } from '../../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 
 import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'

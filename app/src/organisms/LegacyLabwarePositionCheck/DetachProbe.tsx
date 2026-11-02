@@ -9,7 +9,7 @@ import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 
 import { RobotMotionLoader } from './RobotMotionLoader'
 

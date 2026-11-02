@@ -9,7 +9,7 @@ import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 
 import { RobotMotionLoader } from './RobotMotionLoader'

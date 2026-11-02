@@ -24,11 +24,11 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
 import { getIsOnDevice } from '/app/redux/config'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
+import { WizardRequiredEquipmentList } from '../../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import { TerseOffsetTable } from '../ResultsSummary'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'

@@ -13,12 +13,12 @@ import {
 } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/components/ODD/buttons'
-import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
