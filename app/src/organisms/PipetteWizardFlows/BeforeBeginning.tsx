@@ -5,8 +5,8 @@ import {
   Banner,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
@@ -22,7 +22,6 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
 import {
-  BODY_STYLE,
   CALIBRATION_PROBE,
   FLOWS,
   HEX_SCREWDRIVER,
@@ -250,7 +249,14 @@ export const BeforeBeginning = (
 
   return (
     <GenericWizardTile
-      header={t('before_you_begin')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('before_you_begin')}
+        </StyledText>
+      }
       rightHandBody={rightHandBody}
       bodyText={
         <>
@@ -259,7 +265,12 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <LegacyStyledText css={BODY_STYLE} />,
+                block: (
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    oddStyle="bodyTextRegular"
+                  />
+                ),
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&

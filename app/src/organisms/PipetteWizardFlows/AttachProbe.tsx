@@ -6,10 +6,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
-  RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
@@ -18,7 +16,7 @@ import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_9
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations, startCalibrationOnClick } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -27,17 +25,6 @@ interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
   showWasteChuteWarning?: boolean
 }
-
-const IN_PROGRESS_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    line-height: 1.625rem;
-    margin-top: ${SPACING.spacing4};
-  }
-`
 
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
@@ -103,9 +90,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       >
         {isExiting ? undefined : (
           <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <LegacyStyledText css={IN_PROGRESS_STYLE}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              oddStyle="bodyTextRegular"
+              textAlign="center"
+            >
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         )}
       </SimpleWizardInProgressBody>
@@ -114,14 +105,24 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   return (
     <GenericWizardTile
-      header={i18n.format(t('attach_probe'), 'capitalize')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(t('attach_probe'), 'capitalize')}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <LegacyStyledText css={BODY_STYLE}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="bodyTextRegular"
+          >
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -130,7 +131,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
+          </StyledText>
           {showWasteChuteWarning ? (
             <InlineNotification
               type="alert"
