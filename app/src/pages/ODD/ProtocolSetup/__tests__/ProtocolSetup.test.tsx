@@ -22,6 +22,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
@@ -85,7 +86,6 @@ import {
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 
 import { ProtocolSetup } from '../'
-import { mockRobotSideAnalysis } from '../../../../components/adhoc/shared/Command/__fixtures__'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 

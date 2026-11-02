@@ -5,7 +5,8 @@ import {
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
 
-import { mockRobotSideAnalysis } from '../../../components/adhoc/shared/Command/__fixtures__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
+
 import { RECOVERY_MAP } from '../constants'
 
 import type { LabwareDefinition, LoadedLabware } from '@opentrons/shared-data'

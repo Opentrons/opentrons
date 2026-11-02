@@ -20,14 +20,13 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import unmountGripper from '/app/assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { getIsOnDevice } from '/app/redux/config'
-
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperWizardStepProps } from './types'

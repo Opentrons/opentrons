@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
 import { i18n } from '/app/i18n'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
@@ -27,7 +28,6 @@ import {
 } from '/app/resources/runs'
 
 import { ProtocolRunDetails } from '..'
-import { mockRobotSideAnalysis } from '../../../../../components/adhoc/shared/Command/__fixtures__'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 

@@ -24,8 +24,9 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
-import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
-import { LabwareStackContents } from '../../../../components/adhoc/shared/LabwareStackContents'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
+import { LabwareStackContents } from '/app/components/adhoc/shared/LabwareStackContents'
+
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
 import type { ReactNode } from 'react'

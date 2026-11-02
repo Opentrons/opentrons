@@ -8,8 +8,8 @@ import {
   THERMOCYCLER_MODULE_MODELS,
 } from '@opentrons/shared-data'
 
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'

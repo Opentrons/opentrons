@@ -17,12 +17,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ODDFixtureOption } from '/app/components/adhoc/ODD/ODDFixtureOption'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-
-import { ODDFixtureOption } from '../../components/adhoc/ODD/ODDFixtureOption'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

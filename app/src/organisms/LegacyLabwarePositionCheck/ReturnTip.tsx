@@ -14,9 +14,9 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
 import { getIsOnDevice } from '/app/redux/config'
 
-import { UnorderedList } from '../../components/adhoc/shared/UnorderedList'
 import { PrepareSpace } from './PrepareSpace'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { getDisplayLocation } from './utils/getDisplayLocation'

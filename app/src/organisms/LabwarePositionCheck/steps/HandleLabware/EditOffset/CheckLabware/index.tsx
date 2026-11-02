@@ -22,6 +22,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
@@ -38,8 +39,6 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
-
-import { JogControls } from '../../../../../../components/adhoc/shared/JogControls'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

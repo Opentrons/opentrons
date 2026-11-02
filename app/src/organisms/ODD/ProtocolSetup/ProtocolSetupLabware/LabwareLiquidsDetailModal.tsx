@@ -12,6 +12,7 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
+import { LiquidCardList } from '/app/components/adhoc/shared/LiquidDetailCard'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import {
   getDisabledWellFillFromLabwareId,
@@ -19,8 +20,6 @@ import {
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
-
-import { LiquidCardList } from '../../../../components/adhoc/shared/LiquidDetailCard'
 
 import type {
   CompletedProtocolAnalysis,

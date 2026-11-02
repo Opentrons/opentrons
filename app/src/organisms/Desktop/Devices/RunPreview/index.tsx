@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 
 import { NAV_BAR_WIDTH } from '/app/App/constants'
+import { CommandIcon } from '/app/components/adhoc/shared/Command'
 import { Divider } from '/app/components/adhoc/shared/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
@@ -33,8 +34,6 @@ import {
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-
-import { CommandIcon } from '../../../../components/adhoc/shared/Command'
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

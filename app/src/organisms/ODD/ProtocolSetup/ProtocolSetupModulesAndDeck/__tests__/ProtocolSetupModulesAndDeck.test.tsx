@@ -10,6 +10,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
 import { i18n } from '/app/i18n'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
@@ -30,7 +31,6 @@ import {
 } from '/app/transformations/analysis'
 
 import { ProtocolSetupModulesAndDeck } from '..'
-import { mockRobotSideAnalysis } from '../../../../../components/adhoc/shared/Command/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapView } from '../ModulesAndDeckMapView'

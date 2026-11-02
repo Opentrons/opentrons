@@ -3,13 +3,12 @@ import { useSelector } from 'react-redux'
 
 import { StyledText } from '@opentrons/components'
 
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import {
   DescriptionContent,
   TwoColumn,
 } from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-
-import { WizardRequiredEquipmentList } from '../../../components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 
 import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'

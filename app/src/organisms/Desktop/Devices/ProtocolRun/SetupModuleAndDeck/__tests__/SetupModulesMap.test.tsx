@@ -9,11 +9,11 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ModuleInfo } from '/app/components/adhoc/shared/ModuleInfo'
 import { i18n } from '/app/i18n'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 
-import { ModuleInfo } from '../../../../../../components/adhoc/shared/ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
 
 import type { ComponentProps } from 'react'

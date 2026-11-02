@@ -20,11 +20,11 @@ import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/Te
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 import styles from './wizardvideo.module.css'
 

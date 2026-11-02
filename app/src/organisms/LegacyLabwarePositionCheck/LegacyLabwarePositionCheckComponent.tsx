@@ -56,12 +56,12 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
-import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 import type {
   Axis,
   Sign,
   StepSize,
-} from '../../components/adhoc/shared/JogControls/types'
+} from '/app/components/adhoc/shared/JogControls/types'
+import type { LegacySupportLPCFlowsProps } from '/app/organisms/LabwarePositionCheck'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000

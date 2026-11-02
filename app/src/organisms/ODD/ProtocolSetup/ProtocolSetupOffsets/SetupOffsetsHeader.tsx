@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Chip, SPACING } from '@opentrons/components'
 
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
@@ -12,7 +13,6 @@ import {
 } from '/app/redux/protocol-runs'
 import { useUpdateClientLPC } from '/app/resources/client_data'
 
-import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
 import styles from './setupoffsetsheader.module.css'
 
 import type { ReactNode } from 'react'

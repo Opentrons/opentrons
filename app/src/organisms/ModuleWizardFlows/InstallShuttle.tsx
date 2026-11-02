@@ -15,10 +15,9 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import StackerInstallShuttle from '/app/assets/videos/error-recovery/FlexStacker_InstallShuttle.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
-
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'

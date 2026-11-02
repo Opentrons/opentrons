@@ -39,18 +39,18 @@ import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labwa
 import levelProbeWithTip from '/app/assets/images/lpc_level_probe_with_tip.svg'
 import levelWithLabware from '/app/assets/images/lpc_level_with_labware.svg'
 import levelWithTip from '/app/assets/images/lpc_level_with_tip.svg'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'
 
-import { JogControls } from '../../components/adhoc/shared/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
 
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { WellStrokeByName } from '@opentrons/components'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
-import type { Jog } from '../../components/adhoc/shared/JogControls'
+import type { Jog } from '/app/components/adhoc/shared/JogControls'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =

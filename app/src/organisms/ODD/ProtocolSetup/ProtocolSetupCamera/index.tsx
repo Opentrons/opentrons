@@ -10,6 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
@@ -22,7 +23,6 @@ import {
   updateCameraStreamEnablement,
 } from '/app/redux/protocol-runs'
 
-import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
 import styles from './setupcamera.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'

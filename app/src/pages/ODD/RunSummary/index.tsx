@@ -41,6 +41,7 @@ import {
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
@@ -79,7 +80,6 @@ import {
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
-import { RunTimer } from '../../../components/adhoc/shared/RunTimer'
 import { SignRun } from './SignRun'
 
 import type { ReactNode } from 'react'

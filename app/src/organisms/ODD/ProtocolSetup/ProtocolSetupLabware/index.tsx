@@ -38,6 +38,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
 import {
   SmallButton,
   TouchFloatingActionButton,
@@ -53,7 +54,6 @@ import {
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
 
-import { ODDBackButton } from '../../../../components/adhoc/ODD/ODDBackButton'
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
 

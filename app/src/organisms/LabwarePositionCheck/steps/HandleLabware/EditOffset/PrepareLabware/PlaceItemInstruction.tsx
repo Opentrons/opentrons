@@ -12,6 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
 import { DescriptionContent } from '/app/components/ODD/modals/InterventionModal'
 import {
   getFlexSlotNameOnly,
@@ -21,8 +22,6 @@ import {
   selectLwDisplayName,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
-
-import { UnorderedList } from '../../../../../../components/adhoc/shared/UnorderedList'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

@@ -14,8 +14,8 @@ import {
 
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'

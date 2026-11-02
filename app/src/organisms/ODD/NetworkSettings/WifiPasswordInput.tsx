@@ -4,12 +4,12 @@ import clsx from 'clsx'
 
 import { StyledText } from '@opentrons/components'
 
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
-import { PasswordVisibilityToggle } from '../../../components/adhoc/shared/PasswordVisibilityToggle'
 import styles from './wifipasswordinput.module.css'
 
 import type { ReactNode } from 'react'

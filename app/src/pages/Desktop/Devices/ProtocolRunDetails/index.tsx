@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
@@ -46,8 +47,6 @@ import {
   useQuickProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
-
-import { RoundTab } from '../../../../components/adhoc/desktop/RoundTab'
 
 import type { ReactNode } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

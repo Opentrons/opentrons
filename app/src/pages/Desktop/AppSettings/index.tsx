@@ -14,10 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
 
-import { RoundTab } from '../../../components/adhoc/desktop/RoundTab'
 import { AdvancedSettings } from './AdvancedSettings'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'

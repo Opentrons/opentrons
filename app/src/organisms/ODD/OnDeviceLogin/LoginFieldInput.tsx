@@ -2,10 +2,9 @@ import { forwardRef, useRef, useState } from 'react'
 
 import { setRefs } from '@opentrons/components'
 
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
-
-import { PasswordVisibilityToggle } from '../../../components/adhoc/shared/PasswordVisibilityToggle'
 
 import type { ChangeEvent, ReactNode } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'

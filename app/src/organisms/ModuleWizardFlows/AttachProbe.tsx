@@ -7,10 +7,10 @@ import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 
-import { GenericWizardTile } from '../../components/adhoc/shared/wizards/GenericWizardTile'
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 import styles from './wizardvideo.module.css'
 

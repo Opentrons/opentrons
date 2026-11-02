@@ -11,6 +11,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import { useToggleGroup } from '/app/components/adhoc/desktop/ToggleGroup/useToggleGroup'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
@@ -20,7 +21,6 @@ import {
   useRunHasStarted,
 } from '/app/resources/runs'
 
-import { useToggleGroup } from '../../../../../components/adhoc/desktop/ToggleGroup/useToggleGroup'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { SetupLabwareList } from './SetupLabwareList'
 import { SetupLabwareMap } from './SetupLabwareMap'

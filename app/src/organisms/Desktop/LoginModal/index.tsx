@@ -22,6 +22,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -33,7 +34,6 @@ import {
 } from '/app/resources/auth'
 import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 
-import { PasswordVisibilityToggle } from '../../../components/adhoc/shared/PasswordVisibilityToggle'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 

@@ -20,8 +20,8 @@ import type {
   CompletedProtocolAnalysis,
   CreateCommand,
 } from '@opentrons/shared-data'
+import type { Jog } from '/app/components/adhoc/shared/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
-import type { Jog } from '../../components/adhoc/shared/JogControls/types'
 import type {
   AttachProbeStep,
   RegisterPositionAction,

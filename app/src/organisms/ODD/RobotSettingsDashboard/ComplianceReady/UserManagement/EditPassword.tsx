@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { FullKeyboard } from '/app/components/ODD/keyboard'
@@ -12,7 +13,6 @@ import {
   mapSetNewPasswordError,
 } from '/app/resources/auth'
 
-import { PasswordVisibilityToggle } from '../../../../../components/adhoc/shared/PasswordVisibilityToggle'
 import styles from './user_management_settings.module.css'
 
 import type { TFunction } from 'i18next'

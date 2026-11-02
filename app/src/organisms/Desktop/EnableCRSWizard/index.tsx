@@ -23,6 +23,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useRobot } from '/app/redux-resources/robots'
@@ -31,7 +32,6 @@ import { getPasswordComplexityError } from '/app/resources/auth/getPasswordCompl
 import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
-import { PasswordVisibilityToggle } from '../../../components/adhoc/shared/PasswordVisibilityToggle'
 import { useHandleRobotCertImport } from '../RobotCertImport/useHandleRobotCertImport'
 import styles from './enablecrswizard.module.css'
 import { generatePassword } from './generatePassword'
