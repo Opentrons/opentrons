@@ -1,8 +1,8 @@
 .go_back_text {
+  color: var(--grey-50);
   font-size: var(--font-size-13);
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-20);
-  color: var(--grey-50);
 }
 
 .go_back_text:hover {

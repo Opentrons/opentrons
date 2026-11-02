@@ -166,8 +166,7 @@ export const RunPreviewComponent = (
             {t('steps_total', { count: commands.length })}
           </StyledText>
         </Flex>
-        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}
-        >
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
         </StyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
