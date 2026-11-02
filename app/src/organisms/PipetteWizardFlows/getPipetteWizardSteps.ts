@@ -17,7 +17,7 @@ export function insertSelectSlotAfterAttachProbe(
     return steps
   }
 
-  return steps.flatMap(step =>
+  return steps.flatMap((step): PipetteWizardStep[] =>
     step.section === SECTIONS.ATTACH_PROBE
       ? [
           step,
@@ -216,6 +216,7 @@ const getPipetteWizardStepsWithoutSlotSelect = (
       ]
     }
   }
+  return null
 }
 
 export const getPipetteWizardSteps = (

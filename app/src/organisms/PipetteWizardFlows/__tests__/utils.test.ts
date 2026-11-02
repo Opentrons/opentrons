@@ -295,7 +295,7 @@ describe('startCalibrationOnClick', () => {
         handleCommandError,
         mount: LEFT,
         selectedSlot: 'C2',
-      } as PipetteWizardStepProps,
+      } as unknown as PipetteWizardStepProps,
       'abc'
     )
 
