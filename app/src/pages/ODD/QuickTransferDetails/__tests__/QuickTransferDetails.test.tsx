@@ -13,7 +13,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
@@ -36,9 +35,6 @@ vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ODD/RobotDashboard/hooks')
 vi.mock('/app/redux-resources/analytics')
-vi.mock(
-  '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-)
 vi.mock('../DeleteTransferConfirmationModal')
 vi.mock('/app/transformations/commands')
 vi.mock('../Deck')
@@ -99,7 +95,6 @@ describe('ODDQuickTransferDetails', () => {
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,

@@ -41,7 +41,7 @@ import {
   isDocumentedMutationError,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
+import { sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { MiniCard } from '/app/components/desktop/cards/MiniCard'
@@ -52,9 +52,6 @@ import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostP
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
-import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRobotType } from '/app/redux-resources/robots'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import {
   getRunTimeParameterFilesForRun,
@@ -104,8 +101,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
-  const robotType = useRobotType(name)
-  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const [selectedProtocol, setSelectedProtocol] =
     useState<StoredProtocolData | null>(null)
@@ -161,21 +156,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
-  const analysisStatus = getAnalysisStatus(
-    false,
-    selectedProtocol?.mostRecentAnalysis
-  )
-  const missingAnalysisData =
-    analysisStatus === 'error' || analysisStatus === 'stale'
-
-  const [shouldApplyOffsets, setShouldApplyOffsets] = useState(true)
-  const offsetCandidates = useOffsetCandidatesForAnalysis(
-    (!missingAnalysisData ? selectedProtocol?.mostRecentAnalysis : null) ??
-      null,
-    isFlex,
-    robot.ip
-  )
-
   const documentationState = useDocumentationState()
   const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
 
@@ -215,13 +195,7 @@ export function ChooseProtocolSlideoutComponent(
       },
     },
     undefined,
-    shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
-      : []
+    []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
     if (isCreatingRun) {
@@ -655,35 +629,7 @@ export function ChooseProtocolSlideoutComponent(
       currentStep={currentPage}
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
-      footer={
-        <>
-          {currentPage === 1
-            ? !isFlex && (
-                <LegacyApplyHistoricOffsets
-                  offsetCandidates={offsetCandidates}
-                  shouldApplyOffsets={shouldApplyOffsets}
-                  setShouldApplyOffsets={setShouldApplyOffsets}
-                  commands={
-                    (!missingAnalysisData
-                      ? selectedProtocol?.mostRecentAnalysis?.commands
-                      : []) ?? []
-                  }
-                  labware={
-                    (!missingAnalysisData
-                      ? selectedProtocol?.mostRecentAnalysis?.labware
-                      : []) ?? []
-                  }
-                  modules={
-                    (!missingAnalysisData
-                      ? selectedProtocol?.mostRecentAnalysis?.modules
-                      : []) ?? []
-                  }
-                />
-              )
-            : null}
-          {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
-        </>
-      }
+      footer={<>{hasRunTimeParameters ? multiPageFooter : singlePageFooter}</>}
     >
       {showSlideout ? (
         currentPage === 1 ? (

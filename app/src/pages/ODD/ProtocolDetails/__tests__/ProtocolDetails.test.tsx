@@ -18,7 +18,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
@@ -129,7 +128,6 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(useHardwareStatusText).mockReturnValue(
       'mock missing hardware chip text'
     )
-    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
     vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
