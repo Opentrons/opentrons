@@ -1,20 +1,11 @@
 import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
-import {
-  getCommands,
-  getInstruments,
-  getRunCurrentState,
-} from '@opentrons/api-client'
+import { getInstruments } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import type {
-  Mount,
-  PipetteData,
-  Run,
-  RunCommandSummary,
-} from '@opentrons/api-client'
+import type { InstrumentData, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export interface PipetteWithTip {
@@ -28,19 +19,13 @@ export interface PipetteTipState {
   hasTip: boolean
 }
 
-export interface TipAttachmentStatusParams {
-  runId: string
-  runRecord: Run | null
-}
-
 export interface TipAttachmentStatusResult {
-  /** Updates the pipettes with tip cache. Determine whether tips are likely attached on one or more pipettes, assuming
-   * tips are attached when there's uncertainty.
+  /** Updates the pipettes with tip cache.
    *
-   * NOTE: This function makes a few network requests on each invocation!
+   * NOTE: This function makes a network request on each invocation.
    * */
   determineTipStatus: () => Promise<PipetteWithTip[]>
-  /* Whether tips are likely attached on *any* pipette. Typically called after determineTipStatus() */
+  /* Whether tips are attached on *any* pipette. Typically called after determineTipStatus() */
   areTipsAttached: boolean
   /* Resets the cached pipettes with tip statuses to null.  */
   resetTipStatus: () => void
@@ -61,11 +46,10 @@ export interface TipAttachmentStatusResult {
   initialPipettesWithTipsCount: number | null
 }
 
+const MOUNT_ORDER: Record<Mount, number> = { left: 0, right: 1 }
+
 // Returns various utilities for interacting with the cache of pipettes with tips attached.
-export function useTipAttachmentStatus(
-  params: TipAttachmentStatusParams
-): TipAttachmentStatusResult {
-  const { runId, runRecord } = params
+export function useTipAttachmentStatus(): TipAttachmentStatusResult {
   const host = useHost()
   const [pipettesWithTip, setPipettesWithTip] = useState<PipetteWithTip[]>([])
   const [initialPipettesCount, setInitialPipettesCount] = useState<
@@ -77,29 +61,18 @@ export function useTipAttachmentStatus(
     pipettesWithTip.length > 0 && head(pipettesWithTip)?.specs != null
 
   const determineTipStatus = useCallback((): Promise<PipetteWithTip[]> => {
-    return Promise.all([
-      getInstruments(host!),
-      getRunCurrentState(host!, runId),
-      getCommands(host!, runId, {
-        includeFixitCommands: false,
-        pageLength: 1,
-      }),
-    ])
-      .then(([attachedInstruments, currentState, commandsData]) => {
-        const { tipStates } = currentState.data.data
-
-        const pipetteInfo = validatePipetteInfo(
-          attachedInstruments?.data.data as PipetteData[]
-        )
-
-        const pipetteInfoById = createPipetteInfoById(runRecord, pipetteInfo)
-        const pipettesWithTipsData = getPipettesWithTipsData(
-          tipStates,
-          pipetteInfoById,
-          commandsData.data.data as RunCommandSummary[]
-        )
-        const pipettesWithTipAndSpecs =
-          filterPipettesWithTips(pipettesWithTipsData)
+    return getInstruments(host!)
+      .then(attachedInstruments => {
+        const pipettesWithTipsData = getAttachedPipettes(
+          attachedInstruments?.data.data
+        ).map(pipetteInfo => ({
+          specs: getPipetteModelSpecs(pipetteInfo.instrumentModel),
+          mount: pipetteInfo.mount,
+          hasTip: pipetteInfo.state?.tipDetected === true,
+        }))
+        const pipettesWithTipAndSpecs = filterPipettesWithTips(
+          pipettesWithTipsData
+        ).sort((a, b) => MOUNT_ORDER[a.mount] - MOUNT_ORDER[b.mount])
 
         setPipettesWithTip(pipettesWithTipAndSpecs)
 
@@ -111,13 +84,12 @@ export function useTipAttachmentStatus(
       })
       .catch(e => {
         console.error(`Error during tip status check: ${e.message}`)
-        // Unblock post-run flows (auto-close / SignRun) that wait on a settled tip check.
         if (initialPipettesCount === null) {
           setInitialPipettesCount(0)
         }
         return Promise.resolve([])
       })
-  }, [host, initialPipettesCount, runId, runRecord])
+  }, [host, initialPipettesCount])
 
   const resetTipStatus = (): void => {
     setPipettesWithTip([])
@@ -158,86 +130,20 @@ export function useTipAttachmentStatus(
   }
 }
 
-// Return good pipettes from instrument data.
-const validatePipetteInfo = (
-  attachedInstruments: PipetteData[] | null
+const getAttachedPipettes = (
+  attachedInstruments: InstrumentData[] | undefined
 ): PipetteData[] => {
-  const goodPipetteInfo =
-    attachedInstruments?.filter(
-      instr => instr.instrumentType === 'pipette' && instr.ok
-    ) ?? null
-
-  if (goodPipetteInfo == null) {
-    throw new Error(
-      'Attached instrument pipettes differ from current state pipettes.'
-    )
-  }
-
-  return goodPipetteInfo
-}
-
-// Associate pipette info with a pipette id.
-const createPipetteInfoById = (
-  runRecord: Run | null,
-  pipetteInfo: PipetteData[]
-): Record<string, PipetteData> => {
-  const pipetteInfoById: Record<string, PipetteData> = {}
-
-  runRecord?.data.pipettes.forEach(p => {
-    const pipetteInfoForThisPipette = pipetteInfo.find(
-      goodPipette => p.mount === goodPipette.mount
-    )
-    if (pipetteInfoForThisPipette != null) {
-      pipetteInfoById[p.id] = pipetteInfoForThisPipette
-    }
-  })
-
-  return pipetteInfoById
-}
-
-const getPipettesWithTipsData = (
-  tipStates: Record<string, { hasTip: boolean }>,
-  pipetteInfoById: Record<string, PipetteData>,
-  commands: RunCommandSummary[]
-): PipetteTipState[] => {
-  return Object.entries(tipStates).map(([pipetteId, tipInfo]) => {
-    const pipetteInfo = pipetteInfoById[pipetteId]
-    const specs = getPipetteModelSpecs(pipetteInfo.instrumentModel)
-    return {
-      specs,
-      mount: pipetteInfo.mount,
-      hasTip: getMightHaveTipGivenCommands(Boolean(tipInfo.hasTip), commands),
-    }
-  })
-}
-
-const PICK_UP_TIP_COMMAND_TYPES: Array<RunCommandSummary['commandType']> = [
-  'pickUpTip',
-] as const
-
-// Sometimes, the robot and the tip status util have different ideas of when tips are attached.
-// For example, if a pickUpTip command fails, the robot does not think a tip is attached. However, we want to be
-// conservative and prompt drop tip wizard in case there are tips attached unexpectedly.
-const getMightHaveTipGivenCommands = (
-  hasTip: boolean,
-  commands: RunCommandSummary[]
-): boolean => {
-  const lastRunProtocolCommand = commands[commands.length - 1]
-
-  if (
-    PICK_UP_TIP_COMMAND_TYPES.includes(lastRunProtocolCommand.commandType) ||
-    lastRunProtocolCommand?.error?.errorType === 'tipPhysicallyMissing'
-  ) {
-    return true
-  } else {
-    return hasTip
-  }
+  return (attachedInstruments ?? []).filter(
+    (instr): instr is PipetteData =>
+      instr.instrumentType === 'pipette' && instr.ok
+  )
 }
 
 const filterPipettesWithTips = (
   pipettesWithTipsData: PipetteTipState[]
 ): PipetteWithTip[] => {
   return pipettesWithTipsData.filter(
-    pipette => pipette.specs != null && pipette.hasTip
-  ) as PipetteWithTip[]
+    (pipette): pipette is PipetteWithTip =>
+      pipette.specs != null && pipette.hasTip
+  )
 }

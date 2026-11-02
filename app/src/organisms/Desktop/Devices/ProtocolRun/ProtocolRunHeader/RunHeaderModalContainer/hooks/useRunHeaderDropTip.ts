@@ -63,10 +63,7 @@ export function useRunHeaderDropTip({
     setTipStatusResolved,
     aPipetteWithTip,
     initialPipettesWithTipsCount,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-  })
+  } = useTipAttachmentStatus()
 
   const dropTipModalUtils = useProtocolDropTipModal({
     areTipsAttached,

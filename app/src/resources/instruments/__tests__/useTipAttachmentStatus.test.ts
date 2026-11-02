@@ -1,11 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  getCommands,
-  getInstruments,
-  getRunCurrentState,
-} from '@opentrons/api-client'
+import { getInstruments } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
@@ -26,7 +22,6 @@ vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 
 const MOCK_HOST = { ip: '1.2.3.4', port: 31950 } as any
-const MOCK_RUN_ID = 'run-123'
 
 const MOCK_ACTUAL_PIPETTE = {
   ...fixtureP10Single,
@@ -41,25 +36,12 @@ const mockPipetteData: PipetteData = {
   instrumentType: 'pipette',
   instrumentModel: 'p1000_single_v3.6',
   ok: true,
+  state: { tipDetected: true },
 } as any
 
 const mockSecondPipetteData: PipetteData = {
   ...mockPipetteData,
   mount: 'right',
-}
-
-const mockRunRecord = {
-  data: {
-    pipettes: [
-      { id: 'pipette-1', mount: 'left' },
-      { id: 'pipette-2', mount: 'right' },
-    ],
-  },
-} as any
-
-const mockTipStates = {
-  'pipette-1': { hasTip: true },
-  'pipette-2': { hasTip: true },
 }
 
 describe('useTipAttachmentStatus', () => {
@@ -70,23 +52,14 @@ describe('useTipAttachmentStatus', () => {
     vi.mocked(getInstruments).mockResolvedValue({
       data: { data: [mockPipetteData, mockSecondPipetteData] },
     } as any)
+  })
 
-    vi.mocked(getRunCurrentState).mockResolvedValue({
-      data: { data: { tipStates: mockTipStates } },
-    } as any)
-
-    vi.mocked(getCommands).mockResolvedValue({
-      data: { data: [{ commandType: 'mockType' }] },
-    } as any)
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   const renderTipAttachmentStatus = () => {
-    return renderHook(() =>
-      useTipAttachmentStatus({
-        runId: MOCK_RUN_ID,
-        runRecord: mockRunRecord,
-      })
-    )
+    return renderHook(() => useTipAttachmentStatus())
   }
 
   it('should return the correct initial state', async () => {
@@ -101,12 +74,8 @@ describe('useTipAttachmentStatus', () => {
     expect(result.current.initialPipettesWithTipsCount).toEqual(null)
   })
 
-  it('should determine tip status and update state accordingly', async () => {
+  it('should determine tip status from tipDetected', async () => {
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -120,13 +89,30 @@ describe('useTipAttachmentStatus', () => {
     expect(result.current.initialPipettesWithTipsCount).toBe(2)
   })
 
+  it('should treat tipDetected false or missing as no tip', async () => {
+    vi.mocked(getInstruments).mockResolvedValue({
+      data: {
+        data: [
+          { ...mockPipetteData, state: { tipDetected: false } },
+          { ...mockSecondPipetteData, state: undefined },
+        ],
+      },
+    } as any)
+
+    const { result } = renderTipAttachmentStatus()
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.areTipsAttached).toBe(false)
+    expect(result.current.aPipetteWithTip).toBeNull()
+    expect(result.current.initialPipettesWithTipsCount).toBe(0)
+  })
+
   it('should handle network errors', async () => {
     vi.mocked(getInstruments).mockRejectedValueOnce(new Error('Error'))
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -139,10 +125,6 @@ describe('useTipAttachmentStatus', () => {
 
   it('should reset tip status', async () => {
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -160,10 +142,6 @@ describe('useTipAttachmentStatus', () => {
   it('should resolve all tips without resetting the settled tip-check count', async () => {
     const { result } = renderTipAttachmentStatus()
 
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
-
     await act(async () => {
       await result.current.determineTipStatus()
     })
@@ -180,12 +158,8 @@ describe('useTipAttachmentStatus', () => {
     expect(result.current.initialPipettesWithTipsCount).toBe(2)
   })
 
-  it('should set tip status resolved and a  state', async () => {
+  it('should set tip status resolved and advance to the next pipette', async () => {
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -206,23 +180,17 @@ describe('useTipAttachmentStatus', () => {
   })
 
   it('should call onEmptyCache callback when cache becomes empty', async () => {
-    vi.mocked(getRunCurrentState).mockResolvedValueOnce({
+    vi.mocked(getInstruments).mockResolvedValueOnce({
       data: {
-        data: {
-          tipStates: {
-            'pipette-1': { hasTip: true },
-            'pipette-2': { hasTip: false },
-          },
-        },
+        data: [
+          mockPipetteData,
+          { ...mockSecondPipetteData, state: { tipDetected: false } },
+        ],
       },
     } as any)
 
     const onEmptyCacheMock = vi.fn()
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -242,39 +210,9 @@ describe('useTipAttachmentStatus', () => {
     })
   })
 
-  it('should handle tipPhysicallyMissing error by assuming tip is attached', async () => {
-    vi.mocked(getCommands).mockResolvedValueOnce({
-      data: {
-        data: [
-          {
-            error: {
-              errorType: 'tipPhysicallyMissing',
-            },
-          },
-        ],
-      },
-    } as any)
-
-    const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
-
-    await act(async () => {
-      await result.current.determineTipStatus()
-    })
-
-    expect(result.current.areTipsAttached).toBe(true)
-  })
-
   it('should call onTipsDetected callback when tips remain after resolution', async () => {
     const onTipsDetectedMock = vi.fn()
     const { result } = renderTipAttachmentStatus()
-
-    await waitFor(() => {
-      expect(result.current).toBeDefined()
-    })
 
     await act(async () => {
       await result.current.determineTipStatus()
@@ -297,5 +235,21 @@ describe('useTipAttachmentStatus', () => {
       mount: 'right',
       specs: MOCK_ACTUAL_PIPETTE,
     })
+  })
+
+  it('should return the left pipette first when both have tips', async () => {
+    vi.mocked(getInstruments).mockResolvedValueOnce({
+      data: {
+        data: [mockSecondPipetteData, mockPipetteData],
+      },
+    } as any)
+
+    const { result } = renderTipAttachmentStatus()
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.aPipetteWithTip?.mount).toBe('left')
   })
 })

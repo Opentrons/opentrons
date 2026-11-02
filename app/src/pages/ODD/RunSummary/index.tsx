@@ -289,10 +289,7 @@ export function RunSummary(): ReactNode {
     setTipStatusResolved,
     aPipetteWithTip,
     initialPipettesWithTipsCount,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-  })
+  } = useTipAttachmentStatus()
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({
