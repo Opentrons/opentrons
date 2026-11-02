@@ -6,7 +6,7 @@
 }
 
 .go_back_text:hover {
-  opacity: 70%;
+  opacity: 0.7;
 }
 
 @media (height = 600px) and (width = 1024px) {
@@ -17,6 +17,6 @@
   }
 
   .go_back_text:hover {
-    opacity: 100%;
+    opacity: 1;
   }
 }
