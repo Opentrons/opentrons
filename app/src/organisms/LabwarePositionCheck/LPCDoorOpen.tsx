@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -17,13 +17,19 @@ import {
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
+import { proceedEditOffsetSubstep } from '/app/redux/protocol-runs'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function LPCDoorOpen(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
+  const dispatch = useDispatch()
   const { commandUtils } = props
-  const { dismissDoorOpenError, headerCommands } = commandUtils
+  const {
+    dismissDoorOpenError,
+    headerCommands,
+    retryPendingPostConfirmCleanup,
+  } = commandUtils
   const isOnDevice = useSelector(getIsOnDevice)
   // Door-open 409s return immediately. "Try again" replaces "Move gantry
   // to front" in the same slot, so the originating click would dismiss
@@ -39,6 +45,13 @@ export function LPCDoorOpen(props: LPCWizardContentProps): JSX.Element {
       return
     }
     dismissDoorOpenError()
+    void retryPendingPostConfirmCleanup()
+      .then(didCleanup => {
+        if (didCleanup) {
+          dispatch(proceedEditOffsetSubstep(props.runId))
+        }
+      })
+      .catch(() => undefined)
   }
 
   return (
