@@ -1,4 +1,4 @@
-import { InProgressModal } from '../InProgressModal/InProgressModal'
+import { InProgressModal } from '../../InProgressModal'
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
 
 import type { ComponentProps, ReactNode } from 'react'

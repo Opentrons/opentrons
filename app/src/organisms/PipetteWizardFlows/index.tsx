@@ -25,6 +25,7 @@ import {
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -33,7 +34,6 @@ import {
   isMovementError,
   isTipPresenceError,
 } from '/app/local-resources/maintenance_runs/utils'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {

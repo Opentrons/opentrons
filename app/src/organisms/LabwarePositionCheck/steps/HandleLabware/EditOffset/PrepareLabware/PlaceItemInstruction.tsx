@@ -12,8 +12,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
 import { DescriptionContent } from '/app/components/ODD/modals/InterventionModal'
-import { UnorderedList } from '/app/molecules/UnorderedList'
 import {
   getFlexSlotNameOnly,
   OFFSET_KIND_DEFAULT,

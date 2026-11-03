@@ -39,6 +39,7 @@ const StyledEquipmentImage = styled.img<{ isEquipmentImage: boolean }>`
   display: block;
 `
 
+// TODO(jj, 2026-11-02): Split this into desktop and ODD components
 export function WizardRequiredEquipmentList(
   props: WizardRequiredEquipmentListProps
 ): ReactNode {

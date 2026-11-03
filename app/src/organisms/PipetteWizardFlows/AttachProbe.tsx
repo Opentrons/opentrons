@@ -13,9 +13,9 @@ import {
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations, startCalibrationOnClick } from './utils'

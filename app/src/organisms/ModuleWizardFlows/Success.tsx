@@ -12,8 +12,8 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'

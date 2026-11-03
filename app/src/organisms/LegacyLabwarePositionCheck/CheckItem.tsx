@@ -22,7 +22,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { UnorderedList } from '/app/molecules/UnorderedList'
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
 import { getIsOnDevice } from '/app/redux/config'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 
@@ -46,7 +46,7 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls/types'
+import type { Jog } from '/app/components/adhoc/shared/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   CheckLabwareStep,

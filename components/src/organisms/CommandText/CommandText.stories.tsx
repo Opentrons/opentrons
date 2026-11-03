@@ -1,4 +1,4 @@
-import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
+import * as Fixtures from '../../../../app/src/components/adhoc/shared/Command/__fixtures__'
 import { Box } from '../../primitives'
 import { CommandText as CommandTextComponent } from './index'
 import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'

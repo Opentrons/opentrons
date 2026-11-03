@@ -10,11 +10,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/components/ODD/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { GRIPPER_FLOW_TYPES } from './constants'

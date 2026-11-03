@@ -22,8 +22,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { JogControls } from '/app/molecules/JogControls'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'

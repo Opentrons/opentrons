@@ -11,7 +11,6 @@ import { SelectRecoveryOption } from '../SelectRecoveryOption'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 
 const render = (props: ComponentProps<typeof RetryStep>) => {

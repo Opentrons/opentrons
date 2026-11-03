@@ -24,8 +24,8 @@ import {
 
 import { Divider } from '/app/components/adhoc/shared/structure'
 import { RobotCard } from '/app/components/desktop/cards/RobotCard'
+import { CollapsibleSection } from '/app/components/desktop/CollapsibleSection'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useFeatureFlag } from '/app/redux/config'

@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import {
   getPasswordComplexityError,
   mapSetNewPasswordError,

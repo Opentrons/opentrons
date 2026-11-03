@@ -11,8 +11,8 @@ import {
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'

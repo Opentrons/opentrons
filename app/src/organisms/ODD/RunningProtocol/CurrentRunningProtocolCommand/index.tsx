@@ -7,7 +7,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { RunTimer } from '/app/molecules/RunTimer'
+import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 

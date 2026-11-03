@@ -8,8 +8,8 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -20,7 +20,7 @@ import type {
   CompletedProtocolAnalysis,
   CreateCommand,
 } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls/types'
+import type { Jog } from '/app/components/adhoc/shared/JogControls/types'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
   AttachProbeStep,

@@ -7,7 +7,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { CommandIcon } from '/app/molecules/Command'
+import { CommandIcon } from '/app/components/adhoc/shared/Command'
 
 import { ProtocolPlayPauseHeader } from '../shared/ProtocolPlayPauseHeader'
 import styles from './commandlist.module.css'

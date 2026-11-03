@@ -22,9 +22,9 @@ import {
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
-import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'

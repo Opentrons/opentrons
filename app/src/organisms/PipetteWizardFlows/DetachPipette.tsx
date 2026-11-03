@@ -20,14 +20,14 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
-import { SmallButton } from '/app/components/ODD/buttons'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'

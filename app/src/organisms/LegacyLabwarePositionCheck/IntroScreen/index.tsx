@@ -22,9 +22,9 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
 import { getIsOnDevice } from '/app/redux/config'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
@@ -40,7 +40,7 @@ import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
 } from '@opentrons/shared-data'
-import type { Jog } from '/app/molecules/JogControls'
+import type { Jog } from '/app/components/adhoc/shared/JogControls'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { RegisterPositionAction } from '../types'
 

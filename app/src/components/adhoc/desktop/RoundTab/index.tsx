@@ -77,6 +77,7 @@ interface RoundTabProps {
   minWidth?: string
 }
 
+// TODO(jj, 2026-11-02): This should be a helix/tabbed button component
 export function RoundTab({
   disabled,
   tabDisabledReason,

@@ -68,6 +68,7 @@ interface LiquidDetailCardProps {
   totalLiquids?: number
 }
 
+// TODO(jj, 2026-11-02): Split this into desktop and ODD components
 export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
   const {
     liquidId,

@@ -3,9 +3,9 @@ import { Trans, useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'

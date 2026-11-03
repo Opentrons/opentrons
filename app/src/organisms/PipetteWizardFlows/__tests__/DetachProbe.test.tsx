@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InProgressModal } from '/app/components/adhoc/shared/InProgressModal/InProgressModal'
 import { i18n } from '/app/i18n'
-import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
@@ -14,7 +14,7 @@ import { DetachProbe } from '../DetachProbe'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/InProgressModal/InProgressModal')
+vi.mock('/app/components/adhoc/shared/InProgressModal/InProgressModal')
 
 const render = (props: ComponentProps<typeof DetachProbe>) => {
   return renderWithProviders(<DetachProbe {...props} />, {

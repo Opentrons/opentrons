@@ -19,13 +19,13 @@ import {
 
 import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
 import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
-import { WizardBodyText } from '/app/atoms/WizardBodyText'
-import { SmallButton } from '/app/components/ODD/buttons'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import { VERIFY_VACUUM_GAUGE_PRESSURE_MBAR } from './constants'
 import {

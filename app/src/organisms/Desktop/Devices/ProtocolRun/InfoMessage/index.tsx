@@ -20,6 +20,7 @@ export interface InfoMessageProps {
   body?: string
 }
 
+// TODO(jj, 2026-11-02): Replace this with InlineNotification component
 export function InfoMessage({ title, body }: InfoMessageProps): ReactNode {
   return (
     <Flex

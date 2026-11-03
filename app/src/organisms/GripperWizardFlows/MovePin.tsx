@@ -16,11 +16,11 @@ import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_R
 import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,

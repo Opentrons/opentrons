@@ -21,9 +21,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { ODDFixtureOption } from '/app/components/adhoc/ODD/ODDFixtureOption'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
 import {

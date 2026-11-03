@@ -20,12 +20,12 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
-import { SmallButton } from '/app/components/ODD/buttons'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { BadGripper, GripperData } from '@opentrons/api-client'
