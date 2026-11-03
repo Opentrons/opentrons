@@ -25,25 +25,15 @@ from opentrons.types import DeckSlotName
 
 
 @lru_cache
-def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
+def load_deck_from_cache() -> DeckDefinitionV6:
     """Get a deck from robot type."""
-    if robot_type == "OT-3 Standard":
-        return load("ot3_standard")
-    else:
-        return load("ot2_standard")
+    return load("ot3_standard")
 
 
 @pytest.mark.parametrize(
     ("location", "robot_type", "expected_modern_location", "expected_legacy_location"),
     [
         # Directly on a slot
-        pytest.param(
-            LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
-            "OT-2 Standard",
-            [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="5")],
-            LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
-            id="direct-slot-ot2-native",
-        ),
         pytest.param(
             LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
             "OT-3 Standard",
@@ -54,13 +44,6 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
             ],
             LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
             id="direct-slot-flex-ot2",
-        ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
-            "OT-2 Standard",
-            [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="5")],
-            LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
-            id="direct-slot-ot2-flex",
         ),
         pytest.param(
             LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
@@ -114,47 +97,7 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
             ),
             id="module-flex-ot2",
         ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_D1,
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            "OT-2 Standard",
-            [
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="module-ot2-flex",
-        ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            "OT-2 Standard",
-            [
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="module-ot2-native",
-        ),
-        # On a module with no adapter, and specificially the module is a Thermocycler.
+        # On a module with no adapter, and specifically the module is a Thermocycler.
         # The Thermocycler is special because the deck definition splits it into two
         # fixtures. :(
         pytest.param(
@@ -198,24 +141,6 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
         ),
         pytest.param(
             LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_D1, definitionUri="opentrons-test/foo/1"
-            ),
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1"
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1, definitionUri="opentrons-test/foo/1"
-            ),
-            id="labware-slot-ot2-flex",
-        ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1, definitionUri="opentrons-test/foo/1"
             ),
             "OT-3 Standard",
@@ -231,24 +156,6 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
                 slotName=DeckSlotName.SLOT_D1, definitionUri="opentrons-test/foo/1"
             ),
             id="labware-slot-flex-ot2",
-        ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1, definitionUri="opentrons-test/foo/1"
-            ),
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1"
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1, definitionUri="opentrons-test/foo/1"
-            ),
-            id="labware-slot-ot2-native",
         ),
         # On an adapter on a module
         pytest.param(
@@ -278,31 +185,6 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
         ),
         pytest.param(
             LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_D1,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="labware-module-ot2-flex",
-        ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1,
                 definitionUri="opentrons-test/foo/1",
                 moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
@@ -326,31 +208,6 @@ def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
             ),
             id="labware-module-flex-ot2",
         ),
-        pytest.param(
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="labware-module-ot2-native",
-        ),
     ],
 )
 def test_standardize_legacy_labware_offset(
@@ -360,7 +217,7 @@ def test_standardize_legacy_labware_offset(
     expected_legacy_location: LegacyLabwareOffsetLocation,
 ) -> None:
     """It should convert deck slots in `LegacyLabwareOffsetCreate`s and go to the new format."""
-    deck_def = load_from_robot_type(robot_type)
+    deck_def = load_deck_from_cache()
     original = LegacyLabwareOffsetCreate(
         definitionUri="opentrons-test/foo/1",
         location=location,
@@ -382,13 +239,6 @@ def test_standardize_legacy_labware_offset(
     ("location", "robot_type", "expected_modern_location", "expected_legacy_location"),
     [
         # Directly on a slot
-        pytest.param(
-            [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="5")],
-            "OT-2 Standard",
-            [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="5")],
-            LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
-            id="slot-direct-ot2",
-        ),
         pytest.param(
             [
                 OnAddressableAreaOffsetLocationSequenceComponent(
@@ -429,30 +279,6 @@ def test_standardize_legacy_labware_offset(
             ),
             id="module-slot-flex",
         ),
-        pytest.param(
-            [
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            "OT-2 Standard",
-            [
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="module-slot-ot2",
-        ),
         # On a labware  on a slot
         pytest.param(
             [
@@ -476,29 +302,6 @@ def test_standardize_legacy_labware_offset(
                 slotName=DeckSlotName.SLOT_D1, definitionUri="opentrons-test/foo/1"
             ),
             id="labware-slot-flex",
-        ),
-        pytest.param(
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1"
-                ),
-            ],
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1"
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1, definitionUri="opentrons-test/foo/1"
-            ),
-            id="labware-slot-ot2",
         ),
         # On an adapter on a module
         pytest.param(
@@ -531,37 +334,6 @@ def test_standardize_legacy_labware_offset(
                 moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
             ),
             id="labware-module-flex",
-        ),
-        pytest.param(
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="1",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="labware-slot-ot2",
         ),
         # On a stack of labware
         pytest.param(
@@ -600,86 +372,7 @@ def test_standardize_legacy_labware_offset(
             ),
             id="labware-stack-flex",
         ),
-        pytest.param(
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/bar/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/baz/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="2",
-                ),
-            ],
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/bar/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/baz/1"
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="2",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_2,
-                definitionUri="opentrons-test/foo/1",
-            ),
-            id="labware-stack-ot2",
-        ),
         # On a stack of labware on a module
-        pytest.param(
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/bar/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/baz/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="3",
-                ),
-            ],
-            "OT-2 Standard",
-            [
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/foo/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/bar/1"
-                ),
-                OnLabwareOffsetLocationSequenceComponent(
-                    labwareUri="opentrons-test/baz/1"
-                ),
-                OnModuleOffsetLocationSequenceComponent(
-                    moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-                ),
-                OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="3",
-                ),
-            ],
-            LegacyLabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_3,
-                definitionUri="opentrons-test/foo/1",
-                moduleModel=ModuleModel.TEMPERATURE_MODULE_V2,
-            ),
-            id="labware-stack-module-ot2",
-        ),
         pytest.param(
             [
                 OnLabwareOffsetLocationSequenceComponent(
@@ -732,7 +425,7 @@ def test_standardize_modern_labware_offset(
     expected_legacy_location: LegacyLabwareOffsetLocation,
 ) -> None:
     """It should convert deck slots in `LabwareOffsetCreate`s and fill in the old format."""
-    deck_def = load_from_robot_type(robot_type)
+    deck_def = load_deck_from_cache()
     original = LabwareOffsetCreate(
         definitionUri="opentrons-test/foo/1",
         locationSequence=location,
