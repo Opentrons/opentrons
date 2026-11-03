@@ -107,6 +107,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ## Changes in API versions
 
+### Version 2.31
+
+- Adds [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] to support the [Vacuum Module](modules/vacuum.md). Use the load name `vacuumModuleV1` with [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to load the Vacuum Module on the deck for solid-phase extraction or other vacuum-based protocols.
+
 ### Version 2.30
 
 - Aspirating at the [`Well.meniscus()`][opentrons.protocol_api.Well.meniscus] now works when only specifying `target="start"`. In earlier API versions, aspirating with `target="start"` and no `end_location` raised an error. See [Meniscus](robot-position.md#meniscus).
