@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { COLORS } from '../helix-design-system'
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import { Btn, Flex } from '../primitives'
 
 import type { MouseEvent, ReactNode } from 'react'
