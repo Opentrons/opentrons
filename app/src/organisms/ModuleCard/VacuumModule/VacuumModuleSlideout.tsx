@@ -19,8 +19,8 @@ import {
   VACUUM_MIN_PRESSURE_MBAR,
 } from '@opentrons/shared-data'
 
-import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/components/desktop/Slideout'
+import { SubmitPrimaryButton } from '/app/organisms/ModuleCard/SubmitPrimaryButton'
 
 import { useVacuumModuleControls } from './hooks/useVacuumModuleControls'
 import { parseGaugePressureValue } from './utils/parseGaugePressureValue'

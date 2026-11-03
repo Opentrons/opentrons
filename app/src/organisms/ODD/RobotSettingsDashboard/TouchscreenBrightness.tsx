@@ -16,7 +16,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { IconButton } from '/app/atoms/buttons/IconButton'
+import { SimpleIconButton } from '/app/components/ODD/buttons/SimpleIconButton'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
@@ -95,7 +95,7 @@ export function TouchscreenBrightness({
         paddingY={SPACING.spacing120}
         marginTop="7.75rem"
       >
-        <IconButton
+        <SimpleIconButton
           disabled={brightness === LOWEST_BRIGHTNESS}
           onClick={() => {
             handleClick('down')
@@ -116,7 +116,7 @@ export function TouchscreenBrightness({
           ))}
         </Flex>
 
-        <IconButton
+        <SimpleIconButton
           disabled={brightness === HIGHEST_BRIGHTNESS}
           onClick={() => {
             handleClick('up')

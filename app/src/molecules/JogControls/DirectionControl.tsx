@@ -29,7 +29,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { TouchControlButton } from '/app/components/adhoc/shared/buttons/TouchControlButton'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'

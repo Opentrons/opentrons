@@ -37,7 +37,7 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { SecureLabwareModal } from './SecureLabwareModal'

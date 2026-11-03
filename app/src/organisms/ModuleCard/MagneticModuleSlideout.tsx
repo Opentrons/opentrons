@@ -25,9 +25,9 @@ import {
   MM,
 } from '@opentrons/shared-data'
 
-import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { SubmitPrimaryButton } from '/app/organisms/ModuleCard/SubmitPrimaryButton'
 
 import type { MagneticModule } from '@opentrons/api-client'
 import type {

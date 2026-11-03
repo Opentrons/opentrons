@@ -4,14 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { SimpleWizardBody } from '..'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/atoms/Skeleton')
+vi.mock('/app/components/adhoc/shared/Skeleton')
 vi.mock('/app/redux/config')
 
 const render = (props: ComponentProps<typeof SimpleWizardBody>) => {

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'

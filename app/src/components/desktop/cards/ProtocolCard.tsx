@@ -31,7 +31,7 @@ import {
   parseInitialPipetteNamesByMount,
 } from '@opentrons/shared-data'
 
-import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { InstrumentContainer } from '/app/components/adhoc/desktop/InstrumentContainer'
 import { ProtocolAnalysisFailure } from '/app/organisms/Desktop/ProtocolAnalysisFailure'
 import { ProtocolAnalysisStale } from '/app/organisms/Desktop/ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import { ProtocolOverflowMenu } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolOverflowMenu'

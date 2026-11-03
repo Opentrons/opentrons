@@ -21,8 +21,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 import {
   applyShellUpdate,
   downloadShellUpdate,

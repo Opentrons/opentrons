@@ -21,7 +21,7 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { MultiSlideout } from '/app/components/desktop/Slideout/MultiSlideout'
 import { UploadInput } from '/app/components/desktop/UploadInput'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'

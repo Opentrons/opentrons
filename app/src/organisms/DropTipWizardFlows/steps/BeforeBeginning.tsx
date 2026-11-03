@@ -20,7 +20,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../../components/ODD/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
+
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 

@@ -31,7 +31,7 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,

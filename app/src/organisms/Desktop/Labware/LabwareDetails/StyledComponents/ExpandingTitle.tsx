@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { ReactNode } from 'react'
 

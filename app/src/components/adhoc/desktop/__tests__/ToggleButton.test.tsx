@@ -5,7 +5,7 @@ import { COLORS, SIZE_2 } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { ToggleButton } from '..'
+import { ToggleButton } from '../ToggleButton'
 
 import type { ComponentProps } from 'react'
 

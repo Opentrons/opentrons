@@ -18,8 +18,8 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { Divider } from '/app/atoms/structure'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,

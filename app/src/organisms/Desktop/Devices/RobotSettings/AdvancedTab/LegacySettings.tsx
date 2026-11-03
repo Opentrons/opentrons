@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
 import type { MouseEventHandler, ReactNode } from 'react'

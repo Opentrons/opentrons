@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 
 import type { ReactNode } from 'react'
 
@@ -25,6 +25,7 @@ export function CompleteUpdateSoftware({
 }: CompleteUpdateSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'robot_controls'])
 
+  // TODO (jj, 2026-10-29): ProgressBar is a desktop component. We should replace this on ODD.
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex

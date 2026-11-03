@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, ListItem, StyledText } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { SmallButton } from '/app/components/ODD/buttons'
 
 import styles from './media.module.css'

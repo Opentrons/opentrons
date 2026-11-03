@@ -5,7 +5,7 @@ import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { TouchControlButton } from '..'
+import { TouchControlButton } from '../TouchControlButton'
 
 import type { ComponentProps } from 'react'
 

@@ -12,7 +12,7 @@ import {
 import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 import { i18n } from '/app/i18n'
 import {
   InterventionModal,
@@ -50,7 +50,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/resources/runs')
-vi.mock('/app/atoms/ProgressBar')
+vi.mock('/app/components/desktop/ProgressBar')
 vi.mock('/app/organisms/InterventionModal')
 vi.mock('../../Devices/hooks')
 vi.mock('/app/resources/protocols/hooks')

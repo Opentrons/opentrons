@@ -43,7 +43,7 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { MiniCard } from '/app/components/desktop/cards/MiniCard'
 import { MultiSlideout } from '/app/components/desktop/Slideout/MultiSlideout'
 import { UploadInput } from '/app/components/desktop/UploadInput'

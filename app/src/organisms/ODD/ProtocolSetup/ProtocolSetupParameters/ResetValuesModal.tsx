@@ -15,7 +15,7 @@ import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '../../../../components/ODD/modals/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface ResetValuesModalProps {
   runTimeParametersOverrides: RunTimeParameter[]

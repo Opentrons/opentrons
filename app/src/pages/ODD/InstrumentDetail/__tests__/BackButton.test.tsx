@@ -8,7 +8,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { BackButton } from '..'
+import { BackButton } from '../BackButton'
 
 import type { HTMLProps } from 'react'
 

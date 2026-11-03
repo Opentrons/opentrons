@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useLEDLights } from '/app/resources/robot-settings'
 
 import type { ReactNode } from 'react'

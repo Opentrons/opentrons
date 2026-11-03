@@ -1,4 +1,5 @@
-import { withStyleProps } from '../../../../components/src/hocs/withStyleProps'
+import { withStyleProps } from '@opentrons/components'
+
 import styles from './submitprimarybutton.module.css'
 
 import type { ComponentProps, FC } from 'react'

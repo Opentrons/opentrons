@@ -16,7 +16,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TextOnlyButton } from '/app/atoms/buttons'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
 
 import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'

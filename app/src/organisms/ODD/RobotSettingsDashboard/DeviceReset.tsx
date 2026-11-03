@@ -23,7 +23,7 @@ import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useRes
 
 import type { ReactNode } from 'react'
 import type { ResetConfigRequest } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '../../../components/ODD/modals/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { SetSettingOption } from './types'
 
 interface LabelProps {
