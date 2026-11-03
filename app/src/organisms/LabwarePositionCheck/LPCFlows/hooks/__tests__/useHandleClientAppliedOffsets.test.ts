@@ -189,5 +189,4 @@ describe('useHandleClientAppliedOffsets', () => {
     expect(mockClearClientData).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
-
 })
