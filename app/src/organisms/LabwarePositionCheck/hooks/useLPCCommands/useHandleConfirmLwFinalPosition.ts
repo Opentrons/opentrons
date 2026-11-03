@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 import {
   moduleCleanupDuringLPCCommands,
@@ -29,6 +29,7 @@ export interface UseHandleConfirmPositionResult {
   ) => Promise<Vector3D>
   /* Retract, module cleanup, and move labware off deck after a successful capture. */
   handlePostConfirmCleanup: () => Promise<void>
+  hasPendingPostConfirmCleanup: boolean
 }
 
 export function useHandleConfirmLwFinalPosition({
@@ -36,6 +37,8 @@ export function useHandleConfirmLwFinalPosition({
   chainLPCCommands,
 }: UseHandleConfirmPositionProps): UseHandleConfirmPositionResult {
   const pendingCleanupRef = useRef<PendingPostConfirmCleanup | null>(null)
+  const [hasPendingPostConfirmCleanup, setHasPendingPostConfirmCleanup] =
+    useState(false)
 
   const handleConfirmLwFinalPosition = (
     offsetLocationDetails: OffsetLocationDetails,
@@ -64,6 +67,7 @@ export function useHandleConfirmLwFinalPosition({
             pipette,
             position,
           }
+          setHasPendingPostConfirmCleanup(true)
           return Promise.resolve(position)
         } else {
           setErrorMessage('CheckItem failed to save final position.')
@@ -90,10 +94,15 @@ export function useHandleConfirmLwFinalPosition({
 
     return chainLPCCommands(cleanupCommands, false).then(() => {
       pendingCleanupRef.current = null
+      setHasPendingPostConfirmCleanup(false)
     })
   }
 
-  return { handleConfirmLwFinalPosition, handlePostConfirmCleanup }
+  return {
+    handleConfirmLwFinalPosition,
+    handlePostConfirmCleanup,
+    hasPendingPostConfirmCleanup,
+  }
 }
 
 function isSameConfirmTarget(

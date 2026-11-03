@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -93,6 +93,7 @@ describe('useHandleConfirmLwFinalPosition', () => {
 
     expect(result.current).toHaveProperty('handleConfirmLwFinalPosition')
     expect(result.current).toHaveProperty('handlePostConfirmCleanup')
+    expect(result.current.hasPendingPostConfirmCleanup).toBe(false)
     expect(typeof result.current.handleConfirmLwFinalPosition).toBe('function')
     expect(typeof result.current.handlePostConfirmCleanup).toBe('function')
   })
@@ -118,6 +119,9 @@ describe('useHandleConfirmLwFinalPosition', () => {
     )
 
     expect(position).toEqual(mockPosition)
+    await waitFor(() => {
+      expect(result.current.hasPendingPostConfirmCleanup).toBe(true)
+    })
   })
 
   it('should chain retract and cleanup when handlePostConfirmCleanup is called', async () => {
@@ -164,6 +168,9 @@ describe('useHandleConfirmLwFinalPosition', () => {
       ],
       false
     )
+    await waitFor(() => {
+      expect(result.current.hasPendingPostConfirmCleanup).toBe(false)
+    })
   })
 
   it('should reuse the captured pose when cleanup fails and confirm is retried', async () => {
@@ -180,6 +187,9 @@ describe('useHandleConfirmLwFinalPosition', () => {
     await expect(result.current.handlePostConfirmCleanup()).rejects.toThrow(
       'door open'
     )
+    await waitFor(() => {
+      expect(result.current.hasPendingPostConfirmCleanup).toBe(true)
+    })
 
     mockChainLPCCommands.mockClear()
     mockChainLPCCommands.mockResolvedValueOnce([
