@@ -6,7 +6,6 @@ import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
@@ -29,10 +28,7 @@ import {
 import { useLPCAnalytics } from './useLPCAnalytics'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type {
-  LegacySupportLPCFlowsProps,
-  LPCFlowsProps,
-} from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 import type { State } from '/app/redux/types'
 
 const RUN_RECORD_INTERVAL_MS = 1000 * 5
@@ -46,7 +42,7 @@ interface UseLPCFlowsBase {
   showLPC: boolean
   lpcProps: LPCFlowsProps | null
   isLaunchingLPC: boolean
-  isFlexLPCInitializing: boolean
+  isLPCInitializing: boolean
   launchLPC: () => Promise<void>
 }
 interface UseLPCFlowsIdle extends UseLPCFlowsBase {
@@ -55,7 +51,7 @@ interface UseLPCFlowsIdle extends UseLPCFlowsBase {
 }
 interface UseLPCFlowsLaunched extends UseLPCFlowsBase {
   showLPC: true
-  lpcProps: LegacySupportLPCFlowsProps
+  lpcProps: LPCFlowsProps
   isLaunchingLPC: false
 }
 export type UseLPCFlowsResult = UseLPCFlowsIdle | UseLPCFlowsLaunched
@@ -108,7 +104,6 @@ export function useLPCFlows({
     promptForDocumentation
   )
 
-  const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: RUN_RECORD_INTERVAL_MS,
@@ -128,21 +123,16 @@ export function useLPCFlows({
     [compatibleRobotAnalysis?.commands.length]
   )
 
-  const {
-    labwareInfo,
-    storedOffsets: flexOffsets,
-    legacyOffsets: ot2Offsets,
-  } = useLPCLabwareInfo({
+  const { labwareInfo, storedOffsets } = useLPCLabwareInfo({
     labwareDefs,
     protocolData: compatibleRobotAnalysis,
-    robotType,
     runId,
   })
 
-  useOffsetConflictTimestamp(isFlex, runId, runRecord)
-  useUpdateDeckConfig(isFlex, runId, deckConfig)
-  useUpdateLabware(isFlex, runId, maintenanceRunId, labwareInfo)
-  useHandleClientAppliedOffsets(isFlex, runId)
+  useOffsetConflictTimestamp(runId, runRecord)
+  useUpdateDeckConfig(runId, deckConfig)
+  useUpdateLabware(runId, maintenanceRunId, labwareInfo)
+  useHandleClientAppliedOffsets(runId)
   useInitLPCStore({
     runId,
     runRecord,
@@ -152,8 +142,7 @@ export function useLPCFlows({
     labwareDefs,
     labwareInfo,
     deckConfig,
-    isFlex,
-    flexStoredOffsets: flexOffsets,
+    storedOffsets,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
@@ -197,26 +186,19 @@ export function useLPCFlows({
     (state: State) => state?.protocolRuns[runId ?? '']?.lpc != null
   )
 
-  const isFlexLPCInitializing = flexOffsets == null || !hasLpcState
+  const isLPCInitializing = storedOffsets == null || !hasLpcState
   const isWaitingForDocumentation =
     promptForDocumentation && !isDocumentationProvided(commandDocState)
   const isLaunchBlocked =
     isDocumentationLoading ||
-    (isFlex && isFlexLPCInitializing) ||
+    isLPCInitializing ||
     !isDocumentationProvided(commandDocState)
 
   const createLPCMaintenanceRun = useCallback((): Promise<void> => {
-    // Inject OT-2 offsets into the maintenance run upon creation.
-    // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
-    const injectedOffsets =
-      robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
-
-    return createTargetedMaintenanceRun(injectedOffsets).then(
-      maintenanceRun => {
-        setMaintenanceRunId(maintenanceRun.data.id)
-      }
-    )
-  }, [createTargetedMaintenanceRun, ot2Offsets, robotType])
+    return createTargetedMaintenanceRun({}).then(maintenanceRun => {
+      setMaintenanceRunId(maintenanceRun.data.id)
+    })
+  }, [createTargetedMaintenanceRun])
 
   // If documentation or Flex offset queries are still loading, queue the launch
   // and run it once prerequisites are ready.
@@ -274,20 +256,18 @@ export function useLPCFlows({
     ? {
         launchLPC,
         isLaunchingLPC: false,
-        isFlexLPCInitializing,
+        isLPCInitializing,
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
           isClosing,
           runId,
-          robotType,
           deckConfig,
           labwareDefs,
           labwareInfo,
           analysis: compatibleRobotAnalysis,
           protocolName,
           maintenanceRunId,
-          ot2Offsets,
           analytics,
           commandDocState,
           actionsToDocument,
@@ -298,7 +278,7 @@ export function useLPCFlows({
         launchLPC,
         isLaunchingLPC:
           isLaunching || isWaitingForDocumentation || isDocumentationLoading,
-        isFlexLPCInitializing,
+        isLPCInitializing,
         lpcProps: null,
         showLPC,
       }
