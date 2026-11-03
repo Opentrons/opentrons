@@ -20,6 +20,7 @@ describe('useProtocolDropTipModal', () => {
   beforeEach(() => {
     props = {
       hasPipetteWithTip: true,
+      isPromptDismissed: false,
       enableDTWiz: vi.fn(),
       onSkipAndHome: vi.fn(),
       pipetteInfo: {
@@ -66,6 +67,26 @@ describe('useProtocolDropTipModal', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
     expect(result.current.showModal).toBe(true)
+  })
+
+  it('should not show modal when the drop tip prompt is dismissed', () => {
+    props.isPromptDismissed = true
+    const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(false)
+  })
+
+  it('should hide an open modal when the prompt is later dismissed', () => {
+    const { result, rerender } = renderHook(() =>
+      useProtocolDropTipModal(props)
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    props.isPromptDismissed = true
+    rerender()
+
+    expect(result.current.showModal).toBe(false)
   })
 
   it('should call homePipettes when onDTModalSkip is called', () => {

@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
@@ -6,8 +7,12 @@ import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminatingOrTerminal } from '/app/local-resources/runs/utils'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
+import {
+  selectDropTipPromptDismissed,
+  setDropTipPromptDismissed,
+} from '/app/redux/protocol-runs'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
-import { useRunCommands } from '/app/resources/runs'
+import { useMostRecentRunId, useRunCommands } from '/app/resources/runs'
 
 import { useProtocolDropTipModal } from '../modals'
 
@@ -43,20 +48,39 @@ export function useRunHeaderDropTip({
   robotType,
   runStatus,
 }: UseRunHeaderDropTipParams): UseRunHeaderDropTipResult {
+  const dispatch = useDispatch()
+  const isPromptDismissed = useSelector(selectDropTipPromptDismissed(runId))
+  const isMostRecentRun = useMostRecentRunId() === runId
+
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
   const { determineTipStatus, resetTipStatus, aPipetteWithTip } =
     useTipAttachmentStatus()
 
+  const dismissDropTipPrompt = useCallback((): void => {
+    dispatch(setDropTipPromptDismissed(runId))
+  }, [dispatch, runId])
+
+  const checkTipStatus = useCallback((): void => {
+    void determineTipStatus().then(pipettesWithTip => {
+      if (pipettesWithTip.length === 0) {
+        dismissDropTipPrompt()
+      }
+    })
+  }, [determineTipStatus, dismissDropTipPrompt])
+
   const dropTipModalUtils = useProtocolDropTipModal({
-    hasPipetteWithTip: aPipetteWithTip != null,
+    hasPipetteWithTip:
+      aPipetteWithTip != null && isMostRecentRun && !isPromptDismissed,
+    isPromptDismissed,
     enableDTWiz,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
+    onSkipAndHome: dismissDropTipPrompt,
   })
 
   const onCloseFlow = (): void => {
     disableDTWiz()
-    void determineTipStatus()
+    checkTipStatus()
   }
 
   const buildDTWizUtils = (): RunHeaderDropTipWizProps => {
@@ -93,18 +117,22 @@ export function useRunHeaderDropTip({
     if (runStatus === RUN_STATUS_IDLE) {
       resetTipStatus()
     } else if (
+      isMostRecentRun &&
+      !isPromptDismissed &&
       runSummaryNoFixit != null &&
       !tipCheckSkippedBecauseER &&
       isRunTerminatingOrTerminal
     ) {
-      void determineTipStatus()
+      checkTipStatus()
     }
   }, [
     runStatus,
+    isMostRecentRun,
+    isPromptDismissed,
     isRunTerminatingOrTerminal,
     runSummaryNoFixit,
     tipCheckSkippedBecauseER,
-    determineTipStatus,
+    checkTipStatus,
     resetTipStatus,
   ])
 

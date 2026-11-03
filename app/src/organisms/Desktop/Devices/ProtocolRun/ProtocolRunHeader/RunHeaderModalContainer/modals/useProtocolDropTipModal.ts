@@ -10,8 +10,9 @@ type UseProtocolDropTipModalProps = Pick<
   'pipetteInfo'
 > & {
   hasPipetteWithTip: boolean
+  isPromptDismissed: boolean
   enableDTWiz: () => void
-  onSkipAndHome?: () => void
+  onSkipAndHome: () => void
 }
 
 export type UseProtocolDropTipModalResult =
@@ -24,32 +25,32 @@ export type UseProtocolDropTipModalResult =
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
   hasPipetteWithTip,
+  isPromptDismissed,
   enableDTWiz,
   onSkipAndHome,
   pipetteInfo,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
-  const [showModal, setShowModal] = useState(hasPipetteWithTip)
-  // After skip-and-home, keep the modal closed even if tip state briefly lags.
-  const [hasSkipped, setHasSkipped] = useState(false)
+  const [showModal, setShowModal] = useState(
+    hasPipetteWithTip && !isPromptDismissed
+  )
 
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
     onSuccess: () => {
-      setHasSkipped(true)
       setShowModal(false)
-      onSkipAndHome?.()
+      onSkipAndHome()
     },
   })
 
   useEffect(() => {
-    if (hasSkipped) {
+    if (isPromptDismissed) {
       setShowModal(false)
       return
     }
     if (!isHoming) {
       setShowModal(hasPipetteWithTip)
     }
-  }, [hasPipetteWithTip, hasSkipped, isHoming])
+  }, [hasPipetteWithTip, isPromptDismissed, isHoming])
 
   const onSkip = (): void => {
     void homePipettes()
