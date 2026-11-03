@@ -30,6 +30,8 @@ describe('useHandleConfirmLwFinalPosition', () => {
 
   const mockOffsetLocationDetails = {
     labwareId: 'labware-456',
+    kind: 'default',
+    addressableAreaName: 'C2',
     closestBeneathModuleId: 'module-789',
   } as any
 
@@ -84,16 +86,18 @@ describe('useHandleConfirmLwFinalPosition', () => {
     ])
   })
 
-  it('should return handleConfirmLwFinalPosition function', () => {
+  it('should return handleConfirmLwFinalPosition and handlePostConfirmCleanup', () => {
     const { result } = renderHook(() =>
       useHandleConfirmLwFinalPosition(mockProps)
     )
 
     expect(result.current).toHaveProperty('handleConfirmLwFinalPosition')
+    expect(result.current).toHaveProperty('handlePostConfirmCleanup')
     expect(typeof result.current.handleConfirmLwFinalPosition).toBe('function')
+    expect(typeof result.current.handlePostConfirmCleanup).toBe('function')
   })
 
-  it('should chain commands in the correct order when handleConfirmLwFinalPosition is called', async () => {
+  it('should only chain savePosition when handleConfirmLwFinalPosition is called', async () => {
     const { result } = renderHook(() =>
       useHandleConfirmLwFinalPosition(mockProps)
     )
@@ -104,6 +108,32 @@ describe('useHandleConfirmLwFinalPosition', () => {
     )
 
     expect(savePositionCommands).toHaveBeenCalledWith(mockPipette.id)
+    expect(retractPipetteAxesSequentiallyCommands).not.toHaveBeenCalled()
+    expect(moduleCleanupDuringLPCCommands).not.toHaveBeenCalled()
+    expect(moveLabwareOffDeckCommands).not.toHaveBeenCalled()
+
+    expect(mockChainLPCCommands).toHaveBeenCalledWith(
+      [{ commandType: 'savePosition', params: { pipetteId: mockPipette.id } }],
+      false
+    )
+
+    expect(position).toEqual(mockPosition)
+  })
+
+  it('should chain retract and cleanup when handlePostConfirmCleanup is called', async () => {
+    const { result } = renderHook(() =>
+      useHandleConfirmLwFinalPosition(mockProps)
+    )
+
+    await result.current.handleConfirmLwFinalPosition(
+      mockOffsetLocationDetails,
+      mockPipette
+    )
+    mockChainLPCCommands.mockClear()
+    mockChainLPCCommands.mockResolvedValueOnce([])
+
+    await result.current.handlePostConfirmCleanup()
+
     expect(retractPipetteAxesSequentiallyCommands).toHaveBeenCalledWith(
       mockPipette
     )
@@ -116,7 +146,6 @@ describe('useHandleConfirmLwFinalPosition', () => {
 
     expect(mockChainLPCCommands).toHaveBeenCalledWith(
       [
-        { commandType: 'savePosition', params: { pipetteId: mockPipette.id } },
         {
           commandType: 'retractPipetteAxesSequentially',
           params: { pipetteId: mockPipette.id },
@@ -135,8 +164,85 @@ describe('useHandleConfirmLwFinalPosition', () => {
       ],
       false
     )
+  })
 
-    expect(position).toEqual(mockPosition)
+  it('should reuse the captured pose when cleanup fails and confirm is retried', async () => {
+    const { result } = renderHook(() =>
+      useHandleConfirmLwFinalPosition(mockProps)
+    )
+
+    const firstPosition = await result.current.handleConfirmLwFinalPosition(
+      mockOffsetLocationDetails,
+      mockPipette
+    )
+
+    mockChainLPCCommands.mockRejectedValueOnce(new Error('door open'))
+    await expect(result.current.handlePostConfirmCleanup()).rejects.toThrow(
+      'door open'
+    )
+
+    mockChainLPCCommands.mockClear()
+    mockChainLPCCommands.mockResolvedValueOnce([
+      {
+        data: {
+          commandType: 'savePosition',
+          result: { position: { x: 1, y: 2, z: 250 } },
+        },
+      },
+    ])
+
+    const retryPosition = await result.current.handleConfirmLwFinalPosition(
+      mockOffsetLocationDetails,
+      mockPipette
+    )
+
+    expect(retryPosition).toEqual(firstPosition)
+    expect(mockChainLPCCommands).not.toHaveBeenCalled()
+  })
+
+  it('should recapture after cleanup succeeds', async () => {
+    const { result } = renderHook(() =>
+      useHandleConfirmLwFinalPosition(mockProps)
+    )
+
+    await result.current.handleConfirmLwFinalPosition(
+      mockOffsetLocationDetails,
+      mockPipette
+    )
+    mockChainLPCCommands.mockResolvedValueOnce([])
+    await result.current.handlePostConfirmCleanup()
+
+    const nextPosition = { x: 4, y: 5, z: 6 }
+    mockChainLPCCommands.mockClear()
+    mockChainLPCCommands.mockResolvedValueOnce([
+      {
+        data: {
+          commandType: 'savePosition',
+          result: { position: nextPosition },
+        },
+      },
+    ])
+
+    const position = await result.current.handleConfirmLwFinalPosition(
+      mockOffsetLocationDetails,
+      mockPipette
+    )
+
+    expect(position).toEqual(nextPosition)
+    expect(mockChainLPCCommands).toHaveBeenCalledWith(
+      [{ commandType: 'savePosition', params: { pipetteId: mockPipette.id } }],
+      false
+    )
+  })
+
+  it('should no-op cleanup when nothing is pending', async () => {
+    const { result } = renderHook(() =>
+      useHandleConfirmLwFinalPosition(mockProps)
+    )
+
+    await result.current.handlePostConfirmCleanup()
+
+    expect(mockChainLPCCommands).not.toHaveBeenCalled()
   })
 
   it('should reject with error when command response is incorrect', async () => {
