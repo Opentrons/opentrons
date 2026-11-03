@@ -144,4 +144,3 @@ describe('LPCDoorOpen', () => {
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })
-

@@ -310,15 +310,11 @@ describe('EditOffset', () => {
       await waitFor(() => {
         expect(mockDispatch).toHaveBeenCalledWith(mockSetFinalPositionAction)
       })
-      expect(setFinalPosition).toHaveBeenCalledWith(
-        props.runId,
-        false,
-        {
-          labwareUri: 'test-labware-uri',
-          location: mockOffsetLocationDetails,
-          position: mockPosition,
-        }
-      )
+      expect(setFinalPosition).toHaveBeenCalledWith(props.runId, false, {
+        labwareUri: 'test-labware-uri',
+        location: mockOffsetLocationDetails,
+        position: mockPosition,
+      })
       expect(mockHandlePostConfirmCleanup).toHaveBeenCalled()
       await waitFor(() => {
         expect(proceedEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
@@ -341,4 +337,3 @@ describe('EditOffset', () => {
     })
   })
 })
-
