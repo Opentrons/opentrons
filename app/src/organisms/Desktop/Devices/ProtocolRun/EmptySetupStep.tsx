@@ -16,9 +16,7 @@ export function EmptySetupStep(props: EmptySetupStepProps): ReactNode {
     <div className={styles.container}>
       <div className={styles.text_container}>
         <StyledText desktopStyle="bodyDefaultSemiBold">{title}</StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {description}
-        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{description}</StyledText>
       </div>
       {rightElement}
     </div>
