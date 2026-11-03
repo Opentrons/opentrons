@@ -38,9 +38,9 @@ export interface UseLPCAnalyticsProps {
 export interface UseLPCAnalyticsResult {
   /* Report when a user launches LPC, generating a wizard session id. */
   reportLaunchLpcWizard: () => void
-  /* Report when a user clicks the 'apply offsets' button. Effectively a Flex only event. */
+  /* Report when a user clicks the 'apply offsets' button. */
   reportApplyOffsets: (data: LabwareOffsetCreateData[]) => void
-  /* Report all the modified offsets when a user saves to the database. Flex only. */
+  /* Report all the modified offsets when a user saves to the database. */
   reportSaveOffset: (
     params: [StoredLabwareOffset[], StoredLabwareOffset[]]
   ) => void

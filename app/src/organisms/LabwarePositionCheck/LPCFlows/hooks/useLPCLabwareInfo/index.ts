@@ -29,8 +29,7 @@ export interface UseLPCLabwareInfoResult {
 }
 
 // Prepare LPC-able labware info for injection into LPC flows, querying for
-// existing offsets in the process. Only relevant network requests and utilities
-// are invoked depending on the robot type.
+// existing offsets in the process.
 export function useLPCLabwareInfo({
   labwareDefs,
   protocolData,

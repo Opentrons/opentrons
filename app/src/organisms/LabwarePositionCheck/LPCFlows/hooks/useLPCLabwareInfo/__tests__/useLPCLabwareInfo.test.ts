@@ -2,10 +2,12 @@ import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 
 import { useLPCLabwareInfo } from '..'
 import { getLPCLabwareInfoFrom } from '../getLPCLabwareInfoFrom'
@@ -27,7 +29,6 @@ describe('useLPCLabwareInfo', () => {
     filters: [{ definitionUri: 'labware-uri-1' }],
   } as any
   const MOCK_STORED_OFFSETS = [{ id: 'offset-1' }] as any
-  const MOCK_LEGACY_OFFSETS = [{ id: 'legacy-offset-1' }] as any
   const MOCK_LABWARE_INFO = { areOffsetsApplied: true } as any
 
   beforeEach(() => {
@@ -42,16 +43,15 @@ describe('useLPCLabwareInfo', () => {
     } as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
-        data: { labwareOffsets: MOCK_LEGACY_OFFSETS, status: RUN_STATUS_IDLE },
+        data: { status: RUN_STATUS_IDLE },
       },
     } as any)
   })
 
-  it('should return data from both OT2 and Flex hooks for Flex robot type', () => {
+  it('should return labware info and stored offsets', () => {
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
         runId: RUN_ID,
-        robotType: FLEX_ROBOT_TYPE,
         labwareDefs: LABWARE_DEFS,
         protocolData: PROTOCOL_DATA,
       })
@@ -60,15 +60,16 @@ describe('useLPCLabwareInfo', () => {
     expect(result.current).toEqual({
       labwareInfo: MOCK_LABWARE_INFO,
       storedOffsets: MOCK_STORED_OFFSETS,
-      legacyOffsets: MOCK_LEGACY_OFFSETS,
     })
 
     expect(getUniqueValidLwLocationInfoByAnalysis).toHaveBeenCalledWith({
       labwareDefs: LABWARE_DEFS,
       protocolData: PROTOCOL_DATA,
-      robotType: FLEX_ROBOT_TYPE,
     })
     expect(getLPCSearchParams).toHaveBeenCalledWith(MOCK_LW_LOCATION_COMBOS)
+    expect(useNotifyRunQuery).toHaveBeenCalledWith(RUN_ID, {
+      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    })
     expect(useNotifySearchLabwareOffsets).toHaveBeenCalledWith(
       MOCK_SEARCH_PARAMS,
       {
@@ -84,32 +85,10 @@ describe('useLPCLabwareInfo', () => {
     })
   })
 
-  it('should return data from both OT2 and Flex hooks for OT-2 robot type', () => {
-    const { result } = renderHook(() => {
-      return useLPCLabwareInfo({
-        runId: RUN_ID,
-        robotType: OT2_ROBOT_TYPE,
-        labwareDefs: LABWARE_DEFS,
-        protocolData: PROTOCOL_DATA,
-      })
-    })
-
-    expect(result.current).toEqual({
-      labwareInfo: MOCK_LABWARE_INFO,
-      storedOffsets: MOCK_STORED_OFFSETS,
-      legacyOffsets: MOCK_LEGACY_OFFSETS,
-    })
-
-    expect(useNotifyRunQuery).toHaveBeenCalledWith(RUN_ID, {
-      enabled: true,
-    })
-  })
-
   it('should handle null runId', () => {
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
         runId: null,
-        robotType: FLEX_ROBOT_TYPE,
         labwareDefs: LABWARE_DEFS,
         protocolData: PROTOCOL_DATA,
       })
@@ -118,28 +97,23 @@ describe('useLPCLabwareInfo', () => {
     expect(result.current).toEqual({
       labwareInfo: MOCK_LABWARE_INFO,
       storedOffsets: MOCK_STORED_OFFSETS,
-      legacyOffsets: MOCK_LEGACY_OFFSETS,
     })
 
     expect(useNotifyRunQuery).toHaveBeenCalledWith(null, {
-      enabled: false,
+      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     })
   })
 
   it('should not enable offset search if run status is not idle', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
-        data: {
-          labwareOffsets: MOCK_LEGACY_OFFSETS,
-          status: RUN_STATUS_RUNNING,
-        },
+        data: { status: RUN_STATUS_RUNNING },
       },
     } as any)
 
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
         runId: RUN_ID,
-        robotType: FLEX_ROBOT_TYPE,
         labwareDefs: LABWARE_DEFS,
         protocolData: PROTOCOL_DATA,
       })
@@ -148,7 +122,6 @@ describe('useLPCLabwareInfo', () => {
     expect(result.current).toEqual({
       labwareInfo: MOCK_LABWARE_INFO,
       storedOffsets: MOCK_STORED_OFFSETS,
-      legacyOffsets: MOCK_LEGACY_OFFSETS,
     })
 
     expect(useNotifySearchLabwareOffsets).toHaveBeenCalledWith(
@@ -168,7 +141,6 @@ describe('useLPCLabwareInfo', () => {
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
         runId: RUN_ID,
-        robotType: FLEX_ROBOT_TYPE,
         labwareDefs: LABWARE_DEFS,
         protocolData: PROTOCOL_DATA,
       })
@@ -183,23 +155,6 @@ describe('useLPCLabwareInfo', () => {
     })
   })
 
-  it('should handle undefined run record', () => {
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: undefined,
-    } as any)
-
-    const { result } = renderHook(() => {
-      return useLPCLabwareInfo({
-        runId: RUN_ID,
-        robotType: OT2_ROBOT_TYPE,
-        labwareDefs: LABWARE_DEFS,
-        protocolData: PROTOCOL_DATA,
-      })
-    })
-
-    expect(result.current.legacyOffsets).toEqual([])
-  })
-
   it('should handle empty stored offsets', () => {
     vi.mocked(useNotifySearchLabwareOffsets).mockReturnValue({
       data: undefined,
@@ -211,7 +166,6 @@ describe('useLPCLabwareInfo', () => {
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
         runId: RUN_ID,
-        robotType: FLEX_ROBOT_TYPE,
         labwareDefs: LABWARE_DEFS,
         protocolData: PROTOCOL_DATA,
       })

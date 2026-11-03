@@ -200,7 +200,7 @@ export function useLPCFlows({
     })
   }, [createTargetedMaintenanceRun])
 
-  // If documentation or Flex offset queries are still loading, queue the launch
+  // If documentation or offset queries are still loading, queue the launch
   // and run it once prerequisites are ready.
   useEffect(() => {
     if (isLaunchBlocked || pendingLaunchRef.current == null) {
