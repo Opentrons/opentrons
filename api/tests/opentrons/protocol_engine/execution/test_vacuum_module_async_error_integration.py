@@ -6,7 +6,7 @@ from typing import AsyncGenerator, List, Optional
 
 import pytest
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 from opentrons_shared_data.robot import load as load_robot
 
@@ -73,7 +73,7 @@ def ot3_engine_config() -> Config:
 @pytest.fixture
 def state_store(
     ot3_engine_config: Config,
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> StateStore:
     """Get a real StateStore for integration tests."""
     return StateStore(

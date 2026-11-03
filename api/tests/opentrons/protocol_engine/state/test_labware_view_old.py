@@ -12,7 +12,7 @@ from typing import Any, ContextManager, Dict, List, Optional, Union, cast
 import pytest
 from numpy import isclose
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
@@ -130,14 +130,14 @@ def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
-    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_definition: Optional[DeckDefinitionV6] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV5, {"fake": True}),
+        deck_definition=deck_definition or cast(DeckDefinitionV6, {"fake": True}),
     )
 
     return LabwareView(state=state)
@@ -862,7 +862,7 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV5) -> None:
+def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV6) -> None:
     """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 

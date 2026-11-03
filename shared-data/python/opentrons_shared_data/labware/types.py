@@ -213,7 +213,6 @@ class LocatingFeatures(TypedDict):
 
     slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
     slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
-    springDirectionalForce: NotRequired[SpringDirectionalForce]
     opentronsFlexTipRackLidAsParent: NotRequired[OpentronsFlexTipRackLidAsParentFeature]
     opentronsFlexTipRackLidAsChild: NotRequired[OpentronsFlexTipRackLidAsChildFeature]
     heaterShakerUniversalFlatAdapter: NotRequired[

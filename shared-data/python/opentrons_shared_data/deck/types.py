@@ -11,6 +11,7 @@ from typing_extensions import Literal, NotRequired, TypedDict
 from ..module.types import ModuleOrientation, ModuleType
 from opentrons_shared_data.labware.types import LocatingFeatures, SpringDirectionalForce
 
+DeckSchemaVersion6 = Literal[6]
 DeckSchemaVersion5 = Literal[5]
 DeckSchemaVersion4 = Literal[4]
 DeckSchemaVersion3 = Literal[3]

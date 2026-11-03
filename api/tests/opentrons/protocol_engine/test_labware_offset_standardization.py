@@ -5,7 +5,7 @@ from functools import lru_cache
 import pytest
 
 from opentrons_shared_data.deck import load
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_engine import labware_offset_standardization as subject
@@ -25,7 +25,7 @@ from opentrons.types import DeckSlotName
 
 
 @lru_cache
-def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV5:
+def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV6:
     """Get a deck from robot type."""
     if robot_type == "OT-3 Standard":
         return load("ot3_standard")

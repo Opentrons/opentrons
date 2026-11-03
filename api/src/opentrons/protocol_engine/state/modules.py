@@ -23,7 +23,7 @@ from numpy import double as npdouble
 from numpy.typing import NDArray
 from pydantic import BaseModel
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 
 from .. import errors
 from ..actions import (
@@ -773,7 +773,7 @@ class ModuleView:
         return None
 
     def get_by_addressable_area(
-        self, addressable_area_name: str, deck_definition: DeckDefinitionV5
+        self, addressable_area_name: str, deck_definition: DeckDefinitionV6
     ) -> Optional[LoadedModule]:
         """Get the module associated with this addressable area, if any.
 

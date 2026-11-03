@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict, Generic, List, Optional, Sequence, Tuple, Union
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -238,7 +238,7 @@ class AbstractProtocol(
     ) -> LabwareCoreType: ...
 
     @abstractmethod
-    def get_deck_definition(self) -> DeckDefinitionV5:
+    def get_deck_definition(self) -> DeckDefinitionV6:
         """Get the geometry definition of the robot's deck."""
 
     @abstractmethod

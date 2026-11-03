@@ -25,7 +25,7 @@ from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
 from opentrons_shared_data.robot.types import RobotType
 
@@ -75,9 +75,9 @@ from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 5)
+def ot3_standard_deck_def() -> DeckDefinitionV6:
+    """Get the OT-3 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 6)
 
 
 def get_addressable_area_view(
@@ -85,7 +85,7 @@ def get_addressable_area_view(
     potential_cutout_fixtures_by_cutout_id: Optional[
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
-    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_definition: Optional[DeckDefinitionV6] = None,
     deck_configuration: Optional[DeckConfigurationType] = None,
     robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
@@ -95,7 +95,7 @@ def get_addressable_area_view(
         loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
+        deck_definition=deck_definition or cast(DeckDefinitionV6, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
         robot_definition={
             "displayName": "OT-3",
@@ -479,7 +479,7 @@ def test_get_module_offset_for_ot3_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
     expected_offset: LabwareOffsetVector,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
@@ -2003,7 +2003,7 @@ def test_get_module_highest_z(
     deck_type: DeckType,
     slot_name: DeckSlotName,
     expected_highest_z: float,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> None:
     """It should get the highest z point of the module."""
     subject = make_module_view(
