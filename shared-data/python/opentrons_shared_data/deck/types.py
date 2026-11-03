@@ -6,10 +6,10 @@ This should only be imported if typing.TYPE_CHECKING is True
 
 from typing import Any, Dict, List, NewType, Union
 
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal, NotRequired, TypedDict
 
 from ..module.types import ModuleOrientation, ModuleType
-from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.labware.types import LocatingFeatures, SpringDirectionalForce
 
 DeckSchemaVersion5 = Literal[5]
 DeckSchemaVersion4 = Literal[4]
@@ -36,6 +36,10 @@ class BoundingBox(TypedDict):
     xDimension: float
     yDimension: float
     zDimension: float
+
+
+class _ProtoLocatingFeatures(TypedDict):
+    springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
 
 
 class SlotDefV3(TypedDict, total=False):
@@ -112,6 +116,15 @@ class AddressableAreaV5(_RequiredAddressableArea, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     ableToDropTips: bool
     ableToDropLabware: bool
+    features: _ProtoLocatingFeatures
+    orientation: Union[ModuleOrientation, None]
+
+
+class AddressableAreaV6(_RequiredAddressableArea, total=False):
+    compatibleModuleTypes: List[ModuleType]
+    matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
+    ableToDropTips: bool
+    ableToDropLabware: bool
     features: LocatingFeatures
     orientation: Union[ModuleOrientation, None]
 
@@ -152,6 +165,13 @@ class LocationsV4(TypedDict):
 
 class LocationsV5(TypedDict):
     addressableAreas: List[AddressableAreaV5]
+    calibrationPoints: List[CalibrationPoint]
+    cutouts: List[Cutout]
+    legacyFixtures: List[Fixture]
+
+
+class LocationsV6(TypedDict):
+    addressableAreas: List[AddressableAreaV6]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[Cutout]
     legacyFixtures: List[Fixture]
@@ -213,4 +233,21 @@ class DeckDefinitionV5(_RequiredDeckDefinitionV5, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
 
 
-DeckDefinition = Union[DeckDefinitionV3, DeckDefinitionV4, DeckDefinitionV5]
+class _RequiredDeckDefinitionV6(TypedDict):
+    otId: str
+    schemaVersion: Literal[6]
+    cornerOffsetFromOrigin: List[float]
+    dimensions: List[float]
+    metadata: Metadata
+    robot: Robot
+    locations: LocationsV6
+    cutoutFixtures: List[CutoutFixture]
+
+
+class DeckDefinitionV6(_RequiredDeckDefinitionV6, total=False):
+    gripperOffsets: Dict[str, GripperOffsets]
+
+
+DeckDefinition = Union[
+    DeckDefinitionV3, DeckDefinitionV4, DeckDefinitionV5, DeckDefinitionV6
+]
