@@ -488,11 +488,20 @@ export function ProtocolRunSetup({
                       title={t(`${stepKey}_title`)}
                       description={StepDetailMap[stepKey].description}
                       rightElement={
-                        isDeckHardwareEmpty ? undefined : (
-                          <StepRightElement
-                            {...StepDetailMap[stepKey].rightElProps}
-                          />
-                        )
+                        <StepRightElement
+                          {...(isDeckHardwareEmpty
+                            ? {
+                                stepKey: MODULE_SETUP_STEP_KEY,
+                                complete: true,
+                                completeText: t('deck_hardware_ready'),
+                                incompleteText: null,
+                                incompleteElement: null,
+                                disabledHardware: false,
+                                missingHardware: false,
+                                missingHardwareText: '',
+                              }
+                            : StepDetailMap[stepKey].rightElProps)}
+                        />
                       }
                     />
                   ) : (
