@@ -231,7 +231,7 @@
   "name": "Name",
   "no_custom_values": "No custom values specified",
   "no_data": "no data",
-  "no_deck_hardware_specified": "No deck hardware are specified for this protocol.",
+  "no_deck_hardware_specified": "No deck hardware is required for this protocol.",
   "no_files_found": "No files found",
   "no_labware_offset_data": "No labware offsets used in run",
   "no_modules_or_fixtures": "No modules or fixtures are specified for this protocol.",

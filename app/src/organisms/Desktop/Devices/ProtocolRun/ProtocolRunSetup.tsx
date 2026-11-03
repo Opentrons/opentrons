@@ -5,9 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Divider,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
@@ -71,6 +69,7 @@ import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
+import styles from './protocolrunsetup.module.css'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
@@ -456,11 +455,7 @@ export function ProtocolRunSetup({
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
-      margin={SPACING.spacing16}
-    >
+    <div className={styles.setup_container}>
       {isSetupLoading ? (
         <InfoScreen
           iconName="ot-spinner"
@@ -477,23 +472,27 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </LegacyStyledText>
           ) : (
-            orderedSteps.map((stepKey, index) => {
+            orderedSteps.map(stepKey => {
               const setupStepTitle = t(`${stepKey}_title`)
+              const isDeckHardwareEmpty =
+                stepKey === MODULE_SETUP_STEP_KEY &&
+                ((!isFlex && !hasModules) ||
+                  (isFlex && !hasModules && !hasFixtures))
               const showEmptySetupStep =
-                (stepKey === 'module_setup_step' &&
-                  ((!isFlex && !hasModules) ||
-                    (isFlex && !hasModules && !hasFixtures))) ||
-                (stepKey === 'labware_position_check_step' && noLwOffsetsInRun)
+                isDeckHardwareEmpty ||
+                (stepKey === LPC_STEP_KEY && noLwOffsetsInRun)
               return (
-                <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                <div className={styles.setup_step} key={stepKey}>
                   {showEmptySetupStep ? (
                     <EmptySetupStep
                       title={t(`${stepKey}_title`)}
                       description={StepDetailMap[stepKey].description}
                       rightElement={
-                        <StepRightElement
-                          {...StepDetailMap[stepKey].rightElProps}
-                        />
+                        isDeckHardwareEmpty ? undefined : (
+                          <StepRightElement
+                            {...StepDetailMap[stepKey].rightElProps}
+                          />
+                        )
                       }
                     />
                   ) : (
@@ -518,16 +517,13 @@ export function ProtocolRunSetup({
                       {StepDetailMap[stepKey].stepInternals}
                     </SetupStep>
                   )}
-                  {index !== orderedSteps.length - 1 ? (
-                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
-                  ) : null}
-                </Flex>
+                </div>
               )
             })
           )}
         </>
       )}
-    </Flex>
+    </div>
   )
 }
 
