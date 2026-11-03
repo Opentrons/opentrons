@@ -11,8 +11,8 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
+import { InstrumentCard } from '/app/components/desktop/cards/InstrumentCard'
 import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
-import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
@@ -26,7 +26,7 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
+import type { MenuOverlayItemProps } from '/app/components/desktop/cards/InstrumentCard/MenuOverlay'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,

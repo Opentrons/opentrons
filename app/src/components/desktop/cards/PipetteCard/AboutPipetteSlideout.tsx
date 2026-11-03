@@ -10,24 +10,28 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { Slideout } from '/app/components/desktop/Slideout'
 
-interface AboutGripperSlideoutProps {
-  serialNumber: string
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+interface AboutPipetteSlideoutProps {
+  pipetteId: string
+  pipetteName: PipetteModelSpecs['displayName']
   firmwareVersion?: string
   onCloseClick: () => unknown
   isExpanded: boolean
 }
 
-export const AboutGripperSlideout = (
-  props: AboutGripperSlideoutProps
+export const AboutPipetteSlideout = (
+  props: AboutPipetteSlideoutProps
 ): JSX.Element | null => {
-  const { serialNumber, firmwareVersion, isExpanded, onCloseClick } = props
-  const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
+  const { pipetteId, pipetteName, isExpanded, firmwareVersion, onCloseClick } =
+    props
+  const { i18n, t } = useTranslation(['device_details', 'shared'])
 
   return (
     <Slideout
-      title={t('branded:about_flex_gripper')}
+      title={t('about_pipette_name', { name: pipetteName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -63,11 +67,16 @@ export const AboutGripperSlideout = (
           forwardedAs="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey60}
+          data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
-        <StyledText forwardedAs="p" paddingTop={SPACING.spacing4}>
-          {serialNumber}
+        <StyledText
+          forwardedAs="p"
+          paddingTop={SPACING.spacing4}
+          data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
+        >
+          {pipetteId}
         </StyledText>
       </Flex>
     </Slideout>

@@ -10,11 +10,11 @@ import {
   useLongPress,
 } from '@opentrons/components'
 
+import { QuaternaryButton } from '../../components/desktop/buttons/QuaternaryButton'
+import { TertiaryButton } from '../../components/desktop/buttons/TertiaryButton'
 import { AccountIconButton } from './AccountIconButton'
 import {
-  QuaternaryButton,
   SubmitPrimaryButton,
-  TertiaryButton,
   TextOnlyButton,
   ToggleButton,
   TouchControlButton,

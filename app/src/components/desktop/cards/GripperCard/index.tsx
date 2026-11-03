@@ -5,8 +5,8 @@ import { css } from 'styled-components'
 import { InlineNotification } from '@opentrons/components'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 
+import { InstrumentCard } from '/app/components/desktop/cards/InstrumentCard'
 import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
-import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
@@ -14,7 +14,7 @@ import { AboutGripperSlideout } from './AboutGripperSlideout'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
-import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
+import type { MenuOverlayItemProps } from '/app/components/desktop/cards/InstrumentCard/MenuOverlay'
 import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
 interface GripperCardProps {

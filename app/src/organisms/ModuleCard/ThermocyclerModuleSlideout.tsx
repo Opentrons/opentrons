@@ -21,7 +21,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
-import { Slideout } from '/app/atoms/Slideout'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 

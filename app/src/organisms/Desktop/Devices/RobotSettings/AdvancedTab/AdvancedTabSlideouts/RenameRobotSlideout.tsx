@@ -17,7 +17,7 @@ import {
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'

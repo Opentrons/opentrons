@@ -32,16 +32,15 @@ import {
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
+import { ProtocolAnalysisFailure } from '/app/organisms/Desktop/ProtocolAnalysisFailure'
+import { ProtocolAnalysisStale } from '/app/organisms/Desktop/ProtocolAnalysisFailure/ProtocolAnalysisStale'
+import { ProtocolOverflowMenu } from '/app/organisms/Desktop/ProtocolsLanding/ProtocolOverflowMenu'
+import { ProtocolStatusBanner } from '/app/organisms/Desktop/ProtocolStatusBanner'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import { openOT2App } from '/app/redux/shell'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolUsesGripper } from '/app/transformations/commands'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
-
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
-import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'

@@ -47,9 +47,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { Slideout } from '/app/atoms/Slideout'
-import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
-import { UploadInput } from '/app/molecules/UploadInput'
+import { Slideout } from '/app/components/desktop/Slideout'
+import { MultiSlideout } from '/app/components/desktop/Slideout/MultiSlideout'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   getConnectableRobots,
@@ -67,7 +67,7 @@ import { FileCard } from './FileCard'
 import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
-import type { SlideoutProps } from '/app/atoms/Slideout'
+import type { SlideoutProps } from '/app/components/desktop/Slideout'
 import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
