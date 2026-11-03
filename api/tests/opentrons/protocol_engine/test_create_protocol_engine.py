@@ -31,7 +31,6 @@ def ot3_standard_deck_def() -> DeckDefinitionV6:
     return load_deck(STANDARD_OT3_DECK, 6)
 
 
-
 async def test_create_engine_initializes_state_with_no_fixed_trash(
     hardware_api: HardwareAPI,
     ot3_standard_deck_def: DeckDefinitionV6,
@@ -52,7 +51,6 @@ async def test_create_engine_initializes_state_with_no_fixed_trash(
     assert isinstance(engine, ProtocolEngine)
     assert state.labware.get_deck_definition() == ot3_standard_deck_def
     assert state.labware.get_all() == []
-
 
 
 async def test_create_engine_initializes_state_with_fixed_trash(

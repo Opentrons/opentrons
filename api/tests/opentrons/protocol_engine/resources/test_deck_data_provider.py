@@ -2,7 +2,6 @@
 
 import pytest
 from decoy import Decoy
-from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
