@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 
 import type { ReactNode } from 'react'

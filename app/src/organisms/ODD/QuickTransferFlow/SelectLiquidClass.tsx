@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { ACTIONS } from './constants'
@@ -18,7 +18,7 @@ import { checkLiquidClassCompatibility } from './utils'
 
 import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { LiquidClass, LiquidClassType } from '@opentrons/shared-data'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,

@@ -13,8 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { MediumButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'

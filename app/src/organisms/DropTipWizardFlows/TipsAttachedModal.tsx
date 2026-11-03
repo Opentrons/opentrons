@@ -10,16 +10,16 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useHomePipettes } from '/app/local-resources/instruments'
-import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 

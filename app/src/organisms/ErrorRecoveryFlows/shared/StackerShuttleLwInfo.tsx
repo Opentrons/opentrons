@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import ShuttleLabware from '/app/assets/videos/error-recovery/FlexStacker_LoadLabwareOnShuttle.webm'
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'

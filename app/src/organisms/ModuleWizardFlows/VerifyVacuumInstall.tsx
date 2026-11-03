@@ -19,8 +19,8 @@ import {
 
 import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
 import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
-import { SmallButton } from '/app/atoms/buttons'
 import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,

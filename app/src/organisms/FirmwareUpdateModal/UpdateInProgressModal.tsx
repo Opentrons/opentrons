@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'

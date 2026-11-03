@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 

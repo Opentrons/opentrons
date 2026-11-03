@@ -8,12 +8,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
 import type { ComponentProps, Dispatch, ReactNode } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   PathOption,
   QuickTransferWizardAction,

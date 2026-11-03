@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'

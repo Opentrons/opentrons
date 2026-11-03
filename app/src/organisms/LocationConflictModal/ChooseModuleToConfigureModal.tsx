@@ -28,10 +28,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
-import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 

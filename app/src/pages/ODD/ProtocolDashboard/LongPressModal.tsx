@@ -16,8 +16,8 @@ import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { getTopPortalEl } from '/app/App/portal'
+import { SmallModalChildren } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 

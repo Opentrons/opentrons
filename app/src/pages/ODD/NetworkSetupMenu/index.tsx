@@ -7,7 +7,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { CardButton } from '/app/molecules/CardButton'
+import { CardButton } from '/app/components/ODD/CardButton'
 
 import styles from './networksetupmenu.module.css'
 

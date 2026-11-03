@@ -28,9 +28,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
@@ -39,7 +39,7 @@ import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
   OddModalHeaderBaseProps,
-} from '/app/molecules/OddModal/types'
+} from '/app/components/ODD/modals/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.

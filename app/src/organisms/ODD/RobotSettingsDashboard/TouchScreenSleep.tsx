@@ -9,8 +9,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,

@@ -18,8 +18,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TouchFloatingActionButton } from '/app/atoms/buttons'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { TouchFloatingActionButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'

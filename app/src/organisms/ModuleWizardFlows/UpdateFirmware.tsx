@@ -9,7 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'

@@ -1,4 +1,3 @@
-/* eslint-disable opentrons/no-imports-across-applications */
 // client entry point and application manifest
 import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
@@ -10,10 +9,10 @@ import { App } from './App'
 import { uiInitialized } from './redux/shell'
 import { store } from './redux/store'
 
-import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
-import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
-import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
+import '../src/components/ODD/keyboard/AlphanumericKeyboard'
+import '../src/components/ODD/keyboard/FullKeyboard/index.css'
+import '../src/components/ODD/keyboard/IndividualKey/index.css'
+import '../src/components/ODD/keyboard/NumericalKeyboard/index.css'
 import '@opentrons/components/styles/global'
 
 // export public types so they can be accessed by external deps

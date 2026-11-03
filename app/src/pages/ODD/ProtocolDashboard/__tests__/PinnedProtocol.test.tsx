@@ -5,11 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { PinnedProtocol } from '/app/components/ODD/cards/PinnedProtocol'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useFeatureFlag } from '/app/redux/config'
-
-import { PinnedProtocol } from '../PinnedProtocol'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

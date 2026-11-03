@@ -19,10 +19,10 @@ import {
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
-import { OddModal } from '/app/molecules/OddModal'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
@@ -30,7 +30,7 @@ import { UpdateResultsModal } from './UpdateResultsModal'
 
 import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void

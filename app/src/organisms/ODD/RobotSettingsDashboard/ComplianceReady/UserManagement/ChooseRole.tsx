@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { StepMeter } from '@opentrons/components'
 
-import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { ModalContentOneColSimpleButtons } from '/app/components/ODD/modals/InterventionModal'
 
-import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'

@@ -16,7 +16,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
+import { TextOnlyButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

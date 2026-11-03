@@ -14,8 +14,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { LANGUAGES } from '/app/i18n'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Icon, StyledText } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import styles from './cancelingmodal.module.css'
 
