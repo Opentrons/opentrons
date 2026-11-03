@@ -71,6 +71,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 | API Version | Introduced in Robot Software |
 |-------------|------------------------------|
+| 2.31        | 10.2.0                       |
 | 2.30        | 10.0.0                       |
 | 2.29        | 9.1.1                        |
 | 2.28        | 9.0.0 / OT-2 26.6.0          |
@@ -131,10 +132,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.27
 
-- Adds [concurrent module commands](modules/concurrent.md) to perform Temperature, Heater-Shaker, or Thermocycler Module actions alonside other protocol steps: 
+- Adds [concurrent module commands](modules/concurrent.md) to perform Temperature, Heater-Shaker, or Thermocycler Module actions alongside other protocol steps: 
     - [`TemperatureModuleContext.start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]
     - [`HeaterShakerContext.set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]
-    - [`ThermocyclerContext.start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature],[`ThermocycylerContext.start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature], and [`ThermocyclerContext.start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]
+    - [`ThermocyclerContext.start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature],[`ThermocyclerContext.start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature], and [`ThermocyclerContext.start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]
 - Control pipette movement while aspirating or dispensing: 
      - Use the `end_location` and `movement_delay` parameters to control pipette movement while [aspirating](building-block-commands/liquids.md#aspirate-building-block) or [dispensing](building-block-commands/liquids.md#dispense-building-block). 
      - Pipette relative to the [liquid meniscus](robot-position.md#meniscus) as liquid level changes. 
@@ -178,7 +179,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.20
 - Detect liquid presence within a well. The `InstrumentContext.detect_liquid_presence()` and `InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also enable [liquid presence detection][liquid-presence-detection] for all aspirations when loading a pipette, although this will add significant time to your protocol.
-- Define CSV runtime parameters and use their contents in a protocol with new [data manipulation methods][manipulating-csv-data]. See the [cherrypicking use case](runtime-parameters/use-case-cherrypicking.md) for a full example.
+- Define CSV runtime parameters and use their contents in a protocol with new [data manipulation methods][manipulating-csv-data]. See the [cherry-picking use case](runtime-parameters/use-case-cherrypicking.md) for a full example.
 - `configure_nozzle_layout()` now accepts row, single, and partial column layout constants. See [Partial Tip Pickup](pipettes/partial-tip-pickup.md).
 - You can now call `ProtocolContext.define_liquid()` without supplying a `description` or `display_color`.
 
