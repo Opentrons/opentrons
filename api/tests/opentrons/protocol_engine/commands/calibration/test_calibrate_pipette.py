@@ -19,7 +19,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
 )
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.types import InstrumentOffsetVector
-from opentrons.types import MountType, Point
+from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture(autouse=True)
@@ -53,6 +53,33 @@ async def test_calibrate_pipette_implementation(
         ),
         times=1,
     )
+
+    assert result == SuccessData(
+        public=CalibratePipetteResult(
+            pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+        ),
+    )
+
+
+@pytest.mark.ot3_only
+async def test_calibrate_pipette_uses_provided_slot(
+    decoy: Decoy, hardware_api: HardwareControlAPI
+) -> None:
+    """It should probe the requested deck slot."""
+    subject = CalibratePipetteImplementation(hardware_api=hardware_api)
+
+    params = CalibratePipetteParams(
+        mount=MountType.LEFT,
+        slot=DeckSlotName.SLOT_C2,
+    )
+
+    decoy.when(
+        await calibration.find_pipette_offset(
+            hcapi=hardware_api, mount=OT3Mount.LEFT, slot=5
+        )
+    ).then_return(Point(x=3, y=4, z=6))
+
+    result = await subject.execute(params)
 
     assert result == SuccessData(
         public=CalibratePipetteResult(

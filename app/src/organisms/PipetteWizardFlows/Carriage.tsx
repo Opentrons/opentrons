@@ -1,12 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 
-import { LegacyStyledText, PrimaryButton, SPACING } from '@opentrons/components'
+import { PrimaryButton, SPACING, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -48,10 +48,21 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
 
   return (
     <GenericWizardTile
-      header={i18n.format(
-        t(flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'),
-        'capitalize'
-      )}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(
+            t(
+              flowType === FLOWS.ATTACH
+                ? 'unscrew_carriage'
+                : 'reattach_carriage'
+            ),
+            'capitalize'
+          )}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.CARRIAGE,
         flowType,
@@ -64,8 +75,9 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <LegacyStyledText
-                css={BODY_STYLE}
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                oddStyle="bodyTextRegular"
                 marginBottom={SPACING.spacing16}
               />
             ),

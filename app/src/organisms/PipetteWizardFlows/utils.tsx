@@ -47,7 +47,8 @@ export function startCalibrationOnClick(
   props: PipetteWizardStepProps,
   pipetteId: string
 ): () => void {
-  const { chainRunCommands, proceed, handleCommandError, mount } = props
+  const { chainRunCommands, proceed, handleCommandError, mount, selectedSlot } =
+    props
   return () => {
     const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
     const verifyCommands: CreateCommand[] = [
@@ -71,7 +72,7 @@ export function startCalibrationOnClick(
       },
       {
         commandType: 'calibration/calibratePipette',
-        params: { mount },
+        params: { mount, slot: selectedSlot },
       },
       {
         commandType: 'calibration/moveToMaintenancePosition',
