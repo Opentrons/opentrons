@@ -23,7 +23,6 @@ import {
 
 import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
 import { SmallButton } from '/app/components/ODD/buttons'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { ReactNode } from 'react'
@@ -64,7 +63,6 @@ export interface GenericWizardTileProps {
   rightHandBody: ReactNode
   bodyText: ReactNode
   header: string | ReactNode
-  getHelp?: string
   back?: () => void
   proceed?: () => void
   proceedButtonText?: ReactNode
@@ -79,7 +77,6 @@ export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
     rightHandBody,
     bodyText,
     header,
-    getHelp,
     back,
     proceed,
     proceedButtonText,
@@ -93,18 +90,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   let buttonPositioning: string = ''
-  if (
-    (back != null || getHelp != null) &&
-    (proceedButton != null || proceed != null)
-  ) {
+  if (back != null && (proceedButton != null || proceed != null)) {
     buttonPositioning = JUSTIFY_SPACE_BETWEEN
-  } else if (
-    back == null &&
-    getHelp == null &&
-    (proceedButton != null || proceed != null)
-  ) {
+  } else if (back == null && (proceedButton != null || proceed != null)) {
     buttonPositioning = JUSTIFY_FLEX_END
-  } else if ((back != null || getHelp != null) && proceed == null) {
+  } else if (back != null && proceed == null) {
     buttonPositioning = JUSTIFY_START
   }
 
@@ -134,7 +124,6 @@ export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
             buttonText={t('go_back')}
           />
         ) : null}
-        {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
             <>

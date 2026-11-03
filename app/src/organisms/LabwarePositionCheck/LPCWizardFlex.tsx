@@ -29,9 +29,7 @@ import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LPCStep } from '/app/redux/protocol-runs'
 
-export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
-
-export function LPCWizardFlex(props: LPCWizardFlexProps): ReactNode {
+export function LPCWizardFlex(props: LPCFlowsProps): ReactNode {
   const proceedStep = (toStep?: LPCStep): void => {
     dispatch(proceedStepDispatch(props.runId, toStep))
   }

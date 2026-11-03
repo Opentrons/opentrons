@@ -21,7 +21,7 @@ import type {
   DocumentedAction,
 } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
+import type { LPCFlowsProps } from '../../LPCFlows'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'
 import type { UseHandleConfirmPositionResult } from './useHandleConfirmLwFinalPosition'
 import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModulePlacement'
@@ -33,7 +33,7 @@ import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
 import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
 
-export interface UseLPCCommandsProps extends LPCWizardFlexProps {
+export interface UseLPCCommandsProps extends LPCFlowsProps {
   commandDocState: DocumentationState
   actionsToDocument: DocumentedAction[]
   addActionToDocument: (action: DocumentedAction) => void

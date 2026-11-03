@@ -29,18 +29,16 @@ describe('GenericWizardTile', () => {
       proceed: vi.fn(),
       proceedButtonText: <div>Continue</div>,
       header: 'header',
-      getHelp: 'getHelpUrl',
     }
     vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
-  it('renders correct generic tile information with a help link', () => {
+  it('renders correct generic tile information', () => {
     render(props)
     screen.getByText('body')
     const btn = screen.getByText('Continue')
     screen.getByText('header')
     fireEvent.click(btn)
     expect(props.proceed).toHaveBeenCalled()
-    screen.getByText('Need help?')
     expect(screen.queryByText('Go back')).not.toBeInTheDocument()
   })
   it('renders correct generic tile information for on device display', () => {

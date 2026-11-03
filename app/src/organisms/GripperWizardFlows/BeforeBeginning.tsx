@@ -158,8 +158,6 @@ export const BeforeBeginning = (
   ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
-      //  TODO(BC, 11/8/22): wire up this URL and unhide the link!
-      // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={
         <WizardRequiredEquipmentList equipmentList={equipmentList} />
       }
