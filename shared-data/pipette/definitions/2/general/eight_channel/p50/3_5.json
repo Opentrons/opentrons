@@ -131,7 +131,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.09,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.09
               }
             }
           }
@@ -166,7 +168,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.8,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.8
               }
             }
           }
@@ -201,7 +205,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.98,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.98
               }
             }
           }
@@ -236,7 +242,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1":  9.93,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1":  9.93
               }
             }
           }
@@ -271,7 +279,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1":  9.82,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1":  9.82
               }
             }
           }
@@ -306,7 +316,9 @@
             "speed": 10,
             "tipOverlaps": {
               "v0": {
-                "default": 10.5
+                "default": 10.5,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1":  9.86,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1":  9.86
               }
             }
           }
