@@ -164,8 +164,8 @@ DUAL_MULTI_TRASH_SLOT = "A1"
 # - blank_trials handling and measurement loop ordering.
 #
 # Main extension zones:
-# - Runtime params: mounts_to_test, use_96ch_stackers.
-# - FixtureSettings.build(): dual impact connection, stacker bootstrap, shared
+# - Runtime params: mounts_to_test, use_96ch_stackers, use_impact_protection_v2.
+# - FixtureSettings.build(): independent impact connections, stacker bootstrap, shared
 #   tiprack offsets, and optional trash-bin setup.
 # - run() / _run_fixture(): per-mount orchestration, cleanup, and upload.
 # - Stacker helpers: supply planning, rack refresh, recovery, and offset lookup.
@@ -579,6 +579,7 @@ class FixtureSettings(CSVSettings):
     isolate_volumes: bool
     fast_simulate: bool
     use_impact_protection: bool
+    use_impact_protection_v2: bool
     use_96ch_stackers: bool
     run_evaporation: bool
     ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
@@ -684,46 +685,40 @@ class FixtureSettings(CSVSettings):
             env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
             env_serial = env_sensor.get_serial()
             use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
-            use_96ch_stackers = getattr(ctx.params, "use_96ch_stackers", False)
+            use_impact_protection_v2 = bool(
+                getattr(ctx.params, "use_impact_protection_v2", False)
+            )
+            use_96ch_stackers = getattr(ctx.params, "use_96ch_stackers", True)
             run_evaporation = bool(getattr(ctx.params, "run_evaporation", True))
-            if use_impact_protection:
-                if csv_settings.pipette_channels == 96:
-                    skip_port = link_port if link_port is not None else ""
-                    ImpactSerial, impact_1ch_8ch_port = (
-                        _build_impact_protection_v2_with_port(
-                            simulate=simulating,
-                            ctx=ctx,
-                            skip_port=skip_port,
-                        )
+            impact_1ch_8ch_port = None
+            if use_impact_protection_v2:
+                skip_port = link_port if link_port is not None else ""
+                ImpactSerial, impact_1ch_8ch_port = (
+                    _build_impact_protection_v2_with_port(
+                        simulate=simulating, ctx=ctx, skip_port=skip_port
                     )
-                    skip_ports = [
-                        p
-                        for p in [link_port, impact_1ch_8ch_port]
-                        if p is not None
-                    ] or None
-                    ImpactSerial96, impact_96ch_port = (
-                        _build_impact_protection_96ch_with_port(
-                            simulate=simulating,
-                            ctx=ctx,
-                            skip_ports=skip_ports,
-                        )
+                )
+                print_info(
+                    "Impact V2 connected: "
+                    f"port={impact_1ch_8ch_port}, env_skip={link_port}"
+                )
+            else:
+                print_info("Impact V2 disabled by runtime parameter.")
+
+            if use_impact_protection and csv_settings.pipette_channels == 96:
+                skip_ports = [
+                    p for p in [link_port, impact_1ch_8ch_port] if p is not None
+                ] or None
+                ImpactSerial96, impact_96ch_port = (
+                    _build_impact_protection_96ch_with_port(
+                        simulate=simulating, ctx=ctx, skip_ports=skip_ports
                     )
-                    print_info(
-                        "96ch impact connected: "
-                        f"V2={impact_1ch_8ch_port}, 96ch={impact_96ch_port}, "
-                        f"env_skip={link_port}"
-                    )
-                else:
-                    skip_port = link_port if link_port is not None else ""
-                    ImpactSerial, impact_1ch_8ch_port = (
-                        _build_impact_protection_v2_with_port(
-                            simulate=simulating, ctx=ctx, skip_port=skip_port
-                        )
-                    )
-                    print_info(
-                        "Impact V2 connected: "
-                        f"port={impact_1ch_8ch_port}, env_skip={link_port}"
-                    )
+                )
+                print_info(
+                    "96ch impact connected: "
+                    f"V2={impact_1ch_8ch_port}, 96ch={impact_96ch_port}, "
+                    f"env_skip={link_port}"
+                )
         except Exception:
             _cleanup_partial_fixture_build(
                 recorder,
@@ -818,6 +813,7 @@ class FixtureSettings(CSVSettings):
             isolate_volumes=False,
             fast_simulate=fast_simulate,
             use_impact_protection=use_impact_protection,
+            use_impact_protection_v2=use_impact_protection_v2,
             use_96ch_stackers=use_96ch_stackers,
             run_evaporation=run_evaporation,
             ImpactSerial_U=cast(
@@ -1100,16 +1096,23 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_bool(
-        display_name="Use Impact Protection",
+        display_name="Use 96CH Impact Protection",
         variable_name="use_impact_protection",
         default=True,
-        description="Whether to use impact protection device during testing.",
+        description="Enable the dedicated 96-channel fixture and its Home clearance moves.",
+    )
+
+    parameters.add_bool(
+        display_name="Use Impact Protection V2",
+        variable_name="use_impact_protection_v2",
+        default=False,
+        description="Enable the separate V2 grating controller when it is installed.",
     )
 
     parameters.add_bool(
         display_name="Use 96CH Stackers",
         variable_name="use_96ch_stackers",
-        default=False,
+        default=True,
         description="Whether to use Flex Stackers for 96-channel full-rack testing.",
     )
 
@@ -1254,37 +1257,26 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def maybe_close_all_gratings(fixture_settings: FixtureSettings) -> None:
-    """Close all impact protection gratings if the use_impact_protection param is set."""
-    if (
-        not fixture_settings.ctx.is_simulating()
-        and fixture_settings.use_impact_protection
-    ):
-        if fixture_settings.pipette_channels == 96:
-            print_info(
-                "96ch impact close sequence: closing V2 gratings; "
-                "96ch fixture keeps last selected pipette mode"
-            )
+    """Close the optional V2 gratings without changing the 96ch fixture mode."""
+    if not fixture_settings.ctx.is_simulating():
         _close_impact_protection_v2(fixture_settings)
 
 
 def maybe_switch_mode(fixture_settings: FixtureSettings, tip: int) -> None:
-    """Switch gratings mode if the use_impact_protection param is set."""
+    """Switch each enabled impact controller independently."""
+    if fixture_settings.ctx.is_simulating():
+        return
+    _switch_impact_protection_v2(fixture_settings, tip)
     if (
-        not fixture_settings.ctx.is_simulating()
+        fixture_settings.pipette_channels == 96
         and fixture_settings.use_impact_protection
+        and fixture_settings.ImpactSerial_96
     ):
-        if fixture_settings.pipette_channels == 96:
-            print_info(f"96ch impact switch sequence start: tip={tip}")
-            _switch_impact_protection_v2(fixture_settings, tip)
-            if fixture_settings.ImpactSerial_96:
-                _configure_impact_protection_96ch(
-                    fixture_settings.ctx,
-                    fixture_settings.ImpactSerial_96,
-                    tip,
-                )
-            print_info(f"96ch impact switch sequence done: tip={tip}")
-        else:
-            _switch_impact_protection_v2(fixture_settings, tip)
+        _configure_impact_protection_96ch(
+            fixture_settings.ctx,
+            fixture_settings.ImpactSerial_96,
+            tip,
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -4133,7 +4125,10 @@ def maybe_home_impact_protection_96ch(
 def _switch_impact_protection_v2(
     fixture_settings: FixtureSettings, tip: int
 ) -> None:
-    if not fixture_settings.ImpactSerial_U:
+    if (
+        not fixture_settings.use_impact_protection_v2
+        or not fixture_settings.ImpactSerial_U
+    ):
         return
 
     tip_mode_by_size = {
@@ -4161,7 +4156,10 @@ def _switch_impact_protection_v2(
 
 
 def _close_impact_protection_v2(fixture_settings: FixtureSettings) -> None:
-    if not fixture_settings.ImpactSerial_U:
+    if (
+        not fixture_settings.use_impact_protection_v2
+        or not fixture_settings.ImpactSerial_U
+    ):
         return
 
     print_info(
@@ -4193,7 +4191,6 @@ def maybe_home_impact_for_stacker_move(
     """Prepare impact protection for stacker moves that need fixture clearance."""
     if (
         fixture_settings.ctx.is_simulating()
-        or not fixture_settings.use_impact_protection
         or not _should_home_96ch_impact_for_stacker_slot(deck_slot)
     ):
         return

@@ -5,6 +5,21 @@
 For keyboard calibration of all 80 stacker/deck routes, see the
 [offset calibration guide](offset_calibration/README.md).
 
+## Gravimetric speed runtime parameters
+
+`protocol_replacement/gravimetric_speed.py` uses independent controls for the two impact devices:
+
+| App parameter | Default | Behavior |
+|---|---|---|
+| Use Impact Protection V2 | Off | Connects and controls the separate V2 grating controller when enabled. |
+| Use 96CH Impact Protection | On | Controls the dedicated 96ch fixture, including Home clearance before stacker moves. |
+| Use 96CH Stackers | On | Enables stackers for 96-channel full-rack testing. |
+
+The existing `use_impact_protection` variable now refers to the dedicated 96ch fixture.
+The new `use_impact_protection_v2` variable independently controls V2 for all pipette types.
+Turning V2 off does not disable the 96ch fixture. When V2 is explicitly enabled, a missing V2 still fails initialization.
+Re-upload the updated protocol and create a new run to use the new parameter defaults.
+
 ## Before pushing to the robot
 
 These tests need some special patches applied to the main source code in order to work as intended.
