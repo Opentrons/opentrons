@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
@@ -67,7 +66,7 @@ describe('heaterShakerOpenLatch', () => {
     vi.resetAllMocks()
   })
   it('should return an error when there is labware east/west that is above 53 mm', () => {
-    when(getIsTallLabwareEastWestOfHeaterShaker)
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
@@ -112,7 +111,7 @@ describe('heaterShakerOpenLatch', () => {
     })
   })
   it('should return an open latch command when there is no labware that is too tall east/west of the heater shaker', () => {
-    when(getIsTallLabwareEastWestOfHeaterShaker)
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
@@ -136,5 +135,62 @@ describe('heaterShakerOpenLatch', () => {
       ],
       python: 'mock_heater_shaker_1.open_labware_latch()',
     })
+  })
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
+      .calledWith(
+        robotState.labware,
+        invariantContext.labwareEntities,
+        HEATER_SHAKER_SLOT
+      )
+      .thenReturn(false)
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: HEATER_SHAKER_ID,
+      },
+    }
+    const result = heaterShakerOpenLatch(
+      {
+        moduleId: 'selected_module',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          key: expect.any(String),
+          params: { moduleId: 'heaterShakerId' },
+        },
+      ],
+      python: 'mock_heater_shaker_1.open_labware_latch()',
+    })
+  })
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = heaterShakerOpenLatch(
+      {
+        moduleId: 'mock_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

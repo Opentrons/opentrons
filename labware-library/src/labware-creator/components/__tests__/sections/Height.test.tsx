@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
@@ -23,9 +22,9 @@ const formikConfig: FormikConfig<LabwareFields> = {
 
 describe('Height Section', () => {
   beforeEach(() => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
-        ['labwareType', 'labwareZDimension'],
+        ['labwareType', 'labwareZDimension', 'skirtHeight'],
         formikConfig.initialValues
       )
       .thenReturn(false)
@@ -58,6 +57,17 @@ describe('Height Section', () => {
     expect(screen.getByText('Put your labware on top of the aluminum block.'))
   })
 
+  it('should ask for total extents height for a filter plate', () => {
+    formikConfig.initialValues.labwareType = 'filterPlate'
+    render(wrapInFormik(<Height />, formikConfig))
+    expect(
+      screen.getByText(
+        'Measure the total height of the labware: from the highest point on top down to the lowest point. Include any well tips or nozzles that hang below the skirt.'
+      )
+    ).toBeInTheDocument()
+    screen.getByRole('textbox', { name: /Skirt height/i })
+  })
+
   it('should update instructions when tipRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<Height />, formikConfig))
@@ -88,9 +98,9 @@ describe('Height Section', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
-        ['labwareType', 'labwareZDimension'],
+        ['labwareType', 'labwareZDimension', 'skirtHeight'],
         formikConfig.initialValues
       )
       .thenReturn(true)

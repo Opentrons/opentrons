@@ -18,7 +18,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
 import { ChooseRobotSlideout } from '..'
@@ -28,7 +28,7 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/resources/useNotifyDataReady')
 
 // note for auto scroll to top
@@ -110,7 +110,7 @@ describe('ChooseRobotSlideout', () => {
     vi.mocked(startDiscovery).mockReturnValue({
       type: 'mockStartDiscovery',
     } as any)
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: null,
     })

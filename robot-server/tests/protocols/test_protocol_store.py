@@ -24,7 +24,6 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
-from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -89,11 +88,10 @@ def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
 
 @pytest.fixture
 def completed_analysis_store(
-    decoy: Decoy,
     sql_engine: SQLEngine,
 ) -> CompletedAnalysisStore:
     """Get a subject."""
-    return CompletedAnalysisStore(sql_engine, decoy.mock(cls=MemoryCache), "2")
+    return CompletedAnalysisStore(sql_engine, "2")
 
 
 async def test_insert_and_get_protocol(
@@ -295,6 +293,7 @@ def test_remove_protocol_conflict(
         run_id="run-id",
         protocol_id="protocol-id",
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     with pytest.raises(ProtocolUsedByRunError, match="protocol-id"):
@@ -362,6 +361,7 @@ def test_get_usage_info(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_usage_info() == [
         ProtocolUsageInfo(
@@ -418,6 +418,7 @@ def test_get_referencing_run_ids(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2022, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1"]
 
@@ -425,6 +426,7 @@ def test_get_referencing_run_ids(
         run_id="run-id-2",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1", "run-id-2"]
 
@@ -536,6 +538,7 @@ def get_completed_analysis_resource(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
 
@@ -577,6 +580,7 @@ async def test_get_referenced_data_files(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
     analysis_resource2 = CompletedAnalysisResource(
         "analysis-id-2",
@@ -594,6 +598,7 @@ async def test_get_referenced_data_files(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
     subject.insert(protocol_resource_1)
@@ -638,6 +643,7 @@ async def test_get_referenced_data_files(
         run_id="run-id-1",
         protocol_id="protocol-id",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     run_store.insert_csv_rtp(

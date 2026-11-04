@@ -6,7 +6,8 @@ import type { AuthUserResponse, UpdateSelfRequest } from './types'
 
 export function updateSelf(
   config: HostConfig,
-  body: UpdateSelfRequest
+  body: UpdateSelfRequest,
+  userNotes: string
 ): ResponsePromise<AuthUserResponse> {
   return request<AuthUserResponse, UpdateSelfRequest>(
     PATCH,
@@ -14,6 +15,7 @@ export function updateSelf(
     config,
     {
       body,
+      userNotes,
       requiresSecureTransport: true, // Might be sending a new password.
     }
   )

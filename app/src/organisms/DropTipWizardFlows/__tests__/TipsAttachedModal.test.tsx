@@ -3,27 +3,33 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LEFT } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useHomePipettes } from '/app/local-resources/instruments'
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useDropTipWizardFlows } from '..'
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 
 import type { Mock } from 'vitest'
-import type { HostConfig } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
 vi.mock('/app/local-resources/instruments')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,
@@ -43,7 +49,7 @@ const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
 const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
 const mockSetTipStatusResolved = vi.fn()
-const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
+const MOCK_ROBOT_NAME = 'MOCK_ROBOT'
 
 const render = (aPipetteWithTip: PipetteWithTip) => {
   return renderWithProviders(
@@ -51,10 +57,10 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
       <button
         onClick={() =>
           handleTipsAttachedModal({
-            host: MOCK_HOST,
+            robotName: MOCK_ROBOT_NAME,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
-            onSettled: vi.fn(),
+            onSuccess: vi.fn(),
           })
         }
         data-testid="testButton"

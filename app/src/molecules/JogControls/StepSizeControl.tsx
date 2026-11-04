@@ -21,6 +21,7 @@ import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
 
 import { ControlContainer } from './ControlContainer'
 
+import type { ReactNode } from 'react'
 import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
@@ -59,7 +60,7 @@ function StepSizeButtons({
   currentStepSize,
   setCurrentStepSize,
   isOnDevice,
-}: StepSizeControlProps): JSX.Element {
+}: StepSizeControlProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   return (
     <>
@@ -79,7 +80,7 @@ function StepSizeButtons({
   )
 }
 
-export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
+export function StepSizeControl(props: StepSizeControlProps): ReactNode {
   const { stepSizes, currentStepSize, setCurrentStepSize, isOnDevice } = props
   const { t } = useTranslation(['robot_calibration'])
 
@@ -107,11 +108,17 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <StyledIcon name="jump-size" width="1.2rem" />
-            <StyledText css={TYPOGRAPHY.pSemiBold}>{t('jump_size')}</StyledText>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('jump_size')}
+            </StyledText>
           </Flex>
           <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.grey60}
-            css={TYPOGRAPHY.bodyTextSemiBold}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
             {JUMP_SIZE_SUBTITLE}
@@ -130,7 +137,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   )
 }
 
-export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
+export function TouchStepSizeControl(props: StepSizeControlProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   return (
     <Flex

@@ -10,12 +10,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
+
+import type { ReactNode } from 'react'
 
 interface DisplayConnectionStatusProps {
   isConnected: boolean
@@ -25,7 +27,7 @@ interface DisplayConnectionStatusProps {
 export function DisplayConnectionStatus({
   isConnected,
   setShowNetworkDetailsModal,
-}: DisplayConnectionStatusProps): JSX.Element {
+}: DisplayConnectionStatusProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
 
@@ -59,14 +61,14 @@ export function DisplayConnectionStatus({
           gridGap={isConnected ? '0' : SPACING.spacing4}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {isConnected ? t('successfully_connected') : t('no_network_found')}
-          </LegacyStyledText>
+          </StyledText>
           {isConnected ? null : (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
@@ -74,7 +76,7 @@ export function DisplayConnectionStatus({
               margin="0 2rem"
             >
               {t('ethernet_connection_description')}
-            </LegacyStyledText>
+            </StyledText>
           )}
         </Flex>
       </Flex>

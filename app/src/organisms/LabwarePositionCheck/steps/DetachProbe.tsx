@@ -2,11 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  LegacyStyledText,
-  StyledText,
-} from '@opentrons/components'
+import { AnimationVideo, StyledText } from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
@@ -21,9 +17,10 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
+export function DetachProbe(props: LPCWizardContentProps): ReactNode {
   const { proceedStep, goBackLastStep, commandUtils, runId } = props
   const { t } = useTranslation('labware_position_check')
   const { toggleRobotMoving, handleMoveToInitialOffsetPosition, home } =
@@ -107,7 +104,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
               <Trans
                 t={t}
                 i18nKey="store_probe"
-                components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+                components={{ block: <StyledText forwardedAs="p" /> }}
               />
             </StyledText>
           }

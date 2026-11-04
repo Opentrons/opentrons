@@ -34,7 +34,7 @@ export interface RadioGroupProps {
   useBlueChecked?: boolean
 }
 
-export function RadioGroup(props: RadioGroupProps): JSX.Element {
+export function RadioGroup(props: RadioGroupProps): ReactNode {
   const error = props.error != null
 
   const outerClassName = cx({

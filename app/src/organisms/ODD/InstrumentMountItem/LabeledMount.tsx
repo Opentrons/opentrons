@@ -10,14 +10,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler } from 'react'
-import type { Mount } from '/app/redux/pipettes/types'
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { Mount } from '@opentrons/api-client'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;
@@ -39,7 +39,7 @@ interface LabeledMountProps {
   handleClick: MouseEventHandler
 }
 
-export function LabeledMount(props: LabeledMountProps): JSX.Element {
+export function LabeledMount(props: LabeledMountProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { mount, instrumentName, handleClick } = props
   const isNinetySixChannel = instrumentName?.includes('96-Channel') ?? false
@@ -56,7 +56,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing24}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TYPOGRAPHY.textAlignLeft}
@@ -65,8 +65,8 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             width="15.625rem"
           >
             {isNinetySixChannel ? t('left_right') : t('mount', { side: mount })}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             flex="5"
             forwardedAs="h4"
             color={COLORS.grey60}
@@ -75,7 +75,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSize28}
           >
             {instrumentName == null ? t('empty') : instrumentName}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Icon name="more" size="3rem" />
       </Flex>

@@ -6,6 +6,23 @@ type LayoutCandidates =
     }
   | undefined
 
+/**
+ * Hack:
+ *
+ * Software keyboard buttons render as non-focusable <div>s (`useButtonTag={false}`) so
+ * they stay out of tab order and don't steal focus from inputs. This is OK. However,
+ * we have a lot of preexisting tests that were expecting real <button>s and looking
+ * for `role="button"`. This restores the role for the tests' sake.
+ *
+ * This is a half-measure and a lie to accessibility tech. We could use real
+ * <button>s and fix the focusability issues in some other way (but beware of
+ * issues like https://github.com/hodgef/react-simple-keyboard/issues/44).
+ * Or we could rewrite the tests to not rely on `role`.
+ */
+export const softwareKeyboardButtonAttributes = [
+  { attribute: 'role', value: 'button' },
+]
+
 export const customDisplay = {
   '{numbers}': '123',
   '{shift}': 'ABC',

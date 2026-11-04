@@ -1,13 +1,12 @@
 """Response models for protocol analysis."""
 
 # TODO(mc, 2021-08-25): add modules to simulation result
-from typing import List, NamedTuple, Optional, Union
+from typing import Any, List, NamedTuple, Optional, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
-    Command,
     ErrorOccurrence,
     LabwareOffset,
     Liquid,
@@ -75,6 +74,10 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
+    result: Optional[AnalysisResult] = Field(
+        default=None,
+        description="Result of the analysis. This field is only present after the analysis is completed.",
+    )
     runTimeParameters: Optional[List[RunTimeParameter]] = Field(
         default=None,
         description=(
@@ -164,9 +167,9 @@ class CompletedAnalysis(BaseModel):
             " if none are specified in the request."
         ),
     )
-    commands: List[Command] = Field(
+    commands: List[dict[str, Any]] = Field(
         ...,
-        description="The protocol commands the run is expected to produce",
+        description="The protocol commands the run is expected to produce.",
     )
     labware: List[LoadedLabware] = Field(
         ...,

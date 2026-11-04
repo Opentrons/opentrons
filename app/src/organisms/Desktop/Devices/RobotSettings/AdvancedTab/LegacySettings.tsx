@@ -1,42 +1,41 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { updateSetting } from '/app/redux/robot-settings'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
-import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '/app/redux/robot-settings/types'
-import type { Dispatch } from '/app/redux/types'
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface LegacySettingsProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function LegacySettings({
   settings,
-  robotName,
   isRobotBusy,
-}: LegacySettingsProps): JSX.Element {
+}: LegacySettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'deckCalibrationDots'
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 
@@ -47,26 +46,24 @@ export function LegacySettings({
       marginTop={SPACING.spacing40}
     >
       <Box width="70%">
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
-          id="AdvancedSettings_showLink"
         >
           {t('legacy_settings')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+        </StyledText>
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold} forwardedAs="p">
           {t('calibrate_deck_to_dots')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('calibrate_deck_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="legacy_settings"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="RobotSettings_legacySettingsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

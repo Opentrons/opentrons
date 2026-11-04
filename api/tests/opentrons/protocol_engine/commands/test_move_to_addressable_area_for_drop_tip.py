@@ -51,7 +51,7 @@ async def test_move_to_addressable_area_for_drop_tip_implementation(
     )
 
     decoy.when(
-        state_view.geometry.get_next_tip_drop_location_for_addressable_area(
+        state_view.instrument_interface.get_next_tip_drop_location_for_addressable_area(
             addressable_area_name="123", pipette_id="abc"
         )
     ).then_return(AddressableOffsetVector(x=10, y=11, z=12))
@@ -107,7 +107,7 @@ async def test_move_to_addressable_area_for_drop_tip_handles_stalls(
     )
 
     decoy.when(
-        state_view.geometry.get_next_tip_drop_location_for_addressable_area(
+        state_view.instrument_interface.get_next_tip_drop_location_for_addressable_area(
             addressable_area_name="123", pipette_id="abc"
         )
     ).then_return(AddressableOffsetVector(x=10, y=11, z=12))

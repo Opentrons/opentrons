@@ -13,6 +13,7 @@ import {
 } from '../../index'
 import { Flex } from '../../primitives'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '../../index'
 
 interface EmptySelectorButtonProps {
@@ -26,7 +27,7 @@ interface EmptySelectorButtonProps {
 //  used for helix and Opentrons Ai
 export function EmptySelectorButton(
   props: EmptySelectorButtonProps
-): JSX.Element {
+): ReactNode {
   const { onClick, text, iconName, textAlignment, disabled = false } = props
 
   return (

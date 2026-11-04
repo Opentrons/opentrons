@@ -1418,8 +1418,17 @@ def test_get_state_update_for_false_positive() -> None:
         running_command=subject_view.get("command-id-1"),
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=DefinedErrorData(
-            public=sentinel.public,
+        error=DefinedErrorData(  # type: ignore
+            public=ErrorOccurrence(
+                id="error-id",
+                createdAt=datetime(2023, 3, 3, 0, 0),
+                isDefined=False,
+                errorType="ProtocolEngineError",
+                errorCode="4000",
+                detail="oh no",
+                errorInfo={},
+                wrappedErrors=[],
+            ),
             state_update_if_false_positive=sentinel.state_update_if_false_positive,
         ),
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,

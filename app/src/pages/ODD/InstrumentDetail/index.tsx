@@ -13,29 +13,27 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { useHost, useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { BackButton } from '/app/atoms/buttons/BackButton'
 import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
-import {
-  useGripperDisplayName,
-  usePipetteModelSpecs,
-} from '/app/local-resources/instruments'
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import {
   DropTipWizardFlows,
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
 import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
-import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 
-export const InstrumentDetail = (): JSX.Element => {
-  const host = useHost()
+export const InstrumentDetail = (): ReactNode => {
+  const robotName = useLocalRobotName()
   const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
@@ -43,23 +41,14 @@ export const InstrumentDetail = (): JSX.Element => {
       (i): i is PipetteData | GripperData => i.ok && i.mount === mount
     ) ?? null
 
-  const pipetteDisplayName = usePipetteModelSpecs(
-    instrument?.instrumentModel as PipetteModel
-  )?.displayName
-  const gripperDisplayName = useGripperDisplayName(
-    instrument?.instrumentModel as GripperModel
-  )
+  const displayName = useAttachedInstrumentDisplayName(instrument)
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
   const pipetteModelSpecs =
-    instrument != null
-      ? (getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ??
-        null)
+    instrument != null && instrument.instrumentType === 'pipette'
+      ? (getPipetteModelSpecs(instrument.instrumentModel) ?? null)
       : null
-
-  const displayName =
-    instrument?.mount !== 'extension' ? pipetteDisplayName : gripperDisplayName
 
   return (
     <>
@@ -95,7 +84,7 @@ export const InstrumentDetail = (): JSX.Element => {
                 onClick={() => {
                   handleInstrumentDetailOverflowMenu(
                     instrument,
-                    host,
+                    robotName,
                     enableDTWiz
                   )
                 }}

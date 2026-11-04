@@ -6,11 +6,12 @@ import {
 } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -29,7 +30,7 @@ const { DROP_TIP_FLOWS, RETRY_NEW_TIPS, MANUAL_FILL_AND_RETRY_NEW_TIPS } =
   RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,
@@ -346,6 +347,35 @@ describe('useDropTipFlowUtils', () => {
     result.current.reportMap(currentMap)
 
     expect(mockUpdateSubMap).toHaveBeenCalledWith(currentMap)
+  })
+
+  it('should route to begin removal when documentation is cancelled with no selected option', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    result.current.onDocumentationCancel?.()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      DROP_TIP_FLOWS.ROUTE,
+      DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+    )
+  })
+
+  it('should route to confirm cancel when documentation is cancelled during cancel run', () => {
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: RECOVERY_MAP.CANCEL_RUN.ROUTE,
+        },
+      } as any)
+    )
+
+    result.current.onDocumentationCancel?.()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.CANCEL_RUN.ROUTE,
+      RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+    )
   })
 
   it('should return the correct error overrides', () => {

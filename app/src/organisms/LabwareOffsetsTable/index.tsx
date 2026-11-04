@@ -18,6 +18,7 @@ import { selectAllLabwareInfoAndDefaultStatusSorted } from '/app/redux/protocol-
 import { AccordionChildren } from './AccordionChildren'
 import { AccordionHeader } from './AccordionHeader'
 
+import type { ReactNode } from 'react'
 import type { ListAccordionProps } from '@opentrons/components'
 
 export interface LabwareOffsetsTableProps {
@@ -26,7 +27,7 @@ export interface LabwareOffsetsTableProps {
 
 export function LabwareOffsetsTable(
   props: LabwareOffsetsTableProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const { runId } = props
 
@@ -97,7 +98,7 @@ const OFFSET_COLUMN_STYLE = css`
   }
 `
 
-function TableHeaders(): JSX.Element {
+function TableHeaders(): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (

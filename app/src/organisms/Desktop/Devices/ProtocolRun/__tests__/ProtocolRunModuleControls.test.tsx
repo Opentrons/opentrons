@@ -1,18 +1,17 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { ModuleCard } from '/app/organisms/ModuleCard'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
@@ -70,7 +69,7 @@ describe('ProtocolRunModuleControls', () => {
   })
 
   it('renders a magnetic module card', () => {
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID, true)
       .thenReturn({
         [mockMagMod.moduleId]: {
@@ -95,7 +94,7 @@ describe('ProtocolRunModuleControls', () => {
   })
 
   it('renders a temperature module card', () => {
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID, true)
       .thenReturn({
         [mockTempMod.moduleId]: {
@@ -122,7 +121,7 @@ describe('ProtocolRunModuleControls', () => {
   })
 
   it('renders a thermocycler module card', () => {
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID, true)
       .thenReturn({
         [mockTCModule.moduleId]: {
@@ -151,7 +150,7 @@ describe('ProtocolRunModuleControls', () => {
   })
 
   it('renders a heater-shaker module card', () => {
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID, true)
       .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
@@ -179,7 +178,7 @@ describe('ProtocolRunModuleControls', () => {
   })
 
   it('renders correct text when module is not attached but required for protocol', () => {
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID, true)
       .thenReturn({
         [mockHeaterShakerDef.moduleId]: {

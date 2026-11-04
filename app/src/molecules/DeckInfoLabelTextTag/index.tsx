@@ -13,6 +13,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import styles from './deckinfolabeltexttag.module.css'
+
 import type { ReactNode } from 'react'
 
 const MAX_SUPPORTED_LABELS = 3
@@ -29,7 +31,7 @@ export function DeckInfoLabelTextTag({
   colOneDeckInfoLabels,
   colTwoText,
   colThreeTag,
-}: DeckInfoLabelTextTagProps): JSX.Element {
+}: DeckInfoLabelTextTagProps): ReactNode {
   return (
     <Flex display={DISPLAY_GRID} css={CONTAINER_STYLE}>
       <Flex css={LABEL_CONTAINER_STYLE}>
@@ -38,7 +40,7 @@ export function DeckInfoLabelTextTag({
           .map(label => label)}
       </Flex>
       <StyledText
-        css={TEXT_STLYE}
+        className={styles.col_two_text}
         oddStyle="bodyTextRegular"
         desktopStyle="bodyDefaultRegular"
       >
@@ -78,8 +80,4 @@ const TAG_CONTAINER_STYLE = css`
   @media (max-width: 450px) {
     justify-self: ${JUSTIFY_FLEX_START};
   }
-`
-
-const TEXT_STLYE = css`
-  -webkit-line-clamp: 3;
 `

@@ -5,8 +5,8 @@ import {
   Btn,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,13 +17,14 @@ import {
   useEstopContext,
 } from '/app/organisms/EmergencyStop'
 
+import type { ReactNode } from 'react'
 import type { EstopState } from '@opentrons/api-client'
 
 interface EstopBannerProps {
   status?: EstopState
 }
 
-export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
+export function EstopBanner({ status }: EstopBannerProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { setIsEmergencyStopModalDismissed } = useEstopContext()
 
@@ -53,11 +54,11 @@ export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   return (
     <Banner type="error" width="100%">
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing2}>
-        <LegacyStyledText forwardedAs="p">{bannerText}</LegacyStyledText>
+        <StyledText forwardedAs="p">{bannerText}</StyledText>
         <Btn onClick={handleClick}>
-          <LegacyStyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
+          <StyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
             {buttonText}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
       </Flex>
     </Banner>

@@ -1,8 +1,13 @@
 config BR2_PACKAGE_PYTHON_OPENTRONS_UPDATE_SERVER
   bool "python-opentrons-update-server"
   depends on BR2_PACKAGE_PYTHON3
-  select BR2_PACKAGE_PYTHON_AIOHTTP # runtime
+  select BR2_PACKAGE_PYTHON_OPENTRONS_SERVER_UTILS # runtime
+  select BR2_PACKAGE_PYTHON_DOTENV # runtime
+  select BR2_PACKAGE_PYTHON_FASTAPI # runtime
+  select BR2_PACKAGE_PYTHON_MULTIPART # runtime
+  select BR2_PACKAGE_PYTHON_PYDANTIC_SETTINGS # runtime
   select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+  select BR2_PACKAGE_PYTHON_UVICORN # runtime
 
   help
     Opentrons update server. Allows the in-field update of OT2 robots.

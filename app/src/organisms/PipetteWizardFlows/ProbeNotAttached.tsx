@@ -9,10 +9,10 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -21,7 +21,7 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void
-  setShowUnableToDetect: (ableToDetect: boolean) => void
+  dismissError: () => void
   isOnDevice: boolean
 }
 
@@ -30,12 +30,8 @@ interface ProbeNotAttachedProps {
 export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {
-  const { t, i18n } = useTranslation([
-    'pipette_wizard_flows',
-    'shared',
-    'branded',
-  ])
-  const { isOnDevice, handleOnClick, setShowUnableToDetect } = props
+  const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'branded'])
+  const { isOnDevice, handleOnClick, dismissError } = props
   const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
 
   return (
@@ -55,16 +51,20 @@ export const ProbeNotAttached = (
       >
         <Btn
           onClick={() => {
-            setShowUnableToDetect(false)
+            dismissError()
           }}
+          css={GO_BACK_BUTTON_STYLE}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
-            buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
+            buttonText={t('try_again')}
             onClick={() => {
               setNumberOfTryAgains(numberOfTryAgains + 1)
               handleOnClick()
@@ -77,7 +77,7 @@ export const ProbeNotAttached = (
               handleOnClick()
             }}
           >
-            {i18n.format(t('shared:try_again'), 'capitalize')}
+            {t('try_again')}
           </PrimaryButton>
         )}
       </Flex>

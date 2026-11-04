@@ -5,6 +5,8 @@ import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
   EnableDevTools,
+  IncludeProtocolSourceInRunDownload,
+  LogFolder,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
@@ -14,12 +16,18 @@ import {
 
 import styles from './advancedsettings.module.css'
 
-export function AdvancedSettings(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function AdvancedSettings(): ReactNode {
   return (
     <div className={styles.container}>
       <UpdatedChannel />
       <Divider marginY={SPACING.spacing24} />
       <AdditionalCustomLabwareSourceFolder />
+      <Divider marginY={SPACING.spacing24} />
+      <LogFolder />
+      <Divider marginY={SPACING.spacing24} />
+      <IncludeProtocolSourceInRunDownload />
       <Divider marginY={SPACING.spacing24} />
       <PreventRobotCaching />
       <Divider marginY={SPACING.spacing24} />

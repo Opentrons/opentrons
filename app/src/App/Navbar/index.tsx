@@ -3,21 +3,21 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
 import debounce from 'lodash/debounce'
 
-import { Icon, LegacyStyledText, Link } from '@opentrons/components'
+import { Icon, Link, StyledText } from '@opentrons/components'
 
 import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 import logoSvg from '/app/assets/images/logo_nav.svg'
 
 import styles from './navbar.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { RouteProps } from '../types'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const PROJECT: string = _OPENTRONS_PROJECT_
 const DEBOUNCE_DURATION_MS = 300
 
-export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
+export function Navbar({ routes }: { routes: RouteProps[] }): ReactNode {
   const { t } = useTranslation('top_navigation')
   const navigate = useNavigate()
   const navRoutes = routes.filter(
@@ -48,9 +48,9 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }
           >
-            <LegacyStyledText forwardedAs="h3" className={styles.nav_link_text}>
+            <StyledText forwardedAs="h3" className={styles.nav_link_text}>
               {t(name)}
-            </LegacyStyledText>
+            </StyledText>
           </NavLink>
         ))}
       </div>

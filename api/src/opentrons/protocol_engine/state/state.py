@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Awaitable, Callable, Dict, List, Optional, Sequence, TypeVar, Union
 
 from typing_extensions import ParamSpec
 
@@ -20,17 +21,36 @@ from .addressable_areas import (
     AddressableAreaView,
 )
 from .camera import CameraState, CameraStore, CameraView
-from .commands import CommandState, CommandStore, CommandView
+from .commands import (
+    CommandState,
+    CommandStore,
+    CommandView,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from .config import Config
 from .files import FileState, FileStore, FileView
 from .geometry import GeometryView
+from .instrument_interface import InstrumentInterfaceView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
+from .liquid_tracking import LiquidTrackingView
 from .liquids import LiquidState, LiquidStore, LiquidView
-from .modules import ModuleState, ModuleStore, ModuleView
+from .modules import (
+    FlexStackerSubstateNotification,
+    ModuleState,
+    ModuleStore,
+    ModuleView,
+)
 from .motion import MotionView
 from .peripherals import PeripheralState, PeripheralStore, PeripheralView
-from .pipettes import PipetteState, PipetteStore, PipetteView
+from .pipettes import (
+    NozzleMapNotification,
+    PipetteState,
+    PipetteStore,
+    PipetteView,
+    TipAttachedNotification,
+)
 from .preconditions import (
     CommandPreconditionState,
     CommandPreconditionStore,
@@ -41,11 +61,22 @@ from .tasks import TaskState, TaskStore, TaskView
 from .tips import TipState, TipStore, TipView
 from .wells import WellState, WellStore, WellView
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
 from opentrons.util.change_notifier import ChangeNotifier
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")
+
+EngineEventNotification = Union[
+    NozzleMapNotification,
+    TipAttachedNotification,
+    FlexStackerSubstateNotification,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+]
 
 
 @dataclass(frozen=True)
@@ -84,6 +115,8 @@ class StateView(HasState[State]):
     _wells: WellView
     _geometry: GeometryView
     _motion: MotionView
+    _liquid_tracking: LiquidTrackingView
+    _instrument_interface: InstrumentInterfaceView
     _files: FileView
     _config: Config
     _tasks: TaskView
@@ -149,6 +182,16 @@ class StateView(HasState[State]):
     def motion(self) -> MotionView:
         """Get state view selectors for derived motion state."""
         return self._motion
+
+    @property
+    def liquid_tracking(self) -> LiquidTrackingView:
+        """Get state view selectors for liquid tracking state."""
+        return self._liquid_tracking
+
+    @property
+    def instrument_interface(self) -> InstrumentInterfaceView:
+        """Get state view selectors for instrument interface state."""
+        return self._instrument_interface
 
     @property
     def files(self) -> FileView:
@@ -249,10 +292,14 @@ class StateStore(StateView, ActionHandler):
         robot_definition: RobotDefinition,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        command_store_provider: Optional[CommandStoreProvider] = None,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
-        notify_publishers: Optional[Callable[[], None]] = None,
+        notify_publishers: Optional[Callable[[], Awaitable[None]]] = None,
+        updates_callback: Optional[
+            Callable[[list[EngineEventNotification]], Awaitable[None]]
+        ] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -264,18 +311,26 @@ class StateStore(StateView, ActionHandler):
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
             error_recovery_policy: The run's initial error recovery policy.
+            command_store_provider: Provider interface for the presistence Run Store.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
             robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
+            updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
+        self._updates_callback = updates_callback
+        self._update_events_queue: asyncio.Queue[EngineEventNotification] = (
+            asyncio.Queue()
+        )
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
+            updates_callback=self._append_update_events,
+            command_store_provider=command_store_provider,
         )
-        self._pipette_store = PipetteStore()
+        self._pipette_store = PipetteStore(updates_callback=self._append_update_events)
         if deck_configuration is None:
             deck_configuration = []
         self._addressable_area_store = AddressableAreaStore(
@@ -292,6 +347,7 @@ class StateStore(StateView, ActionHandler):
             config=config,
             deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
+            updates_callback=self._append_update_events,
         )
         self._peripheral_store = PeripheralStore(
             config=config,
@@ -430,6 +486,9 @@ class StateStore(StateView, ActionHandler):
 
         return current_value
 
+    def _append_update_events(self, event: EngineEventNotification) -> None:
+        self._update_events_queue.put_nowait(event)
+
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
         return State(
@@ -474,10 +533,21 @@ class StateStore(StateView, ActionHandler):
         self._geometry = GeometryView(
             config=self._config,
             labware_view=self._labware,
-            well_view=self._wells,
             module_view=self._modules,
+            addressable_area_view=self._addressable_areas,
+        )
+        self._liquid_tracking = LiquidTrackingView(
+            labware_view=self._labware,
+            well_view=self._wells,
+            pipette_view=self._pipettes,
+            geometry_view=self._geometry,
+        )
+        self._instrument_interface = InstrumentInterfaceView(
+            labware_view=self._labware,
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
+            geometry_view=self._geometry,
+            liquid_tracking_view=self._liquid_tracking,
         )
         self._motion = MotionView(
             config=self._config,
@@ -485,6 +555,7 @@ class StateStore(StateView, ActionHandler):
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
+            instrument_interface_view=self._instrument_interface,
             module_view=self._modules,
         )
 
@@ -505,5 +576,25 @@ class StateStore(StateView, ActionHandler):
         self._tasks._state = next_state.tasks
         self._camera._state = next_state.camera
         self._change_notifier.notify()
-        if self._notify_robot_server is not None:
-            self._notify_robot_server()
+
+    async def notify_and_update_callbacks(self) -> None:
+        """Async loop that waits for update events to be available before updating and notifying the robot server."""
+        while True:
+            events = [await self._update_events_queue.get()]
+            try:
+                while True:
+                    events.append(self._update_events_queue.get_nowait())
+            except asyncio.QueueEmpty:
+                pass
+            if self._notify_robot_server is not None:
+                await self._notify_robot_server()
+
+            if self._updates_callback is not None:
+                await self._updates_callback(events)
+
+            for _ in events:
+                self._update_events_queue.task_done()
+
+    async def wait_for_update_events(self) -> None:
+        """Block until all items in the update events queue have been processed."""
+        await self._update_events_queue.join()

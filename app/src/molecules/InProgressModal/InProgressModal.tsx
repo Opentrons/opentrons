@@ -1,4 +1,4 @@
-import { Flex, Icon, LegacyStyledText } from '@opentrons/components'
+import { Flex, Icon, StyledText } from '@opentrons/components'
 
 import styles from './inprogressmodal.module.css'
 
@@ -12,7 +12,7 @@ interface Props {
   children?: JSX.Element
 }
 
-export function InProgressModal(props: Props): JSX.Element {
+export function InProgressModal(props: Props): ReactNode {
   const { alternativeSpinner, children, description, body } = props
 
   return (
@@ -27,12 +27,10 @@ export function InProgressModal(props: Props): JSX.Element {
       )}
       <Flex className={styles.description_container}>
         {description != null && (
-          <LegacyStyledText className={styles.description}>
-            {description}
-          </LegacyStyledText>
+          <StyledText className={styles.description}>{description}</StyledText>
         )}
         {body != null && (
-          <LegacyStyledText className={styles.body}>{body}</LegacyStyledText>
+          <StyledText className={styles.body}>{body}</StyledText>
         )}
       </Flex>
       {children}

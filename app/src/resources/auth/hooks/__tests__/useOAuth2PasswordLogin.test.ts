@@ -82,7 +82,6 @@ describe('useOAuth2PasswordLogin', () => {
           username: 'alice',
           fullName: 'Alice',
           accountType: 'user',
-          scopes: [],
           locked: false,
           resetPassword: false,
         },
@@ -112,7 +111,6 @@ describe('useOAuth2PasswordLogin', () => {
       username: 'alice',
       fullName: 'Alice',
       accountType: 'user',
-      scopes: [],
       locked: false,
       resetPassword: true,
     }

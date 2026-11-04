@@ -15,22 +15,26 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useAcknowledgeEstopDisengageMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
@@ -51,7 +55,7 @@ export function EstopPressedModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const isOnDevice = useSelector(getIsOnDevice)
   return createPortal(
     isOnDevice ? (
@@ -80,14 +84,16 @@ function TouchscreenModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = useState<boolean>(false)
-  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
+  const documentationState = useDocumentationState()
+  const { acknowledgeEstopDisengage } =
+    useAcknowledgeEstopDisengageMutation(documentationState)
 
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
-      onSettled: closeModal,
+      onSuccess: closeModal,
     })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
@@ -100,22 +106,27 @@ function TouchscreenModal({
   }
   const handleClick = (): void => {
     setIsResuming(true)
-    setIsWaitingForResumeOperation()
-    acknowledgeEstopDisengage(null)
-    handlePlaceReaderLid()
-    if (!isValidPlateReaderMove) {
-      closeModal()
-    }
+    acknowledgeEstopDisengage(undefined, {
+      onSuccess: () => {
+        setIsWaitingForResumeOperation()
+        handlePlaceReaderLid()
+        if (!isValidPlateReaderMove) {
+          closeModal()
+        }
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setIsResuming(false)
+        }
+      },
+    })
   }
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
@@ -123,12 +134,12 @@ function TouchscreenModal({
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('estop')}
-          </LegacyStyledText>
+          </StyledText>
           <Chip
             type={isEngaged ? 'error' : 'success'}
             text={isEngaged ? t('engaged') : t('disengaged')}
@@ -159,13 +170,15 @@ function DesktopModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
-  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
+  const documentationState = useDocumentationState()
+  const { acknowledgeEstopDisengage } =
+    useAcknowledgeEstopDisengageMutation(documentationState)
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
-      onSettled: closeModal,
+      onSuccess: closeModal,
     })
 
   const modalProps: ModalProps = {
@@ -180,12 +193,20 @@ function DesktopModal({
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     setIsResuming(true)
-    setIsWaitingForResumeOperation()
-    acknowledgeEstopDisengage(null)
-    handlePlaceReaderLid()
-    if (!isValidPlateReaderMove) {
-      closeModal()
-    }
+    acknowledgeEstopDisengage(undefined, {
+      onSuccess: () => {
+        setIsWaitingForResumeOperation()
+        handlePlaceReaderLid()
+        if (!isValidPlateReaderMove) {
+          closeModal()
+        }
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setIsResuming(false)
+        }
+      },
+    })
   }
 
   return (
@@ -194,9 +215,9 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+        <StyledText forwardedAs="p" color={COLORS.grey60}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}

@@ -6,17 +6,18 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { getConfig, toggleConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function PreventRobotCaching(): JSX.Element {
+export function PreventRobotCaching(): ReactNode {
   const { t } = useTranslation('app_settings')
   const disableRobotCache = useSelector((state: State) => {
     return getConfig(state)?.discovery.disableCache ?? false
@@ -26,33 +27,32 @@ export function PreventRobotCaching(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_disableRobotCache"
         >
           {t('prevent_robot_caching')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="prevent_robot_caching_description"
             components={{
               strong: (
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="span"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 />
               ),
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="disable_robot_cache"
         toggledOn={disableRobotCache}
         onClick={() => dispatch(toggleConfigValue('discovery.disableCache'))}
-        id="AdvancedSettings_disableRobotCacheToggleButton"
       />
     </Flex>
   )

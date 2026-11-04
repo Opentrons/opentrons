@@ -150,13 +150,14 @@
   "multiDispense": "Distribute",
   "multi_dispense_options": "Disposal volume",
   "new_location": "New location",
-  "no_tiprack": "No tiprack available",
   "no_nozzles_and_wells_selected": "No nozzles and wells selected",
+  "no_tiprack": "No tiprack available",
   "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "num_nozzles": "{{num}} nozzles",
   "number_of_nozzles_used": "Number of nozzles used",
   "of": "of",
   "off_deck": "Off-Deck",
+  "partial_nozzles": "Partial nozzles",
   "pause": {
     "forDuration": "For {{duration}}",
     "pausingForDuration": "<text>Pausing for</text><tag/>",
@@ -165,7 +166,6 @@
     "untilResume": "Until told to resume",
     "untilTemperature": "Until {{temperature}} °C reached"
   },
-  "partial_nozzles": "Partial nozzles",
   "pipette": "Pipette",
   "pipette_nozzles_and_wells": "Pipette nozzles and wells",
   "pipette_path": "Pipette path",
@@ -278,20 +278,12 @@
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
-    "profile_timeline": {
-      "start": "Start profile",
-      "wait_for_complete": "Wait for profile to complete"
-    },
-    "state_timeline": {
-      "start": "Start vacuum",
-      "wait_for_complete": "Wait for vacuum to complete"
-    },
     "controls": {
       "duration": {
         "label": "Time at pressure",
         "title": "Duration"
       },
-      "ending_hold_vent": { "title": "Ending hold", "label": "Vent" },
+      "ending_hold_vent": { "label": "Vent", "title": "Ending hold" },
       "label": "Module controls",
       "mode": {
         "label": "Select mode type",
@@ -335,9 +327,9 @@
         "no_profile_defined": "No profile defined",
         "no_steps_defined": "No steps defined",
         "number_of_cycles": "Number of cycles",
-        "profile_steps": "Profile steps",
-        "profile_defined_single": "{{numSteps}} profile step defined",
         "profile_defined_multiple": "{{numSteps}} profile steps defined",
+        "profile_defined_single": "{{numSteps}} profile step defined",
+        "profile_steps": "Profile steps",
         "pump_power": "Pump power",
         "repetitions": "Number of cycles",
         "save": "Save",
@@ -382,6 +374,14 @@
         "opened": "Open"
       }
     },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
+    },
+    "state_timeline": {
+      "start": "Start vacuum",
+      "wait_for_complete": "Wait for vacuum to complete"
+    },
     "step_summary": {
       "num_steps_multiple": "{{numSteps}} steps",
       "num_steps_one": "{{numSteps}} step",
@@ -405,10 +405,10 @@
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": {
+    "mix": "Mix volume",
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
-    "single": "Volume per well",
-    "mix": "Mix volume"
+    "single": "Volume per well"
   },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",

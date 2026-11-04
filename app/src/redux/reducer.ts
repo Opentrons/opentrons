@@ -2,18 +2,14 @@ import { combineReducers } from 'redux'
 
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
-// calibration data state
-import { calibrationReducer } from './calibration/reducer'
+// audit log period deletion key state
+import { auditReducer } from './audit/slice'
 // config state
 import { configReducer } from './config/reducer'
 // custom labware state
 import { customLabwareReducer } from './custom-labware/reducer'
 // discovery state
 import { discoveryReducer } from './discovery/reducer'
-// networking state
-import { networkingReducer } from './networking/reducer'
-// pipettes state
-import { pipettesReducer } from './pipettes/reducer'
 // local protocol run state
 import { protocolRunReducer } from './protocol-runs/reducer'
 // local protocol storage from file system state
@@ -24,12 +20,8 @@ import { robotAdminReducer } from './robot-admin/reducer'
 import { robotApiReducer } from './robot-api/reducer'
 // robot auth state
 import { robotAuthReducer } from './robot-auth/slice'
-// robot settings state
-import { robotSettingsReducer } from './robot-settings/reducer'
 // robot robot update state
 import { robotUpdateReducer } from './robot-update/reducer'
-// robot  calibration and (eventually) protocol sessions state
-import { sessionReducer } from './sessions/reducer'
 // app shell state
 import { shellReducer } from './shell/reducer'
 // system info state
@@ -43,21 +35,17 @@ export const rootReducer: Reducer<State, Action> = (
   action: Action
 ): State => {
   const combinedReducer = combineReducers({
+    audit: auditReducer,
     robotAdmin: robotAdminReducer,
     robotApi: robotApiReducer,
     robotAuth: robotAuthReducer,
-    robotSettings: robotSettingsReducer,
     robotUpdate: robotUpdateReducer,
-    pipettes: pipettesReducer,
-    networking: networkingReducer,
     config: configReducer,
     discovery: discoveryReducer,
     labware: customLabwareReducer,
     shell: shellReducer,
     systemInfo: systemInfoReducer,
     alerts: alertsReducer,
-    sessions: sessionReducer,
-    calibration: calibrationReducer,
     protocolStorage: protocolStorageReducer,
     protocolRuns: protocolRunReducer,
   })

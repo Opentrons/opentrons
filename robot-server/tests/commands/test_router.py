@@ -1,5 +1,6 @@
 """Tests for robot_server.commands.router."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -7,7 +8,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandSlice,
+    JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -45,8 +46,12 @@ async def test_create_command(
         result=None,
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(run_orchestrator.get_command("abc123")).then_return(queued_command)
+    async def _stub_queued_command_state(
+        *_a: object, **_k: object
+    ) -> pe_commands.Command:
+        decoy.when(await run_orchestrator.get_command("abc123")).then_return(
+            queued_command
+        )
         return queued_command
 
     decoy.when(
@@ -99,7 +104,9 @@ async def test_create_command_wait_for_complete(
         )
     ).then_return(completed_command)
 
-    decoy.when(run_orchestrator.get_command("abc123")).then_return(completed_command)
+    decoy.when(await run_orchestrator.get_command("abc123")).then_return(
+        completed_command
+    )
 
     result = await create_command(
         RequestModel(data=command_create),
@@ -132,7 +139,7 @@ async def test_get_commands_list(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(run_orchestrator.get_current_command()).then_return(
+    decoy.when(await run_orchestrator.get_current_command()).then_return(
         CommandPointer(
             command_id="abc123",
             command_key="command-key-1",
@@ -141,11 +148,18 @@ async def test_get_commands_list(
         )
     )
     decoy.when(
-        run_orchestrator.get_command_slice(
+        await run_orchestrator.get_command_slice(
             cursor=1337, length=42, include_fixit_commands=True
         )
     ).then_return(
-        CommandSlice(commands=[command_1, command_2], cursor=0, total_length=2)
+        JsonCommandSlice(
+            commands=[
+                command_1.model_dump_json(by_alias=True, exclude_none=True),
+                command_2.model_dump_json(by_alias=True, exclude_none=True),
+            ],
+            cursor=0,
+            total_length=2,
+        )
     )
 
     result = await get_commands_list(
@@ -154,7 +168,12 @@ async def test_get_commands_list(
         pageLength=42,
     )
 
-    assert result.content.data == [command_1, command_2]
+    expected_data = [
+        command_1.model_dump_json(by_alias=True, exclude_none=True),
+        command_2.model_dump_json(by_alias=True, exclude_none=True),
+    ]
+
+    assert result.content.data == [json.loads(command) for command in expected_data]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 
@@ -172,7 +191,7 @@ async def test_get_command(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(run_orchestrator.get_command("abc123")).then_return(command_1)
+    decoy.when(await run_orchestrator.get_command("abc123")).then_return(command_1)
 
     result = await get_command(commandId="abc123", orchestrator=run_orchestrator)
 
@@ -185,7 +204,7 @@ async def test_get_command_not_found(
     run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should raise a 404 if command is not found."""
-    decoy.when(run_orchestrator.get_command("abc123")).then_raise(
+    decoy.when(await run_orchestrator.get_command("abc123")).then_raise(
         CommandDoesNotExistError("oh no")
     )
 

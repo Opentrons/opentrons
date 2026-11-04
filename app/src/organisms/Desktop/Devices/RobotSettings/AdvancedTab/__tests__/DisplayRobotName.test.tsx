@@ -27,7 +27,7 @@ describe('RobotSettings DisplayRobotName', () => {
   it('should render title, description, and butoon', () => {
     render()
     screen.getByText('About')
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('otie')
     screen.getByRole('button', { name: 'Rename robot' })
   })

@@ -6,8 +6,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -19,11 +19,12 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { MouseEventHandler } from 'react'
+import type { HeaterShakerModule } from '@opentrons/api-client'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
@@ -37,7 +38,8 @@ export const HeaterShakerSlideout = (
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = useState<number | null>(null)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = t('temperature')
   const { reportModuleCommand } = useModuleCommandAnalytics()
@@ -122,27 +124,27 @@ export const HeaterShakerSlideout = (
         />
       }
     >
-      <LegacyStyledText
+      <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
         data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
       >
         {t('set_target_temp_of_hs')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}
-        </LegacyStyledText>
+        </StyledText>
         <form id="HeaterShakerSlideout_submitValue">
           <InputField
             title={`${String(module.moduleModel)}_setTemp`}

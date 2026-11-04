@@ -2,221 +2,225 @@
 
 from __future__ import annotations
 
-import datetime
 import json
-from typing import Generator
+from typing import Any, cast
 
-import aiohttp
+import fastapi
 import pytest
-from fastapi import FastAPI
-from starlette.testclient import TestClient
+from decoy import Decoy
+from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
 
-from server_utils.keys.fastapi import install_key_client
-from server_utils.keys.key_server import (
-    Client as KeyClient,
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
 )
-from server_utils.keys.key_server import (
-    SignedMessageData,
-    SignMessageData,
+from server_utils.fastapi_utils.models.json_api import RequestModel
+
+from .. import LogPayloadMatcher, RecentTimestampMatcher
+from audit_server.log_ingest.models import (
+    SubmitAuditLogMessageData,
+    SubmitExternalAuditLogMessageData,
 )
-
-from audit_server.log_ingest.router import router as ingest_router
-
-_ENDPOINT_PATH = "/audit/internal/logMessage"
-
-_CANNED_SIGNED_MESSAGE = SignedMessageData(
-    message="<placeholder>",
-    messageHash="sha256:ZmFrZQ==",
-    messageSignature="ed25519:ZmFrZQ==",
-    signatureVersion=1,
-)
+from audit_server.log_ingest.router import post_external_log_message, post_log_message
+from audit_server.log_storage.log_data_manager import LogDataManager
 
 
-class StubKeyClient(KeyClient):
-    """A hand-rolled mock of the key-server `Client`.
-
-    Captures every call to `sign_message` in `calls` and, by default, returns
-    `_CANNED_SIGNED_MESSAGE`. Setting `raise_on_sign` to an exception makes
-    the next call raise that exception instead, simulating a key-server that's
-    unreachable or otherwise broken.
-    """
-
-    def __init__(self) -> None:
-        self.calls: list[SignMessageData] = []
-        self.response: SignedMessageData = _CANNED_SIGNED_MESSAGE
-        self.raise_on_sign: Exception | None = None
-
-    async def sign_message(self, message: SignMessageData) -> SignedMessageData:
-        self.calls.append(message)
-        if self.raise_on_sign is not None:
-            raise self.raise_on_sign
-        return self.response
-
-
-@pytest.fixture
-def stub_key_client() -> StubKeyClient:
-    """A fresh `StubKeyClient` for each test."""
-    return StubKeyClient()
-
-
-@pytest.fixture
-def app(stub_key_client: StubKeyClient) -> FastAPI:
-    """A minimal FastAPI app wired up with the log-ingest router and a stub key client."""
-    app = FastAPI()
-    install_key_client(app.state, stub_key_client)
-    app.include_router(ingest_router)
-    return app
-
-
-@pytest.fixture
-def client(app: FastAPI) -> Generator[TestClient, None, None]:
-    """A starlette `TestClient` for the FastAPI app."""
-    with TestClient(app) as test_client:
-        yield test_client
-
-
-def _assert_loggedat_is_recent_utc_iso(value: object) -> datetime.datetime:
-    """Assert ``value`` is an ISO-8601 UTC datetime near the current wall clock."""
-    assert isinstance(value, str)
-    parsed = datetime.datetime.fromisoformat(value)
-    assert parsed.tzinfo is not None, f"loggedAt {value!r} must include tz info"
-    assert parsed.utcoffset() == datetime.timedelta(0), (
-        f"loggedAt {value!r} must be UTC"
-    )
-    # The route stamps loggedAt at request handling time; allow a generous skew so
-    # the test isn't flaky on slow CI.
-    now = datetime.datetime.now(datetime.timezone.utc)
-    assert abs((now - parsed).total_seconds()) < 60, (
-        f"loggedAt {value!r} is too far from now {now.isoformat()}"
-    )
-    return parsed
-
-
-def test_full_request_body_forwarded_to_key_server(
-    client: TestClient,
-    stub_key_client: StubKeyClient,
+async def test_full_request_body_forwarded_to_ldm(
+    decoy: Decoy, mock_log_data_manager: LogDataManager
 ) -> None:
-    """The full request body must be serialized to JSON and forwarded to
-    ``key_client.sign_message`` (along with the server-stamped ``loggedAt``)."""
-    request_body = {
-        "data": {
-            "action": "run.start",
-            "accountName": "alice",
-            "legalName": "Alice Anderson",
-            "message": "Started run abc-123",
-            "reason": "Routine experiment",
-        },
-    }
-    response = client.post(_ENDPOINT_PATH, json=request_body)
+    """The full request body must be sent to the log data manager with a server timestamp."""
+    log_data = SubmitAuditLogMessageData(
+        action="run.start",
+        accountName="alice",
+        legalName="Alice Anderson",
+        message="Started run abc-123",
+        reason="Routine experiment",
+    )
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(message=log_data, loggedAt=RecentTimestampMatcher()),
+            )
+        )
+    ).then_return("")
+    response = await post_log_message(
+        RequestModel(data=log_data), log_data_manager=mock_log_data_manager
+    )
 
-    assert response.status_code == 201, response.text
-
-    assert len(stub_key_client.calls) == 1
-    forwarded_arg = stub_key_client.calls[0]
-    assert forwarded_arg.previousHash is None
-
-    forwarded_payload = json.loads(forwarded_arg.message)
-    # Every field from the request body must round-trip into what we ask the
-    # key-server to sign.
-    for key, value in request_body["data"].items():
-        assert forwarded_payload[key] == value
-    # The server also adds an ingest timestamp; verify it's a sensible value.
-    _assert_loggedat_is_recent_utc_iso(forwarded_payload["loggedAt"])
-    # Make sure nothing extra got smuggled in.
-    assert set(forwarded_payload) == set(request_body["data"]) | {"loggedAt"}
+    assert response.status_code == 201
 
 
-def test_full_request_body_forwarded_with_null_reason(
-    client: TestClient,
-    stub_key_client: StubKeyClient,
+async def test_full_request_body_forwarded_with_null_reason(
+    mock_log_data_manager: LogDataManager, decoy: Decoy
 ) -> None:
-    """A `reason: null` request body must round-trip through to the key-server
-    payload as JSON `null` (not omitted)."""
-    request_body = {
-        "data": {
-            "action": "run.start",
-            "accountName": "alice",
-            "legalName": "Alice Anderson",
-            "message": "Started run abc-123",
-            "reason": None,
-        },
-    }
-    response = client.post(_ENDPOINT_PATH, json=request_body)
+    """The full request body must be sent to the log data manager with a server timestamp."""
+    log_data = SubmitAuditLogMessageData(
+        action="run.start",
+        accountName="alice",
+        legalName="Alice Anderson",
+        message="Started run abc-123",
+        reason=None,
+    )
 
-    assert response.status_code == 201, response.text
+    def _null_reason_not_dropped(message_str: str) -> bool:
+        message_data = json.loads(message_str)
+        assert message_data["reason"] is None
+        return True
 
-    assert len(stub_key_client.calls) == 1
-    forwarded_payload = json.loads(stub_key_client.calls[0].message)
-    assert "reason" in forwarded_payload
-    assert forwarded_payload["reason"] is None
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(
+                    message=log_data,
+                    loggedAt=RecentTimestampMatcher(),
+                    extra=_null_reason_not_dropped,
+                ),
+            )
+        )
+    ).then_return("")
+
+    response = await post_log_message(
+        RequestModel(data=log_data), log_data_manager=mock_log_data_manager
+    )
+
+    assert response.status_code == 201
 
 
-def test_non_ascii_utf8_message_forwarded_verbatim(
-    client: TestClient,
-    stub_key_client: StubKeyClient,
+async def test_non_ascii_utf8_message_forwarded_verbatim(
+    mock_log_data_manager: LogDataManager, decoy: Decoy
 ) -> None:
     """Non-ASCII characters that round-trip cleanly through UTF-8 must reach
-    the key-server with their code points intact."""
+    the log data manager with their code points intact."""
     # Includes Latin diacritics, CJK ideographs, a zero-width joiner emoji
     # sequence, and a high-plane emoji to cover BMP + supplementary planes.
     non_ascii_message = "Démarrage du protocole №1: 实验开始 — 🧬👩‍🔬🚀 (β=½)"
-    request_body = {
-        "data": {
-            "action": "run.start",
-            "accountName": "élise",
-            "legalName": "Élise Müller-中野",
-            "message": non_ascii_message,
-            "reason": "experimentación",
-        },
-    }
-    response = client.post(_ENDPOINT_PATH, json=request_body)
-
-    assert response.status_code == 201, response.text
-
-    assert len(stub_key_client.calls) == 1
-    forwarded_arg = stub_key_client.calls[0]
-    forwarded_payload = json.loads(forwarded_arg.message)
-    assert forwarded_payload["message"] == non_ascii_message
-    assert forwarded_payload["accountName"] == "élise"
-    assert forwarded_payload["legalName"] == "Élise Müller-中野"
-    assert forwarded_payload["reason"] == "experimentación"
-    # The serialized JSON we pass to the key-server must itself round-trip
-    # losslessly through UTF-8, since the key-server hashes UTF-8 bytes.
-    assert (
-        forwarded_arg.message.encode("utf-8").decode("utf-8") == forwarded_arg.message
+    log_data = SubmitAuditLogMessageData(
+        action="run.start",
+        accountName="élise",
+        legalName="Élise Müller-中野",
+        message=non_ascii_message,
+        reason="experimentación",
     )
-    assert non_ascii_message in forwarded_arg.message
+
+    def _test_utf8_stuff(log_message: str) -> bool:
+        forwarded_payload = json.loads(log_message)
+        assert forwarded_payload["message"] == non_ascii_message
+        assert forwarded_payload["accountName"] == "élise"
+        assert forwarded_payload["legalName"] == "Élise Müller-中野"
+        assert forwarded_payload["reason"] == "experimentación"
+        # The serialized JSON we pass to the key-server must itself round-trip
+        # losslessly through UTF-8, since the key-server hashes UTF-8 bytes.
+        assert log_message.encode("utf-8").decode("utf-8") == log_message
+        assert non_ascii_message in log_message
+        return True
+
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(
+                    message=log_data,
+                    loggedAt=RecentTimestampMatcher(),
+                    extra=_test_utf8_stuff,
+                ),
+            )
+        )
+    )
+
+    response = await post_log_message(
+        RequestModel(data=log_data), log_data_manager=mock_log_data_manager
+    )
+
+    assert response.status_code == 201
 
 
-def test_returns_503_when_key_server_unavailable(
-    client: TestClient,
-    stub_key_client: StubKeyClient,
+async def test_returns_503_when_key_server_unavailable(
+    mock_log_data_manager: LogDataManager, decoy: Decoy
 ) -> None:
     """If the key-server cannot be contacted, the endpoint must return a
     well-formed HTTP 503 instead of crashing with a 500."""
-    stub_key_client.raise_on_sign = aiohttp.ClientConnectionError("connection refused")
+    log_data = SubmitAuditLogMessageData(
+        action="run.start",
+        accountName="alice",
+        legalName="Alice Anderson",
+        message="Started run abc-123",
+        reason=None,
+    )
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(message=log_data, loggedAt=RecentTimestampMatcher()),
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError("oh no"))
 
-    request_body = {
-        "data": {
-            "action": "run.start",
-            "accountName": "alice",
-            "legalName": "Alice Anderson",
-            "message": "Started run abc-123",
-            "reason": None,
-        },
-    }
-    response = client.post(_ENDPOINT_PATH, json=request_body)
+    def _check(exc: BaseException) -> bool:
+        if not isinstance(exc, fastapi.HTTPException):
+            return False
+        if exc.status_code != 503:
+            return False
+        return True
 
-    assert response.status_code == 503
-    assert response.headers["content-type"].startswith("application/json")
-    body = response.json()
-    assert isinstance(body, dict)
-    # FastAPI's standard error envelope: {"detail": "..."}.
-    assert "detail" in body
-    assert isinstance(body["detail"], str) and body["detail"]
-    # The error message should clearly identify key-server as the cause so
-    # the operator knows what to fix.
-    assert "key-server" in body["detail"].lower()
-    # And the stub really was called — proving we did try to reach the key
-    # server before returning 503.
-    assert len(stub_key_client.calls) == 1
+    with pytest.raises(check=_check):
+        await post_log_message(
+            RequestModel(data=log_data), log_data_manager=mock_log_data_manager
+        )
+
+
+async def test_raises_if_authentication_is_not_required(
+    mock_log_data_manager: LogDataManager,
+) -> None:
+    """If CRS mode is disabled, the endpoint must raise a 418."""
+    with pytest.raises(fastapi.HTTPException) as exc_info:
+        await post_external_log_message(
+            RequestModel(
+                data=SubmitExternalAuditLogMessageData(action="test", message="test")
+            ),
+            log_data_manager=mock_log_data_manager,
+            user_notes="test",
+            authentication=AuthenticationNotRequiredResult(),
+        )
+    assert exc_info.value.status_code == 418
+    assert (
+        exc_info.value.detail
+        == "Audit log is not available while Compliance Ready Software is inactive."
+    )
+
+
+async def test_forwards_data_if_authentication_is_required(
+    mock_log_data_manager: LogDataManager, decoy: Decoy
+) -> None:
+    """If CRS mode is enabled, the endpoint must forward the data to the log data manager."""
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(
+                    message=SubmitAuditLogMessageData(
+                        action="External-test-action",
+                        message="our message",
+                        reason="our reason",
+                        accountName="testusername",
+                        legalName="Test User",
+                    ),
+                    loggedAt=RecentTimestampMatcher(),
+                ),
+            )
+        )
+    ).then_return("")
+    response = await post_external_log_message(
+        RequestModel(
+            data=SubmitExternalAuditLogMessageData(
+                action="test-action", message="our message"
+            )
+        ),
+        log_data_manager=mock_log_data_manager,
+        user_notes="our reason",
+        authentication=AuthenticatedResult(
+            username="testusername", fullname="Test User", scope="audit_log.write"
+        ),
+    )
+    assert response.status_code == 201

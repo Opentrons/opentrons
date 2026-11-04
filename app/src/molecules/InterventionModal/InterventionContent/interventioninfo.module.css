@@ -1,0 +1,19 @@
+.labware_name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+
+.sub_text {
+  margin: var(--spacing-2) 0 var(--spacing-8);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .sub_text {
+    margin: var(--spacing-4) 0 var(--spacing-8);
+    font-size: var(--font-size-22);
+  }
+}

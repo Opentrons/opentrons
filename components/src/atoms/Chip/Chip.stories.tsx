@@ -1,4 +1,5 @@
 import { Chip as ChipComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { COLORS } from '../../helix-design-system'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
@@ -40,7 +41,9 @@ const meta: Meta<typeof ChipComponent> = {
     },
   },
   component: ChipComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   decorators: [
     Story => (
       <Flex

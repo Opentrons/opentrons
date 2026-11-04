@@ -842,7 +842,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1014,7 +1014,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1160,7 +1160,7 @@ def test_deck_conflict_raises_for_out_of_bounds_96_channel_move(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1300,7 +1300,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     ).then_return(True)
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
@@ -1309,7 +1309,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1454,7 +1454,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
     ).then_return(True)
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
@@ -1463,7 +1463,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),

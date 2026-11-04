@@ -1,18 +1,22 @@
 """Router for /maintenance_runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
-from opentrons.protocol_engine import (
-    CommandPointer,
-)
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine import CommandPointer
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from server_utils.audit.audit_logger import AuditLogger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -33,6 +37,7 @@ from ..maintenance_run_models import MaintenanceRunNotFoundError
 from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .base_router import RunNotFound
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.hardware import HardwareStateStore, get_hardware_state_store
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.runs.command_models import (
     CommandCollectionLinks,
@@ -60,6 +65,13 @@ class CommandNotAllowed(ErrorDetails):
     title: str = "Setup Command Not Allowed"
 
 
+class MaintenanceCommandDoorOpen(ErrorDetails):
+    """An error if a command sent with `requiresClosedDoor` is enqueued while the door is open."""
+
+    id: Literal["MaintenanceCommandDoorOpen"] = "MaintenanceCommandDoorOpen"
+    title: str = "Door Open"
+
+
 async def get_current_run_from_url(
     runId: str,
     run_orchestrator_store: Annotated[
@@ -85,23 +97,28 @@ async def get_current_run_from_url(
     commands_router.post,
     path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
-    description=textwrap.dedent(
-        """
+    description=textwrap.dedent("""
         Add a single command to the maintenance run.
 
         These commands will execute immediately and in the order they are
         enqueued. The execution of these commands cannot be paused,
         but a maintenance run can be deleted at any point, as long as there
         are no commands running.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[CommandNotAllowed]},
+        status.HTTP_409_CONFLICT: {
+            "model": Union[
+                ErrorBody[CommandNotAllowed],
+                ErrorBody[MaintenanceCommandDoorOpen],
+            ]
+        },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+    ],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
@@ -110,6 +127,12 @@ async def create_run_command(
     ],
     run_id: Annotated[str, Depends(get_current_run_from_url)],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    hardware_state_store: Annotated[
+        HardwareStateStore, Depends(get_hardware_state_store)
+    ],
+    audit_logger: Annotated[
+        AuditLogger, Depends(get_audit_logger("execute command in maintenance run"))
+    ],
     waitUntilComplete: Annotated[
         bool,
         Query(
@@ -142,6 +165,15 @@ async def create_run_command(
             ),
         ),
     ] = None,
+    requiresClosedDoor: Annotated[
+        bool,
+        Query(
+            description=(
+                "If `True`, the command will be rejected if"
+                " the robot's front door is open at enqueue time."
+            ),
+        ),
+    ] = True,
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -156,16 +188,35 @@ async def create_run_command(
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
         run_id: Run identification to attach command to.
+        hardware_state_store: The hardware state store.
+        requiresClosedDoor: If True, reject the command when the door is open.
+        audit_logger: Records the command for audit when access control is enabled.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.model_copy(update={"intent": command_intent})
-    command = await run_orchestrator_store.add_command_and_wait_for_interval(
-        request=command_create, wait_until_complete=waitUntilComplete, timeout=timeout
-    )
 
-    response_data = run_orchestrator_store.get_command(command.id)
+    # Jog presses are frequent and signing each one after waitUntilComplete makes
+    # the HTTP response lag the physical move.
+    if request_body.data.commandType == "moveRelative":
+        audit_logger.skip_persist()
+
+    if requiresClosedDoor and hardware_state_store.door_state == DoorState.OPEN:
+        raise MaintenanceCommandDoorOpen(
+            detail="This command requires the robot's door to be closed."
+        ).as_error(status.HTTP_409_CONFLICT)
+
+    try:
+        command = await run_orchestrator_store.add_command_and_wait_for_interval(
+            request=command_create,
+            wait_until_complete=waitUntilComplete,
+            timeout=timeout,
+        )
+    except pe_errors.SetupCommandNotAllowedError as e:
+        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
+
+    response_data = await run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -213,7 +264,7 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -223,7 +274,7 @@ async def get_run_commands(
         run_data_manager: Run data retrieval interface.
     """
     try:
-        command_slice = run_data_manager.get_commands_slice(
+        command_slice = await run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -231,22 +282,14 @@ async def get_run_commands(
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    current_command = run_data_manager.get_current_command(run_id=runId)
-    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
+    current_command = await run_data_manager.get_current_command(run_id=runId)
+    recovery_target_command = await run_data_manager.get_recovery_target_command(
+        run_id=runId
+    )
 
     data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            failedCommandId=c.failedCommandId,
+        RunCommandSummary.build_from_json(c).model_dump(
+            by_alias=True, exclude_none=True
         )
         for c in command_slice.commands
     ]
@@ -297,7 +340,7 @@ async def get_run_command(
         run_data_manager: Run data retrieval.
     """
     try:
-        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+        command = await run_data_manager.get_command(run_id=runId, command_id=commandId)
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandDoesNotExistError as e:

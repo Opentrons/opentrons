@@ -2,7 +2,7 @@ import { useQueryClient } from 'react-query'
 
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
-import { useDocumentedMutation } from '../access_control'
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -10,16 +10,17 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
+import type {
+  CommandData,
+  CreateMaintenanceCommandParams,
+} from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { DocumentationState, DocumentedAction } from '../access_control'
-import type { DocumentedMutationParameters } from '../access_control/types'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
-interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
+interface CreateMaintenanceCommandMutateParams extends CreateMaintenanceCommandParams {
   maintenanceRunId: string
   command: CreateCommand
-  waitUntilComplete?: boolean
-  timeout?: number
 }
 
 export type UseCreateMaintenanceCommandMutationResult = UseMutationResult<
@@ -56,7 +57,13 @@ export function useCreateMaintenanceCommandMutation(
     documentationState,
     actionsToDocument,
     ({
-      variables: { maintenanceRunId, command, waitUntilComplete, timeout },
+      variables: {
+        maintenanceRunId,
+        command,
+        waitUntilComplete,
+        timeout,
+        requiresClosedDoor = true,
+      },
       userNotes,
     }: DocumentedMutationParameters<CreateMaintenanceCommandMutateParams>) =>
       createMaintenanceCommand(
@@ -66,19 +73,24 @@ export function useCreateMaintenanceCommandMutation(
         {
           waitUntilComplete,
           timeout,
+          requiresClosedDoor,
         },
         userNotes
       )
         .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating maintenance runs query: ${e.message}`
-              )
-            })
+          // Jogs are high-frequency, so documenting each press fills the
+          // end-of-flow modal and refetches maintenance runs on every tick.
+          if (command.commandType !== 'moveRelative') {
+            queryClient
+              .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+              .catch((e: Error) => {
+                console.error(
+                  `error invalidating maintenance runs query: ${e.message}`
+                )
+              })
 
-          addActionToDocument(response.data.data)
+            addActionToDocument(response.data.data)
+          }
           return response.data
         })
         .catch((e: any) => {

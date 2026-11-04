@@ -9,12 +9,14 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
+
+import type { ReactNode } from 'react'
 
 const IpItem = styled.div`
   flex: 1 1 auto;
@@ -52,7 +54,7 @@ export function ManualIpHostnameItem({
   mostRecentAddition,
   setMostRecentAddition,
   setMostRecentDiscovered,
-}: IpHostnameItemProps): JSX.Element {
+}: IpHostnameItemProps): ReactNode {
   const remove = (): void => {
     removeIp(candidate)
   }
@@ -80,23 +82,21 @@ export function ManualIpHostnameItem({
     <>
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={JUSTIFY_CENTER}>
         <IpItem>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             data-testid="ip-hostname"
             color={discovered ? COLORS.black90 : COLORS.grey40}
           >
             {candidate}
-          </LegacyStyledText>
+          </StyledText>
         </IpItem>
-        <LegacyStyledText
+        <StyledText
           forwardedAs="label"
           color={COLORS.grey50}
-          css={{
-            'white-space': 'nowrap',
-          }}
+          style={{ whiteSpace: 'nowrap' }}
         >
           {getDiscoveryText()}
-        </LegacyStyledText>
+        </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
           color={COLORS.black90}

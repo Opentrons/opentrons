@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -10,21 +10,20 @@ import {
   DISPLAY_FLEX,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { getLocalRobot } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
 
 interface SelectAuthenticationTypeProps {
   selectedAuthType: WifiSecurityType
@@ -34,15 +33,12 @@ interface SelectAuthenticationTypeProps {
 export function SelectAuthenticationType({
   selectedAuthType,
   setSelectedAuthType,
-}: SelectAuthenticationTypeProps): JSX.Element {
+}: SelectAuthenticationTypeProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const { wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi } = useNetworkInterfaces(robotName)
   const [
     showAlternativeSecurityTypeModal,
     setShowAlternativeSecurityTypeModal,
@@ -64,10 +60,6 @@ export function SelectAuthenticationType({
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setSelectedAuthType(event.target.value as WifiSecurityType)
   }
-
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
-  }, [robotName, dispatch])
 
   return (
     <>
@@ -107,13 +99,13 @@ export function SelectAuthenticationType({
             ))}
           </Flex>
           <Flex marginY={SPACING.spacing24}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               color={COLORS.grey60}
             >
               {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
           <Btn
             display={DISPLAY_FLEX}
@@ -125,13 +117,13 @@ export function SelectAuthenticationType({
             }}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('need_another_security_type')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         </Flex>
       </Flex>

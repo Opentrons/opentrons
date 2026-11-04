@@ -1,15 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
-import { css } from 'styled-components'
 
-import {
-  DeckConfigurator,
-  InlineNotification,
-  RESPONSIVENESS,
-  StyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { DeckConfigurator, InlineNotification } from '@opentrons/components'
 import {
   COMBO_FIXTURES,
   FAKE_FIXTURE_IDS,
@@ -37,11 +29,14 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 
+import type { ReactNode } from 'react'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   AreaType,
@@ -51,20 +46,13 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 export interface SelectLocationProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
+  updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
 }
-export function SelectLocation(props: SelectLocationProps): JSX.Element {
+export function SelectLocation(props: SelectLocationProps): ReactNode {
   const {
     proceed,
     attachedModule,
@@ -73,6 +61,8 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     createMaintenanceRun,
     maintenanceRunId,
     setErrorMessage,
+    setIsDoorOpenError,
+    updateDeckConfiguration,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
@@ -94,14 +84,18 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     if (maintenanceRunId == null) {
       createMaintenanceRun({})
         .catch(error => {
-          setErrorMessage(error.message as string)
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsDoorOpenError(true)
+            setErrorMessage(t('door_is_open') as string)
+          } else {
+            setErrorMessage(error.message as string)
+          }
         })
         .then(proceed)
     } else {
       proceed()
     }
   }
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
@@ -277,13 +271,15 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       }
       bodyText={
         <>
-          <StyledText css={BODY_STYLE}>
+          <WizardBodyText>
             {t('select_the_slot', {
               module: moduleName,
               port: parseModuleUSBPort(attachedModule),
             })}
-            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
-          </StyledText>
+            {isFlexStacker || isVacuumModule
+              ? null
+              : ` ${t('location_must_be_correct')}`}
+          </WizardBodyText>
           {isFlexStacker || isVacuumModule ? (
             <InlineNotification
               type="neutral"

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -11,11 +10,12 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
+  PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
   SIZE_3,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -23,13 +23,15 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
+
 interface ExitConfirmationProps {
   onGoBack: () => void
   onConfirmExit: () => void
   shouldUseMetalProbe: boolean
 }
 
-export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
+export const ExitConfirmation = (props: ExitConfirmationProps): ReactNode => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
   const { onGoBack, onConfirmExit, shouldUseMetalProbe } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -67,9 +69,9 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
                 ? t('remove_probe_before_exit')
                 : t('exit_screen_title')}
             </ConfirmationHeader>
-            <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing8}>
+            <StyledText forwardedAs="p" marginTop={SPACING.spacing8}>
               {t('exit_screen_subtitle')}
-            </LegacyStyledText>
+            </StyledText>
           </>
         )}
       </Flex>
@@ -106,14 +108,15 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
             <SecondaryButton onClick={onGoBack}>
               {t('shared:go_back')}
             </SecondaryButton>
-            <AlertPrimaryButton
+            <PrimaryButton
+              variant="warning"
               onClick={onConfirmExit}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {shouldUseMetalProbe
                 ? t('remove_calibration_probe')
                 : i18n.format(t('shared:exit'), 'capitalize')}
-            </AlertPrimaryButton>
+            </PrimaryButton>
           </Flex>
         </Flex>
       )}

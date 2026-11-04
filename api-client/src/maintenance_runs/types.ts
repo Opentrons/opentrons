@@ -11,6 +11,7 @@ import type {
   RunCommandSummary,
   RunStatus,
 } from '../runs'
+import type { CreateCommandParams } from '../runs/commands/types'
 
 export interface MaintenanceRunData {
   id: string
@@ -44,6 +45,10 @@ export interface MaintenanceRunError {
 
 export interface CreateMaintenanceRunData {
   labwareOffsets?: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
+}
+
+export interface CreateMaintenanceCommandParams extends CreateCommandParams {
+  requiresClosedDoor?: boolean
 }
 
 export interface LabwareDefinitionSummary {

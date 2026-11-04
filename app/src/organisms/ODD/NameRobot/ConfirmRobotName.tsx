@@ -7,14 +7,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
   StepMeter,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
 import { MediumButton } from '/app/atoms/buttons'
+
+import type { ReactNode } from 'react'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
@@ -24,7 +26,7 @@ interface ConfirmRobotNameProps {
 
 export function ConfirmRobotName({
   robotName,
-}: ConfirmRobotNameProps): JSX.Element {
+}: ConfirmRobotNameProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
 
@@ -39,12 +41,9 @@ export function ConfirmRobotName({
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
-          <LegacyStyledText
-            forwardedAs="h2"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('name_love_it', { name: robotName })}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex height="26.5625rem" justifyContent={JUSTIFY_CENTER}>
           <Flex
@@ -58,7 +57,7 @@ export function ConfirmRobotName({
               width="944px"
               height="236px"
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               marginTop={SPACING.spacing12}
@@ -66,7 +65,7 @@ export function ConfirmRobotName({
               color={COLORS.grey60}
             >
               {t('your_robot_is_ready_to_go')}
-            </LegacyStyledText>
+            </StyledText>
             <MediumButton
               buttonType="primary"
               buttonCategory="rounded"

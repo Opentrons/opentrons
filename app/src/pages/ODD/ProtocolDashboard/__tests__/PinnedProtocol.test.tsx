@@ -2,10 +2,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { PinnedProtocol } from '../PinnedProtocol'
@@ -26,6 +27,9 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('/app/redux/config')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
   return {
@@ -98,9 +102,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 11.75rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize32}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight42}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightBold}`)
+    expect(text.className).toMatch(/protocol_name_full/)
   })
 
   it('should display text - half', () => {
@@ -111,9 +113,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 13.25rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(text.className).toMatch(/protocol_name_half/)
   })
 
   it('should display text - regular', () => {
@@ -126,9 +126,7 @@ describe('Pinned Protocol', () => {
     expect(pinnedProtocolCard).toHaveStyle('height: 13.25rem')
     expect(pinnedProtocolCard).toHaveStyle(`background-color: ${COLORS.grey35}`)
     const text = screen.getByText('yay mock protocol')
-    expect(text).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
-    expect(text).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
-    expect(text).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(text.className).toMatch(/protocol_name_regular/)
   })
 
   it('should redirect to protocol details after short click', () => {

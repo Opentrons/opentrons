@@ -64,8 +64,11 @@ async def get_public_key(
 ) -> PydanticResponse[SimpleBody[SigningPublicKey]]:
     """Get the public key."""
     public_key = signing_key_manager.get_public_key_pem()
+    hashed_key = await signing_key_manager.hash_message(public_key)
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(
-            data=SigningPublicKey.model_construct(publicKeyPem=public_key)
+            data=SigningPublicKey.model_construct(
+                publicKeyPem=public_key, hashedKey=hashed_key
+            )
         )
     )

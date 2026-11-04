@@ -4,13 +4,15 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+
+import type { ReactNode } from 'react'
 
 interface PipetteNotAttachedErrorModalProps {
   onExit: () => void
@@ -19,7 +21,7 @@ interface PipetteNotAttachedErrorModalProps {
 
 export const PipetteNotAttachedErrorModal = (
   props: PipetteNotAttachedErrorModalProps
-): JSX.Element => {
+): ReactNode => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared', 'branded'])
 
   return (
@@ -35,9 +37,9 @@ export const PipetteNotAttachedErrorModal = (
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
+        <StyledText css={TYPOGRAPHY.bodyTextRegular}>
           {t('branded:attach_a_pipette_for_quick_transfer')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"

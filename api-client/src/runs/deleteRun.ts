@@ -5,7 +5,8 @@ import type { EmptyResponse, HostConfig } from '../types'
 
 export function deleteRun(
   config: HostConfig,
-  runId: string
+  runId: string,
+  userNotes?: string
 ): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse>(DELETE, `/runs/${runId}`, config)
+  return request<EmptyResponse>(DELETE, `/runs/${runId}`, config, { userNotes })
 }

@@ -6,8 +6,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -22,11 +22,12 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { WelcomeModal } from './WelcomeModal'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
-export function RobotDashboard(): JSX.Element {
+export function RobotDashboard(): ReactNode {
   const { t } = useTranslation('device_details')
   const { data: allRunsQueryData, error: allRunsQueryError } =
     useNotifyAllRunsQuery()
@@ -88,13 +89,13 @@ export function RobotDashboard(): JSX.Element {
       contents = (
         <>
           {hasStandardProtocols ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('run_again')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           <RecentRunProtocolCarousel
             recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}

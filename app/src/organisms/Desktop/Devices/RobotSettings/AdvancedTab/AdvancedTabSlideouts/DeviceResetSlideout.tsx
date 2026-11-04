@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep'
 
 import {
@@ -14,40 +13,28 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
 
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import {
-  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-  useTrackEvent,
-} from '/app/redux/analytics'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
+import { useRobot } from '/app/redux-resources/robots'
 import { UNREACHABLE } from '/app/redux/discovery'
-import {
-  fetchResetConfigOptions,
-  getResetConfigOptions,
-} from '/app/redux/robot-admin'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import {
-  useDeckCalibrationData,
-  usePipetteOffsetCalibrations,
-  useTipLengthCalibrations,
-} from '../../../hooks'
-
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type {
   ResetConfigOption,
   ResetConfigRequest,
-} from '/app/redux/robot-admin/types'
-import type { Dispatch, State } from '/app/redux/types'
+} from '@opentrons/api-client'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean
@@ -61,67 +48,47 @@ export function DeviceResetSlideout({
   onCloseClick,
   robotName,
   updateResetStatus,
-}: DeviceResetSlideoutProps): JSX.Element {
+}: DeviceResetSlideoutProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
-  const dispatch = useDispatch<Dispatch>()
   const [displayedOptions, setDisplayedOptions] =
     useState<DisplayedResetOptionState>(ALL_DESELECTED)
   const runsQueryResponse = useNotifyAllRunsQuery()
-  const isFlex = useIsFlex(robotName)
 
-  // Calibration data
-  const deckCalibrationData = useDeckCalibrationData(robotName)
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
-  const tipLengthCalibrations = useTipLengthCalibrations()
-  const serverOptions = useSelector((state: State) =>
-    getResetConfigOptions(state, robotName)
-  )
-  // Check length>0 to cope with the current behavior of getResetConfigOptions.
-  // Perhaps it should return null instead of [] if we don't have options loaded yet.
-  const areServerOptionsLoaded =
-    serverOptions != null && Object.keys(serverOptions).length > 0
-
-  useEffect(() => {
-    dispatch(fetchResetConfigOptions(robotName))
-  }, [dispatch, robotName])
-
+  const { data: resetOptionsData } = useResetConfigOptionsQuery({
+    enabled: isExpanded,
+  })
+  const serverOptions = resetOptionsData?.options ?? []
+  const areServerOptionsLoaded = serverOptions.length > 0
+  const { downloadCalibration } = useDownloadCalibrationData(robotName)
   const downloadCalibrationLogs: MouseEventHandler = e => {
     e.preventDefault()
-    doTrackEvent({
-      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-      properties: {
-        robotType: isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE,
-      },
+    void downloadCalibration().catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
     })
-    saveAs(
-      new Blob([
-        JSON.stringify({
-          deck: deckCalibrationData,
-          pipetteOffset: pipetteOffsetCalibrations,
-          tipLength: tipLengthCalibrations,
-        }),
-      ]),
-      `opentrons-${robotName}-calibration.json`
-    )
   }
 
   const downloadRunHistoryLogs: MouseEventHandler = e => {
     e.preventDefault()
     const runsHistory =
       runsQueryResponse != null ? runsQueryResponse.data?.data : []
-    saveAs(
-      new Blob([JSON.stringify(runsHistory)]),
-      `opentrons-${robotName}-runsHistory.json`
-    )
+    void saveFileFromBuffer({
+      name: `opentrons-${robotName}-runsHistory.json`,
+      buffer: new TextEncoder().encode(JSON.stringify(runsHistory)).buffer,
+    }).catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   const handleClearData = (): void => {
     const reachable = robot?.status !== UNREACHABLE
     updateResetStatus(
       reachable,
-      buildResetRequest(displayedOptions, serverOptions, isFlex)
+      buildResetRequest(displayedOptions, serverOptions, true)
     )
     onCloseClick()
   }
@@ -134,7 +101,7 @@ export function DeviceResetSlideout({
       footer={
         <PrimaryButton
           disabled={
-            !isAnyOptionSelected(displayedOptions, isFlex) ||
+            !isAnyOptionSelected(displayedOptions, true) ||
             // handleClearData assumes options are loaded.
             !areServerOptionsLoaded
           }
@@ -160,53 +127,49 @@ export function DeviceResetSlideout({
             marginRight={SPACING.spacing8}
             color={COLORS.yellow60}
           />
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('resets_cannot_be_undone')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
-        {isFlex ? (
-          <>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <LegacyStyledText
-                  forwardedAs="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                >
-                  {t('clear_all_data')}
-                </LegacyStyledText>
-                <LegacyStyledText forwardedAs="p" marginY={SPACING.spacing8}>
-                  {t('clear_all_stored_data_description')}
-                </LegacyStyledText>
-                <CheckboxField
-                  onChange={() => {
-                    setDisplayedOptions(
-                      isEveryOptionSelected(displayedOptions, isFlex)
-                        ? ALL_DESELECTED
-                        : ALL_SELECTED
-                    )
-                  }}
-                  value={isEveryOptionSelected(displayedOptions, isFlex)}
-                  label={t(`select_all_settings`)}
-                  isIndeterminate={
-                    !isEveryOptionSelected(displayedOptions, isFlex) &&
-                    isAnyOptionSelected(displayedOptions, isFlex)
-                  }
-                />
-              </Flex>
-            </Flex>
-            <Divider marginY={SPACING.spacing16} />
-          </>
-        ) : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('clear_all_data')}
+            </StyledText>
+            <StyledText forwardedAs="p" marginY={SPACING.spacing8}>
+              {t('clear_all_stored_data_description')}
+            </StyledText>
+            <CheckboxField
+              onChange={() => {
+                setDisplayedOptions(
+                  isEveryOptionSelected(displayedOptions, true)
+                    ? ALL_DESELECTED
+                    : ALL_SELECTED
+                )
+              }}
+              value={isEveryOptionSelected(displayedOptions, true)}
+              label={t(`select_all_settings`)}
+              isIndeterminate={
+                !isEveryOptionSelected(displayedOptions, true) &&
+                isAnyOptionSelected(displayedOptions, true)
+              }
+            />
+          </Flex>
+        </Flex>
+        <Divider marginY={SPACING.spacing16} />
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('clear_individual_data')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('device_reset_slideout_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             marginTop={SPACING.spacing20}
             flexDirection={DIRECTION_COLUMN}
@@ -219,9 +182,12 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom="0.625rem"
               >
-                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  forwardedAs="p"
+                >
                   {t('robot_calibration_data')}
-                </LegacyStyledText>
+                </StyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -234,74 +200,37 @@ export function DeviceResetSlideout({
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={-SPACING.spacing4}
               >
-                {isFlex ? (
-                  <>
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.common.pipetteOffsetCalibrations =
-                          !options.common.pipetteOffsetCalibrations
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.common.pipetteOffsetCalibrations}
-                      // Server option "pipette offset calibrations" branded "pipette calibrations" on Flex.
-                      label={t('clear_option_pipette_calibrations')}
-                    />
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.flexOnly.gripperCalibrations =
-                          !options.flexOnly.gripperCalibrations
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.flexOnly.gripperCalibrations}
-                      label={t('clear_option_gripper_offset_calibrations')}
-                    />
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.flexOnly.moduleCalibrations =
-                          !options.flexOnly.moduleCalibrations
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.flexOnly.moduleCalibrations}
-                      label={t('clear_option_module_calibration')}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.ot2Only.deckCalibration =
-                          !options.ot2Only.deckCalibration
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.ot2Only.deckCalibration}
-                      label={t('clear_option_deck_calibration')}
-                    />
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.ot2Only.tipLengthCalibrations =
-                          !options.ot2Only.tipLengthCalibrations
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.ot2Only.tipLengthCalibrations}
-                      label={t('clear_option_tip_length_calibrations')}
-                    />
-                    <CheckboxField
-                      onChange={() => {
-                        const options = cloneDeep(displayedOptions)
-                        options.common.pipetteOffsetCalibrations =
-                          !options.common.pipetteOffsetCalibrations
-                        setDisplayedOptions(options)
-                      }}
-                      value={displayedOptions.common.pipetteOffsetCalibrations}
-                      label={t('clear_option_pipette_offset_calibrations')}
-                    />
-                  </>
-                )}
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.common.pipetteOffsetCalibrations =
+                      !options.common.pipetteOffsetCalibrations
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.common.pipetteOffsetCalibrations}
+                  // Server option "pipette offset calibrations" branded "pipette calibrations" on Flex.
+                  label={t('clear_option_pipette_calibrations')}
+                />
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.flexOnly.gripperCalibrations =
+                      !options.flexOnly.gripperCalibrations
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.flexOnly.gripperCalibrations}
+                  label={t('clear_option_gripper_offset_calibrations')}
+                />
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.flexOnly.moduleCalibrations =
+                      !options.flexOnly.moduleCalibrations
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.flexOnly.moduleCalibrations}
+                  label={t('clear_option_module_calibration')}
+                />
               </Flex>
             </Box>
             <Box>
@@ -310,9 +239,12 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom={SPACING.spacing8}
               >
-                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+                <StyledText
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  forwardedAs="p"
+                >
                   {t('protocol_run_data')}
-                </LegacyStyledText>
+                </StyledText>
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
@@ -334,28 +266,26 @@ export function DeviceResetSlideout({
                   value={displayedOptions.common.runsHistory}
                   label={t('clear_option_runs_history')}
                 />
-                {isFlex && (
-                  <CheckboxField
-                    onChange={() => {
-                      const options = cloneDeep(displayedOptions)
-                      options.flexOnly.labwareOffsets =
-                        !options.flexOnly.labwareOffsets
-                      setDisplayedOptions(options)
-                    }}
-                    value={displayedOptions.flexOnly.labwareOffsets}
-                    label={t('clear_option_labware_offsets')}
-                  />
-                )}
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.flexOnly.labwareOffsets =
+                      !options.flexOnly.labwareOffsets
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.flexOnly.labwareOffsets}
+                  label={t('clear_option_labware_offsets')}
+                />
               </Flex>
             </Box>
             <Box>
-              <LegacyStyledText
+              <StyledText
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 forwardedAs="p"
-                css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('boot_scripts')}
-              </LegacyStyledText>
+              </StyledText>
               <CheckboxField
                 onChange={() => {
                   const options = cloneDeep(displayedOptions)
@@ -367,13 +297,13 @@ export function DeviceResetSlideout({
               />
             </Box>
             <Box>
-              <LegacyStyledText
+              <StyledText
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 forwardedAs="p"
-                css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
                 {t('ssh_public_keys')}
-              </LegacyStyledText>
+              </StyledText>
               <CheckboxField
                 onChange={() => {
                   const options = cloneDeep(displayedOptions)

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 export interface UseModuleUSBPortResult {
   parseModuleUSBPort: (module: AttachedModule | null) => string

@@ -5,13 +5,13 @@ from typing import Annotated, Optional, Type, cast
 from fastapi import Depends
 from opentrons_hardware.hardware_control.types import PCBARevision
 
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbsorbanceReaderStatus,
@@ -55,7 +55,12 @@ from .module_models import (
     VacuumModule,
     VacuumModuleData,
 )
-from robot_server.hardware import get_deck_type, get_hardware
+from robot_server.hardware import (
+    HardwareStateStore,
+    get_deck_type,
+    get_hardware,
+    get_hardware_state_store,
+)
 
 
 class ModuleDataMapper:
@@ -65,9 +70,13 @@ class ModuleDataMapper:
         self,
         deck_type: Annotated[DeckType, Depends(get_deck_type)],
         hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+        hardware_state_store: Annotated[
+            HardwareStateStore, Depends(get_hardware_state_store)
+        ],
     ) -> None:
         self.deck_type = deck_type
         self.hardware = hardware
+        self.hardware_state_store = hardware_state_store
 
     def map_data(  # noqa: C901
         self,
@@ -94,9 +103,6 @@ class ModuleDataMapper:
             module_cls = MagneticModule
             assert ModuleDataValidator.is_magnetic_module_data(live_data["data"])
             live_data_height = live_data["data"].get("height")
-            assert isinstance(live_data_height, (int, float)), (
-                f"Expected magnetic module height, got {live_data_height}"
-            )
 
             # Origin of height reported by hardware API is the magnet home
             # Origin we report to the user should be labware bottom
@@ -198,11 +204,14 @@ class ModuleDataMapper:
             # support the Stacker.
             compatible_with_robot = False
             if self.deck_type == DeckType.OT3_STANDARD:
-                compatible_with_robot = self.hardware.is_simulator
-                rear_panel = self.hardware.attached_subsystems.get(SubSystem.rear_panel)
+                rear_panel = self.hardware_state_store.attached_subsystems.get(
+                    SubSystem.rear_panel
+                )
                 if rear_panel is not None:
                     rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
                     compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
+                else:
+                    compatible_with_robot = self.hardware.is_simulator
         elif module_type == ModuleType.VACUUM_MODULE:
             module_cls = VacuumModule
             assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])

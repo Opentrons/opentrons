@@ -13,12 +13,12 @@ import {
   Flex,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   ReleaseNotes,
   SecondaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
@@ -33,6 +33,7 @@ import { useIsOEMMode } from '/app/resources/robot-settings'
 
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface PlaceHolderErrorProps {
@@ -41,7 +42,7 @@ interface PlaceHolderErrorProps {
 
 const PlaceholderError = ({
   errorMessage,
-}: PlaceHolderErrorProps): JSX.Element => {
+}: PlaceHolderErrorProps): ReactNode => {
   const SOMETHING_WENT_WRONG = 'Something went wrong while updating your app.'
   const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred.'
   const FALLBACK_ERROR_MESSAGE = `If you keep getting this message, try restarting your app and/or
@@ -84,7 +85,7 @@ export interface UpdateAppModalProps {
   closeModal: (arg0: boolean) => void
 }
 
-export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
+export function UpdateAppModal(props: UpdateAppModalProps): ReactNode {
   const { closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const isOEMMode = useIsOEMMode()
@@ -136,7 +137,6 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
         marginLeft={SPACING.spacing32}
       >
         {t('release_notes')}
@@ -184,9 +184,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             padding={SPACING.spacing48}
           >
-            <LegacyStyledText>
+            <StyledText>
               {downloading ? t('download_update') : t('restarting_app')}
-            </LegacyStyledText>
+            </StyledText>
             <ProgressBar
               percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}

@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   COLORS,
@@ -7,10 +6,8 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   PrimaryButton,
-  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -18,26 +15,16 @@ import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
-
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 interface SuccessProps extends ModuleSetupWizardMaybePipetteStepProps {
   setSelectedModule: (module: AttachedModule | null) => void
   attachedModuleOnLaunch?: AttachedModule | null
 }
 
-export function Success(props: SuccessProps): JSX.Element {
+export function Success(props: SuccessProps): ReactNode {
   const {
     proceed,
     attachedModule,
@@ -46,9 +33,9 @@ export function Success(props: SuccessProps): JSX.Element {
     isOnDevice,
     restartSetup,
     setSelectedModule,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyModule = useSendIdentifyModule()
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 

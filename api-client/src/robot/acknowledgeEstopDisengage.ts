@@ -5,11 +5,13 @@ import type { HostConfig } from '../types'
 import type { EstopStatus } from './types'
 
 export function acknowledgeEstopDisengage(
-  config: HostConfig
+  config: HostConfig,
+  userNotes: string
 ): ResponsePromise<EstopStatus> {
   return request<EstopStatus>(
     PUT,
     '/robot/control/acknowledgeEstopDisengage',
-    config
+    config,
+    { userNotes }
   )
 }

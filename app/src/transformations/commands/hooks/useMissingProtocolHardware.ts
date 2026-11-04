@@ -19,10 +19,11 @@ export const useMissingProtocolHardware = (
   isLoading: boolean
 } => {
   const { data: protocolData } = useProtocolQuery(protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
   const { requiredProtocolHardware, isLoading } =
     useRequiredProtocolHardwareFromAnalysis(analysis ?? null)

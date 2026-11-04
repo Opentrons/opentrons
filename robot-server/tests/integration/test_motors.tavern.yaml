@@ -6,21 +6,21 @@ marks:
 stages:
   - name: Get status of all motors
     request:
-      url: "{ot2_server_base_url}/motors/engaged"
+      url: '{ot2_server_base_url}/motors/engaged'
       method: GET
     response:
       status_code: 200
       json:
         x:
-          enabled: !anybool 
+          enabled: !anybool
         y:
-          enabled: !anybool 
+          enabled: !anybool
         z_l:
-          enabled: !anybool 
+          enabled: !anybool
         z_r:
-          enabled: !anybool 
+          enabled: !anybool
         p_l:
-          enabled: !anybool 
+          enabled: !anybool
         p_r:
           enabled: !anybool
         g: !anything
@@ -31,9 +31,9 @@ marks:
   - usefixtures:
       - ot2_server_base_url
 stages:
-  - name: Disengae motors
+  - name: Disengage motors
     request:
-      url: "{ot2_server_base_url}/motors/disengage"
+      url: '{ot2_server_base_url}/motors/disengage'
       method: POST
       json:
         axes:
@@ -42,10 +42,10 @@ stages:
     response:
       status_code: 200
       json:
-        message: !re_search "Disengaged axes"
+        message: !re_search 'Disengaged axes'
   - name: Verify disengaged motors
     request:
-      url: "{ot2_server_base_url}/motors/engaged"
+      url: '{ot2_server_base_url}/motors/engaged'
       method: GET
     response:
       status_code: 200

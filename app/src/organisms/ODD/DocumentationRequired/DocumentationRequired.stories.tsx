@@ -29,7 +29,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof DocumentationRequiredComponent> = {
   title: 'ODD/Organisms/DocumentationRequired',
   component: DocumentationRequiredComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>
@@ -47,5 +47,7 @@ export const DocumentationRequired: Story = {
     username: 'John Doe',
     onBack: action('onBack'),
     onConfirm: action('onConfirm'),
+    minReportLength: 10,
+    actionsToDocument: [],
   },
 }

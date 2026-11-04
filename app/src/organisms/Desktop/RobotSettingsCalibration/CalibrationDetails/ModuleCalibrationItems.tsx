@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,6 +16,7 @@ import {
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -31,7 +32,7 @@ export function ModuleCalibrationItems({
   formattedPipetteOffsetCalibrations,
   robotName,
   isRobotBusy,
-}: ModuleCalibrationItemsProps): JSX.Element {
+}: ModuleCalibrationItemsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -53,23 +54,23 @@ export function ModuleCalibrationItems({
           return (
             <StyledTableRow key={attachedModule.id}>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {getModuleDisplayName(attachedModule.moduleModel)}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {attachedModule.serialNumber}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {attachedModule.moduleOffset?.last_modified != null
                     ? formatLastCalibrated(
                         attachedModule.moduleOffset?.last_modified
                       )
                     : noCalibrationCopy}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
                 {attachedModule.moduleType !== ABSORBANCE_READER_TYPE ? (

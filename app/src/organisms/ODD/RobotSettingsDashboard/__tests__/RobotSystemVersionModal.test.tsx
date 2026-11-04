@@ -41,7 +41,7 @@ describe('RobotSystemVersionModal', () => {
 
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('Robot System Version mockVersion available')
+    screen.getByText('Robot system version mockVersion available')
     screen.getByText(
       'Updating the robot software requires restarting the robot'
     )

@@ -7,8 +7,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -19,11 +20,15 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { OddModal } from '/app/molecules/OddModal'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 
+import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -34,7 +39,7 @@ interface UpdateNeededModalProps {
   setInitiatedSubsystemUpdate: (subsystem: Subsystem | null) => void
 }
 
-export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
+export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
   const [updateId, setUpdateId] = useState<string | null>(null)
@@ -49,7 +54,10 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     instrument => instrument.subsystem === subsystem
   )
 
-  const { updateSubsystem } = useUpdateSubsystemMutation({
+  const documentationState = useDocumentationState()
+  const robotName = useLocalRobotName()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName ?? 'no name')
+  const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
     },
@@ -77,10 +85,10 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     iconColor: COLORS.yellow50,
   }
 
-  let modalContent = (
-    <OddModal header={updateNeededHeader}>
+  const modalContent = (
+    <OddModal header={updateNeededHeader} modalZIndex={Z_INDEX.BLOCKING_MODALS}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"
@@ -92,9 +100,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
               bold: <strong />,
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
         <SmallButton
           onClick={() => {
+            if (!ensureCanUpdate()) {
+              return
+            }
             setInitiatedSubsystemUpdate(subsystem)
             updateSubsystem(subsystem)
           }}
@@ -108,9 +119,13 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     (status === 'updating' || status === 'queued') &&
     ongoingUpdateId != null
   ) {
-    modalContent = <UpdateInProgressModal subsystem={subsystem} />
-  } else if (status === 'done' && ongoingUpdateId != null) {
-    modalContent = (
+    return createPortal(
+      <UpdateInProgressModal subsystem={subsystem} />,
+      getTopPortalEl()
+    )
+  }
+  if (status === 'done' && ongoingUpdateId != null) {
+    return createPortal(
       <UpdateResultsModal
         instrument={instrument}
         isSuccess={updateError === undefined}
@@ -121,9 +136,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           onClose()
         }}
         shouldExit={shouldExit}
-      />
+      />,
+      getTopPortalEl()
     )
   }
 
-  return createPortal(modalContent, getTopPortalEl())
+  // Stay in the ODD tree so the admin-credentials toast and
+  // login overlay can stack above this modal.
+  return modalContent
 }

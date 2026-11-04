@@ -5,7 +5,7 @@ name: 'server-utils test/lint'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'server-utils/**/*'
       - 'Makefile'
       - 'scripts/**/*.mk'
@@ -18,13 +18,7 @@ on:
       - '*'
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    paths:
-      - 'server-utils/**/*'
-      - 'Makefile'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/server-utils-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -41,12 +35,10 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'server-utils'
@@ -58,12 +50,10 @@ jobs:
     needs: [lint]
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'server-utils'

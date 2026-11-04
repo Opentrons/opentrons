@@ -8,22 +8,24 @@ import {
   COLORS,
   Flex,
   Icon,
-  LegacyStyledText,
   MenuItem,
   MenuList,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 import { ShutdownRobotConfirmationModal } from './ShutdownRobotConfirmationModal'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler
@@ -31,11 +33,22 @@ interface NavigationMenuProps {
   setShowNavMenu: (showNavMenu: boolean) => void
 }
 
-export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
+export function NavigationMenu(props: NavigationMenuProps): ReactNode {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const { home } = useHomeMutation()
+  const { makeSnackbar } = useToaster()
+  const { homeGantry, isHoming } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+      setShowNavMenu(false)
+    },
+    onSuccess: () => {
+      setShowNavMenu(false)
+    },
+  })
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
@@ -57,8 +70,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   }
 
   const handleHomeGantry = (): void => {
-    home({ target: 'robot' })
-    setShowNavMenu(false)
+    void homeGantry()
   }
 
   return createPortal(
@@ -80,20 +92,28 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem key="reset-position" onClick={handleHomeGantry}>
+        <MenuItem
+          key="reset-position"
+          onClick={handleHomeGantry}
+          disabled={isHoming}
+        >
           <Flex alignItems={ALIGN_CENTER}>
-            <Icon
-              name="reset-position"
-              aria-label="reset-position_icon"
-              size="2.5rem"
-            />
-            <LegacyStyledText
+            {isHoming ? (
+              <Icon name="ot-spinner" aria-label="spinner" size="2.5rem" spin />
+            ) : (
+              <Icon
+                name="reset-position"
+                aria-label="reset-position_icon"
+                size="2.5rem"
+              />
+            )}
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('home_gantry')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="restart" onClick={handleRestart}>
@@ -104,13 +124,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               color={COLORS.black90}
               aria-label="restart_icon"
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('robot_controls:restart_label')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         {isFlex ? (
@@ -122,13 +142,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
                 color={COLORS.black90}
                 aria-label="power-off_icon"
               />
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing12}
               >
                 {t('robot_controls:turn_off_label')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </MenuItem>
         ) : null}
@@ -140,13 +160,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
               {t('deck_configuration')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
         <MenuItem key="light" onClick={toggleLights}>
@@ -157,7 +177,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               color={COLORS.black90}
               aria-label="light_icon"
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
@@ -166,7 +186,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
                 t(lightsOn ? 'lights_off' : 'lights_on'),
                 'capitalize'
               )}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </MenuItem>
       </MenuList>

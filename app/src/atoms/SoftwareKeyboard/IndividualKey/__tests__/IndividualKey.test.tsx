@@ -1,39 +1,50 @@
 import { useRef } from 'react'
-import { fireEvent, renderHook, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { IndividualKey } from '..'
 
-import type { ComponentProps } from 'react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-const render = (props: ComponentProps<typeof IndividualKey>) => {
-  return renderWithProviders(<IndividualKey {...props} />)[0]
+function TestKeyboard(): JSX.Element {
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <>
+      <input data-testid="IndividualKey_Input" ref={inputElementRef} />
+      <IndividualKey
+        keyboardRef={keyboardRef}
+        inputElementRef={inputElementRef}
+        keyText="mockKey"
+      />
+    </>
+  )
+}
+
+const render = () => {
+  return renderWithProviders(<TestKeyboard />)[0]
 }
 
 describe('IndividualKey', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should render the text key', () => {
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-      keyText: 'mockKey',
-    }
-    render(props)
+    render()
     screen.getByRole('button', { name: 'mockKey' })
   })
 
-  it('should call mock function when clicking text key', () => {
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-      keyText: 'mockKey',
-    }
-    render(props)
-    const textKey = screen.getByRole('button', { name: 'mockKey' })
-    fireEvent.click(textKey)
-    expect(props.onChange).toHaveBeenCalled()
+  it('should update the input when clicking keys', async () => {
+    const user = userEvent.setup()
+    render()
+    await user.click(screen.getByRole('button', { name: 'mockKey' }))
+    expect(screen.getByTestId('IndividualKey_Input')).toHaveValue('mockKey')
   })
 })

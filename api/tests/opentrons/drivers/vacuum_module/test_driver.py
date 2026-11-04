@@ -378,6 +378,68 @@ async def test_get_pressure_control_tunings(
     )
 
 
+async def test_set_waste_configs(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should send M127 with sealed-hold knobs and enable."""
+    connection.send_command.return_value = "M127"
+
+    await subject.set_waste_configs(
+        True,
+        p_filter_alpha=0.5,
+        g_sealed_max=0.50,
+        flowing_dp_mbar=8.0,
+        stable_hold_ms=6000.0,
+        stable_hold_deep_ms=10000.0,
+        min_waste_depth_mbar=20.0,
+    )
+
+    set_waste = (
+        types.GCODE.SET_WASTE_CONFIG.build_command()
+        .add_float("A", 0.5)
+        .add_float("G", 0.50)
+        .add_float("H", 8.0)
+        .add_float("T", 6000.0)
+        .add_float("U", 10000.0)
+        .add_float("N", 20.0)
+        .add_int("E", 1)
+    )
+    connection.send_command.assert_any_call(set_waste)
+    connection.reset_mock()
+
+    await subject.set_waste_configs(False)
+    set_waste = types.GCODE.SET_WASTE_CONFIG.build_command().add_int("E", 0)
+    connection.send_command.assert_any_call(set_waste)
+    connection.reset_mock()
+
+
+async def test_get_waste_configs(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should parse M128 sealed-hold knobs."""
+    connection.send_command.return_value = (
+        "M128 E:1 A:0.5 G:0.50 H:8.0 T:6000 U:10000 N:20.0"
+    )
+
+    waste = await subject.get_waste_configs()
+
+    get_waste = types.GCODE.GET_WASTE_CONFIG.build_command()
+    connection.send_command.assert_any_call(get_waste)
+    assert waste == types.WasteConfigParameters(
+        waste_detection_enabled=True,
+        p_filter_alpha=0.5,
+        g_sealed_max=0.50,
+        flowing_dp_mbar=8.0,
+        stable_hold_ms=6000.0,
+        stable_hold_deep_ms=10000.0,
+        min_waste_depth_mbar=20.0,
+    )
+
+    connection.send_command.return_value = "M128 garbage"
+    with pytest.raises(ValueError):
+        await subject.get_waste_configs()
+
+
 async def test_move_port(subject: VacuumModuleDriver, connection: AsyncMock) -> None:
     """It should forward port moves to the serial connection."""
     await subject.move_port("/dev/ot_module_vacuummodule6")

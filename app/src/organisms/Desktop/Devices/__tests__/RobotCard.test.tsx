@@ -1,9 +1,10 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
+
+import { mockFetchModulesSuccessActionPayloadModules } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -13,13 +14,7 @@ import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useAttachedPipettes } from '/app/resources/instruments'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {
@@ -95,10 +90,6 @@ describe('RobotCard', () => {
     vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    vi.mocked(useAttachedPipettes).mockReturnValue({
-      left: mockLeftProtoPipette,
-      right: mockRightProtoPipette,
-    })
     vi.mocked(UpdateRobotBanner).mockReturnValue(
       <div>Mock UpdateRobotBanner</div>
     )
@@ -113,7 +104,7 @@ describe('RobotCard', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(getRobotModelByName)
+    vi.when(getRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
       .thenReturn('Opentrons Flex')
     vi.mocked(ErrorRecoveryBanner).mockReturnValue(

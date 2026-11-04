@@ -9,8 +9,8 @@ import {
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -21,8 +21,9 @@ import {
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface LabelProps {
@@ -48,7 +49,7 @@ interface UpdateChannelProps {
 
 export function UpdateChannel({
   handleBackPress,
-}: UpdateChannelProps): JSX.Element {
+}: UpdateChannelProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
 
@@ -60,9 +61,16 @@ export function UpdateChannel({
     ? channelOptions.filter(option => option.value !== 'alpha')
     : channelOptions
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    dispatch(updateConfigValue('update.channel', event.target.value))
-  }
+  const handleChangeAndLog = useHandleAndLog<ChangeEvent<HTMLInputElement>>(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateConfigValue('update.channel', event.target.value))
+    },
+    'change_update_channel',
+    (event: ChangeEvent<HTMLInputElement>) => ({
+      action: 'change update channel',
+      message: `User changed update channel to ${event.target.value}`,
+    })
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -75,13 +83,13 @@ export function UpdateChannel({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('update_channel_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
@@ -94,21 +102,21 @@ export function UpdateChannel({
                 type="radio"
                 value={radio.value}
                 checked={radio.value === channel}
-                onChange={handleChange}
+                onChange={handleChangeAndLog}
               />
               <SettingButtonLabel
                 htmlFor={radio.label}
                 isSelected={radio.value === channel}
               >
-                <LegacyStyledText
+                <StyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight="1.875rem"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {radio.label}
-                </LegacyStyledText>
+                </StyledText>
                 {radio.label === 'Alpha' ? (
-                  <LegacyStyledText
+                  <StyledText
                     marginTop={SPACING.spacing4}
                     fontSize={TYPOGRAPHY.fontSize28}
                     lineHeight={TYPOGRAPHY.lineHeight36}
@@ -118,7 +126,7 @@ export function UpdateChannel({
                     }
                   >
                     {t('alpha_description')}
-                  </LegacyStyledText>
+                  </StyledText>
                 ) : null}
               </SettingButtonLabel>
             </Fragment>

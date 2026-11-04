@@ -19,10 +19,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Modal,
   ProtocolDeck,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -82,11 +82,7 @@ interface ProtocolDetailsProps extends StoredProtocolData {
 }
 
 export type ProtocolDetailsTab =
-  | 'robot_config'
-  | 'labware'
-  | 'liquids'
-  | 'stats'
-  | 'parameters'
+  'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
 
 export function ProtocolDetailsContents(
   props: ProtocolDetailsProps
@@ -300,12 +296,12 @@ export function ProtocolDetailsContents(
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   padding={SPACING.spacing16}
                 >
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('deck_view')}
-                  </LegacyStyledText>
+                  </StyledText>
                   <Btn
                     alignItems={ALIGN_CENTER}
                     disabled={analysisStatus !== 'complete'}

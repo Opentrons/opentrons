@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_MODELS,
@@ -11,6 +11,7 @@ import {
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -22,7 +23,7 @@ interface EqipmentItem {
 
 interface BeforeBeginningProps extends ModuleSetupWizardMaybePipetteStepProps {}
 
-export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
+export function BeforeBeginning(props: BeforeBeginningProps): ReactNode {
   const { proceed, attachedModule, setErrorMessage } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
 
@@ -75,7 +76,7 @@ export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
           t={t}
           i18nKey="branded:module_calibration_get_started"
           values={{ module: moduleDisplayName }}
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{ block: <StyledText forwardedAs="p" /> }}
         />
       }
       proceedButtonText={t('start_setup')}

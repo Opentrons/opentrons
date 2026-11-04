@@ -1,64 +1,62 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { updateSetting } from '/app/redux/robot-settings'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
-import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '/app/redux/robot-settings/types'
-import type { Dispatch } from '/app/redux/types'
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface ShortTrashBinProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function ShortTrashBin({
   settings,
-  robotName,
   isRobotBusy,
-}: ShortTrashBinProps): JSX.Element {
+}: ShortTrashBinProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'shortTrashBin'
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_devTools"
         >
           {t('short_trash_bin')}
-        </LegacyStyledText>
-        <LegacyStyledText css={TYPOGRAPHY.pRegular}>
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('short_trash_bin_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="short_trash_bin"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="AdvancedSettings_shortTrashBin"
         disabled={isRobotBusy}
       />
     </Flex>

@@ -12,11 +12,11 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+from server_utils.sql_utils import JsonPythonValue
 
 from auth_server.persistence.fastapi_dependencies import get_sql_engine
 from auth_server.persistence.orm_models import (
     AccessControlEnabled,
-    JsonPythonValue,
     Setting,
 )
 from auth_server.settings.models import (

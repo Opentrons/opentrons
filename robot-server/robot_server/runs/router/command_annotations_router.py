@@ -84,7 +84,7 @@ async def get_command_annotations_list(
     """
     try:
         total_command_annotations_count = (
-            run_data_manager.get_total_command_annotations_count(
+            await run_data_manager.get_total_command_annotations_count(
                 run_id=runId,
             )
         )
@@ -93,7 +93,7 @@ async def get_command_annotations_list(
             cursor = max(cursor - pageLength + 1, 0)
             cursor = min(cursor, total_command_annotations_count)
 
-        annotations_slice = run_data_manager.get_command_annotations_slice(
+        annotations_slice = await run_data_manager.get_command_annotations_slice(
             run_id=runId, cursor=cursor, length=pageLength
         )
     except RunNotFoundError as e:
@@ -138,7 +138,7 @@ async def get_command_annotation(
         commandAnnotationId: Unique command annotation identifier.
     """
     try:
-        annotation = run_data_manager.get_command_annotation(
+        annotation = await run_data_manager.get_command_annotation(
             run_id=runId, annotation_id=commandAnnotationId
         )
     except RunNotFoundError as e:

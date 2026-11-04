@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useSearchLabwareOffsets } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -17,16 +19,19 @@ export function useNotifySearchLabwareOffsets(
     AxiosError
   > = {}
 ): UseQueryResult<SearchLabwareOffsetsResponse> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/labwareOffsets',
     options,
   })
 
   const httpQueryResult = useSearchLabwareOffsets(request, queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

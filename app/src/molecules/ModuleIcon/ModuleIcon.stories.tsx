@@ -2,15 +2,15 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ModuleIcon } from './index'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 export default {
   title: 'App/Molecules/ModuleIcon',
@@ -50,7 +50,7 @@ const modules = [
 
 const Template: Story<React.ComponentProps<typeof ModuleIcon>> = args => (
   <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-    <LegacyStyledText>Modules</LegacyStyledText>
+    <StyledText>Modules</StyledText>
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
       {modules.map((module, i) => (
         <ModuleIcon

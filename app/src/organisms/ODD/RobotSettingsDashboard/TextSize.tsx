@@ -13,10 +13,11 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from './types'
 
 interface RectProps {
@@ -36,7 +37,7 @@ interface TextSizeProps {
 }
 
 // ToDo (kj:03/03/2023) We need to define the max text size and min text size also decided to the default text size position in the rectangles
-export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
+export function TextSize({ setCurrentOption }: TextSizeProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
 
   const handleClick = (changeType: 'up' | 'down'): void => {
@@ -53,15 +54,12 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
-        <LegacyStyledText
-          fontSize="2rem"
-          textAlign={TYPOGRAPHY.textAlignCenter}
-        >
+        <StyledText fontSize="2rem" textAlign={TYPOGRAPHY.textAlignCenter}>
           {t('text_size')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop="8.125rem">
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -69,7 +67,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           width="56.5rem"

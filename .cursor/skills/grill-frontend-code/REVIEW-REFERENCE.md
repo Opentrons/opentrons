@@ -1,0 +1,70 @@
+# Opentrons Frontend Review Reference
+
+This reference governs the architectural boundaries of Opentrons UI development.
+
+## 1. Atomic Design Layers
+
+Canonical source: `.cursor/skills/opentrons-typescript/SKILL.md` § "Atomic Design Hierarchy".
+Open it and check the diff against the layer-import rules there (atoms → molecules →
+organisms → pages, the `no-imports-up-the-tree-of-life` ESLint rule). Cite the exact
+violated rule from that file in your `Details` — do not re-derive the boundary from memory.
+
+## 2. CSS Modules & Styles
+
+Canonical source: `.cursor/skills/css-modules/SKILL.md`.
+Open it and check file naming, class naming, design-token usage, and Stylelint rules
+against that file. Do not restate these rules here — they will drift out of sync.
+
+## 3. Web Accessibility (a11y)
+
+Opentrons interfaces are used in physical lab environments. Accessibility is functional reliability.
+
+- **Interactivity**: Any clickable element that is not a semantic `<button>` or `<a>` must be rejected. Do not allow `onClick` on a raw `<div>` without appropriate `role` and `tabIndex`.
+- **Visual Labels**: Icon-only buttons (e.g., an X close button) must explicitly declare an `aria-label` or `aria-describedby`.
+- **Dynamic States**: Loading indicators must possess `aria-busy="true"`.
+
+## 4. TypeScript & Logic Rigor
+
+Canonical source: `.cursor/skills/opentrons-typescript/SKILL.md` § "Common Pitfalls" and
+"TypeScript Configuration". Cross-check `any` usage, nullability checks, and nested-ternary
+usage against that list.
+
+## 5. Component API Design (Props Extension)
+
+Standard HTML attributes must not be manually replicated. Components that wrap native HTML elements must explicitly extend native attributes to maintain web standards and prevent configuration creep.
+
+- **Anti-Pattern (Manual Shadowing)**: Do not manually type ubiquitous props like `onClick`, `className`, `id`, or `style` in custom prop interfaces.
+- **Enforced Pattern**: Always extend `React.ComponentPropsWithoutRef<'tag'>` (or `React.ComponentPropsWithRef<'tag'>` if forwarding refs).
+
+```ts
+// ❌ BAD: Manual and brittle replication
+interface ButtonProps {
+  label: string
+  onClick?: () => void
+  className?: string
+  disabled?: boolean
+}
+
+//  GOOD: Native type extension
+interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
+  label: string // Only define custom business props here
+}
+```
+
+## 6. Test Coverage & Rigor (Unprotected Code)
+
+Every feature branch must guard against regression. Code without test coverage is an automatic failure.
+
+- **Sibling Rule**: Any new component `MyComponent.tsx` or hook `useMyHook.ts` must be accompanied by a sibling `__tests__/MyComponent.test.tsx` or `MyComponent.test.ts` file within the same directory.
+- **RTL Standards**: Opentrons uses React Testing Library.
+  - Avoid testing internal state; always test observable behavior from the user's perspective (e.g., fireEvent/userEvent).
+  - Enforce explicit MSW (Mock Service Worker) handlers for any network/API layer mock, rather than manual `vi.fn()` overrides of global fetch.
+
+## 7. Modularization vs. Over-engineering (Over-baked Code)
+
+Components must be lean, single-purpose, and modular. Do not write speculative code for future feature requirements.
+
+- **The 300-Line Ceiling**: Any component file exceeding 300 lines of code (including styles and types) is an automatic trigger for structural review. Demand that the author split the file and extract sub-sections into dedicated Atoms or Molecules.
+- **Single Responsibility**: If a component is handling both complex layouts, business logic fetching, and deep sub-UI states, it must be split regardless of line count.
+- **Speculative Props**: Reject any prop, utility function, or configuration object added "for future flexibility" that is not actively utilized in the current PR's user stories.
+- **YAGNI Enforced**: Lean on the side of minimal code. If a component can be achieved with standard primitives and design tokens without adding new custom wrapper functions, force the simpler path.

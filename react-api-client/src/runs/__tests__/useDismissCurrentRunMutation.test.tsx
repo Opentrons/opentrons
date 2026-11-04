@@ -6,6 +6,7 @@ import { dismissCurrentRun } from '@opentrons/api-client'
 
 import { useDismissCurrentRunMutation } from '..'
 import { RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -31,18 +32,29 @@ describe('useDismissCurrentRunMutation hook', () => {
 
   it('should dismiss the current run when callback is called', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(dismissCurrentRun).mockResolvedValue({ data: 'something' } as any)
+    const mockRunResponse = {
+      data: { id: RUN_ID_1, logPeriodId: 'log-period-1' },
+    }
+    vi.mocked(dismissCurrentRun).mockResolvedValue({
+      data: mockRunResponse,
+    } as any)
 
-    const { result } = renderHook(() => useDismissCurrentRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useDismissCurrentRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {
       result.current.dismissCurrentRun(RUN_ID_1)
     })
     await waitFor(() => {
-      expect(result.current.data).toBe('something')
+      expect(result.current.data).toEqual(mockRunResponse)
     })
   })
 })

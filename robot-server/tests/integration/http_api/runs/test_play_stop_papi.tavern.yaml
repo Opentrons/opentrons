@@ -118,7 +118,7 @@ stages:
             notes: []
             error:
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-              detail: 'Run was cancelled'
+              detail: 'Run was cancelled '
               errorCode: '4000'
               errorInfo: {}
               errorType: 'RunStoppedError'

@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { Snackbar as SnackbarComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -17,7 +18,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof SnackbarComponent> = {
   title: 'Helix/Atoms/Snackbar',
   component: SnackbarComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(
@@ -75,7 +78,7 @@ const SnackbarRenderComponent: React.FC<
           width="100%"
           position="absolute"
           bottom={SPACING.spacing40}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
         >
           <SnackbarComponent
             {...args}

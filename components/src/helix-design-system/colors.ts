@@ -86,7 +86,7 @@ export const transparentBlack90 = `${black90}90`
 /**
  * flex
  */
-export const flex40 = '#aae3fc'
+export const flex40 = '#99E4FF'
 export const flex55 = '#0297CC'
 export const flex50 = '#00BDFF'
 

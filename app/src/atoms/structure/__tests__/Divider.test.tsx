@@ -27,7 +27,7 @@ describe('Divider', () => {
 
   it('renders divider', () => {
     render(props)
-    const divider = screen.getByTestId('divider')
+    const divider = screen.getByRole('separator')
     expect(divider).toHaveStyle(`borderBottom: 1px solid ${COLORS.grey30}`)
     expect(divider).toHaveStyle('width: 80%')
     expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)
@@ -43,7 +43,7 @@ describe('Divider', () => {
       paddingX: SPACING.spacing4,
     }
     render(props)
-    const divider = screen.getByTestId('divider')
+    const divider = screen.getByRole('separator')
     expect(divider).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')

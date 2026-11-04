@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   A1_NOZZLE,
@@ -439,7 +438,7 @@ mock_pipette.aspirate(
     })
   })
   it('should return an error when aspirating east/west of a heater shaker with a multi channel pipette', () => {
-    when(getIsHeaterShakerEastWestMultiChannelPipette)
+    vi.when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
@@ -469,7 +468,7 @@ mock_pipette.aspirate(
     })
   })
   it('should return an error when aspirating east/west of a heater shaker with its latch open', () => {
-    when(getIsHeaterShakerEastWestWithLatchOpen)
+    vi.when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
@@ -498,7 +497,7 @@ mock_pipette.aspirate(
     })
   })
   it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking for ot-2', () => {
-    when(pipetteAdjacentHeaterShakerWhileShaking)
+    vi.when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
@@ -528,7 +527,7 @@ mock_pipette.aspirate(
     })
   })
   it('should return an error when aspirating north/south of a heater shaker from a non tiprack using a multi channel pipette', () => {
-    when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+    vi.when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),

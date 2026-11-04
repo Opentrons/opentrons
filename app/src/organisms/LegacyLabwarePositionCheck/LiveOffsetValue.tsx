@@ -9,14 +9,15 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface OffsetVectorProps extends StyleProps {
@@ -25,7 +26,7 @@ interface OffsetVectorProps extends StyleProps {
   z: number
 }
 
-export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
+export function LiveOffsetValue(props: OffsetVectorProps): ReactNode {
   const { x, y, z, ...styleProps } = props
   const axisLabels = ['X', 'Y', 'Z']
   const { i18n, t } = useTranslation('labware_position_check')
@@ -37,7 +38,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       marginY={SPACING.spacing8}
       gridGap={SPACING.spacing4}
     >
-      <LegacyStyledText
+      <StyledText
         forwardedAs="label"
         fontWeight={
           isOnDevice
@@ -46,7 +47,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         }
       >
         {i18n.format(t('labware_offset_data'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         border={`${BORDERS.styleSolid} 1px ${COLORS.grey30}`}
@@ -57,17 +58,15 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         <Icon name="reticle" size={isOnDevice ? '1.5rem' : SIZE_1} />
         {[x, y, z].map((axis, index) => (
           <Fragment key={index}>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               marginLeft={SPACING.spacing8}
               marginRight={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {axisLabels[index]}
-            </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
-              {axis.toFixed(1)}
-            </LegacyStyledText>
+            </StyledText>
+            <StyledText forwardedAs="p">{axis.toFixed(1)}</StyledText>
           </Fragment>
         ))}
       </Flex>

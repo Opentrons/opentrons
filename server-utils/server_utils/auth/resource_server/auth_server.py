@@ -6,12 +6,17 @@ This is just the bare minimum required by resource servers.
 from __future__ import annotations
 
 import contextlib
-import json
 import typing
 from abc import ABC, abstractmethod
 
 import aiohttp
-import pydantic
+
+from .types import (
+    AuthSettingsResponse,
+    ClientIDType,
+    TokenIntrospectionRequestFormData,
+    TokenIntrospectionResponse,
+)
 
 SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
 ALL_AUTH_SETTINGS_ENDPOINT_PATH = "auth/settings"
@@ -27,7 +32,6 @@ TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 # in our requests here. If it isn't, we should use a client_id separate from the
 # Opentrons App, like "opentrons_resource_server" or something.
 CLIENT_ID: ClientIDType = "opentrons_app"
-ClientIDType: typing.TypeAlias = typing.Literal["opentrons_app"]
 
 
 class Client(ABC):
@@ -36,17 +40,6 @@ class Client(ABC):
     @abstractmethod
     async def get_auth_settings(self) -> AuthSettingsResponse:
         """Ask the Opentrons auth-server what the current system-wide auth settings are.
-
-        If there's an internal error (e.g. the auth server is unconnectable),
-        the implementation should raise it as an exception.
-        """
-        pass
-
-    @abstractmethod
-    async def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionSettingsResponse:
-        """Read ``requireReasonForInteraction`` from GET /auth/settings.
 
         If there's an internal error (e.g. the auth server is unconnectable),
         the implementation should raise it as an exception.
@@ -117,20 +110,6 @@ class LocalHTTPClient(Client):
         return parsed_response
 
     @typing.override
-    async def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionSettingsResponse:
-        async with self._session.get(ALL_AUTH_SETTINGS_ENDPOINT_PATH) as response:
-            response_bytes = await response.read()
-        response.raise_for_status()
-        body = json.loads(response_bytes)
-        return RequireReasonForInteractionSettingsResponse(
-            data=RequireReasonForInteractionSettingsResponseData(
-                requireReasonForInteraction=body["data"]["requireReasonForInteraction"],
-            )
-        )
-
-    @typing.override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:
         request_form_data: TokenIntrospectionRequestFormData = {
             "token": token,
@@ -144,53 +123,3 @@ class LocalHTTPClient(Client):
         response.raise_for_status()
         parsed_response = TokenIntrospectionResponse.model_validate_json(response_bytes)
         return parsed_response
-
-
-class _StrictBaseModel(pydantic.BaseModel):
-    model_config = {"strict": True}
-
-
-class TokenIntrospectionResponse(_StrictBaseModel):
-    """A response body from auth-server's token introspection endpoint.
-
-    This is specified by https://datatracker.ietf.org/doc/html/rfc7662#section-2.2.
-    """
-
-    active: bool
-    scope: str = ""
-    username: str | None = None
-
-
-class TokenIntrospectionRequestFormData(typing.TypedDict):
-    """Form data for a request to auth-server's token introspection endpoint.
-
-    This is specified by https://datatracker.ietf.org/doc/html/rfc7662#section-2.1.
-    """
-
-    token: str
-
-    client_id: ClientIDType
-
-
-class AuthSettingsResponse(_StrictBaseModel):
-    """A response body from auth-server's /settings endpoint."""
-
-    data: AuthSettingsResponseData
-
-
-class AuthSettingsResponseData(_StrictBaseModel):
-    """Response body data from auth-server's /settings endpoint."""
-
-    accessControlEnabled: bool
-
-
-class RequireReasonForInteractionSettingsResponse(_StrictBaseModel):
-    """A response body with the require-reason-for-interaction setting."""
-
-    data: RequireReasonForInteractionSettingsResponseData
-
-
-class RequireReasonForInteractionSettingsResponseData(_StrictBaseModel):
-    """Response body data for the require-reason-for-interaction setting."""
-
-    requireReasonForInteraction: bool

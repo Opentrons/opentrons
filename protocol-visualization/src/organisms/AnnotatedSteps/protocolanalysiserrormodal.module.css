@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.button_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.code_block_container {
+  position: relative;
+}
+
+.copy_button {
+  position: absolute;
+  z-index: var(--z-index-base);
+  top: var(--spacing-8);
+  right: var(--spacing-12);
+}

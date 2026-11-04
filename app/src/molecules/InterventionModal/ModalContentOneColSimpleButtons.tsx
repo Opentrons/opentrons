@@ -3,15 +3,15 @@ import { useState } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { OneColumn } from './OneColumn'
 
-import type { ChangeEventHandler } from 'react'
+import type { ChangeEventHandler, ReactNode } from 'react'
 
 export interface ButtonProps {
   label: string
@@ -30,7 +30,7 @@ export interface ModalContentOneColSimpleButtonsProps {
 
 export function ModalContentOneColSimpleButtons(
   props: ModalContentOneColSimpleButtonsProps
-): JSX.Element {
+): ReactNode {
   const [selected, setSelected] = useState<string | null>(
     props.initialSelected ?? null
   )
@@ -42,13 +42,13 @@ export function ModalContentOneColSimpleButtons(
         height="100%"
       >
         <Flex>
-          <LegacyStyledText
+          <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight={TYPOGRAPHY.lineHeight36}
           >
             {props.headline}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -69,13 +69,13 @@ export function ModalContentOneColSimpleButtons(
             />
           ))}
           {props.subText != null ? (
-            <LegacyStyledText
+            <StyledText
               fontSize={TYPOGRAPHY.fontSize22}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               lineHeight={TYPOGRAPHY.lineHeight28}
             >
               {props.subText}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>

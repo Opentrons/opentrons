@@ -9,7 +9,7 @@ from opentrons.drivers.mag_deck import (
     MagDeckDriver,
     SimulatingDriver,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.modules.retry import retry_module_init
 
 log = logging.getLogger(__name__)
@@ -218,7 +218,7 @@ class MagDeck(mod_abc.AbstractModule):
             "height": self.current_height,
         }
         return {
-            "status": self.status,
+            "status": self.status.value,
             "data": data,
         }
 

@@ -2,16 +2,17 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
+import { SECURITY_WPA_EAP, SECURITY_WPA_PSK } from '@opentrons/api-client'
 import { BUTTON_TYPE_SUBMIT, FONT_SIZE_BODY_1 } from '@opentrons/components'
 
 import { ScrollableAlertModal } from '/app/molecules/modals'
-import { SECURITY_WPA_EAP, SECURITY_WPA_PSK } from '/app/redux/networking'
 
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'
 import { TextField } from './TextField'
 
+import type { ReactNode } from 'react'
 import type { Control } from 'react-hook-form'
 import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 
@@ -50,7 +51,7 @@ export interface FormModalProps {
   control: Control<ConnectFormValues, any>
 }
 
-export const FormModal = (props: FormModalProps): JSX.Element => {
+export const FormModal = (props: FormModalProps): ReactNode => {
   const { id, network, fields, isValid, onCancel, control } = props
   const { t } = useTranslation(['device_settings', 'shared'])
 
@@ -126,6 +127,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
                     {...fieldProps}
                     field={field}
                     fieldState={fieldState}
+                    onCancel={onCancel}
                   />
                 )}
               />

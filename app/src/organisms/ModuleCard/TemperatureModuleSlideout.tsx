@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -20,10 +19,11 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
+import type { TemperatureModule } from '@opentrons/api-client'
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '/app/redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
@@ -36,7 +36,8 @@ export const TemperatureModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
   const { reportModuleCommand } = useModuleCommandAnalytics()
@@ -104,7 +105,7 @@ export const TemperatureModuleSlideout = (
         />
       }
     >
-      <LegacyStyledText
+      <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -113,20 +114,19 @@ export const TemperatureModuleSlideout = (
         {t('tempdeck_slideout_body', {
           model: name,
         })}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.black90}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
-        </LegacyStyledText>
+        </StyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
             id={`${String(module.moduleModel)}`}

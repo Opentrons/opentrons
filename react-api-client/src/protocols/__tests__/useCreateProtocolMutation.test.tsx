@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createProtocol } from '@opentrons/api-client'
 
 import { useCreateProtocolMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -59,9 +60,13 @@ describe('useCreateProtocolMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createProtocol).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCreateProtocolMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateProtocolMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.createProtocol({ files: createProtocolData })
@@ -76,9 +81,13 @@ describe('useCreateProtocolMutation hook', () => {
       data: PROTOCOL_RESPONSE,
     } as Response<Protocol>)
 
-    const { result } = renderHook(() => useCreateProtocolMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateProtocolMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.createProtocol({ files: createProtocolData }))
 
     await waitFor(() => {
@@ -92,9 +101,13 @@ describe('useCreateProtocolMutation hook', () => {
       data: PROTOCOL_RESPONSE,
     } as Response<Protocol>)
 
-    const { result } = renderHook(() => useCreateProtocolMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateProtocolMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() =>
       result.current.createProtocol({
         files: createProtocolData,

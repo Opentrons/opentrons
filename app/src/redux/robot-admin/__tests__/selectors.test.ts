@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CONNECTABLE, REACHABLE } from '../../discovery'
-import {
-  getNextRestartStatus,
-  getResetConfigOptions,
-  getRobotRestarting,
-} from '../selectors'
+import { getNextRestartStatus, getRobotRestarting } from '../selectors'
 
 import type { ConnectivityStatus } from '../../discovery/types'
 import type { State } from '../../types'
@@ -18,36 +14,6 @@ const RESTART_BASE = {
 }
 
 describe('robot admin selectors', () => {
-  describe('get reset config options', () => {
-    it('should return empty array by default', () => {
-      const state: State = { robotAdmin: {} } as any
-
-      const result = getResetConfigOptions(state, 'robotName')
-
-      expect(result).toEqual([])
-    })
-
-    it('should return options from state', () => {
-      const state: State = {
-        robotAdmin: {
-          robotName: {
-            resetConfigOptions: [
-              { id: 'foo', name: 'Foo', description: 'foobar' },
-              { id: 'baz', name: 'Baz', description: 'bazqux' },
-            ],
-          },
-        },
-      } as any
-
-      const result = getResetConfigOptions(state, 'robotName')
-
-      expect(result).toEqual([
-        { id: 'foo', name: 'Foo', description: 'foobar' },
-        { id: 'baz', name: 'Baz', description: 'bazqux' },
-      ])
-    })
-  })
-
   describe('get robot restarting', () => {
     it('should return true if restart status is pending or in progress', () => {
       const state: State = {

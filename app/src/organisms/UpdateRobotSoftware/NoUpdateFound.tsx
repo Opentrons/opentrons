@@ -8,18 +8,20 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 export interface NoUpdateFoundProps {
   onContinue: () => void
 }
 
-export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
+export function NoUpdateFound(props: NoUpdateFoundProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const { onContinue } = props
   return (
@@ -44,12 +46,9 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
           color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('software_is_up_to_date')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}

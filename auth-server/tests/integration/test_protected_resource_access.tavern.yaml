@@ -3,6 +3,7 @@ test_name: Accessing protected resources within auth-server
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Enable access control enabled so protected resources require a valid token

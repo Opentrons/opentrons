@@ -372,6 +372,19 @@ class CANBusBusError(CommunicationError):
         super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
 
 
+class KeyStorageUnavailableError(CommunicationError):
+    """An error indicating a low-level communications failure with key storage."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a KeyStorageUnavailableError."""
+        super().__init__(ErrorCodes.KEY_STORAGE_UNAVAILABLE, message, detail, wrapping)
+
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
@@ -1340,6 +1353,22 @@ class MissingConfigurationData(GeneralError):
         super().__init__(
             ErrorCodes.MISSING_CONFIGURATION_DATA, message, detail, wrapping
         )
+
+
+class AuditLoggingError(GeneralError):
+    """An error indicating an audit logging failure.
+
+    Raised when audit log storage or ingest operations fail.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an AuditLoggingError."""
+        super().__init__(ErrorCodes.AUDIT_LOGGING_ERROR, message, detail, wrapping)
 
 
 class VacuumModuleUnknownError(RoboticsControlError):

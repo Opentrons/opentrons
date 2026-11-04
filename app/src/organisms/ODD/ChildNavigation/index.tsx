@@ -10,10 +10,10 @@ import {
   InlineNotification,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,6 +27,7 @@ import type {
   StyleProps,
 } from '@opentrons/components'
 import type {
+  ButtonCategory,
   IconPlacement,
   SmallButtonTypes,
 } from '/app/atoms/buttons/SmallButton'
@@ -38,12 +39,14 @@ export interface ChildNavigationProps extends StyleProps {
   inlineNotification?: InlineNotificationProps
   onClickButton?: MouseEventHandler
   buttonType?: SmallButtonTypes
+  buttonCategory?: ButtonCategory
   buttonIsDisabled?: boolean
   iconName?: IconName
   backIconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: ComponentProps<typeof SmallButton>
   ariaDisabled?: boolean
+  headerStyleProps?: StyleProps
 }
 
 export function ChildNavigation({
@@ -53,14 +56,16 @@ export function ChildNavigation({
   onClickBack,
   onClickButton,
   buttonType = 'primary',
+  buttonCategory,
   iconName,
   backIconName,
   iconPlacement,
   secondaryButtonProps,
   buttonIsDisabled,
   ariaDisabled = false,
+  headerStyleProps,
   ...styleProps
-}: ChildNavigationProps): JSX.Element {
+}: ChildNavigationProps): ReactNode {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -90,12 +95,13 @@ export function ChildNavigation({
             />
           </IconButton>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
+          {...headerStyleProps}
         >
           {header}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
@@ -108,7 +114,10 @@ export function ChildNavigation({
 
           <SmallButton
             buttonType={buttonType}
-            buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
+            buttonCategory={
+              buttonCategory ??
+              (buttonType === 'primary' ? 'rounded' : 'default')
+            }
             buttonText={buttonText}
             onClick={onClickButton}
             iconName={iconName}

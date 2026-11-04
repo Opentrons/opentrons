@@ -52,28 +52,28 @@ REPOS = [
         "name": "ot3-firmware",
         "dir_name": "ot3-firmware",
         "clone_url": "git@github.com:opentrons/ot3-firmware.git",
-        "tag_pattern": "v*",
+        "tag_pattern": "v[0-9]*",
         "tag_type": "numeric",  # v67 → v68
     },
     {
         "name": "buildroot",
         "dir_name": "buildroot",
         "clone_url": "git@github.com:opentrons/buildroot.git",
-        "tag_pattern": "v*",
+        "tag_pattern": "v[0-9]*",
         "tag_type": "semver",  # v1.19.6 → v1.19.7
     },
     {
         "name": "oe-core",
         "dir_name": "oe-core",
         "clone_url": "git@github.com:opentrons/oe-core.git",
-        "tag_pattern": "v*",
+        "tag_pattern": "v[0-9]*",
         "tag_type": "semver",  # v0.9.7 → v0.9.8
     },
     {
         "name": "opentrons",
         "dir_name": "opentrons",
         "clone_url": "git@github.com:opentrons/opentrons.git",
-        "tag_pattern": "v*",   # Match all v* tags (both alpha and non-alpha)
+        "tag_pattern": "v[0-9]*.[0-9]*",   # Semver robot-stack tags (v9.1.0, v9.1.0-alpha.1, ...)
         "tag_type": "alpha",   # alpha logic described below
     },
 ]

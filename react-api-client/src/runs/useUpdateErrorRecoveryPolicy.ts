@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { updateErrorRecoveryPolicy } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -14,6 +13,7 @@ import type {
   RecoveryPolicyRulesParams,
   UpdateErrorRecoveryPolicyResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseErrorRecoveryPolicyResponse = UseMutationResult<
   UpdateErrorRecoveryPolicyResponse,
@@ -35,18 +35,21 @@ export type UseUpdateErrorRecoveryPolicyOptions = UseMutationOptions<
 
 export function useUpdateErrorRecoveryPolicy(
   runId: string,
+  documentationState: DocumentationState,
   options: UseUpdateErrorRecoveryPolicyOptions = {}
 ): UseErrorRecoveryPolicyResponse {
   const host = useHost()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     UpdateErrorRecoveryPolicyResponse,
     AxiosError,
     RecoveryPolicyRulesParams
   >(
+    documentationState,
+    ['update_error_recovery_policy'],
     getQueryKey(host, 'runs', runId, 'errorRecoveryPolicy'),
-    (policyRules: RecoveryPolicyRulesParams) =>
-      updateErrorRecoveryPolicy(host!, runId, policyRules)
+    ({ variables: policyRules, userNotes }) =>
+      updateErrorRecoveryPolicy(host!, runId, policyRules, userNotes)
         .then(response => response.data)
         .catch(e => {
           throw e

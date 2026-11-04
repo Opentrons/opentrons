@@ -11,8 +11,6 @@ from .response import (
     EmptyBody,
     MultiBody,
     MultiBodyMeta,
-    NotifyRefetchBody,
-    NotifyUnsubscribeBody,
     PydanticResponse,
     ResourceModel,
     SimpleBody,
@@ -45,7 +43,4 @@ __all__ = [
     "DeprecatedResponseDataModel",
     "DeprecatedResponseModel",
     "DeprecatedMultiResponseModel",
-    # notify models
-    "NotifyRefetchBody",
-    "NotifyUnsubscribeBody",
 ]

@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -20,12 +19,12 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '/app/redux/networking'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
 } from '/app/redux/protocol-storage/__fixtures__'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCloseCurrentRun, useCurrentRunId } from '/app/resources/runs'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
@@ -33,7 +32,6 @@ import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
 import type { ComponentProps } from 'react'
-import type { State } from '/app/redux/types'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/ProtocolUpload/hooks')
@@ -41,7 +39,7 @@ vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock(
   '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -91,18 +89,24 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     provideNullCurrentRunIdFor(mockConnectableRobot.ip)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
-    when(vi.mocked(useCreateRunFromProtocol))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
+        expect.any(Array),
         expect.any(Array)
       )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
-    when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(expect.any(Object), null, expect.any(Array))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
+      .calledWith(
+        expect.any(Object),
+        null,
+        expect.any(Array),
+        expect.any(Array)
+      )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -110,34 +114,36 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataFixture.mostRecentAnalysis,
         expect.any(String)
       )
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         false,
         null
       )
       .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
+    vi.when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
         expect.any(String)
       )
       .thenReturn([])
-    when(vi.mocked(getNetworkInterfaces))
-      .calledWith({} as State, expect.any(String))
-      .thenReturn({ wifi: null, ethernet: null })
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: null,
+    })
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
   afterEach(() => {
+    nullCurrentRunIdOnceByHostname.clear()
     vi.resetAllMocks()
   })
 
@@ -351,20 +357,28 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
   })
 })
 
+const nullCurrentRunIdOnceByHostname = new Map<string, boolean>()
+
 const provideNullCurrentRunIdFor = (hostname: string): void => {
-  let once = true
-  when(vi.mocked(useCurrentRunId))
-    .calledWith(expect.any(Object), {
-      hostname,
-      requestor: undefined,
-    })
-    .thenDo(options => {
+  nullCurrentRunIdOnceByHostname.set(hostname, true)
+  vi.when(vi.mocked(useCurrentRunId), {
+    onUnmatched: (options, hostConfig): string | null => {
+      const matchedHostname = hostConfig?.hostname
+      if (
+        matchedHostname == null ||
+        !nullCurrentRunIdOnceByHostname.has(matchedHostname) ||
+        hostConfig?.requestor !== undefined
+      ) {
+        return null
+      }
+      const once = nullCurrentRunIdOnceByHostname.get(matchedHostname)
       void (options?.onSuccess != null && once
         ? options.onSuccess({
             links: { current: null },
           } as any)
         : {})
-      once = false
+      nullCurrentRunIdOnceByHostname.set(matchedHostname, false)
       return null
-    })
+    },
+  })
 }

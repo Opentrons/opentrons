@@ -11,7 +11,7 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
-  LegacyStyledText,
+  InfoScreen,
   NO_WRAP,
   SPACING,
   StyledText,
@@ -34,7 +34,6 @@ import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
   CAMERA_SETUP_STEP_KEY,
@@ -67,6 +66,7 @@ import {
   useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
+import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
@@ -75,6 +75,7 @@ import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
+import { useIsProtocolRunSetupLoading } from './useIsProtocolRunSetupLoading'
 
 import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -93,7 +94,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'run_details'])
   const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -116,10 +117,13 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -136,6 +140,13 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  const isSetupLoading = useIsProtocolRunSetupLoading(
+    runId,
+    isRunRecordLoading,
+    isFlex,
+    runHasStarted
+  )
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -148,9 +159,14 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
-  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const hasLpcState = useSelector(
+    (state: State) => state.protocolRuns?.[runId]?.lpc != null
+  )
+  const locationSpecificOffsetCount = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const noLwOffsetsInRun =
-    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
+    isFlex && hasLpcState && locationSpecificOffsetCount === 0
 
   // A separate app can apply offsets. We need to update the missing steps as a side effect.
   useEffect(() => {
@@ -185,14 +201,7 @@ export function ProtocolRunSetup({
     (runPipetteInfoByMount.left != null &&
       runPipetteInfoByMount.left.requestedPipetteMatch === INCOMPATIBLE) ||
     (runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE) ||
-    // for Flex, require exact match
-    (isFlex &&
-      runPipetteInfoByMount.left != null &&
-      runPipetteInfoByMount.left.requestedPipetteMatch === INEXACT_MATCH) ||
-    (isFlex &&
-      runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INEXACT_MATCH)
+      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE)
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
@@ -401,10 +410,10 @@ export function ProtocolRunSetup({
         incompleteText: null,
         incompleteElement: (
           <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.black90}
-            css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
-            id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
             whiteSpace={NO_WRAP}
           >
             {t('check_locations_and_volumes')}
@@ -452,15 +461,21 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolAnalysis != null ? (
+      {isSetupLoading ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_details:setup_loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
               {t('protocol_analysis_failed')}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             orderedSteps.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
@@ -511,10 +526,6 @@ export function ProtocolRunSetup({
             })
           )}
         </>
-      ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
       )}
     </Flex>
   )
@@ -546,8 +557,7 @@ interface HardwareRequiredStepCompletion {
 }
 
 type StepRightElementProps =
-  | NoHardwareRequiredStepCompletion
-  | HardwareRequiredStepCompletion
+  NoHardwareRequiredStepCompletion | HardwareRequiredStepCompletion
 
 const stepRequiresHW = (
   props: StepRightElementProps
@@ -569,13 +579,11 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.green60}
           marginRight={SPACING.spacing8}
           name="ot-check"
-          id={`RunSetupCard_${props.stepKey}_completeIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           color={COLORS.green60}
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_completeText`}
         >
           {props.completeText}
         </StyledText>
@@ -595,7 +603,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           }
           marginRight={SPACING.spacing8}
           name="ot-alert"
-          id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
@@ -607,7 +614,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
                 : COLORS.grey60
           }
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >
           {props.missingHardware
             ? props.missingHardwareText
@@ -623,13 +629,11 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.grey60}
           marginRight={SPACING.spacing8}
           name="ot-alert"
-          id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           color={COLORS.grey60}
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >
           {props.incompleteText}
         </StyledText>

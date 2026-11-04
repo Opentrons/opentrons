@@ -29,6 +29,7 @@ dependencies = [
     "paho-mqtt==1.6.1",
     "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
+    "zipstream-ng==1.9.3",
 ]
 
 [dependency-groups]
@@ -52,6 +53,7 @@ robot = [
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
     "Pyro5==5.16",
+    "zipstream-ng==1.9.3",
 ]
 dev = [
     "ruff==0.14.10",
@@ -80,6 +82,7 @@ dev = [
     "types-requests==2.33.*",
     "zipp==3.21.0",
     "opentrons-hardware",
+    "watchfiles>=1.2.0,<2", # For uvicorn hot reloading.
 ]
 
 [tool.ruff.lint]
@@ -152,7 +155,7 @@ source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
 root = ".."
-git_describe_command = "git describe --dirty --tags --long --match=v*"
+git_describe_command = "git describe --dirty --tags --long --match=v[0-9]*.[0-9]*"
 fallback_version = "0.0.0-dev"
 version_scheme = "only-version"
 local_scheme = "no-local-version"
@@ -175,7 +178,6 @@ packages = ["robot_server"]
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 markers = [
-    "ot2_only: Test only functions using the OT2 hardware",
     "ot3_only: Test only functions using the OT3 hardware",
     "slow: Marks tests that are especially slow. Commonly, this means the test starts and stops its own dev server process, which takes several seconds, instead of reusing a session-scoped one. Exclude this mark to run only the tests that are fast.",
     "integration: Marks tests that are integration tests with a server in a separate process",
@@ -199,9 +201,6 @@ exclude = """(?x)(
       robot
       | service/labware
       | service/legacy
-      | service/pipette_offset
-      | service/session
-      | service/tip_length
     )
     # Ignore Python Protocol API files that are used as opaque test input.
     | tests/integration/persistence_snapshots
@@ -216,9 +215,6 @@ warn_untyped_fields = true
 
 # TODO(mc, 2021-09-08): fix and remove any / all of the
 # overrides below whenever able
-[[tool.mypy.overrides]]
-module = "robot_server.service.session.*"
-no_implicit_reexport = false
 
 [[tool.mypy.overrides]]
 module = "tests.service.json_api.*"
@@ -235,4 +231,8 @@ module = [
     "Pyro5.*",
     "serpent"
 ]
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
 follow_untyped_imports = true

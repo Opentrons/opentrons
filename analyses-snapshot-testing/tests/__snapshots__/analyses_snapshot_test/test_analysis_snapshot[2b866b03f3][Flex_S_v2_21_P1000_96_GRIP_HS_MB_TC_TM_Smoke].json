@@ -373,10 +373,6 @@
             "kind": "onAddressableArea"
           },
           {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -556,10 +552,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -745,10 +737,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -938,10 +926,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -1135,10 +1119,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -12393,7 +12373,7 @@
         "position": {
           "x": 178.38,
           "y": 395.38,
-          "z": 42.12400000000001
+          "z": 44.036000000000016
         }
       },
       "startedAt": "TIMESTAMP",
@@ -13195,7 +13175,7 @@
         "position": {
           "x": 178.38,
           "y": 395.38,
-          "z": 42.12400000000001
+          "z": 44.036000000000016
         }
       },
       "startedAt": "TIMESTAMP",
@@ -13500,10 +13480,6 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -14992,7 +14968,7 @@
         "position": {
           "x": 178.38,
           "y": 395.38,
-          "z": 42.12400000000001
+          "z": 44.036000000000016
         }
       },
       "startedAt": "TIMESTAMP",

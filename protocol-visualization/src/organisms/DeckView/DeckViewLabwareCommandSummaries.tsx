@@ -11,6 +11,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { getActiveLayer } from '../utils/getActiveLayer'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 
+import type { ReactNode } from 'react'
 import type { DeckDefinition, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { LabwareEntityExtended } from './index'
@@ -31,7 +32,7 @@ const STACKER_MOVE_MAP: Record<string, string> = {
 
 export function DeckViewLabwareCommandSummaries(
   props: DeckViewLabwareCommandSummariesProps
-): JSX.Element {
+): ReactNode {
   const {
     robotState,
     invariantContext,

@@ -6,6 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     NamedTuple,
@@ -20,6 +21,7 @@ from typing import (
 from numpy import array, dot
 from numpy import double as npdouble
 from numpy.typing import NDArray
+from pydantic import BaseModel
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
@@ -35,7 +37,11 @@ from ..commands import (
     temperature_module,
     thermocycler,
 )
-from ..errors import AreaNotInDeckConfigurationError, ModuleNotConnectedError
+from ..errors import (
+    AreaNotInDeckConfigurationError,
+    FixtureDoesNotExistError,
+    ModuleNotConnectedError,
+)
 from ..resources import DeckFixedLabware, deck_configuration_provider
 from ..types import (
     AddressableAreaLocation,
@@ -100,6 +106,12 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
+
+
+class FlexStackerSubstateNotification(BaseModel):
+    """Engine notification for Flex Stacker substate change."""
+
+    stacker_substate_map: Dict[str, FlexStackerSubState]
 
 
 class SlotTransit(NamedTuple):
@@ -222,6 +234,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         config: Config,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        updates_callback: Optional[
+            Callable[[FlexStackerSubstateNotification | Any], None]
+        ] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -235,6 +250,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             deck_fixed_labware=deck_fixed_labware,
         )
         self._robot_type = config.robot_type
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -671,6 +687,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         self._state.substate_by_module_id[module_id] = (
             prev_substate.new_from_state_change(state_update)
         )
+        if self._updates_callback:
+            stackers: Dict[str, FlexStackerSubState] = {}
+            for module_id, substate in self._state.substate_by_module_id.items():
+                if isinstance(substate, FlexStackerSubState):
+                    stackers[module_id] = substate
+
+            self._updates_callback(
+                FlexStackerSubstateNotification(stacker_substate_map=stackers)
+            )
 
     def _handle_vacuum_module_commands(
         self, state_update: VacuumModuleStateUpdate
@@ -750,15 +775,34 @@ class ModuleView:
     def get_by_addressable_area(
         self, addressable_area_name: str, deck_definition: DeckDefinitionV5
     ) -> Optional[LoadedModule]:
-        """Get the module associated with this addressable area, if any."""
+        """Get the module associated with this addressable area, if any.
+
+        A module owns its provided addressable area, plus any extra areas on
+        that module's dedicated cutout fixture (for example the vacuum module
+        dock).
+        """
         for module_id in self._state.load_location_by_module_id.keys():
+            module = self.get(module_id)
             module_addressable_area = self.get_provided_addressable_area(module_id)
-            cutout_fixtures = deck_configuration_provider.get_potential_cutout_fixtures(
+
+            if addressable_area_name == module_addressable_area:
+                return module
+
+            try:
+                module_fixture = deck_configuration_provider.get_cutout_fixture(
+                    module.model.value, deck_definition
+                )
+            except FixtureDoesNotExistError:
+                continue
+
+            cutout_id, _ = deck_configuration_provider.get_potential_cutout_fixtures(
                 module_addressable_area, deck_definition
             )
-            for fixture in cutout_fixtures[1]:
-                if addressable_area_name in fixture.provided_addressable_areas:
-                    return self.get(module_id)
+            provided_areas = module_fixture["providesAddressableAreas"].get(
+                cutout_id, []
+            )
+            if addressable_area_name in provided_areas:
+                return module
 
         return None
 

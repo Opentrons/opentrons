@@ -7,14 +7,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import imgSrc from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
-export function NoProtocols(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function NoProtocols(): ReactNode {
   const { t } = useTranslation(['protocol_info', 'branded'])
   return (
     <Flex
@@ -31,17 +33,17 @@ export function NoProtocols(): JSX.Element {
         width="284px"
         height="166px"
       />
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('nothing_here_yet')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="h4" color={COLORS.grey60}>
+      </StyledText>
+      <StyledText forwardedAs="h4" color={COLORS.grey60}>
         {t('branded:send_a_protocol_to_store')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

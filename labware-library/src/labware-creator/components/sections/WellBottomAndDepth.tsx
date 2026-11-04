@@ -36,7 +36,10 @@ const Instructions = (props: Props): JSX.Element => {
       </p>
 
       <p>
-        Depth informs the robot how far down it can go inside a {labwareName}.
+        Depth informs the robot how far down it can go inside a {labwareName},
+        stopping at the inside bottom. Depth cannot exceed the total labware
+        height; any remaining height under that bottom is solid material (for
+        example a filter nozzle) that the pipette cannot enter.
       </p>
     </>
   )

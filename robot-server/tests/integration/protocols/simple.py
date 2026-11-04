@@ -4,8 +4,9 @@ metadata = {
     "protocolName": "simple",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
-    "apiLevel": "2.12",
 }
+
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:

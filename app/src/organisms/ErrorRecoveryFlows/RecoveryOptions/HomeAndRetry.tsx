@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import {
@@ -13,10 +13,11 @@ import {
 import { ManageTips } from './ManageTips'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 const { HOME_AND_RETRY } = RECOVERY_MAP
-export function HomeAndRetry(props: RecoveryContentProps): JSX.Element {
+export function HomeAndRetry(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { route, step } = recoveryMap
   switch (step) {
@@ -50,7 +51,7 @@ export function HomeAndRetry(props: RecoveryContentProps): JSX.Element {
   }
 }
 
-export function RetryAfterHome(props: RecoveryContentProps): JSX.Element {
+export function RetryAfterHome(props: RecoveryContentProps): ReactNode {
   const { recoveryMap, routeUpdateActions } = props
   const { step, route } = recoveryMap
   const { HOME_AND_RETRY } = RECOVERY_MAP
@@ -80,7 +81,7 @@ export function RetryAfterHome(props: RecoveryContentProps): JSX.Element {
   return buildContent()
 }
 
-export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
+export function PrepareDeckForHome(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions, tipStatusUtils } = props
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -95,7 +96,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
     <Trans
       t={t}
       i18nKey="carefully_move_labware"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <StyledText forwardedAs="p" /> }}
     />
   )
   return (
@@ -109,9 +110,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): JSX.Element {
   )
 }
 
-export function HomeGantryBeforeRetry(
-  props: RecoveryContentProps
-): JSX.Element {
+export function HomeGantryBeforeRetry(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions, tipStatusUtils } = props
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -120,7 +119,7 @@ export function HomeGantryBeforeRetry(
     <Trans
       t={t}
       i18nKey="take_necessary_actions_home"
-      components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+      components={{ block: <StyledText forwardedAs="p" /> }}
     />
   )
   const secondaryBtnOnClick = (): Promise<void> =>

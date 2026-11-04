@@ -5,7 +5,7 @@ name: 'shared-data test/lint/deploy'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'shared-data/*/**'
       - 'scripts/**/*.mk'
@@ -19,19 +19,11 @@ on:
       - 'release'
       - '*hotfix*'
     tags:
-      - 'v*'
+      - 'v[0-9]*.[0-9]*'
       - 'shared-data*'
       - 'components*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'shared-data/*/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/shared-data-test-lint-deploy.yaml'
-      - '.github/actions/python/**/*'
-      - '.github/workflows/utils.js'
-      - 'vitest.config.*'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -48,15 +40,13 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
         with:
-          version: 10.32.1
+          version: 11.28.7
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
@@ -75,8 +65,9 @@ jobs:
 
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make dist-py` call below consults Git history for the version number.
           fetch-depth: 0
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
@@ -86,7 +77,7 @@ jobs:
           sudo apt-get update && sudo apt-get install libudev-dev
       - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e # v1.4.6
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
@@ -107,13 +98,13 @@ jobs:
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
         with:
-          version: 10.32.1
+          version: 11.28.7
       - name: 'install udev'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
@@ -131,7 +122,7 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
+          pnpm config set cache-dir ./.pnpm-cache
           make setup-js-ci
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
@@ -145,8 +136,9 @@ jobs:
       id-token: write # Required for OIDC
       contents: read # Required for checkout
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make dist-py` call below consults Git history for the version number.
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
@@ -156,7 +148,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
       - name: 'install udev for usb-detection'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
@@ -217,7 +209,7 @@ jobs:
     needs: ['js-test', 'publish-switch']
     if: needs.publish-switch.outputs.should_publish == 'true'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -226,10 +218,10 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
         with:
-          version: 10.32.1
+          version: 11.28.7
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
           registry-url: 'https://registry.npmjs.org'
       - name: 'install udev for usb-detection'
         run: |
@@ -248,7 +240,7 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
+          pnpm config set cache-dir ./.pnpm-cache
           make setup-js-ci
       - name: 'build typescript'
         run: make build-ts
@@ -264,7 +256,7 @@ jobs:
           cd ./shared-data
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '22.22.0'
+          node-version: '24.22.1'
           registry-url: 'https://registry.npmjs.org'
       - name: 'publish to npm registry'
         env:
@@ -288,7 +280,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.python-lint.result == 'success' && needs.python-test.result == 'success' && needs.js-test.result == 'success' && needs.python-deploy.result == 'success' && needs.publish-switch.result == 'success' && needs.publish-to-npm.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -311,7 +303,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'failure' || needs.python-test.result == 'failure' || needs.js-test.result == 'failure' || needs.python-deploy.result == 'failure' || needs.publish-switch.result == 'failure' || needs.publish-to-npm.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -362,7 +354,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'cancelled' || needs.python-test.result == 'cancelled' || needs.js-test.result == 'cancelled' || needs.python-deploy.result == 'cancelled' || needs.publish-switch.result == 'cancelled' || needs.publish-to-npm.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

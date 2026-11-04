@@ -1,33 +1,25 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import last from 'lodash/last'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { resetConfig } from '/app/redux/robot-admin'
-import {
-  getRequestById,
-  PENDING,
-  SUCCESS,
-  useDispatchApiRequest,
-} from '/app/redux/robot-api'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
-import type { State } from '/app/redux/types'
+import type { ReactNode } from 'react'
+import type { ResetConfigRequest } from '@opentrons/api-client'
 
 interface DeviceResetModalProps {
   closeModal: () => void
@@ -41,27 +33,31 @@ export function DeviceResetModal({
   isRobotReachable,
   robotName,
   resetOptions,
-}: DeviceResetModalProps): JSX.Element {
+}: DeviceResetModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const resetRequestStatus = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? getRequestById(state, lastId) : null
-  })?.status
+  const documentationState = useDocumentationState()
+  const { postResetConfig, isLoading, reset } = useResetRobotConfigMutation(
+    documentationState,
+    robotName,
+    {
+      onSuccess: () => {
+        closeModal()
+        navigate('/devices/')
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          reset()
+        }
+      },
+    }
+  )
 
   const triggerReset = (): void => {
     if (resetOptions != null) {
-      dispatchRequest(resetConfig(robotName, resetOptions))
-      navigate('/devices/')
+      postResetConfig(resetOptions)
     }
   }
-
-  useEffect(() => {
-    if (resetRequestStatus === SUCCESS) closeModal()
-  }, [resetRequestStatus, closeModal])
-
-  const PENDING_STATUS = resetRequestStatus === PENDING
 
   return (
     <>
@@ -72,9 +68,9 @@ export function DeviceResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing24}>
+            <StyledText forwardedAs="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
               <Link
                 role="button"
@@ -86,12 +82,13 @@ export function DeviceResetModal({
               >
                 {t('shared:cancel')}
               </Link>
-              <AlertPrimaryButton
+              <PrimaryButton
+                variant="warning"
                 onClick={triggerReset}
-                disabled={PENDING_STATUS}
+                disabled={isLoading}
               >
                 {t('shared:confirm')}
-              </AlertPrimaryButton>
+              </PrimaryButton>
             </Flex>
           </Flex>
         </Modal>
@@ -101,13 +98,13 @@ export function DeviceResetModal({
           title={t('connection_to_robot_lost')}
           onClose={closeModal}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
             {t('branded:connection_lost_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton
               onClick={closeModal}

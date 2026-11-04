@@ -39,6 +39,7 @@ import { maskToPositiveInteger } from '/protocol-designer/steplist/fieldLevel/pr
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
 import type {
   FlexStackerModuleState,
   HopperLocationMapKey,
@@ -54,7 +55,7 @@ interface EditLabwareQuantityModalProps {
 }
 export function EditLabwareQuantityModal(
   props: EditLabwareQuantityModalProps
-): JSX.Element {
+): ReactNode {
   const { onClose, allLabwareIdsOnStack, labwareId, isOnHopper, location } =
     props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
@@ -225,7 +226,6 @@ export function EditLabwareQuantityModal(
       }}
     >
       <Modal
-        marginLeft="0"
         width="37.125rem"
         title={t('edit_labware_quantity')}
         type="info"

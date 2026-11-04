@@ -21,7 +21,7 @@ export function FeatureFlagsModal(): JSX.Element {
   const { t } = useTranslation('feature_flags')
 
   return (
-    <Modal type="info" title={t('feature_flags_title')} marginLeft="0">
+    <Modal type="info" title={t('feature_flags_title')}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           paddingTop={`${SPACING.spacing8}`}

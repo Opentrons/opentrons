@@ -15,11 +15,11 @@ import {
   InlineNotification,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -124,7 +124,7 @@ export function InterventionModal({
   run,
   analysis,
   alternateFooterContent,
-}: InterventionModalProps): JSX.Element {
+}: InterventionModalProps): ReactNode {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 
@@ -241,9 +241,7 @@ export function InterventionModal({
     </OddModal>
   ) : (
     <InterventionModalMolecule
-      iconHeading={
-        <LegacyStyledText forwardedAs="h1">{headerTitle}</LegacyStyledText>
-      }
+      iconHeading={<StyledText forwardedAs="h1">{headerTitle}</StyledText>}
       iconName={iconName}
       type="intervention-required"
       iconSize={iconSize}

@@ -23,6 +23,7 @@ import {
 } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from '../types'
 
 export interface UseConfirmPositionResult {
@@ -34,7 +35,8 @@ export interface UseConfirmPositionResult {
 // an "in-motion" the same way other commands do, we synthetically create an "in motion", disabling
 // it once the step has completed or failed.
 export function useConfirmPosition(
-  currentStep: DropTipWizardContainerProps['currentStep']
+  currentStep: DropTipWizardContainerProps['currentStep'],
+  errorDetails: DropTipWizardContainerProps['errorDetails']
 ): UseConfirmPositionResult {
   const [isRobotPipetteMoving, setIsRobotPipetteMoving] = useState(false)
 
@@ -46,15 +48,16 @@ export function useConfirmPosition(
     () => {
       if (
         isRobotPipetteMoving &&
-        currentStep !== CONFIRM_POSITION &&
-        currentStep !== CHOOSE_LOCATION_OPTION
+        ((currentStep !== CONFIRM_POSITION &&
+          currentStep !== CHOOSE_LOCATION_OPTION) ||
+          errorDetails != null)
       ) {
         toggleIsRobotPipetteMoving()
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentStep, isRobotPipetteMoving]
+    [currentStep, isRobotPipetteMoving, errorDetails]
   )
 
   return {
@@ -73,7 +76,7 @@ export function ConfirmPosition({
   dropTipCommands,
   proceed,
   modalStyle,
-}: ConfirmPositionProps): JSX.Element {
+}: ConfirmPositionProps): ReactNode {
   const { blowoutOrDropTip } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
 

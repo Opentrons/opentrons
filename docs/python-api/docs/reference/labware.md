@@ -11,6 +11,7 @@ description: "Labware and trash container API reference for the Python API."
         - "!use_tips"
         - "!previous_tip"
         - "!return_tips"
+        - "!load_adapter"
 
 ::: opentrons.protocol_api.TrashBin
     options:

@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -42,7 +41,7 @@ describe('InterventionModal', () => {
       iconName: 'ot-alert',
       type: 'intervention-required',
     }
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
+    vi.when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
   })
   ;(['intervention-required', 'error'] as ModalType[]).forEach(type => {
     const color =
@@ -108,7 +107,7 @@ describe('InterventionModal', () => {
   })
 
   it('renders the alternative ODD style when isOnDevice is true', () => {
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(true)
+    vi.when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(true)
     render(props)
 
     expect(screen.getByTestId('__otInterventionModal')).toHaveStyle({

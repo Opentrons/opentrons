@@ -8,18 +8,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 
-import type { RequestState } from '/app/redux/robot-api/types'
+import type { ReactNode } from 'react'
 
 interface FailedToConnectProps {
   selectedSsid: string
-  requestState: RequestState | null
+  errorMessage?: string | null
   handleChangeNetwork: () => void
   handleTryAgain: () => void
   isInvalidPassword: boolean
@@ -27,11 +27,11 @@ interface FailedToConnectProps {
 
 export function FailedToConnect({
   selectedSsid,
-  requestState,
+  errorMessage,
   handleTryAgain,
   handleChangeNetwork,
   isInvalidPassword,
-}: FailedToConnectProps): JSX.Element {
+}: FailedToConnectProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
@@ -59,7 +59,7 @@ export function FailedToConnect({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginTop={SPACING.spacing40}
@@ -67,17 +67,12 @@ export function FailedToConnect({
               {isInvalidPassword
                 ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
                 : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
-            </LegacyStyledText>
-            {!isInvalidPassword &&
-              requestState != null &&
-              'error' in requestState &&
-              requestState.error != null &&
-              'message' in requestState.error &&
-              requestState.error.message != null && (
-                <LegacyStyledText marginTop={SPACING.spacing16}>
-                  {requestState.error.message}
-                </LegacyStyledText>
-              )}
+            </StyledText>
+            {!isInvalidPassword && errorMessage != null && (
+              <StyledText marginTop={SPACING.spacing16}>
+                {errorMessage}
+              </StyledText>
+            )}
           </Flex>
         </Flex>
       </Flex>

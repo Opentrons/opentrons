@@ -1,5 +1,6 @@
 """Class to monitor firmware update status."""
 
+import asyncio
 import logging
 from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
@@ -14,6 +15,9 @@ from typing import (
     Optional,
 )
 
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control.errors import UpdateOngoingError
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
@@ -181,13 +185,30 @@ class _UpdateProcess:
     async def _update_task(self) -> None:
         last_progress = 0
         try:
-            async for update in self._hw_handle.update_firmware({self.subsystem}):
-                last_progress = update.progress
-                await self._status_queue.put(
-                    UpdateProgress(
-                        UpdateState.from_hw(update.state), last_progress, None
-                    )
+            if ff.hardware_subprocess_enabled():
+                # In subprocess mode update progress is tracked via polling
+                fetch_progress_callback = self._hw_handle.update_firmware_with_fetching(
+                    {self.subsystem}
                 )
+                update = await fetch_progress_callback()
+                while update is not None:
+                    last_progress = update.progress
+                    await self._status_queue.put(
+                        UpdateProgress(
+                            UpdateState.from_hw(update.state), last_progress, None
+                        )
+                    )
+                    await asyncio.sleep(0.1)  # Wait, then poll again.
+                    update = await fetch_progress_callback()
+            else:
+                # Otherwise the traditional AsyncIterator method is utilized
+                async for update in self._hw_handle.update_firmware({self.subsystem}):
+                    last_progress = update.progress
+                    await self._status_queue.put(
+                        UpdateProgress(
+                            UpdateState.from_hw(update.state), last_progress, None
+                        )
+                    )
             last_progress = 100
             await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
         except UpdateOngoingError:
@@ -200,7 +221,6 @@ class _UpdateProcess:
                 )
             )
         except BaseException as be:
-            log.exception("Failed to update firmware")
             await self._status_queue.put(
                 UpdateProgress(UpdateState.failed, last_progress, be)
             )
@@ -327,6 +347,7 @@ class FirmwareUpdateManager:
     ) -> _UpdateProcess:
         hw_subsystem = subsystem.to_hw()
 
+        # note: this is a pyro blocking call but it is rare
         if hw_subsystem not in self._hardware_handle.attached_subsystems:
             raise SubsystemNotFound(subsystem)
 

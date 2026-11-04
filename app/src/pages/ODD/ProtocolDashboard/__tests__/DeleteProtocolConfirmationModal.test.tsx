@@ -1,12 +1,17 @@
 import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
-import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
+import { getProtocol } from '@opentrons/api-client'
+import {
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
+  useHost,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
@@ -17,10 +22,21 @@ import type { HostConfig } from '@opentrons/api-client'
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
 
 const mockFunc = vi.fn()
 const PROTOCOL_ID = 'mockProtocolId'
 const mockMakeSnackbar = vi.fn()
+const mockDeleteProtocol = vi.fn()
+const mockDeleteRun = vi.fn()
 const MOCK_HOST_CONFIG = {} as HostConfig
 
 const render = (
@@ -39,8 +55,8 @@ describe('DeleteProtocolConfirmationModal', () => {
       protocolId: PROTOCOL_ID,
       setShowDeleteConfirmationModal: mockFunc,
     }
-    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
@@ -49,11 +65,19 @@ describe('DeleteProtocolConfirmationModal', () => {
           },
         },
       } as any)
-    when(vi.mocked(useToaster)).calledWith().thenReturn({
+    vi.when(vi.mocked(useToaster)).calledWith().thenReturn({
       makeSnackbar: mockMakeSnackbar,
       makeToast: vi.fn(),
       eatToast: vi.fn(),
     })
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: mockDeleteProtocol,
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
+    } as any)
+    mockDeleteProtocol.mockResolvedValue(undefined)
+    mockDeleteRun.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -75,7 +99,7 @@ describe('DeleteProtocolConfirmationModal', () => {
   })
 
   it('should call a mock function when tapping delete button', async () => {
-    when(vi.mocked(getProtocol))
+    vi.when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, PROTOCOL_ID)
       .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
@@ -86,12 +110,9 @@ describe('DeleteProtocolConfirmationModal', () => {
       screen.getByText('Delete').click()
     })
     await new Promise(setImmediate)
-    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
-      MOCK_HOST_CONFIG,
-      PROTOCOL_ID
-    )
+    expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '1' })
+    expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '2' })
+    expect(mockDeleteProtocol).toHaveBeenCalledWith(PROTOCOL_ID)
     expect(mockMakeSnackbar).toHaveBeenCalledWith('Protocol deleted')
   })
 })

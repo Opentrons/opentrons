@@ -19,12 +19,12 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
@@ -41,7 +41,7 @@ import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_
 import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
-import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { usePromptForDocumentation } from '/app/local-resources/access-control/usePromptForDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
@@ -120,7 +120,7 @@ interface ChoosePipetteProps {
   exit: () => void
   mount: PipetteMount
 }
-export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
+export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'audit_log'])
@@ -130,7 +130,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
 
   const initialAction =
     mount === LEFT ? 'attach_pipette_left' : 'attach_pipette_right'
-  const initialDocstate = usePromptForInteractionReason([initialAction])
+  const initialDocstate = usePromptForDocumentation([initialAction], exit)
   const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
@@ -239,9 +239,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="h1">
-                {t('choose_pipette')}
-              </LegacyStyledText>
+              <StyledText forwardedAs="h1">{t('choose_pipette')}</StyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -258,13 +256,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="150.99px"
                     alt={singleMount}
                   />
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -278,13 +276,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="151.2px"
                     alt={bothMounts}
                   />
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>
@@ -309,7 +307,7 @@ interface PipetteMountOptionProps extends StyleProps {
   onClick: () => void
   children: ReactNode
 }
-function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
+function PipetteMountOption(props: PipetteMountOptionProps): ReactNode {
   const { isSelected, onClick, children, ...styleProps } = props
   return (
     <Flex

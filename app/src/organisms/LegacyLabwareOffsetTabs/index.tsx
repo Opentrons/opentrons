@@ -11,6 +11,7 @@ import {
   Tabs,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
@@ -26,7 +27,7 @@ export function LegacyLabwareOffsetTabs({
   JupyterComponent,
   CommandLineComponent,
   ...styleProps
-}: LegacyLabwareOffsetTabsProps): JSX.Element {
+}: LegacyLabwareOffsetTabsProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const [currentTab, setCurrentTab] = useState<TabOptions>('table')
 

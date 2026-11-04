@@ -13,7 +13,6 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/robot-settings')
 
-const ROBOT_NAME = 'otie'
 const mockToggleSensors = vi.fn()
 const render = (props: ComponentProps<typeof DisableStackerSensors>) => {
   return renderWithProviders(<DisableStackerSensors {...props} />, {
@@ -26,7 +25,6 @@ describe('DisableStackerSensors', () => {
 
   beforeEach(() => {
     props = {
-      robotName: ROBOT_NAME,
       isRobotBusy: false,
     }
     vi.mocked(useDisableStackerSensors).mockReturnValue({
@@ -37,7 +35,7 @@ describe('DisableStackerSensors', () => {
 
   it('should render text and toggle button', () => {
     render(props)
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText('Disable Stacker sensors for labware detection')
     screen.getByText(
       'Applies to x- axis and z-axis for all connected Stackers.'
     )

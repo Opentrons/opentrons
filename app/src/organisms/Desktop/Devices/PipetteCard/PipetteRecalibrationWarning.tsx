@@ -6,8 +6,8 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,20 +28,20 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
         }}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid="PipetteRecalibrationWarning_title"
           >
             {t('pipette_recalibration_recommended')}
-          </LegacyStyledText>
+          </StyledText>
 
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             data-testid="PipetteRecalibrationWarning_body"
           >
             {`${t('pipette_calibrations_differ')}`}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Banner>
     </Box>

@@ -4,7 +4,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -14,6 +13,7 @@ import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
 import { DropTipFooterButtons } from '/app/organisms/DropTipWizardFlows/shared'
 
+import type { ReactNode } from 'react'
 import type { ModuleLocation } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from '/app/organisms/DropTipWizardFlows/types'
 
@@ -24,7 +24,7 @@ export function ChooseDeckLocation({
   goBackRunValid,
   currentRoute,
   isOnDevice,
-}: DropTipWizardContainerProps): JSX.Element {
+}: DropTipWizardContainerProps): ReactNode {
   const { moveToAddressableArea } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
   const [selectedLocation, setSelectedLocation] = useState<ModuleLocation>()
@@ -70,7 +70,7 @@ export function ChooseDeckLocation({
               t={t}
               i18nKey={buildBodyText()}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
               }}
             />
           </StyledText>

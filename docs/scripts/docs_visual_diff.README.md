@@ -1,0 +1,105 @@
+# Docs visual diff
+
+`docs_visual_diff.py` builds the Opentrons docs site (`docs/`) at **two git refs**
+(branches, tags, or commits) and produces a **browsable, rendered diff** — the real
+docs pages, with mkdocs-material styling intact, showing GitHub-style inline
+additions and deletions on the content that changed.
+
+It's meant as a pre-deploy sanity check: before pushing a `staging-mkdocs*` or `mkdocs*` tag,
+confirm that only the changes you expect show up in the built site — including the
+API Reference pages, which are compiled from docstrings in `api/src/opentrons/`.
+
+## What you get
+
+The tool writes an **output directory** (not a single file — the pages load the real
+theme CSS/JS/images):
+
+```
+<output>/
+  report.html     summary: per-page change counts, expandable excerpts, and links
+  site-diff/       ref B's full site. Changed pages show inline ins/del; added
+                   pages are tinted green. Browse it like the real docs site.
+  site-a/          ref A's full site. Removed pages are tinted red.
+```
+
+`report.html` lists each changed page as an accordion: expand it to preview just the
+changed paragraphs (with the inline additions/deletions) without leaving the report,
+or click `↗` to open the full rendered page.
+
+- **Changed** pages: the page's content is the merge of A and B with inline
+  `<ins>` (green) and `<del>` (red strikethrough) markers, rendered with the real
+  theme — links, code, tables, admonitions, and docstring formatting all preserved.
+- **Added** / **removed** pages render fully styled with a green / red tint and a banner.
+- Every diff page gets a sticky banner (status, the two refs, a "back to summary" link).
+  On changed pages the banner also has **change navigation** — a paragraph-level
+  count and **first / prev / next** buttons (or `Alt`+`↑`/`↓`) that jump between
+  changes and outline the current one, so edits on long pages
+  are easy to find. The summary lists the change count per page.
+
+## How it works
+
+1. For each ref, it creates a detached **git worktree** (your working tree is never
+   touched) and runs `uv run mkdocs build` in `docs/`. Because `docs/pyproject.toml`
+   installs `opentrons` and `opentrons-shared-data` as editable path deps, each
+   build's API Reference is generated from that ref's own `api/` source — so
+   docstring edits diff just like Markdown edits.
+2. For every page it extracts the main `<article class="md-content__inner">` region
+   (deliberately excluding the site-wide nav, header, footer, and search so they
+   don't appear as noise) and diffs the two versions with `lxml.html.diff.htmldiff`,
+   which inserts `<ins>`/`<del>` while preserving the surrounding markup.
+3. It rewrites the affected pages in place (in `site-diff` / `site-a`), injects the
+   diff highlight CSS and banner, and writes the top-level `report.html` summary.
+
+## Requirements
+
+- `git` and [`uv`](https://docs.astral.sh/uv/) on your PATH.
+- Network access on the first run (uv downloads the docs deps and `lxml`; later runs
+  reuse the uv cache).
+- The script **self-bootstraps `lxml`** by re-executing itself under
+  `uv run --with lxml` — no manual environment setup.
+
+## Usage
+
+The easiest way is the `docs/` Makefile target (handles the Python/lxml setup):
+
+```bash
+make -C docs diff                      # latest deployed docs vs HEAD
+make -C docs diff edge my-branch       # refs can be passed positionally
+make -C docs diff ARGS="-o /tmp/d"     # use ARGS for option flags (e.g. -o)
+```
+
+Or invoke the script directly:
+
+```bash
+# No args: compare the latest deployed docs (newest mkdocs-* tag) to HEAD
+docs/scripts/docs_visual_diff.py
+
+# Compare two refs. Builds both, diffs, writes ./docs-visual-diff-report/
+docs/scripts/docs_visual_diff.py edge my-feature-branch
+
+# Compare a deploy tag against edge
+docs/scripts/docs_visual_diff.py mkdocs-2025-10-01 edge
+
+# Choose the output directory
+docs/scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
+
+# Skip building — diff two site/ dirs you already built
+docs/scripts/docs_visual_diff.py --site-a docs/site --site-b /some/other/site
+```
+
+When it finishes it prints the report path; open it in a browser
+(`open docs-visual-diff-report/report.html`) and click through to each changed page.
+
+## Notes and caveats
+
+- **Build time.** The script builds the full docs site twice, which takes about 30 seconds. 
+  The first build also resolves and downloads dependencies, so expect a few minutes; later runs are faster.
+- **Output is a directory.** The rendered pages need their co-located theme assets, so
+  the result can't be a single standalone HTML file.
+- **Old refs.** Each worktree builds with *its own* `uv.lock` and docs config, so the
+  tool faithfully reproduces how that commit would have built — but a ref whose docs
+  build was actually broken will fail to build here too (the error is surfaced).
+- **Structure dependency.** If the mkdocs-material theme
+  ever renames the `md-content__inner` content class, update `CONTENT_XPATH` in the script.
+- **Output not committed.** Output lands in `docs-visual-diff-report/` by default — covered by a
+  `.gitignore` rule. Use `-o` to point elsewhere.

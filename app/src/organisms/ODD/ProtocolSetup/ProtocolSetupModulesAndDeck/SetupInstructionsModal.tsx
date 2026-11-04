@@ -7,14 +7,15 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import imgSrc from '/app/assets/images/on-device-display/setup_instructions_qr_code.png'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 const INSTRUCTIONS_URL = 'https://docs.opentrons.com/modules'
@@ -24,7 +25,7 @@ interface SetupInstructionsModalProps {
 }
 export function SetupInstructionsModal({
   setShowSetupInstructionsModal,
-}: SetupInstructionsModalProps): JSX.Element {
+}: SetupInstructionsModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_setup', 'branded'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
@@ -46,20 +47,20 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('branded:setup_instructions_description')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {INSTRUCTIONS_URL}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
         <img

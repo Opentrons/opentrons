@@ -8,8 +8,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -19,6 +19,7 @@ import { useFeatureFlag } from '/app/redux/config'
 
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
+import type { ReactNode } from 'react'
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
 import type { SetSettingOption } from './types'
 
@@ -40,7 +41,7 @@ export function RobotSystemVersion({
   isUpdateAvailable,
   robotUpdateInfo,
   setCurrentOption,
-}: RobotSystemVersionProps): JSX.Element {
+}: RobotSystemVersionProps): ReactNode {
   const { t, i18n } = useTranslation([
     'device_settings',
     'shared',
@@ -86,9 +87,9 @@ export function RobotSystemVersion({
           marginTop="7.75rem"
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               {t('branded:view_latest_release_notes_at', { url: GITHUB_URL })}
-            </LegacyStyledText>
+            </StyledText>
             <Flex
               backgroundColor={COLORS.grey35}
               flexDirection={DIRECTION_ROW}
@@ -96,13 +97,11 @@ export function RobotSystemVersion({
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               borderRadius={BORDERS.borderRadius8}
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >{`${t('device_details:current_version')}`}</LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
-                {currentVersion}
-              </LegacyStyledText>
+              >{`${t('device_details:current_version')}`}</StyledText>
+              <StyledText forwardedAs="p">{currentVersion}</StyledText>
             </Flex>
             {showGitDetails && (
               <>
@@ -113,13 +112,11 @@ export function RobotSystemVersion({
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   borderRadius={BORDERS.borderRadius8}
                 >
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >{`${t('device_details:current_git_commit')}`}</LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
-                    {gitCommitHash}
-                  </LegacyStyledText>
+                  >{`${t('device_details:current_git_commit')}`}</StyledText>
+                  <StyledText forwardedAs="p">{gitCommitHash}</StyledText>
                 </Flex>
                 <Flex
                   backgroundColor={COLORS.grey35}
@@ -128,13 +125,11 @@ export function RobotSystemVersion({
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   borderRadius={BORDERS.borderRadius8}
                 >
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >{`${t('device_details:current_git_branch')}`}</LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
-                    {gitBranchName}
-                  </LegacyStyledText>
+                  >{`${t('device_details:current_git_branch')}`}</StyledText>
+                  <StyledText forwardedAs="p">{gitBranchName}</StyledText>
                 </Flex>
               </>
             )}

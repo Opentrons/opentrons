@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import pathlib
@@ -5,7 +6,7 @@ import tempfile
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Generator, Iterator, cast
+from typing import AsyncIterator, Callable, Generator, Iterator, cast
 
 import pytest
 from _pytest.mark import deselect_by_mark
@@ -17,34 +18,32 @@ from starlette.testclient import TestClient
 from typing_extensions import NoReturn
 
 from opentrons import config
-from opentrons.calibration_storage import (
-    helpers,
-    save_robot_deck_attitude,
+from opentrons.hardware_control import (
+    HardwareControlAPI,
 )
-
-# NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
-# get pulled in by OT-2 server tests. If this ever changes, we need to
-# conditionally set up ot2/ot3 calibration structures instead of invariably
-# calling the OT2 functions.
-from opentrons.calibration_storage.ot2 import (
-    create_tip_length_data,
-    save_pipette_calibration,
-    save_tip_length_calibration,
+from opentrons.hardware_control import (
+    types as hw_types,
 )
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.protocol_api import labware
-from opentrons.types import Mount, Point
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
+from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.audit.audit_server import (
+    AuditSettingsResponseData,
+)
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.fastapi import get_audit_client, install_audit_client
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
+    AuthenticationChecker,
 )
 from server_utils.auth.resource_server.fastapi import (
-    get_authorization_checker,
+    get_authentication_checker,
 )
 
 from robot_server.app import app
-from robot_server.hardware import get_hardware, get_ot2_hardware
+from robot_server.hardware import HardwareStateStore, get_hardware
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
@@ -55,7 +54,6 @@ from robot_server.service.notifications.notification_client import (
     NotificationClient,
     get_notification_client,
 )
-from robot_server.service.session.manager import SessionManager
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 test_router = routing.APIRouter()
@@ -102,7 +100,20 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Return a mock in the shape of a HardwareControlAPI."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return decoy.mock(cls=API)
+    return decoy.mock(cls=HardwareControlAPI)
+
+
+@pytest.fixture
+async def hardware_state_store(hardware_api: HardwareControlAPI) -> HardwareStateStore:
+    """Build a hardware state store on fixtured data."""
+    return HardwareStateStore(
+        hardware_resource=hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=hw_types.EstopState.DISENGAGED,
+        door_state=hw_types.DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -143,7 +154,7 @@ def current_time() -> datetime:
 
 @pytest.fixture
 def hardware() -> MagicMock:
-    return MagicMock(spec=API)
+    return MagicMock(spec=OT3API)
 
 
 @pytest.fixture
@@ -195,17 +206,6 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
-    async def get_ot2_hardware_override() -> API:
-        """Override for the get_ot2_hardware FastAPI dependency."""
-        return hardware
-
-    app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
-    yield
-    del app.dependency_overrides[get_ot2_hardware]
-
-
-@pytest.fixture
 def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
     async def get_run_data_manager_override() -> RunDataManager:
         """Override for the get_run_data_manager FastAPI dependency."""
@@ -230,17 +230,43 @@ def _override_notification_client_with_mock(decoy: Decoy) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_authorization_checker_with_always_allowed(decoy: Decoy) -> Iterator[None]:
-    authorization_checker = AlwaysAllowedAuthorizationChecker()
+def _override_authentication_checker_with_always_allowed(
+    decoy: Decoy,
+) -> Iterator[None]:
+    authentication_checker = AlwaysAllowedAuthenticationChecker()
 
-    async def get_authorization_checker_override() -> AuthorizationChecker:
-        return authorization_checker
+    async def get_authentication_checker_override() -> AuthenticationChecker:
+        return authentication_checker
 
-    app.dependency_overrides[get_authorization_checker] = (
-        get_authorization_checker_override
+    app.dependency_overrides[get_authentication_checker] = (
+        get_authentication_checker_override
     )
     yield
-    del app.dependency_overrides[get_authorization_checker]
+    del app.dependency_overrides[get_authentication_checker]
+
+
+@pytest.fixture
+def mock_audit_client(decoy: Decoy) -> AuditClient:
+    return decoy.mock(cls=AuditClient)
+
+
+@pytest.fixture
+async def _override_audit_client_with_mock(
+    mock_audit_client: AuditClient,
+    decoy: Decoy,
+) -> AsyncIterator[None]:
+    def get_audit_client_override() -> AuditClient:
+        return mock_audit_client
+
+    decoy.when(await mock_audit_client.get_settings()).then_return(
+        AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=None
+        )
+    )
+    app.dependency_overrides[get_audit_client] = get_audit_client_override
+    install_audit_client(app.state, mock_audit_client)
+    yield
+    del app.dependency_overrides[get_audit_client]
 
 
 @pytest.fixture
@@ -248,9 +274,9 @@ def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -264,10 +290,10 @@ def api_client_camera_overrides(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
-    _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -319,51 +345,6 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     yield
     os.remove(pipette_file_path)
     del os.environ["OT_API_CONFIG_DIR"]
-
-
-@pytest.fixture
-def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    mount_list = [Mount.LEFT, Mount.RIGHT]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    def_hash = helpers.hash_labware_def(definition)
-    for pip, mount in zip(attached_pip_list, mount_list):
-        save_pipette_calibration(
-            offset=Point(0, 0, 0),
-            pip_id=pip,
-            mount=mount,
-            tiprack_hash=def_hash,
-            tiprack_uri="opentrons/opentrons_96_filtertiprack_200ul/1",
-        )
-
-
-@pytest.fixture
-def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
-    attached_pip_list = ["123", "321"]
-    tip_length_list = [30.5, 31.5]
-    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
-    assert definition["schemaVersion"] == 2  # Required by create_tip_length_data().
-    for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal_data = create_tip_length_data(definition, tip_len)
-        save_tip_length_calibration(pip, cal_data)
-
-
-@pytest.fixture
-def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
-    attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
-    save_robot_deck_attitude(
-        attitude,
-        "pip_1",
-        "fakehash",
-    )
-
-
-@pytest.fixture
-def session_manager(hardware: HardwareControlAPI) -> SessionManager:
-    return SessionManager(
-        hardware=hardware,
-        motion_lock=ThreadedAsyncLock(),
-    )
 
 
 @pytest.fixture
@@ -536,3 +517,15 @@ def zulu_iso8601_to_datetime(iso8601_str: str) -> datetime:
     See `datetime_to_zulu_iso8601()`.
     """
     return datetime.fromisoformat(iso8601_str.replace("Z", "+00:00"))
+
+
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(config.feature_flags, name, mock_get_ff)

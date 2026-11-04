@@ -7,11 +7,7 @@ import {
 
 import type { ConnectivityStatus } from '../discovery/types'
 import type { State } from '../types'
-import type {
-  PerRobotAdminState,
-  ResetConfigOption,
-  RobotRestartStatus,
-} from './types'
+import type { PerRobotAdminState, RobotRestartStatus } from './types'
 
 const robotState = (
   state: State,
@@ -70,11 +66,4 @@ function getRestartIsComplete(
   const wasDown = prevRestartStatus === RESTART_IN_PROGRESS_STATUS
 
   return isConnectable && (hasNewBootId || wasDown)
-}
-
-export function getResetConfigOptions(
-  state: State,
-  robotName: string
-): ResetConfigOption[] {
-  return robotState(state, robotName)?.resetConfigOptions || []
 }

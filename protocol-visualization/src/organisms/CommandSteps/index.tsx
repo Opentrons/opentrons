@@ -6,7 +6,7 @@ import { COLORS, StyledText } from '@opentrons/components'
 import { AnnotatedSteps } from '../AnnotatedSteps'
 import styles from './commandsteps.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
@@ -23,7 +23,7 @@ interface CommandStepsProps {
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
 }
-export function CommandSteps(props: CommandStepsProps): JSX.Element {
+export function CommandSteps(props: CommandStepsProps): ReactNode {
   const {
     groupedCommands,
     analysis,

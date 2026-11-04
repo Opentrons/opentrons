@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName, isEveryFieldHidden } from '../../../utils'
@@ -31,7 +30,7 @@ describe('Volume', () => {
   })
 
   it('should render with the correct information', () => {
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('well')
     render(wrapInFormik(<Volume />, formikConfig))
@@ -44,7 +43,7 @@ describe('Volume', () => {
 
   it('should render tubes when tubeRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tubeRack'
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('tube')
     render(wrapInFormik(<Volume />, formikConfig))
@@ -54,7 +53,7 @@ describe('Volume', () => {
 
   it('should render tubes when aluminumBlock is selected', () => {
     formikConfig.initialValues.labwareType = 'aluminumBlock'
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('tube')
     render(wrapInFormik(<Volume />, formikConfig))
@@ -64,7 +63,7 @@ describe('Volume', () => {
 
   it('should render wells when wellPlate is selected', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('well')
     render(wrapInFormik(<Volume />, formikConfig))
@@ -74,7 +73,7 @@ describe('Volume', () => {
 
   it('should render tips when tipRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
       .thenReturn('tip')
     render(wrapInFormik(<Volume />, formikConfig))
@@ -93,7 +92,7 @@ describe('Volume', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['wellVolume'], formikConfig.initialValues)
       .thenReturn(true)
 

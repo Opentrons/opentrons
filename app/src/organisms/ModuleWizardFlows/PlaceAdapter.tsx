@@ -1,15 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, Flex, SPACING } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getCalibrationAdapterLoadName,
@@ -27,12 +19,16 @@ import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
+import styles from './wizardvideo.module.css'
 
+import type { ReactNode } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
@@ -42,16 +38,7 @@ interface PlaceAdapterProps extends ModuleSetupWizardRequiresPipetteStepProps {
   setCreatedAdapterId: (adapterId: string) => void
 }
 
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
-
-export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
+export function PlaceAdapter(props: PlaceAdapterProps): ReactNode {
   const {
     proceed,
     goBack,
@@ -59,6 +46,7 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
     attachedModule,
     chainRunCommands,
     setErrorMessage,
+    setIsDoorOpenError,
     setCreatedAdapterId,
     attachedPipette,
     isRobotMoving,
@@ -175,7 +163,12 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         proceed()
       })
       .catch((e: Error) => {
-        setErrorMessage(e.message)
+        if (isMaintenanceDoorOpenError(e)) {
+          setIsDoorOpenError(true)
+          setErrorMessage(t('door_is_open') as string)
+        } else {
+          setErrorMessage(e.message)
+        }
       })
   }
 
@@ -226,29 +219,18 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         }
         rightHandBody={
           <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
+            <AnimationVideo className={styles.animation_video}>
               <source src={attachAdapterVideoSrc} />
             </AnimationVideo>
           </Flex>
         }
         bodyText={
           attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_heater_shaker')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush_heater_shaker')}</WizardBodyText>
           ) : attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_thermocycler')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush_thermocycler')}</WizardBodyText>
           ) : (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush')}
-            </LegacyStyledText>
+            <WizardBodyText>{t('place_flush')}</WizardBodyText>
           )
         }
         proceedButtonText={t('confirm_placement')}

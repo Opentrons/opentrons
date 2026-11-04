@@ -7,6 +7,7 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
+import { getDoorOpenErrorDetails } from './errors'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'
@@ -119,7 +120,13 @@ function useCreateDropTipMaintenanceRun({
             .then(() => {
               setCreatedMaintenanceRunId(response.data.id)
             })
-            .catch((error: Error) => error)
+            .catch((error: Error) => {
+              const doorOpenDetails = getDoorOpenErrorDetails(error)
+              if (doorOpenDetails != null) {
+                setErrorDetails(doorOpenDetails)
+              }
+              return error
+            })
         },
         onError: (error: Error) => {
           setErrorDetails({ message: error.message })

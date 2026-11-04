@@ -11,8 +11,8 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getIsOnDevice } from '/app/redux/config'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
@@ -26,9 +26,9 @@ vi.mock('/app/local-resources/access-control/utils', () => ({
   isDocumentationProvided: vi.fn(() => true),
 }))
 vi.mock(
-  '/app/local-resources/access-control/usePromptForInteractionReason',
+  '/app/local-resources/access-control/usePromptForDocumentation',
   () => ({
-    usePromptForInteractionReason: vi.fn(() => ({
+    usePromptForDocumentation: vi.fn(() => ({
       accessControlEnabled: false,
     })),
   })

@@ -53,5 +53,12 @@ module.exports = {
         importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
       },
     },
+    {
+      files: ['**/localization/**/*.json'],
+      options: {
+        plugins: [require.resolve('prettier-plugin-sort-json')],
+        jsonRecursiveSort: true,
+      },
+    },
   ],
 }

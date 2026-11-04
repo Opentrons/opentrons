@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import Keyboard from 'react-simple-keyboard'
 
@@ -8,36 +8,38 @@ import {
   alphanumericKeyboardLayout,
   customDisplay,
   layoutCandidates,
+  softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LayoutName } from '../types'
 
 import '../index.css'
 import './index.css'
 
+import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
+
+import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
+
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface AlphanumericKeyboardProps {
-  onChange: (input: string) => void
   keyboardRef: MutableRefObject<KeyboardReactInterface | null>
-  value?: string
+  /**
+   * The underlying element that the software keyboard should type into.
+   * See `useSoftwareKeyboardControl()`.
+   */
+  inputElementRef: SoftwareKeyboardControlOptions['inputElementRef']
   debug?: boolean
 }
 
 export function AlphanumericKeyboard({
-  onChange,
   keyboardRef,
-  value,
-  debug = false, // If true, <ENTER> will input a \n
-}: AlphanumericKeyboardProps): JSX.Element {
+  inputElementRef,
+  debug = false,
+}: AlphanumericKeyboardProps): ReactNode {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
-  useEffect(() => {
-    if (value !== undefined && keyboardRef.current != null) {
-      keyboardRef.current.setInput(value)
-    }
-  }, [value, keyboardRef])
   const appLanguage = useSelector(getAppLanguage)
 
   const onKeyPress = (button: string): void => {
@@ -72,6 +74,11 @@ export function AlphanumericKeyboard({
     setLayoutName('default')
   }
 
+  const { beforeInputUpdate, onChange } = useSoftwareKeyboardControl({
+    keyboardRef,
+    inputElementRef,
+  })
+
   return (
     <Keyboard
       keyboardRef={r => {
@@ -79,6 +86,7 @@ export function AlphanumericKeyboard({
       }}
       theme="hg-theme-default oddTheme1 alphanumericKeyboard"
       onChange={onChange}
+      beforeInputUpdate={beforeInputUpdate}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
       layout={alphanumericKeyboardLayout}
@@ -87,9 +95,11 @@ export function AlphanumericKeyboard({
       }
       display={customDisplay}
       mergeDisplay={true}
-      useButtonTag={true}
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
       width="100%"
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

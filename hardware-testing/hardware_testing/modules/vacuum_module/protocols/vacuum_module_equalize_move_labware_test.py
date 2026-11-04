@@ -46,7 +46,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.30",
+    "apiLevel": "2.31",
 }
 
 # Mild vacuum + short holds keep QC / sim runs fast.

@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,9 +17,10 @@ import {
   toggleAnalyticsOptedIn,
 } from '/app/redux/analytics'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function PrivacySettings(): JSX.Element {
+export function PrivacySettings(): ReactNode {
   const { t } = useTranslation('branded')
   const dispatch = useDispatch<Dispatch>()
   const analyticsOptedIn = useSelector((s: State) => getAnalyticsOptedIn(s))
@@ -33,25 +34,22 @@ export function PrivacySettings(): JSX.Element {
       gridGap={SPACING.spacing16}
     >
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('share_app_analytics')}
-        </LegacyStyledText>
-        <LegacyStyledText
-          css={TYPOGRAPHY.pRegular}
-          paddingBottom={SPACING.spacing8}
-        >
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('share_app_analytics_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="analytics_opt_in"
         size="2rem"
         toggledOn={analyticsOptedIn}
         onClick={() => dispatch(toggleAnalyticsOptedIn())}
-        id="PrivacySettings_analytics"
       />
     </Flex>
   )

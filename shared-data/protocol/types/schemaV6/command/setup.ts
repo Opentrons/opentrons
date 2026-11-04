@@ -68,14 +68,10 @@ export type SetupCreateCommand =
   | MoveLabwareCreateCommand
 
 export type LabwareLocation =
-  | { slotName: string }
-  | { moduleId: string }
-  | 'offDeck'
+  { slotName: string } | { moduleId: string } | 'offDeck'
 
 export type LabwareMovementStrategy =
-  | 'usingGripper'
-  | 'manualMoveWithPause'
-  | 'manualMoveWithoutPause'
+  'usingGripper' | 'manualMoveWithPause' | 'manualMoveWithoutPause'
 
 export interface ModuleLocation {
   slotName: string

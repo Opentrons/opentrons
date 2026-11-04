@@ -72,6 +72,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              result: ok
         links:
           referencingRuns: []
   - name: Get protocol analysis by ID
@@ -80,6 +81,8 @@ stages:
       method: GET
     response:
       status_code: 200
+      strict:
+        - json:off
       json:
         meta:
           cursor: 0

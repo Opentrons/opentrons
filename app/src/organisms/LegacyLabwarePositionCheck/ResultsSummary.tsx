@@ -15,13 +15,13 @@ import {
   getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -44,6 +44,7 @@ import {
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetCreateData,
@@ -165,9 +166,9 @@ export const ResultsSummary = (
                   marginRight={SPACING.spacing8}
                 />
               ) : null}
-              <LegacyStyledText>
+              <StyledText>
                 {i18n.format(t('complete'), 'capitalize')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </PrimaryButton>
         </Flex>
@@ -234,7 +235,7 @@ interface OffsetTableProps {
   labwareDefinitions: LabwareDefinition[]
 }
 
-const OffsetTable = (props: OffsetTableProps): JSX.Element => {
+const OffsetTable = (props: OffsetTableProps): ReactNode => {
   const { offsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   return (
@@ -258,7 +259,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           return (
             <TableRow key={index}>
               <LeftRoundedTableDatum>
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
@@ -268,31 +269,29 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     t as TFunction,
                     i18n
                   )}
-                </LegacyStyledText>
+                </StyledText>
               </LeftRoundedTableDatum>
               <TableDatum>
-                <LegacyStyledText forwardedAs="p">
-                  {labwareDisplayName}
-                </LegacyStyledText>
+                <StyledText forwardedAs="p">{labwareDisplayName}</StyledText>
               </TableDatum>
               <RightRoundedTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
+                  <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <Fragment key={index}>
-                        <LegacyStyledText
+                        <StyledText
                           forwardedAs="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </LegacyStyledText>
-                        <LegacyStyledText forwardedAs="p">
+                        </StyledText>
+                        <StyledText forwardedAs="p">
                           {axis.toFixed(1)}
-                        </LegacyStyledText>
+                        </StyledText>
                       </Fragment>
                     ))}
                   </Flex>
@@ -308,7 +307,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized
 // for smaller screens
-export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
+export const TerseOffsetTable = (props: OffsetTableProps): ReactNode => {
   const { offsets, labwareDefinitions } = props
   const { i18n, t } = useTranslation('labware_position_check')
   return (
@@ -347,21 +346,21 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                 </Flex>
               </TerseTableDatum>
               <TerseTableDatum>
-                <LegacyStyledText
+                <StyledText
                   fontSize={TYPOGRAPHY.fontSize20}
                   lineHeight={TYPOGRAPHY.lineHeight24}
                 >
                   {labwareDisplayName}
-                </LegacyStyledText>
+                </StyledText>
               </TerseTableDatum>
               <TerseTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
-                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
+                  <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
                   <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <Fragment key={index}>
-                        <LegacyStyledText
+                        <StyledText
                           fontSize={TYPOGRAPHY.fontSize20}
                           lineHeight={TYPOGRAPHY.lineHeight24}
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
@@ -369,13 +368,13 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
-                        </LegacyStyledText>
-                        <LegacyStyledText
+                        </StyledText>
+                        <StyledText
                           fontSize={TYPOGRAPHY.fontSize20}
                           lineHeight={TYPOGRAPHY.lineHeight24}
                         >
                           {axis.toFixed(1)}
-                        </LegacyStyledText>
+                        </StyledText>
                       </Fragment>
                     ))}
                   </Flex>

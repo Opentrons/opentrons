@@ -59,6 +59,7 @@ export function useRunHeaderDropTip({
     areTipsAttached,
     determineTipStatus,
     resetTipStatus,
+    resolveAllTips,
     setTipStatusResolved,
     aPipetteWithTip,
     initialPipettesWithTipsCount,
@@ -74,6 +75,10 @@ export function useRunHeaderDropTip({
     currentRunId: runId,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
     onSkipAndHome: () => {
+      // Clear tip state so the modal dismisses even if run currentness briefly
+      // lags after close is requested. Do not resetTipStatus — that nulls the
+      // settled tip-check count and can re-trigger tip check on a terminating run.
+      resolveAllTips()
       closeCurrentRun()
     },
   })
@@ -114,6 +119,9 @@ export function useRunHeaderDropTip({
     },
     { enabled: isRunTerminatingOrTerminal }
   )
+  const tipCheckSkippedBecauseER =
+    runSummaryNoFixit != null &&
+    lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
 
   // Manage tip checking
   useEffect(
@@ -126,10 +134,7 @@ export function useRunHeaderDropTip({
         // Only run tip checking if it wasn't *just* handled during Error Recovery.
         else if (
           runSummaryNoFixit != null &&
-          !lastRunCommandPromptedErrorRecovery(
-            runSummaryNoFixit,
-            isEREnabled
-          ) &&
+          !tipCheckSkippedBecauseER &&
           isRunCurrent &&
           isRunTerminatingOrTerminal
         ) {
@@ -142,27 +147,29 @@ export function useRunHeaderDropTip({
     [runStatus, robotType, isRunCurrent, runSummaryNoFixit, isEREnabled]
   )
 
-  // If the run terminates with a "stopped" status, close the run if no tips are attached after running tip check at least once.
-  // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
-  useEffect(
-    () => {
-      if (
-        isRunTerminatingOrTerminal &&
-        isRunCurrent &&
-        (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
-      ) {
-        closeCurrentRun()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      isRunTerminatingOrTerminal,
-      isRunCurrent,
-      enteredER,
-      initialPipettesWithTipsCount,
-    ]
-  )
+  // If the run terminates, close the run if no tips need handling. This marks
+  // the robot as "not busy" when drop tip CTAs are unnecessary.
+  // Include tipCheckSkippedBecauseER: tip check is intentionally skipped after
+  // ER, but without this the close never fires.
+  useEffect(() => {
+    if (
+      isRunTerminatingOrTerminal &&
+      isRunCurrent &&
+      (initialPipettesWithTipsCount === 0 ||
+        robotType === OT2_ROBOT_TYPE ||
+        tipCheckSkippedBecauseER)
+    ) {
+      closeCurrentRun()
+    }
+  }, [
+    isRunTerminatingOrTerminal,
+    isRunCurrent,
+    enteredER,
+    initialPipettesWithTipsCount,
+    robotType,
+    tipCheckSkippedBecauseER,
+    closeCurrentRun,
+  ])
 
   return {
     dropTipModalUtils,

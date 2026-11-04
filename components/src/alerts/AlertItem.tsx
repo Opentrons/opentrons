@@ -55,7 +55,7 @@ const ALERT_PROPS_BY_TYPE: Record<
  * @deprecated Use 'Banner' instead
  */
 
-export function AlertItem(props: AlertItemProps): JSX.Element {
+export function AlertItem(props: AlertItemProps): ReactNode {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

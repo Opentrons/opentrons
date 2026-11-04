@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -27,9 +26,24 @@ export const JogToPosition = ({
   isOnDevice,
   modalStyle,
   proceed,
+  issuedCommandsType,
 }: JogToPositionProps): JSX.Element | null => {
-  const { handleJog } = dropTipCommands
+  const { handleJog, flushJogAudit } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
+
+  const handleConfirm = (): void => {
+    if (issuedCommandsType !== 'fixit') {
+      flushJogAudit()
+    }
+    void proceed()
+  }
+
+  const handleGoBack = (): void => {
+    if (issuedCommandsType !== 'fixit') {
+      flushJogAudit()
+    }
+    goBackRunValid()
+  }
 
   return (
     <>
@@ -41,11 +55,11 @@ export const JogToPosition = ({
           >
             {t('position_the_pipette')}
           </StyledText>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {currentRoute === DT_ROUTES.BLOWOUT
               ? t('position_and_blowout')
               : t('position_and_drop_tip')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
       <Flex
@@ -57,9 +71,9 @@ export const JogToPosition = ({
       >
         <JogControls jog={handleJog} isOnDevice={isOnDevice} height="100%" />
         <DropTipFooterButtons
-          primaryBtnOnClick={proceed}
+          primaryBtnOnClick={handleConfirm}
           primaryBtnTextOverride={t('shared:confirm_position')}
-          secondaryBtnOnClick={goBackRunValid}
+          secondaryBtnOnClick={handleGoBack}
         />
       </Flex>
     </>

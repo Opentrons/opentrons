@@ -423,26 +423,6 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name: 'handles robotUpdate:UPLOAD_FILE',
-      action: {
-        type: 'robotUpdate:UPLOAD_FILE',
-        payload: {
-          host: { name: mockRobot.name },
-          path: '/server/update/a-token/file',
-          systemFile: '/some/system/file/somewhere',
-        },
-        meta: { shell: true },
-      },
-      initialState: {
-        ...INITIAL_STATE,
-        session: { ...BASE_SESSION, step: 'getToken' },
-      },
-      expected: {
-        ...INITIAL_STATE,
-        session: { ...BASE_SESSION, step: 'uploadFile' },
-      },
-    },
-    {
       name: 'handles robotUpdate:FILE_UPLOAD_DONE',
       action: { type: 'robotUpdate:FILE_UPLOAD_DONE' },
       initialState: {

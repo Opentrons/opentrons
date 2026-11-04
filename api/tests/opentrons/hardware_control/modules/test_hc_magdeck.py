@@ -3,7 +3,8 @@ from typing import AsyncGenerator
 
 import pytest
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from . import require_live_data_real_string
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.magdeck import MagDeck
 from opentrons.hardware_control.modules.types import (
@@ -59,7 +60,7 @@ async def test_sim_data(subject: modules.MagDeck) -> None:
     assert subject.device_info["model"] == "mag_deck_v1.1"
     assert subject.device_info["version"] == "dummyVersionMD"
     assert subject.live_data["status"] == subject.status
-    assert "data" in subject.live_data
+    require_live_data_real_string(subject)
 
 
 async def test_sim_state_update(subject: modules.MagDeck) -> None:

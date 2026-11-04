@@ -86,7 +86,7 @@ async def add_labware_offset(
 
     added_offsets: list[LabwareOffset] = []
     for offset_to_add in offsets_to_add:
-        added_offset = run_orchestrator_store.add_labware_offset(offset_to_add)
+        added_offset = await run_orchestrator_store.add_labware_offset(offset_to_add)
         added_offsets.append(added_offset)
         log.info(f'Added labware offset "{added_offset.id}" to run "{run.id}".')
 
@@ -138,7 +138,7 @@ async def add_labware_definition(
             status.HTTP_409_CONFLICT
         )
 
-    uri = run_orchestrator_store.add_labware_definition(request_body.data)
+    uri = await run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(
@@ -177,7 +177,7 @@ async def get_run_loaded_labware_definitions(
         run_data_manager: Current and historical run data management.
     """
     try:
-        labware_definitions = run_data_manager.get_run_loaded_labware_definitions(
+        labware_definitions = await run_data_manager.get_run_loaded_labware_definitions(
             run_id=runId
         )
     except RunNotCurrentError as e:

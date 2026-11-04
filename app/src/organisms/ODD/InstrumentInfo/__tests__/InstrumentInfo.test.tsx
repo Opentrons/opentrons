@@ -5,7 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
-import { mockPipetteData1Channel } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteData1Channel } from '/app/resources/instruments/__fixtures__'
 
 import { InstrumentInfo } from '..'
 

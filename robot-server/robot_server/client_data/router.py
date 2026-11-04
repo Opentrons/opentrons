@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 
 import fastapi
 
+from server_utils.audit.fastapi import skip_audit_logger
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     RequestModel,
@@ -52,8 +53,7 @@ class ClientDataKeyDoesNotExist(ErrorDetails):
 @router.put(
     path="/clientData/{key}",
     summary="Store client-defined data",
-    description=textwrap.dedent(
-        """\
+    description=textwrap.dedent("""\
         Store a small amount of arbitrary client-defined data.
 
         This endpoint is experimental and may be changed or removed without warning.
@@ -65,8 +65,8 @@ class ClientDataKeyDoesNotExist(ErrorDetails):
         to store which step the user is currently on.
 
         The data is cleared when the robot reboots.
-        """
-    ),
+        """),
+    dependencies=[fastapi.Depends(skip_audit_logger)],
 )
 async def put_client_data(  # noqa: D103
     key: Key,
@@ -114,6 +114,7 @@ async def get_client_data(  # noqa: D103
             "model": ErrorBody[ClientDataKeyDoesNotExist]
         },
     },
+    dependencies=[fastapi.Depends(skip_audit_logger)],
 )
 async def delete_client_data(  # noqa: D103
     key: Key,
@@ -137,6 +138,7 @@ async def delete_client_data(  # noqa: D103
     path="/clientData",
     summary="Delete all client-defined data",
     description="Delete all client-defined data. See `PUT /clientData` for background.",
+    dependencies=[fastapi.Depends(skip_audit_logger)],
 )
 async def delete_all_client_data(  # noqa: D103
     store: Annotated[ClientDataStore, fastapi.Depends(get_client_data_store)],

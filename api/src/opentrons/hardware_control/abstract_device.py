@@ -7,7 +7,7 @@ from .modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 
 class AbstractDevice(abc.ABC):

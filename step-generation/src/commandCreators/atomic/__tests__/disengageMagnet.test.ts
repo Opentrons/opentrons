@@ -5,7 +5,11 @@ import {
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getInitialRobotStateStandard, makeContext } from '../../../fixtures'
+import {
+  getErrorResult,
+  getInitialRobotStateStandard,
+  makeContext,
+} from '../../../fixtures'
 import { disengageMagnet } from '../disengageMagnet'
 
 import type { InvariantContext, RobotState } from '../../../types'
@@ -52,5 +56,57 @@ describe('disengageMagnet', () => {
       ],
       python: 'mock_magnetic_module_1.disengage()',
     })
+  })
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+    }
+    const result = disengageMagnet(
+      {
+        moduleId: 'selected_module',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'magneticModule/disengage',
+          key: expect.any(String),
+          params: {
+            moduleId,
+          },
+        },
+      ],
+      python: 'mock_magnetic_module_1.disengage()',
+    })
+  })
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = disengageMagnet(
+      {
+        moduleId: 'mock_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

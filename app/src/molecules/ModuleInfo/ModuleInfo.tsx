@@ -8,10 +8,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   RobotCoordsForeignObject,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -23,6 +23,7 @@ import {
 
 import { useRunHasStarted } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 export interface ModuleInfoProps {
@@ -32,7 +33,7 @@ export interface ModuleInfoProps {
   runId?: string
 }
 
-export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
+export const ModuleInfo = (props: ModuleInfoProps): ReactNode => {
   const { moduleModel, physicalPort, isAttached, runId = null } = props
   const moduleDef = getModuleDef(moduleModel)
   const {
@@ -82,22 +83,22 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               marginRight={SPACING.spacing4}
             />
 
-            <LegacyStyledText
+            <StyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
@@ -109,7 +110,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           {runHasStarted
             ? t('connection_info_not_available')
             : connectionStatus}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </RobotCoordsForeignObject>
   )

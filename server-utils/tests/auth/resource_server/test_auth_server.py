@@ -13,11 +13,11 @@ from server_utils.auth.resource_server.auth_server import (
     CLIENT_ID,
     SETTINGS_ENDPOINT_PATH,
     TOKEN_INTROSPECTION_ENDPOINT_PATH,
+    LocalHTTPClient,
+)
+from server_utils.auth.resource_server.types import (
     AuthSettingsResponse,
     AuthSettingsResponseData,
-    LocalHTTPClient,
-    RequireReasonForInteractionSettingsResponse,
-    RequireReasonForInteractionSettingsResponseData,
     TokenIntrospectionResponse,
 )
 
@@ -149,37 +149,6 @@ async def test_settings(mock_server: tuple[AppMock, LocalHTTPClient]) -> None:
     )
 
 
-async def test_require_reason_for_interaction_settings(
-    mock_server: tuple[AppMock, LocalHTTPClient],
-) -> None:
-    """Test that the client can retrieve the require-reason-for-interaction setting."""
-    app_mock, client = mock_server
-
-    app_mock.all_auth_settings_response = {
-        "data": {
-            "requireReasonForInteraction": True,
-            "accessControlEnabled": True,
-            "idleLogout": 180.0,
-        }
-    }
-    result = await client.get_require_reason_for_interaction_settings()
-    assert result == RequireReasonForInteractionSettingsResponse(
-        data=RequireReasonForInteractionSettingsResponseData(
-            requireReasonForInteraction=True
-        )
-    )
-
-    app_mock.all_auth_settings_response = {
-        "data": {"requireReasonForInteraction": False, "idleLogout": 60.0}
-    }
-    result = await client.get_require_reason_for_interaction_settings()
-    assert result == RequireReasonForInteractionSettingsResponse(
-        data=RequireReasonForInteractionSettingsResponseData(
-            requireReasonForInteraction=False
-        )
-    )
-
-
 async def test_token_introspection(
     mock_server: tuple[AppMock, LocalHTTPClient],
 ) -> None:
@@ -199,12 +168,14 @@ async def test_token_introspection(
         "active": True,
         "scope": "mama_mia papa_pia",
         "username": "test_username",
+        "ot_fullname": "Test Fullname",
     }
     introspect_response = await client.introspect_token("test-token")
     assert introspect_response == TokenIntrospectionResponse(
         active=True,
         scope="mama_mia papa_pia",
         username="test_username",
+        ot_fullname="Test Fullname",
     )
     assert app_mock.introspect_requests == [
         {"token": "test-token", "client_id": CLIENT_ID}

@@ -8,10 +8,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -26,10 +26,10 @@ import {
   openPythonInterpreterDirectory,
 } from '/app/redux/protocol-analysis'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function OverridePathToPython(): JSX.Element {
+export function OverridePathToPython(): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const pathToPythonInterpreter = useSelector(getPathToPythonOverride)
   const dispatch = useDispatch<Dispatch>()
@@ -48,31 +48,30 @@ export function OverridePathToPython(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_overridePathToPython"
         >
           {t('override_path_to_python')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:opentrons_app_will_use_interpreter')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('override_path')}
-        </LegacyStyledText>
+        </StyledText>
         {pathToPythonInterpreter !== null ? (
           <Link
             role="button"
             css={TYPOGRAPHY.pRegular}
             color={COLORS.black90}
             onClick={() => dispatch(openPythonInterpreterDirectory())}
-            id="AdvancedSettings_sourceFolderLinkPython"
           >
             {pathToPythonInterpreter}
             <Icon
@@ -82,9 +81,7 @@ export function OverridePathToPython(): JSX.Element {
             />
           </Link>
         ) : (
-          <LegacyStyledText forwardedAs="p">
-            {t('no_specified_folder')}
-          </LegacyStyledText>
+          <StyledText forwardedAs="p">{t('no_specified_folder')}</StyledText>
         )}
       </Box>
       {pathToPythonInterpreter !== null ? (
@@ -93,7 +90,6 @@ export function OverridePathToPython(): JSX.Element {
           onClick={() =>
             dispatch(resetConfigValue('python.pathToPythonOverride'))
           }
-          id="AdvancedSettings_changePythonInterpreterSource"
         >
           {t('reset_to_default')}
         </TertiaryButton>
@@ -101,7 +97,6 @@ export function OverridePathToPython(): JSX.Element {
         <TertiaryButton
           marginLeft={SPACING_AUTO}
           onClick={handleClickPythonDirectoryChange}
-          id="AdvancedSettings_changePythonInterpreterSource"
         >
           {t('add_override_path')}
         </TertiaryButton>

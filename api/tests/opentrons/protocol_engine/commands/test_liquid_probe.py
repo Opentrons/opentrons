@@ -193,7 +193,7 @@ async def test_liquid_probe_implementation(
     ).then_return(15.0)
 
     decoy.when(
-        state_view.geometry.get_well_volume_at_height(
+        state_view.liquid_tracking.get_well_volume_at_height(
             labware_id="123",
             well_name="A3",
             height=15.0,

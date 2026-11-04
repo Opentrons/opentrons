@@ -37,7 +37,7 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
     ) as client:
         assert await client.dead(), "Server is running and must not be."
 
-        with DevServer(port=port) as server:
+        with DevServer(port=port, is_ot3=True) as server:
             server.start()
             await client.wait_until_ready()
 

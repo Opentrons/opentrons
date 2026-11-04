@@ -9,7 +9,7 @@ from enum import Enum
 from functools import lru_cache
 from logging import getLogger
 from math import copysign, floor
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 from typing_extensions import TYPE_CHECKING, Final, Literal
@@ -30,10 +30,6 @@ from opentrons_shared_data.errors.exceptions import (
     MisalignedGantryError,
 )
 
-from .robot_calibration import (
-    DeckCalibration,
-    RobotCalibration,
-)
 from .types import Axis, GripperProbe, OT3Mount
 from .util import DeckTransformState
 from opentrons.calibration_storage import types
@@ -469,7 +465,7 @@ async def find_axis_center(
 
 
 def _edges_from_data(
-    data: List[float], distance: float, log_metadata: Optional[Dict[str, Any]] = None
+    data: List[float], distance: float, log_metadata: Dict[str, Any] | None = None
 ) -> Tuple[float, float]:
     """
     Postprocess the capacitance data taken from a sweep to find the calibration slot.
@@ -1110,7 +1106,19 @@ class OT3RobotCalibrationProvider:
 
 
 @dataclass
-class OT3Transforms(RobotCalibration):
+class DeckCalibration:
+    attitude: types.AttitudeMatrix
+    source: types.SourceType
+    status: types.CalibrationStatus
+    belt_attitude: types.AttitudeMatrix | None = None
+    last_modified: datetime.datetime | None = None
+    pipette_calibrated_with: str | None = None
+    tiprack: str | None = None
+
+
+@dataclass
+class OT3Transforms:
+    deck_calibration: DeckCalibration
     carriage_offset: Point
     left_mount_offset: Point
     right_mount_offset: Point
@@ -1124,12 +1132,16 @@ class OT3Transforms(RobotCalibration):
         transform_dict["deck_calibration"]["source"] = obj.deck_calibration.source.value
         transform_dict["deck_calibration"]["status"] = {
             "markedBad": obj.deck_calibration.status.markedBad,
-            "source": obj.deck_calibration.status.source.value
-            if obj.deck_calibration.status.source is not None
-            else None,
-            "markedAt": obj.deck_calibration.status.markedAt.isoformat()
-            if obj.deck_calibration.status.markedAt is not None
-            else None,
+            "source": (
+                obj.deck_calibration.status.source.value
+                if obj.deck_calibration.status.source is not None
+                else None
+            ),
+            "markedAt": (
+                obj.deck_calibration.status.markedAt.isoformat()
+                if obj.deck_calibration.status.markedAt is not None
+                else None
+            ),
         }
         transform_dict["deck_calibration"]["last_modified"] = (
             obj.deck_calibration.last_modified.isoformat()
@@ -1173,19 +1185,27 @@ class OT3Transforms(RobotCalibration):
                 source=types.SourceType(data["deck_calibration"]["source"]),
                 status=types.CalibrationStatus(
                     markedBad=data["deck_calibration"]["status"]["markedBad"],
-                    source=None
-                    if status_source is None
-                    else types.SourceType(status_source)
-                    if status_source is not None
-                    else None,
-                    markedAt=datetime.datetime.fromisoformat(status_marked_at)
-                    if status_marked_at is not None
-                    else None,
+                    source=(
+                        None
+                        if status_source is None
+                        else (
+                            types.SourceType(status_source)
+                            if status_source is not None
+                            else None
+                        )
+                    ),
+                    markedAt=(
+                        datetime.datetime.fromisoformat(status_marked_at)
+                        if status_marked_at is not None
+                        else None
+                    ),
                 ),
                 belt_attitude=data["deck_calibration"]["belt_attitude"],
-                last_modified=datetime.datetime.fromisoformat(last_modified)
-                if last_modified is not None
-                else None,
+                last_modified=(
+                    datetime.datetime.fromisoformat(last_modified)
+                    if last_modified is not None
+                    else None
+                ),
                 pipette_calibrated_with=data["deck_calibration"][
                     "pipette_calibrated_with"
                 ],

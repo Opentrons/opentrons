@@ -1287,4 +1287,154 @@ describe('moveLabware', () => {
       type: 'VACUUM_UNDER_PRESSURE',
     })
   })
+  it('resolves labwareId, strategy, and slotName when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_labware: {
+        variableName: 'selected_labware',
+        displayName: 'Selected labware',
+        type: 'string',
+        default: SOURCE_LABWARE,
+      },
+      move_strategy: {
+        variableName: 'move_strategy',
+        displayName: 'Move strategy',
+        type: 'string',
+        default: 'usingGripper',
+      },
+      slot_name: {
+        variableName: 'slot_name',
+        displayName: 'Slot name',
+        type: 'string',
+        default: 'A1',
+      },
+    }
+    const result = moveLabware(
+      {
+        labwareId: 'selected_labware',
+        strategy: 'move_strategy',
+        newLocation: { slotName: 'slot_name' },
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveLabware',
+        key: expect.any(String),
+        params: {
+          labwareId: SOURCE_LABWARE,
+          strategy: 'usingGripper',
+          newLocation: { slotName: 'A1' },
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_labware(mock_source_plate, slot_name, use_gripper=True)`
+    )
+  })
+  it('resolves addressableAreaName when it is a runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      area_name: {
+        variableName: 'area_name',
+        displayName: 'Area name',
+        type: 'string',
+        default: 'A4',
+      },
+    }
+    const result = moveLabware(
+      {
+        labwareId: SOURCE_LABWARE,
+        strategy: 'manualMoveWithPause',
+        newLocation: { addressableAreaName: 'area_name' },
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveLabware',
+        key: expect.any(String),
+        params: {
+          labwareId: SOURCE_LABWARE,
+          strategy: 'manualMoveWithPause',
+          newLocation: { addressableAreaName: 'A4' },
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_labware(mock_source_plate, area_name)`
+    )
+  })
+  it('resolves a string newLocation when it is a runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      deck_location: {
+        variableName: 'deck_location',
+        displayName: 'Deck location',
+        type: 'string',
+        default: 'offDeck',
+      },
+    }
+    const result = moveLabware(
+      {
+        labwareId: SOURCE_LABWARE,
+        strategy: 'manualMoveWithPause',
+        newLocation: 'deck_location',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveLabware',
+        key: expect.any(String),
+        params: {
+          labwareId: SOURCE_LABWARE,
+          strategy: 'manualMoveWithPause',
+          newLocation: 'offDeck',
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_labware(mock_source_plate, protocol_api.OFF_DECK)`
+    )
+  })
+  it('returns errors if labwareId, strategy, and newLocation are not valid runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      mock_bool_rtp: {
+        variableName: 'mock_bool_rtp',
+        displayName: 'mock bool rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_int_rtp: {
+        variableName: 'mock_int_rtp',
+        displayName: 'mock int rtp',
+        type: 'int',
+        default: 1,
+      },
+    }
+    const result = moveLabware(
+      {
+        labwareId: 'mock_bool_rtp',
+        strategy: 'mock_int_rtp',
+        newLocation: { slotName: 'mock_bool_rtp' },
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

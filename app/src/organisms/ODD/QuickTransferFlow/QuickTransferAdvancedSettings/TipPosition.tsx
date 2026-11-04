@@ -15,12 +15,13 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -34,14 +35,19 @@ interface TipPositionEntryProps {
   kind: FlowRateKind // TODO: rename flowRateKind to be generic
 }
 
-export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
+export function TipPositionEntry(props: TipPositionEntryProps): ReactNode {
   const { onBack, state, dispatch, kind } = props
-  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
-  const [tipPosition, setTipPosition] = useState<number>(
-    kind === 'aspirate' ? state.tipPositionAspirate : state.tipPositionDispense
+  const [tipPosition, setTipPosition] = useState<string>(
+    String(
+      kind === 'aspirate'
+        ? state.tipPositionAspirate
+        : state.tipPositionDispense
+    )
   )
 
   let wellHeight = 1
@@ -73,12 +79,18 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       ? ACTIONS.SET_ASPIRATE_TIP_POSITION
       : ACTIONS.SET_DISPENSE_TIP_POSITION
 
+  const parsedTipPosition = parseNumericalInput(tipPosition, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: tipPositionRange.min,
+    max: tipPositionRange.max,
+  })
+
   const handleClickSave = (): void => {
-    // the button will be disabled if this values is null
-    if (tipPosition != null) {
+    if (parsedTipPosition.result === 'success') {
       dispatch({
         type: tipPositionAction,
-        position: tipPosition,
+        position: parsedTipPosition.data,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -90,14 +102,15 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
     onBack()
   }
 
-  const error =
-    tipPosition != null &&
-    (tipPosition < tipPositionRange.min || tipPosition > tipPositionRange.max)
-      ? t(`value_out_of_range`, {
-          min: Math.floor(tipPositionRange.min),
-          max: Math.floor(tipPositionRange.max),
+  const tipPositionErrorMessage =
+    parsedTipPosition.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: Math.floor(parsedTipPosition.min),
+          max: Math.floor(parsedTipPosition.max),
         })
-      : null
+      : parsedTipPosition.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -107,11 +120,11 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             ? t('aspirate_tip_position')
             : t('dispense_tip_position')
         }
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || tipPosition == null}
+        buttonIsDisabled={parsedTipPosition.result !== 'success'}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -130,16 +143,14 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={tipPosition}
             label={textEntryCopy}
-            error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
+            error={tipPositionErrorMessage}
             onChange={e => {
-              setTipPosition(Number(e.target.value))
+              setTipPosition(e.target.value)
             }}
           />
         </Flex>
@@ -151,10 +162,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            initialValue={String(tipPosition ?? '')}
-            onChange={e => {
-              setTipPosition(Number(e))
-            }}
+            inputElementRef={inputElementRef}
           />
         </Flex>
       </Flex>

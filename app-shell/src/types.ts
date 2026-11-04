@@ -1,5 +1,4 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Logger } from '@opentrons/app/src/logger'
 import type {
   Action,
   Error as PlainError,
@@ -10,7 +9,16 @@ export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
 
-export type { Logger }
+export type Log = (message: string, meta?: {}) => void
+export interface Logger {
+  error: Log
+  warn: Log
+  info: Log
+  http: Log
+  verbose: Log
+  debug: Log
+  silly: Log
+}
 
 // copied types below from the app so the app shell does not pull in the app
 // in its bundle
@@ -23,6 +31,9 @@ export type CONFIG_TOGGLE_VALUE_TYPE = 'config:TOGGLE_VALUE'
 export type CONFIG_ADD_UNIQUE_VALUE_TYPE = 'config:ADD_UNIQUE_VALUE'
 export type CONFIG_SUBTRACT_VALUE_TYPE = 'config:SUBTRACT_VALUE'
 export type CONFIG_VALUE_UPDATED_TYPE = 'config:VALUE_UPDATED'
+export type CHANGE_AUDIT_LOG_DIRECTORY_TYPE = 'audit:CHANGE_AUDIT_LOG_DIRECTORY'
+export type DOWNLOAD_AUDIT_LOG_TYPE = 'audit:DOWNLOAD_AUDIT_LOG'
+export type DOWNLOAD_AUDIT_LOGS_TYPE = 'audit:DOWNLOAD_AUDIT_LOGS'
 
 export type POLL_TYPE = 'poll'
 export type INITIAL_TYPE = 'initial'

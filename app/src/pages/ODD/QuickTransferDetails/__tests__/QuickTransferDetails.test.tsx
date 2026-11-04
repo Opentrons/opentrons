@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useCreateRunMutation,
@@ -12,6 +11,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
@@ -46,6 +46,9 @@ vi.mock('../Hardware')
 vi.mock('../Labware')
 vi.mock('/app/redux/config')
 vi.mock('/app/local-resources/dom-utils')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
@@ -115,7 +118,7 @@ describe('ODDQuickTransferDetails', () => {
         status: 'completed',
       },
     } as any)
-    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(useScrollPosition).mockReturnValue({
       isScrolled: false,
       scrollRef: {} as any,
@@ -217,7 +220,7 @@ describe('ODDQuickTransferDetails', () => {
       isLoading: true,
     } as any)
     render()
-    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
   })
 
   it('render chip about modules when missing a hardware', () => {

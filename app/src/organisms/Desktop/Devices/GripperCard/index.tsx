@@ -4,17 +4,16 @@ import { css } from 'styled-components'
 
 import { InlineNotification } from '@opentrons/components'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
 
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import { InstrumentCard } from '/app/molecules/InstrumentCard'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
-import type { GripperModel } from '@opentrons/shared-data'
 import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/types'
 
@@ -42,12 +41,15 @@ export function GripperCard({
   isCalibrated,
   isRunActive,
   isEstopNotDisengaged,
-}: GripperCardProps): JSX.Element {
+}: GripperCardProps): ReactNode {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   const [openWizardFlowType, setOpenWizardFlowType] =
     useState<GripperWizardFlowType | null>(null)
   const [showAboutGripperSlideout, setShowAboutGripperSlideout] =
     useState<boolean>(false)
+  const gripperDisplayName = useAttachedInstrumentDisplayName(
+    attachedGripper?.ok ? attachedGripper : null
+  )
 
   const handleAttach: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
@@ -73,15 +75,22 @@ export function GripperCard({
   // this gives the instruments endpoint time to start reporting
   // a good instrument
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>
     if (attachedGripper?.ok === false) {
       setPollForSubsystemUpdate(true)
     } else if (
       subsystemUpdateData != null &&
       subsystemUpdateData.data.updateStatus === 'done'
     ) {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setPollForSubsystemUpdate(false)
       }, POLL_DURATION_MS)
+    }
+
+    return () => {
+      if (timeoutId != null) {
+        clearTimeout(timeoutId)
+      }
     }
   }, [attachedGripper?.ok, subsystemUpdateData])
 
@@ -122,11 +131,7 @@ export function GripperCard({
       subsystemUpdateData == null ? (
         <InstrumentCard
           description={
-            attachedGripper != null
-              ? getGripperDisplayName(
-                  attachedGripper.instrumentModel as GripperModel
-                )
-              : i18n.format(t('shared:empty'), 'capitalize')
+            gripperDisplayName ?? i18n.format(t('shared:empty'), 'capitalize')
           }
           banner={
             attachedGripper?.ok && !isCalibrated ? (

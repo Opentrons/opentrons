@@ -1,7 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -46,7 +45,7 @@ describe('ProtocolList', () => {
     vi.mocked(EmptyStateLinks).mockReturnValue(
       <div>mock empty state links</div>
     )
-    when(vi.mocked(useSortedProtocols))
+    vi.when(vi.mocked(useSortedProtocols))
       .calledWith('alphabetical', [storedProtocolData, storedProtocolDataTwo])
       .thenReturn([storedProtocolData, storedProtocolDataTwo])
     vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('alphabetical')
@@ -90,7 +89,7 @@ describe('ProtocolList', () => {
   })
 
   it('renders Alphabetical button and clicking on it open overflow menu and can select reverse', () => {
-    when(vi.mocked(useSortedProtocols))
+    vi.when(vi.mocked(useSortedProtocols))
       .calledWith('reverse', [storedProtocolData, storedProtocolDataTwo])
       .thenReturn([storedProtocolDataTwo, storedProtocolData])
     vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('reverse')
@@ -106,7 +105,7 @@ describe('ProtocolList', () => {
   })
 
   it('renders Alphabetical button and clicking on it open overflow menu and can select recent', () => {
-    when(vi.mocked(useSortedProtocols))
+    vi.when(vi.mocked(useSortedProtocols))
       .calledWith('recent', [storedProtocolData, storedProtocolDataTwo])
       .thenReturn([storedProtocolData, storedProtocolDataTwo])
     vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('recent')
@@ -122,7 +121,7 @@ describe('ProtocolList', () => {
   })
 
   it('renders Alphabetical button and clicking on it open overflow menu and can select oldest', () => {
-    when(vi.mocked(useSortedProtocols))
+    vi.when(vi.mocked(useSortedProtocols))
       .calledWith('oldest', [storedProtocolData, storedProtocolDataTwo])
       .thenReturn([storedProtocolDataTwo, storedProtocolData])
     vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('oldest')

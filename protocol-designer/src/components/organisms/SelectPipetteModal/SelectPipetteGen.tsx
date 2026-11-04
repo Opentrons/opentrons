@@ -11,7 +11,7 @@ import {
 
 import { PIPETTE_GENS } from '/protocol-designer/pages/Onboarding/constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Gen } from '/protocol-designer/pages/Onboarding/types'
 
 interface SelectPipetteGenProps {
@@ -20,7 +20,7 @@ interface SelectPipetteGenProps {
   pipetteGen: Gen | 'flex'
 }
 
-export function SelectPipetteGen(props: SelectPipetteGenProps): JSX.Element {
+export function SelectPipetteGen(props: SelectPipetteGenProps): ReactNode {
   const { setPipetteGen, setPipetteVolume, pipetteGen } = props
   const { t } = useTranslation('onboarding')
 

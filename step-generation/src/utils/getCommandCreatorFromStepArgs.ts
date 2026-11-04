@@ -47,6 +47,11 @@ import {
   dispenseWhileTracking,
   dropTip,
   dropTipInPlace,
+  heaterShakerCloseLatch,
+  heaterShakerDeactivateHeater,
+  heaterShakerOpenLatch,
+  heaterShakerSetTargetShakeSpeed,
+  heaterShakerStopShake,
   home,
   moveRelative,
   moveToAddressableArea,
@@ -55,6 +60,13 @@ import {
   moveToWell,
   pickUpTip,
   prepareToAspirate,
+  thermocyclerCloseLid,
+  thermocyclerDeactivateBlock,
+  thermocyclerDeactivateLid,
+  thermocyclerOpenLid,
+  thermocyclerSetTargetBlockTemperature,
+  thermocyclerSetTargetLidTemperature,
+  thermocyclerStartRunExtendedProfile,
   touchTip,
   tryLiquidProbe,
 } from '../commandCreators/atomic'
@@ -174,7 +186,6 @@ export const getCommandCreatorFromStepArgs = (
     // NOTE: ja 6/3/26: here and below are for opentronsAI usage only (for now)
     case 'airGapInPlace':
       return curryCommandCreator(airGapInPlace, args)
-
     case 'aspirate':
       return curryCommandCreator(airGapInPlace, args)
     case 'aspirateInPlace':
@@ -219,6 +230,30 @@ export const getCommandCreatorFromStepArgs = (
       return curryCommandCreator(touchTip, args)
     case 'tryLiquidProbe':
       return curryCommandCreator(tryLiquidProbe, args)
+    case 'heaterShaker/closeLabwareLatch':
+      return curryCommandCreator(heaterShakerCloseLatch, args)
+    case 'heaterShaker/openLabwareLatch':
+      return curryCommandCreator(heaterShakerOpenLatch, args)
+    case 'heaterShaker/setAndWaitForShakeSpeed':
+      return curryCommandCreator(heaterShakerSetTargetShakeSpeed, args)
+    case 'heaterShaker/deactivateHeater':
+      return curryCommandCreator(heaterShakerDeactivateHeater, args)
+    case 'heaterShaker/deactivateShaker':
+      return curryCommandCreator(heaterShakerStopShake, args)
+    case 'thermocycler/closeLid':
+      return curryCommandCreator(thermocyclerCloseLid, args)
+    case 'thermocycler/openLid':
+      return curryCommandCreator(thermocyclerOpenLid, args)
+    case 'thermocycler/deactivateBlock':
+      return curryCommandCreator(thermocyclerDeactivateBlock, args)
+    case 'thermocycler/deactivateLid':
+      return curryCommandCreator(thermocyclerDeactivateLid, args)
+    case 'thermocycler/setTargetBlockTemperature':
+      return curryCommandCreator(thermocyclerSetTargetBlockTemperature, args)
+    case 'thermocycler/setTargetLidTemperature':
+      return curryCommandCreator(thermocyclerSetTargetLidTemperature, args)
+    case 'thermocycler/startRunExtendedProfile':
+      return curryCommandCreator(thermocyclerStartRunExtendedProfile, args)
   }
   args satisfies never // Make sure we handle every commandCreatorFnName.
 }

@@ -20,6 +20,7 @@ import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 
 import { getNozzleType } from '../utils'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../types'
 
 type TipWellSelectionFieldProps = FieldProps & {
@@ -30,7 +31,7 @@ type TipWellSelectionFieldProps = FieldProps & {
 
 export function TipWellSelectionField(
   props: TipWellSelectionFieldProps
-): JSX.Element {
+): ReactNode {
   const {
     value: selectedWells,
     errorToShow,

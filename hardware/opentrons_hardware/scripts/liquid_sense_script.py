@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterator, List
 from numpy import float64
 
 import opentrons_hardware.sensors.types as sensor_types
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger, SerialUsbDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger, build
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -128,7 +129,9 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
-    network_info = NetworkInfo(messenger)
+    usb_driver = SerialUsbDriver(asyncio.get_running_loop())
+    usb_messenger = BinaryMessenger(usb_driver)
+    network_info = NetworkInfo(messenger, usb_messenger)
     found = set(await network_info.probe({NodeId.head, target_pipette}, 10))
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")

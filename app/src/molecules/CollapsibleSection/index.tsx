@@ -9,7 +9,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,9 +32,7 @@ interface CollapsibleSectionProps extends StyleProps {
   isExpandedInitially?: boolean
 }
 
-export function CollapsibleSection(
-  props: CollapsibleSectionProps
-): JSX.Element {
+export function CollapsibleSection(props: CollapsibleSectionProps): ReactNode {
   const { title, children, isExpandedInitially = true, ...styleProps } = props
   const [isExpanded, setIsExpanded] = useState(isExpandedInitially)
   return (
@@ -48,12 +46,12 @@ export function CollapsibleSection(
           cursor: CURSOR_POINTER,
         }}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {title}
-        </LegacyStyledText>
+        </StyledText>
         <Btn
           onClick={() => {
             setIsExpanded(!isExpanded)

@@ -10,8 +10,9 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 // import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
@@ -20,8 +21,6 @@ import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
@@ -35,16 +34,6 @@ const render = (props: ComponentProps<typeof BeforeBeginning>) => {
 }
 
 describe('BeforeBeginning', () => {
-  const mockDeckConfig = {
-    data: [
-      {
-        cutoutId: 'cutoutD3',
-      } as any,
-    ],
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
@@ -58,17 +47,13 @@ describe('BeforeBeginning', () => {
       flowType: FLOWS.CALIBRATE,
       createMaintenanceRun: vi.fn(),
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
+      handleCommandError: vi.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
-      deckConfig: mockDeckConfig,
-      documentationState: {
-        reasonForInteractionRequired: false,
-        isLoading: false,
-      },
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
@@ -141,16 +126,6 @@ describe('BeforeBeginning', () => {
         name: 'Move gantry to front',
       })
       expect(proceedBtn).toBeDisabled()
-    })
-
-    it('renders the error modal screen when errorMessage is true', () => {
-      props = {
-        ...props,
-        errorMessage: 'error shmerror',
-      }
-      render(props)
-      screen.getByText('Error encountered')
-      screen.getByText('error shmerror')
     })
   })
 

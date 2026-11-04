@@ -7,18 +7,20 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 export interface InfoMessageProps {
   title: string
   body?: string
 }
 
-export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
+export function InfoMessage({ title, body }: InfoMessageProps): ReactNode {
   return (
     <Flex
       backgroundColor={COLORS.blue30}
@@ -41,15 +43,10 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
         gridGap={SPACING.spacing4}
         color={COLORS.black90}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {title}
-        </LegacyStyledText>
-        {body != null ? (
-          <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
-        ) : null}
+        </StyledText>
+        {body != null ? <StyledText forwardedAs="p">{body}</StyledText> : null}
       </Flex>
     </Flex>
   )

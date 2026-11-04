@@ -6,6 +6,8 @@ import { Flex } from '../../primitives'
 import { spacing8 } from '../../ui-style-constants/spacing'
 import { StyledText } from '../StyledText'
 
+import type { ReactNode } from 'react'
+
 interface ToggleGroupProps {
   leftText: string
   rightText: string
@@ -14,7 +16,7 @@ interface ToggleGroupProps {
   selectedValue: string
 }
 
-export const ToggleGroup = (props: ToggleGroupProps): JSX.Element => {
+export const ToggleGroup = (props: ToggleGroupProps): ReactNode => {
   const { leftText, rightText, leftClick, rightClick, selectedValue } = props
 
   return (

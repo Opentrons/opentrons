@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -41,18 +42,20 @@ describe('AirGap', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for air gap aspirate', () => {
+  it('renders text, buttons for air gap aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Air gap after aspirating')
     screen.getByText('Save')
     screen.getByText('Draw air into the tip after aspirating')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons for air gap dispense', () => {
+  it('renders text, buttons for air gap dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
     screen.getByText('Air gap after dispensing')
@@ -60,36 +63,38 @@ describe('AirGap', () => {
     screen.getByText('Draw in air before moving to trash to dispose of tip')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons, input field, and keyboard for air gap aspirating', () => {
+  it('renders text, buttons, input field, and keyboard for air gap aspirating', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Air gap volume (µL)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Save'))
     screen.getByText('Value must be between 0 to 9')
   })
 
-  it('should call dispatch when clicking save button aspirate', () => {
+  it('should call dispatch when clicking save button aspirate', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Air gap volume (µL)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_AIR_GAP_ASPIRATE',
       volume: 1,
@@ -102,18 +107,19 @@ describe('AirGap', () => {
     })
   })
 
-  it('should call dispatch when clicking save button dispense', () => {
+  it('should call dispatch when clicking save button dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Air gap volume (µL)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '5' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_AIR_GAP_DISPENSE',
       volume: 5,
@@ -126,9 +132,10 @@ describe('AirGap', () => {
     })
   })
 
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

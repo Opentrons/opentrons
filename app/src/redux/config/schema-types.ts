@@ -1,6 +1,5 @@
 import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
-import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -15,9 +14,7 @@ export type DevInternalFlag =
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
-  | 'reactScan'
   | 'quickTransferProtocolContentsLog'
-  | 'accessControlMode'
   | 'robotSearchBar'
   | 'showGitDetails'
 
@@ -32,10 +29,7 @@ export type ProtocolsOnDeviceSortKey =
   | 'oldCreated'
 
 export type QuickTransfersOnDeviceSortKey =
-  | 'alphabetical'
-  | 'reverse'
-  | 'recentCreated'
-  | 'oldCreated'
+  'alphabetical' | 'reverse' | 'recentCreated' | 'oldCreated'
 
 export interface OnDeviceDisplaySettings {
   sleepMs: number
@@ -43,6 +37,9 @@ export interface OnDeviceDisplaySettings {
   textSize: number
   unfinishedUnboxingFlowRoute: string | null
 }
+
+export type LogLevel =
+  'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly'
 
 export interface ConfigV0 {
   version: 0
@@ -310,4 +307,18 @@ export type ConfigV29 = Omit<ConfigV28, 'version' | 'update'> & {
   }
 }
 
-export type Config = ConfigV29
+export type ConfigV30 = Omit<ConfigV29, 'version'> & {
+  version: 30
+  audit: {
+    logDirectory: string | null
+  }
+}
+
+export type ConfigV31 = Omit<ConfigV30, 'version' | 'protocols'> & {
+  version: 31
+  protocols: ConfigV30['protocols'] & {
+    includeProtocolSourceInRunDownload: boolean
+  }
+}
+
+export type Config = ConfigV31

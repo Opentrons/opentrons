@@ -82,11 +82,7 @@ describe('flexStackerStore', () => {
   })
 
   it('creates flex stacker store command', () => {
-    const result = flexStackerStore(
-      { moduleId, strategy: 'automatic' },
-      invariantContext,
-      robotState
-    )
+    const result = flexStackerStore({ moduleId }, invariantContext, robotState)
     expect(result).toEqual({
       commands: [
         {
@@ -133,7 +129,7 @@ describe('flexStackerStore', () => {
     }
 
     const result = flexStackerStore(
-      { moduleId, strategy: 'automatic' },
+      { moduleId },
       emptyShuttleInvariantContext,
       emptyShuttleRobotState
     )
@@ -195,7 +191,7 @@ describe('flexStackerStore', () => {
       },
     }
     const result = flexStackerStore(
-      { moduleId, strategy: 'automatic' },
+      { moduleId },
       mismatchInvariantContext,
       mismatchRobotState
     )
@@ -279,12 +275,65 @@ describe('flexStackerStore', () => {
       },
     }
     const result = flexStackerStore(
-      { moduleId, strategy: 'automatic' },
+      { moduleId },
       invariantContext,
       fullRobotState
     )
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HOPPER_FULL',
     })
+  })
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+    }
+    const result = flexStackerStore(
+      {
+        moduleId: 'selected_module',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'flexStacker/store',
+          key: expect.any(String),
+          params: {
+            moduleId,
+            strategy: 'automatic',
+          },
+        },
+      ],
+      python: 'mock_flex_stacker_1.store()',
+    })
+  })
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = flexStackerStore(
+      {
+        moduleId: 'mock_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

@@ -29,6 +29,7 @@ import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 const MAX_NICK_NAME_LENGTH = 115
@@ -36,7 +37,7 @@ interface EditNickNameModalProps {
   labwareId: string
   onClose: () => void
 }
-export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
+export function EditNickNameModal(props: EditNickNameModalProps): ReactNode {
   const { onClose, labwareId } = props
   const { t } = useTranslation(['onboarding', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -58,7 +59,6 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
       }}
     >
       <Modal
-        marginLeft="0"
         title={t('rename_labware')}
         type="info"
         onClose={onClose}

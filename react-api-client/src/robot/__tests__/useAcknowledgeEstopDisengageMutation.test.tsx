@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 
 import { useAcknowledgeEstopDisengageMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -39,11 +40,14 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(acknowledgeEstopDisengage).mockRejectedValue('oh no')
     const { result } = renderHook(
-      () => useAcknowledgeEstopDisengageMutation(),
+      () =>
+        useAcknowledgeEstopDisengageMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
       { wrapper }
     )
     expect(result.current.data).toBeUndefined()
-    result.current.acknowledgeEstopDisengage(null)
+    result.current.acknowledgeEstopDisengage()
     await waitFor(() => {
       expect(result.current.data).toBeUndefined()
     })
@@ -56,10 +60,13 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
     } as Response<EstopStatus>)
 
     const { result } = renderHook(
-      () => useAcknowledgeEstopDisengageMutation(),
+      () =>
+        useAcknowledgeEstopDisengageMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
       { wrapper }
     )
-    act(() => result.current.acknowledgeEstopDisengage(null))
+    act(() => result.current.acknowledgeEstopDisengage())
     await waitFor(() => {
       expect(result.current.data).toEqual(updatedEstopPhysicalStatus)
     })

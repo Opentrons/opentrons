@@ -4,9 +4,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SecondaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { ProgressBar } from './index'
@@ -40,9 +40,7 @@ const Template: StoryFn<React.ComponentProps<typeof ProgressBar>> = args => {
       backgroundColor={COLORS.grey30}
       padding={SPACING.spacing16}
     >
-      <LegacyStyledText>
-        {'Add 5% to the current progress every 0.2 sec'}
-      </LegacyStyledText>
+      <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>
       <ProgressBar percentComplete={progress} />
       <SecondaryButton
         onClick={() => {

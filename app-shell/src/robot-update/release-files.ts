@@ -100,13 +100,6 @@ export function downloadAndNotify(
             })
           })
         }
-        // This action will only have an effect if the user is actively waiting for the download to complete.
-        else {
-          dispatch({
-            type: 'robotUpdate:DOWNLOAD_DONE',
-            payload: target,
-          })
-        }
       })
       .then(() => path)
   })

@@ -13,14 +13,13 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -34,7 +33,7 @@ interface PreWetTipProps {
   kind: FlowRateKind
 }
 
-export function PreWetTip(props: PreWetTipProps): JSX.Element {
+export function PreWetTip(props: PreWetTipProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -80,7 +79,7 @@ export function PreWetTip(props: PreWetTipProps): JSX.Element {
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={t('pre_wet_tip_before_aspirating')}
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={handleClickBackOrExit}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}

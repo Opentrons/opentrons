@@ -6,9 +6,11 @@ import type { Lights, SetLightsData } from './types'
 
 export function setLights(
   config: HostConfig,
-  data: SetLightsData
+  data: SetLightsData,
+  userNotes?: string
 ): ResponsePromise<Lights> {
   return request<Lights, SetLightsData>(POST, '/robot/lights', config, {
     body: data,
+    userNotes,
   })
 }

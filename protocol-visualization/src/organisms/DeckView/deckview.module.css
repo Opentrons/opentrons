@@ -4,7 +4,7 @@
   height: 100%;
   flex-direction: column;
   border-radius: var(--border-radius-8);
-  background-color: var(--white);
+  background-color: var(--grey-10);
   container-name: deckview-container;
   container-type: inline-size;
   gap: var(--spacing-16);

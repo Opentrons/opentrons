@@ -12,6 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { useSendIdentifyModule } from '../../ModuleWizardFlows/hooks'
@@ -46,6 +47,12 @@ vi.mock('i18next', () => {
   }
 })
 
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi
+    .fn()
+    .mockReturnValue(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+}))
+
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
 const deckDef = getDeckDefFromRobotType('OT-3 Standard')
@@ -77,6 +84,7 @@ describe('Touchscreen AddFixtureModal', () => {
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
       deckDef,
+      updateDeckConfiguration: mockUpdateDeckConfiguration,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -130,6 +138,7 @@ describe('Desktop AddFixtureModal', () => {
       addressableAreaId: 'D3',
       closeModal: mockCloseModal,
       deckDef,
+      updateDeckConfiguration: mockUpdateDeckConfiguration,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,

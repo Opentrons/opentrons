@@ -161,9 +161,7 @@ describe('ConnectRobotSlideout', () => {
 
   it('Clicking close button should close the slideout', async () => {
     render(props)
-    const closeButton = screen.getByTestId(
-      'Slideout_icon_close_Connect to a Robot via IP Address'
-    )
+    const closeButton = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(closeButton)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

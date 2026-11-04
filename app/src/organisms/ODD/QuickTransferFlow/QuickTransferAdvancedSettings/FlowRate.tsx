@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -17,17 +17,15 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import {
-  isValidNumericalInput,
-  StatelessNumericalKeyboard,
-} from '/app/atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { SupportedTip } from '@opentrons/shared-data'
 import type {
   FlowRateKind,
@@ -42,17 +40,18 @@ interface FlowRateEntryProps {
   kind: FlowRateKind
 }
 
-export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
+export function FlowRateEntry(props: FlowRateEntryProps): ReactNode {
   const { onBack, state, dispatch, kind } = props
-  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+  const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const initialFlowRate =
     kind === 'aspirate' ? state.aspirateFlowRate : state.dispenseFlowRate
   const [flowRate, setFlowRate] = useState<string>(
     String(initialFlowRate ?? '')
   )
-  const flowRateAsNumber = flowRate !== '' ? Number(flowRate) : null
 
   // TODO (ba, 2024-07-02): use the pipette name once we add it to the v2 spec
   let pipetteName = state.pipette.model
@@ -91,12 +90,18 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
     textEntryCopy = t('dispense_flow_rate_µL')
   }
 
+  const parsedFlowRate = parseNumericalInput(flowRate, {
+    allowDecimal: true,
+    allowNegative: false,
+    min: minFlowRate,
+    max: maxFlowRate,
+  })
+
   const handleClickSave = (): void => {
-    // the button will be disabled if this values is null
-    if (flowRateAsNumber != null && !Number.isNaN(flowRateAsNumber)) {
+    if (parsedFlowRate.result === 'success') {
       dispatch({
         type: flowRateAction,
-        rate: flowRateAsNumber,
+        rate: parsedFlowRate.data,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -108,34 +113,25 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
     onBack()
   }
 
-  const error =
-    flowRateAsNumber != null &&
-    (Number.isNaN(flowRateAsNumber) ||
-      flowRateAsNumber < minFlowRate ||
-      flowRateAsNumber > maxFlowRate)
-      ? t(`value_out_of_range`, {
-          min: minFlowRate,
-          max: maxFlowRate,
+  const flowRateErrorMessage =
+    parsedFlowRate.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedFlowRate.min,
+          max: parsedFlowRate.max,
         })
-      : null
-
-  const handleFlowRateChange = (input: string): void => {
-    const isValidInput = isValidNumericalInput(input, { allowDecimal: true })
-    if (isValidInput === false) {
-      return
-    }
-    setFlowRate(input)
-  }
+      : parsedFlowRate.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={headerCopy}
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate === ''}
+        buttonIsDisabled={parsedFlowRate.result !== 'success'}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -154,16 +150,14 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={flowRate}
             label={textEntryCopy}
-            error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
+            error={flowRateErrorMessage}
             onChange={e => {
-              handleFlowRateChange(e.target.value as string)
+              setFlowRate(e.target.value)
             }}
           />
         </Flex>
@@ -173,10 +167,10 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop="7.75rem"
           borderRadius="0"
         >
-          <StatelessNumericalKeyboard
-            value={flowRate}
+          <NumericalKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            onChange={handleFlowRateChange}
           />
         </Flex>
       </Flex>

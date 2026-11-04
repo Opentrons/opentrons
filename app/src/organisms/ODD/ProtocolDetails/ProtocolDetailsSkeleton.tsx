@@ -2,7 +2,9 @@ import { BORDERS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
 
-export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ProtocolDetailsHeaderChipSkeleton(): ReactNode {
   return (
     <Skeleton
       width="12.17875rem"
@@ -13,10 +15,10 @@ export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolDetailsHeaderTitleSkeleton(): JSX.Element {
+export function ProtocolDetailsHeaderTitleSkeleton(): ReactNode {
   return (
     <Skeleton
-      width="42rem"
+      width="100%"
       height="3rem"
       backgroundSize="99rem"
       borderRadius={BORDERS.borderRadius12}
@@ -24,7 +26,7 @@ export function ProtocolDetailsHeaderTitleSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolDetailsSectionContentSkeleton(): JSX.Element {
+export function ProtocolDetailsSectionContentSkeleton(): ReactNode {
   return (
     <Flex margin={SPACING.spacing16}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

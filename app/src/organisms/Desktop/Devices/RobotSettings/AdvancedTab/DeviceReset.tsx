@@ -5,15 +5,15 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface DeviceResetProps {
   updateIsExpanded: (
@@ -26,7 +26,7 @@ interface DeviceResetProps {
 export function DeviceReset({
   updateIsExpanded,
   isRobotBusy,
-}: DeviceResetProps): JSX.Element {
+}: DeviceResetProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
@@ -38,21 +38,18 @@ export function DeviceReset({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
-          id="AdvancedSettings_deviceReset"
         >
           {t('device_reset')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
-          {t('device_reset_description')}
-        </LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{t('device_reset_description')}</StyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="RobotSettings_DeviceResetChooseButton"
         disabled={isRobotBusy}
       >
         {t('choose_reset_settings')}

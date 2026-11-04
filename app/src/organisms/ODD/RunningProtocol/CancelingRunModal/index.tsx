@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
-import { Icon, LegacyStyledText } from '@opentrons/components'
+import { Icon, StyledText } from '@opentrons/components'
 
 import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './cancelingmodal.module.css'
 
-export function CancelingRunModal(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function CancelingRunModal(): ReactNode {
   const { t, i18n } = useTranslation('run_details')
 
   return (
@@ -19,9 +21,9 @@ export function CancelingRunModal(): JSX.Element {
           className={styles.icon}
           aria-label="CancelingRunModal_icon"
         />
-        <LegacyStyledText forwardedAs="h4" className={styles.canceling_text}>
+        <StyledText forwardedAs="h4" className={styles.canceling_text}>
           {i18n.format(t('canceling_run_dot'), 'capitalize')}
-        </LegacyStyledText>
+        </StyledText>
       </div>
     </OddModal>
   )

@@ -8,6 +8,7 @@ import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
   EnableDevTools,
+  LogFolder,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
@@ -60,6 +61,7 @@ describe('AdvancedSettings', () => {
     vi.mocked(AdditionalCustomLabwareSourceFolder).mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
+    vi.mocked(LogFolder).mockReturnValue(<div>mock LogFolder</div>)
   })
 
   afterEach(() => {
@@ -74,6 +76,11 @@ describe('AdvancedSettings', () => {
   it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
     render()
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
+  })
+
+  it('should render mock LogFolder section', () => {
+    render()
+    screen.getByText('mock LogFolder')
   })
 
   it('should render mock robot caching section', () => {

@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
@@ -67,7 +66,7 @@ describe('ChooseCsvFile', () => {
     vi.mocked(EmptyFile).mockReturnValue(<div>mock EmptyFile</div>)
     vi.mocked(getShellUpdateDataFiles).mockReturnValue(mockUsbData)
     vi.mocked(useAllCsvFilesQuery)
-    when(useAllCsvFilesQuery)
+    vi.when(useAllCsvFilesQuery)
       .calledWith(PROTOCOL_ID)
       .thenReturn([] as any)
   })
@@ -81,7 +80,7 @@ describe('ChooseCsvFile', () => {
   })
 
   it('should render csv file names', () => {
-    when(useAllCsvFilesQuery)
+    vi.when(useAllCsvFilesQuery)
       .calledWith(PROTOCOL_ID)
       .thenReturn(mockDataOnRobot as any)
     render(props)
@@ -101,7 +100,7 @@ describe('ChooseCsvFile', () => {
   })
 
   it('should render a selected radio button in Robot side when tapped', () => {
-    when(useAllCsvFilesQuery)
+    vi.when(useAllCsvFilesQuery)
       .calledWith(PROTOCOL_ID)
       .thenReturn(mockDataOnRobot as any)
     render(props)
@@ -120,7 +119,7 @@ describe('ChooseCsvFile', () => {
   })
 
   it('call mock function (setParameter) with fileId + fileName when the selected file is a csv on Robot + tapping back button', () => {
-    when(useAllCsvFilesQuery)
+    vi.when(useAllCsvFilesQuery)
       .calledWith(PROTOCOL_ID)
       .thenReturn(mockDataOnRobot as any)
     render(props)

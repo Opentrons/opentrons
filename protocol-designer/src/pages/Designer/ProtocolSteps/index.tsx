@@ -63,7 +63,7 @@ import { StepForm } from './StepForm'
 import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 
@@ -85,7 +85,7 @@ export function ProtocolSteps({
   showDefineLiquidModal,
   targetWidth,
   setTargetWidth,
-}: ProtocolStepsProps): JSX.Element {
+}: ProtocolStepsProps): ReactNode {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
   const dispatch = useDispatch<ThunkDispatch<any>>()

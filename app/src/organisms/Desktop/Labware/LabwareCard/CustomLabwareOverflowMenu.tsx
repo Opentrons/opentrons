@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
@@ -13,17 +12,19 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   MenuItem,
   Modal,
   NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -37,7 +38,7 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
@@ -49,7 +50,7 @@ interface CustomLabwareOverflowMenuProps {
 
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -113,7 +114,7 @@ export function CustomLabwareOverflowMenu(
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
-          zIndex={10}
+          zIndex={Z_INDEX.MODALS}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
@@ -129,14 +130,18 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <LegacyStyledText css={TYPOGRAPHY.linkPSemiBold}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.blue50}
+            >
               {t('open_labware_creator')}
               <Icon
                 name="open-in-new"
                 height="10px"
                 marginLeft={SPACING.spacing6}
               />
-            </LegacyStyledText>
+            </StyledText>
           </MenuItem>
         </Flex>
       )}
@@ -148,12 +153,10 @@ export function CustomLabwareOverflowMenu(
             onClose={handleCancelModal}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="p">
-                {t('def_moved_to_trash')}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
+              <StyledText forwardedAs="p">{t('def_moved_to_trash')}</StyledText>
+              <StyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
                 {t('cannot-run-python-missing-labware')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 justifyContent={JUSTIFY_FLEX_END}
                 alignItems={ALIGN_CENTER}
@@ -167,9 +170,9 @@ export function CustomLabwareOverflowMenu(
                 >
                   {t('shared:cancel')}
                 </Btn>
-                <AlertPrimaryButton onClick={handleClickDelete}>
+                <PrimaryButton variant="warning" onClick={handleClickDelete}>
                   {t('yes_delete_def')}
-                </AlertPrimaryButton>
+                </PrimaryButton>
               </Flex>
             </Flex>
           </Modal>,

@@ -53,7 +53,7 @@ describe('vacuumCloseVent', () => {
 
   it('generates JSON and python when the module is present and idle', () => {
     const result = vacuumCloseVent(
-      { moduleId: vacuumModuleId, commandCreatorFnName: 'vacuumCloseVent' },
+      { moduleId: vacuumModuleId },
       invariantContext,
       robotState
     )
@@ -71,7 +71,7 @@ describe('vacuumCloseVent', () => {
 
   it('returns missing module when moduleId is unknown', () => {
     const result = vacuumCloseVent(
-      { moduleId: 'missingVacuum', commandCreatorFnName: 'vacuumCloseVent' },
+      { moduleId: 'missingVacuum' },
       invariantContext,
       robotState
     )
@@ -95,10 +95,58 @@ describe('vacuumCloseVent', () => {
       },
     })
     const result = vacuumCloseVent(
-      { moduleId: vacuumModuleId, commandCreatorFnName: 'vacuumCloseVent' },
+      { moduleId: vacuumModuleId },
       invariantContext,
       busyRobot
     )
     expect(getErrorResult(result)).toEqual(liveTaskError)
+  })
+
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const result = vacuumCloseVent(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result)).toEqual({
+      commands: [
+        {
+          commandType: 'vacuumModule/closeVent',
+          key: expect.any(String),
+          params: { moduleId: vacuumModuleId },
+        },
+      ],
+      python: 'mock_vacuum_module.close_vent()',
+    })
+  })
+
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = vacuumCloseVent(
+      { moduleId: 'mock_rtp' },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

@@ -73,3 +73,4 @@ class SigningPublicKey(BaseModel):
         str,
         Field(..., description="The public key in PEM SubjectPublicKeyInfo format."),
     ]
+    hashedKey: Annotated[str, Field(..., description="A hash of the public key.")]

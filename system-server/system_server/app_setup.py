@@ -1,5 +1,6 @@
 """Main FastAPI application."""
 
+import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import AsyncGenerator
 
@@ -8,19 +9,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
-    build_authorization_checker,
+    build_authentication_checker,
     handle_authorization_error,
-    install_authorization_checker,
+    install_authentication_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from system_server._version import version
+from system_server.logs.settings import apply_persisted_log_level
+from system_server.persistence import get_persistence_directory, get_sql_engine
 from system_server.router import router
 from system_server.settings import get_settings
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
+
+_log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -28,13 +38,30 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         settings = get_settings()
 
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
+
+        if settings.persistence_directory is not None:
+            persistence_directory = await get_persistence_directory(app.state)
+            sql_engine = await get_sql_engine(app.state, persistence_directory)
+            try:
+                # After migrate (inside create_sql_engine), apply the stored log level.
+                apply_persisted_log_level(sql_engine)
+            except Exception:
+                # Non-robot/dev environments may not have journald or systemctl.
+                _log.exception("Failed to apply persisted log level to journald")
 
         # Start serving requests.
         yield
@@ -60,7 +87,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 app.exception_handler(AuthorizationError)(handle_authorization_error)

@@ -18,12 +18,13 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -37,11 +38,12 @@ interface TouchTipProps {
   kind: FlowRateKind
 }
 
-export function TouchTip(props: TouchTipProps): JSX.Element {
+export function TouchTip(props: TouchTipProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [touchTipIsEnabled, setTouchTipIsEnabled] = useState<boolean>(
     kind === 'aspirate'
@@ -52,14 +54,16 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     kind === 'aspirate'
       ? state.touchTipAspirateSpeed
       : state.touchTipDispenseSpeed
-  const [speed, setSpeed] = useState<number | null>(initialSpeed ?? null)
+  const [speed, setSpeed] = useState<string>(
+    initialSpeed != null ? String(initialSpeed) : ''
+  )
   const [currentStep, setCurrentStep] = useState<number>(1)
   const touchTipAspirate =
     state.touchTipAspirate != null ? state.touchTipAspirate.toString() : null
   const touchTipDispense =
     state.touchTipDispense != null ? state.touchTipDispense.toString() : null
-  const [position, setPosition] = useState<string | null>(
-    kind === 'aspirate' ? touchTipAspirate : touchTipDispense
+  const [position, setPosition] = useState<string>(
+    kind === 'aspirate' ? (touchTipAspirate ?? '') : (touchTipDispense ?? '')
   )
 
   const touchTipAction =
@@ -107,10 +111,12 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
     } else if (currentStep === 3) {
       dispatch({
         type: touchTipAction,
-        position: position != null ? parseInt(position) : undefined,
+        position:
+          parsedPosition.result === 'success' ? parsedPosition.data : undefined,
         [kind === 'aspirate'
           ? 'touchTipAspirateSpeed'
-          : 'touchTipDispenseSpeed']: speed,
+          : 'touchTipDispenseSpeed']:
+          parsedSpeed.result === 'success' ? parsedSpeed.data : undefined,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -148,32 +154,34 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
 
   // the allowed range for touch tip is half the height of the well to 1x the height
   const positionRange = { min: -Math.round(wellHeight / 2), max: 0 }
-  const positionError =
-    position !== null &&
-    (position === '-' ||
-      position.indexOf('-') !== position.lastIndexOf('-') ||
-      Number(position) < positionRange.min ||
-      Number(position) > positionRange.max)
-      ? t(`value_out_of_range`, {
-          min: positionRange.min,
-          max: Math.floor(positionRange.max),
+  const parsedPosition = parseNumericalInput(position, {
+    allowDecimal: false,
+    allowNegative: true,
+    min: positionRange.min,
+    max: positionRange.max,
+  })
+  const positionErrorMessage =
+    parsedPosition.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedPosition.min,
+          max: Math.floor(parsedPosition.max),
         })
-      : null
+      : parsedPosition.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
+  const parsedSpeed = parseNumericalInput(speed, {
+    allowDecimal: false,
+    allowNegative: false,
+  })
+  const speedErrorMessage =
+    parsedSpeed.result === 'syntaxError' ? t('enter_a_valid_number') : null
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = speed == null
+    buttonIsDisabled = parsedSpeed.result !== 'success'
   }
   if (currentStep === 3) {
-    buttonIsDisabled = position == null || positionError != null
-  }
-
-  const handleSpeedChange = (userInput: string): void => {
-    if (userInput === '') {
-      setSpeed(null)
-    }
-    const parsedSpeed = parseInt(userInput)
-    setSpeed(!isNaN(parsedSpeed) ? parsedSpeed : null)
+    buttonIsDisabled = parsedPosition.result !== 'success'
   }
 
   return createPortal(
@@ -235,15 +243,14 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
-              value={String(speed ?? '')}
+              value={speed}
               label={t('speed')}
-              onBlur={e => {
-                e.target.focus()
-              }}
+              error={speedErrorMessage}
               onChange={e => {
-                handleSpeedChange(e.target.value as string)
+                setSpeed(e.target.value)
               }}
             />
           </Flex>
@@ -255,10 +262,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(speed ?? '')}
-              onChange={e => {
-                handleSpeedChange(e)
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -281,14 +285,12 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
-              value={String(position ?? '')}
+              value={position}
               label={t('touch_tip_position_mm')}
-              error={positionError}
-              onBlur={e => {
-                e.target.focus()
-              }}
+              error={positionErrorMessage}
               onChange={e => {
                 setPosition(e.target.value as string)
               }}
@@ -309,10 +311,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             <NumericalKeyboard
               hasHyphen
               keyboardRef={keyboardRef}
-              initialValue={String(position ?? '')}
-              onChange={e => {
-                setPosition(e)
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

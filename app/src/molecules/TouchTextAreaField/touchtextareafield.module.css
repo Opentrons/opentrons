@@ -4,8 +4,8 @@
   align-items: center;
 }
 
-.warning_color {
-  color: var(--yellow-60);
+.error_color {
+  color: var(--red-50);
 }
 
 .default_color {
@@ -20,6 +20,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
+  gap: var(--spacing-8);
 }
 
 .label_row {
@@ -37,52 +38,51 @@
 
 .textarea_row {
   display: flex;
+  width: 100%;
   align-items: center;
 }
 
 .textarea {
   width: 100%;
   height: 100%;
-  padding: var(--spacing-8);
-  border: 1px solid var(--grey-50);
-  border-radius: var(--border-radius-4);
+  padding: var(--spacing-16) var(--spacing-24);
+  border: 2px solid var(--grey-50);
+  border-radius: var(--border-radius-8);
   background-color: var(--white);
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-38);
   font-style: normal;
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-28);
+  line-height: var(--line-height-48);
   resize: none;
 }
 
 .textarea:focus {
-  border: 1px solid var(--blue-50);
+  border: 3px solid var(--blue-50);
   outline: none;
 }
 
 .textarea:disabled {
-  border: 1px solid var(--grey-30);
+  border: 2px solid var(--grey-30);
   background-color: var(--grey-20);
 }
 
 .textarea_error {
-  border: 1px solid var(--red-50);
+  border: 2px solid var(--red-50);
 }
 
 .textarea_error:focus {
-  border: 1px solid var(--red-50);
-}
-
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
+  border: 2px solid var(--red-50);
 }
 
 .label_text {
-  padding-bottom: var(--spacing-4);
-  color: var(--grey-60);
-  font-size: var(--font-size-h3);
+  color: var(--black-90);
+  font-size: var(--font-size-22);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-20);
+  line-height: var(--line-height-28);
+}
+
+.label_text_error {
+  color: var(--red-50);
 }
 
 .label_text_left {
@@ -94,11 +94,40 @@
 }
 
 .caption_text {
-  padding-top: var(--spacing-4);
   color: var(--grey-60);
 }
 
 .error_text {
-  padding-top: var(--spacing-4);
   color: var(--red-50);
+}
+
+/* Stretch label + textarea to fill a flex column parent. */
+.wrapper_multiline {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.column_container_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.clickable_column_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.textarea_row_multiline {
+  min-height: 0;
+  flex: 1;
+  align-items: stretch;
+}
+
+.textarea_multiline {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
 }

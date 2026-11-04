@@ -2,7 +2,7 @@
 
 React components for Opentrons' applications. Visit the [Opentrons Components Library][components-library] to see available components.
 
-[components-library]: https://s3-us-west-2.amazonaws.com/opentrons-components/edge/index.html
+[components-library]: https://sandbox.components.opentrons.com/edge/
 
 ## example usage
 
@@ -14,11 +14,25 @@ export default function CowButton(props) {
 }
 ```
 
+### localization (Node-safe)
+
+Shared i18n resource objects (`shared_en_resources`, `shared_zh_resources`,
+`resources`) are available from a DOM-free subpath. Use this in Node scripts,
+tests, or SSR instead of importing from the package root (which loads React/DOM):
+
+```javascript
+import {
+  shared_en_resources,
+  shared_zh_resources,
+  resources,
+} from '@opentrons/components/localization'
+```
+
 ## setup
 
 Usage requirements for dependent projects:
 
-- Node v22.22.0+ and pnpm v10.32.1+
+- Node v24.22.1+ and pnpm v10.32.1+
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
   - `react`: `18.2.0`,
   - `react-router-dom`: `6.24.1`,

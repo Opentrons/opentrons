@@ -307,9 +307,7 @@ export const duplicateSelectedSteps: () => ThunkAction<
     },
   }
   const selectNewStepsAction = (():
-    | SelectStepAction
-    | SelectMultipleStepsAction
-    | null => {
+    SelectStepAction | SelectMultipleStepsAction | null => {
     // If we have multiple step IDs to select, dispatch a SELECT_MULTIPLE_STEPS; if we
     // have just one, dispatch a SELECT_STEP. This just preserves prior behavior and
     // I'm not sure the distinction actually matters. We might be able to simplify this

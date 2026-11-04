@@ -200,15 +200,6 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
         : state
     }
 
-    case Constants.ROBOTUPDATE_UPLOAD_FILE: {
-      return state.session
-        ? {
-            ...state,
-            session: { ...state.session, step: Constants.UPLOAD_FILE },
-          }
-        : state
-    }
-
     case Constants.ROBOTUPDATE_FILE_UPLOAD_DONE: {
       return state.session
         ? {

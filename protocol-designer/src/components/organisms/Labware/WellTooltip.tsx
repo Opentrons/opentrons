@@ -68,7 +68,7 @@ const initialTooltipState: TooltipState = {
 export const WellTooltip = ({
   children,
   ingredNames,
-}: WellTooltipProps): JSX.Element => {
+}: WellTooltipProps): ReactNode => {
   const [tooltipState, setTooltipState] =
     useState<TooltipState>(initialTooltipState)
 

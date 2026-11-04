@@ -8,11 +8,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type {
   LabwareDefinition,
   LabwareVolumeUnits,
@@ -36,7 +37,7 @@ const BOTTOM_SHAPE_TO_ICON = {
   flat: 'ot-flat-bottom',
 } as const
 
-export function WellProperties(props: WellPropertiesProps): JSX.Element {
+export function WellProperties(props: WellPropertiesProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { wellProperties, wellLabel, displayVolumeUnits: units } = props
 
@@ -59,14 +60,12 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText forwardedAs="h6">
-            {t('max_volume')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="h6">{t('max_volume')}</StyledText>
+          <StyledText forwardedAs="p">
             {vol != null
               ? `${String(getDisplayVolume(vol, units, 2))} ${String(units)}`
               : t('various')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         {wellBottomShape != null && wellBottomValue && (
           <Flex flexDirection={DIRECTION_ROW}>
@@ -75,12 +74,10 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               marginRight={SPACING.spacing16}
             >
-              <LegacyStyledText forwardedAs="h6">
+              <StyledText forwardedAs="h6">
                 {t(wellLabel)} {t('shape')}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">
-                {wellBottomValue}
-              </LegacyStyledText>
+              </StyledText>
+              <StyledText forwardedAs="p">{wellBottomValue}</StyledText>
             </Flex>
             <Icon
               height="1.25rem"

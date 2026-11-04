@@ -7,19 +7,19 @@ import {
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import StackerInstallShuttle from '/app/assets/videos/error-recovery/FlexStacker_InstallShuttle.webm'
 import { SmallButton } from '/app/atoms/buttons'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -28,14 +28,6 @@ interface InstallShuttleProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   attachedModules: AttachedModule[]
 }
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 const BUTTON_STYLE = css`
     width: 100%;
@@ -50,7 +42,7 @@ const BUTTON_STYLE = css`
     }
   `
 
-export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
+export function InstallShuttle(props: InstallShuttleProps): ReactNode {
   const { proceed, isOnDevice, attachedModules } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 
@@ -115,7 +107,7 @@ export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
         }
         bodyText={
           <>
-            <LegacyStyledText css={BODY_STYLE}>
+            <WizardBodyText>
               <Trans
                 t={t}
                 i18nKey="place_shuttle_description"
@@ -123,7 +115,7 @@ export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
                   bold: <strong />,
                 }}
               />
-            </LegacyStyledText>
+            </WizardBodyText>
           </>
         }
         proceedButtonText={t('confirm_placement')}

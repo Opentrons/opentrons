@@ -1,44 +1,45 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   Btn,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   StyledText,
   Tooltip,
   truncateString,
-  TYPOGRAPHY,
   useHoverTooltip,
-  useInterval,
 } from '@opentrons/components'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
-import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {
@@ -51,7 +52,7 @@ interface RobotNameContainerProps {
   isGoToRun: boolean
 }
 
-export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
+export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
   const { name, local, robotModel, ...styleProps } = props
   const { t, i18n } = useTranslation([
     'devices_landing',
@@ -60,9 +61,10 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   ])
   const navigate = useNavigate()
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const dispatch = useDispatch<Dispatch>()
 
-  const isFlex = useIsFlex(name)
+  const { data: accessControlData } = useAccessControlEnabledQuery()
+  const isComplianceReady =
+    accessControlData?.data?.accessControlEnabled ?? false
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useNotifyRunQuery(currentRunId, {
@@ -85,29 +87,23 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         }}
         gridGap={SPACING.spacing8}
       >
-        <LegacyStyledText
-          forwardedAs="label"
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-        >
+        <StyledText forwardedAs="label" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
-          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
           <QuaternaryButton>{t('go_to_run')}</QuaternaryButton>
         </Link>
       </Flex>
     ) : null
 
-  const { ethernet, wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, name)
-  )
+  const { ethernet, wifi } = useNetworkInterfaces(name, STATUS_REFRESH_MS)
 
   const addresses = useSelector((state: State) =>
     getRobotAddressesByName(state, name)
@@ -122,9 +118,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   )
   // do not show ethernet connection for OT-2
   const isFlexConnectedViaEthernet =
-    isFlex &&
-    ethernetAddress != null &&
-    ethernetAddress.healthStatus === HEALTH_STATUS_OK
+    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isFlexConnectedViaUSB =
@@ -143,8 +137,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     tooltipTranslationKey = 'device_settings:wired_usb'
   }
 
-  useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
-
   const RobotNameContainer = styled.div`
     max-width: ${(props: RobotNameContainerProps) =>
       props.isGoToRun ? `150px` : undefined};
@@ -160,19 +152,13 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps} width="100%">
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing2}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          id={`RobotStatusHeader_${String(name)}_robotModel`}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <RobotNameContainer isGoToRun={isGoToRun}>
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflow="hidden"
               textOverflow="ellipsis"
             >
@@ -198,6 +184,15 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <Tooltip tooltipProps={tooltipProps} width="auto">
             {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
           </Tooltip>
+          {isComplianceReady ? (
+            <Chip
+              type="info"
+              text={t('devices_landing:compliance_ready')}
+              hasIcon={false}
+              chipSize="small"
+              borderRadius={BORDERS.borderRadius4}
+            />
+          ) : null}
         </Flex>
       </Flex>
       {runningProtocolBanner}

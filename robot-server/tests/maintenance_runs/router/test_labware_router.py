@@ -87,12 +87,12 @@ async def test_add_labware_offsets(
     )
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.add_labware_offset(
+        await mock_maintenance_run_orchestrator_store.add_labware_offset(
             labware_offset_request_1
         )
     ).then_return(labware_offset_1)
     decoy.when(
-        mock_maintenance_run_orchestrator_store.add_labware_offset(
+        await mock_maintenance_run_orchestrator_store.add_labware_offset(
             labware_offset_request_2
         )
     ).then_return(labware_offset_2)
@@ -134,7 +134,7 @@ async def test_add_labware_definition(
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.add_labware_definition(
+        await mock_maintenance_run_orchestrator_store.add_labware_definition(
             labware_definition
         )
     ).then_return(uri)

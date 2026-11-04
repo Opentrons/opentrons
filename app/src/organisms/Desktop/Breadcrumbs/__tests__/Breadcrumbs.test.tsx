@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
@@ -13,8 +12,8 @@ import { getIsOnDevice } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
+import { logOut } from '/app/redux/robot-auth'
 import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
-import { useLogOut } from '/app/resources/access-control/useLogOut'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
@@ -35,7 +34,6 @@ vi.mock('/app/transformations/protocols')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/resources/access-control/useAccountIconInitial')
-vi.mock('/app/resources/access-control/useLogOut')
 vi.mock('/app/organisms/Desktop/LoginModal')
 
 const ROBOT_NAME = 'otie'
@@ -95,17 +93,16 @@ describe('Breadcrumbs', () => {
   beforeEach(() => {
     mockAccessControlEnabled(false)
     vi.mocked(useAccountIconInitial).mockReturnValue({ showIcon: false })
-    vi.mocked(useLogOut).mockReturnValue(vi.fn())
 
-    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
-    when(useRunCreatedAtTimestamp).calledWith(RUN_ID).thenReturn(CREATED_AT)
-    when(getStoredProtocol)
+    vi.when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
+    vi.when(useRunCreatedAtTimestamp).calledWith(RUN_ID).thenReturn(CREATED_AT)
+    vi.when(getStoredProtocol)
       .calledWith({} as State, PROTOCOL_KEY)
       .thenReturn(storedProtocolDataFixture)
-    when(getIsOnDevice)
+    vi.when(getIsOnDevice)
       .calledWith({} as State)
       .thenReturn(false)
-    when(getProtocolDisplayName)
+    vi.when(getProtocolDisplayName)
       .calledWith(
         storedProtocolDataFixture.protocolKey,
         storedProtocolDataFixture.srcFileNames,
@@ -132,7 +129,7 @@ describe('Breadcrumbs', () => {
   })
 
   it('does not render devices breadcrumb when in on device mode', () => {
-    when(getIsOnDevice)
+    vi.when(getIsOnDevice)
       .calledWith({} as State)
       .thenReturn(true)
     render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
@@ -196,15 +193,13 @@ describe('Breadcrumbs', () => {
       expect(showLoginModal).toHaveBeenCalledOnce()
     })
 
-    it('opens the account menu and calls logOut when log out is clicked', () => {
-      const logOut = vi.fn()
-      vi.mocked(useLogOut).mockReturnValue(logOut)
+    it('opens the account menu and dispatches logOut when log out is clicked', () => {
       mockAccessControlEnabled(true)
       vi.mocked(useAccountIconInitial).mockReturnValue({
         showIcon: true,
         iconContents: ACCOUNT_ICON_INITIAL,
       })
-      render(BREADCRUMB_PATH)
+      const [, store] = render(BREADCRUMB_PATH)
 
       fireEvent.click(
         screen.getByRole('button', { name: ACCOUNT_ICON_INITIAL })
@@ -212,7 +207,9 @@ describe('Breadcrumbs', () => {
       screen.getByText('Account settings')
       fireEvent.click(screen.getByRole('button', { name: 'Log out' }))
 
-      expect(logOut).toHaveBeenCalled()
+      expect(store.dispatch).toHaveBeenCalledWith(
+        logOut({ robotName: ROBOT_NAME })
+      )
     })
   })
 })

@@ -10,12 +10,7 @@ interface PhysicalPort {
 }
 
 type ModuleOffsetSource =
-  | 'default'
-  | 'factory'
-  | 'user'
-  | 'calibration_check'
-  | 'legacy'
-  | 'unknown'
+  'default' | 'factory' | 'user' | 'calibration_check' | 'legacy' | 'unknown'
 
 export interface ModuleOffset {
   offset: Vector3D
@@ -90,38 +85,29 @@ export interface FlexStackerData {
   installDetected: boolean
   status: FlexStackerStatus
 }
+export type VacuumMode = 'pressure' | 'power'
+
 export interface VacuumModuleData {
   currentPressure: number | null
   targetPressure: number | null
   currentPower: number | null
   targetPower: number | null
   ventStatus: 'opened' | 'closed'
-  modeType: 'pressure' | 'power'
+  modeType: VacuumMode
   status: VacuumModuleStatus
 }
 export type TemperatureStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
+  'idle' | 'holding at target' | 'cooling' | 'heating'
 
 export type ThermocyclerStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
-  | 'error'
+  'idle' | 'holding at target' | 'cooling' | 'heating' | 'error'
 
 export type MagneticStatus = 'engaged' | 'disengaged'
 
 export type HeaterShakerStatus = 'idle' | 'running' | 'error'
 
 export type SpeedStatus =
-  | 'holding at target'
-  | 'speeding up'
-  | 'slowing down'
-  | 'idle'
-  | 'error'
+  'holding at target' | 'speeding up' | 'slowing down' | 'idle' | 'error'
 
 export type LatchStatus =
   | 'opening'
@@ -136,9 +122,4 @@ export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
 export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'
 
 export type VacuumModuleStatus =
-  | 'idle'
-  | 'ramping'
-  | 'holding'
-  | 'venting'
-  | 'complete'
-  | 'error'
+  'idle' | 'ramping' | 'holding' | 'venting' | 'complete' | 'error'

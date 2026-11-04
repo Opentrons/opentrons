@@ -92,7 +92,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
     }
 
     # requirements
-    requirements = {"robotType": "OT-2", "apiLevel": "{{ apiLevel }}"}
+    requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
     # protocol run function
     def run(protocol: protocol_api.ProtocolContext):
@@ -118,7 +118,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
     This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
 
     1. Gives the name, contact information, and a brief description for the protocol.
-    2. Indicates the protocol should run on an OT-2 robot, using API version {{ apiLevel }}.
+    2. Indicates the protocol should run on an OT-2 robot, using API version 2.28.
     3. Tells the robot that there is:
 
         1. A 96-well flat plate in slot 1.

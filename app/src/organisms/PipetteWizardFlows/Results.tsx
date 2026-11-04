@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_END,
   Btn,
   COLORS,
-  LegacyStyledText,
   PrimaryButton,
-  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
@@ -24,8 +22,9 @@ import {
 
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
+import styles from './results.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LoadedPipette, MotorAxes } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
@@ -40,7 +39,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   nextMount?: string
 }
 
-export const Results = (props: ResultsProps): JSX.Element => {
+export const Results = (props: ResultsProps): ReactNode => {
   const {
     goBack,
     proceed,
@@ -58,15 +57,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
-    errorMessage,
-    setShowErrorMessage,
     nextMount,
+    handleCommandError,
   } = props
   const { t, i18n } = useTranslation([
     'pipette_wizard_flows',
     'shared',
     'branded',
   ])
+
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
 
@@ -174,9 +173,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .then(() => {
           proceed()
         })
-        .catch(error => {
-          setShowErrorMessage(error.message as string)
-        })
+        .catch(handleCommandError)
     } else if (
       isSuccess &&
       flowType === FLOWS.ATTACH &&
@@ -207,9 +204,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .then(() => {
           proceed()
         })
-        .catch(error => {
-          setShowErrorMessage(error.message as string)
-        })
+        .catch(handleCommandError)
     } else {
       proceed()
     }
@@ -253,32 +248,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipDisplayName == null &&
     (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)
   ) {
-    const GO_BACK_BUTTON_STYLE = css`
-      ${TYPOGRAPHY.pSemiBold};
-      color: ${COLORS.grey50};
-
-      &:hover {
-        opacity: 70%;
-      }
-
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-        font-size: ${TYPOGRAPHY.fontSize22};
-
-        &:hover {
-          opacity: 100%;
-        }
-      }
-    `
     subHeader =
       numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
     button = (
       <>
         {Boolean(isOnDevice) ? (
           <Btn onClick={goBack} aria-label="back">
-            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+            <StyledText className={styles.go_back_text}>
               {t('shared:go_back')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         ) : (
           <SecondaryButton
@@ -298,7 +276,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed={() => {
             setNumberOfTryAgains(numberOfTryAgains + 1)
           }}
-          proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
+          proceedButtonText={t('try_again')}
           setFetching={setFetching}
           isFetching={isFetching}
           isOnDevice={isOnDevice}
@@ -309,16 +287,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
-  if (errorMessage != null) {
-    return (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        subHeader={errorMessage}
-      />
-    )
-  }
+
   return (
     <SimpleWizardBody
       iconColor={iconColor}

@@ -24,7 +24,10 @@ from .deck_configuration import (
     DeckType,
     PotentialCutoutFixture,
 )
-from .execution import EngineStatus, PostRunHardwareState
+from .execution import (
+    EngineStatus,
+    PostRunHardwareState,
+)
 from .hardware_passthrough import MotorAxis, MovementAxis
 from .instrument import (
     CurrentAddressableArea,
@@ -153,7 +156,6 @@ from .well_position import (
     PickUpTipWellLocation,
     PickUpTipWellOrigin,
     WellLocation,
-    WellLocationFunction,
     WellLocationType,
     WellOffset,
     WellOrigin,
@@ -299,7 +301,6 @@ __all__ = [
     "PickUpTipWellLocation",
     "DropTipWellLocation",
     "WellLocationType",
-    "WellLocationFunction",
     # Execution
     "EngineStatus",
     "PostRunHardwareState",

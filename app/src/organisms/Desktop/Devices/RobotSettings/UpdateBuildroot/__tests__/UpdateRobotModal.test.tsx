@@ -1,5 +1,4 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -9,17 +8,25 @@ import { i18n } from '/app/i18n'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { getDiscoverableRobotByName } from '/app/redux/discovery'
 import {
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
 
 import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 
-import type { Store } from 'redux'
 import type { ComponentProps } from 'react'
-import type { State } from '/app/redux/types'
+
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
+const mockGatedStart = vi.hoisted(() => ({
+  startUpdate: mockStartUpdate,
+  isLoading: false,
+}))
 
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => mockGatedStart,
+}))
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
 
@@ -31,10 +38,15 @@ const render = (props: ComponentProps<typeof UpdateRobotModal>) => {
 
 describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
-  let store: Store<State>
   beforeEach(() => {
-    store = legacy_createStore(vi.fn(), {})
-    store.dispatch = vi.fn()
+    mockStartUpdate.mockClear()
+    mockStartUpdate.mockReturnValue(true)
+    mockGatedStart.isLoading = false
+    vi.mocked(downloadRobotUpdate).mockClear()
+    vi.mocked(downloadRobotUpdate).mockReturnValue({
+      type: 'robotUpdate:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    } as ReturnType<typeof downloadRobotUpdate>)
     props = {
       robotName: 'test robot',
       releaseNotes: 'test notes',
@@ -118,5 +130,79 @@ describe('UpdateRobotModal', () => {
     screen.getByText('Robot Operating System Update Available')
     screen.getByText('Not now')
     screen.getByText('Update robot now')
+  })
+
+  it('downloads then starts the update when update is allowed', () => {
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+
+    expect(downloadRobotUpdate).toHaveBeenCalled()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
+  })
+
+  it('keeps update enabled without a spinner while admin queries are loading', () => {
+    mockGatedStart.isLoading = true
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    render(props)
+    expect(screen.getByText('Update robot now')).toBeEnabled()
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
+  })
+
+  it('shows a spinner after click until admin queries settle then starts the update', () => {
+    mockGatedStart.isLoading = true
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ rerender }] = render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+
+    expect(downloadRobotUpdate).toHaveBeenCalledTimes(1)
+    expect(mockStartUpdate).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('ot-spinner')).toBeInTheDocument()
+    expect(screen.getByText('Update robot now')).toBeEnabled()
+
+    fireEvent.click(screen.getByText('Update robot now'))
+    expect(downloadRobotUpdate).toHaveBeenCalledTimes(1)
+    expect(mockStartUpdate).not.toHaveBeenCalled()
+
+    mockGatedStart.isLoading = false
+    rerender(<UpdateRobotModal {...props} />)
+
+    expect(mockStartUpdate).toHaveBeenCalledTimes(1)
+  })
+
+  it('clears the spinner if starting the update is blocked', () => {
+    mockGatedStart.isLoading = true
+    mockStartUpdate.mockReturnValue(false)
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ rerender }] = render(props)
+    fireEvent.click(screen.getByText('Update robot now'))
+    expect(screen.getByLabelText('ot-spinner')).toBeInTheDocument()
+
+    mockGatedStart.isLoading = false
+    rerender(<UpdateRobotModal {...props} />)
+
+    expect(mockStartUpdate).toHaveBeenCalledTimes(1)
+    expect(screen.queryByLabelText('ot-spinner')).not.toBeInTheDocument()
   })
 })

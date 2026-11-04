@@ -17,27 +17,97 @@ import {
   getIsSlotAVacuumDock,
   getLargestStackInSlot,
   getSlotInLocationStack,
+  resolveStringRuntimeValue,
 } from '../utils'
 import { assignContainsAmongSiblings } from '../utils/traversals'
 
 import type {
+  AddressableAreaName,
   FlexStackerStoredLabwareGroup,
-  MoveLabwareParams,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   InvariantContext,
+  MoveLabwareStepGenArgs,
   RobotStateAndWarnings,
 } from '../types'
 
 export function forMoveLabware(
-  params: MoveLabwareParams,
+  params: MoveLabwareStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { labwareId, newLocation } = params
+  const { runtimeParameters, labwareEntities } = invariantContext
+  const labwareId = resolveStringRuntimeValue(
+    params.labwareId,
+    runtimeParameters
+  )
+  let newLocation: LabwareLocation | null = null
+  if (typeof params.newLocation === 'string') {
+    const resolvedLocation = resolveStringRuntimeValue(
+      params.newLocation,
+      runtimeParameters
+    )
+    if (resolvedLocation != null) {
+      newLocation = resolvedLocation as LabwareLocation
+    }
+  } else if ('labwareId' in params.newLocation) {
+    const destLabwareId = resolveStringRuntimeValue(
+      params.newLocation.labwareId,
+      runtimeParameters
+    )
+    if (destLabwareId != null) {
+      newLocation =
+        destLabwareId === params.newLocation.labwareId
+          ? params.newLocation
+          : { labwareId: destLabwareId }
+    }
+  } else if ('moduleId' in params.newLocation) {
+    const moduleId = resolveStringRuntimeValue(
+      params.newLocation.moduleId,
+      runtimeParameters
+    )
+    if (moduleId != null) {
+      newLocation =
+        moduleId === params.newLocation.moduleId
+          ? params.newLocation
+          : { moduleId }
+    }
+  } else if ('slotName' in params.newLocation) {
+    const slotName = resolveStringRuntimeValue(
+      params.newLocation.slotName,
+      runtimeParameters
+    )
+    if (slotName != null) {
+      newLocation =
+        slotName === params.newLocation.slotName
+          ? params.newLocation
+          : { slotName }
+    }
+  } else {
+    const addressableAreaName = resolveStringRuntimeValue(
+      params.newLocation.addressableAreaName,
+      runtimeParameters
+    )
+    if (addressableAreaName != null) {
+      newLocation =
+        addressableAreaName === params.newLocation.addressableAreaName
+          ? (params.newLocation as LabwareLocation)
+          : {
+              addressableAreaName: addressableAreaName as AddressableAreaName,
+            }
+    }
+  }
+  if (labwareId == null || newLocation == null) {
+    console.error(
+      `forMoveLabware: arg resolved to null (labwareId=${String(
+        labwareId
+      )}, newLocation=${String(newLocation)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
-  const { labwareEntities } = invariantContext
   const { modules, labware } = robotState
   if (labware[labwareId] == null) {
     return
@@ -108,14 +178,15 @@ export function forMoveLabware(
   }
 
   // update shuttle if it is the new location of the move
+  const destination = newLocation
   const newShuttleParentStackerState =
     Object.entries(modules).find(([id, { slot }]) => {
       const { type } = invariantContext.moduleEntities[id] ?? {}
       return (
         type === FLEX_STACKER_MODULE_TYPE &&
-        typeof newLocation === 'object' &&
-        (('moduleId' in newLocation && newLocation.moduleId === id) ||
-          ('slotName' in newLocation && slot === newLocation.slotName))
+        typeof destination === 'object' &&
+        (('moduleId' in destination && destination.moduleId === id) ||
+          ('slotName' in destination && slot === destination.slotName))
       )
     }) ?? null
   const [newModuleId, newStackerOnDeck] = newShuttleParentStackerState ?? []

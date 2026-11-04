@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -20,6 +19,7 @@ import {
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSigningOrDownloadingRequired'
 import { useLights } from '/app/resources/devices'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
@@ -29,17 +29,7 @@ import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from '../ErrorRecoveryBanner'
-import { useCalibrationTaskList, useUSBRegistration } from '../hooks'
-import {
-  expectedBadDeckAndPipetteOffsetTaskList,
-  expectedBadDeckTaskList,
-  expectedBadEverythingTaskList,
-  expectedBadPipetteOffsetTaskList,
-  expectedBadTipLengthAndOffsetTaskList,
-  expectedBadTipLengthTaskList,
-  expectedIncompleteDeckCalTaskList,
-  expectedTaskList,
-} from '../hooks/__fixtures__/taskListFixtures'
+import { useUSBRegistration } from '../hooks'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from '../RobotStatusHeader'
@@ -53,6 +43,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/devices')
+vi.mock('/app/resources/audit/useIsSigningOrDownloadingRequired')
 vi.mock('../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../RobotStatusHeader')
@@ -119,7 +110,6 @@ describe('RobotOverview', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useLights).mockReturnValue({
@@ -137,7 +127,7 @@ describe('RobotOverview', () => {
     vi.mocked(RobotOverviewOverflowMenu).mockReturnValue(
       <div>mock RobotOverviewOverflowMenu</div>
     )
-    when(getRobotModelByName)
+    vi.when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('OT-2')
     vi.mocked(getConfig).mockReturnValue({
@@ -151,6 +141,11 @@ describe('RobotOverview', () => {
       showRecoveryBanner: false,
       recoveryIntent: 'recovering',
     })
+    vi.mocked(useIsSigningOrDownloadingRequired).mockReturnValue({
+      isSigningRequired: false,
+      isDownloadingRequired: false,
+      onLinkClick: vi.fn(),
+    })
   })
 
   it('renders an OT-2 image', () => {
@@ -160,7 +155,7 @@ describe('RobotOverview', () => {
   })
 
   it('renders a Flex image', () => {
-    when(getRobotModelByName)
+    vi.when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .thenReturn('Opentrons Flex')
     render(props)
@@ -179,135 +174,6 @@ describe('RobotOverview', () => {
   })
 
   it('does not render a calibration status label when calibration is good and the calibration wizard feature flag is set', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    expect(
-      screen.queryByRole('link', {
-        name: 'Go to calibration',
-      })
-    ).not.toBeInTheDocument()
-  })
-
-  it('renders a missing calibration status label when the calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedIncompleteDeckCalTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Robot is missing calibration data')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('does not render a missing calibration status label when the robot is not viewable', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedIncompleteDeckCalTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    vi.mocked(useIsRobotViewable).mockReturnValue(false)
-    render(props)
-    expect(
-      screen.queryByText('Robot is missing calibration data')
-    ).not.toBeInTheDocument()
-  })
-
-  it('renders a recommended recalibration status label when the deck is bad and calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedBadDeckTaskList)
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('renders a recommended recalibration status label when both the deck and offset is bad and the calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedBadDeckAndPipetteOffsetTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('renders a recommended recalibration status label when everything is bad and the calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedBadEverythingTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('renders a recommended recalibration status label when the offset is bad and calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedBadPipetteOffsetTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('renders a recommended recalibration status label when the tip length is bad and calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedBadTipLengthTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('renders a recommended recalibration status label when both the tip length and offset is bad and the calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedBadTipLengthAndOffsetTaskList
-    )
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    render(props)
-    screen.getByText('Recalibration recommended')
-    const calibrationDashboardLink = screen.getByRole('link', {
-      name: 'Go to calibration',
-    })
-    expect(calibrationDashboardLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/robot-settings/calibration'
-    )
-  })
-
-  it('does not render a calibration status label when robot is busy and the calibration wizard feature flag is set', () => {
-    vi.mocked(useCalibrationTaskList).mockReturnValue(
-      expectedIncompleteDeckCalTaskList
-    )
-    vi.mocked(useIsRobotBusy).mockReturnValue(true)
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     render(props)
     expect(
@@ -357,5 +223,21 @@ describe('RobotOverview', () => {
     render(props)
 
     screen.getByText('MOCK_RECOVERY_BANNER')
+  })
+
+  it('renders the SignAndDownload banner when signing is required', () => {
+    vi.mocked(useIsSigningOrDownloadingRequired).mockReturnValue({
+      isSigningRequired: true,
+      isDownloadingRequired: false,
+      onLinkClick: vi.fn(),
+    })
+
+    render(props)
+
+    screen.getByText('Signature required')
+    screen.getByText(
+      'A signature is required to verify the protocol run has ended.'
+    )
+    screen.getByText('Sign now')
   })
 })

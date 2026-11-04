@@ -69,6 +69,4 @@ interface InaccessibleStatus extends AccessibilityStatusBase {
 export type AccessibilityStatus = AccessibleStatus | InaccessibleStatus
 
 export type TipSelectionBannerReason =
-  | 'incompletePickup'
-  | 'pickupsRequired'
-  | 'tooManyTips'
+  'incompletePickup' | 'pickupsRequired' | 'tooManyTips'

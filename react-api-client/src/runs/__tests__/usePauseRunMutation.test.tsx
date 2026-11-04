@@ -6,6 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { usePauseRunMutation } from '..'
 import { mockPauseRunAction, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -36,9 +37,12 @@ describe('usePauseRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRunAction).mockRejectedValue('uh oh')
 
-    const { result } = renderHook(usePauseRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePauseRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.pauseRun(RUN_ID_1))
@@ -53,9 +57,12 @@ describe('usePauseRunMutation hook', () => {
       data: mockPauseRunAction,
     } as Response<RunAction>)
 
-    const { result } = renderHook(usePauseRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePauseRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.pauseRun(RUN_ID_1))
 
     await waitFor(() => {

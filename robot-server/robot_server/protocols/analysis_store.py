@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from logging import getLogger
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import sqlalchemy
 from typing_extensions import Final
 
 from opentrons.protocol_engine import (
-    Command,
     ErrorOccurrence,
     Liquid,
     LiquidClassRecordWithId,
@@ -18,6 +18,9 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -28,7 +31,6 @@ from opentrons.protocol_engine.types import (
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
 
-from .analysis_memcache import MemoryCache
 from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -68,8 +70,6 @@ _log = getLogger(__name__)
 #     * Changed to "2" for version 7.0 from "initial"
 #     * Changed to "3" for the implementation of Command Preconditions
 _CURRENT_ANALYZER_VERSION: Final = "3"
-# We have a reasonable limit for a memory cache of analyses.
-_CACHE_MAX_SIZE: Final = 32
 
 
 class AnalysisNotFoundError(ValueError):
@@ -113,15 +113,37 @@ class AnalysisStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
+        access_control_status: bool,
         completed_store: Optional[CompletedAnalysisStore] = None,
     ) -> None:
         """Initialize the `AnalysisStore`."""
         self._pending_store = _PendingAnalysisStore()
         self._completed_store = completed_store or CompletedAnalysisStore(
             sql_engine=sql_engine,
-            memory_cache=MemoryCache(_CACHE_MAX_SIZE, str, CompletedAnalysisResource),
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
+        self._access_control_status = access_control_status
+        self._commands_dict_list: List[dict[str, Any]] = []
+        self._analysis_store_provider = CommandStoreProvider(
+            run_id=None,
+            store_insert_batch_commands=self.insert_batch_analysis_command,
+        )
+
+    async def insert_batch_analysis_command(
+        self, run_id: str, batch_commands: list[tuple[int, str]]
+    ) -> None:
+        """Store analysis commands as JSON dicts locally."""
+        for _index, command in batch_commands:
+            command_json_dict = json.loads(command)
+            self._commands_dict_list.append(command_json_dict)
+
+    def set_analysis_provider_id(self, analysis_id: str) -> None:
+        """Set the ID used by the analysis provider."""
+        self._analysis_store_provider.set_run_id(analysis_id)
+
+    def get_analysis_store_provider(self) -> CommandStoreProvider:
+        """Get the AnalysisStoreProvider."""
+        return self._analysis_store_provider
 
     def add_pending(
         self,
@@ -153,7 +175,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands: List[Command],
+        commands: Optional[List[dict[str, Any]]],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -185,6 +207,9 @@ class AnalysisStore:
             labware_offsets: See `CompletedAnalysis.labware_offsets`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
+        if commands is None:
+            # Use the locally stored commands list
+            commands = self._commands_dict_list
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
         assert protocol_id is not None, (
@@ -226,18 +251,22 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            result=completed_analysis.result,
         )
         primitive_rtp_resources = self._extract_primitive_run_time_params(
             completed_analysis
         )
         csv_rtp_resources = self._extract_csv_run_time_params(completed_analysis)
-        await self._completed_store.make_room_and_add(
-            completed_analysis_resource=completed_analysis_resource,
-            primitive_rtp_resources=primitive_rtp_resources,
-            csv_rtp_resources=csv_rtp_resources,
-        )
+        try:
+            await self._completed_store.make_room_and_add(
+                completed_analysis_resource=completed_analysis_resource,
+                primitive_rtp_resources=primitive_rtp_resources,
+                csv_rtp_resources=csv_rtp_resources,
+            )
 
-        self._pending_store.remove(analysis_id=analysis_id)
+            self._pending_store.remove(analysis_id=analysis_id)
+        finally:
+            self._commands_dict_list.clear()
 
     async def save_initialization_failed_analysis(
         self,
@@ -268,6 +297,7 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            result=completed_analysis.result,
         )
         await self._completed_store.make_room_and_add(
             completed_analysis_resource=completed_analysis_resource,
@@ -313,15 +343,9 @@ class AnalysisStore:
 
         If `protocol_id` doesn't point to a valid protocol, returns an empty list.
         """
-        completed_analysis_ids = self._completed_store.get_ids_by_protocol(
+        completed_analysis_summaries = self._completed_store.get_summaries_by_protocol(
             protocol_id=protocol_id
         )
-        completed_analysis_summaries = [
-            AnalysisSummary.model_construct(
-                id=analysis_id, status=AnalysisStatus.COMPLETED
-            )
-            for analysis_id in completed_analysis_ids
-        ]
 
         pending_analysis = self._pending_store.get_by_protocol(protocol_id=protocol_id)
         if pending_analysis is None:
@@ -444,6 +468,14 @@ class AnalysisStore:
                 return False
         return True
 
+    def get_access_control_status(self) -> bool:
+        """Return the current status of access control enablement from the Analysis Store."""
+        return self._access_control_status
+
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the current status of access control enablement for the Analysis Store."""
+        self._access_control_status = access_control_mode
+
 
 class _PendingAnalysisStore:
     """An in-memory store of protocol analyses that are pending.
@@ -508,4 +540,8 @@ class _PendingAnalysisStore:
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:
-    return AnalysisSummary(id=pending_analysis.id, status=pending_analysis.status)
+    return AnalysisSummary.model_construct(
+        id=pending_analysis.id,
+        status=pending_analysis.status,
+        result=None,
+    )

@@ -10,10 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import {
-  useModulesQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   getAADisplayName,
   getFixtureDisplayName,
@@ -37,6 +34,7 @@ import {
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -45,6 +43,7 @@ import type {
   CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
+  DeckConfiguration,
   DeckDefinition,
 } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -59,6 +58,7 @@ interface AddFixtureModalProps {
   deckDef: DeckDefinition
   isOnDevice?: boolean
   existingCutoutFixtureId?: CutoutFixtureId
+  updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
 }
 type OptionStage =
   | 'modulesOrFixtures'
@@ -74,13 +74,13 @@ export function AddFixtureModal({
   isOnDevice = false,
   deckDef,
   existingCutoutFixtureId,
-}: AddFixtureModalProps): JSX.Element {
+  updateDeckConfiguration,
+}: AddFixtureModalProps): ReactNode {
   const { t } = useTranslation([
     'device_details',
     'shared',
     'deck_configuration',
   ])
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 

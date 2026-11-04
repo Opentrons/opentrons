@@ -4,18 +4,27 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { getResetConfigOptions } from '/app/redux/robot-admin'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useResetConfigOptionsQuery: vi.fn(),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-admin/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../../../../hooks')
+vi.mock('/app/resources/devices/hooks')
 
 const mockOnCloseClick = vi.fn()
 const ROBOT_NAME = 'otie'
@@ -79,68 +88,37 @@ const render = () => {
 }
 
 describe('RobotSettings DeviceResetSlideout', () => {
+  const downloadCalibration =
+    vi.fn<
+      ReturnType<typeof useDownloadCalibrationData>['downloadCalibration']
+    >()
   beforeEach(() => {
-    vi.mocked(getResetConfigOptions).mockReturnValue(mockResetConfigOptions)
-    vi.mocked(useIsFlex).mockReturnValue(false)
-  })
-
-  it('should render title, description, checkboxes, links and button: OT-2', () => {
-    render()
-    screen.getByText('Device Reset')
-    screen.getByText('Resets cannot be undone')
-    screen.getByText('Clear individual data')
-    screen.getByText(
-      'Select individual settings to only clear specific data types.'
-    )
-    screen.getByText('Robot Calibration Data')
-    screen.getByText('Clear deck calibration')
-    screen.getByText('Clear pipette offset calibrations')
-    screen.getByText('Clear tip length calibrations')
-    screen.getByText('Protocol run data')
-    expect(screen.queryByText('labware offset')).toBe(null)
-    screen.getByText('Clear protocol run history')
-    screen.getByText('Boot scripts')
-    screen.getByText('Clear custom boot scripts')
-    screen.getByText('Clear SSH public keys')
-    const downloads = screen.getAllByText('Download')
-    expect(downloads.length).toBe(2)
-    screen.getByRole('checkbox', { name: 'Clear deck calibration' })
-    screen.getByRole('checkbox', { name: 'Clear pipette offset calibrations' })
-    screen.getByRole('checkbox', { name: 'Clear tip length calibrations' })
-    screen.getByRole('checkbox', { name: 'Clear protocol run history' })
-    screen.getByRole('checkbox', { name: 'Clear custom boot scripts' })
-    screen.getByRole('checkbox', { name: 'Clear SSH public keys' })
-    screen.getByRole('button', { name: 'Clear data and restart robot' })
-    screen.getByTestId('Slideout_icon_close_Device Reset')
+    vi.mocked(useResetConfigOptionsQuery).mockReturnValue({
+      data: { options: mockResetConfigOptions },
+    } as any)
+    vi.mocked(useDownloadCalibrationData).mockReturnValue({
+      downloadCalibration,
+    } as any)
   })
 
   it('should change some options and text for Flex', () => {
-    vi.mocked(useIsFlex).mockReturnValue(true)
     render()
     screen.getByText('Clear all data')
     screen.getByText(
-      'Clears calibrations, protocols, and all settings except robot name and network settings.'
+      'Clears calibrations, protocols, and all settings. You’ll have to redo initial setup before using the robot again.'
     )
-    expect(screen.queryByText('Clear deck calibration')).toBeNull()
     screen.getByText('Clear pipette calibration')
-    expect(screen.queryByText('Clear tip length calibrations')).toBeNull()
     screen.getByText('Clear gripper calibration')
     screen.getByRole('checkbox', { name: 'Clear pipette calibration' })
     screen.getByRole('checkbox', { name: 'Clear gripper calibration' })
     screen.getByRole('checkbox', { name: 'Clear module calibration' })
-    expect(
-      screen.queryByRole('checkbox', { name: 'Clear deck calibration' })
-    ).toBeNull()
-    expect(
-      screen.queryByRole('checkbox', { name: 'Clear tip length calibrations' })
-    ).toBeNull()
     screen.getByRole('checkbox', { name: 'Clear labware offset data' })
   })
 
   it('should enable Clear data and restart robot button when checked one checkbox', () => {
     render()
     const checkbox = screen.getByRole('checkbox', {
-      name: 'Clear deck calibration',
+      name: 'Clear gripper calibration',
     })
     fireEvent.click(checkbox)
     const clearButton = screen.getByRole('button', {
@@ -151,7 +129,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
 
   it('should close the slideout when clicking close icon button', () => {
     render()
-    const closeButton = screen.getByTestId('Slideout_icon_close_Device Reset')
+    const closeButton = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(closeButton)
     expect(mockOnCloseClick).toHaveBeenCalled()
   })

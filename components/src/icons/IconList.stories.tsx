@@ -25,7 +25,7 @@ interface IconState {
   showCopied: boolean
 }
 
-function IconListComponent(): JSX.Element {
+function IconListComponent(): React.ReactNode {
   const ICON_NAMES = Object.keys(ICON_DATA_BY_NAME) as IconName[]
   const [icons, setIcons] = React.useState<IconState[]>(() =>
     ICON_NAMES.map(name => ({

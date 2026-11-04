@@ -7,6 +7,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
+  useAttachedInstrumentDisplayName,
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '/app/local-resources/instruments'
@@ -36,6 +37,9 @@ vi.mock('react-router-dom', () => ({
 vi.mock('/app/local-resources/instruments')
 vi.mock('/app/resources/robot-settings/hooks')
 vi.mock('/app/organisms/DropTipWizardFlows')
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: vi.fn().mockReturnValue('otie'),
+}))
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {
@@ -109,6 +113,14 @@ describe('InstrumentDetail', () => {
       displayName: 'mockPipette',
     } as any)
     vi.mocked(useGripperDisplayName).mockReturnValue('mockGripper')
+    vi.mocked(useAttachedInstrumentDisplayName).mockImplementation(
+      instrument => {
+        if (instrument == null || !instrument.ok) return null
+        return instrument.instrumentType === 'gripper'
+          ? 'mockGripper'
+          : 'mockPipette'
+      }
+    )
     vi.mocked(useParams).mockReturnValue({ mount: 'left' })
     vi.mocked(useIsOEMMode).mockReturnValue(false)
     vi.mocked(useDropTipWizardFlows).mockReturnValue({

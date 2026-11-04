@@ -38,7 +38,7 @@ describe('TouchscreenBrightness', () => {
 
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('Touchscreen Brightness')
+    screen.getByText('Touchscreen brightness')
     screen.getByTestId('TouchscreenBrightness_decrease')
     screen.getByTestId('TouchscreenBrightness_increase')
   })

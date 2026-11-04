@@ -19,10 +19,11 @@ export const useRequiredProtocolLabware = (
   protocolId: string
 ): RequiredLabwareDetails[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
   const commands = mostRecentAnalysis?.commands ?? []
   const labwareDetails = getRequiredLabwareDetailsFromLoadCommands(commands)

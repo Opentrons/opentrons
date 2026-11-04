@@ -1,3 +1,12 @@
+import {
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
+  updateCameraUsageSettings,
+  updateRunSetupStepsComplete,
+  updateRunSetupStepsRequired,
+} from '../actions'
 import * as Constants from '../constants'
 import { LPCReducer } from './lpc'
 import { setupReducer } from './setup'
@@ -19,9 +28,13 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
-    case Constants.CAMERA_SETUP_STEP_KEY: {
+    case updateRunSetupStepsComplete.type:
+    case updateRunSetupStepsRequired.type:
+    case updateCameraEnablement.type:
+    case updateCameraRecoveryEnablement.type:
+    case updateCameraStreamEnablement.type:
+    case updateCameraUsageSettings.type:
+    case updateCameraSpecificSettings.type: {
       const runId = action.payload.runId
       const currentRunState = state[runId]
 

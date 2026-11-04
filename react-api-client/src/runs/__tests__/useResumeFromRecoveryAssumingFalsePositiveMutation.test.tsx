@@ -6,6 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { useResumeRunFromRecoveryAssumingFalsePositiveMutation } from '..'
 import { mockResumeFromRecoveryAction, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -41,10 +42,11 @@ describe('useResumeRunFromRecoveryAssumingFalsePositiveMutation hook', () => {
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      useResumeRunFromRecoveryAssumingFalsePositiveMutation,
-      {
-        wrapper,
-      }
+      () =>
+        useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      { wrapper }
     )
 
     expect(result.current.data).toBeUndefined()
@@ -63,10 +65,11 @@ describe('useResumeRunFromRecoveryAssumingFalsePositiveMutation hook', () => {
     } as Response<RunAction>)
 
     const { result } = renderHook(
-      useResumeRunFromRecoveryAssumingFalsePositiveMutation,
-      {
-        wrapper,
-      }
+      () =>
+        useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      { wrapper }
     )
     act(() =>
       result.current.resumeRunFromRecoveryAssumingFalsePositive(RUN_ID_1)

@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { AnimationVideo, SPACING } from '@opentrons/components'
-import { LEFT, RIGHT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
@@ -24,13 +24,7 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 
 import { FLOWS, SECTIONS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type {
-  CreateCommand,
-  DeckConfiguration,
-  MotorAxes,
-} from '@opentrons/shared-data'
+import type { CreateCommand, MotorAxes } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type {
   PipetteWizardFlow,
@@ -51,10 +45,9 @@ interface PipetteAnimationProps {
 
 export function startCalibrationOnClick(
   props: PipetteWizardStepProps,
-  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
   pipetteId: string
 ): () => void {
-  const { chainRunCommands, proceed, setShowErrorMessage, mount } = props
+  const { chainRunCommands, proceed, handleCommandError, mount } = props
   return () => {
     const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
     const verifyCommands: CreateCommand[] = [
@@ -92,38 +85,9 @@ export function startCalibrationOnClick(
           .then(() => {
             proceed()
           })
-          .catch(error => {
-            setShowErrorMessage(error.message as string)
-          })
+          .catch(handleCommandError)
       })
-      .catch(() => {
-        setShowUnableToDetect?.(true)
-      })
-  }
-}
-
-export function isWasteChuteOnDeck(
-  deckConfig?: UseQueryResult<DeckConfiguration>
-): boolean {
-  return !!deckConfig?.data?.find(
-    fixture =>
-      fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
-      fixture.cutoutFixtureId?.includes('wasteChute')
-  )
-}
-
-export function is96Channel(
-  instrument: AttachedPipettesFromInstrumentsQuery
-): boolean {
-  const left_instrument = instrument[LEFT]
-  const right_instrument = instrument[RIGHT]
-  if (
-    left_instrument?.data?.channels === 96 ||
-    right_instrument?.data?.channels === 96
-  ) {
-    return true
-  } else {
-    return false
+      .catch(handleCommandError)
   }
 }
 
@@ -172,10 +136,11 @@ export function getPipetteAnimations(
       css={css`
         padding-top: ${SPACING.spacing4};
         width: 100%;
-        min-height: ${section === SECTIONS.ATTACH_PROBE ||
-        section === SECTIONS.DETACH_PROBE
-          ? `18rem`
-          : `12rem`};
+        min-height: ${
+          section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE
+            ? `18rem`
+            : `12rem`
+        };
       `}
       data-testid={
         section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE

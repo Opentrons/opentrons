@@ -10,11 +10,11 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -22,13 +22,14 @@ import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -60,7 +61,7 @@ const GO_BACK_BUTTON_TEXT_STYLE = css`
   }
 `
 
-export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
+export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
   const {
     isRobotMoving,
     goBack,
@@ -72,8 +73,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     chainRunCommands,
     isOnDevice,
     flowType,
-    errorMessage,
-    setShowErrorMessage,
+    handleCommandError,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
@@ -82,6 +82,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       setFetching(false)
     },
   })
+
   const pipetteWizardStep = {
     mount,
     flowType,
@@ -133,9 +134,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   const [showPipetteStillAttached, setShowPipetteStillAttached] =
@@ -176,9 +175,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <LegacyStyledText css={BODY_STYLE}>
-          {t('hold_and_loosen')}
-        </LegacyStyledText>
+        <WizardBodyText>{t('hold_and_loosen')}</WizardBodyText>
         {is96ChannelPipette && (
           <Banner
             type="warning"
@@ -213,34 +210,31 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
               setShowPipetteStillAttached(false)
             }}
             marginLeft={SPACING.spacing32}
+            css={GO_BACK_BUTTON_TEXT_STYLE}
           >
-            <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('shared:go_back')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
           {Boolean(isOnDevice) ? (
             <SmallButton
               disabled={isFetching}
-              buttonText={i18n.format(t('try_again'), 'capitalize')}
+              buttonText={t('try_again')}
               onClick={handleOnClick}
             />
           ) : (
             <PrimaryButton disabled={isFetching} onClick={handleOnClick}>
-              {i18n.format(t('try_again'), 'capitalize')}
+              {t('try_again')}
             </PrimaryButton>
           )}
         </Flex>
       </SimpleWizardBody>
     )
   }
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      subHeader={errorMessage}
-    />
-  ) : (
+  return (
     <GenericWizardTile
       header={
         isFetching ? (

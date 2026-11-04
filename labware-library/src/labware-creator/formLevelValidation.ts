@@ -22,8 +22,7 @@ type BoundingBoxFields = {
   gridSpacingX: number
   gridSpacingY: number
 } & (
-  | { wellDiameter: number }
-  | { wellXDimension: number; wellYDimension: number }
+  { wellDiameter: number } | { wellXDimension: number; wellYDimension: number }
 )
 
 interface BoundingBoxResult {

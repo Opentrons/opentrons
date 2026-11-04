@@ -2118,8 +2118,7 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     stackerLabwareReducer: stackerLabwareReducer(
       prevStateFallback.stackerLabwareReducer,
       action as
-        | StackerLabwareCreationStartAction
-        | StackerLabwareCreationFinishAction
+        StackerLabwareCreationStartAction | StackerLabwareCreationFinishAction
     ),
   })
 )

@@ -28,6 +28,7 @@ def version_dict(version_file_path: str) -> Dict[str, str]:
         return json.load(f)
 
 
+# todo(mm, 2026-07-24): Merge with downloaded_update_file_ot3?
 @pytest.fixture
 def downloaded_update_file(request, extracted_update_file):
     """

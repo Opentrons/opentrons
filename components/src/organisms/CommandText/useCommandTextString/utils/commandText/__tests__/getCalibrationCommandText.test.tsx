@@ -8,6 +8,8 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getCalibrationCommandText } from '../getCalibrationCommandText'
 
+import type { ReactNode } from 'react'
+
 vi.mock('@opentrons/shared-data')
 
 const baseCommandData = {
@@ -30,7 +32,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getCalibrationCommandText({
     command,

@@ -2,7 +2,15 @@ export { useDoorQuery } from './useDoorQuery'
 export { useEstopQuery } from './useEstopQuery'
 export { useLightsQuery } from './useLightsQuery'
 export { useAcknowledgeEstopDisengageMutation } from './useAcknowledgeEstopDisengageMutation'
-export { useHomeMutation } from './useHomeMutation'
 export { useSetLightsMutation } from './useSetLightsMutation'
 export { useRobotSettingsQuery } from './useRobotSettingsQuery'
 export { useUpdateRobotSettingMutation } from './useUpdateRobotSettingMutation'
+export {
+  resetConfigOptionsQueryKey,
+  useResetConfigOptionsQuery,
+} from './useResetConfigOptionsQuery'
+export { usePostResetConfigMutation } from './usePostResetConfigMutation'
+export type {
+  UsePostResetConfigMutationOptions,
+  UsePostResetConfigMutationResult,
+} from './usePostResetConfigMutation'

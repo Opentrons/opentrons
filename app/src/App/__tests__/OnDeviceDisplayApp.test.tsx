@@ -87,10 +87,14 @@ vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks/useModuleAttachedToast')
 vi.mock('../hooks/useProtocolReceiptToast')
 vi.mock('../hooks/useSoftwareUpdatePoll')
+vi.mock('/app/local-resources/access-control/useHandleInsufficientPermissions')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
-vi.mock('/app/organisms/ODD/OnDeviceLogin/clearStaleAuthBeforeLogin', () => ({
-  clearStaleAuthBeforeLogin: () => Promise.resolve(),
+vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
+  useTrackRobotRestarts: vi.fn(),
+}))
+vi.mock('/app/resources/robot-update/RobotUpdateProvider', () => ({
+  RobotUpdateProvider: ({ children }: { children: JSX.Element }) => children,
 }))
 
 const mockSettings = {
@@ -186,7 +190,21 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders ProtocolDashboard component from /protocols', () => {
     render('/protocols')
-    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalledWith(
+      expect.objectContaining({ isCRSEnabled: false }),
+      expect.anything()
+    )
+  })
+  it('hides CRS-incompatible ProtocolDashboard UI when access control is enabled', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: true } },
+      isSuccess: true,
+    } as any)
+    render('/protocols')
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalledWith(
+      expect.objectContaining({ isCRSEnabled: true }),
+      expect.anything()
+    )
   })
   it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
     render('/protocols/my-protocol-id')
@@ -222,6 +240,40 @@ describe('OnDeviceDisplayApp', () => {
     render('/')
     screen.getByLabelText('loading indicator')
     expect(vi.mocked(LocalizationProvider)).not.toHaveBeenCalled()
+  })
+  it('does not return to the loading screen if access-control queries reset after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: undefined,
+      isSuccess: false,
+    } as any)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+  })
+  it('does not return to the loading screen if the shell becomes unready after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

@@ -9,6 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface BasicButtonsProps {
   header: string
   selected: boolean | null
@@ -17,7 +19,7 @@ interface BasicButtonsProps {
   subHeader?: string
 }
 
-export function BasicsButtons(props: BasicButtonsProps): JSX.Element {
+export function BasicsButtons(props: BasicButtonsProps): ReactNode {
   const { header, onChange, selected, type, subHeader } = props
   const { t } = useTranslation('shared')
 

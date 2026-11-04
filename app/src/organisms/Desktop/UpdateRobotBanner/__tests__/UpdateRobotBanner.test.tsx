@@ -17,7 +17,13 @@ import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildro
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async () => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateDisplayInfo: vi.fn(),
+  }
+})
 vi.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
 const getUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo
@@ -58,13 +64,14 @@ describe('UpdateRobotBanner', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    render(props)
     const bannerText = screen.queryByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
     expect(bannerText).toBeNull()
   })
 
-  it('should render nothing if update is not available when autoUpdateAction returns downgrade', () => {
+  it('should display the banner when autoUpdateAction returns downgrade', () => {
     vi.mocked(getUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'downgrade',
       autoUpdateDisabledReason: null,
@@ -80,6 +87,7 @@ describe('UpdateRobotBanner', () => {
     props = {
       robot: mockReachableRobot,
     }
+    render(props)
     const bannerText = screen.queryByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )

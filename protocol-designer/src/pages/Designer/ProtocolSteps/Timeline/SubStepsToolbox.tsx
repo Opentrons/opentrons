@@ -24,6 +24,7 @@ import {
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
 
+import type { ReactNode } from 'react'
 import type { SubstepIdentifier } from '/protocol-designer/steplist'
 import type { HoverOnSubstepAction } from '/protocol-designer/ui/steps'
 
@@ -31,9 +32,7 @@ interface SubStepsToolboxProps {
   stepId: string
 }
 
-export function SubStepsToolbox(
-  props: SubStepsToolboxProps
-): JSX.Element | null {
+export function SubStepsToolbox(props: SubStepsToolboxProps): ReactNode {
   const { stepId } = props
   const { t, i18n } = useTranslation([
     'application',

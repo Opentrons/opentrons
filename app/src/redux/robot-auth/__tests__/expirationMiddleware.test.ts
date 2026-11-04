@@ -36,7 +36,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-a-expires-at-3000',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 3000,
@@ -45,7 +49,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-b-expires-at-1000',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 1000,
@@ -54,7 +62,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-c-expires-at-2000',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 2000,
@@ -63,7 +75,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-d-expires-never',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: null,
@@ -110,7 +126,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-a',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + int32Max + 1000,
@@ -134,7 +154,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-a',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 1000,
@@ -143,7 +167,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-b',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 1000,
@@ -159,7 +187,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       refreshLogin({
         robotName: 'robot-a',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 2000,
@@ -180,7 +212,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-a',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 - 1,
@@ -189,7 +225,11 @@ describe('expirationMiddleware', () => {
     store.dispatch(
       logIn({
         robotName: 'robot-b',
-        username: 'username',
+        user: {
+          username: 'username',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
         expiresAt: T0 + 1000,

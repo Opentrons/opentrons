@@ -8,7 +8,7 @@ from .modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 DeviceType = Union[modules.ModuleType, peripherals.PeripheralType]
 

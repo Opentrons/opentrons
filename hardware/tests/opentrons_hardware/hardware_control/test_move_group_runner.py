@@ -1,6 +1,8 @@
 """Tests for the move scheduler."""
 
-from typing import Any, List
+import asyncio
+import logging
+from typing import Any, Dict, List, Tuple
 
 import pytest
 from mock import AsyncMock, MagicMock, call, patch
@@ -19,6 +21,7 @@ from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdPar
 from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
     ErrorSeverity,
+    GearMotorId,
     MotorDriverErrorCode,
     MoveAckId,
     NodeId,
@@ -1503,3 +1506,364 @@ async def test_single_move_driver_error(
     with pytest.raises(MotionFailedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 1
+
+
+def _completion(
+    node: NodeId,
+    group_id: int,
+    seq_id: int,
+    message_index: int,
+    position_um: int = 0,
+    ack_id: int = 1,
+) -> Tuple[md.MoveCompleted, ArbitrationId]:
+    """Build a MoveCompleted that carries a chosen message index.
+
+    BaseMessage.__post_init__ only assigns an index when the payload does not already
+    have one, so stamping the payload before building the message preserves the choice.
+    """
+    payload = MoveCompletedPayload(
+        group_id=UInt8Field(group_id),
+        seq_id=UInt8Field(seq_id),
+        current_position_um=UInt32Field(position_um),
+        encoder_position_um=Int32Field(position_um),
+        position_flags=MotorPositionFlagsField(0),
+        ack_id=UInt8Field(ack_id),
+    )
+    payload.message_index = UInt32Field(message_index)
+    return md.MoveCompleted(payload=payload), _build_arb(node)
+
+
+def _tip_response(
+    node: NodeId,
+    group_id: int,
+    seq_id: int,
+    message_index: int,
+    gear_motor_id: int,
+) -> Tuple[md.TipActionResponse, ArbitrationId]:
+    """Build a TipActionResponse that carries a chosen message index."""
+    payload = TipActionResponsePayload(
+        group_id=UInt8Field(group_id),
+        seq_id=UInt8Field(seq_id),
+        current_position_um=UInt32Field(0),
+        encoder_position_um=Int32Field(0),
+        position_flags=MotorPositionFlagsField(0),
+        ack_id=UInt8Field(1),
+        action=PipetteTipActionTypeField(0),
+        success=UInt8Field(1),
+        gear_motor_id=GearMotorIdField(gear_motor_id),
+    )
+    payload.message_index = UInt32Field(message_index)
+    return md.TipActionResponse(payload=payload), _build_arb(node)
+
+
+@pytest.fixture
+def move_group_three_seq_one_node() -> MoveGroups:
+    """One group of three sequences on a single Z node."""
+    return [
+        [
+            {
+                NodeId.head_r: MoveGroupSingleAxisStep(
+                    distance_mm=float64(33.246),
+                    velocity_mm_sec=float64(50),
+                    duration_sec=float64(1),
+                )
+            },
+            {
+                NodeId.head_r: MoveGroupSingleAxisStep(
+                    distance_mm=float64(48.396),
+                    velocity_mm_sec=float64(50),
+                    duration_sec=float64(1),
+                )
+            },
+            {
+                NodeId.head_r: MoveGroupSingleAxisStep(
+                    distance_mm=float64(33.249),
+                    velocity_mm_sec=float64(50),
+                    duration_sec=float64(1),
+                )
+            },
+        ]
+    ]
+
+
+def test_stale_foreign_completion_does_not_satisfy_live_move(
+    move_group_three_seq_one_node: MoveGroups,
+) -> None:
+    """A completion for a move this group did not send must be ignored.
+
+    This reproduces a field failure. Duplicate CAN frames belonging to an earlier move
+    group were matched against the group that was executing, because every move reuses
+    the same (node id, seq id) pairs. That satisfied the pending set early and let a
+    stale position win the position vote, so the API cached a Z position of 0 while the
+    axis was really 114.891 mm down, then computed the next move from there.
+    """
+    subject = MoveScheduler(
+        move_group_three_seq_one_node,
+        0,
+        expected_completions={
+            1001: (NodeId.head_r.value, 0, 0),
+            1002: (NodeId.head_r.value, 0, 1),
+            1003: (NodeId.head_r.value, 0, 2),
+        },
+    )
+
+    # A frame for a live (node, seq) but carrying an index this group never sent.
+    subject(*_completion(NodeId.head_r, 0, 2, message_index=277193, position_um=0))
+
+    assert subject._moves[0] == {
+        (NodeId.head_r.value, 0),
+        (NodeId.head_r.value, 1),
+        (NodeId.head_r.value, 2),
+    }, "the stale completion must not satisfy a pending move"
+    assert subject._completion_queue.empty(), "its position must not become a candidate"
+    assert not subject._event.is_set(), "the group must not be declared complete"
+    assert subject._dropped_foreign_completions == 1
+
+    # The real completions still work, and the position that survives is the real one.
+    subject(*_completion(NodeId.head_r, 0, 0, 1001, position_um=33246))
+    subject(*_completion(NodeId.head_r, 0, 1, 1002, position_um=81642))
+    subject(*_completion(NodeId.head_r, 0, 2, 1003, position_um=114891))
+
+    assert subject._event.is_set()
+    completions = []
+    while not subject._completion_queue.empty():
+        completions.append(subject._completion_queue.get_nowait())
+    assert len(completions) == 3
+    positions = MoveGroupRunner._accumulate_move_completions(completions)
+    assert positions[NodeId.head_r].motor_position == pytest.approx(114.891)
+
+
+def test_duplicate_completion_is_dropped(
+    move_group_three_seq_one_node: MoveGroups,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A completion delivered more than once must only be counted once."""
+    subject = MoveScheduler(
+        move_group_three_seq_one_node,
+        0,
+        expected_completions={
+            1001: (NodeId.head_r.value, 0, 0),
+            1002: (NodeId.head_r.value, 0, 1),
+            1003: (NodeId.head_r.value, 0, 2),
+        },
+    )
+    with caplog.at_level(logging.WARNING):
+        subject(*_completion(NodeId.head_r, 0, 0, 1001, position_um=33246))
+        subject(*_completion(NodeId.head_r, 0, 0, 1001, position_um=33246))
+
+    assert subject._completion_queue.qsize() == 1
+    assert subject._moves[0] == {(NodeId.head_r.value, 1), (NodeId.head_r.value, 2)}
+    assert subject._dropped_duplicate_completions == 1
+    assert subject._dropped_foreign_completions == 0
+    assert "duplicate delivery" in caplog.text
+
+
+def test_schedulers_only_consume_their_own_completions(
+    move_group_three_seq_one_node: MoveGroups,
+) -> None:
+    """Concurrent runners share a bus and must not consume each other's completions.
+
+    ot3controller.move() and home() both run two MoveGroupRunners through
+    asyncio.gather, each with start_at_index 0, and every scheduler is a listener on
+    the same messenger. Message index membership is what separates them.
+    """
+    first = MoveScheduler(
+        move_group_three_seq_one_node,
+        0,
+        expected_completions={2001: (NodeId.head_r.value, 0, 0)},
+    )
+    second = MoveScheduler(
+        move_group_three_seq_one_node,
+        0,
+        expected_completions={3001: (NodeId.head_r.value, 0, 0)},
+    )
+    for message in (
+        _completion(NodeId.head_r, 0, 0, 2001, position_um=1000),
+        _completion(NodeId.head_r, 0, 0, 3001, position_um=2000),
+    ):
+        first(*message)
+        second(*message)
+
+    assert first._completion_queue.qsize() == 1
+    assert second._completion_queue.qsize() == 1
+    assert first._dropped_foreign_completions == 1
+    assert second._dropped_foreign_completions == 1
+    assert first._completion_queue.get_nowait()[1].payload.message_index.value == 2001
+    assert second._completion_queue.get_nowait()[1].payload.message_index.value == 3001
+
+
+def test_tip_action_two_responses_share_one_message_index(
+    move_group_tip_action_single: MoveGroups,
+) -> None:
+    """Both gear motor responses to one tip action request must be accepted.
+
+    A single TipActionRequest is answered twice, once per gear motor, and both
+    responses echo that one request's message index. Deduplicating on the index alone
+    would drop the second response and hang tip handling, so the key includes the gear
+    motor id.
+    """
+    subject = MoveScheduler(
+        move_group_tip_action_single,
+        0,
+        expected_completions={1001: (NodeId.pipette_left.value, 0, 0)},
+    )
+    subject(*_tip_response(NodeId.pipette_left, 0, 0, 1001, gear_motor_id=1))
+    assert subject._expected_tip_action_motors[0][0] == [GearMotorId.left]
+    assert not subject._event.is_set()
+
+    subject(*_tip_response(NodeId.pipette_left, 0, 0, 1001, gear_motor_id=0))
+    assert subject._expected_tip_action_motors[0][0] == []
+    assert subject._event.is_set()
+    assert subject._completion_queue.qsize() == 1
+    assert subject._dropped_duplicate_completions == 0
+
+    # A third copy is a duplicate delivery and must be dropped, not raise.
+    subject(*_tip_response(NodeId.pipette_left, 0, 0, 1001, gear_motor_id=0))
+    assert subject._dropped_duplicate_completions == 1
+    assert subject._completion_queue.qsize() == 1
+
+
+def test_tip_action_response_for_unexpected_gear_motor_is_ignored(
+    move_group_single: MoveGroups,
+) -> None:
+    """A tip action response for a move this scheduler does not own must not raise.
+
+    A concurrently running gear axis runner's responses arrive at every scheduler. This
+    used to raise ValueError out of a CAN listener callback, and
+    CanMessenger._read_task only catches BinarySerializableException, so the frame was
+    never dispatched to any listener registered after this one.
+    """
+    subject = MoveScheduler(move_group_single)
+    before = set(subject._moves[0])
+
+    subject(*_tip_response(NodeId.pipette_left, 0, 0, 1001, gear_motor_id=0))
+
+    assert subject._moves[0] == before
+    assert subject._completion_queue.empty()
+    assert not subject._event.is_set()
+
+
+def test_completion_for_out_of_range_group_is_ignored(
+    move_group_single: MoveGroups,
+) -> None:
+    """A group id below start_at_index must not address the last group.
+
+    group_id - start_at_index goes negative for a foreign frame, and a negative index
+    would quietly select this scheduler's last group instead of raising IndexError.
+    """
+    subject = MoveScheduler(move_group_single, 1)
+    before = set(subject._moves[0])
+
+    subject(*_tip_response(NodeId.pipette_left, 0, 0, 1001, gear_motor_id=0))
+
+    assert subject._moves[0] == before
+    assert subject._completion_queue.empty()
+
+
+async def test_send_groups_records_message_indices(
+    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
+) -> None:
+    """Prep must record the message index of every request it sends."""
+    subject = MoveGroupRunner(move_groups=move_group_multiple)
+    await subject.prep(mock_can_messenger)
+
+    sent = [c.kwargs["message"] for c in mock_can_messenger.send.call_args_list]
+    assert subject._expected_completions is not None
+    assert set(subject._expected_completions) == {
+        m.payload.message_index.value for m in sent
+    }
+    assert len(subject._expected_completions) == len(sent) == 5
+    assert (NodeId.gantry_y.value, 1, 0) in subject._expected_completions.values()
+
+
+async def test_send_groups_records_nonzero_start_index(
+    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
+) -> None:
+    """Recorded group ids must be the ones that go on the wire."""
+    subject = MoveGroupRunner(move_groups=move_group_multiple, start_at_index=2)
+    await subject.prep(mock_can_messenger)
+
+    assert subject._expected_completions is not None
+    assert {group for _, group, _ in subject._expected_completions.values()} == {
+        2,
+        3,
+        4,
+    }
+
+
+async def test_reprep_replaces_expected_message_indices(
+    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
+) -> None:
+    """Prepping a runner again must not keep the previous prep's expectations.
+
+    Runners are reused in a loop, so carrying indices over would let one iteration
+    accept the previous iteration's completions.
+    """
+    subject = MoveGroupRunner(move_groups=move_group_multiple)
+    await subject.prep(mock_can_messenger)
+    assert subject._expected_completions is not None
+    first = set(subject._expected_completions)
+
+    await subject.prep(mock_can_messenger)
+    assert subject._expected_completions is not None
+    second = set(subject._expected_completions)
+
+    assert len(second) == len(first)
+    assert first.isdisjoint(second)
+
+
+async def test_move_forwards_expected_completions(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """The scheduler must be given the runner's recorded expectations."""
+    subject = MoveGroupRunner(move_groups=move_group_single)
+    with patch(
+        "opentrons_hardware.hardware_control.move_group_runner.MoveScheduler"
+    ) as scheduler_cls:
+        scheduler_cls.return_value.run = AsyncMock(return_value=[])
+        await subject.prep(mock_can_messenger)
+        await subject.execute(mock_can_messenger)
+    assert (
+        scheduler_cls.call_args.kwargs["expected_completions"]
+        is subject._expected_completions
+    )
+
+
+async def test_move_without_prep_does_not_validate() -> None:
+    """A scheduler built without a preceding prep must accept every completion.
+
+    None and an empty mapping are not the same: None disables validation, while an
+    empty mapping would reject every completion and hang.
+    """
+    subject = MoveGroupRunner(move_groups=[])
+    assert subject._expected_completions is None
+    with patch(
+        "opentrons_hardware.hardware_control.move_group_runner.MoveScheduler"
+    ) as scheduler_cls:
+        scheduler_cls.return_value.run = AsyncMock(return_value=[])
+        await subject._move(MagicMock(), 0)
+    assert scheduler_cls.call_args.kwargs["expected_completions"] is None
+
+
+async def test_dropped_completion_counts_reach_the_timeout_error(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """A move that times out must report how many completions were refused.
+
+    If the premise that firmware echoes a request's message index were ever wrong for
+    some kind of move, this is what turns the resulting timeout into a diagnosis.
+    """
+    expected: Dict[int, Tuple[int, int, int]] = {1001: (NodeId.head.value, 0, 0)}
+    subject = MoveScheduler(move_group_single, 0, expected_completions=expected)
+    subject(*_completion(NodeId.head, 0, 0, message_index=999))
+
+    with patch(
+        "opentrons_hardware.hardware_control.move_group_runner.asyncio.wait_for",
+        AsyncMock(side_effect=asyncio.TimeoutError),
+    ):
+        with pytest.raises(MotionFailedError) as exc_info:
+            await subject.run(can_messenger=mock_can_messenger)
+
+    assert exc_info.value.detail["dropped-completions"] == (
+        "1 for moves this group did not send, 0 duplicate deliveries"
+    )

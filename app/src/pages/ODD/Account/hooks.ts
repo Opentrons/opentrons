@@ -16,7 +16,7 @@ interface UseAccountInfoResult {
 /** Returns information about the currently logged-in account of the current robot. */
 export function useAccountInfo(): UseAccountInfoResult {
   const authState = useSelector(getLocalRobotAuthState)
-  const username = authState?.username ?? null
+  const username = authState?.user.username ?? null
   const isLoggedIn = username != null
   const query = useSelfQuery()
   const fullName = query.data?.data.fullName ?? null

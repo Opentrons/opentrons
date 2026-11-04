@@ -9,7 +9,7 @@ from decoy import Decoy
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.heater_shaker import (
     HeaterShaker as HardwareHeaterShaker,
 )
@@ -38,12 +38,6 @@ from opentrons.types import DeckSlotName
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
     return decoy.mock(cls=StateStore)
@@ -52,7 +46,7 @@ def state_store(decoy: Decoy) -> StateStore:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> HeaterShakerMovementFlagger:
     """Return a h/s movement flagger initialized with mocked-out dependencies."""
     return HeaterShakerMovementFlagger(
@@ -378,7 +372,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
     expected_raise_cm: ContextManager[Any],
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """When on a H/S, it should raise if the latch isn't open."""
     decoy.when(
@@ -412,7 +406,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
 async def test_raises_if_hardware_module_has_gone_missing(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     decoy: Decoy,
 ) -> None:
     """It should raise if the hardware module can't be found by its serial no."""
@@ -464,7 +458,6 @@ async def test_passes_if_virtual_module_latch_open(
 async def test_passes_if_labware_on_non_heater_shaker_module(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware is on a module other than a Heater-Shaker."""
@@ -479,7 +472,6 @@ async def test_passes_if_labware_on_non_heater_shaker_module(
 async def test_passes_if_labware_not_on_any_module(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware isn't on a module."""

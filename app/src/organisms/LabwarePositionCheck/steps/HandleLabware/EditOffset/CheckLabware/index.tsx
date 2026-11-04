@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -41,6 +40,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
@@ -50,10 +50,15 @@ interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
 }
 
-export function CheckLabware(props: CheckLabwareProps): JSX.Element {
+export function CheckLabware(props: CheckLabwareProps): ReactNode {
   const { runId, commandUtils, contentHeader } = props
-  const { toggleRobotMoving, handleJog, resetJog, handleResetLwModulesOnDeck } =
-    commandUtils
+  const {
+    toggleRobotMoving,
+    handleJog,
+    resetJog,
+    handleResetLwModulesOnDeck,
+    flushJogAudit,
+  } = commandUtils
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const dispatch = useDispatch()
@@ -114,6 +119,7 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
     })
 
   const handleGoBack = (): void => {
+    flushJogAudit()
     void toggleRobotMoving(true)
       .then(() => handleResetLwModulesOnDeck(offsetLocationDetails))
       .then(() => {
@@ -167,7 +173,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
   isLwTiprack: boolean
 }
 
-function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
+function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const {
     contentHeader,
@@ -177,10 +183,12 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
     isLwTiprack,
     liveOffset,
     setJoggedPosition,
+    commandUtils,
   } = props
   const [showOddJogControls, setShowOddJogControls] = useState(false)
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     handleAddConfirmedWorkingVector()
   }
 
@@ -210,7 +218,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText forwardedAs="p" />,
+                  block: <StyledText forwardedAs="p" />,
                   bold: <strong />,
                 }}
               />
@@ -255,7 +263,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
 
 function CheckLabwareContentDesktop(
   props: CheckLabwareContentProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const {
     contentHeader,
@@ -271,6 +279,7 @@ function CheckLabwareContentDesktop(
   const dispatch = useDispatch()
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     dispatch(proceedEditOffsetSubstep(runId, true))
   }
 
@@ -301,7 +310,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

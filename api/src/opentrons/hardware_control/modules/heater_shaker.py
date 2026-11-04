@@ -14,8 +14,8 @@ from opentrons.drivers.heater_shaker.driver import (
     HeaterShakerDriver,
 )
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.retry import retry_module_init
@@ -246,9 +246,9 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         data: HeaterShakerData = {
-            "temperatureStatus": self.temperature_status,
-            "speedStatus": self.speed_status,
-            "labwareLatchStatus": self.labware_latch_status,
+            "temperatureStatus": self.temperature_status.value,
+            "speedStatus": self.speed_status.value,
+            "labwareLatchStatus": self.labware_latch_status.value,
             "currentTemp": self.temperature,
             "targetTemp": self.target_temperature,
             "currentSpeed": self.speed,

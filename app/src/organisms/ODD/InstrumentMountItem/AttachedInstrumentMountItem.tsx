@@ -3,23 +3,23 @@ import { useNavigate } from 'react-router-dom'
 
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
-import {
-  useGripperDisplayName,
-  usePipetteModelSpecs,
-} from '/app/local-resources/instruments'
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import { LabeledMount } from './LabeledMount'
 
-import type { ComponentProps, MouseEventHandler } from 'react'
-import type { InstrumentData } from '@opentrons/api-client'
-import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
+import type {
+  GripperData,
+  InstrumentData,
+  Mount,
+  PipetteData,
+} from '@opentrons/api-client'
 import type { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import type { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types'
-import type { Mount } from '/app/redux/pipettes/types'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'
@@ -34,7 +34,7 @@ interface AttachedInstrumentMountItemProps {
 
 export function AttachedInstrumentMountItem(
   props: AttachedInstrumentMountItemProps
-): JSX.Element {
+): ReactNode {
   const navigate = useNavigate()
   const { mount, attachedInstrument, setWizardProps } = props
 
@@ -64,20 +64,11 @@ export function AttachedInstrumentMountItem(
     }
   }
 
-  const instrumentModel = attachedInstrument?.ok
-    ? attachedInstrument.instrumentModel
-    : null
-
-  const pipetteDisplayName =
-    usePipetteModelSpecs(instrumentModel as PipetteModel)?.displayName ?? null
-  const gripperDisplayName = useGripperDisplayName(
-    instrumentModel as GripperModel
+  const displayName = useAttachedInstrumentDisplayName(
+    attachedInstrument?.ok
+      ? (attachedInstrument as PipetteData | GripperData)
+      : null
   )
-
-  const displayName =
-    attachedInstrument?.ok && attachedInstrument?.mount === 'extension'
-      ? gripperDisplayName
-      : pipetteDisplayName
 
   return (
     <>

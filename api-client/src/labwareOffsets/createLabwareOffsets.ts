@@ -11,14 +11,12 @@ import type { ANY_LOCATION, StoredLabwareOffset } from './types'
 export interface StoredLabwareOffsetCreate {
   definitionUri: string
   locationSequence:
-    | LabwareOffsetLocationSequenceComponent[]
-    | typeof ANY_LOCATION
+    LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
   vector: VectorOffset
 }
 
 export type CreateLabwareOffsetData =
-  | StoredLabwareOffsetCreate
-  | StoredLabwareOffsetCreate[]
+  StoredLabwareOffsetCreate | StoredLabwareOffsetCreate[]
 
 export interface CreateLabwareOffsetResponse {
   data: StoredLabwareOffset | StoredLabwareOffset[]
@@ -32,10 +30,11 @@ export interface CreateLabwareOffsetResponse {
  */
 export function createLabwareOffsets(
   config: HostConfig,
-  data: CreateLabwareOffsetData
+  data: CreateLabwareOffsetData,
+  userNotes?: string
 ): ResponsePromise<CreateLabwareOffsetResponse> {
   return request<
     CreateLabwareOffsetResponse,
     { data: CreateLabwareOffsetData }
-  >(POST, '/labwareOffsets', config, { body: { data } })
+  >(POST, '/labwareOffsets', config, { body: { data }, userNotes })
 }

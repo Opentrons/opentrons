@@ -11,7 +11,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
@@ -45,7 +45,7 @@ describe('Results', () => {
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
+      handleCommandError: vi.fn(),
       flowType: FLOWS.CALIBRATE,
       handleCleanUpAndClose: vi.fn(),
       currentStepIndex: 2,
@@ -117,7 +117,7 @@ describe('Results', () => {
     )
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
-  it('calls setShowErrorMessage when chainRunCommands fails', async () => {
+  it('calls handleCommandError when chainRunCommands fails', async () => {
     props = {
       ...props,
       chainRunCommands: vi
@@ -147,7 +147,9 @@ describe('Results', () => {
       ],
       false
     )
-    await waitFor(() => expect(props.setShowErrorMessage).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(props.handleCommandError).toHaveBeenCalledWith(expect.any(Error))
+    })
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
     props = {

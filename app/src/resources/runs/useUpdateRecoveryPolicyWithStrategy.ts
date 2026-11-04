@@ -8,6 +8,7 @@ import type {
   RecoveryPolicyRulesParams,
   UpdateErrorRecoveryPolicyResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 /**
  * append - Add a new policy rule to the end of the existing recovery policy.
@@ -21,7 +22,8 @@ export interface UpdateErrorRecoveryPolicyWithStrategy {
 }
 
 export function useUpdateRecoveryPolicyWithStrategy(
-  runId: string
+  runId: string,
+  documentationState: DocumentationState
 ): (
   newPolicy: UpdateErrorRecoveryPolicyWithStrategy['newPolicy'],
   strategy: UpdateErrorRecoveryPolicyWithStrategy['strategy']
@@ -29,7 +31,7 @@ export function useUpdateRecoveryPolicyWithStrategy(
   const host = useHost()
 
   const { mutateAsync: updateErrorRecoveryPolicy } =
-    useUpdateErrorRecoveryPolicy(runId)
+    useUpdateErrorRecoveryPolicy(runId, documentationState)
 
   return (
     newPolicy: UpdateErrorRecoveryPolicyWithStrategy['newPolicy'],

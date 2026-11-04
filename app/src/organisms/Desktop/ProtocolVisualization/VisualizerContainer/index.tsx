@@ -30,7 +30,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -54,7 +54,7 @@ interface VisualizerContainerProps {
 
 export function VisualizerContainer(
   props: VisualizerContainerProps
-): JSX.Element {
+): ReactNode {
   const dispatch = useDispatch()
   const stepDetailViewerClosed = useSelector(getStepDetailViewerClosed)
   const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =

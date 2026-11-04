@@ -9,8 +9,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -25,7 +25,7 @@ import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
-import type { ComponentProps, MouseEventHandler } from 'react'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type { InstrumentData } from '@opentrons/api-client'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -36,7 +36,7 @@ interface InstrumentInfoProps {
   // the main empty contents of this page
   instrument: InstrumentData | null
 }
-export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
+export const InstrumentInfo = (props: InstrumentInfoProps): ReactNode => {
   const { t, i18n } = useTranslation('instruments_dashboard')
   const { instrument } = props
   const navigate = useNavigate()
@@ -185,7 +185,7 @@ interface InfoItemProps extends StyleProps {
   label: string
   value: string
 }
-function InfoItem(props: InfoItemProps): JSX.Element {
+function InfoItem(props: InfoItemProps): ReactNode {
   return (
     <Flex
       borderRadius={BORDERS.borderRadius12}
@@ -195,22 +195,22 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}
     >
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         fontSize={TYPOGRAPHY.fontSize28}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {props.label}
-      </LegacyStyledText>
-      <LegacyStyledText
+      </StyledText>
+      <StyledText
         forwardedAs="h4"
         color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >
         {props.value}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

@@ -10,12 +10,13 @@ export function createCommand(
   config: HostConfig,
   runId: string,
   data: CreateCommand,
-  params?: CreateCommandParams
+  params?: CreateCommandParams,
+  userNotes?: string
 ): ResponsePromise<CommandData> {
   return request<CommandData, { data: CreateCommand }>(
     POST,
     `/runs/${runId}/commands`,
     config,
-    { queryParams: { ...params }, body: { data } }
+    { queryParams: { ...params }, body: { data }, userNotes }
   )
 }

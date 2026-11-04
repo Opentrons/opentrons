@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Chip,
-  COLORS,
   NewIconButton,
   NO_WRAP,
   StyledText,
@@ -19,7 +18,7 @@ import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 //   getPreviousGroupFirstCommandId,
 // } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -36,7 +35,7 @@ interface ControlsProps {
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
-export function Controls(props: ControlsProps): JSX.Element {
+export function Controls(props: ControlsProps): ReactNode {
   const {
     numErrors,
     protocolName,
@@ -137,10 +136,8 @@ export function Controls(props: ControlsProps): JSX.Element {
             <NewIconButton
               variant="primary"
               iconName={isPlaying ? 'pause' : 'play'}
-              iconSize="1.5rem"
-              iconColor={COLORS.white}
-              size="3rem"
               onClick={handlePlayPause}
+              aria-label={isPlaying ? t('pause') : t('play')}
             />
           </div>
         </div>

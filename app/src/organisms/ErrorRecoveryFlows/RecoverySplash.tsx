@@ -26,7 +26,9 @@ import {
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   WARNING_TOAST,
+  Z_INDEX,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useToaster } from '../ToasterOven'
 import {
@@ -163,6 +165,12 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
             return recoveryCommands.homePipetteZAxes()
           }
         })
+        .catch((error: unknown) => {
+          // Cancelling the documentation modal should return to the splash unchanged.
+          if (isDocumentedMutationError(error)) {
+            return toggleERWizAsActiveUser(false, false)
+          }
+        })
         .finally(() => {
           void handleMotionRouting(false)
         })
@@ -202,7 +210,7 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
         gridGap={SPACING.spacing60}
         padding={SPACING.spacing40}
         backgroundColor={COLORS.red50}
-        zIndex={5}
+        zIndex={Z_INDEX.MODALS}
       >
         <SplashFrame>
           <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>

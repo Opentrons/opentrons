@@ -1,7 +1,10 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
+import {
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '@opentrons/api-client'
 import {
   heater_shaker_commands_with_results_key,
   TEMPERATURE_MODULE_TYPE,
@@ -9,10 +12,6 @@ import {
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
-import {
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
@@ -22,6 +21,7 @@ import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForPro
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
 import type { UseQueryResult } from 'react-query'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -29,7 +29,6 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')
@@ -119,20 +118,22 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       mockTemperatureModuleGen2,
       mockThermocycler,
     ])
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS as unknown as ProtocolAnalysisOutput)
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
     vi.mocked(getProtocolModulesInfo).mockReturnValue([TEMPERATURE_MODULE_INFO])
   })
 
   it('should return no module render info when protocol details not found', () => {
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(null)
-    when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith('1')
+      .thenReturn(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('1', true)
     )

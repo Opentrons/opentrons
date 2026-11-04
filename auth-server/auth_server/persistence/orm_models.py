@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
-from typing import Any, TypeAlias
 
-from sqlalchemy import ForeignKey, String, TypeDecorator, false
+from sqlalchemy import ForeignKey, false
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -14,7 +12,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from server_utils.sql_utils import UTCDateTime
+from server_utils.sql_utils import JsonPythonValue, JsonValue, UTCDateTime
 
 
 class Base(DeclarativeBase):
@@ -37,10 +35,18 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(unique=True)
-    hashed_password: Mapped[str]
+    # Null when the account only has a temporary password (not yet set by the user).
+    hashed_password: Mapped[str | None]
     full_name: Mapped[str]
     account_type: Mapped[str]
+    # A flag that this user must reset their password for reasons other than time-based expiration.
     reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
+    # When the user's current password was set. Used for time-based password expiration.
+    password_set_at: Mapped[datetime]
+    # When true, the account was deactivated by an admin and cannot log in.
+    deactivated: Mapped[bool] = mapped_column(server_default=false(), default=False)
+    # Set when a user gets a one-time password. Placed last to match Alembic ADD COLUMN order.
+    temporary_hashed_password: Mapped[str | None] = mapped_column(nullable=True)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",
@@ -73,36 +79,6 @@ class FailedLogin(Base):
     We don't use this for anything yet, but we're storing it in case we someday want to
     implement time-based lockouts or rate limiting.
     """
-
-
-JsonPythonValue: TypeAlias = (
-    str
-    | int
-    | float
-    | bool
-    | None
-    | list["JsonPythonValue"]
-    | dict[str, "JsonPythonValue"]
-)
-"""The output of `json.dumps()` / the input of `json.loads()`."""
-
-
-class JsonValue(TypeDecorator[object]):
-    """Transparently serializes Python values to/from JSON strings in the DB."""
-
-    impl = String
-    cache_ok = True
-
-    def process_bind_param(self, value: object | None, dialect: Any) -> str | None:
-        """Python → DB: json.dumps before writing."""
-        return json.dumps(value)
-
-    def process_result_value(self, value: str | None, dialect: Any) -> object | None:
-        """DB → Python: json.loads after reading."""
-        if value is not None:
-            result: object = json.loads(value)
-            return result
-        return None
 
 
 class Setting(Base):

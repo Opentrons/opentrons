@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  LegacyStyledText,
   StepMeter,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -11,6 +11,7 @@ import { CardButton } from '/app/molecules/CardButton'
 
 import styles from './networksetupmenu.module.css'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 
 const NetworkSetupOptions = [
@@ -34,7 +35,7 @@ const NetworkSetupOptions = [
   },
 ]
 
-export function NetworkSetupMenu(): JSX.Element {
+export function NetworkSetupMenu(): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
 
   return (
@@ -42,23 +43,23 @@ export function NetworkSetupMenu(): JSX.Element {
       <StepMeter totalSteps={6} currentStep={1} />
       <div className={styles.container}>
         <div className={styles.title_row}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
             {t('choose_network_type')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
         <div className={styles.description_row}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('branded:network_setup_menu_description')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
         <div className={styles.card_button_row}>
           {NetworkSetupOptions.map(networkOption => (

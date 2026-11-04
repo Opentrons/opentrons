@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -41,18 +42,20 @@ describe('TouchTip', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for touch tip aspirate', () => {
+  it('renders text, buttons for touch tip aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Touch tip after aspirating')
     screen.getByText('Save')
     screen.getByText('Touch tip to each side of the well after aspirating')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons for touch tip dispense', () => {
+  it('renders text, buttons for touch tip dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
     screen.getByText('Touch tip after dispensing')
@@ -60,14 +63,15 @@ describe('TouchTip', () => {
     screen.getByText('Touch tip to each side of the well after dispensing')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Enabled'))
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons for touch tip speed - aspirate', () => {
+  it('renders text, buttons for touch tip speed - aspirate', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Speed (mm/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
@@ -76,57 +80,60 @@ describe('TouchTip', () => {
     screen.getByText('Continue')
   })
 
-  it('renders text, buttons, input field, and keyboard for touch tip - aspirate', () => {
+  it('renders text, buttons, input field, and keyboard for touch tip - aspirate', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Speed (mm/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
   })
 
-  it('renders text, buttons, input field, and keyboard for touch tip position- aspirate', () => {
+  it('renders text, buttons, input field, and keyboard for touch tip position- aspirate', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Speed (mm/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Touch tip position from top of well (mm)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '0' }))
   })
 
-  it('should call dispatch when clicking save button - aspirate', () => {
+  it('should call dispatch when clicking save button - aspirate', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Speed (mm/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Touch tip position from top of well (mm)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_TOUCH_TIP_ASPIRATE',
       position: 0,
@@ -140,25 +147,26 @@ describe('TouchTip', () => {
     })
   })
 
-  it('should call dispatch when clicking save button - dispense', () => {
+  it('should call dispatch when clicking save button - dispense', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Speed (mm/second)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Touch tip position from top of well (mm)')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_TOUCH_TIP_DISPENSE',
       position: 0,
@@ -172,9 +180,10 @@ describe('TouchTip', () => {
     })
   })
 
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useClientData } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../../useNotifyDataReady'
@@ -14,7 +16,7 @@ export function useNotifyClientDataRecovery(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataRecovery>, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.ERROR_RECOVERY}`,
     options,
   })
@@ -23,10 +25,13 @@ export function useNotifyClientDataRecovery(
     KEYS.ERROR_RECOVERY,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

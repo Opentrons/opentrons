@@ -224,7 +224,7 @@ def _check_pair_compatibility(
             if not isinstance(item1, wrapped_deck_conflict.FlexStackerModule)
             else item2
         )
-        # type-only assertion: trash bins are not alowed in _check_pair_compat_once and
+        # type-only assertion: trash bins are not allowed in _check_pair_compat_once and
         # so we would never get here
         assert not isinstance(not_stacker, wrapped_deck_conflict.TrashBin)
         return wrapped_deck_conflict.FlexStackerModuleKindaButSomethingElseReally(

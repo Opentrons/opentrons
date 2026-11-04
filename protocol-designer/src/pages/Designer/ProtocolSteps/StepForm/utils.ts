@@ -77,6 +77,27 @@ export function getBlowoutLocationOptionsForForm(args: {
 
   return []
 }
+
+export interface BlowoutLabwareDetails {
+  isBlowoutLocationLabware: boolean
+  blowOutLabwareId: string | null
+}
+
+export function getBlowoutLabwareDetails(
+  propsForFields: FieldPropsByName
+): BlowoutLabwareDetails {
+  const blowoutLocation = propsForFields.blowout_location.value ?? null
+  const isBlowoutLocationSource =
+    blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationDestination =
+    blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationLabware =
+    isBlowoutLocationSource || isBlowoutLocationDestination
+  const blowOutLabwareId = isBlowoutLocationSource
+    ? (propsForFields.aspirate_labware.value as string)
+    : ((propsForFields.dispense_labware.value as string) ?? null)
+  return { isBlowoutLocationLabware, blowOutLabwareId }
+}
 // TODO: type fieldNames, don't use `string`
 export const getDirtyFields = (
   isNewStep: boolean,

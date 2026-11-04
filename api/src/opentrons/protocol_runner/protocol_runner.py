@@ -59,7 +59,7 @@ from opentrons.util.broker import Broker
 
 
 class RunResult(BaseModel):
-    """Result data from a run, pulled from the ProtocolEngine."""
+    """Result data from a run, pulled from the ProtocolEngine, including the commands list and command annotations list."""
 
     commands: List[Command]
     state_summary: StateSummary
@@ -67,6 +67,14 @@ class RunResult(BaseModel):
     command_annotations: List[
         CommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
+    command_preconditions: Optional[CommandPreconditions]
+
+
+class EngineRunResult(BaseModel):
+    """Result data from a run, pulled from the ProtocolEngine, without large list set of commands."""
+
+    state_summary: StateSummary
+    parameters: List[RunTimeParameter]
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -150,7 +158,7 @@ class AbstractRunner(ABC):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Run a given protocol to completion."""
 
 
@@ -276,7 +284,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests & protocol analyzer
         if protocol_source:
@@ -292,19 +300,13 @@ class PythonAndLegacyRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
-        command_annotations = (
-            self._protocol_engine.state_view.commands.get_all_command_annotations()
-        )
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=parameters,
-            command_annotations=command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -438,7 +440,7 @@ class JsonRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
@@ -449,15 +451,12 @@ class JsonRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=[],
-            command_annotations=self._command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -521,7 +520,7 @@ class LiveRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         assert protocol_source is None
         await self._hardware_api.home()
         self.play(deck_configuration=deck_configuration)
@@ -529,15 +528,12 @@ class LiveRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=[],
-            command_annotations=[],
             command_preconditions=preconditions,
         )
 

@@ -30,7 +30,7 @@ Complex liquid handling commands combine multiple [building block commands](../b
     </tr>
 </table>
 
-The legacy complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the *liquid class definition* to account for liquid properties like viscosity. For more information, see [Liquid Classes](../liquid-classes.md).
+The legacy complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the *liquid class definition* to account for liquid properties like viscosity. For more information, see [Liquid Classes](../liquid-classes/index.md).
 
 Pages in this section of the documentation cover:
 

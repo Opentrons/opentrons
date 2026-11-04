@@ -9,10 +9,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   truncateString,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 const FILE_UPLOAD_STYLE = css`
 &:hover > svg {
@@ -40,7 +42,7 @@ export function FileUpload({
   file,
   fileError,
   handleClick,
-}: FileUploadProps): JSX.Element {
+}: FileUploadProps): ReactNode {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Btn
@@ -57,16 +59,16 @@ export function FileUpload({
           padding={SPACING.spacing8}
           css={FILE_UPLOAD_STYLE}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {truncateString(file.name, 34, 19)}
-          </LegacyStyledText>
+          </StyledText>
           <Icon name="close" size="1.5rem" borderRadius="50%" />
         </Flex>
       </Btn>
       {fileError != null ? (
-        <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+        <StyledText forwardedAs="label" color={COLORS.red50}>
           {fileError}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
     </Flex>
   )

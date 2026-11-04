@@ -15,12 +15,15 @@ from sqlalchemy import and_
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandIntent,
-    CommandSlice,
     CommandStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.types import CommandAnnotation, RunTimeParameter
 from opentrons.util.helpers import utc_now
@@ -71,6 +74,8 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+    signed_by: Optional[str]
+    log_period_id: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -91,6 +96,8 @@ class BadRunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+    signed_by: Optional[str]
+    log_period_id: Optional[str]
     error: EnumeratedError
 
 
@@ -135,12 +142,20 @@ class RunStore:
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._run_store_provider = CommandStoreProvider(
+            run_id=None,
+            store_insert_batch_commands=self.insert_batch_commands,
+        )
+
+    def get_run_store_provider(self) -> CommandStoreProvider:
+        """Get the CommandStoreProvider created by the RunStore."""
+        return self._run_store_provider
 
     def update_run_state(
         self,
         run_id: str,
         summary: StateSummary,
-        commands: List[Command],
+        commands: Optional[List[Command]],
         command_annotations: List[CommandAnnotation],
         run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
@@ -200,8 +215,9 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id)
 
             transaction.execute(update_run)
-            transaction.execute(delete_existing_command_annotations_mapping)
-            transaction.execute(delete_existing_commands)
+            if commands is not None:
+                transaction.execute(delete_existing_command_annotations_mapping)
+                transaction.execute(delete_existing_commands)
             transaction.execute(delete_existing_command_annotations)
             for command_annotation in command_annotations:
                 transaction.execute(
@@ -210,34 +226,35 @@ class RunStore:
                         run_id, command_annotation
                     ),
                 )
-            for command_index, command in enumerate(commands):
-                transaction.execute(
-                    insert_command,
-                    {
-                        "run_id": run_id,
-                        "index_in_run": command_index,
-                        "command_id": command.id,
-                        "command": pydantic_to_json(command),
-                        "command_intent": str(command.intent.value)
-                        if command.intent
-                        else CommandIntent.PROTOCOL,
-                        "command_error": pydantic_to_json(command.error)
-                        if command.error
-                        else None,
-                        "command_status": _convert_commands_status_to_sql_command_status(
-                            command.status
-                        ),
-                    },
-                )
-                for annotation_id in command.commandAnnotationIds:
+            if commands is not None:
+                for command_index, command in enumerate(commands):
                     transaction.execute(
-                        insert_command_annotation_mapping,
+                        insert_command,
                         {
                             "run_id": run_id,
+                            "index_in_run": command_index,
                             "command_id": command.id,
-                            "annotation_id": annotation_id,
+                            "command": pydantic_to_json(command),
+                            "command_intent": str(command.intent.value)
+                            if command.intent
+                            else CommandIntent.PROTOCOL,
+                            "command_error": pydantic_to_json(command.error)
+                            if command.error
+                            else None,
+                            "command_status": _convert_commands_status_to_sql_command_status(
+                                command.status
+                            ),
                         },
                     )
+                    for annotation_id in command.commandAnnotationIds:
+                        transaction.execute(
+                            insert_command_annotation_mapping,
+                            {
+                                "run_id": run_id,
+                                "command_id": command.id,
+                                "annotation_id": annotation_id,
+                            },
+                        )
 
             run_row = transaction.execute(select_run_resource).one()
             action_rows = transaction.execute(select_actions).all()
@@ -266,6 +283,29 @@ class RunStore:
             if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
             transaction.execute(insert)
+
+        self._clear_caches()
+
+    def set_signed_by(self, run_id: str, signed_by: str) -> None:
+        """Set the signed_by value for a run.
+
+        Args:
+            run_id: The run to update.
+            signed_by: Signature of the user who reviewed the run.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found in the store.
+        """
+        update = (
+            sqlalchemy.update(run_table)
+            .where(run_table.c.id == run_id)
+            .values(signed_by=signed_by)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            transaction.execute(update)
 
         self._clear_caches()
 
@@ -307,6 +347,7 @@ class RunStore:
         run_id: str,
         created_at: datetime,
         protocol_id: Optional[str],
+        log_period_id: Optional[str],
     ) -> RunResource:
         """Insert run resource in the db.
 
@@ -314,6 +355,7 @@ class RunStore:
             run_id: Unique identifier to use for the run.
             created_at: Run creation timestamp.
             protocol_id: Protocol resource used by the run, if any.
+            log_period_id: The log period this run is associated with, if any
 
         Returns:
             The resource that was added to the store.
@@ -328,6 +370,8 @@ class RunStore:
             created_at=created_at,
             protocol_id=protocol_id,
             actions=[],
+            signed_by=None,
+            log_period_id=log_period_id,
         )
         insert = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
@@ -492,7 +536,7 @@ class RunStore:
         length: int,
         cursor: Optional[int],
         include_fixit_commands: bool,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands from the store.
 
         Args:
@@ -557,11 +601,9 @@ class RunStore:
                 )
             slice_result = transaction.execute(select_slice).all()
 
-        sliced_commands: List[Command] = [
-            _parse_command(row.command) for row in slice_result
-        ]
+        sliced_commands: List[str] = [row.command for row in slice_result]
 
-        return CommandSlice(
+        return JsonCommandSlice(
             cursor=actual_cursor,
             total_length=count_result,
             commands=sliced_commands,
@@ -693,6 +735,56 @@ class RunStore:
             total_length=count_result,
             commands_errors=sliced_commands,
         )
+
+    async def insert_batch_commands(
+        self, run_id: str, batch_commands: list[tuple[int, str]]
+    ) -> None:
+        """Insert or update commands on the run command table.
+
+        Args:
+            run_id: The run id these commands belong to.
+            batch_commands: Commands to insert into persistence, paired by index and Command.
+        """
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            for index, command in batch_commands:
+                command_dict = json.loads(command)
+                select_existing_index = sqlalchemy.select(
+                    run_command_table.c.index_in_run
+                ).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command_dict["id"],
+                )
+                insert_command = sqlalchemy.insert(run_command_table)
+                existing_index = transaction.execute(
+                    select_existing_index
+                ).scalar_one_or_none()
+                delete_existing_command = sqlalchemy.delete(run_command_table).where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.command_id == command_dict["id"],
+                )
+                if existing_index is not None:
+                    index = existing_index
+                    transaction.execute(delete_existing_command)
+                transaction.execute(
+                    insert_command,
+                    {
+                        "run_id": run_id,
+                        "index_in_run": index,
+                        "command_id": command_dict["id"],
+                        "command": command,
+                        "command_intent": command_dict.get("intent")
+                        if command_dict.get("intent")
+                        else CommandIntent.PROTOCOL,
+                        "command_error": json.dumps(command_dict.get("error"))
+                        if command_dict.get("error")
+                        else None,
+                        "command_status": _convert_commands_status_to_sql_command_status(
+                            command_dict["status"]
+                        ),
+                    },
+                )
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
@@ -880,7 +972,13 @@ class RunStore:
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
-_run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
+_run_columns = [
+    run_table.c.id,
+    run_table.c.protocol_id,
+    run_table.c.created_at,
+    run_table.c.signed_by,
+    run_table.c.log_period_id,
+]
 
 
 def _convert_row_to_csv_rtp(
@@ -906,6 +1004,8 @@ def _convert_row_to_run(
     run_id = row.id
     protocol_id = row.protocol_id
     created_at = row.created_at
+    signed_by = row.signed_by
+    log_period_id = row.log_period_id
     # Checking the fundamental data types here are not covered by the error handling
     # because if they fire, the only thing we can do to address the issue is immediately
     # delete the row while we still have a handle on it from sql - we won't have any
@@ -914,6 +1014,12 @@ def _convert_row_to_run(
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(protocol_id, str), (
         f"Protocol ID {protocol_id} is not a string or None"
+    )
+    assert signed_by is None or isinstance(signed_by, str), (
+        f"signed_by {signed_by} is not a string or None"
+    )
+    assert log_period_id is None or isinstance(log_period_id, str), (
+        f"log_period_id {log_period_id} is not a string or None"
     )
     try:
         actions = [
@@ -932,11 +1038,13 @@ def _convert_row_to_run(
             created_at=created_at,
             protocol_id=protocol_id,
             actions=[],
+            signed_by=signed_by,
             error=InvalidStoredData(
                 message="This run has invalid or unknown actions. It has likely been saved in a future version of software.",
                 detail={"kind": "bad-actions"},
                 wrapping=[PythonException(be)],
             ),
+            log_period_id=log_period_id,
         )
 
     return RunResource(
@@ -945,6 +1053,8 @@ def _convert_row_to_run(
         created_at=created_at,
         protocol_id=protocol_id,
         actions=actions,
+        signed_by=signed_by,
+        log_period_id=log_period_id,
     )
 
 
@@ -953,6 +1063,8 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
         "id": run.run_id,
         "created_at": run.created_at,
         "protocol_id": run.protocol_id,
+        "signed_by": run.signed_by,
+        "log_period_id": run.log_period_id,
     }
 
 

@@ -1,7 +1,22 @@
+import type { AxiosError } from 'axios'
+import type { AuthUserAccountType } from '@opentrons/api-client'
 import type {
   DocumentationReport,
   DocumentationState,
 } from '@opentrons/react-api-client'
+
+const UPDATES_WRITE_SCOPE = 'updates.write'
+
+const MAX_ERROR_DETAIL_LENGTH = 255
+
+const RUN_SIGNOFF_REQUIRED = 'RunSignoffRequired'
+
+/** Admin and service accounts share the same privileged robot permissions. */
+export function isAdminEquivalentAccountType(
+  accountType: AuthUserAccountType | undefined
+): boolean {
+  return accountType === 'admin' || accountType === 'service'
+}
 
 export function isDocumentationReportValid(
   docreport: DocumentationReport,
@@ -16,8 +31,86 @@ export function isDocumentationProvided(state: DocumentationState): boolean {
   if (state.isLoading) {
     return false
   }
+  if (!state.accessControlEnabled) {
+    return true
+  }
   if (!state.reasonForInteractionRequired) {
     return true
   }
   return state.docreport != null && state.docreport.length > 0
+}
+
+export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
+  isLoading: false,
+  accessControlEnabled: false,
+}
+
+export function isForbiddenError(error: unknown): error is AxiosError {
+  return isAxiosError(error) && error.response?.status === 403
+}
+
+/**
+ * True for a 403 from the robot's authorization layer, i.e. the logged-in
+ * account lacks a required scope. Other 403s (e.g. action forbidden while a
+ * run is active) do not include requiredScopes.
+ */
+export function isInsufficientScopeError(error: unknown): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes)
+}
+
+export function isRunSignoffRequiredError(error: unknown): boolean {
+  if (!isAxiosError(error)) {
+    return false
+  }
+  const errorId = (
+    error.response?.data as { errors?: Array<{ id?: unknown }> } | undefined
+  )?.errors?.[0]?.id
+  return errorId === RUN_SIGNOFF_REQUIRED
+}
+
+export function isUpdatesWritePermissionError(error: unknown): boolean {
+  return isForbiddenMissingScope(error, UPDATES_WRITE_SCOPE)
+}
+
+export function getProtocolOrRunCreationErrorMessage(
+  error: unknown,
+  generalErrorMessage: string
+): string {
+  if (isAxiosError(error)) {
+    const detail = (
+      error.response?.data as
+        { errors?: Array<{ detail?: unknown }> } | undefined
+    )?.errors?.[0]?.detail
+    if (typeof detail === 'string' && detail.length > 0) {
+      return detail.length > MAX_ERROR_DETAIL_LENGTH
+        ? generalErrorMessage
+        : detail
+    }
+  }
+  return generalErrorMessage
+}
+
+function isForbiddenMissingScope(error: unknown, scope: string): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes) && requiredScopes.includes(scope)
+}
+
+function isAxiosError(error: unknown): error is AxiosError {
+  return (
+    typeof error === 'object' &&
+    error != null &&
+    'isAxiosError' in error &&
+    error.isAxiosError === true
+  )
 }

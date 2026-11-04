@@ -4,6 +4,8 @@ import debounce from 'lodash/debounce'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
+import { useCoalescedJogAudit } from '/app/local-resources/access-control/useCoalescedJogAudit'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
 import { moveRelativeCommand, moveToWellCommands } from './commands'
@@ -25,6 +27,7 @@ const DEBOUNCE_TIME_MS = 50
 
 interface UseHandleJogProps extends UseLPCCommandWithChainRunChildProps {
   setErrorMessage: (msg: string | null) => void
+  setIsDoorOpenError: (isDoorOpenError: boolean) => void
 }
 
 export interface UseHandleJogResult {
@@ -34,6 +37,7 @@ export interface UseHandleJogResult {
     pipetteId: string,
     offset?: VectorOffset | null
   ) => Promise<void>
+  flushJogAudit: () => void
 }
 
 // TODO(jh, 01-21-25): Extract the throttling logic into its own hook that lives elsewhere and is used by other Jog flows.
@@ -42,6 +46,7 @@ export function useHandleJog({
   runId,
   maintenanceRunId,
   setErrorMessage,
+  setIsDoorOpenError,
   chainLPCCommands,
   commandDocState,
   actionsToDocument,
@@ -49,6 +54,11 @@ export function useHandleJog({
 }: UseHandleJogProps): UseHandleJogResult {
   const pipette = useSelector(selectActivePipette(runId))
   const pipetteId = pipette?.id
+  const {
+    recordJog,
+    reset: resetJogAudit,
+    flush: flushJogAudit,
+  } = useCoalescedJogAudit(commandDocState, addActionToDocument)
   const { createMaintenanceCommand: createSilentCommand } =
     useCreateMaintenanceCommandMutation(
       commandDocState,
@@ -89,10 +99,15 @@ export function useHandleJog({
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
         .then(data => {
+          recordJog(axis, dir, step)
           onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
-          setErrorMessage(`Error issuing jog command: ${e.message}`)
+          if (isMaintenanceDoorOpenError(e)) {
+            setIsDoorOpenError(true)
+          } else {
+            setErrorMessage(`Error issuing jog command: ${e.message}`)
+          }
         })
         .finally(() => {
           processingRef.current = false
@@ -112,7 +127,14 @@ export function useHandleJog({
         processNextInQueue()
       }, DEBOUNCE_TIME_MS)
     }
-  }, [pipetteId, maintenanceRunId, createSilentCommand, setErrorMessage])
+  }, [
+    pipetteId,
+    maintenanceRunId,
+    createSilentCommand,
+    setErrorMessage,
+    setIsDoorOpenError,
+    recordJog,
+  ])
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,6 +178,7 @@ export function useHandleJog({
       offset?: VectorOffset | null
     ): Promise<void> => {
       queueRef.current = []
+      resetJogAudit()
 
       const resetJogCommands = [
         ...moveToWellCommands(offsetLocationDetails, pipetteId, offset),
@@ -165,8 +188,8 @@ export function useHandleJog({
         Promise.resolve()
       )
     },
-    [chainLPCCommands]
+    [chainLPCCommands, resetJogAudit]
   )
 
-  return { handleJog, resetJog }
+  return { handleJog, resetJog, flushJogAudit }
 }

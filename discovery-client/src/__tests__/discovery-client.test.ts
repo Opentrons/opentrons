@@ -399,4 +399,51 @@ describe('discovery client', () => {
     expect(onListChange).toHaveBeenCalledTimes(1)
     expect(onListChange).toHaveBeenCalledWith([])
   })
+
+  it('should rename a robot without dropping its addresses', () => {
+    const client = createDiscoveryClient({ onListChange, logger })
+    const initialRobots = [
+      {
+        name: 'opentrons-dev',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+        addresses: [
+          {
+            ip: 'fd00:0:cafe:fefe::1',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: null,
+          },
+          {
+            ip: 'opentrons-usb',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: null,
+          },
+        ],
+      },
+    ]
+
+    client.start({ initialRobots })
+    client.renameRobot('opentrons-dev', 'new-name')
+
+    expect(onListChange).toHaveBeenCalledTimes(1)
+    expect(onListChange).toHaveBeenCalledWith([
+      expect.objectContaining({
+        name: 'new-name',
+        addresses: [
+          expect.objectContaining({ ip: 'fd00:0:cafe:fefe::1' }),
+          expect.objectContaining({ ip: 'opentrons-usb' }),
+        ],
+      }),
+    ])
+  })
 })

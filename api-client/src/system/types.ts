@@ -16,3 +16,25 @@ export type CreateRegistrationParams = Registrant
 export interface ActiveConnections {
   connections: Registrant[]
 }
+
+export interface SystemTimeData {
+  id: 'time'
+  systemTime: string
+}
+
+export interface SystemTimeResponse {
+  data: SystemTimeData
+  links?: { self?: { href: string } }
+}
+
+export interface SystemTimeRequest {
+  data: {
+    systemTime: string
+  }
+}
+
+export type LogLevels = 'debug' | 'info' | 'warning' | 'error'
+
+export interface LogLevelPayload {
+  log_level: LogLevels
+}

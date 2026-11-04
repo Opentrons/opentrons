@@ -1,13 +1,14 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -15,12 +16,17 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
-import { useRunTimeParameters } from '/app/resources/protocols'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
+import {
+  useEnsureProtocolAnalysis,
+  useRunTimeParameters,
+} from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
@@ -29,6 +35,7 @@ import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
+import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal'
 
 import type { HostConfig } from '@opentrons/api-client'
 
@@ -49,9 +56,25 @@ vi.mock('../Labware')
 vi.mock('../Parameters')
 vi.mock('/app/redux/config')
 vi.mock('/app/local-resources/dom-utils')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
+vi.mock('../RobotOutOfStorageModal')
+vi.mock('/app/resources/devices')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
+const mockDeleteProtocol = vi.fn()
+const mockDeleteRun = vi.fn()
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',
@@ -71,6 +94,11 @@ const MOCK_DATA = {
   },
 }
 
+const MOCK_COMPLETED_ANALYSIS = {
+  id: 'mockAnalysisId',
+  status: 'completed',
+}
+
 const render = (path = '/protocols/fakeProtocolId') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -86,10 +114,18 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
-    when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
+    vi.when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: mockDeleteProtocol,
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
+    } as any)
+    mockDeleteProtocol.mockResolvedValue(undefined)
+    mockDeleteRun.mockResolvedValue(undefined)
     vi.mocked(useHardwareStatusText).mockReturnValue(
       'mock missing hardware chip text'
     )
@@ -99,17 +135,20 @@ describe('ODDProtocolDetails', () => {
       isLoading: false,
       conflictedSlots: [],
     })
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: MOCK_COMPLETED_ANALYSIS as any,
+      analysisId: MOCK_COMPLETED_ANALYSIS.id,
+      isAnalyzing: false,
+      protocolRecord: MOCK_DATA as any,
+    })
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,
     } as any)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
-      },
+      data: MOCK_COMPLETED_ANALYSIS,
     } as any)
-    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(getProtocol).mockResolvedValue({
       data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
     } as any)
@@ -163,7 +202,7 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('renders the delete protocol button', async () => {
-    when(vi.mocked(getProtocol))
+    vi.when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
       .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
@@ -174,16 +213,13 @@ describe('ODDProtocolDetails', () => {
     const confirmDeleteButton = screen.getByText('Delete')
     fireEvent.click(confirmDeleteButton)
     await waitFor(() =>
-      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+      expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '1' })
     )
     await waitFor(() =>
-      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+      expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '2' })
     )
     await waitFor(() =>
-      expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
-        MOCK_HOST_CONFIG,
-        'fakeProtocolId'
-      )
+      expect(mockDeleteProtocol).toHaveBeenCalledWith('fakeProtocolId')
     )
   })
 
@@ -213,16 +249,18 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('should render a loading skeleton while awaiting a response from the server', () => {
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: MOCK_DATA,
-      isLoading: true,
-    } as any)
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: null,
+      analysisId: null,
+      isAnalyzing: true,
+      protocolRecord: MOCK_DATA as any,
+    })
     render()
-    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
   })
 
   it('renders the parameters screen', () => {
-    when(useRunTimeParameters)
+    vi.when(useRunTimeParameters)
       .calledWith('fakeProtocolId')
       .thenReturn(mockRunTimeParameterData)
     render()
@@ -231,25 +269,81 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('render chip about modules when missing a hardware', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
-      },
-    } as any)
     render()
     screen.getByText('mock missing hardware chip text')
   })
 
   it('render requires csv text when a csv file is required', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: {
-        id: 'mockAnalysisId',
-        status: 'completed',
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: {
+        ...MOCK_COMPLETED_ANALYSIS,
         result: 'parameter-value-required',
-      },
-    } as any)
+      } as any,
+      analysisId: MOCK_COMPLETED_ANALYSIS.id,
+      isAnalyzing: false,
+      protocolRecord: MOCK_DATA as any,
+    })
     render()
     screen.getByText('mock missing hardware chip text & requires CSV')
+  })
+
+  it('renders RobotOutOfStorageModal on Start Setup click if robot storage is full', () => {
+    vi.mocked(useIsRobotOutOfStorage).mockReturnValue(true)
+    vi.mocked(RobotOutOfStorageModal).mockReturnValue(
+      <div>mockRobotOutOfStorageModal</div>
+    )
+    render()
+    const startSetupButton = screen.getByRole('button', { name: 'Start setup' })
+    fireEvent.click(startSetupButton)
+    screen.getByText('mockRobotOutOfStorageModal')
+  })
+
+  it('disables start setup and does not create a run while analysis is missing', () => {
+    vi.mocked(useEnsureProtocolAnalysis).mockReturnValue({
+      analysis: null,
+      analysisId: null,
+      isAnalyzing: true,
+      protocolRecord: MOCK_DATA as any,
+    })
+    render()
+    const startSetupButton = screen.getByRole('button', {
+      name: /Start setup/i,
+    })
+    expect(startSetupButton).toBeDisabled()
+    fireEvent.click(startSetupButton)
+    expect(mockCreateRun).not.toHaveBeenCalled()
+  })
+
+  it('creates a run when start setup is clicked and analysis is complete', () => {
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      { protocolId: 'fakeProtocolId' },
+      expect.objectContaining({ onError: expect.any(Function) })
+    )
+  })
+
+  it('shows a spinner while creating a run from start setup', () => {
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    screen.getByLabelText('loading indicator')
+  })
+
+  it('clears the start setup spinner if creating a run fails', async () => {
+    let onError: ((error: unknown) => void) | undefined
+    mockCreateRun.mockImplementation(
+      (_vars: unknown, options?: { onError?: (error: unknown) => void }) => {
+        onError = options?.onError
+      }
+    )
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Start setup' }))
+    screen.getByLabelText('loading indicator')
+    onError?.(new Error('failed'))
+    await waitFor(() => {
+      expect(
+        screen.queryByLabelText('loading indicator')
+      ).not.toBeInTheDocument()
+    })
   })
 })

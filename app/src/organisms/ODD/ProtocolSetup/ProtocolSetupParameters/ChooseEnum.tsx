@@ -4,15 +4,13 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-
-import { useToaster } from '../../../ToasterOven'
 
 import type { ChoiceParameter } from '@opentrons/shared-data'
 
@@ -29,14 +27,11 @@ export function ChooseEnum({
   setParameter,
   rawValue,
 }: ChooseEnumProps): JSX.Element | null {
-  const { makeSnackbar } = useToaster()
-
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const options = 'choices' in parameter ? parameter.choices : null
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
   }
-  const resetValueDisabled = parameter.default === rawValue
 
   return (
     <>
@@ -46,9 +41,7 @@ export function ChooseEnum({
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
-          resetValueDisabled
-            ? makeSnackbar(t('no_custom_values') as string)
-            : setParameter(parameter.default, parameter.variableName)
+          setParameter(parameter.default, parameter.variableName)
         }}
       />
       <Flex
@@ -59,13 +52,13 @@ export function ChooseEnum({
         flexDirection={DIRECTION_COLUMN}
         paddingBottom={SPACING.spacing40}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h4"
           textAlign={TYPOGRAPHY.textAlignLeft}
           marginBottom={SPACING.spacing16}
         >
           {parameter.description}
-        </LegacyStyledText>
+        </StyledText>
 
         {options?.map(option => {
           return (

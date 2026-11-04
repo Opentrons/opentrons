@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createLiveCommand } from '@opentrons/api-client'
 
 import { mockAnonLoadCommand } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
 
@@ -33,9 +34,16 @@ describe('useCreateLiveCommandMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateLiveCommandMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          []
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -53,9 +61,16 @@ describe('useCreateLiveCommandMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateLiveCommandMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          []
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {

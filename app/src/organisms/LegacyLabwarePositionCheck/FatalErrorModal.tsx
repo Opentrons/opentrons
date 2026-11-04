@@ -11,11 +11,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
@@ -24,6 +24,8 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { i18n } from '/app/i18n'
+
+import type { ReactElement, ReactNode } from 'react'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {
@@ -36,7 +38,7 @@ interface FatalErrorModalProps extends FatalErrorProps {
   isOnDevice: boolean
 }
 
-export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
+export function FatalErrorModal(props: FatalErrorModalProps): ReactElement {
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   const { onClose, isOnDevice } = props
   return createPortal(
@@ -65,7 +67,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   )
 }
 
-export function FatalError(props: FatalErrorProps): JSX.Element {
+export function FatalError(props: FatalErrorProps): ReactNode {
   const { errorMessage, shouldUseMetalProbe, onClose } = props
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
   return (
@@ -86,19 +88,19 @@ export function FatalError(props: FatalErrorProps): JSX.Element {
         {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
       </ErrorHeader>
       {shouldUseMetalProbe ? (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textAlign={TEXT_ALIGN_CENTER}
         >
           {t('remove_probe_before_exit')}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
-      <LegacyStyledText forwardedAs="p" textAlign={TEXT_ALIGN_CENTER}>
+      <StyledText forwardedAs="p" textAlign={TEXT_ALIGN_CENTER}>
         {t('branded:help_us_improve_send_error_report', {
           support_email: SUPPORT_EMAIL,
         })}
-      </LegacyStyledText>
+      </StyledText>
       <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
       <PrimaryButton
         textTransform={TEXT_TRANSFORM_CAPITALIZE}

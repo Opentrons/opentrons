@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import { css } from 'styled-components'
@@ -13,14 +13,14 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Tooltip,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -42,6 +42,7 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
+  getFlexStackerPrepActions,
   getFlexStackerPrepCommands,
   getModuleImage,
   useModuleUSBPort,
@@ -63,7 +64,8 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData } from '@opentrons/api-client'
+import type { ReactNode } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -71,8 +73,6 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules'
-import type { AttachedModule } from '/app/redux/modules/types'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,
@@ -84,7 +84,7 @@ interface SetupModulesListProps {
   runId: string
 }
 
-export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
+export const SetupModulesList = (props: SetupModulesListProps): ReactNode => {
   const { robotName, runId, deckConfigCompatibility } = props
   const moduleRenderInfoForProtocolById =
     useModuleRenderInfoForProtocolById(runId)
@@ -96,7 +96,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { chainLiveCommands } = useChainLiveCommands()
 
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
@@ -148,10 +147,10 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                   heaterShakerModuleFromProtocol={null}
                   isFlex={isFlex}
                   calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
                   conflictedFixture={comboFixtureConflict}
                   deckDef={deckDef}
                   robotName={robotName}
+                  runId={runId}
                   comboFixtureId={comboFixtureId}
                 />
               )
@@ -176,10 +175,10 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               }
               isFlex={isFlex}
               calibrationStatus={calibrationStatus}
-              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture != null}
               deckDef={deckDef}
               robotName={robotName}
+              runId={runId}
             />
           )
         }
@@ -197,13 +196,10 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
-    continuePastCommandFailure: boolean
-  ) => Promise<CommandData[]>
   deckDef: DeckDefinition
   conflictedFixture: boolean
   robotName: string
+  runId: string
   comboFixtureId?: CutoutFixtureId
 }
 
@@ -215,18 +211,17 @@ export function ModulesListItem({
   attachedModuleMatch,
   isFlex,
   calibrationStatus,
-  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
+  runId,
   comboFixtureId,
-}: ModulesListItemProps): JSX.Element {
+}: ModulesListItemProps): ReactNode {
   const { t } = useTranslation([
     'protocol_setup',
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -239,12 +234,19 @@ export function ModulesListItem({
 
   const { parseModuleUSBPort } = useModuleUSBPort()
 
+  // NOTE (jj 9/4/26): chainLiveCommands is only used here to home this row's Flex Stacker.
+  // If it is ever used to send other commands, this will need updating.
+  const actionsToDocument = useMemo(
+    () => getFlexStackerPrepActions([attachedModuleMatch]),
+    [attachedModuleMatch]
+  )
+  const { chainLiveCommands } = useChainLiveCommands(actionsToDocument, runId)
+
   const handleSetupModuleClick = (): void => {
     if (attachedModuleMatch !== null) {
       handleModuleWizardFlows({
         attachedModule: attachedModuleMatch,
         robotName,
-        host,
       })
     }
   }
@@ -255,7 +257,11 @@ export function ModulesListItem({
         getFlexStackerPrepCommands(attachedModuleMatch),
         // if the close latch command fails, we still want to home the shuttle
         true
-      )
+      ).catch(error => {
+        if (!isDocumentedMutationError(error)) {
+          console.error(`error homing stacker: ${String(error)}`)
+        }
+      })
     }
   }
 
@@ -284,21 +290,21 @@ export function ModulesListItem({
         }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('view_setup_instructions')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Btn>
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         marginLeft={SPACING.spacing20}
         color={COLORS.grey50}
       >
         {t('no_usb_connection_required')}
-      </LegacyStyledText>
+      </StyledText>
     )
   }
 
@@ -447,12 +453,13 @@ export function ModulesListItem({
               alt={`Image of a ${fixtureDisplayName}`}
             />
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing20}
               >
                 {fixtureDisplayName}
-              </LegacyStyledText>
+              </StyledText>
               {subText}
             </Flex>
           </Flex>
@@ -461,11 +468,11 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               {getModuleDeckLabel(moduleType, slotName)}
-            </LegacyStyledText>
+            </StyledText>
             {portDisplay != null ? (
-              <LegacyStyledText forwardedAs="p">{portDisplay}</LegacyStyledText>
+              <StyledText forwardedAs="p">{portDisplay}</StyledText>
             ) : null}
           </Flex>
           <Flex
@@ -490,9 +497,9 @@ export function ModulesListItem({
                     setShowLocationConflictModal(true)
                   }}
                 >
-                  <LegacyStyledText forwardedAs="label" cursor="pointer">
+                  <StyledText forwardedAs="label" cursor="pointer">
                     {t('resolve')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (

@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import styled from 'styled-components'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Box,
@@ -16,15 +15,19 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getQueryKey,
+  isDocumentedMutationError,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeleteProtocolConfirmationModalProps {
@@ -35,7 +38,7 @@ interface DeleteProtocolConfirmationModalProps {
 export function DeleteProtocolConfirmationModal({
   protocolId,
   setShowDeleteConfirmationModal,
-}: DeleteProtocolConfirmationModalProps): JSX.Element {
+}: DeleteProtocolConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = useState<boolean>(false)
@@ -45,7 +48,12 @@ export function DeleteProtocolConfirmationModal({
     iconColor: COLORS.yellow50,
   }
   const host = useHost()
-  const queryClient = useQueryClient()
+  const { documentationState } = useLinkedDocumentationState(
+    ['delete_protocol', 'delete_runs'],
+    protocolId
+  )
+  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
+  const { deleteRun } = useDeleteRunMutation(documentationState)
   const { data: protocolRecord } = useProtocolQuery(protocolId)
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
@@ -64,23 +72,22 @@ export function DeleteProtocolConfirmationModal({
         )
         .then(referencingRunIds => {
           return Promise.all(
-            referencingRunIds?.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun({ runId }))
           )
         })
-        .then(() => deleteProtocol(host, protocolId))
-        .then(() =>
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'protocols'))
-            .catch((e: Error) => {
-              console.error(`error invalidating runs query: ${e.message}`)
-            })
-        )
+        .then(() => {
+          return deleteProtocol(protocolId)
+        })
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
           makeSnackbar(t('protocol_deleted') as string)
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            setShowIcon(false)
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {

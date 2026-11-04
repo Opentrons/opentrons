@@ -97,9 +97,7 @@ interface TipPickUpOffsetAction {
   offset: VectorOffset | null
 }
 export type RegisterPositionAction =
-  | InitialPositionAction
-  | FinalPositionAction
-  | TipPickUpOffsetAction
+  InitialPositionAction | FinalPositionAction | TipPickUpOffsetAction
 export interface WorkingOffset {
   labwareId: string
   location: LegacyLabwareOffsetLocation

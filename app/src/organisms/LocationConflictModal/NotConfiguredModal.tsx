@@ -17,12 +17,14 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 interface NotConfiguredModalProps {
@@ -34,14 +36,16 @@ interface NotConfiguredModalProps {
 
 export const NotConfiguredModal = (
   props: NotConfiguredModalProps
-): JSX.Element => {
+): ReactNode => {
   const { onCloseClick, cutoutId, requiredFixtureId, isOnDevice } = props
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
     'deck_configuration',
   ])
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const documentationState = useDocumentationState()
+  const { updateDeckConfiguration } =
+    useUpdateDeckConfigurationMutation(documentationState)
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const handleUpdateDeck = (): void => {

@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine import errors
@@ -36,12 +36,6 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
 )
 from opentrons.types import DeckSlotName, Mount, MountType, Point
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
@@ -77,7 +71,7 @@ def mock_equipment_handler(decoy: Decoy) -> EquipmentHandler:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     mock_gantry_mover: GantryMover,
@@ -602,7 +596,7 @@ async def test_retract_axis(
 async def test_check_valid_position(
     decoy: Decoy,
     subject: MovementHandler,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should check for an exception to determine if the position is ok."""
     decoy.when(

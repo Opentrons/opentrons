@@ -1,13 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useLongPress } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { LongPressModal } from '../LongPressModal'
 
@@ -21,6 +21,9 @@ const mockSetTargetProtocolId = vi.fn()
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (longPress: UseLongPressResult) => {
   return renderWithProviders(
@@ -40,7 +43,7 @@ const render = (longPress: UseLongPressResult) => {
 
 describe('Long Press Modal', () => {
   beforeEach(() => {
-    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
   })
   afterEach(() => {
     vi.resetAllMocks()

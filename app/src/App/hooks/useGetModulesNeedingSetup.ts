@@ -3,8 +3,9 @@ import {
   FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useAttachedPipettes } from '/app/resources/instruments'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useAttachedModules } from '/app/resources/modules'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -45,11 +46,12 @@ export function useGetModulesNeedingSetup(): AttachedModule[] {
 
 export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModule[] {
   const modulesRequiringSetup = useGetModulesNeedingSetup()
-  const attachedPipettes = useAttachedPipettes(modulesRequiringSetup.length > 0)
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const hasCalibratedPipette =
+    getCalibratedPipetteForModuleSetup(attachedPipettes) != null
   return modulesRequiringSetup.filter(
     m =>
       MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(m.moduleType) ||
-      attachedPipettes.left != null ||
-      attachedPipettes.right != null
+      hasCalibratedPipette
   )
 }

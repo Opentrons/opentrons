@@ -8,12 +8,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function CheckUpdates(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function CheckUpdates(): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
@@ -27,9 +29,9 @@ export function CheckUpdates(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
     >
       <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
-      <LegacyStyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

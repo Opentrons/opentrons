@@ -1,3 +1,4 @@
+import { useMemo, useRef } from 'react'
 import { useQuery } from 'react-query'
 
 import { getSelf } from '@opentrons/api-client'
@@ -35,11 +36,21 @@ export function useSelfQuery(
   hostOverride?: HostConfig | null
 ): UseQueryResult<AuthUserResponse, AxiosError> {
   const contextHost = useHost()
-  const host =
-    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+
+  const host = useMemo(() => {
+    return hostOverride != null
+      ? { ...contextHost, ...hostOverride }
+      : contextHost
+  }, [contextHost, hostOverride])
+
+  // This is one of two queries in the api that require authentication.
+  // We use a ref to ensure the query function uses the latest token when called from the ReactQuery cache.
+  const hostRef = useRef<HostConfig | null>(host)
+  hostRef.current = host
+
   const query = useQuery<AuthUserResponse, AxiosError>(
     getSelfQueryKey(host),
-    () => fetchSelf(host!),
+    () => fetchSelf(hostRef.current!),
     { enabled: host != null, ...options }
   )
 

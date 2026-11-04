@@ -4,7 +4,7 @@ import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
 import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
-import type { CalibrationAction, CalibrationState } from './calibration/types'
+import type { AuditAction, AuditState } from './audit'
 import type { ConfigAction, ConfigState } from './config/types'
 import type {
   AddCustomLabwareFromCreatorAction,
@@ -12,9 +12,6 @@ import type {
   CustomLabwareState,
 } from './custom-labware/types'
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
-import type { ModulesAction } from './modules/types'
-import type { NetworkingAction, NetworkingState } from './networking/types'
-import type { PipettesAction, PipettesState } from './pipettes/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
 import type {
@@ -24,12 +21,7 @@ import type {
 import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
-import type {
-  RobotSettingsAction,
-  RobotSettingsState,
-} from './robot-settings/types'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
-import type { SessionsAction, SessionState } from './sessions/types'
 import type {
   ShellAction,
   ShellState,
@@ -38,33 +30,27 @@ import type {
 import type { SystemInfoAction, SystemInfoState } from './system-info/types'
 
 export interface State {
+  readonly audit: AuditState
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
-  readonly pipettes: PipettesState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
-  readonly networking: NetworkingState
   readonly labware: CustomLabwareState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
   readonly alerts: AlertsState
-  readonly sessions: SessionState
-  readonly calibration: CalibrationState
   readonly protocolStorage: ProtocolStorageState
   readonly protocolRuns: ProtocolRunState
 }
 
 export type Action =
+  | AuditAction
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotSettingsAction
   | RobotUpdateAction
-  | PipettesAction
-  | ModulesAction
   | ShellAction
   | ConfigAction
   | RouterAction
@@ -72,11 +58,8 @@ export type Action =
   | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction
-  | NetworkingAction
   | SystemInfoAction
   | AlertsAction
-  | SessionsAction
-  | CalibrationAction
   | AnalyticsTriggerAction
   | AddCustomLabwareFromCreatorAction
   | ProtocolRunAction

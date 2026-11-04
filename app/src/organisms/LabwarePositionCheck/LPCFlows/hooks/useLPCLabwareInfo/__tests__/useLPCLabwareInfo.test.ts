@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -19,18 +18,14 @@ vi.mock('../getLPCSearchParams')
 vi.mock('/app/resources/labware_offsets')
 vi.mock('/app/resources/runs')
 
-const runningRun = {
-  current: false,
-  id: 'test_id_running',
-  status: RUN_STATUS_RUNNING,
-}
-
 describe('useLPCLabwareInfo', () => {
   const RUN_ID = 'run-123'
   const PROTOCOL_DATA = { commands: [] } as any
   const LABWARE_DEFS = [{ uri: 'labware-1' }] as any
   const MOCK_LW_LOCATION_COMBOS = [{ definitionUri: 'labware-uri-1' }] as any
-  const MOCK_SEARCH_PARAMS = { definitionUris: ['labware-uri-1'] } as any
+  const MOCK_SEARCH_PARAMS = {
+    filters: [{ definitionUri: 'labware-uri-1' }],
+  } as any
   const MOCK_STORED_OFFSETS = [{ id: 'offset-1' }] as any
   const MOCK_LEGACY_OFFSETS = [{ id: 'legacy-offset-1' }] as any
   const MOCK_LABWARE_INFO = { areOffsetsApplied: true } as any
@@ -132,11 +127,14 @@ describe('useLPCLabwareInfo', () => {
   })
 
   it('should not enable offset search if run status is not idle', () => {
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith('test_id_running')
-      .thenReturn({
-        data: { data: { status: runningRun } },
-      } as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          labwareOffsets: MOCK_LEGACY_OFFSETS,
+          status: RUN_STATUS_RUNNING,
+        },
+      },
+    } as any)
 
     const { result } = renderHook(() => {
       return useLPCLabwareInfo({
@@ -200,5 +198,31 @@ describe('useLPCLabwareInfo', () => {
     })
 
     expect(result.current.legacyOffsets).toEqual([])
+  })
+
+  it('should handle empty stored offsets', () => {
+    vi.mocked(useNotifySearchLabwareOffsets).mockReturnValue({
+      data: undefined,
+    } as any)
+
+    vi.mocked(getUniqueValidLwLocationInfoByAnalysis).mockReturnValue([])
+    vi.mocked(getLPCSearchParams).mockReturnValue({ filters: [] })
+
+    const { result } = renderHook(() => {
+      return useLPCLabwareInfo({
+        runId: RUN_ID,
+        robotType: FLEX_ROBOT_TYPE,
+        labwareDefs: LABWARE_DEFS,
+        protocolData: PROTOCOL_DATA,
+      })
+    })
+
+    expect(result.current.storedOffsets).toEqual([])
+    expect(getLPCLabwareInfoFrom).toHaveBeenCalledWith({
+      currentOffsets: [],
+      lwLocInfo: [],
+      labwareDefs: LABWARE_DEFS,
+      protocolData: PROTOCOL_DATA,
+    })
   })
 })

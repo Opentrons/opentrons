@@ -1,5 +1,7 @@
 import { COLORS } from '../../../helix-design-system'
 
+import type { ReactNode } from 'react'
+
 const BORDER_THICKNESS = 10
 
 interface OpentronsVacuumManifoldSpacerProps {
@@ -12,7 +14,7 @@ interface OpentronsVacuumManifoldSpacerProps {
 
 export function OpentronsVacuumManifoldSpacer({
   lidDimensions,
-}: OpentronsVacuumManifoldSpacerProps): JSX.Element {
+}: OpentronsVacuumManifoldSpacerProps): ReactNode {
   const width = lidDimensions?.xDimension ?? 128
   const height = lidDimensions?.yDimension ?? 86
 

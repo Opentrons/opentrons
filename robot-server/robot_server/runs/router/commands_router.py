@@ -1,7 +1,7 @@
 """Router for /runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Final, Literal, Optional, Union
+from typing import Annotated, Any, Final, Literal, Optional, Union
 
 from fastapi import Depends, Query, status
 
@@ -244,7 +244,7 @@ async def create_run_command(
     except pe_errors.CommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
-    response_data = run_orchestrator_store.get_command(command.id)
+    response_data = await run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -298,7 +298,7 @@ async def get_run_commands(
         description="If `true`, return all commands (protocol, setup, fixit)."
         " If `false`, only return safe commands (protocol, setup).",
     ),
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -310,7 +310,7 @@ async def get_run_commands(
             " If `false`, only return safe commands.
     """
     try:
-        command_slice = run_data_manager.get_commands_slice(
+        command_slice = await run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -320,25 +320,12 @@ async def get_run_commands(
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
-    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
-
+    recovery_target_command = await run_data_manager.get_recovery_target_command(
+        run_id=runId
+    )
     data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            notes=c.notes,
-            failedCommandId=c.failedCommandId,
-            commandAnnotationIds=c.commandAnnotationIds
-            if c.commandAnnotationIds
-            else None,
+        RunCommandSummary.build_from_json(c).model_dump(
+            by_alias=True, exclude_none=True
         )
         for c in command_slice.commands
     ]
@@ -402,7 +389,7 @@ async def get_run_commands_as_pre_serialized_list(
             " If `false`, only return safe commands.
     """
     try:
-        commands = run_data_manager.get_all_commands_as_preserialized_list(
+        commands = await run_data_manager.get_all_commands_as_preserialized_list(
             run_id=runId, include_fixit_commands=includeFixitCommands
         )
     except RunNotFoundError as e:
@@ -446,7 +433,7 @@ async def get_run_command(
         run_data_manager: Run data retrieval.
     """
     try:
-        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+        command = await run_data_manager.get_command(run_id=runId, command_id=commandId)
     except RunNotFoundError as e:
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandNotFoundError as e:

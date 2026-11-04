@@ -1,0 +1,17 @@
+.header_row {
+  display: flex;
+  height: var(--spacing-20);
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-12);
+  color: var(--grey-60);
+  gap: var(--spacing-12);
+}
+
+.data_row {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+  gap: var(--spacing-12);
+}

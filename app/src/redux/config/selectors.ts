@@ -55,6 +55,12 @@ export const getIsLabwareOffsetCodeSnippetsOn = (state: State): boolean => {
   return state.config?.labware.showLabwareOffsetCodeSnippets ?? false
 }
 
+export const getIncludeProtocolSourceInRunDownload = (
+  state: State
+): boolean => {
+  return state.config?.protocols.includeProtocolSourceInRunDownload ?? false
+}
+
 export const getPathToPythonOverride: (state: State) => string | null =
   createSelector(
     getConfig,

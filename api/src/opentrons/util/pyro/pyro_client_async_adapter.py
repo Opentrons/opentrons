@@ -159,9 +159,13 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             validated_func = wrap_parameter_validation(proxy, func_name)
             return validated_func(self, *args, **kwargs)
 
-        return await asyncio.to_thread(
+        result = await asyncio.to_thread(
             _thread_call, self._proxy, method_metadata["__name__"], *args, **kwargs
         )
+        # Yield to the event loop after transaction, prevents stale refs waiting to clear
+        # This is done to address a known CPython issue https://github.com/python/cpython/issues/85865
+        await asyncio.sleep(0)
+        return result
 
     # Construct the metadata of the client wrapper function
     wrapper.__module__ = method_metadata["__module__"]
@@ -205,6 +209,7 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
             arg = _validate_keys_builtins(arg)
             arg = _validate_outbound_proxy(arg)
             arg = _validate_outbound_nested_proxy(arg)
+            arg = _validate_outbound_iterable(arg)
             return arg
 
         validated_args = tuple()  # type: ignore
@@ -248,6 +253,19 @@ def _validate_keys_builtins(arg: Any) -> Any:
                 key_type=".".join((key_type.__module__, key_type.__qualname__)),
                 value_type=".".join((value_type.__module__, value_type.__qualname__)),
             )
+    return arg
+
+
+def _validate_outbound_iterable(arg: Any) -> Any:
+    """Handle an argument which is an iterable object that may need pyro-safe reformating.
+
+    This function will handle those by creating a pyro-safe dictionary containing `_pyro_safe_translation`
+    and `data` fields, which will be used in a PyroSynchronousObject counterpart to reformat the data.
+    """
+    if isinstance(arg, set):
+        arg = {"_pyro_safe_translation": "set", "data": list(arg)}
+    # NOTE: Expand iterable type coverage as needed matching this pattern with it's PyroSynchronousObject counterpart
+
     return arg
 
 

@@ -21,14 +21,18 @@ export interface UseBuildOffsetsToApplyResult {
 export function useSaveWorkingOffsets({
   runId,
   analytics,
+  commandDocState,
+  addActionToDocument,
 }: UseLPCCommandChildProps): UseBuildOffsetsToApplyResult {
   const [isLoading, setIsLoading] = useState(false)
 
   const { toUpdate, toDelete } = useSelector(
     selectPendingOffsetOperations(runId)
   )
-  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
-  const { deleteLabwareOffset } = useDeleteLabwareOffsetMutation()
+  const { createLabwareOffsets } =
+    useCreateLabwareOffsetsMutation(commandDocState)
+  const { deleteLabwareOffset } =
+    useDeleteLabwareOffsetMutation(commandDocState)
 
   const deleteLabwareOffsets = (): Promise<StoredLabwareOffset[]> => {
     if (toDelete.length > 0) {
@@ -58,6 +62,12 @@ export function useSaveWorkingOffsets({
     ])
       .then(res => {
         setIsLoading(false)
+        if (toUpdate.length > 0) {
+          addActionToDocument('create_offsets')
+        }
+        if (toDelete.length > 0) {
+          addActionToDocument('delete_offsets')
+        }
         analytics.reportSaveOffset(res)
 
         return res

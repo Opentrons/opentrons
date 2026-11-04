@@ -5,8 +5,8 @@ import {
   AnimationVideo,
   COLORS,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
@@ -266,9 +266,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <StyledText forwardedAs="p" />,
             bold: (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               />
@@ -281,7 +281,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}
-      bodyText={<LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>}
+      bodyText={<StyledText forwardedAs="p">{body}</StyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

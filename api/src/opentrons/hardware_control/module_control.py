@@ -21,12 +21,13 @@ from .types import (
     AsynchronousModuleErrorNotification,
     BoardRevision,
     HardwareEvent,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     OT3Mount,
     StatusBarUpdateEvent,
 )
 from opentrons.config import IS_LINUX, IS_ROBOT
-from opentrons.drivers.rpi_drivers import interfaces, types, usb, usb_simulator
+from opentrons.drivers.usb import interfaces, types, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
@@ -41,7 +42,6 @@ from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
 from opentrons.types import Point
 
 if TYPE_CHECKING:
-    from .api import API
     from .ot3api import OT3API
 
 CLEANUP_DELAY_S = 3.0
@@ -82,7 +82,7 @@ class AttachedModulesControl:
 
     def __init__(
         self,
-        api: Union["API", "OT3API"],
+        api: "OT3API",
         usb: interfaces.USBDriverInterface,
         event_callback: Callable[[HardwareEvent], None],
     ) -> None:
@@ -107,7 +107,7 @@ class AttachedModulesControl:
     @classmethod
     async def build(
         cls,
-        api_instance: Union["API", "OT3API"],
+        api_instance: "OT3API",
         board_revision: BoardRevision,
         event_callback: Callable[[HardwareEvent], None],
     ) -> AttachedModulesControl:
@@ -410,6 +410,19 @@ class AttachedModulesControl:
                         f"Module {device.name} discovered and attached"
                         f" at port {device.port}, new_instance: {new_instance}"
                     )
+                    try:
+                        self._api.loop.call_soon(
+                            self._event_callback,
+                            ModuleConnectedNotification(
+                                module_serial=device.serial,
+                                name=device.name,
+                                port=device.port,
+                            ),
+                        )
+                    except Exception:
+                        log.exception(
+                            f"Module connection callback for module {device.name} {device.serial} at {device.port} failed"
+                        )
             except Exception as e:
                 log.exception(
                     f"Failed to build device {device.name} at port {device.port}: {e}"

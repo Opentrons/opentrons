@@ -70,8 +70,7 @@ export interface ModuleAnalyticLiveCommand extends BaseModuleAnalytics {
 }
 
 export type ModuleAnalyticType =
-  | ModuleAnalyticProtocolCommand
-  | ModuleAnalyticLiveCommand
+  ModuleAnalyticProtocolCommand | ModuleAnalyticLiveCommand
 
 export interface UseModuleCommandAnalyticsResult {
   reportModuleCommand: (params: ModuleAnalyticType) => void

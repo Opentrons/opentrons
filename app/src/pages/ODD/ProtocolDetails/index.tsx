@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import last from 'lodash/last'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,24 +16,27 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
-  getQueryKey,
+  isDocumentedMutationError,
   useCreateRunMutation,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
-  useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
@@ -47,7 +48,11 @@ import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/Protoc
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
-import { useRunTimeParameters } from '/app/resources/protocols'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
+import {
+  useEnsureProtocolAnalysis,
+  useRunTimeParameters,
+} from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
@@ -56,7 +61,9 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 import { Parameters } from './Parameters'
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 
+import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -68,6 +75,7 @@ interface ProtocolHeaderProps {
   chipText: string
   isScrolled: boolean
   isProtocolFetching: boolean
+  startSetup: boolean
 }
 
 const ProtocolHeader = ({
@@ -76,11 +84,11 @@ const ProtocolHeader = ({
   chipText,
   isScrolled,
   isProtocolFetching,
-}: ProtocolHeaderProps): JSX.Element => {
+  startSetup,
+}: ProtocolHeaderProps): ReactNode => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = useState<boolean>(true)
-  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -101,12 +109,13 @@ const ProtocolHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -115,13 +124,15 @@ const ProtocolHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isProtocolFetching ? (
@@ -134,30 +145,29 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <ProtocolDetailsHeaderTitleSkeleton />
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunProtocol()
-        }}
-        buttonText={t('protocol_details:start_setup')}
-        disabled={isProtocolFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={handleRunProtocol}
+          buttonText={t('protocol_details:start_setup')}
+          disabled={isProtocolFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -190,7 +200,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
-}: ProtocolSectionTabsProps): JSX.Element => {
+}: ProtocolSectionTabsProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex gridGap={SPACING.spacing8}>
@@ -214,7 +224,7 @@ interface SummaryProps {
   date: string | null
 }
 
-const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
+const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -222,24 +232,21 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
         overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -247,9 +254,9 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <StyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</LegacyStyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )
@@ -322,38 +329,34 @@ export function ProtocolDetails(): JSX.Element | null {
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const [showParameters, setShowParameters] = useState<boolean>(false)
-  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = useState<TabOption>(
     protocolSectionTabOptions[0]
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
-  const { data: protocolRecord, isLoading: isProtocolFetching } =
-    useProtocolQuery(protocolId, {
-      staleTime: Infinity,
-    })
+  const {
+    analysis: mostRecentAnalysis,
+    isAnalyzing,
+    protocolRecord,
+  } = useEnsureProtocolAnalysis(protocolId)
+  const isProtocolFetching = isAnalyzing
 
   // Watch for scrolling to toggle dropshadow
   const { scrollRef, isScrolled } = useScrollPosition()
 
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
+  const { documentationState: deleteDocumentationState } =
+    useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)
+  const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
+  const { deleteRun } = useDeleteRunMutation(deleteDocumentationState)
+  const documentationState = useDocumentationState()
+  const { createRun } = useCreateRunMutation(documentationState)
 
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
-  )
-
-  const { createRun } = useCreateRunMutation({
-    onSuccess: data => {
-      queryClient
-        .invalidateQueries(getQueryKey(host, 'runs'))
-        .catch((e: Error) => {
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        })
-    },
-  })
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
 
   const isRequiredCsv =
     mostRecentAnalysis?.result === 'parameter-value-required'
@@ -382,15 +385,29 @@ export function ProtocolDetails(): JSX.Element | null {
     )
   }
   const handleRunProtocol = (): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+    if (mostRecentAnalysis?.status !== 'completed') {
+      return
+    }
+    setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId })
+      : createRun(
+          { protocolId },
+          {
+            onError: () => {
+              setStartSetup(false)
+            },
+          }
+        )
   }
   const [showConfirmDeleteProtocol, setShowConfirmationDeleteProtocol] =
     useState<boolean>(false)
 
   const handleDeleteClick = (): void => {
-    setShowConfirmationDeleteProtocol(false)
     if (host != null) {
       getProtocol(host, protocolId)
         .then(
@@ -398,14 +415,21 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds =>
-          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
+          Promise.all(referencingRunIds?.map(runId => deleteRun({ runId })))
         )
-        .then(() => deleteProtocol(host, protocolId))
         .then(() => {
+          return deleteProtocol(protocolId)
+        })
+        .then(() => {
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
     } else {
@@ -434,6 +458,16 @@ export function ProtocolDetails(): JSX.Element | null {
     />
   ) : (
     <>
+      {showRobotOutOfStorageModal ? (
+        <RobotOutOfStorageModal
+          onConfirm={() => {
+            navigate('/robot-settings')
+          }}
+          onClose={() => {
+            setShowRobotOutOfStorageModal(false)
+          }}
+        />
+      ) : null}
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
           {!isProtocolFetching ? (
@@ -445,13 +479,13 @@ export function ProtocolDetails(): JSX.Element | null {
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
                     onClick={() => {
@@ -495,6 +529,7 @@ export function ProtocolDetails(): JSX.Element | null {
           chipText={chipText}
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
+          startSetup={startSetup || isAnalyzing}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

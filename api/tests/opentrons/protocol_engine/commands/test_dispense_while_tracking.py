@@ -103,7 +103,7 @@ async def test_dispense_while_tracking_implementation(
         flowRate=456,
     )
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id=stateupdateLabware,
             well_name=stateupdateWell,
             well_location=well_location,
@@ -138,7 +138,7 @@ async def test_dispense_while_tracking_implementation(
     ).then_return(34)
 
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
@@ -146,7 +146,7 @@ async def test_dispense_while_tracking_implementation(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -283,7 +283,7 @@ async def test_overpressure_error(
     )
 
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id",
@@ -291,7 +291,7 @@ async def test_overpressure_error(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id"
         )
     ).then_return(["A3", "A4"])
@@ -300,7 +300,7 @@ async def test_overpressure_error(
     decoy.when(pipetting.get_state_view()).then_return(state_view)
 
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id=stateupdateLabware,
             well_name=stateupdateWell,
             well_location=well_location,

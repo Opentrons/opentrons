@@ -263,7 +263,7 @@ class SealPipetteToTipImplementation(
             return move_result
 
         # Aspirate to move plunger to a maximum volume position per pipette type
-        tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
+        tip_geometry = self._state_view.instrument_interface.get_nominal_tip_geometry(
             pipette_id, labware_id, well_name
         )
         if self._state_view.pipettes.get_mount(pipette_id) == MountType.LEFT:

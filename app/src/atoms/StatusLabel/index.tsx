@@ -6,8 +6,8 @@ import {
   COLORS,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -20,7 +20,6 @@ interface StatusLabelProps {
   fontWeight?: number
   iconSize?: string
   pulse?: boolean
-  id?: string
   capitalizeStatus?: boolean
 }
 
@@ -34,7 +33,6 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     iconSize,
     pulse,
     showIcon = true,
-    id,
     capitalizeStatus = true,
   } = props
 
@@ -49,17 +47,9 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing4}
         marginBottom={SPACING.spacing4}
-        data-testid={
-          id != null ? `status_label_${status}_${id}` : `status_label_${status}`
-        }
       >
         {showIcon ? (
-          <Icon
-            name="circle"
-            color={iconColor}
-            size={iconSize ?? '0.25rem'}
-            data-testid="status_circle"
-          >
+          <Icon name="circle" color={iconColor} size={iconSize ?? '0.25rem'}>
             {pulse != null && pulse ? (
               <animate
                 attributeName="fill"
@@ -67,18 +57,17 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
                 dur="1s"
                 calcMode="discrete"
                 repeatCount="indefinite"
-                data-testid="pulsing_status_circle"
               />
             ) : null}
           </Icon>
         ) : null}
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
           color={textColor ?? COLORS.blue60}
         >
           {capitalizeStatus ? capitalize(status) : status}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

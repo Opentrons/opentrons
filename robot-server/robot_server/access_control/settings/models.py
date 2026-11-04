@@ -20,7 +20,7 @@ class ResponseData(pydantic.BaseModel):
         pydantic.Field(
             description="Require logs to be saved in app.",
         ),
-    ] = True
+    ] = False
     deleteOverMaxOnDiskProtocols: Annotated[
         bool,
         pydantic.Field(

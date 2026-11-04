@@ -21,9 +21,9 @@ export function ProgressBar({
   outerStyles,
   innerStyles,
   children,
-}: ProgressBarProps): JSX.Element {
-  const ratio = percentComplete / 100
-  const progress = ratio > 1 ? '100%' : `${String(ratio * 100)}%`
+}: ProgressBarProps): ReactNode {
+  const boundedPercent = Math.min(Math.max(percentComplete, 0), 100)
+  const progress = `${String(boundedPercent)}%`
 
   const LINER_PROGRESS_CONTAINER_STYLE = css`
     height: 0.5rem;
@@ -54,10 +54,12 @@ export function ProgressBar({
   return (
     <Box
       role="progressbar"
+      aria-valuenow={boundedPercent}
+      aria-valuemin={0}
+      aria-valuemax={100}
       css={LINER_PROGRESS_CONTAINER_STYLE}
-      data-testid="ProgressBar_Container"
     >
-      <Box css={LINER_PROGRESS_FILLER_STYLE} data-testid="ProgressBar_Bar" />
+      <Box css={LINER_PROGRESS_FILLER_STYLE} />
       {children}
     </Box>
   )

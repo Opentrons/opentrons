@@ -7,7 +7,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.drivers.types import ThermocyclerLidStatus
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
 from opentrons.protocol_engine.errors import (
     ThermocyclerNotOpenError,
@@ -31,12 +31,6 @@ from opentrons.types import DeckSlotName
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
     return decoy.mock(cls=StateStore)
@@ -51,12 +45,14 @@ def equipment_handler(decoy: Decoy) -> EquipmentHandler:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     equipment_handler: EquipmentHandler,
 ) -> ThermocyclerMovementFlagger:
     """Return a movement flagger initialized with mocked-out dependencies."""
     return ThermocyclerMovementFlagger(
-        state_store=state_store, hardware_api=hardware_api, equipment=equipment_handler
+        state_store=state_store,
+        hardware_api=hardware_api,
+        equipment=equipment_handler,
     )
 
 
@@ -122,7 +118,7 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
     expected_raise_cm: ContextManager[Any],
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     decoy: Decoy,
 ) -> None:
     """When on a Thermocycler, it should raise if the lid isn't open."""
@@ -159,7 +155,7 @@ async def test_raises_depending_on_thermocycler_hardware_lid_status(
 async def test_raises_if_hardware_module_has_gone_missing(
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     decoy: Decoy,
 ) -> None:
     """It should raise if the hardware module can't be found by its serial no."""
@@ -211,7 +207,7 @@ async def test_passes_if_virtual_module_lid_open(
 async def test_passes_if_labware_on_non_thermocycler_module(
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware is on a module other than a Thermocycler."""
@@ -226,7 +222,7 @@ async def test_passes_if_labware_on_non_thermocycler_module(
 async def test_passes_if_labware_not_on_any_module(
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware isn't on a module."""

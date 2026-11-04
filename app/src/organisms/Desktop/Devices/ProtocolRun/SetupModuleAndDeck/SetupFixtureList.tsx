@@ -13,8 +13,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -39,6 +39,7 @@ import {
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -55,7 +56,7 @@ interface SetupFixtureListProps {
  * @param props
  * @returns JSX.Element
  */
-export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
+export const SetupFixtureList = (props: SetupFixtureListProps): ReactNode => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
@@ -88,7 +89,7 @@ export function FixtureListItem({
   deckDef,
   robotName,
   partialRequiredCutoutFixtureId,
-}: FixtureListItemProps): JSX.Element {
+}: FixtureListItemProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const isCurrentFixtureCompatible = isFixtureCompatible(
@@ -212,12 +213,13 @@ export function FixtureListItem({
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
             >
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing20}
               >
                 {fixtureDisplayName}
-              </LegacyStyledText>
+              </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
                 css={css`
@@ -232,15 +234,15 @@ export function FixtureListItem({
                   setShowSetupInstructionsModal(true)
                 }}
               >
-                <LegacyStyledText marginLeft={SPACING.spacing4} forwardedAs="p">
+                <StyledText marginLeft={SPACING.spacing4} forwardedAs="p">
                   {t('protocol_setup:view_setup_instructions')}
-                </LegacyStyledText>
+                </StyledText>
               </Btn>
             </Flex>
           </Flex>
-          <LegacyStyledText forwardedAs="p" width="15%">
+          <StyledText forwardedAs="p" width="15%">
             {displayLocation}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             width="15%"
             flexDirection={DIRECTION_COLUMN}
@@ -256,9 +258,9 @@ export function FixtureListItem({
                     : setShowNotConfiguredModal(true)
                 }}
               >
-                <LegacyStyledText forwardedAs="label" cursor="pointer">
+                <StyledText forwardedAs="label" cursor="pointer">
                   {t('protocol_setup:resolve')}
-                </LegacyStyledText>
+                </StyledText>
               </TertiaryButton>
             ) : null}
           </Flex>

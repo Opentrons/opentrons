@@ -15,7 +15,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -25,6 +24,7 @@ import { MediumButton } from '../../../atoms/buttons'
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from '../types'
 
 import blowoutVideo from '../../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
@@ -159,7 +159,7 @@ function DropTipOption({
   onClick: () => void
   videoSrc: string
   text: string
-}): JSX.Element {
+}): ReactNode {
   return (
     <Flex
       onClick={onClick}
@@ -177,7 +177,7 @@ function DropTipOption({
       >
         <source src={videoSrc} />
       </AnimationVideo>
-      <LegacyStyledText forwardedAs="h3">{text}</LegacyStyledText>
+      <StyledText forwardedAs="h3">{text}</StyledText>
     </Flex>
   )
 }

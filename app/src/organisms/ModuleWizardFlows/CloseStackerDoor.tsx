@@ -7,11 +7,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -19,13 +21,14 @@ interface CloseDoorProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
 }
 
-export function CloseDoor(props: CloseDoorProps): JSX.Element {
+export function CloseDoor(props: CloseDoorProps): ReactNode {
   const {
     proceed,
     isRobotMoving,
     attachedModule,
     chainRunCommands,
     setErrorMessage,
+    setIsDoorOpenError,
     isOnDevice,
   } = props
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
@@ -65,7 +68,12 @@ export function CloseDoor(props: CloseDoorProps): JSX.Element {
         proceed()
       })
       .catch((e: Error) => {
-        setErrorMessage(`error homing stacker shuttle: ${e.message}`)
+        if (isMaintenanceDoorOpenError(e)) {
+          setIsDoorOpenError(true)
+          setErrorMessage(t('module_wizard_flows:door_is_open') as string)
+        } else {
+          setErrorMessage(`error homing stacker shuttle: ${e.message}`)
+        }
       })
   }
 

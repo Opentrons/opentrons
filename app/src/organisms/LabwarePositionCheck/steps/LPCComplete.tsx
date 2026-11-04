@@ -15,9 +15,10 @@ import SuccessIcon from '/app/assets/images/icon_success.png'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
+export function LPCComplete(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const isOnDevice = useSelector(getIsOnDevice)
 

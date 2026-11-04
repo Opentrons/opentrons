@@ -1,16 +1,17 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
-import time
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, Awaitable, Callable, cast
 
-import Pyro5.api as pyro
 import Pyro5.errors as pyro_errors
 
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from server_utils.fastapi_utils.app_state import (
     AppState,
 )
@@ -23,6 +24,7 @@ from robot_server.service.pyro_utils.pyro_resource import (
 
 if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
+    from robot_server.hardware import HardwareStateStore
     from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
         MaintenanceRunOrchestratorStore,
     )
@@ -30,27 +32,16 @@ if TYPE_CHECKING:
 
 
 # Pyro Resource Retreival for local processes (recieve proxies, etc)
-# todo(chb, 04-09-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate
-def get_pyro_resource() -> RobotServerPyroResource:
+async def get_pyro_resource() -> RobotServerPyroResource:
     """Get a Proxy of the hosted Robot Server Pyro Resource."""
-
-    robot_server_proxy = None
-    start_time = time.monotonic()
-    with pyro.locate_ns() as ns:
-        while time.monotonic() - start_time < 60:
-            if RS_PYRONAME in ns.list():
-                robot_server_proxy = pyro.Proxy(ns.list()[RS_PYRONAME])  # type: ignore[no-untyped-call]
-                break
-            time.sleep(0.01)
+    robot_server_proxy = await wait_for_proxy(proxy_name=RS_PYRONAME)
 
     if robot_server_proxy is None:
         raise pyro_errors.CommunicationError(
             "Could not find robot-server-resource URI on Pyro5 Nameserver."
         )
     else:
-        robot_server_resource = cast(
-            RobotServerPyroResource, AsyncClientPyroObject(robot_server_proxy)
-        )
+        robot_server_resource = cast(RobotServerPyroResource, robot_server_proxy)
         return robot_server_resource
 
 
@@ -133,7 +124,7 @@ def register_file_provider_to_pyro_resource(
 
 def register_notify_publishers_to_pyro_resource(
     app_state: AppState,
-    notify_publishers: Callable[[], None],
+    notify_publishers: Callable[[], Awaitable[None]],
 ) -> None:
     """Set the provided Notification Publishers as the callback to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
@@ -142,4 +133,43 @@ def register_notify_publishers_to_pyro_resource(
     else:
         raise RuntimeError(
             "Cannot set Notification Publishers, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_hardware_state_store_to_pyro_resource(
+    app_state: AppState, hardware_store: "HardwareStateStore"
+) -> None:
+    """Set the provided Hardware State Store as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_hardware_state_store(hardware_store)
+    else:
+        raise RuntimeError(
+            "Cannot set HardwareStateStore, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_run_store_provider_to_pyro_resource(
+    app_state: AppState, run_store_provider: CommandStoreProvider
+) -> None:
+    """Set the CommandStoreProvider for RunStore as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_run_store_provider(run_store_provider)
+    else:
+        raise RuntimeError(
+            "Cannot set CommandStoreProvider for RunStore, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_analysis_store_provider_to_pyro_resource(
+    app_state: AppState, analysis_store_provider: CommandStoreProvider
+) -> None:
+    """Set the CommandStoreProvider for AnalysisStore as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_analysis_store_provider(analysis_store_provider)
+    else:
+        raise RuntimeError(
+            "Cannot set CommandStoreProvider for AnalysisStore, RobotServerPyroResource is not initialized."
         )

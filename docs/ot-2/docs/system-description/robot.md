@@ -125,4 +125,4 @@ Every OT-2 has a unique serial number. The format of the serial number provides 
 You can find the serial number for your OT-2:
 
 - On the certification sticker on the back of the robot.
-- In the Opentrons App under **Devices** > your OT-2 > **Robot settings** > **Advanced**.
+- In the Opentrons OT-2 App under **Devices** > your OT-2 > **Robot settings** > **Advanced**.

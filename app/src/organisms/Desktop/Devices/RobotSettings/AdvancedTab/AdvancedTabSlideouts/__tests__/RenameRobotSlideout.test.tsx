@@ -8,6 +8,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
@@ -32,6 +33,10 @@ vi.mock('/app/redux/discovery', async importOriginal => {
     getUnreachableRobots: vi.fn(),
   }
 })
+
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockOnCloseClick = vi.fn()
 let mockTrackEvent: any
@@ -71,7 +76,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('17 characters max')
     screen.getByRole('textbox')
     const renameButton = screen.getByRole('button', { name: 'Rename robot' })
@@ -91,7 +96,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     screen.getByText(
       'Please enter 17 characters max using valid inputs: letters and numbers.'
     )
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('17 characters max')
     screen.getByRole('textbox')
     const renameButton = screen.getByRole('button', { name: 'Rename robot' })

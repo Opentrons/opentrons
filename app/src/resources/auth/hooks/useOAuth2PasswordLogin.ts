@@ -25,7 +25,7 @@ export interface UseOAuth2PasswordLoginOptions {
   /**
    * Called with a user-facing message when the token request fails.
    */
-  onError: (message: string) => void
+  onError: (message: string, error?: unknown) => void
 }
 
 interface UseOAuth2PasswordLoginResult {
@@ -73,7 +73,7 @@ export function useOAuth2PasswordLogin(
           })
       },
       onError: (error: unknown) => {
-        onError(getOAuth2LoginErrorMessage(error, t))
+        onError(getOAuth2LoginErrorMessage(error, t), error)
       },
     })
 

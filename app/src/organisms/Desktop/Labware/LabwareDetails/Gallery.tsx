@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareViewBox, labwareImages } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 /**
@@ -27,7 +28,7 @@ export interface GalleryProps {
   definition: LabwareDefinition
 }
 
-export function Gallery(props: GalleryProps): JSX.Element {
+export function Gallery(props: GalleryProps): ReactNode {
   const { definition } = props
   const { parameters: params } = definition
 

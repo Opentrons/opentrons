@@ -6,9 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { Slideout } from '/app/atoms/Slideout'
@@ -23,6 +23,7 @@ import {
 } from '/app/redux/custom-labware'
 import { remote } from '/app/redux/shell/remote'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 export interface AddCustomLabwareSlideoutProps {
@@ -32,7 +33,7 @@ export interface AddCustomLabwareSlideoutProps {
 
 export function AddCustomLabwareSlideout(
   props: AddCustomLabwareSlideoutProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
@@ -63,7 +64,7 @@ export function AddCustomLabwareSlideout(
           }}
           uploadText={t('choose_file_to_upload')}
           dragAndDropText={
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="shared:drag_and_drop"
@@ -77,7 +78,7 @@ export function AddCustomLabwareSlideout(
                   ),
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
           }
         />
       </Flex>

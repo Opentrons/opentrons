@@ -1,17 +1,34 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  BlowOutInPlaceStepGenArgs,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 
-export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
+export const blowOutInPlace: CommandCreator<BlowOutInPlaceStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, flowRate } = args
-
-  const errors: CommandCreatorError[] = []
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  const flowRate = resolveNumericRuntimeValue(args.flowRate, runtimeParameters)
+  const rawValues = [args.pipetteId, args.flowRate]
+  const resolvedValues = [pipetteId, flowRate]
+  const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] == null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (errors.length > 0 || pipetteId == null || flowRate == null) {
+    return { errors }
+  }
 
   if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
@@ -21,31 +38,26 @@ export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
       })
     )
   }
-
   if (errors.length > 0) {
-    return {
-      errors,
-    }
+    return { errors }
   }
 
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
-
-  const commands = [
-    {
-      commandType: 'blowOutInPlace' as const,
-      key: uuid(),
-      params: {
-        pipetteId,
-        flowRate,
-      },
-    },
-  ]
   return {
-    commands,
+    commands: [
+      {
+        commandType: 'blowOutInPlace' as const,
+        key: uuid(),
+        params: {
+          pipetteId,
+          flowRate,
+        },
+      },
+    ],
     python:
       // blow_out() blows out in place if no location= is specified
-      `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
+      `${pipettePythonName}.flow_rate.blow_out = ${args.flowRate}\n` +
       `${pipettePythonName}.blow_out()`,
   }
 }

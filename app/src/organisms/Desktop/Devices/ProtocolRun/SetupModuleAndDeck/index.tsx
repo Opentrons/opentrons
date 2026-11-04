@@ -6,9 +6,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -31,6 +31,7 @@ import { SetupFixtureList } from './SetupFixtureList'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupModulesMap } from './SetupModulesMap'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
@@ -50,7 +51,7 @@ export const SetupModuleAndDeck = ({
   runId,
   hasModules,
   protocolAnalysis,
-}: SetupModuleAndDeckProps): JSX.Element => {
+}: SetupModuleAndDeckProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view') as string,
@@ -86,23 +87,29 @@ export const SetupModuleAndDeck = ({
               marginLeft={SPACING.spacing20}
               marginBottom={SPACING.spacing12}
             >
-              <LegacyStyledText css={TYPOGRAPHY.labelSemiBold} width="45%">
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                width="45%"
+              >
                 {i18n.format(t('deck_hardware'), 'capitalize')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                css={TYPOGRAPHY.labelSemiBold}
+              </StyledText>
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('location')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                css={TYPOGRAPHY.labelSemiBold}
+              </StyledText>
+              <StyledText
+                forwardedAs="label"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginRight={SPACING.spacing16}
                 width="15%"
               >
                 {t('status')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -139,7 +146,6 @@ export const SetupModuleAndDeck = ({
             !moduleCalibrationStatus.complete
           }
           onClick={expandLabwarePositionCheckStep}
-          id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >

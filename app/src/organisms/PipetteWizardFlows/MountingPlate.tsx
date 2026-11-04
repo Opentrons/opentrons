@@ -1,15 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
+import { SPACING } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
+import { WizardBodyText } from '/app/atoms/WizardBodyText'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import {
-  SimpleWizardBody,
-  SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -23,8 +21,7 @@ export const MountingPlate = (
     proceed,
     flowType,
     chainRunCommands,
-    errorMessage,
-    setShowErrorMessage,
+    handleCommandError,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -48,22 +45,13 @@ export const MountingPlate = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
-  return errorMessage != null ? (
-    <SimpleWizardBody
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      isSuccess={false}
-      subHeader={errorMessage}
-    />
-  ) : (
+  return (
     <GenericWizardTile
       header={t(
         flowType === FLOWS.ATTACH
@@ -80,18 +68,13 @@ export const MountingPlate = (
             t={t}
             i18nKey="attach_mounting_plate_instructions"
             components={{
-              block: (
-                <LegacyStyledText
-                  css={BODY_STYLE}
-                  marginBottom={SPACING.spacing16}
-                />
-              ),
+              block: <WizardBodyText marginBottom={SPACING.spacing16} />,
             }}
           />
         ) : (
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             {t('detach_mounting_plate_instructions')}
-          </LegacyStyledText>
+          </WizardBodyText>
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}

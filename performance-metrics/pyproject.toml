@@ -29,7 +29,7 @@ source = 'vcs-tunable'
 
 [tool.hatch.version.raw-options]
 root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match=v*'
+git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
 fallback_version = '0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if

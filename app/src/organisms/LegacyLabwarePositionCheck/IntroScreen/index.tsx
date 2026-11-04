@@ -14,10 +14,10 @@ import {
   getLabwareDefinitionsFromCommands,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -34,7 +34,7 @@ import { RobotMotionLoader } from '../RobotMotionLoader'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getPrepCommands } from './getPrepCommands'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -111,7 +111,7 @@ export const IntroScreen = (props: {
         <Trans
           t={t}
           i18nKey="legacy_labware_position_check_description"
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{ block: <StyledText forwardedAs="p" /> }}
         />
       }
       rightElement={
@@ -160,7 +160,7 @@ interface ViewOffsetsProps {
   existingOffsets: LabwareOffset[]
   labwareDefinitions: LabwareDefinition[]
 }
-function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
+function ViewOffsets(props: ViewOffsetsProps): ReactNode {
   const { existingOffsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   const [showOffsetsTable, setShowOffsetsModal] = useState(false)
@@ -178,9 +178,9 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         aria-label="show labware offsets"
       >
         <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
-        </LegacyStyledText>
+        </StyledText>
       </Btn>
       {showOffsetsTable
         ? createPortal(
@@ -192,12 +192,12 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               header={
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {i18n.format(t('labware_offset_data'), 'capitalize')}
-                </LegacyStyledText>
+                </StyledText>
               }
               footer={
                 <SmallButton

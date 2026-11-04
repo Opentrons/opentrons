@@ -9,6 +9,7 @@ import {
 } from 'electron-devtools-installer'
 import fse from 'fs-extra'
 
+import { registerAudit } from './audit'
 import {
   getConfig,
   getOverrides,
@@ -18,6 +19,7 @@ import {
 } from './config'
 import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { registerDownloadHandlers } from './fs/ipc'
 import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
@@ -32,11 +34,10 @@ import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForBackendAndShowMainWindow } from './ui'
-import { registerSystemInfo } from './usb'
+import { registerSystemInfo, registerUsbDeviceHandlers } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
-import type { LogEntry } from 'winston'
 import type { OTLogger } from './log'
 import type { Action, Dispatch, Logger } from './types'
 
@@ -142,7 +143,7 @@ function startUp(): void {
   registerInternalApiListener()
 
   mainWindow = createUi(dispatch)
-  rendererLogger = createRendererLogger()
+  rendererLogger = createRendererLogger(mainWindow)
   void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
@@ -156,7 +157,11 @@ function startUp(): void {
     registerNotify(dispatch, mainWindow),
     registerDataFiles(dispatch),
     registerSystemInfo(dispatch),
+    registerAudit(dispatch),
   ]
+
+  registerUsbDeviceHandlers()
+  registerDownloadHandlers()
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
@@ -194,11 +199,29 @@ function startUp(): void {
   })
 }
 
-function createRendererLogger(): OTLogger {
+function createRendererLogger(window: BrowserWindow): OTLogger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')
-  ipcMain.on('log', (_, info) => logger.log(info as LogEntry))
+
+  window.webContents.session.webRequest.onResponseStarted(details => {
+    const level =
+      details.statusCode >= 400
+        ? 'error'
+        : details.method === 'GET'
+          ? 'debug'
+          : 'info'
+    logger.log(
+      level,
+      `network request: ${details.method} ${details.url} returned ${details.statusLine}`
+    )
+  })
+
+  window.webContents.on('console-message', event => {
+    const { level, message } = event
+    const levelToUse = level === 'warning' ? 'warn' : level
+    logger.log(levelToUse, message)
+  })
 
   return logger
 }

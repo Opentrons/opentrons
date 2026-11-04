@@ -31,6 +31,7 @@ import { PipetteConfiguration } from './PipetteConfiguration'
 import { PipetteOverview } from './PipetteOverview'
 import { usePipetteConfig } from './usePipetteConfig'
 
+import type { ReactNode } from 'react'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -40,7 +41,7 @@ interface EditInstrumentsModalProps {
 
 export function EditInstrumentsModal(
   props: EditInstrumentsModalProps
-): JSX.Element {
+): ReactNode {
   const { onClose } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('shared')
@@ -144,7 +145,6 @@ export function EditInstrumentsModal(
   return createPortal(
     <HandleEnter onEnter={handleOnSave}>
       <Modal
-        marginLeft="0"
         title={page === 'add' ? t('edit_pipette') : t('edit_instruments')}
         type="info"
         closeOnOutsideClick

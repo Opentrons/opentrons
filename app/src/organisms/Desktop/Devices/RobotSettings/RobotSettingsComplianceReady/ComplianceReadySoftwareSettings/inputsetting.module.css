@@ -1,0 +1,14 @@
+.field_row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-16);
+}
+
+.label {
+  flex: 1;
+}
+
+.input {
+  width: 4.9375rem;
+  flex-shrink: 0;
+}

@@ -6,9 +6,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   Modal,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -16,6 +16,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -34,7 +35,7 @@ export function EstopMissingModal({
   closeModal,
   isDismissedModal,
   setIsDismissedModal,
-}: EstopMissingModalProps): JSX.Element {
+}: EstopMissingModalProps): ReactNode {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return createPortal(
@@ -62,7 +63,7 @@ interface EstopMissingTouchscreenModalProps extends Omit<
 
 function TouchscreenModal({
   robotName,
-}: EstopMissingTouchscreenModalProps): JSX.Element {
+}: EstopMissingTouchscreenModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -76,15 +77,12 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('estop_missing_description', { robotName })}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </OddModal>
   )
@@ -99,7 +97,7 @@ function DesktopModal({
   robotName,
   closeModal,
   setIsDismissedModal,
-}: EstopMissingDesktopModalProps): JSX.Element {
+}: EstopMissingDesktopModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const handleCloseModal = (): void => {
@@ -121,12 +119,10 @@ function DesktopModal({
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <LegacyStyledText forwardedAs="h1">
+        <StyledText forwardedAs="h1">
           {t('connect_the_estop_to_continue')}
-        </LegacyStyledText>
-        <LegacyStyledText>
-          {t('estop_missing_description', { robotName })}
-        </LegacyStyledText>
+        </StyledText>
+        <StyledText>{t('estop_missing_description', { robotName })}</StyledText>
       </Flex>
     </Modal>
   )

@@ -22,7 +22,7 @@ const meta: Meta<typeof MediumButton> = {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

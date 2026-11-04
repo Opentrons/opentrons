@@ -6,24 +6,24 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { useLEDLights } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface EnableStatusLightProps {
-  robotName: string
   isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
-  robotName,
   isEstopNotDisengaged,
-}: EnableStatusLightProps): JSX.Element {
+}: EnableStatusLightProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights()
 
   return (
     <Flex
@@ -33,23 +33,21 @@ export function EnableStatusLight({
     >
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Enable_Status_Light"
           >
             {t('enable_status_light')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('enable_status_light_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Box>
       <ToggleButton
         label="enable_status_light"
         toggledOn={lightsEnabled}
         onClick={toggleLights}
-        id="RobotSettings_enableStatusLightToggleButton"
         disabled={isEstopNotDisengaged}
       />
     </Flex>

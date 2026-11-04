@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -16,10 +16,11 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import * as Config from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { DevInternalFlag } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function FeatureFlags(): JSX.Element {
+export function FeatureFlags(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(Config.getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()
@@ -39,18 +40,16 @@ export function FeatureFlags(): JSX.Element {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              id={`FeatureFlags_${flag}_text`}
             >
               {t(`__dev_internal__${flag}`)}
-            </LegacyStyledText>
+            </StyledText>
             <ToggleButton
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}
               onClick={() => dispatch(() => toggleDevInternalFlag(flag))}
-              id={`FeatureFlags_${flag}_button`}
             />
           </Flex>
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (

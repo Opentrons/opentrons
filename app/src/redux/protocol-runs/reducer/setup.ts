@@ -1,6 +1,17 @@
+import { createReducer, isAnyOf } from '@reduxjs/toolkit'
+
+import {
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
+  updateCameraUsageSettings,
+  updateRunSetupStepsComplete,
+  updateRunSetupStepsRequired,
+} from '../actions'
 import * as Constants from '../constants'
 
-import type { ProtocolRunAction, RunSetupStatus } from '../types'
+import type { RunSetupStatus } from '../types'
 
 const INITIAL_SETUP_STEP_STATE = {
   required: true,
@@ -24,63 +35,39 @@ export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
   [Constants.CAMERA_SETUP_STEP_KEY]: CAMERA_INITIAL_SETUP_STATE,
 }
 
-export function setupReducer(
-  state: RunSetupStatus = INITIAL_RUN_SETUP_STATE,
-  action: ProtocolRunAction
-): RunSetupStatus {
-  switch (action.type) {
-    case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
-      return Constants.SETUP_STEP_KEYS.reduce(
-        (currentState, step) => ({
-          ...currentState,
-          [step]: {
-            ...currentState[step],
-            complete:
-              action.payload.complete[step] ?? currentState[step].complete,
-          },
-        }),
-        state
-      )
-
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
-      return Constants.SETUP_STEP_KEYS.reduce(
-        (currentState, step) => ({
-          ...currentState,
-          [step]: {
-            ...currentState[step],
-            required:
-              action.payload.required[step] ?? currentState[step].required,
-          },
-        }),
-        state
-      )
-
-    case Constants.CAMERA_SETUP_STEP_KEY: {
-      const { runId, ...rest } = action.payload
-
-      if ('cameraId' in rest && 'cameraImageSettings' in rest) {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            cameraImageSettings: {
-              ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
-              [rest.cameraId]: rest.cameraImageSettings,
-            },
-          },
+export const setupReducer = createReducer(INITIAL_RUN_SETUP_STATE, builder => {
+  builder
+    .addCase(updateRunSetupStepsComplete, (state, { payload }) => {
+      Constants.SETUP_STEP_KEYS.forEach(step => {
+        const complete = payload.complete[step]
+        if (complete != null) {
+          state[step].complete = complete
         }
-      } else {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            ...rest,
-          },
+      })
+    })
+    .addCase(updateRunSetupStepsRequired, (state, { payload }) => {
+      Constants.SETUP_STEP_KEYS.forEach(step => {
+        const required = payload.required[step]
+        if (required != null) {
+          state[step].required = required
         }
+      })
+    })
+    .addCase(updateCameraSpecificSettings, (state, { payload }) => {
+      state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings[
+        payload.cameraId
+      ] = payload.cameraImageSettings
+    })
+    .addMatcher(
+      isAnyOf(
+        updateCameraEnablement,
+        updateCameraRecoveryEnablement,
+        updateCameraStreamEnablement,
+        updateCameraUsageSettings
+      ),
+      (state, action) => {
+        const { runId, ...rest } = action.payload
+        Object.assign(state[Constants.CAMERA_SETUP_STEP_KEY], rest)
       }
-    }
-
-    default:
-      return state
-  }
-}
+    )
+})

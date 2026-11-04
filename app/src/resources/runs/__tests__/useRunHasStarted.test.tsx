@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -20,7 +19,7 @@ const MOCK_RUN_ID = '1'
 
 describe('useRunHasStarted', () => {
   beforeEach(() => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(null, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({ data: null } as any)
   })
@@ -37,7 +36,7 @@ describe('useRunHasStarted', () => {
       id: MOCK_RUN_ID,
       status: RUN_STATUS_IDLE,
     }
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })
@@ -52,7 +51,7 @@ describe('useRunHasStarted', () => {
       id: MOCK_RUN_ID,
       status: RUN_STATUS_RUNNING,
     }
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID, {
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
       })

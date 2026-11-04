@@ -3,7 +3,8 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
+
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
 import {
@@ -12,22 +13,21 @@ import {
   getRobotSerialNumber,
 } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { getAttachedPipettes } from '/app/redux/pipettes'
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/pipettes')
 vi.mock('/app/redux/robot-settings')
+vi.mock('/app/redux/pipettes')
 
 const ROBOT_SETTINGS = [
   { id: `setting1`, value: true, title: '', description: '' },
@@ -35,10 +35,6 @@ const ROBOT_SETTINGS = [
 ]
 const ROBOT_VERSION = 'version1'
 const ROBOT_FIRMWARE_VERSION = 'firmwareVersion1'
-const ATTACHED_PIPETTES = {
-  left: { id: '1', model: 'testModelLeft' },
-  right: { id: '2', model: 'testModelRight' },
-}
 const ROBOT_SERIAL_NUMBER = 'OT123'
 
 let wrapper: FunctionComponent<{ children: ReactNode }>
@@ -56,13 +52,12 @@ describe('useRobotAnalyticsData hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
+    vi.when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
     vi.mocked(getRobotApiVersion).mockReturnValue(ROBOT_VERSION)
-    vi.mocked(getRobotSettings).mockReturnValue(ROBOT_SETTINGS)
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: { settings: ROBOT_SETTINGS },
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     vi.mocked(getRobotFirmwareVersion).mockReturnValue(ROBOT_FIRMWARE_VERSION)
-    vi.mocked(getAttachedPipettes).mockReturnValue(
-      ATTACHED_PIPETTES as AttachedPipettesByMount
-    )
     vi.mocked(getRobotSerialNumber).mockReturnValue(ROBOT_SERIAL_NUMBER)
   })
 
@@ -78,7 +73,7 @@ describe('useRobotAnalyticsData hook', () => {
   })
 
   it('returns robot analytics data when robot exists', () => {
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn({
         ...mockConnectableRobot,
@@ -95,8 +90,6 @@ describe('useRobotAnalyticsData hook', () => {
       robotApiServerVersion: ROBOT_VERSION,
       robotFF_setting1: true,
       robotFF_setting2: false,
-      robotLeftPipette: 'testModelLeft',
-      robotRightPipette: 'testModelRight',
       robotSmoothieVersion: ROBOT_FIRMWARE_VERSION,
       robotSerialNumber: ROBOT_SERIAL_NUMBER,
     })

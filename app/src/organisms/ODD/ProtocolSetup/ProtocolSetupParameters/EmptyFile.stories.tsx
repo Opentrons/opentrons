@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof EmptyFileComponent> = {
   title: 'ODD/Organisms/EmptyFile',
   component: EmptyFileComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16}>

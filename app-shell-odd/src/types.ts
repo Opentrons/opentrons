@@ -1,5 +1,4 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Logger } from '@opentrons/app/src/logger'
 import type { Config } from '@opentrons/app/src/redux/config/types'
 import type {
   Action,
@@ -9,9 +8,6 @@ import type {
 export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
-
-export type { Logger }
-
 export interface Manifest {
   productionV2: {
     [version: string]: {
@@ -21,6 +17,17 @@ export interface Manifest {
       releaseNotes: [url: string]
     }
   }
+}
+
+export type Log = (message: string, meta?: {}) => void
+export interface Logger {
+  error: Log
+  warn: Log
+  info: Log
+  http: Log
+  verbose: Log
+  debug: Log
+  silly: Log
 }
 
 export type { Config }
@@ -40,6 +47,8 @@ export type CONFIG_TOGGLE_VALUE_TYPE = 'config:TOGGLE_VALUE'
 export type CONFIG_ADD_UNIQUE_VALUE_TYPE = 'config:ADD_UNIQUE_VALUE'
 export type CONFIG_SUBTRACT_VALUE_TYPE = 'config:SUBTRACT_VALUE'
 export type CONFIG_VALUE_UPDATED_TYPE = 'config:VALUE_UPDATED'
+export type DOWNLOAD_AUDIT_LOG_TYPE = 'audit:DOWNLOAD_AUDIT_LOG'
+export type DOWNLOAD_AUDIT_LOGS_TYPE = 'audit:DOWNLOAD_AUDIT_LOGS'
 
 export type POLL_TYPE = 'poll'
 export type INITIAL_TYPE = 'initial'
@@ -125,6 +134,7 @@ export type DISCOVERY_START_TYPE = 'discovery:START'
 export type DISCOVERY_FINISH_TYPE = 'discovery:FINISH'
 export type DISCOVERY_UPDATE_LIST_TYPE = 'discovery:UPDATE_LIST'
 export type DISCOVERY_REMOVE_TYPE = 'discovery:REMOVE'
+export type DISCOVERY_RENAME_TYPE = 'discovery:RENAME'
 export type CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 
 export interface ConfigInitializedAction {

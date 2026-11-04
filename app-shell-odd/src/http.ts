@@ -1,4 +1,5 @@
 // fetch wrapper to throw if response is not ok
+import { createHash } from 'crypto'
 import fs from 'fs'
 import { Transform } from 'stream'
 import FormData from 'form-data'
@@ -13,6 +14,17 @@ import type { Request, RequestInit, Response } from 'node-fetch'
 import type { Readable } from 'stream'
 
 const log = createLogger('http')
+
+function parseSha256ContentDigest(header: string | null): Buffer | null {
+  if (header == null) {
+    return null
+  }
+  const match = /(?:^|,)\s*sha-256=:([A-Za-z0-9+/]+=*):/i.exec(header)
+  if (match == null) {
+    return null
+  }
+  return Buffer.from(match[1], 'base64')
+}
 
 type RequestInput = Request | string
 
@@ -61,6 +73,7 @@ export function fetchText(input: Request, init?: RequestInit): Promise<string> {
 
 export interface FetchToFileOptions {
   onProgress: (progress: DownloadProgress) => unknown
+  onResponse: (response: Response) => unknown
   signal: AbortSignal
 }
 
@@ -71,8 +84,13 @@ export function fetchToFile(
   options?: Partial<FetchToFileOptions>
 ): Promise<string> {
   return fetch(input, { signal: options?.signal }).then(response => {
+    options?.onResponse?.(response)
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) ?? null
+
+    const contentDigest = response.headers.get('content-digest')
+    const expectedDigest = parseSha256ContentDigest(contentDigest)
+    const hasher = createHash('sha256')
 
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
@@ -84,6 +102,9 @@ export function fetchToFile(
     const progressReader = new Transform({
       transform(chunk: string | Buffer, encoding, next) {
         downloaded += chunk.length
+        if (contentDigest != null) {
+          hasher.update(chunk)
+        }
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (onProgress) onProgress({ downloaded, size })
         next(null, chunk)
@@ -97,25 +118,27 @@ export function fetchToFile(
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
         const handleError = (problem: Error): void => {
-          // if we error out, delete the temp dir to clean up
           log.error(`Aborting fetchToFile: ${problem.name}: ${problem.message}`)
           remove(destination).then(() => {
-            reject(error)
+            reject(problem)
           })
         }
-        const listener = (): void => {
-          handleError(
-            new LocalAbortError(
-              (options?.signal?.reason as string | null) ?? 'aborted'
-            )
-          )
-        }
-        options?.signal?.addEventListener('abort', listener, { once: true })
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) {
           handleError(error)
+          return
         }
-        options?.signal?.removeEventListener('abort', listener, {})
+
+        if (
+          contentDigest != null &&
+          (expectedDigest == null || !expectedDigest.equals(hasher.digest()))
+        ) {
+          handleError(
+            new Error('Downloaded file hash does not match expected hash')
+          )
+          return
+        }
+
         resolve(destination)
       })
     })
@@ -125,14 +148,32 @@ export function fetchToFile(
 export function postFile(
   input: RequestInput,
   name: string,
-  source: string
+  source: string,
+  init?: RequestInit
 ): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
     createReadStream(source, reject).then(readStream =>
       new Promise<Response>(resolve => {
         const body = new FormData()
         body.append(name, readStream)
-        resolve(fetch(input, { body, method: 'POST' }))
+        const formHeaders =
+          typeof body.getHeaders === 'function' ? body.getHeaders() : {}
+        const initHeaders =
+          init?.headers != null && !Array.isArray(init.headers)
+            ? (init.headers as Record<string, string>)
+            : {}
+
+        resolve(
+          fetch(input, {
+            ...init,
+            body,
+            method: 'POST',
+            headers: {
+              ...formHeaders,
+              ...initHeaders,
+            },
+          })
+        )
       }).then(resolve)
     )
   })

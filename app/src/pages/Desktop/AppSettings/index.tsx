@@ -9,8 +9,8 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -22,9 +22,10 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 
+import type { ReactNode } from 'react'
 import type { AppSettingsTab, DesktopRouteParams } from '/app/App/types'
 
-export function AppSettings(): JSX.Element {
+export function AppSettings(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const { appSettingsTab } = useParams<
@@ -49,12 +50,13 @@ export function AppSettings(): JSX.Element {
     <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box width="100%" borderRadius={BORDERS.borderRadius8}>
         <Box padding={SPACING.spacing16} paddingBottom={SPACING.spacing16}>
-          <LegacyStyledText
-            css={TYPOGRAPHY.h1Default}
+          <StyledText
+            forwardedAs="h1"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing24}
           >
             {t('app_settings')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}

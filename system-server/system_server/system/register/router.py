@@ -7,6 +7,8 @@ from uuid import UUID
 import sqlalchemy
 from fastapi import APIRouter, Depends, Response, status
 
+from server_utils.audit.fastapi import skip_audit_logger
+
 from .dependencies import create_registrant
 from .models import PostRegisterResponse
 from .storage import get_or_create_registration_token
@@ -20,8 +22,7 @@ register_router = APIRouter()
     "/system/register",
     deprecated=True,
     summary="Register a client with this robot",
-    description=dedent(
-        """\
+    description=dedent("""\
         This was part of an experimental set of endpoints for authorization.
         It's kept for compatibility reasons. Do not use it in new code.
         Use the `/auth` endpoints instead.
@@ -29,12 +30,12 @@ register_router = APIRouter()
         This registers a client (basically just storing the information you pass in)
         and returns a registration token that you can pass to `/system/authorize`.
         Identical information is deduplicated, so this is safe to call multiple times.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": PostRegisterResponse},
         status.HTTP_201_CREATED: {"model": PostRegisterResponse},
     },
+    dependencies=[Depends(skip_audit_logger)],
 )
 async def register_endpoint(
     response: Response,

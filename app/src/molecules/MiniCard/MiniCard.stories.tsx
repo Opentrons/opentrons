@@ -4,8 +4,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -41,9 +41,9 @@ const Children = (
     <Box backgroundColor={COLORS.white}>
       <img src={ROBOT_IMG} style={{ width: '3rem' }} alt="Robot image" />
     </Box>
-    <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+    <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
       MiniCard stories protocol
-    </LegacyStyledText>
+    </StyledText>
   </Flex>
 )
 

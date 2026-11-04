@@ -27,7 +27,7 @@
   "incorrect_pipette_attached": "连接了错误的移液器",
   "insert_screws": "<h1>插入螺钉</h1><block>使用 2.5 毫米螺丝刀，插入移液器背面的三个螺丝。</block>",
   "leave_attached": "保持连接",
-  "level_the_pipette": "<h1>调整移液器水平</h1><block>用您的手，<strong>轻轻地、慢慢地</strong>将移液器向上推。</block><block></block><block>将移液器向下拉，使 8 个喷嘴都接触到</strong>校准块的表面。</block><block>在<strong>按住移液器的同时，</strong>拧紧三个螺钉。</block>",
+  "level_the_pipette": "<h1>调平移液器</h1><block>用手<strong>轻柔且缓慢地</strong>向上推动移液器。</block><block>将校准块放入板位 {{slot}} 中，使{{side}}表面朝向{{direction}}侧。</block><block>向下拉动移液器，使<strong>全部8个吸头</strong>均接触到校准块表面。</block><block>在<strong>保持移液器向下按压的状态下，</strong>拧紧三颗螺丝。</block><block>再次轻柔且缓慢地将移液器向上推回。</block>",
   "loosen_the_screws": "<h1>松开螺丝</h1><block>用一把 2.5 毫米的螺丝刀，拧松移液器背面的三颗螺丝。.</block>",
   "mount": "{{mount}}安装支架",
   "moving_gantry": "移动龙门架...",

@@ -138,4 +138,16 @@ describe('discovery client action creators', () => {
       payload: { name: 'opentrons-dev' },
     })
   })
+
+  it('should create a robot rename action', () => {
+    const action = Actions.renameRobot('opentrons-dev', 'new-name')
+
+    expect(action).toEqual({
+      type: 'client:RENAME_ROBOT',
+      payload: {
+        prevName: 'opentrons-dev',
+        newName: 'new-name',
+      },
+    })
+  })
 })

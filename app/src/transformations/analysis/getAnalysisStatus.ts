@@ -1,12 +1,7 @@
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export type AnalysisStatus =
-  | 'missing'
-  | 'loading'
-  | 'error'
-  | 'complete'
-  | 'stale'
-  | 'parameterRequired'
+  'missing' | 'loading' | 'error' | 'complete' | 'stale' | 'parameterRequired'
 
 export function getAnalysisStatus(
   isAnalyzing: boolean,

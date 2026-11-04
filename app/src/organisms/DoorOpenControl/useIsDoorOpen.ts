@@ -1,20 +1,20 @@
-import { useSelector } from 'react-redux'
-
-import { useDoorQuery, useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useDoorQuery,
+  useModulesQuery,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getCutoutDisplayName,
 } from '@opentrons/shared-data'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { getRobotSettings } from '/app/redux/robot-settings'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { EQUIPMENT_POLL_MS } from './constants'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { CutoutConfig } from '@opentrons/shared-data'
-import type { State } from '/app/redux/types'
 
 export const NOT_CONFIGURED: 'moduleLocationNotConfigured' =
   'moduleLocationNotConfigured'
@@ -37,9 +37,8 @@ function identifyDooredModuleSlot(
 
 export function useIsDoorOpen(robotName: string): DoorResult {
   const doorResult: DoorResult = { isDoorOpen: false, moduleDoorLocation: null }
-  const robotSettings = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const robotSettings = robotSettingsQuery.data?.settings ?? []
   const isFlex = useIsFlex(robotName)
 
   const doorSafetySetting = robotSettings.find(

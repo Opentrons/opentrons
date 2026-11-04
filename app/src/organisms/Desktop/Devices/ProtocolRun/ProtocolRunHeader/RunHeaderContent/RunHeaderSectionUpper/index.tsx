@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { AlertPrimaryButton, BORDERS, StyledText } from '@opentrons/components'
+import { BORDERS, PrimaryButton, StyledText } from '@opentrons/components'
 
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
@@ -13,12 +13,11 @@ import { ActionButton } from '../ActionButton'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionupper.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderContentProps } from '..'
 
 // The upper row of Protocol Run Header.
-export function RunHeaderSectionUpper(
-  props: RunHeaderContentProps
-): JSX.Element {
+export function RunHeaderSectionUpper(props: RunHeaderContentProps): ReactNode {
   const { runId, runStatus, runHeaderModalContainerUtils } = props
   const { t } = useTranslation('run_details')
   const { pause } = useRunControls(runId)
@@ -53,10 +52,10 @@ export function RunHeaderSectionUpper(
       <div className={styles.buttons_container}>
         <div className={styles.buttons_inner}>
           {isCancellableStatus(runStatus) && (
-            <AlertPrimaryButton
+            <PrimaryButton
+              variant="warning"
               borderRadius={BORDERS.borderRadiusFull}
               onClick={handleCancelRunClick}
-              id="RunHeader_cancelRunButton"
             >
               <StyledText
                 oddStyle="bodyTextSemiBold"
@@ -64,7 +63,7 @@ export function RunHeaderSectionUpper(
               >
                 {t('cancel_run')}
               </StyledText>
-            </AlertPrimaryButton>
+            </PrimaryButton>
           )}
           <ActionButton {...props}></ActionButton>
         </div>

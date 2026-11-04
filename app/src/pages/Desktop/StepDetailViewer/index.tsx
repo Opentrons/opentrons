@@ -5,6 +5,7 @@ import { SlotDetails } from '/app/organisms/Desktop/ProtocolVisualization/SlotDe
 
 import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   ProtocolAnalysisOutput,
@@ -24,7 +25,7 @@ interface StepDetailViewerParams {
   protocolKey: string
 }
 
-export function StepDetailViewer(): JSX.Element {
+export function StepDetailViewer(): ReactNode {
   const { protocolKey } = useParams<
     keyof StepDetailViewerParams
   >() as StepDetailViewerParams

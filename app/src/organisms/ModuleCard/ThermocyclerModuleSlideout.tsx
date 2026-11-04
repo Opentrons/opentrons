@@ -6,8 +6,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -22,13 +22,14 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
+import type { ThermocyclerModule } from '@opentrons/api-client'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
-import type { ThermocyclerModule } from '/app/redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -43,7 +44,8 @@ export const ThermocyclerModuleSlideout = (
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = useState<number | null>(null)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
@@ -143,7 +145,7 @@ export const ThermocyclerModuleSlideout = (
         />
       }
     >
-      <LegacyStyledText
+      <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -154,20 +156,20 @@ export const ThermocyclerModuleSlideout = (
           min: tempRanges.min,
           max: tempRanges.max,
         })}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
-        <LegacyStyledText
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
-        </LegacyStyledText>
+        </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
             title={`${String(module.moduleModel)}_${String(isSecondaryTemp)}`}

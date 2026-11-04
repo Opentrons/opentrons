@@ -1,4 +1,4 @@
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
 import { CHOOSE_DROP_TIP_LOCATION, DT_ROUTES } from '../constants'
 
@@ -6,7 +6,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from '../types'
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,
@@ -19,6 +19,7 @@ export const mockDropTipWizardContainerProps: DropTipWizardContainerProps = {
   issuedCommandsType: 'setup',
   activeMaintenanceRunId: 'MOCK_MAINTENANCE_RUN_ID',
   errorDetails: null,
+  clearErrorDetails: MOCK_FN,
   currentStep: CHOOSE_DROP_TIP_LOCATION,
   currentRoute: DT_ROUTES.DROP_TIP,
   currentStepIdx: 0,

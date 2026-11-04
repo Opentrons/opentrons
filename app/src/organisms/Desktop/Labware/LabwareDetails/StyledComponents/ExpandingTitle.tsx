@@ -7,8 +7,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -21,7 +21,7 @@ interface ExpandingTitleProps {
   diagram?: ReactNode
 }
 
-export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
+export function ExpandingTitle(props: ExpandingTitleProps): ReactNode {
   const [diagramVisible, setDiagramVisible] = useState<boolean>(false)
   const toggleDiagramVisible = (): void => {
     setDiagramVisible(currentDiagramVisible => !currentDiagramVisible)
@@ -35,12 +35,9 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {label}
-        </LegacyStyledText>
+        </StyledText>
         {diagram != null && (
           <Link role="button" onClick={toggleDiagramVisible}>
             <Icon

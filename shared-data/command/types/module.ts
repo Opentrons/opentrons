@@ -397,8 +397,7 @@ export interface AtomicVacuumProfileStepPower extends AtomicVacuumProfileStepBas
 }
 
 export type AtomicVacuumProfileStep =
-  | AtomicVacuumProfileStepPressure
-  | AtomicVacuumProfileStepPower
+  AtomicVacuumProfileStepPressure | AtomicVacuumProfileStepPower
 
 export interface VacuumProfileCycle {
   steps: AtomicVacuumProfileStep[]
@@ -711,6 +710,8 @@ interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
   // in seconds
   timeout?: number
   ventAfter?: boolean
+  // in seconds; wait for atmospheric after venting
+  equalizeTimeout?: number
   taskId?: string | null
 }
 

@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { COLORS } from '@opentrons/components'
 import {
@@ -12,6 +11,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { ProtocolSetupParameters } from '..'
@@ -42,6 +42,9 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('/app/redux/config')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()
@@ -72,14 +75,23 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseNumber).mockReturnValue(<div>mock ChooseNumber</div>)
     vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
-    when(vi.mocked(useCreateProtocolAnalysisMutation))
+    vi.when(vi.mocked(useCreateProtocolAnalysisMutation))
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createProtocolAnalysis: mockCreateProtocolAnalysis } as any)
-    when(vi.mocked(useCreateRunMutation))
-      .calledWith(expect.anything())
+    vi.when(vi.mocked(useCreateRunMutation))
+      .calledWith(
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+        expect.anything(),
+        undefined,
+        ['confirm_parameters']
+      )
       .thenReturn({ createRun: mockCreateRun } as any)
-    when(vi.mocked(useUploadCsvFileMutation))
-      .calledWith(expect.anything(), expect.anything())
+    vi.when(vi.mocked(useUploadCsvFileMutation))
+      .calledWith(
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+        expect.anything(),
+        expect.anything()
+      )
       .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,

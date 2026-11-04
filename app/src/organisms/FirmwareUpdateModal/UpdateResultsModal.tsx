@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -16,6 +16,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { usePipetteModelSpecs } from '/app/local-resources/instruments'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -26,9 +27,7 @@ interface UpdateResultsModalProps {
   instrument?: InstrumentData
 }
 
-export function UpdateResultsModal(
-  props: UpdateResultsModalProps
-): JSX.Element {
+export function UpdateResultsModal(props: UpdateResultsModalProps): ReactNode {
   const { isSuccess, shouldExit, onClose, instrument } = props
   const { i18n, t } = useTranslation(['firmware_update', 'shared', 'branded'])
 
@@ -54,9 +53,9 @@ export function UpdateResultsModal(
       {!isSuccess ? (
         <OddModal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
+            <StyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
               {t('branded:firmware_update_download_logs')}
-            </LegacyStyledText>
+            </StyledText>
             <SmallButton
               onClick={onClose}
               buttonText={
@@ -93,14 +92,14 @@ export function UpdateResultsModal(
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 forwardedAs="p"
                 textAlign={TYPOGRAPHY.textAlignCenter}
               >
@@ -114,7 +113,7 @@ export function UpdateResultsModal(
                     bold: <strong />,
                   }}
                 />
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <SmallButton
               onClick={onClose}

@@ -1,14 +1,13 @@
 import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import { resolveNumericRuntimeValue, resolveStringRuntimeValue } from '../utils'
 
 import type {
-  AbsorbanceReaderInitializeParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data'
-import type {
+  AbsorbanceReaderInitializeStepGenArgs,
   AbsorbanceReaderState,
   InvariantContext,
+  ModuleStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -30,12 +29,21 @@ const _getAbsorbanceReaderState = (
 }
 
 export const forAbsorbanceReaderOpenLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    console.error(
+      `forAbsorbanceReaderOpenLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
 
   if (moduleState != null) {
@@ -44,12 +52,21 @@ export const forAbsorbanceReaderOpenLid = (
 }
 
 export const forAbsorbanceReaderCloseLid = (
-  params: ModuleOnlyParams,
+  params: ModuleStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    console.error(
+      `forAbsorbanceReaderCloseLid: arg resolved to null (moduleId=${String(
+        moduleId
+      )})`
+    )
+    return
+  }
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
 
   if (moduleState != null) {
@@ -58,20 +75,51 @@ export const forAbsorbanceReaderCloseLid = (
 }
 
 export const forAbsorbanceReaderInitialize = (
-  params: AbsorbanceReaderInitializeParams,
+  params: AbsorbanceReaderInitializeStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, measureMode, sampleWavelengths, referenceWavelength } =
-    params
+  const { runtimeParameters } = invariantContext
+  const { measureMode, sampleWavelengths, referenceWavelength } = params
+  const moduleId = resolveStringRuntimeValue(params.moduleId, runtimeParameters)
+  const measureModeValue = resolveStringRuntimeValue(
+    measureMode,
+    runtimeParameters
+  )
+  const resolvedMeasureMode =
+    measureModeValue === 'single' || measureModeValue === 'multi'
+      ? measureModeValue
+      : null
+  const resolvedSampleWavelengths = sampleWavelengths.map(wavelength =>
+    resolveNumericRuntimeValue(wavelength, runtimeParameters)
+  )
+  const resolvedReferenceWavelength =
+    referenceWavelength == null
+      ? undefined
+      : resolveNumericRuntimeValue(referenceWavelength, runtimeParameters)
+  if (
+    moduleId == null ||
+    resolvedMeasureMode == null ||
+    resolvedSampleWavelengths.some(wavelength => wavelength == null) ||
+    resolvedReferenceWavelength === null
+  ) {
+    console.error(
+      `forAbsorbanceReaderInitialize: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, measureMode=${String(resolvedMeasureMode)}, sampleWavelengths=${String(
+        resolvedSampleWavelengths
+      )}, referenceWavelength=${String(resolvedReferenceWavelength)})`
+    )
+    return
+  }
 
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
   if (moduleState != null) {
     moduleState.initialization = {
-      mode: measureMode,
-      wavelengths: sampleWavelengths,
-      referenceWavelength,
+      mode: resolvedMeasureMode,
+      wavelengths: resolvedSampleWavelengths as number[],
+      referenceWavelength: resolvedReferenceWavelength,
     }
     moduleState.lidOpen = false
   }

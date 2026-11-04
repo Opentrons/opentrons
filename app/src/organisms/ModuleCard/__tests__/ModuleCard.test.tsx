@@ -1,23 +1,25 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
-import { useCurrentAllSubsystemUpdatesQuery } from '@opentrons/react-api-client'
-
-import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { useToaster } from '/app/organisms/ToasterOven'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { getIsHeaterShakerAttached } from '/app/redux/config'
-import { getLocalRobot } from '/app/redux/discovery'
-import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
-import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
+} from '@opentrons/api-client'
+import {
+  useCurrentAllSubsystemUpdatesQuery,
+  useUpdateModuleMutation,
+} from '@opentrons/react-api-client'
+
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
@@ -36,17 +38,16 @@ import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 import { VacuumModuleData } from '../VacuumModule/VacuumModuleData'
 
-import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   FlexStackerModule,
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
   VacuumModule,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')
@@ -61,13 +62,24 @@ vi.mock('../ModuleOverflowMenu')
 vi.mock('../../ModuleWizardFlows')
 vi.mock('/app/resources/runs')
 vi.mock('../FirmwareUpdateFailedModal')
-vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('../../DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/redux/discovery')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+vi.mock(
+  '/app/local-resources/access-control/useRequireAdminForUpdates',
+  () => ({
+    useRequireAdminForUpdates: () => ({
+      isLoading: false,
+      ensureCanUpdate: () => true,
+    }),
+  })
+)
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -239,8 +251,8 @@ const mockVacuumModule = {
 const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
-
-const MOCK_LATEST_REQUEST_ID = '1234'
+const mockUpdateModuleAsync = vi.fn()
+const mockResetUpdateModule = vi.fn()
 
 const render = (props: ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
@@ -248,13 +260,23 @@ const render = (props: ComponentProps<typeof ModuleCard>) => {
   })[0]
 }
 
+const mockUpdateModuleMutation = (
+  overrides: Record<string, unknown> = {}
+): void => {
+  vi.mocked(useUpdateModuleMutation).mockReturnValue({
+    mutateAsync: mockUpdateModuleAsync,
+    isLoading: false,
+    isError: false,
+    error: null,
+    reset: mockResetUpdateModule,
+    ...overrides,
+  } as any)
+}
+
 describe('ModuleCard', () => {
   let props: ComponentProps<typeof ModuleCard>
-  let mockHandleModuleApiRequests: Mock
 
   beforeEach(() => {
-    mockHandleModuleApiRequests = vi.fn()
-
     props = {
       module: mockMagneticModule,
       robotName: mockRobot.name,
@@ -262,8 +284,6 @@ describe('ModuleCard', () => {
       attachPipetteRequired: false,
       calibratePipetteRequired: false,
       updatePipetteFWRequired: false,
-      handleModuleApiRequests: mockHandleModuleApiRequests,
-      latestRequestId: MOCK_LATEST_REQUEST_ID,
     }
 
     vi.mocked(ErrorInfo).mockReturnValue(null)
@@ -293,12 +313,15 @@ describe('ModuleCard', () => {
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
-    vi.mocked(getRequestById).mockReturnValue(null)
-    when(useRunStatuses)
+    mockUpdateModuleAsync.mockResolvedValue({})
+    mockUpdateModuleMutation()
+    vi.when(useRunStatuses)
       .calledWith()
       .thenReturn({ isRunRunning: false } as any)
-    when(useIsFlex).calledWith(props.robotName).thenReturn(true)
-    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
+    vi.when(useIsFlex).calledWith(props.robotName).thenReturn(true)
+    vi.when(useIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .thenReturn(false)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
     } as unknown as UseQueryResult<DeckConfiguration>)
@@ -395,7 +418,7 @@ describe('ModuleCard', () => {
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {
-    when(useRunStatuses)
+    vi.when(useRunStatuses)
       .calledWith()
       .thenReturn({ isRunRunning: true } as any)
     render({
@@ -416,21 +439,28 @@ describe('ModuleCard', () => {
     })
     screen.getByText(nestedTextMatcher('Module is hot to the touch'))
   })
-  it('renders information success toast when update has completed', () => {
-    vi.mocked(getRequestById).mockReturnValue({
-      status: SUCCESS,
-      response: {
-        method: 'POST',
-        ok: true,
-        path: '/',
-        status: 200,
-      },
-    })
+  it('renders information success toast when update has completed', async () => {
+    mockUpdateModuleAsync.mockResolvedValue({})
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: 'thermocyclerModuleV1',
+          opentronsModuleSerialNumber: 'jkl123',
+        },
+      ],
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
-      module: mockHotHeaterShaker,
+      module: mockHotThermo,
     })
-    expect(mockMakeToast).toBeCalled()
+    fireEvent.click(screen.getByText('Update now'))
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith(
+      mockHotThermo.serialNumber
+    )
+    await vi.waitFor(() => {
+      expect(mockMakeToast).toHaveBeenCalled()
+    })
   })
   it('renders information when calibration is required so calibration update banner renders', () => {
     render({
@@ -457,7 +487,6 @@ describe('ModuleCard', () => {
       const button = screen.getByText('Set up module')
       fireEvent.click(button)
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
-      expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
   })
   ;[mockFlexStacker, mockVacuumModule].forEach(module => {
@@ -472,7 +501,6 @@ describe('ModuleCard', () => {
       const button = screen.getByText('Set up module')
       fireEvent.click(button)
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
-      expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     })
   })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
@@ -495,7 +523,7 @@ describe('ModuleCard', () => {
     screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
-    expect(vi.mocked(getRequestById)).toHaveBeenCalled()
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith('fs123')
   })
   it('renders information when a firmware update is available if it has already been calibrated', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
@@ -514,7 +542,9 @@ describe('ModuleCard', () => {
     screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
-    expect(vi.mocked(getRequestById)).toHaveBeenCalled()
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith(
+      mockHotThermo.serialNumber
+    )
   })
   it('renders information for update available and it fails rendering the fail modal', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
@@ -526,14 +556,8 @@ describe('ModuleCard', () => {
         },
       ],
     } as unknown as UseQueryResult<DeckConfiguration>)
-    vi.mocked(getRequestById).mockReturnValue({
-      status: FAILURE,
-      response: {
-        method: 'POST',
-        ok: false,
-        path: '/',
-        status: 500,
-      },
+    mockUpdateModuleMutation({
+      isError: true,
       error: { message: 'ruh roh' },
     })
     render({
@@ -541,15 +565,10 @@ describe('ModuleCard', () => {
       module: mockHotThermo,
     })
     screen.getByText('Firmware update available.')
-    const button = screen.getByText('Update now')
-    fireEvent.click(button)
-    expect(vi.mocked(getRequestById)).toHaveBeenCalled()
     expect(screen.getByText('mock firmware update failed modal')).toBeVisible()
   })
   it('renders information for update available and updating now text shows up when update is in progress', () => {
-    vi.mocked(getRequestById).mockReturnValue({
-      status: PENDING,
-    })
+    mockUpdateModuleMutation({ isLoading: true })
     render({
       ...props,
       module: mockMagneticModuleHub,

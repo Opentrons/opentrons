@@ -58,7 +58,7 @@ class OpenVentImpl(AbstractCommandImpl[OpenVentParams, SuccessData[OpenVentResul
             if params.equalizeTimeout is not None:
                 await vm_hardware.wait_for_pressure_equalization(params.equalizeTimeout)
 
-        # Equalize wait clears residual va.
+        # Equalize wait clears residual vacuum.
         if params.equalizeTimeout is not None and params.equalizeTimeout > 0:
             state_update.update_vacuum_module_residual_vacuum(
                 params.moduleId, residual_vacuum=False

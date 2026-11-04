@@ -1,15 +1,16 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { ERROR_KINDS, RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function RetryStepInfo(
   props: RecoveryContentProps & { secondaryBtnOnClickOverride?: () => void }
-): JSX.Element {
+): ReactNode {
   const { routeUpdateActions, recoveryCommands, errorKind } = props
   const { ROBOT_RETRYING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
@@ -43,7 +44,7 @@ export function RetryStepInfo(
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText forwardedAs="p" />,
+          block: <StyledText forwardedAs="p" />,
         }}
       />
     )

@@ -7,6 +7,7 @@ import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -61,7 +62,10 @@ router = LightRouter()
             "model": ErrorBody[models.InvalidDeckConfiguration]
         },
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("set deck configuration")),
+    ],
 )
 async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],

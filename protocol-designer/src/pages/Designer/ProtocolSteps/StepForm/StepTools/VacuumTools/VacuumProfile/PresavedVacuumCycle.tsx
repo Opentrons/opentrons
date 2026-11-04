@@ -16,6 +16,7 @@ import { PresavedVacuumStep } from './PresavedVacuumStep'
 import { SavedVacuumStep } from './SavedVacuumStep'
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
@@ -34,7 +35,7 @@ export interface PresavedVacuumCycleProps extends PresavedVacuumCycleBaseProps {
 
 export function PresavedVacuumCycle(
   props: PresavedVacuumCycleProps
-): JSX.Element {
+): ReactNode {
   const {
     orderedProfileStepIds,
     profileStepItemsById,

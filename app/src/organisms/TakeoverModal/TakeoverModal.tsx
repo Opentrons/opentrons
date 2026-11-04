@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,7 +17,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
@@ -28,7 +28,7 @@ interface TakeoverModalProps {
   terminateInProgress: boolean
 }
 
-export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
+export function TakeoverModal(props: TakeoverModalProps): ReactNode {
   const {
     title,
     showConfirmTerminateModal,
@@ -49,9 +49,9 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
       //    confirm terminate modal
       <OddModal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
+          <StyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
             <SmallButton
               onClick={() => {
@@ -96,21 +96,18 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               size="2.5rem"
               marginBottom={SPACING.spacing16}
             />
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h4"
               marginBottom={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
               {title}
-            </LegacyStyledText>
-            <LegacyStyledText
-              forwardedAs="p"
-              textAlign={TYPOGRAPHY.textAlignCenter}
-            >
+            </StyledText>
+            <StyledText forwardedAs="p" textAlign={TYPOGRAPHY.textAlignCenter}>
               {t('branded:computer_in_app_is_controlling_robot')}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             onClick={() => {
@@ -118,7 +115,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             }}
           >
             {t('terminate')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </OddModal>
     ),

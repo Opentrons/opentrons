@@ -6,19 +6,21 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 
+import type { ReactNode } from 'react'
+
 export function EnableErrorRecoveryMode({
   isRobotBusy,
 }: {
   isRobotBusy: boolean
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('app_settings')
   const { isEREnabled, toggleERSettings } = useErrorRecoverySettingsToggle()
 
@@ -30,16 +32,15 @@ export function EnableErrorRecoveryMode({
     >
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Error_Recovery_Mode"
           >
             {t('error_recovery_mode')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('error_recovery_mode_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Box>
       <ToggleButton
@@ -47,7 +48,6 @@ export function EnableErrorRecoveryMode({
         toggledOn={isEREnabled}
         onClick={toggleERSettings}
         disabled={isRobotBusy}
-        id="RobotSettings_enableErrorRecoveryModeToggleButton"
       />
     </Flex>
   )

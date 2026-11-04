@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -29,12 +28,12 @@ describe('ViewOnlyParameters', () => {
       runId: 'mockId',
       setSetupScreen: vi.fn(),
     }
-    when(vi.mocked(useMostRecentCompletedAnalysis))
+    vi.when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as any)
-    when(useToaster)
+    vi.when(useToaster)
       .calledWith()
       .thenReturn({
         makeSnackbar: mockMakeSnackBar,

@@ -7,6 +7,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   POSITION_FIXED,
+  Z_INDEX,
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
@@ -17,7 +18,7 @@ import type { Meta, Story } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(
@@ -56,7 +57,7 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_FIXED}
           bottom={SPACING.spacing16}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
         >
           <Toast
             {...args}

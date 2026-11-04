@@ -3,7 +3,7 @@ import { getLabwareViewBox } from '@opentrons/shared-data'
 import { COLORS } from '../../../helix-design-system'
 import { getTiprackBackgroundColor } from './getTiprackBackgroundColor'
 
-import type { CSSProperties, SVGProps } from 'react'
+import type { CSSProperties, ReactNode, SVGProps } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export type LabwareOutlineProps = {
@@ -39,7 +39,7 @@ interface DefinitionReplacementProps {
 
 const OUTLINE_THICKNESS_MM = 1
 
-export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
+export function LabwareOutline(props: LabwareOutlineProps): ReactNode {
   const {
     definition,
     isTiprack = false,
@@ -139,7 +139,7 @@ interface LabwareBorderProps extends SVGProps<SVGRectElement> {
   yDimension: number
   showRadius?: boolean
 }
-function LabwareBorder(props: LabwareBorderProps): JSX.Element {
+function LabwareBorder(props: LabwareBorderProps): ReactNode {
   const {
     borderThickness,
     minX,

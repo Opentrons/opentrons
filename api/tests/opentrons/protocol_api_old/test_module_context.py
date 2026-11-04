@@ -29,7 +29,9 @@ from opentrons.types import Location, Point
 
 @pytest.fixture
 def mock_hardware() -> mock.MagicMock:
-    return mock.MagicMock()
+    mock_hardware = mock.MagicMock()
+    del mock_hardware._proxy
+    return mock_hardware
 
 
 @pytest.fixture

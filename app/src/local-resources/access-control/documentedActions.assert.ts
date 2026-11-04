@@ -4,7 +4,7 @@ import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
   AttachingModuleAction,
   PipetteWizardFlowAction,
-} from '@opentrons/react-api-client/src/access_control/types'
+} from '@opentrons/react-api-client/src/accessControl/types'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 /**

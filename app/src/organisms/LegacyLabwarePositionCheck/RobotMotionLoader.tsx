@@ -7,19 +7,21 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   RESPONSIVENESS,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 interface RobotMotionLoaderProps {
   header?: string
   body?: string
 }
 
-export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
+export function RobotMotionLoader(props: RobotMotionLoaderProps): ReactNode {
   const { header, body } = props
   return (
     <Flex
@@ -31,9 +33,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
     >
       <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
-      {body != null ? (
-        <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
-      ) : null}
+      {body != null ? <StyledText forwardedAs="p">{body}</StyledText> : null}
     </Flex>
   )
 }

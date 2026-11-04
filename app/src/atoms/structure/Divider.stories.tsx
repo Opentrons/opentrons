@@ -3,8 +3,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -25,16 +25,13 @@ const meta: Meta<typeof DividerComponent> = {
             gridGap={SPACING.spacing8}
           >
             <Box padding={SPACING.spacing16}>
-              <LegacyStyledText
-                as="h3"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {'About Calibration'}
-              </LegacyStyledText>
+              </StyledText>
 
-              <LegacyStyledText as="p">
+              <StyledText as="p">
                 {'This section is about calibration.'}
-              </LegacyStyledText>
+              </StyledText>
             </Box>
           </Flex>
         </Box>
@@ -45,15 +42,12 @@ const meta: Meta<typeof DividerComponent> = {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Box padding={SPACING.spacing16} gridGap={SPACING.spacing8}>
-              <LegacyStyledText
-                as="h3"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {'Deck Calibration'}
-              </LegacyStyledText>
-              <LegacyStyledText as="p">
+              </StyledText>
+              <StyledText as="p">
                 {'This section is for deck calibration.'}
-              </LegacyStyledText>
+              </StyledText>
             </Box>
           </Flex>
         </Box>

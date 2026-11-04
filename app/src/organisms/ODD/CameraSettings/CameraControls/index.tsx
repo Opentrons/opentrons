@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import isEqual from 'lodash/isEqual'
 
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
@@ -11,14 +13,11 @@ import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
 import { ZoomSettingsView } from './ZoomSettingsView'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 export type ActiveControlView =
-  | 'zoom'
-  | 'brightness'
-  | 'contrast'
-  | 'saturation'
-  | null
+  'zoom' | 'brightness' | 'contrast' | 'saturation' | null
 
 export interface CameraControlsProps {
   toggleShowControls: () => void
@@ -28,13 +27,15 @@ export interface CameraControlsProps {
 export function CameraControls({
   toggleShowControls,
   runId,
-}: CameraControlsProps): JSX.Element {
+}: CameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
   const settings = useCameraSettingsValues(runId)
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
+  const documentationState = useDocumentationState()
+  const { createCameraImageSettings } =
+    useCreateCameraImageSettings(documentationState)
 
   const returnToHomeView = (partialSettings: CameraImageSettings): void => {
     setIsLoading(true)
@@ -56,6 +57,11 @@ export function CameraControls({
       )
       setActiveSubView(null)
     } else {
+      if (isEqual(cameraImageSettings, settings)) {
+        setIsLoading(false)
+        setActiveSubView(null)
+        return
+      }
       createCameraImageSettings(cameraImageSettings, {
         onSuccess: () => {
           setActiveSubView(null)

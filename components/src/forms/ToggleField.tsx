@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './forms.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 
 export interface ToggleFieldProps {
   /** change handler */
@@ -26,7 +26,7 @@ export interface ToggleFieldProps {
   tabIndex?: number
 }
 
-export function ToggleField(props: ToggleFieldProps): JSX.Element {
+export function ToggleField(props: ToggleFieldProps): ReactNode {
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.toggle_disabled]: props.disabled,
   })

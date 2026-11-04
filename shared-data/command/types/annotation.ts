@@ -3,8 +3,7 @@ import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 export type AnnotationCreateCommand = CommentCreateCommand | CustomCreateCommand
 
 export type AnnotationRunTimeCommand =
-  | CommentRunTimeCommand
-  | CustomRunTimeCommand
+  CommentRunTimeCommand | CustomRunTimeCommand
 
 export interface CommentCreateCommand extends CommonCommandCreateInfo {
   commandType: 'comment'

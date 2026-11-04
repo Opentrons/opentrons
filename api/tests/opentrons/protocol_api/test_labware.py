@@ -149,6 +149,37 @@ def test_load_labware(
     decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
 
 
+def test_load_adapter(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: Labware,
+) -> None:
+    """It should load an adapter onto the labware."""
+    new_mock_core = decoy.mock(cls=LabwareCore)
+    decoy.when(
+        mock_protocol_core.load_adapter(
+            load_name="adapter-name",
+            namespace="a-namespace",
+            version=123,
+            location=mock_labware_core,
+        )
+    ).then_return(new_mock_core)
+    decoy.when(new_mock_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        name="adapter-name",
+        namespace="a-namespace",
+        version=123,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.api_version == api_version
+    decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_labware_core: LabwareCore,

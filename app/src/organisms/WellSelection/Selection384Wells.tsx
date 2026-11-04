@@ -7,9 +7,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -40,7 +40,7 @@ export function Selection384Wells({
   deselectWells,
   labwareRender,
   selectWells,
-}: Selection384WellsProps): JSX.Element {
+}: Selection384WellsProps): ReactNode {
   const [selectBy, setSelectBy] = useState<'columns' | 'wells'>('columns')
 
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
@@ -186,17 +186,14 @@ function SelectBy({
   selectBy,
   setSelectBy,
   setLastSelectedIndex,
-}: SelectByProps): JSX.Element {
+}: SelectByProps): ReactNode {
   const { t, i18n } = useTranslation('quick_transfer')
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <RadioButton
           buttonLabel={i18n.format(t('columns'), 'capitalize')}
@@ -249,7 +246,7 @@ function StartingWell({
     SetStateAction<Record<StartingWellOption, boolean>>
   >
   wells: string[]
-}): JSX.Element {
+}): ReactNode {
   const { t, i18n } = useTranslation('quick_transfer')
 
   const checkboxWellOptions: StartingWellOption[] =
@@ -273,12 +270,9 @@ function StartingWell({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {checkboxWellOptions.map(well => (
           <Checkbox
@@ -314,7 +308,7 @@ interface ButtonControlsProps {
   plusDisabled: boolean
 }
 
-function ButtonControls(props: ButtonControlsProps): JSX.Element {
+function ButtonControls(props: ButtonControlsProps): ReactNode {
   const { channels, handleMinus, handlePlus, minusDisabled, plusDisabled } =
     props
   const { t, i18n } = useTranslation('quick_transfer')
@@ -322,15 +316,12 @@ function ButtonControls(props: ButtonControlsProps): JSX.Element {
   const addOrRemoveButtons =
     channels !== 96 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {i18n.format(
             t(channels === 8 ? 'add_or_remove_columns' : 'add_or_remove'),
             'capitalize'
           )}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing16} height="6.5rem">
           <IconButton
             disabled={minusDisabled}

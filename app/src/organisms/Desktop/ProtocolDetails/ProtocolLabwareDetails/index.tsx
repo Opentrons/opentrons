@@ -18,12 +18,13 @@ import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/
 
 import { LabwareDetailOverflowMenu } from './LabwareDetailOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export const ProtocolLabwareDetails = (props: {
   commands: RunTimeCommand[]
-}): JSX.Element => {
+}): ReactNode => {
   const { commands } = props
   const { t } = useTranslation('protocol_details')
 
@@ -81,7 +82,7 @@ interface ProtocolLabwareDetailItemProps {
 
 export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
-): JSX.Element => {
+): ReactNode => {
   const { t } = useTranslation('protocol_details')
   const { isStandard, displayName, quantity, labware, lidDisplayName } = props
   return (

@@ -10,9 +10,9 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -34,6 +34,7 @@ import {
 } from '/app/resources/deck_configuration/utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -107,7 +108,7 @@ function FixtureTableItem({
   deckDef,
   robotName,
   partialRequiredCutoutFixtureId,
-}: FixtureTableItemProps): JSX.Element {
+}: FixtureTableItemProps): ReactNode {
   const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const [showLocationConflictModal, setShowLocationConflictModal] =
@@ -212,7 +213,7 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
@@ -226,7 +227,7 @@ function FixtureTableItem({
                   partialRequiredCutoutFixtureId ??
                     compatibleCutoutFixtureIds?.[0]
                 )}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
           <RobotInfoLabel deckLabel={displayLocation} />

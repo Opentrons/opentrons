@@ -12,12 +12,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -40,7 +41,7 @@ export interface SlideoutProps {
 }
 
 const SHARED_STYLE = css`
-  z-index: 2;
+  z-index: var(--z-index-details);
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -117,7 +118,7 @@ const CLOSE_ICON_STYLE = css`
   }
 `
 
-export const Slideout = (props: SlideoutProps): JSX.Element => {
+export const Slideout = (props: SlideoutProps): ReactNode => {
   const {
     isExpanded,
     title,
@@ -185,7 +186,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {multiSlideoutSpecs === undefined ? null : (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
@@ -195,7 +196,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                 current: multiSlideoutSpecs.currentStep,
                 max: multiSlideoutSpecs.maxSteps,
               })}
-            </LegacyStyledText>
+            </StyledText>
           )}
           {typeof title === 'string' ? (
             <Flex
@@ -205,21 +206,15 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               paddingX={SPACING.spacing16}
               marginBottom={SPACING.spacing16}
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                data-testid={`Slideout_title_${title}`}
               >
                 {title}
-              </LegacyStyledText>
+              </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
-                <Btn
-                  size="1.5rem"
-                  onClick={handleClose}
-                  aria-label="exit"
-                  data-testid={`Slideout_icon_close_${title}`}
-                >
+                <Btn size="1.5rem" onClick={handleClose} aria-label="exit">
                   <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>
               </Flex>
@@ -232,9 +227,6 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
             padding={childrenPadding}
             flex="1 1 auto"
             overflowY="auto"
-            data-testid={`Slideout_body_${
-              typeof title === 'string' ? title : ''
-            }`}
             ref={slideOutRef}
             onScroll={handleScroll}
           >
@@ -246,7 +238,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               paddingX={SPACING.spacing16}
               flex="0 0 auto"
               boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
-              zIndex="3"
+              zIndex={Z_INDEX.MENUS}
             >
               {footer}
             </Box>

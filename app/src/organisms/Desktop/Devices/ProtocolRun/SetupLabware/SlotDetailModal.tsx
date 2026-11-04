@@ -184,7 +184,6 @@ export function SlotDetailModal(
       closeOnOutsideClick
       childrenPadding={0}
       width={isVariedStack || selectedLiquidId != null ? '47rem' : '31.25rem'}
-      marginLeft="0"
       overflowY="hidden"
     >
       <Box

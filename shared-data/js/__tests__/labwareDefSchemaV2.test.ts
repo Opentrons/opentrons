@@ -198,7 +198,9 @@ const expectGroupsFollowConvention = (
 
     const { displayCategory } = labwareDef.metadata
     const noGroupsMetadataAllowed =
-      displayCategory === 'reservoir' || displayCategory === 'wellPlate'
+      displayCategory === 'reservoir' ||
+      displayCategory === 'wellPlate' ||
+      displayCategory === 'filterPlate'
 
     if (noGroupsMetadataAllowed) {
       labwareDef.groups.forEach(group => {

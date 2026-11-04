@@ -5,45 +5,44 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDisableStackerSensors } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface DisableStackerSensorsProps {
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function DisableStackerSensors({
-  robotName,
   isRobotBusy,
-}: DisableStackerSensorsProps): JSX.Element {
+}: DisableStackerSensorsProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_disableStackerSensors"
         >
           {t('disable_stacker_sensors')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('disable_stacker_sensors_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="disable_stacker_sensors"
         toggledOn={sensorsDisabled}
         onClick={toggleSensors}
-        id="RobotSettings_DisableStackerSensorsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

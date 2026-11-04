@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_scopes_str
+      - seed_users
 
 stages:
   - name: Exchange a username and password for an access token and refresh token
@@ -40,6 +41,7 @@ stages:
       json:
         active: true
         username: testadmin
+        ot_fullname: Test Admin
         scope: *returned_scope
 
   - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
@@ -89,6 +91,7 @@ stages:
       json:
         active: true
         username: testadmin
+        ot_fullname: Test Admin
         scope: *returned_scope
 
   - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
@@ -111,6 +114,7 @@ marks:
   - usefixtures:
       - run_server
       - user_scopes_str
+      - seed_users
 
 stages:
   - name: Send a password authorization request with invalid scopes
@@ -176,6 +180,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_scopes_str
+      - seed_users
 
 stages:
   - name: Send a password authorization request with narrower-than-default scope
@@ -249,6 +254,7 @@ test_name: Wrong username and password credentials should be rejected
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Send an invalid username+password combo to the token endpoint
@@ -288,6 +294,7 @@ test_name: Invalid refresh tokens should be rejected
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Send an invalid refresh token to the token endpoint
@@ -325,6 +332,7 @@ test_name: Unrecognized clients should be rejected
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Send an unrecognized client_id to the token endpoint
@@ -363,6 +371,7 @@ test_name: Unrecognized scopes should be rejected
 marks:
   - usefixtures:
       - run_server
+      - seed_users
 
 stages:
   - name: Pass an unrecognized scope to the initial token request
@@ -424,6 +433,8 @@ test_name: Unsupported grant types (those other than "password" and "refresh") s
 marks:
   - usefixtures:
       - run_server
+      - seed_users
+
   - parametrize:
       key: grant_type
       vals:

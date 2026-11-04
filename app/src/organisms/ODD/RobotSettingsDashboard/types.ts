@@ -21,5 +21,6 @@ export type SettingOption =
   | 'CameraPreferences'
   | 'Devices'
   | 'RobotEncryptionKey'
+  | 'FileManager'
 
 export type SetSettingOption = (option: SettingOption | null) => void

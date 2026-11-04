@@ -8,10 +8,10 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -19,6 +19,8 @@ import { i18n } from '/app/i18n'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
+
+import type { ReactNode } from 'react'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/creating-labware-offsets'
@@ -28,7 +30,7 @@ interface TipConfirmationProps {
   confirmTip: () => void
 }
 
-export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
+export function TipConfirmation(props: TipConfirmationProps): ReactNode {
   const { invalidateTip, confirmTip } = props
   const { t } = useTranslation('shared')
   const isOnDevice = useSelector(getIsOnDevice)
@@ -62,9 +64,9 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
+      <StyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -103,7 +103,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
 
         state_update = StateUpdate()
 
-        final_location = self._state_view.geometry.get_well_position(
+        final_location = self._state_view.instrument_interface.get_well_position(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
@@ -189,7 +189,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         if isinstance(aspirate_result, DefinedErrorData):
             state_update.set_liquid_operated(
                 labware_id=labware_id,
-                well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                     labware_id,
                     well_name,
                     params.pipetteId,
@@ -202,11 +202,11 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
 
         state_update.set_liquid_operated(
             labware_id=labware_id,
-            well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+            well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                 labware_id, well_name, pipette_id
             ),
             volume_added=-aspirate_result.public.volume
-            * self._state_view.geometry.get_nozzles_per_well(
+            * self._state_view.instrument_interface.get_nozzles_per_well(
                 labware_id,
                 well_name,
                 params.pipetteId,

@@ -1,0 +1,60 @@
+import { useTranslation } from 'react-i18next'
+
+import { Chip, StyledText, TYPOGRAPHY } from '@opentrons/components'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+
+import { TertiaryButton } from '/app/atoms/buttons'
+import { handleEnableCRSWizard } from '/app/organisms/Desktop/EnableCRSWizard'
+
+import styles from './index.module.css'
+
+import type { ReactNode } from 'react'
+
+interface Props {
+  isRobotBusy: boolean
+  robotName: string
+}
+
+export function EnableComplianceReadySoftware(props: Props): ReactNode {
+  const { isRobotBusy, robotName } = props
+  const { t } = useTranslation('device_settings')
+
+  const crsEnabledQuery = useAccessControlEnabledQuery()
+  const isCRSEnabledQuerySuccessful = crsEnabledQuery.isSuccess
+  const isCRSEnabled = crsEnabledQuery.data?.data.accessControlEnabled ?? false
+
+  const isButtonEnabled =
+    isCRSEnabledQuerySuccessful && !isCRSEnabled && !isRobotBusy
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.text_container}>
+        <div className={styles.title_row}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {t('crs_title')}
+          </StyledText>
+          {isCRSEnabledQuerySuccessful ? (
+            <Chip
+              chipSize="small"
+              hasIcon={false}
+              type={isCRSEnabled ? 'success' : 'neutral'}
+              text={isCRSEnabled ? t('enabled') : t('disabled')}
+            />
+          ) : null}
+        </div>
+        <StyledText forwardedAs="p">{t('crs_description')}</StyledText>
+      </div>
+      <TertiaryButton
+        onClick={() => {
+          handleEnableCRSWizard({ robotName })
+        }}
+        disabled={!isButtonEnabled}
+      >
+        {t('crs_button')}
+      </TertiaryButton>
+    </div>
+  )
+}

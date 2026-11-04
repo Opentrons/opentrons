@@ -26,6 +26,8 @@ SERIAL_SELECTORS = [
     "opentrons-api-serial-can",
     "opentrons-api-serial-usbbin",
 ]
+KERNEL_SPECIAL = "KERNEL"
+REMOTE_ACCESS_SPECIAL = "REMOTE_ACCESS"
 
 
 async def get_records_dumb(selector: str, records: int, mode: str) -> bytes:
@@ -41,6 +43,19 @@ async def get_records_dumb(selector: str, records: int, mode: str) -> bytes:
             selector_array.extend(["-t", serial_selector])
     elif selector in UNIT_SELECTORS:
         selector_array.extend(["-u", selector])
+    elif selector == KERNEL_SPECIAL:
+        selector_array.append("-k")
+    elif selector == REMOTE_ACCESS_SPECIAL:
+        selector_array.extend(
+            [
+                "-u",
+                "opentrons-remote-access-allowed.service",
+                "-u",
+                "dropbear@.service",
+                "-u",
+                "jupyter-notebook.service",
+            ]
+        )
     else:
         selector_array.extend(["-t", selector])
 

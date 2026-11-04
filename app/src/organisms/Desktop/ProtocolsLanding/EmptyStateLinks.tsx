@@ -7,9 +7,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -33,24 +33,23 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       paddingBottom={SPACING.spacing8}
       width="96.5%"
     >
-      <LegacyStyledText
+      <StyledText
         role="complementary"
         forwardedAs="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing8}
       >
         {props.title}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_ROW}
         flexWrap={WRAP}
       >
-        <LegacyStyledText>
+        <StyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_LIBRARY_URL}
-            id="EmptyStateLinks_protocolLibraryButton"
             marginRight={SPACING.spacing8}
             external
           >
@@ -61,12 +60,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </LegacyStyledText>
-        <LegacyStyledText>
+        </StyledText>
+        <StyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_DESIGNER_URL}
-            id="EmptyStateLinks_protocolDesignerButton"
             marginRight={SPACING.spacing8}
             external
           >
@@ -78,12 +76,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </LegacyStyledText>
-        <LegacyStyledText>
+        </StyledText>
+        <StyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={API_DOCS_URL}
-            id="EmptyStateLinks_apiDocsButton"
             marginRight={SPACING.spacing4}
             external
           >
@@ -94,7 +91,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
               size="0.5rem"
             />
           </Link>
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

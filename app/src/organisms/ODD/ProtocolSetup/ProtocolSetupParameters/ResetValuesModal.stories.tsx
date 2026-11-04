@@ -8,7 +8,7 @@ import type * as React from 'react'
 export default {
   title: 'ODD/Organisms/ResetValuesModal',
   component: ResetValuesModal,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof ResetValuesModal>> = args => (

@@ -7,19 +7,21 @@ import { useNavigate } from 'react-router-dom'
 import {
   Flex,
   Icon,
-  LegacyStyledText,
   MenuItem,
   MenuList,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
 
@@ -35,7 +37,7 @@ export function LongPressModal({
   protocolId,
   setShowDeleteConfirmationModal,
   setTargetProtocolId,
-}: LongPressModalProps): JSX.Element {
+}: LongPressModalProps): ReactNode {
   const navigate = useNavigate()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { i18n, t } = useTranslation(['protocol_info', 'shared'])
@@ -45,6 +47,7 @@ export function LongPressModal({
   const pinned = pinnedProtocolIds.includes(protocolId)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
+  const documentationState = useDocumentationState()
 
   // This looks totally bonkers, and it is. This construction is to make
   // it easier to use in unit tests, where we have to mock both the mutation
@@ -54,7 +57,7 @@ export function LongPressModal({
   //
   // Having the empty function fallback lets the mocks get called. In real use it
   // shouldn't ever get needed.
-  const createRunUse = useCreateRunMutation({
+  const createRunUse = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       const runId: string = data.data.id
       navigate(`/runs/${runId}/setup`)
@@ -119,25 +122,25 @@ export function LongPressModal({
             <MenuItem onClick={handleRunClick} key="play-circle">
               <Flex>
                 <Icon name="play-circle" size="1.75rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {t('run_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
             <MenuItem onClick={handlePinClick} key="pin">
               <Flex>
                 <Icon name="pin" size="2.5rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {pinned ? t('unpin_protocol') : t('pin_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
             <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
               <Flex>
                 <Icon name="trash" size="2.5rem" />
-                <LegacyStyledText marginLeft={SPACING.spacing24}>
+                <StyledText marginLeft={SPACING.spacing24}>
                   {t('delete_protocol')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </MenuItem>
           </MenuList>,

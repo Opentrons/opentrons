@@ -13,7 +13,6 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/robot-settings')
 
-const ROBOT_NAME = 'otie'
 const mockToggleLights = vi.fn()
 const render = (props: ComponentProps<typeof EnableStatusLight>) => {
   return renderWithProviders(<EnableStatusLight {...props} />, {
@@ -26,7 +25,6 @@ describe('EnableStatusLight', () => {
 
   beforeEach(() => {
     props = {
-      robotName: ROBOT_NAME,
       isEstopNotDisengaged: false,
     }
     vi.mocked(useLEDLights).mockReturnValue({

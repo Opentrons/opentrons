@@ -5,14 +5,19 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
+  Tooltip,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
+
+import type { ReactNode } from 'react'
 
 const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 
@@ -27,40 +32,51 @@ export interface OpenJupyterControlProps {
 export function OpenJupyterControl({
   robotIp,
   isEstopNotDisengaged,
-}: OpenJupyterControlProps): JSX.Element {
+}: OpenJupyterControlProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const targetURL = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
+  const [buttonPropsForTooltip, tooltipProps] = useHoverTooltip()
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const isAccessControlEnabled =
+    accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
+  const isDisabled = isEstopNotDisengaged || isAccessControlEnabled
 
   const handleClick = (): void => {
     trackEvent(EVENT_JUPYTER_OPEN)
-    window.open(targetURL, '_blank')
+    window.open(targetURL, '_blank', 'noopener')
   }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing8}
-          id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('jupyter_notebook_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>
       </Box>
       <TertiaryButton
-        disabled={isEstopNotDisengaged}
+        {...buttonPropsForTooltip}
+        disabled={isDisabled}
         onClick={handleClick}
         marginLeft={SPACING.spacing32}
       >
         {t('launch_jupyter_notebook')}
       </TertiaryButton>
+      {isAccessControlEnabled ? (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('jupyter_notebook_unavailable_when_crs_enabled')}
+        </Tooltip>
+      ) : null}
     </Flex>
   )
 }

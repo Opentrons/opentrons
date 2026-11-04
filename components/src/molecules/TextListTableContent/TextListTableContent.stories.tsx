@@ -3,6 +3,7 @@ import React from 'react'
 import { css } from 'styled-components'
 
 import { TextListTableContent as TextListTableContentComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { StyledText } from '../../atoms'
 import { DISPLAY_GRID } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
@@ -28,7 +29,9 @@ export default {
         'For Storybook only. Number of lorem ipsum text rows to display in the table. ',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface TextListTableContentStoryProps extends Omit<

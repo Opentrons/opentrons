@@ -1,7 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
+import {
+  useCurrentSubsystemUpdateQuery,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -28,7 +31,9 @@ describe('GripperCard', () => {
   beforeEach(() => {
     props = {
       attachedGripper: {
+        instrumentType: 'gripper',
         instrumentModel: 'gripperV1.1',
+        displayName: 'Flex Gripper',
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
@@ -44,6 +49,9 @@ describe('GripperCard', () => {
     }
     vi.mocked(GripperWizardFlows).mockReturnValue(<>wizard flow launched</>)
     vi.mocked(AboutGripperSlideout).mockReturnValue(<>about gripper</>)
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: { settings: [] },
+    } as any)
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
@@ -68,7 +76,9 @@ describe('GripperCard', () => {
   it('renders recalibrate banner when no calibration data is present', () => {
     props = props = {
       attachedGripper: {
+        instrumentType: 'gripper',
         instrumentModel: 'gripperV1.1',
+        displayName: 'Flex Gripper',
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,
@@ -91,7 +101,9 @@ describe('GripperCard', () => {
   it('renders recalibrate banner without calibrate now when no calibration data is present and e-stop is pressed', () => {
     props = {
       attachedGripper: {
+        instrumentType: 'gripper',
         instrumentModel: 'gripperV1.1',
+        displayName: 'Flex Gripper',
         serialNumber: '123',
         firmwareVersion: '12',
         ok: true,

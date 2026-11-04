@@ -25,6 +25,8 @@ export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
   hasImages: boolean
   hasCsvFiles: boolean
+  closeCurrentRun: () => void
+  isClosingCurrentRun: boolean
 }
 
 // Holds all the various banners that render in ProtocolRunHeader.

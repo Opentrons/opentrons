@@ -19,7 +19,10 @@ export function useHandleClose({
   commandDocState,
   actionsToDocument,
   addActionToDocument,
-}: UseLPCCommandChildProps): UseHandleConditionalCleanupResult {
+  flushJogAudit,
+}: UseLPCCommandChildProps & {
+  flushJogAudit: () => void
+}): UseHandleConditionalCleanupResult {
   const [isExiting, setIsExiting] = useState(false)
   const { chainRunCommands } = useChainMaintenanceCommands(
     commandDocState,
@@ -28,6 +31,7 @@ export function useHandleClose({
   )
 
   const handleHomeAndClose = (): Promise<void> => {
+    flushJogAudit()
     setIsExiting(true)
     const cleanupCommands: CreateCommand[] = [...retractSafelyAndHomeCommands()]
 
@@ -41,6 +45,7 @@ export function useHandleClose({
   }
 
   const handleCloseNoHome = (): Promise<void> => {
+    flushJogAudit()
     setIsExiting(true)
 
     return new Promise(() => {
