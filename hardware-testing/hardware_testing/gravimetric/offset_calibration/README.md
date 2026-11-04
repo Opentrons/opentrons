@@ -1,6 +1,6 @@
 # Gravimetric gripper 路线偏移校准
 
-从电脑运行脚本，通过 SSH 终端的方向键调整 **OT3 上真实夹持的 tip rack**。
+将脚本和配套模块上传到 OT3，**在 OT3 上运行脚本**，通过 SSH 终端的方向键调整真实夹持的 tip rack。
 确认落座后，自动保存生产协议使用的 `drop_offset`。
 这是人工确认的工程校准工具，每条路线需要人工放置、检查和取走测试架。
 
@@ -18,7 +18,39 @@
 A3 也可测试，但需移除 A3 垃圾桶并安装 adapter，App 的实际 deck 配置必须与实物一致。
 准备 shuttle 时只做空平台复位/伸出，不从 hopper 自动取料，也不执行生产回收流程。
 
-## 部署与启动
+## 直接在 OT3 上运行
+
+机器人端入口是 `hardware-testing/gravimetric_offset_calibration_ot3.py`。
+将它上传为 `/data/gravimetric/calibrate_offsets.py`，并把本目录配套模块安装到
+`/opt/opentrons-robot-server/hardware_testing/gravimetric/offset_calibration/` 后，登录 OT3：
+
+```sh
+# 电脑终端：登录 OT3，保留交互终端供方向键使用。
+ssh -t root@192.168.6.177
+```
+
+下面命令均在 **OT3 终端**执行：
+
+```sh
+# 只检查入口和全部 80 条路线，不运行硬件。
+python3 /data/gravimetric/calibrate_offsets.py --help
+python3 /data/gravimetric/calibrate_offsets.py --list
+
+# 开始全部路线校准；每条路线需要人工准备和确认。
+python3 /data/gravimetric/calibrate_offsets.py --rack T200
+
+# 继续未完成路线，或只校准单条路线。
+python3 /data/gravimetric/calibrate_offsets.py --rack T200 --resume
+python3 /data/gravimetric/calibrate_offsets.py --source D2 --target A4 --rack T200
+
+# 人工安全恢复后解除中断标记。
+python3 /data/gravimetric/calibrate_offsets.py --acknowledge-recovery
+```
+
+入口会使用 robot-server 的 Python 包路径；校准逻辑、运动和 JSON 保存都在 OT3 上执行。
+电脑只提供 SSH 终端和按键输入。不要把桌面 SSH 启动器 `gravimetric_offset_calibration.py` 当作机器人端入口。
+
+## 完整部署及可选电脑启动器
 
 本工具针对本工程的 **robot software 9.1.2 / Protocol API 2.29** 实现。
 使用了该版本的内部 Engine 接口；其他 robot software 版本会在运动前拒绝运行。
@@ -33,6 +65,15 @@ make -C hardware-testing push-ot3 host=192.168.6.177 ssh_key="$HOME/.ssh/id_rsa"
 生产使用的 `gravimetric_speed.py` 也必须是本分支的新版本；如果在 App 中运行此前上传的旧协议，请重新上传。
 旧协议副本不会因为更新 Python 包而自动增加新的校准文件查找路径。
 
+完整包部署后，可在电脑执行下列命令上传机器人端入口：
+
+```sh
+ssh root@192.168.6.177 'mkdir -p /data/gravimetric'
+scp -O hardware-testing/gravimetric_offset_calibration_ot3.py \
+  root@192.168.6.177:/data/gravimetric/calibrate_offsets.py
+```
+
+也可以使用下面的电脑启动器自动建立 SSH 会话，它仍然是在 OT3 上执行校准模块。
 电脑端只需 Python 3，无需安装机器人硬件依赖：
 
 ```sh
