@@ -41,9 +41,8 @@ from opentrons.protocol_engine.types.command_annotations import CommandAnnotatio
 
 def _make_config() -> Config:
     return Config(
-        # Choice of robot and deck type is arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 
@@ -405,7 +404,6 @@ def test_nonfatal_command_failure_with_door_open() -> None:
         is_door_open=False,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
         ),
@@ -578,9 +576,8 @@ def test_door_during_setup_phase() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -611,9 +608,8 @@ def test_door_during_protocol_phase() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -661,9 +657,8 @@ def test_door_during_error_recovery() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -749,9 +744,8 @@ def test_door_ungrip_labware(close_door_before_queueing: bool) -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -830,7 +824,6 @@ def test_door_initially_open(
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
             robot_type="OT-2 Standard",
             deck_type=DeckType.OT2_STANDARD,
         ),

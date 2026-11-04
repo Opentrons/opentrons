@@ -97,7 +97,6 @@ async def test_create_engine_initializes_state_with_door_state(
         hardware_api=hardware_api,
         config=EngineConfig(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
         ),
