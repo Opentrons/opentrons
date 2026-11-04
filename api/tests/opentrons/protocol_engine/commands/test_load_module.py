@@ -39,10 +39,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleModel,
 )
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName
 
 
@@ -254,35 +251,35 @@ async def test_load_module_raises_if_location_occupied(
         (
             TemperatureModuleModel.TEMPERATURE_V2,
             EngineModuleModel.TEMPERATURE_MODULE_V2,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(STANDARD_OT3_DECK, 6),
             DeckSlotName.SLOT_D2,
             "OT-3 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
-            load_deck(STANDARD_OT2_DECK, 5),
-            DeckSlotName.SLOT_1,
+            load_deck(STANDARD_OT3_DECK, 6),
+            DeckSlotName.SLOT_D1,
             "OT-2 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(STANDARD_OT3_DECK, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
         (
             HeaterShakerModuleModel.HEATER_SHAKER_V1,
             EngineModuleModel.HEATER_SHAKER_MODULE_V1,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(STANDARD_OT3_DECK, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
         (
             FlexStackerModuleModel.FLEX_STACKER_V1,
             EngineModuleModel.FLEX_STACKER_MODULE_V1,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(STANDARD_OT3_DECK, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
