@@ -120,18 +120,12 @@ class LoadModuleImplementation(
         module_type = params.model.as_type()
         self._ensure_module_location(params.location.slotName, module_type)
 
-        if self._state_view.modules.get_deck_supports_module_fixtures():
-            addressable_area_module_reference = (
-                self._state_view.modules.ensure_and_convert_module_fixture_location(
-                    deck_slot=params.location.slotName,
-                    model=params.model,
-                )
+        addressable_area_module_reference = (
+            self._state_view.modules.ensure_and_convert_module_fixture_location(
+                deck_slot=params.location.slotName,
+                model=params.model,
             )
-        else:
-            addressable_area_module_reference = params.location.slotName.id
-            state_update.set_addressable_area_used(
-                addressable_area_name=addressable_area_module_reference
-            )
+        )
 
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             addressable_area_module_reference

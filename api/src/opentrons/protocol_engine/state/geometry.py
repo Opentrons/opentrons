@@ -1266,36 +1266,20 @@ class GeometryView:
             | NotOnDeckLocationSequenceComponent
         ) = self._cutout_fixture_location_sequence_from_addressable_area(module_aa)
 
-        if self._modules.get_deck_supports_module_fixtures():
-            # On a deck with modules as cutout fixtures, we want, in order,
-            # - the addressable area of the module
-            # - the module with its module id, which is what clients want
-            # - the cutout
-            loc = self._modules.get_location(module_id)
-            model = self._modules.get_connected_model(module_id)
-            module_aa = self._modules.ensure_and_convert_module_fixture_location(
-                loc.slotName, model
-            )
-            return building + [
-                OnAddressableAreaLocationSequenceComponent(
-                    addressableAreaName=module_aa
-                ),
-                OnModuleLocationSequenceComponent(moduleId=module_id),
-                base_location,
-            ]
-        else:
-            # If the module isn't a cutout fixture, then we want
-            # - the module
-            # - the addressable area the module is loaded on
-            # - the cutout
-            location = self._modules.get_location(module_id)
-            return building + [
-                OnModuleLocationSequenceComponent(moduleId=module_id),
-                OnAddressableAreaLocationSequenceComponent(
-                    addressableAreaName=location.slotName.value
-                ),
-                base_location,
-            ]
+        # With modules as cutout fixtures, we want, in order,
+        # - the addressable area of the module
+        # - the module with its module id, which is what clients want
+        # - the cutout
+        loc = self._modules.get_location(module_id)
+        model = self._modules.get_connected_model(module_id)
+        module_aa = self._modules.ensure_and_convert_module_fixture_location(
+            loc.slotName, model
+        )
+        return building + [
+            OnAddressableAreaLocationSequenceComponent(addressableAreaName=module_aa),
+            OnModuleLocationSequenceComponent(moduleId=module_id),
+            base_location,
+        ]
 
     def _recurse_labware_location_from_stacker_hopper(
         self,
@@ -1438,12 +1422,9 @@ class GeometryView:
             )
 
             module_location = self._modules.get_location(module_id=module_id)
-            if self._modules.get_deck_supports_module_fixtures():
-                module_aa = self._modules.ensure_and_convert_module_fixture_location(
-                    module_location.slotName, module_model
-                )
-            else:
-                module_aa = module_location.slotName.value
+            module_aa = self._modules.ensure_and_convert_module_fixture_location(
+                module_location.slotName, module_model
+            )
             return building + [
                 OnModuleOffsetLocationSequenceComponent(moduleModel=module_model),
                 OnAddressableAreaOffsetLocationSequenceComponent(

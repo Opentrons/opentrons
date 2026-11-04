@@ -106,8 +106,6 @@ async def test_load_module_implementation(
         moduleId="some-id",
     )
 
-    decoy.when(state_view.modules.get_deck_supports_module_fixtures()).then_return(True)
-
     decoy.when(state_view.labware.get_deck_definition()).then_return(
         ot3_standard_deck_def
     )
@@ -206,7 +204,6 @@ async def test_load_module_raises_if_location_occupied(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         moduleId="some-id",
     )
-    decoy.when(state_view.modules.get_deck_supports_module_fixtures()).then_return(True)
     addressable_area_provided_by_module = (
         f"{data.model}{data.location.slotName.value}"
         if data.model != ModuleModel.FLEX_STACKER_MODULE_V1
