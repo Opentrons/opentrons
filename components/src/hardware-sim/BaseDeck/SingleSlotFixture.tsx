@@ -1,3 +1,4 @@
+import { MiddleSlot } from './MiddleSlot'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
@@ -73,22 +74,12 @@ export function SingleSlotFixture(
       </>
     ),
     cutoutA2: (
-      <>
-        <SlotBase
-          d="M150.8,417.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,415.1,148.4,417.1,150.8,417.1z"
-          fill={fixtureBaseColor}
-          stroke={stroke}
-          strokeWidth={2}
-        />
-        {showSlotClips ? (
-          <>
-            <SlotClip d="M162.1,398.9V409h10.8" stroke={slotClipColor} />,
-            <SlotClip d="M162.1,329.8v-10.5h10.6" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,398.9V409h-10.8" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,329.8v-10.7h-10.8" stroke={slotClipColor} />
-          </>
-        ) : null}
-      </>
+      <MiddleSlot
+        showSlotClips={showSlotClips}
+        fixtureBaseColor={fixtureBaseColor}
+        slotClipColor={slotClipColor}
+        stroke={stroke}
+      ></MiddleSlot>
     ),
     cutoutA3: (
       <>
@@ -127,22 +118,14 @@ export function SingleSlotFixture(
       </>
     ),
     cutoutB2: (
-      <>
-        <SlotBase
-          d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
-          fill={fixtureBaseColor}
+      <g transform={'translate(0, -107)'}>
+        <MiddleSlot
+          showSlotClips={showSlotClips}
+          fixtureBaseColor={fixtureBaseColor}
+          slotClipColor={slotClipColor}
           stroke={stroke}
-          strokeWidth={2}
-        />
-        {showSlotClips ? (
-          <>
-            <SlotClip d="M162.1,291.9V302h10.8" stroke={slotClipColor} />,
-            <SlotClip d="M162.1,222.8v-10.5h10.6" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,291.9V302h-10.8" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,222.8v-10.7h-10.8" stroke={slotClipColor} />
-          </>
-        ) : null}
-      </>
+        ></MiddleSlot>
+      </g>
     ),
     cutoutB3: (
       <>
@@ -182,20 +165,14 @@ export function SingleSlotFixture(
     ),
     cutoutC2: (
       <>
-        <SlotBase
-          d="M150.8,203.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,201.2,148.4,203.1,150.8,203.1z"
-          fill={fixtureBaseColor}
-          stroke={stroke}
-          strokeWidth={2}
-        />
-        {showSlotClips ? (
-          <>
-            <SlotClip d="M162.1,185v10.1h10.8" stroke={slotClipColor} />,
-            <SlotClip d="M162.1,115.8v-10.5h10.6" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,185v10.1h-10.8" stroke={slotClipColor} />,
-            <SlotClip d="M293.9,115.8v-10.7h-10.8" stroke={slotClipColor} />
-          </>
-        ) : null}
+        <g transform={'translate(0, -214)'}>
+          <MiddleSlot
+            showSlotClips={showSlotClips}
+            fixtureBaseColor={fixtureBaseColor}
+            slotClipColor={slotClipColor}
+            stroke={stroke}
+          ></MiddleSlot>
+        </g>
       </>
     ),
     cutoutC3: (
@@ -235,22 +212,14 @@ export function SingleSlotFixture(
       </>
     ),
     cutoutD2: (
-      <>
-        <SlotBase
-          fill={fixtureBaseColor}
+      <g transform={'translate(0, -321)'}>
+        <MiddleSlot
+          showSlotClips={showSlotClips}
+          fixtureBaseColor={fixtureBaseColor}
+          slotClipColor={slotClipColor}
           stroke={stroke}
-          strokeWidth={2}
-          d="M150.8,96.1h154.3c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,94.2,148.4,96.1,150.8,96.1z"
-        />
-        {showSlotClips ? (
-          <>
-            <SlotClip d="M162.1,77.9V88h10.8" stroke={slotClipColor} />
-            <SlotClip d="M162.1,8.8V-1.7h10.6" stroke={slotClipColor} />
-            <SlotClip d="M293.9,77.9V88h-10.8" stroke={slotClipColor} />
-            <SlotClip d="M293.9,8.8V-1.9h-10.8" stroke={slotClipColor} />
-          </>
-        ) : null}
-      </>
+        ></MiddleSlot>
+      </g>
     ),
     cutoutD3: (
       <>

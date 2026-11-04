@@ -70,8 +70,9 @@ function getFlexRunCalibrationStatus(
     )
     return pipetteOnThisMount?.instrumentName !== speccedPipette.pipetteName
   })
-  if (wrongPipettesAttached)
+  if (wrongPipettesAttached) {
     return { complete: false, reason: 'attach_pipette_failure_reason' }
+  }
 
   const pipettesNotCalibrated = requiredPipettes.some(speccedPipette => {
     const pipetteMatch = instrumentsQueryData?.data.find(
@@ -83,8 +84,9 @@ function getFlexRunCalibrationStatus(
     )
     return pipetteMatch?.data.calibratedOffset?.last_modified == null
   })
-  if (pipettesNotCalibrated)
+  if (pipettesNotCalibrated) {
     return { complete: false, reason: 'calibrate_pipette_failure_reason' }
+  }
 
   const protocolRequiresGripper = isGripperInCommands(
     robotAnalysis?.commands ?? storedAnalysis?.commands ?? []

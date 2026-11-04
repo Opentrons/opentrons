@@ -335,3 +335,43 @@ def flex_stacker_fill(
         "name": command_types.FLEX_STACKER_FILL,
         "payload": {"text": text},
     }
+
+
+def vacuum_module_start_set_vacuum_pressure(
+    self: Any,
+    gauge_pressure_mbar: float,
+    duration_s: int | None,
+    ramp_rate: float | None,
+    timeout_s: int | None,
+    vent_after: bool | None,
+) -> command_types.VacuumModuleStartSetVacuumPressureCommand:
+    text = f"Setting module {self} pressure to {gauge_pressure_mbar}: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
+    return {
+        "name": command_types.VACUUM_MODULE_START_SET_VACUUM_PRESSURE,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_start_set_vacuum_power(
+    self: Any,
+    percent_power: float,
+    duration_s: int | None,
+    ramp_rate: float | None,
+    timeout_s: int | None,
+    vent_after: bool | None,
+) -> command_types.VacuumModuleStartSetVacuumPowerCommand:
+    text = f"Setting module {self} power to {percent_power}%: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
+    return {
+        "name": command_types.VACUUM_MODULE_START_SET_VACUUM_POWER,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_stop_vacuum(
+    self: Any,
+) -> command_types.VacuumModuleStopVacuumCommand:
+    text = f"Stopping module {self}"
+    return {
+        "name": command_types.VACUUM_MODULE_STOP_VACUUM,
+        "payload": {"text": text},
+    }

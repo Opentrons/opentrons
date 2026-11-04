@@ -3,13 +3,15 @@ import argparse
 import asyncio
 from typing import List
 
-from hardware_testing.opentrons_api import types
+
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
-    pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=45, z=pos_max.z - 200)  # stay above deck to be safe
+def _create_bowtie_points(homed_position: Point) -> List[Point]:
+    pos_max = homed_position - Point(x=1, y=1, z=1)
+    pos_min = Point(x=0, y=45, z=pos_max.z - 200)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right-up
         pos_min._replace(z=pos_max.z),  # front-left-up
@@ -23,7 +25,7 @@ def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     return bowtie_points
 
 
-async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None:
+async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await helpers_ot3.home_ot3(api)
     bowtie_points = _create_bowtie_points(await api.gantry_position(mount))
@@ -32,7 +34,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
         for p in bowtie_points:
             await api.move_to(mount, p)
     await api.move_to(mount, bowtie_points[0])
-    await api.disengage_axes([types.Axis.X, types.Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
 
 
 if __name__ == "__main__":
@@ -42,9 +44,9 @@ if __name__ == "__main__":
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     args = parser.parse_args()
     if args.mount == "left":
-        mount = types.OT3Mount.LEFT
+        mount = OT3Mount.LEFT
     else:
-        mount = types.OT3Mount.RIGHT
+        mount = OT3Mount.RIGHT
     if not args.simulate:
         input("BOWTIE-OT3: Is the deck totally empty? (press ENTER to continue)")
     asyncio.run(_main(args.simulate, args.cycles, mount))

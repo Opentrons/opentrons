@@ -15844,6 +15844,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutC3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -42977,6 +42981,10 @@
           {
             "addressableAreaName": "C4",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutC3",

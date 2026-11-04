@@ -110,7 +110,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     </Flex>
   )
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
@@ -131,7 +131,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </SimpleWizardInProgressBody>
     )
-  else if (showUnableToDetect)
+  } else if (showUnableToDetect) {
     return (
       <ProbeNotAttached
         handleOnClick={
@@ -143,6 +143,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         isOnDevice={isOnDevice ?? false}
       />
     )
+  }
 
   return errorMessage != null ? (
     <SimpleWizardBody

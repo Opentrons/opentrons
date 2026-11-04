@@ -55,21 +55,29 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
   ])
   const fixtureIdByCutoutId = getFixtureIdByCutoutId(attachedModule, deckConfig)
   const attachedPipetteChannels = attachedPipette.data.channels
-  let pipetteAttachProbeVideoSource, probeLocation
-  switch (attachedPipetteChannels) {
-    case 1:
-      pipetteAttachProbeVideoSource = attachProbe1
-      probeLocation = ''
-      break
-    case 8:
-      pipetteAttachProbeVideoSource = attachProbe8
-      probeLocation = t('pipette_wizard_flows:backmost')
-      break
-    case 96:
-      pipetteAttachProbeVideoSource = attachProbe96
-      probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
-      break
-  }
+  const mount = attachedPipette.mount
+  const pipetteAttachProbeVideoSource = ((): string => {
+    switch (attachedPipetteChannels) {
+      case 8:
+        return attachProbe8
+      case 96:
+        return attachProbe96
+      case 1:
+      default:
+        return attachProbe1
+    }
+  })()
+  const probeLocation = ((): string => {
+    switch (attachedPipetteChannels) {
+      case 8:
+        return `${t('pipette_wizard_flows:backmost')} (${mount} mount)`
+      case 96:
+        return t('pipette_wizard_flows:ninety_six_probe_location')
+      case 1:
+      default:
+        return `${mount} mount`
+    }
+  })()
   const wasteChuteConflictWith96Channel =
     'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
   const isWasteChuteOnDeck = deckConfig.some(cc =>
@@ -113,7 +121,7 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
@@ -121,52 +129,52 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
         description={t('stand_back')}
       />
     )
+  }
   // TODO: add calibration loading screen and error screen
-  else
-    return (
-      <GenericWizardTile
-        header={i18n.format(t('attach_probe'), 'capitalize')}
-        rightHandBody={
-          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
-              <source src={pipetteAttachProbeVideoSource} />
-            </AnimationVideo>
-          </Flex>
-        }
-        bodyText={
-          <>
-            <LegacyStyledText css={BODY_STYLE}>
-              <Trans
-                t={t}
-                i18nKey="pipette_wizard_flows:install_probe"
-                values={{ location: probeLocation }}
-                components={{
-                  bold: <strong />,
-                }}
-              />
-            </LegacyStyledText>
+  return (
+    <GenericWizardTile
+      header={i18n.format(t('attach_probe'), 'capitalize')}
+      rightHandBody={
+        <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+          <AnimationVideo
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+          >
+            <source src={pipetteAttachProbeVideoSource} />
+          </AnimationVideo>
+        </Flex>
+      }
+      bodyText={
+        <>
+          <LegacyStyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey="pipette_wizard_flows:install_probe"
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </LegacyStyledText>
 
-            {wasteChuteConflictWith96Channel && (
-              <Banner
-                type={isWasteChuteOnDeck ? 'error' : 'warning'}
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-              >
-                {isWasteChuteOnDeck
-                  ? t('pipette_wizard_flows:waste_chute_error')
-                  : t('pipette_wizard_flows:waste_chute_warning')}
-              </Banner>
-            )}
-          </>
-        }
-        proceedButtonText={t('begin_calibration')}
-        proceed={handleBeginCalibration}
-        back={goBack}
-      />
-    )
+          {wasteChuteConflictWith96Channel && (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {isWasteChuteOnDeck
+                ? t('pipette_wizard_flows:waste_chute_error')
+                : t('pipette_wizard_flows:waste_chute_warning')}
+            </Banner>
+          )}
+        </>
+      }
+      proceedButtonText={t('begin_calibration')}
+      proceed={handleBeginCalibration}
+      back={goBack}
+    />
+  )
 }

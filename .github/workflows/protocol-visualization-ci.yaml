@@ -1,4 +1,4 @@
-# Lint, test, and build @opentrons/protocol-visualization (modeled on components CI).
+# Test and build @opentrons/protocol-visualization (modeled on components CI).
 
 name: 'Protocol visualization — lint, test, build'
 
@@ -29,17 +29,17 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/js/setup
       - name: 'typescript project build'
-        run: make -C protocol-visualization check-ts
+        run: make -C protocol-visualization build-ts
       - name: 'unit tests with coverage'
         run: make -C protocol-visualization test-cov
       - name: 'vite lib build'
         run: make -C protocol-visualization lib
       - name: 'Upload coverage report'
         if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
         with:
           files: ./coverage/lcov.info
           flags: protocol-visualization

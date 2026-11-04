@@ -1,3 +1,0 @@
-overrides:
-  '@opentrons/components': link:pack/opentrons-components
-  '@opentrons/shared-data': link:pack/opentrons-shared-data

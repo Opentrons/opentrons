@@ -18,8 +18,8 @@
   },
   "no_tiprack_selected": "Select a tiprack to continue",
   "no_valid_tips_available": {
-    "title": "Not enough tips to complete action",
-    "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps."
+    "title": "Not enough accessible tips",
+    "body": "Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action."
   },
   "not_enough_tips_selected": "Not enough tips selected ({{count}} pickups remaining)",
   "pickups_remaining": "{{count}} pickups remaining",
@@ -29,6 +29,10 @@
   "select_tiprack": "Select a tip rack to pick up tips from",
   "select_tips": "Select tips",
   "select_tips_for_tracking": "Select tips for manual tip tracking",
+  "selected_tiprack_not_valid": {
+    "title": "Not enough accessible tips in selected tiprack",
+    "body": "Select another tip rack to complete this action."
+  },
   "accessible": {
     "deselect_multiple": "Deselect tips",
     "deselect_one": "Deselect tip",

@@ -157,9 +157,12 @@ export function DeckLocationSelect({
             )?.cutoutFixtureId ?? null
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill = theme === 'default' ? COLORS.purple35 : COLORS.grey35
-          if (isSelected)
+          if (isSelected) {
             fill = theme === 'default' ? COLORS.purple50 : COLORS.grey50
-          if (isDisabled) fill = COLORS.grey30
+          }
+          if (isDisabled) {
+            fill = COLORS.grey30
+          }
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">
@@ -201,8 +204,9 @@ export function DeckLocationSelect({
                     fixtureBaseColor={fill}
                     slotClipColor={COLORS.white}
                     onClick={() => {
-                      if (!isDisabled && setSelectedLocation != null)
+                      if (!isDisabled && setSelectedLocation != null) {
                         setSelectedLocation(slotLocation)
+                      }
                     }}
                     cursor={
                       setSelectedLocation == null || isDisabled || isSelected
@@ -228,8 +232,9 @@ export function DeckLocationSelect({
                   slotName={slot.id}
                   slotClipColor={COLORS.white}
                   onClick={() => {
-                    if (!isDisabled && setSelectedLocation != null)
+                    if (!isDisabled && setSelectedLocation != null) {
                       setSelectedLocation(slotLocation)
+                    }
                   }}
                   cursor={
                     setSelectedLocation == null || isDisabled || isSelected

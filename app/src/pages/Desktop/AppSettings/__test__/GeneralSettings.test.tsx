@@ -52,7 +52,7 @@ describe('GeneralSettings', () => {
   it('renders correct titles', () => {
     render()
     screen.getByText('App Software Version')
-    screen.getByText('Software Update Alerts')
+    screen.getByText('Software Update')
     screen.getByText('Connect to a Robot via IP Address')
   })
 
@@ -100,6 +100,15 @@ describe('GeneralSettings', () => {
     )
     screen.getByRole('switch', {
       name: 'Enable app update notifications',
+    })
+  })
+  it('renders the text and toggle for automatic update download section', () => {
+    render()
+    screen.getByText(
+      "When enabled, updates are downloaded automatically so they're ready to install later. When disabled, you'll choose when updates are downloaded."
+    )
+    screen.getByRole('switch', {
+      name: 'Enable update autodownload',
     })
   })
 

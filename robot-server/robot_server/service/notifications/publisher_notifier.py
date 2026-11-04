@@ -13,6 +13,10 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
+from robot_server.service.pyro_utils.resource_utilities import (
+    register_notify_publishers_to_pyro_resource,
+)
+
 LOG = getLogger(__name__)
 
 
@@ -81,6 +85,11 @@ def get_pe_notify_publishers(
     """Provides access to the callback used to notify publishers of changes. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
     assert isinstance(publisher_notifier, PublisherNotifier)
+
+    # Register Notificaiton Publishers with the robot server pyro resource
+    register_notify_publishers_to_pyro_resource(
+        app_state, publisher_notifier._notify_publishers
+    )
 
     return publisher_notifier._notify_publishers
 

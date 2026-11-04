@@ -45,6 +45,9 @@ export const ROBOTUPDATE_UPDATE_INFO: 'robotUpdate:UPDATE_INFO' =
 export const ROBOTUPDATE_FILE_INFO: 'robotUpdate:FILE_INFO' =
   'robotUpdate:FILE_INFO'
 
+export const ROBOTUPDATE_DOWNLOAD_UPDATE: 'robotUpdate:DOWNLOAD_UPDATE' =
+  'robotUpdate:DOWNLOAD_UPDATE'
+
 export const ROBOTUPDATE_DOWNLOAD_PROGRESS: 'robotUpdate:DOWNLOAD_PROGRESS' =
   'robotUpdate:DOWNLOAD_PROGRESS'
 

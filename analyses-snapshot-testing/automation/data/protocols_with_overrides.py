@@ -100,23 +100,6 @@ class ProtocolsWithOverrides:
         folder=GENERATORS_FOLDER,
     )
 
-    # analyses-snapshot-testing/files/protocols/OT2_X_v2_20_8_Overrides_InvalidConfigs.py
-
-    OT2_X_v2_20_8_Overrides_InvalidConfigs: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="OT2_X_v2_20_8_Overrides_InvalidConfigs",
-        file_extension="py",
-        robot="Flex",
-        override_variable_name="key",
-        overrides=[
-            "eight_partial_column_bottom_left",
-            "eight_partial_column_bottom_right",
-            "eight_partial_column_no_end",
-            "return_tip_error",
-            "drop_tip_with_location",
-        ],
-        folder=GENERATORS_FOLDER,
-    )
-
     # analyses-snapshot-testing/files/protocols/Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid.py
     Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
         file_stem="Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid",

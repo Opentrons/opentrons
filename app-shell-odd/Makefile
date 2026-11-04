@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 5173
@@ -21,16 +21,17 @@ noop := cd .
 # Other SSH args for robots
 ssh_opts ?= $(default_ssh_opts)
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--publish never
 
-electron := yarn electron . \
+electron := pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
+	--discovery.candidates=$(ODD_IP) \
 
 OPENTRONS_PROJECT ?= robot-stack
 
@@ -41,14 +42,14 @@ OPENTRONS_PROJECT ?= robot-stack
 all: package
 
 .PHONY: setup
-# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist opentrons-robot-app.tar.gz
+	pnpm exec shx rm -rf lib dist opentrons-robot-app.tar.gz
 
 # artifacts
 #####################################################################
@@ -84,6 +85,7 @@ push-ot3: deps dist-ot3
 
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export ODD_key_server_host := http://localhost:33960
 dev:
 	vite build
 	$(electron)

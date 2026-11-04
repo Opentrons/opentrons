@@ -24,6 +24,24 @@ vi.mock('../notifyLog', () => {
   }
 })
 
+const seedPendingConnections = async (): Promise<void> => {
+  await Promise.all(
+    MOCK_STORE_ROBOTS.map(async robot => {
+      await connectionStore.associateIPWithRobotName(robot.ip, robot.robotName)
+      await connectionStore.setPendingConnection(robot.robotName)
+    })
+  )
+}
+
+const seedConnectedRobots = async (): Promise<void> => {
+  await seedPendingConnections()
+  await Promise.all(
+    MOCK_STORE_ROBOTS.map(robot =>
+      connectionStore.setConnected(robot.robotName, vi.fn() as any)
+    )
+  )
+}
+
 describe('getHealthyRobotDataForNotifyConnections', () => {
   it('should filter a list of discovery robots, only returning robots that have a health status of ok', () => {
     const healthyRobots = getHealthyRobotDataForNotifyConnections(
@@ -35,13 +53,8 @@ describe('getHealthyRobotDataForNotifyConnections', () => {
 
 describe('cleanUpUnreachableRobots', () => {
   it('should close connections forcefully for unreachable robots and resolve them', async () => {
-    MOCK_STORE_ROBOTS.forEach(robot => {
-      void connectionStore
-        .setPendingConnection(robot.robotName)
-        .then(() =>
-          connectionStore.setConnected(robot.robotName, vi.fn() as any)
-        )
-    })
+    connectionStore.clearStore()
+    await seedConnectedRobots()
     const unreachableRobots =
       await cleanUpUnreachableRobots(MOCK_HEALTHY_ROBOTS)
     expect(unreachableRobots).toEqual(['opentrons-dev3'])
@@ -51,24 +64,20 @@ describe('cleanUpUnreachableRobots', () => {
 describe('establishConnections', () => {
   it('should not resolve any new connections if all reported robots are already in the connection store and connected', async () => {
     connectionStore.clearStore()
-    MOCK_STORE_ROBOTS.forEach(robot => {
-      void connectionStore
-        .setPendingConnection(robot.robotName)
-        .then(() =>
-          connectionStore.setConnected(robot.robotName, vi.fn() as any)
-        )
-    })
+    await seedConnectedRobots()
 
     const newRobots = await establishConnections(MOCK_HEALTHY_ROBOTS)
     expect(newRobots).toEqual([])
   })
 
   it('should not attempt to connect to a robot if it a known notification port blocked robot', async () => {
+    connectionStore.clearStore()
+    connectionStore.associateIPWithRobotName('10.14.19.51', 'opentrons-dev2')
+    await connectionStore.setPendingConnection('opentrons-dev2')
     await connectionStore.setErrorStatus(
       '10.14.19.51',
       FAILURE_STATUSES.ECONNREFUSED
     )
-    connectionStore.clearStore()
 
     const newRobots = await establishConnections(MOCK_HEALTHY_ROBOTS)
     expect(newRobots).toEqual([
@@ -79,9 +88,7 @@ describe('establishConnections', () => {
 
   it('should not report a robot as new if it is connecting', async () => {
     connectionStore.clearStore()
-    MOCK_STORE_ROBOTS.forEach(robot => {
-      void connectionStore.setPendingConnection(robot.robotName)
-    })
+    await seedPendingConnections()
 
     const newRobots = await establishConnections(MOCK_HEALTHY_ROBOTS)
     expect(newRobots).toEqual([])
@@ -98,13 +105,7 @@ describe('establishConnections', () => {
 describe('closeConnectionsForcefullyFor', () => {
   it('should return an array of promises for each closing connection and resolve after closing connections', async () => {
     connectionStore.clearStore()
-    MOCK_STORE_ROBOTS.forEach(robot => {
-      void connectionStore
-        .setPendingConnection(robot.robotName)
-        .then(() =>
-          connectionStore.setConnected(robot.robotName, vi.fn() as any)
-        )
-    })
+    await seedConnectedRobots()
     const closingRobots = closeConnectionsForcefullyFor([
       'opentrons-dev',
       'opentrons-dev2',

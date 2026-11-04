@@ -43,6 +43,8 @@ const WINDOW_OPTS = {
   ),
 }
 
+const READY_POLL_INTERVAL_MS = 1500
+
 export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
@@ -65,7 +67,7 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   return mainWindow
 }
 
-export function waitForRobotServerAndShowMainWindow(
+export function waitForBackendAndShowMainWindow(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): void {
@@ -122,16 +124,16 @@ export function waitForRobotServerAndShowMainWindow(
   _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd
-        .getisRobotServerReady()
+        .getIsBackendReady()
         .then((isReady: boolean) => {
           dispatch(sendReadyStatus(isReady))
           if (!isReady) {
-            waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+            waitForBackendAndShowMainWindow(dispatch, mainWindow)
           }
         })
         .catch(e => {
-          log.debug('Could not get status of robot server service', { e })
-          waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+          log.debug('Could not get status of backend services', { e })
+          waitForBackendAndShowMainWindow(dispatch, mainWindow)
         })
-    }, 1500)
+    }, READY_POLL_INTERVAL_MS)
 }

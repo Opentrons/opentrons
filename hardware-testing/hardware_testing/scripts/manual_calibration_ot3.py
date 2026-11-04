@@ -6,7 +6,8 @@ from typing import Tuple
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import GripperProbe
 
-from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 from opentrons.calibration_storage.ot3.gripper_offset import save_gripper_calibration

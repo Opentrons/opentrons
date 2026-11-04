@@ -1316,7 +1316,7 @@ class OT3Controller(FlexBackend):
             if "ot_module" in event.name:
                 event_name = event.name
                 event_description = AionotifyEvent.build(event_name, flags)
-                await self.module_controls.handle_module_appearance(event_description)
+                await self.module_controls.handle_device_appearance(event_description)
 
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         can_watch = aionotify is not None
@@ -1976,7 +1976,7 @@ class OT3Controller(FlexBackend):
         return sensor_data.to_float() if sensor_data else None
 
     async def read_capacitive_sensor(
-        self, mount: OT3Mount, primary: bool
+        self, mount: OT3Mount, primary: bool, timeout: int = 1
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         sensor = CapacitiveSensor.build(

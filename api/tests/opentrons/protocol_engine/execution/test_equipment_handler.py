@@ -28,17 +28,23 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     TempDeck,
 )
+from opentrons.hardware_control.peripherals import (
+    AbstractPeripheral,
+    BarcodeScanner,
+)
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
     LoadedLabwareData,
     LoadedModuleData,
+    LoadedPeripheralData,
     LoadedPipetteData,
 )
 from opentrons.protocol_engine.resources import (
     LabwareDataProvider,
     ModelUtils,
     ModuleDataProvider,
+    PeripheralDataProvider,
     deck_configuration_provider,
     pipette_data_provider,
 )
@@ -66,6 +72,8 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     OnLabwareOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
+    PeripheralDefinition,
+    PeripheralModel,
 )
 from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.types import Mount as HwMount
@@ -74,6 +82,7 @@ from opentrons.types import Mount as HwMount
 def _make_config(use_virtual_modules: bool) -> Config:
     return Config(
         use_virtual_modules=use_virtual_modules,
+        use_virtual_peripherals=use_virtual_modules,
         # Robot and deck type are arbitrary.
         robot_type="OT-2 Standard",
         deck_type=DeckType.OT2_STANDARD,
@@ -123,6 +132,12 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
 
 
 @pytest.fixture
+def peripheral_data_provider(decoy: Decoy) -> PeripheralDataProvider:
+    """Get a mocked out ModuleDataProvider instance."""
+    return decoy.mock(cls=PeripheralDataProvider)
+
+
+@pytest.fixture
 async def temp_module_v1(decoy: Decoy) -> TempDeck:
     """Get a mocked out module fixture."""
     temp_mod = decoy.mock(cls=TempDeck)
@@ -130,6 +145,16 @@ async def temp_module_v1(decoy: Decoy) -> TempDeck:
     decoy.when(temp_mod.model()).then_return("temperatureModuleV1")
 
     return temp_mod
+
+
+@pytest.fixture
+async def barcode_scanner_v1(decoy: Decoy) -> BarcodeScanner:
+    """Get a mocked out module fixture."""
+    bs_peripheral = decoy.mock(cls=BarcodeScanner)
+    decoy.when(bs_peripheral.device_info).then_return({"serial": "serial-1"})
+    decoy.when(bs_peripheral.model()).then_return("barcodeScannerV1")
+
+    return bs_peripheral
 
 
 @pytest.fixture
@@ -183,7 +208,7 @@ def loaded_static_pipette_data(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
 
@@ -1229,6 +1254,43 @@ async def test_load_module_using_virtual(
         module_id="module-id",
         serial_number="fake-serial-number-abc123",
         definition=tempdeck_v1_def,
+    )
+
+
+async def test_load_peripheral_using_virtual(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    peripheral_data_provider: PeripheralDataProvider,
+    hardware_api: HardwareControlAPI,
+    barcode_scanner_def: PeripheralDefinition,
+    barcode_scanner_v1: AbstractPeripheral,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load a virtual peripheral."""
+    decoy.when(model_utils.ensure_id("input-peripheral-id")).then_return(
+        "peripheral-id"
+    )
+
+    decoy.when(model_utils.generate_id(prefix="fake-serial-number-")).then_return(
+        "fake-serial-number-abc123"
+    )
+
+    decoy.when(
+        peripheral_data_provider.get_definition(PeripheralModel.BARCODE_SCANNER_V1)
+    ).then_return(barcode_scanner_def)
+
+    decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=True))
+
+    result = await subject.load_peripheral(
+        model=PeripheralModel.BARCODE_SCANNER_V1,
+        peripheral_id="input-peripheral-id",
+    )
+
+    assert result == LoadedPeripheralData(
+        peripheral_id="peripheral-id",
+        serial_number="fake-serial-number-abc123",
+        definition=barcode_scanner_def,
     )
 
 

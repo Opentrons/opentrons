@@ -34,7 +34,6 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
   return (
     <button
-      data-testid={`LabwareButton-${numberInStack}`}
       onClick={(event: MouseEvent<HTMLButtonElement>) => {
         onClick(id, event)
       }}
@@ -59,7 +58,6 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
         {isSelected ? (
           <Box position={POSITION_RELATIVE}>
             <OverflowBtn
-              data-testid="LabwareCard_overflowBtn"
               onClick={() => {
                 setShowOverflowMenu(true)
               }}

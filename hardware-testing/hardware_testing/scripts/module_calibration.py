@@ -1,7 +1,7 @@
 """OT-3 Module Calibration test script."""
 import argparse
 
-from hardware_testing.opentrons_api.types import Point
+from opentrons.types import Point
 from hardware_testing.opentrons_api.http_api import (
     OpentronsHTTPAPI,
 )

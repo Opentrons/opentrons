@@ -17,7 +17,6 @@ import { getPythonPath, selectPythonPath } from '../getPythonPath'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
 import type electron from 'electron'
-import type { Config } from '../../config'
 import type { createLogger } from '../../log'
 import type { Dispatch } from '../../types'
 
@@ -52,9 +51,9 @@ describe('analyzeProtocolSource', () => {
 
   beforeEach(() => {
     dispatch = vi.fn()
-    vi.mocked(getConfig).mockReturnValue({
-      python: { pathToPythonOverride: '/some/override/python' },
-    } as Config)
+    when(vi.mocked(getConfig)).calledWith('python').thenReturn({
+      pathToPythonOverride: '/some/override/python',
+    })
     handleAction = registerProtocolAnalysis(dispatch, mockMainWindow)
   })
 

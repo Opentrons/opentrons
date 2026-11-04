@@ -68,6 +68,8 @@ beforeEach(() => {
     description: 'test blah blah',
     tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     pipette: DEFAULT_PIPETTE,
+    primaryNozzle: 'A1',
+
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
     stepNumber: 1,

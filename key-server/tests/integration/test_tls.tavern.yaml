@@ -1,0 +1,44 @@
+test_name: TLS certificates
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /keys/external/ca/encryptedCerts returns current and current
+    request:
+      method: GET
+      url: '{run_server.base_url}/keys/external/ca/encryptedCerts'
+    response:
+      status_code: 200
+      json:
+        data:
+          current:
+            current:
+              cert_data: !anystr
+              key_salt: !anystr
+              key_expires_at: !anystr
+              kdf_iterations: !anyint
+
+  - name: GET /keys/external/ca/plaintextCerts returns current and current
+    request:
+      method: GET
+      url: '{run_server.base_url}/keys/external/ca/plaintextCerts'
+    response:
+      status_code: 200
+      json:
+        data:
+          current:
+            cert_data: !anystr
+
+  - name: GET /keys/internal/ca/password gets the password
+    request:
+      method: GET
+      url: '{run_server.base_url}/keys/internal/ca/password'
+    response:
+      status_code: 200
+      json:
+        data:
+          password: !anystr
+          valid_from_utc: !anystr
+          valid_until_utc: !anystr

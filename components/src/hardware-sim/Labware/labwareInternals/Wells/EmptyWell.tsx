@@ -1,3 +1,5 @@
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
+
 import { COLORS } from '../../../../helix-design-system'
 import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
@@ -8,58 +10,56 @@ import type { ParentType } from '../types'
 interface EmptyWellProps {
   wellMap: LabwareWellMap
   parentType: ParentType
-  size?: string
+  wellName: string
+  size: string
 }
 
-export function EmptyWell(props: EmptyWellProps): JSX.Element {
-  const { size, wellMap, parentType } = props
-  const firstWell = wellMap.A1
-  const isCircular = firstWell.shape === 'circular'
+export function EmptyWell({
+  size,
+  wellMap,
+  wellName,
+  parentType,
+}: EmptyWellProps): JSX.Element {
+  const commonProps = {
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
+  }
+  const { shape } = wellMap.A1
+  const isCircular = shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
   const isLabware = parentType === LABWARE
   const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
-  const circularDimension = 20
-  const viewBoxWidth = isCircular ? circularDimension : width
-  const viewBoxHeight = isCircular ? circularDimension : height
+  const circularSize = 20
+  const viewBoxWidth = isCircular ? circularSize : width
+  const viewBoxHeight = isCircular ? circularSize : height
   const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
   const lineStrokeWidth = isCircular ? 2 : 1
-  const lineProps = isLabware
+
+  const cx = 10
+  const cy = 10
+  const r = 9
+  const angle = Math.PI / 4
+  const dx = r * Math.cos(angle)
+  const dy = r * Math.sin(angle)
+  const lineProps = isCircular
     ? {
-        x1: 0,
-        y1: 0,
-        x2: viewBoxWidth,
-        y2: viewBoxHeight,
+        x1: cx - dx,
+        y1: cy - dy,
+        x2: cx + dx,
+        y2: cy + dy,
       }
-    : {
-        x1: viewBoxWidth,
-        y1: 0,
-        x2: 0,
-        y2: viewBoxHeight,
-      }
+    : { x1: 0, y1: 0, x2: viewBoxWidth, y2: viewBoxHeight }
+
+  const maskId = 'emptyWellMask'
+
   return (
     <svg
-      width={size ?? width}
-      height={size ?? height}
+      width={isCircular ? size : width}
+      height={isCircular ? size : height}
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <mask
-        id="emptyWellMask"
-        maskUnits="userSpaceOnUse"
-        x="0"
-        y="0"
-        width={isCircular ? circularDimension : width}
-        height={isCircular ? circularDimension : height}
-      >
-        {isCircular ? (
-          <circle cx="10" cy="10" r="9.5" fill="white" />
-        ) : (
-          <rect x="0" y="0" width={width} height={height} fill="white" />
-        )}
-      </mask>
-
-      <g mask="url(#emptyWellMask)">
+      <g mask={`url(#${maskId})`}>
         {isCircular ? (
           <circle
             cx="10"
@@ -67,17 +67,17 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
             r="9"
             fill="#CBCCCC"
             stroke={outlineColor}
-            strokeWidth="3"
+            strokeWidth="2"
+            {...commonProps}
           />
         ) : (
           <rect
-            x="0"
-            y="0"
             width={width}
             height={height}
             fill="#CBCCCC"
             stroke={outlineColor}
             strokeWidth="2"
+            {...commonProps}
           />
         )}
 

@@ -10,6 +10,8 @@ from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
+from opentrons.config.robot_configs import build_config_ot3
+from opentrons.config.types import OT3Config
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     Axis as HardwareAxis,
@@ -49,6 +51,12 @@ def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
 def mock_state_view(decoy: Decoy) -> StateView:
     """Get a mock in the shape of a StateView."""
     return decoy.mock(cls=StateView)
+
+
+@pytest.fixture
+def mock_config() -> OT3Config:
+    """Get a mock in the shape of a OT3Config."""
+    return build_config_ot3({})
 
 
 @pytest.fixture
@@ -516,6 +524,7 @@ async def test_home_z(
 async def test_move_axes(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
+    mock_config: OT3Config,
     mock_state_view: StateView,
     axis_map: Dict[MotorAxis, float],
     critical_point: Optional[Dict[MotorAxis, float]],
@@ -550,13 +559,10 @@ async def test_move_axes(
         await ot3_hardware_api.current_position(expected_mount, refresh=True)
     ).then_do(_current_position)
 
-    decoy.when(ot3_hardware_api.config.left_mount_offset).then_return(Point(1, 1, 1))
-    decoy.when(ot3_hardware_api.config.right_mount_offset).then_return(
-        Point(10, 10, 10)
-    )
-    decoy.when(ot3_hardware_api.config.gripper_mount_offset).then_return(
-        Point(0.5, 0.5, 0.5)
-    )
+    decoy.when(ot3_hardware_api.config).then_return(mock_config)
+    mock_config.left_mount_offset = Point(1, 1, 1)
+    mock_config.right_mount_offset = Point(10, 10, 10)
+    mock_config.gripper_mount_offset = Point(0.5, 0.5, 0.5)
 
     decoy.when(ot3_hardware_api.get_deck_from_machine(curr_pos)).then_return(curr_pos)
 
@@ -567,7 +573,6 @@ async def test_move_axes(
         decoy.when(ot3_hardware_api.critical_point_for(expected_mount)).then_return(
             Point(1, 1, 1)
         )
-
     pos = await subject.move_axes(axis_map, critical_point, 100, relative_move)
     decoy.verify(
         await ot3_hardware_api.move_axes(

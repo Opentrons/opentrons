@@ -27,6 +27,7 @@ from ..types import (
     LabwareOffsetCreateInternal,
     Liquid,
     ModuleDefinition,
+    PeripheralDefinition,
     Task,
 )
 from opentrons.hardware_control.modules import LiveData
@@ -290,6 +291,15 @@ class AddModuleAction:
     serial_number: str
     definition: ModuleDefinition
     module_live_data: LiveData
+
+
+@dataclasses.dataclass(frozen=True)
+class AddPeripheralAction:
+    """Add an attached peripheral directly to state without a location."""
+
+    peripheral_id: str
+    serial_number: str
+    definition: PeripheralDefinition
 
 
 @dataclasses.dataclass(frozen=True)

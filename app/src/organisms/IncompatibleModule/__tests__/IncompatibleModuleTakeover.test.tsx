@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import {
   MODAL_PORTAL_ID,
-  PortalRoot,
+  ModalPortalRoot,
   TOP_PORTAL_ID,
   TopPortalRoot,
 } from '/app/App/portal'
@@ -39,7 +39,7 @@ const getRenderer = (incompatibleModules: AttachedModule[]) => {
   return (props: ComponentProps<typeof IncompatibleModuleTakeover>) => {
     const [rendered] = renderWithProviders(
       <>
-        <PortalRoot />
+        <ModalPortalRoot />
         <TopPortalRoot />
         <IncompatibleModuleTakeover {...(props as any)} />
       </>,
@@ -49,7 +49,7 @@ const getRenderer = (incompatibleModules: AttachedModule[]) => {
     )
     rendered.rerender(
       <>
-        <PortalRoot />
+        <ModalPortalRoot />
         <TopPortalRoot />
         <IncompatibleModuleTakeover {...(props as any)} />
       </>

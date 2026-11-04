@@ -66,7 +66,7 @@ Parameter and CSV file selections are still editable until you tap **Confirm val
 ## Labware offsets and position checking
 
 ### Labware offsets
-Labware offsets are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
+*Labware offsets* are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
 
 | Feature | Description |
 |----|----|
@@ -83,7 +83,7 @@ This illustration shows how the different types of offsets appear as you're conf
 
 ### Labware Position Check
 
-Labware Position Check lets you align a pipette relative to a piece of labware (e.g., a well plate), which helps ensure accurate and reproducible pipetting results.
+*Labware Position Check* lets you align a pipette relative to a piece of labware (e.g., a well plate), which helps ensure accurate and reproducible pipetting results.
 
 You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the example below, you cannot run a protocol (the play button is inactive) if it uses labware that is missing offset data.
 

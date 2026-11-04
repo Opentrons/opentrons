@@ -1,4 +1,3 @@
-import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
@@ -197,8 +196,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     // No assertion failure, continue with the logic
   } else {
-    assert(
-      false,
+    throw new Error(
       `Transfer command creator expected N:N source-to-dest wells ratio. Got ${sourceWells.length}:${destWells?.length} in labware`
     )
   }

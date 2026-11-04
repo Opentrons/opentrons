@@ -17,10 +17,12 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
+import { ShutdownRobotConfirmationModal } from './ShutdownRobotConfirmationModal'
 
 import type { MouseEventHandler } from 'react'
 import type { Dispatch } from '/app/redux/types'
@@ -40,11 +42,20 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
   ] = useState<boolean>(false)
+  const [
+    showShutdownRobotConfirmationModal,
+    setShowShutdownRobotConfirmationModal,
+  ] = useState<boolean>(false)
 
   const navigate = useNavigate()
+  const isFlex = useIsFlex(robotName)
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
+  }
+
+  const handleShutdown = (): void => {
+    setShowShutdownRobotConfirmationModal(true)
   }
 
   const handleHomeGantry = (): void => {
@@ -59,6 +70,14 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           robotName={robotName}
           setShowRestartRobotConfirmationModal={
             setShowRestartRobotConfirmationModal
+          }
+        />
+      ) : null}
+      {showShutdownRobotConfirmationModal ? (
+        <ShutdownRobotConfirmationModal
+          robotName={robotName}
+          setShowShutdownRobotConfirmationModal={
+            setShowShutdownRobotConfirmationModal
           }
         />
       ) : null}
@@ -96,6 +115,25 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </LegacyStyledText>
           </Flex>
         </MenuItem>
+        {isFlex ? (
+          <MenuItem key="shutdown" onClick={handleShutdown}>
+            <Flex alignItems={ALIGN_CENTER}>
+              <Icon
+                name="power-off"
+                size="2.5rem"
+                color={COLORS.black90}
+                aria-label="power-off_icon"
+              />
+              <LegacyStyledText
+                forwardedAs="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginLeft={SPACING.spacing12}
+              >
+                {t('robot_controls:turn_off_label')}
+              </LegacyStyledText>
+            </Flex>
+          </MenuItem>
+        ) : null}
         <MenuItem
           key="deck-configuration"
           onClick={() => {

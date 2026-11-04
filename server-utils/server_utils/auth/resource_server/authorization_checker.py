@@ -1,4 +1,7 @@
-"""Logic to check whether an HTTP client is authorized to do something."""
+"""Interfaces that endpoints can use to check whether an HTTP client is authorized to do something.
+
+This module should be framework-agnostic, not tied to FastAPI or whatever.
+"""
 
 from __future__ import annotations
 
@@ -32,7 +35,8 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
 
     @override
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
-        return AuthorizedResult()
+        """See base class for documentation."""
+        return AuthorizationNotRequiredResult()
 
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
@@ -43,6 +47,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
 
     @override
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
+        """See base class for documentation."""
         if token is None:
             # The client is trying to access a protected resource without providing a token.
             # We allow this if and only if access control is disabled.
@@ -52,27 +57,43 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
             if access_control_enabled:
                 return MissingTokenResult()
             else:
-                return AuthorizedResult()
+                return AuthorizationNotRequiredResult()
 
         else:
             token_info = await self._client.introspect_token(token)
-            provided_scopes = parse_scopes(token_info.scope)
 
+            provided_scopes = parse_scopes(token_info.scope)
             missing_scopes = required_scopes - provided_scopes
 
             if not token_info.active:
                 return NotAnActiveTokenResult()
             elif missing_scopes:
                 return InsufficientScopeResult(provided_scopes)
+            elif token_info.username is None:
+                # This should never happen in practice. Although token_info.username is
+                # optional according to the OAuth 2 specs, our implementation in
+                # auth-server should always return it.
+                raise RuntimeError(
+                    "Username not present in token introspection response."
+                    " This is a bug in auth-server."
+                )
             else:
-                return AuthorizedResult()
+                return AuthorizedResult(username=token_info.username)
+
+
+@dataclass
+class AuthorizationNotRequiredResult:
+    """Authorization was neither provided nor required--access control mode is disabled."""
+
+    pass
 
 
 @dataclass
 class AuthorizedResult:
-    """The request is authorized, or no authorization is required."""
+    """The request is authorized with a valid access token."""
 
-    pass
+    username: str
+    """The user who issued the request."""
 
 
 @dataclass
@@ -98,7 +119,8 @@ class NotAnActiveTokenResult:
 
 
 Result: TypeAlias = (
-    AuthorizedResult
+    AuthorizationNotRequiredResult
+    | AuthorizedResult
     | InsufficientScopeResult
     | MissingTokenResult
     | NotAnActiveTokenResult

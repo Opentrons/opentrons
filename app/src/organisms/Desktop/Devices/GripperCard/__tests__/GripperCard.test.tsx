@@ -55,7 +55,7 @@ describe('GripperCard', () => {
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/flex_gripper.png'
     )
-    screen.getByText('extension mount')
+    screen.getByText('Extension Mount')
     screen.getByText('Flex Gripper')
     const overflowButton = screen.getByRole('button', {
       name: /overflow/i,

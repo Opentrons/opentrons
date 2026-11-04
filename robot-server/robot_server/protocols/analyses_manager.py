@@ -17,6 +17,7 @@ from robot_server.protocols.analysis_models import (
 )
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.task_runner import TaskRunner
 
 
@@ -31,9 +32,15 @@ class FailedToInitializeAnalyzer(Exception):
 class AnalysesManager:
     """A Collaborator that manages and provides an interface to Protocol Analyzers."""
 
-    def __init__(self, analysis_store: AnalysisStore, task_runner: TaskRunner) -> None:
+    def __init__(
+        self,
+        analysis_store: AnalysisStore,
+        task_runner: TaskRunner,
+        run_process_pyro_provider: RunProcessPyroProvider,
+    ) -> None:
         self._analysis_store = analysis_store
         self._task_runner = task_runner
+        self._run_process_pyro_provider = run_process_pyro_provider
 
     async def initialize_analyzer(
         self,
@@ -57,6 +64,7 @@ class AnalysesManager:
         analyzer = protocol_analyzer.create_protocol_analyzer(
             analysis_store=self._analysis_store,
             protocol_resource=protocol_resource,
+            run_process_pyro_provider=self._run_process_pyro_provider,
         )
         try:
             await analyzer.load_orchestrator(

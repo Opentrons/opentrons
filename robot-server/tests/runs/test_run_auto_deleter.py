@@ -42,7 +42,7 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
     )
 
     protocol_resources: List[ProtocolResource] = [
-        ProtocolResource(
+        ProtocolResource.model_construct(
             protocol_id=f"protocol-id-{idx}",
             created_at=datetime.min,
             source=mock_protocol_source,

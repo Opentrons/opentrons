@@ -39,12 +39,7 @@ export function DisabledScreen(): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         paddingX={SPACING.spacing80}
       >
-        <Icon
-          name="browser"
-          size="2.5rem"
-          color={COLORS.white}
-          data-testid="browser_icon_in_DisabledScreen"
-        />
+        <Icon name="browser" size="2.5rem" color={COLORS.white} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}

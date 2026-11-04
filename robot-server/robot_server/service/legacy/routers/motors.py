@@ -9,7 +9,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons_shared_data.errors import ErrorCodes
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse

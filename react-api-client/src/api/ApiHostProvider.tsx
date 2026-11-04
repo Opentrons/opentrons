@@ -10,7 +10,7 @@ export interface ApiHostProviderProps {
   port?: number | null
   requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
   robotName?: string | null
-  token?: string
+  token?: string | null
   children?: React.ReactNode
 }
 

@@ -4,7 +4,7 @@ from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.types import DeckLocation, Location
+from opentrons.types import DeckLocation, Location, ModuleFixtureLocation
 
 CommandLocation = Union[Location, Well]
 
@@ -107,7 +107,13 @@ def stringify_well_list(
 
 def _stringify_labware_movement_location(
     location: Union[
-        DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute, TrashBin
+        DeckLocation,
+        OffDeckType,
+        Labware,
+        ModuleContext,
+        ModuleFixtureLocation,
+        WasteChute,
+        TrashBin,
     ],
 ) -> str:
     if isinstance(location, (int, str)):
@@ -116,7 +122,7 @@ def _stringify_labware_movement_location(
         return "off-deck"
     elif isinstance(location, Labware):
         return location.name
-    elif isinstance(location, ModuleContext):
+    elif isinstance(location, (ModuleContext, ModuleFixtureLocation)):
         return str(location)
     elif isinstance(location, WasteChute):
         return "Waste Chute"
@@ -127,7 +133,13 @@ def _stringify_labware_movement_location(
 def stringify_labware_movement_command(
     source_labware: Labware,
     destination: Union[
-        DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute, TrashBin
+        DeckLocation,
+        OffDeckType,
+        Labware,
+        ModuleContext,
+        ModuleFixtureLocation,
+        WasteChute,
+        TrashBin,
     ],
     use_gripper: bool,
 ) -> str:

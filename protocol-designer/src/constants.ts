@@ -59,6 +59,10 @@ export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
 export const PAUSE_UNTIL_TC_PROFILE_COMPLETE: 'untilThermocyclerProfileComplete' =
   'untilThermocyclerProfileComplete'
+export const PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE: 'untilVacuumProfileComplete' =
+  'untilVacuumProfileComplete'
+export const PAUSE_UNTIL_VACUUM_STATE_COMPLETE: 'untilVacuumStateComplete' =
+  'untilVacuumStateComplete'
 
 export const DND_TYPES = {
   LABWARE: 'LABWARE',
@@ -171,3 +175,8 @@ export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'
 
 export const HOPPER_LABWARE_X_OFFSET = 178
 export const HOPPER_ZOOM_OFFSET_POSTITION = 230
+
+// Vacuum dock is in A4, adjacent to module in A3
+// Start with similar offset to hopper, adjust based on testing
+export const VACUUM_DOCK_LABWARE_X_OFFSET = 178
+export const VACUUM_DOCK_ZOOM_OFFSET_POSITION = 230

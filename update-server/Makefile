@@ -6,8 +6,8 @@ SHELL := bash
 
 SHX := npx shx
 
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-PATH := $(shell cd .. && yarn bin):$(PATH)
+# add pnpm CLI dev deps to PATH (for cross platform POSIX commands via shx)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 port ?= 34000
 tests ?= tests

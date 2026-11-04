@@ -79,7 +79,7 @@ describe('CustomLabwareOverflowMenu', () => {
     screen.getByText(
       'Robots cannot run Python protocols with missing labware definitions.'
     )
-    fireEvent.click(screen.getByText('cancel'))
+    fireEvent.click(screen.getByText('Cancel'))
     expect(mockCancel).toHaveBeenCalled()
   })
 

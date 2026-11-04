@@ -59,7 +59,7 @@ class Params(BaseModel):
     homeAfter: Optional[bool] = None
     alternateDropLocation: Optional[bool] = None
     holdTimeSeconds: Optional[float] = None
-    maintenancePosition: Optional[str] = None
+    motionModifier: Optional[str] = None
     pipetteName: Optional[str] = None
     model: Optional[str] = None
     loadName: Optional[str] = None

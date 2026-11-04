@@ -6,7 +6,7 @@ import asyncio
 import logging
 from typing import NoReturn
 
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
     build_authorization_checker,
 )
 

@@ -67,7 +67,9 @@ export default defineConfig({
       ...configDefaults.exclude,
       '**/node_modules/**',
       '**/dist/**',
+      '**/js-package-testing/**',
       '**/lib/**',
+      '**/js-package-testing/tests/**',
     ],
     setupFiles: ['./setup-vitest.mts'],
     coverage: {
@@ -76,6 +78,7 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
         '**/lib/**',
+        '**/js-package-testing/tests/**',
         ...configDefaults.exclude,
       ],
       provider: 'v8',
@@ -99,55 +102,89 @@ export default defineConfig({
     _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
     _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
     _OT_PD_VERSION_: JSON.stringify(process.env.OT_PD_VERSION),
+    _GIT_COMMIT_HASH_: JSON.stringify(''),
+    _GIT_BRANCH_NAME_: JSON.stringify(''),
+    _ODD_IP_: JSON.stringify(process.env.ODD_IP ?? 'localhost'),
     global: 'globalThis',
   },
   resolve: {
-    alias: {
+    alias: [
       // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
       // files being processed with the wrong config (the config from the
       // consuming project vs. the config from the source project).
       // Can these be replaced with regular package.json dependencies?
-      '@opentrons/components/styles': path.resolve(
-        './components/src/index.module.css'
-      ),
-      '@opentrons/components': path.resolve('./components/src/index.ts'),
-      '@opentrons/shared-data/pipette/fixtures/name': path.resolve(
-        './shared-data/pipette/fixtures/name/index.ts'
-      ),
-      '@opentrons/shared-data/labware/fixtures/1': path.resolve(
-        './shared-data/labware/fixtures/1/index.ts'
-      ),
-      '@opentrons/shared-data/labware/fixtures/2': path.resolve(
-        './shared-data/labware/fixtures/2/index.ts'
-      ),
-      '@opentrons/shared-data/labware/fixtures/3': path.resolve(
-        './shared-data/labware/fixtures/3/index.ts'
-      ),
-      '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),
-      '@opentrons/step-generation': path.resolve(
-        './step-generation/src/index.ts'
-      ),
-      '@opentrons/api-client': path.resolve('./api-client/src/index.ts'),
-      '@opentrons/react-api-client': path.resolve(
-        './react-api-client/src/index.ts'
-      ),
-      '@opentrons/discovery-client': path.resolve(
-        './discovery-client/src/index.ts'
-      ),
-      '@opentrons/usb-bridge/node-client': path.resolve(
-        './usb-bridge/node-client/src/index.ts'
-      ),
-      '@opentrons/labware-library': path.resolve(
-        './labware-library/src/labware-creator/index.tsx'
-      ),
-      '@opentrons/protocol-visualization': path.resolve(
-        './protocol-visualization/src/index.ts'
-      ),
-      // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
-      // https://nodejs.org/api/path.html#pathresolvepaths
-      '/app/': path.resolve('./app/src/') + '/',
-      '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
-      '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
-    },
+      {
+        find: '@opentrons/components/styles',
+        replacement: path.resolve('./components/src/index.module.css'),
+      },
+      {
+        find: '@opentrons/components',
+        replacement: path.resolve('./components/src/index.ts'),
+      },
+      {
+        find: '@opentrons/shared-data/pipette/fixtures/name',
+        replacement: path.resolve(
+          './shared-data/pipette/fixtures/name/index.ts'
+        ),
+      },
+      {
+        find: '@opentrons/shared-data/labware/fixtures/1',
+        replacement: path.resolve('./shared-data/labware/fixtures/1/index.ts'),
+      },
+      {
+        find: '@opentrons/shared-data/labware/fixtures/2',
+        replacement: path.resolve('./shared-data/labware/fixtures/2/index.ts'),
+      },
+      {
+        find: '@opentrons/shared-data/labware/fixtures/3',
+        replacement: path.resolve('./shared-data/labware/fixtures/3/index.ts'),
+      },
+      {
+        find: '@opentrons/shared-data',
+        replacement: path.resolve('./shared-data/js/index.ts'),
+      },
+      {
+        find: '@opentrons/step-generation',
+        replacement: path.resolve('./step-generation/src/index.ts'),
+      },
+      {
+        find: '@opentrons/api-client',
+        replacement: path.resolve('./api-client/src/index.ts'),
+      },
+      {
+        find: '@opentrons/react-api-client',
+        replacement: path.resolve('./react-api-client/src/index.ts'),
+      },
+      {
+        find: '@opentrons/discovery-client',
+        replacement: path.resolve('./discovery-client/src/index.ts'),
+      },
+      {
+        find: '@opentrons/usb-bridge/node-client',
+        replacement: path.resolve('./usb-bridge/node-client/src/index.ts'),
+      },
+      {
+        find: '@opentrons/labware-library',
+        replacement: path.resolve(
+          './labware-library/src/labware-creator/index.tsx'
+        ),
+      },
+      {
+        find: '@opentrons/protocol-visualization',
+        replacement: path.resolve('./protocol-visualization/src/index.ts'),
+      },
+      {
+        find: /^\/app\/(?!src\/)/,
+        replacement: path.resolve('./app/src/') + '/',
+      },
+      {
+        find: /^\/protocol-designer\/(?!src\/)/,
+        replacement: path.resolve('./protocol-designer/src/') + '/',
+      },
+      {
+        find: /^\/ai-client\/(?!src\/)/,
+        replacement: path.resolve('./opentrons-ai-client/src/') + '/',
+      },
+    ],
   },
 })

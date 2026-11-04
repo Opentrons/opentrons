@@ -19,7 +19,7 @@ from starlette.responses import JSONResponse
 
 from opentrons.system import nmcli, wifi
 from opentrons_shared_data.errors import ErrorCodes
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse

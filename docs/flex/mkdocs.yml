@@ -61,6 +61,7 @@ nav:
       - App Installation and Management: opentrons-app/install.md
       - Downgrading Flex Software: opentrons-app/flex-downgrade.md
       - Transferring Protocols: opentrons-app/protocol-transfer.md
+      - Protocol Visualization: opentrons-app/protocol-viz.md
       - Controlling Modules: opentrons-app/module-control.md
       - Using the Camera: opentrons-app/camera.md
   - Advanced Operations:
@@ -119,6 +120,7 @@ markdown_extensions:
   - sane_lists
   - toc:
       permalink: true
+      title: Table of Contents
 
 extra_css:
   - ../shared/instruction-manuals.css

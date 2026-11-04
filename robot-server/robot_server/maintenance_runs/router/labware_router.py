@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     LegacyLabwareOffsetCreate,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (

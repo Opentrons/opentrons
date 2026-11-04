@@ -1,0 +1,6 @@
+.table_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-60) var(--spacing-32);
+}

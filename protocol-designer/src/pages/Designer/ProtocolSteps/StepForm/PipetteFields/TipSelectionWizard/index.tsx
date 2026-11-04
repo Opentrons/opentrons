@@ -20,6 +20,10 @@ import {
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
+import {
+  getAreAnyMatchingTipracksSelectable,
+  getIsTiprackSelectableAndValid,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -82,7 +86,7 @@ export function TipSelectionWizard(
       ? robotState?.tipState.tipracks[selectedTiprackId]
       : null
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const { pipetteEntities } = useSelector(getInvariantContext)
+  const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
@@ -96,6 +100,26 @@ export function TipSelectionWizard(
     updateFormTipsSelected(selectedTips)
     setShowTipSelectionModal(false)
   }
+
+  const areAnyMatchingTipracksSelectable = getAreAnyMatchingTipracksSelectable({
+    allLabware: Object.values(activeDeckSetup.labware),
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+  })
+
+  const isSelectedTiprackValid =
+    selectedTiprackId != null &&
+    getIsTiprackSelectableAndValid({
+      labware: activeDeckSetup.labware[selectedTiprackId],
+      formTiprackUri,
+      pipetteSpecs,
+      nozzles,
+      labwareEntities,
+      validTiprackIds,
+    })
 
   const selectedTiprackStatus =
     selectedTiprackId != null ? tipAccessibilityStatus[selectedTiprackId] : {}
@@ -168,9 +192,7 @@ export function TipSelectionWizard(
   let currentComponent: JSX.Element
   switch (currentStepIndex) {
     case 0:
-      currentComponent = (
-        <SelectTiprack {...baseProps} validTiprackIds={validTiprackIds} />
-      )
+      currentComponent = <SelectTiprack {...baseProps} />
       break
     case 1:
       currentComponent = (
@@ -208,6 +230,8 @@ export function TipSelectionWizard(
       showErrorBanner={showErrorBanner}
       numPickupsRemaining={numPickups - selectedTips.length}
       showReusingTipsBanner={isAnySelectedWellUsed}
+      showNoAvailableTipracksBanner={!areAnyMatchingTipracksSelectable}
+      showSelectedTiprackNotValidBanner={!isSelectedTiprackValid}
       errorReason={errorReason}
     >
       {currentComponent}

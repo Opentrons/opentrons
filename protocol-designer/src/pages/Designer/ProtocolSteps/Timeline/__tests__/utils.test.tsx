@@ -43,12 +43,12 @@ describe('getShiftSelectedSteps', () => {
         { type: 'standaloneStep', stepId: 'step1' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'step2',
+          startStepId: 'step2',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'step3' },
             { type: 'standaloneStep', stepId: 'step4' },
           ],
-          waitForThermocyclerProfileStepId: 'step5',
+          waitStepId: 'step5',
         },
         { type: 'standaloneStep', stepId: 'step6' },
         { type: 'standaloneStep', stepId: 'step7' },
@@ -70,12 +70,12 @@ describe('getShiftSelectedSteps', () => {
         { type: 'standaloneStep', stepId: 'step1' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'step2',
+          startStepId: 'step2',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'step3' },
             { type: 'standaloneStep', stepId: 'step4' },
           ],
-          waitForThermocyclerProfileStepId: 'step5',
+          waitStepId: 'step5',
         },
         { type: 'standaloneStep', stepId: 'step6' },
         { type: 'standaloneStep', stepId: 'step7' },

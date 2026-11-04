@@ -118,7 +118,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         {showOverflowMenu ? (
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
-            labwareIds={filteredStack}
+            // fixes bug where deleting a labware from its overflow menu deletes all non-adapter labware in the stack
+            labwareIds={quantity === 1 ? [labware.id] : filteredStack}
             lidId={lidId}
           />
         ) : null}
@@ -165,7 +166,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   css={LINK_BUTTON_STYLE}
                   onClick={handleOnClick}
-                  data-testid="LabwareCard_addLiquid_button"
                 >
                   <StyledText desktopStyle="captionRegular">
                     {editButton}
@@ -176,7 +176,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           </Flex>
           <Flex padding={`${SPACING.spacing4} ${SPACING.spacing4} 0 0`}>
             <OverflowBtn
-              data-testid="LabwareCard_overflowBtn"
+              aria-label={`${displayName} options`}
               onClick={() => {
                 setShowOverflowMenu(true)
               }}

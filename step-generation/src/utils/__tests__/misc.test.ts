@@ -3,17 +3,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
+  FLEX_STACKER_A4_ADDRESSABLE_AREA,
+  FLEX_STACKER_MODULE_TYPE,
   getMmFromBottom,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
 import {
+  deckSlotKeyForFlexStackerShuttleAddressableArea,
+  getFlexStackerShuttleAddressableArea,
   getFullStackFromLabwares,
   getIsRetractSafeForAirGap,
   getTransferPlanAndReferenceVolumes,
+  resolveDeckSlotKeyForLabwareStackInSlot,
 } from '../misc'
 
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { ModuleEntities, RobotState } from '../../types'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -452,5 +458,54 @@ describe('getFullStackFromLabwares', () => {
     const slot = 'D3'
     const largestStack = getFullStackFromLabwares(labware, slot, undefined)
     expect(largestStack).toEqual(['labwareId2', 'labwareId1', 'D3'])
+  })
+
+  it('return empty array if no labwares in slot', () => {
+    const labware = {
+      labwareId1: {
+        stack: [],
+      },
+      labwareId2: {
+        stack: [],
+      },
+    }
+    const slot = 'D3'
+    const largestStack = getFullStackFromLabwares(labware, slot, undefined)
+    expect(largestStack).toEqual([])
+  })
+})
+
+describe('flex stacker deck slot helpers', () => {
+  it('resolveDeckSlotKeyForLabwareStackInSlot maps staging A4 to A3 when a stacker uses the cutout', () => {
+    const modules = {
+      stackerMod: {
+        slot: 'A3',
+        moduleState: { type: FLEX_STACKER_MODULE_TYPE },
+      },
+    } as unknown as RobotState['modules']
+    const moduleEntities = {
+      stackerMod: { type: FLEX_STACKER_MODULE_TYPE },
+    } as unknown as ModuleEntities
+    expect(
+      resolveDeckSlotKeyForLabwareStackInSlot('A4', modules, moduleEntities)
+    ).toBe('A3')
+  })
+
+  it('resolveDeckSlotKeyForLabwareStackInSlot leaves A4 when no stacker occupies the cutout', () => {
+    expect(resolveDeckSlotKeyForLabwareStackInSlot('A4', {}, {})).toBe('A4')
+  })
+
+  it('deckSlotKeyForFlexStackerShuttleAddressableArea maps shuttle AA to the module deck slot id', () => {
+    expect(
+      deckSlotKeyForFlexStackerShuttleAddressableArea(
+        FLEX_STACKER_A4_ADDRESSABLE_AREA
+      )
+    ).toBe('A3')
+  })
+
+  it('getFlexStackerShuttleAddressableArea returns the shuttle AA for a stacker module slot', () => {
+    expect(getFlexStackerShuttleAddressableArea('A3')).toBe(
+      FLEX_STACKER_A4_ADDRESSABLE_AREA
+    )
   })
 })

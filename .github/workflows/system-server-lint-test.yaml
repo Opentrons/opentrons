@@ -43,10 +43,10 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -60,10 +60,10 @@ jobs:
     needs: [lint]
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -71,7 +71,7 @@ jobs:
           project: 'system-server'
       - name: Test
         run: make -C system-server test
-      - uses: 'codecov/codecov-action@v3'
+      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./system-server/coverage.xml
           flags: system-server

@@ -36,6 +36,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -334,6 +335,7 @@ export function ModulesListItem({
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
     attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
+    attachedModuleMatch.moduleType !== VACUUM_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
 
   if (needsCalibration) {

@@ -8,7 +8,7 @@ All Flex robots keep records of their movements and system processes. During nor
 
 ## Understanding Flex log files
 
-In an idle state or during a protocol run, your Flex constantly writes data to several different log files. Each of these files tracks the activities specific to different parts of the robot and its attachments. The following table summarizes the data captured in each file.
+In an idle state or during a protocol run, your Flex constantly writes data to several different *log files*. Each of these files tracks the activities specific to different parts of the robot and its attachments. The following table summarizes the data captured in each file.
 
 
 | Log type | Description |

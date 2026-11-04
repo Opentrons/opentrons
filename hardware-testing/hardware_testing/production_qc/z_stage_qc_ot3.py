@@ -7,7 +7,7 @@ from statistics import mean
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
@@ -401,7 +401,8 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     report = _build_csv_report()
     dut = helpers_ot3.DeviceUnderTest.OTHER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator, dut=dut)
 
     # NOTE: We submit an automatic "PASS" result for these parameter lists.
     # They do not test any logic but only add the list of parameters used to the CSV

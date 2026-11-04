@@ -24,32 +24,27 @@ import type {
   ZoomedIntoSlotInfoState,
 } from './types'
 
-// TODO: Ian 2019-02-15 no RootSlice, use BaseState
-interface RootSlice {
-  labwareIngred: RootState
-}
-
-const rootSelector = (state: RootSlice): RootState => state.labwareIngred
+const rootSelector = (state: BaseState): RootState => state.labwareIngred
 // NOTE: not intended for UI use! Use getLabwareNicknamesById for the string.
-const getLabwareNameInfo: Selector<RootSlice, ContainersState> = createSelector(
+const getLabwareNameInfo: Selector<BaseState, ContainersState> = createSelector(
   rootSelector,
   s => s.containers
 )
 
-const getLiquidGroupsById = (state: RootSlice): IngredientsState =>
+const getLiquidGroupsById = (state: BaseState): IngredientsState =>
   rootSelector(state).ingredients
 
-const getLiquidsByLabwareId = (state: RootSlice): LabwareLiquidState =>
+const getLiquidsByLabwareId = (state: BaseState): LabwareLiquidState =>
   rootSelector(state).ingredLocations
 
-const getNextLiquidGroupId: Selector<RootSlice, string> = createSelector(
+const getNextLiquidGroupId: Selector<BaseState, string> = createSelector(
   getLiquidGroupsById,
   ingredGroups =>
     // @ts-expect-error(sa, 2021-6-15): this could return undefined
     (max(Object.keys(ingredGroups).map(id => parseInt(id))) + 1 || 0).toString()
 )
 const getLiquidNamesById: Selector<
-  RootSlice,
+  BaseState,
   Record<string, string>
 > = createSelector(
   getLiquidGroupsById,
@@ -59,7 +54,7 @@ const getLiquidNamesById: Selector<
       (ingred: Ingredient) => ingred.displayName
     ) as Record<string, string>
 )
-const getLiquidSelectionOptions: Selector<RootSlice, DropdownOption[]> =
+const getLiquidSelectionOptions: Selector<BaseState, DropdownOption[]> =
   createSelector(getLiquidGroupsById, liquidGroupsById => {
     return Object.keys(liquidGroupsById).map(id => ({
       // NOTE: if these fallbacks are used, it's a bug
@@ -74,11 +69,11 @@ const getLiquidSelectionOptions: Selector<RootSlice, DropdownOption[]> =
 const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
 
-const getSelectedLabwareId: Selector<RootSlice, SelectedContainerId> =
+const getSelectedLabwareId: Selector<BaseState, SelectedContainerId> =
   createSelector(rootSelector, rootState => rootState.selectedContainerId)
 
 const getMultipleSelectedLabwareIds: Selector<
-  RootSlice,
+  BaseState,
   SelectedMultipleContainerIds
 > = createSelector(
   rootSelector,
@@ -86,12 +81,12 @@ const getMultipleSelectedLabwareIds: Selector<
 )
 
 const getSelectedLiquidGroupState: Selector<
-  RootSlice,
+  BaseState,
   SelectedLiquidGroupState
 > = createSelector(rootSelector, rootState => rootState.selectedLiquidGroup)
-const getDrillDownLabwareId: Selector<RootSlice, DrillDownLabwareId> =
+const getDrillDownLabwareId: Selector<BaseState, DrillDownLabwareId> =
   createSelector(rootSelector, rootState => rootState.drillDownLabwareId)
-const allIngredientGroupFields: Selector<RootSlice, AllIngredGroupFields> =
+const allIngredientGroupFields: Selector<BaseState, AllIngredGroupFields> =
   createSelector(getLiquidGroupsById, ingreds =>
     reduce<IngredientsState, AllIngredGroupFields>(
       ingreds,
@@ -107,13 +102,13 @@ const allIngredientGroupFields: Selector<RootSlice, AllIngredGroupFields> =
     )
   )
 
-const getLabwareSelectionMode: Selector<RootSlice, boolean> = createSelector(
+const getLabwareSelectionMode: Selector<BaseState, boolean> = createSelector(
   rootSelector,
   rootState => {
     return rootState.modeLabwareSelection !== false
   }
 )
-const getLiquidGroupsOnDeck: Selector<RootSlice, string[]> = createSelector(
+const getLiquidGroupsOnDeck: Selector<BaseState, string[]> = createSelector(
   getLiquidsByLabwareId,
   ingredLocationsByLabware => {
     const liquidGroups: Set<string> = new Set()
@@ -142,12 +137,12 @@ const getLiquidGroupsOnDeck: Selector<RootSlice, string[]> = createSelector(
     return [...liquidGroups]
   }
 )
-const getDeckHasLiquid: Selector<RootSlice, boolean> = createSelector(
+const getDeckHasLiquid: Selector<BaseState, boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )
 const getLiquidDisplayColors: Selector<
-  RootSlice,
+  BaseState,
   Record<string, string>
 > = createSelector(
   getLiquidGroupsById,
@@ -161,18 +156,18 @@ const getLiquidDisplayColors: Selector<
     )
 )
 
-const getZoomedInSlotInfo: Selector<RootSlice, ZoomedIntoSlotInfoState> =
+const getZoomedInSlotInfo: Selector<BaseState, ZoomedIntoSlotInfoState> =
   createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
 
 const getZoomedInSlot: Selector<
-  RootSlice,
+  BaseState,
   { slot: DeckSlot | null; cutout: CutoutId | null }
 > = createSelector(
   rootSelector,
   rootState => rootState.zoomedInSlotInfo.selectedSlot
 )
 
-const getIsNewProtocol: Selector<RootSlice, boolean> = createSelector(
+const getIsNewProtocol: Selector<BaseState, boolean> = createSelector(
   rootSelector,
   rootState => rootState.generateNewProtocol.isNewProtocol
 )

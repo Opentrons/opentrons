@@ -227,6 +227,38 @@ describe('health poller', () => {
     })
   })
 
+  it('should strip unrecognized fields from responses', () => {
+    const healthWithExtraFields = {
+      ...Fixtures.mockLegacyHealthResponse,
+      extraField: 'extra value',
+    }
+    const serverHealthWithExtraFields = {
+      ...Fixtures.mockLegacyServerHealthResponse,
+      extraField: 'extra value',
+    }
+
+    stubFetchOnce('http://127.0.0.1:31950/health')(
+      makeMockJsonResponse(healthWithExtraFields)
+    )
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
+      makeMockJsonResponse(serverHealthWithExtraFields)
+    )
+
+    poller.start({ list: [HOST_1], interval: 1000 })
+    vi.advanceTimersByTime(1000)
+
+    return flush().then(() => {
+      expect(onPollResult).toHaveBeenCalledWith({
+        ip: '127.0.0.1',
+        port: 31950,
+        health: Fixtures.mockLegacyHealthResponse, // Should exclude the extra fields.
+        serverHealth: Fixtures.mockLegacyServerHealthResponse, // Should exclude the extra fields.
+        healthError: null,
+        serverHealthError: null,
+      })
+    })
+  })
+
   it('should map partially successful fetch responses to onPollResult', () => {
     stubFetchOnce('http://127.0.0.1:31950/health')(
       makeMockJsonResponse({ message: 'some error' }, false, 400)

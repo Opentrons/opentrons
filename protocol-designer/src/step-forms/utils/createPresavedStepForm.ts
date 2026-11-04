@@ -8,6 +8,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -405,6 +406,31 @@ const _patchAbsorbanceReaderModuleId =
     return null
   }
 
+const _patchVacuumModuleId =
+  (args: {
+    initialDeckSetup: InitialDeckSetup
+    stepType: StepType
+  }): FormUpdater =>
+  () => {
+    const { initialDeckSetup, stepType } = args
+    const numOfModules =
+      Object.values(initialDeckSetup.modules).filter(
+        module => module.type === VACUUM_MODULE_TYPE
+      )?.length ?? 1
+    const isVacuumStep = stepType === 'vacuum'
+    if (isVacuumStep && numOfModules === 1) {
+      const moduleId =
+        getModuleOnDeckByType(initialDeckSetup, VACUUM_MODULE_TYPE)?.id ?? null
+      if (moduleId != null) {
+        return {
+          moduleId,
+        }
+      }
+    }
+
+    return null
+  }
+
 const _patchThermocyclerFields =
   (args: {
     initialDeckSetup: InitialDeckSetup
@@ -539,6 +565,10 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
+  const updateVacuumModuleId = _patchVacuumModuleId({
+    initialDeckSetup,
+    stepType,
+  })
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
@@ -563,6 +593,7 @@ export const createPresavedStepForm = ({
     updateFlexStackerModuleId,
     updateDefaultLabwareLocations,
     updateMoveLabwareFields,
+    updateVacuumModuleId,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {
       const updates = updater(acc)

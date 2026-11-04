@@ -37,7 +37,7 @@ export function SavedVacuumStep(props: SavedVacuumStepProps): JSX.Element {
           pressure: pumpData.pressureMbar,
         })
       : t('vacuum.controls.profile.step_detail.power', {
-          power: pumpData.powerPercent,
+          power: pumpData.percentPower,
         })
   return (
     <ListItem

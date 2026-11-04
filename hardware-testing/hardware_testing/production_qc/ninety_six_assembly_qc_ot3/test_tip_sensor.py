@@ -21,7 +21,7 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from opentrons.hardware_control.types import OT3Mount, Axis
 from hardware_testing.opentrons_api import helpers_ot3
 
 TIP_PRESENCE_POSITION = 6

@@ -5,8 +5,8 @@ import {
   BORDERS,
   COLORS,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -33,7 +33,7 @@ const Table = styled('table')`
 const TableHeader = styled('th')`
   font-size: ${TYPOGRAPHY.fontSize20};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  padding: 0 ${SPACING.spacing4} 0 ${SPACING.spacing4};
+  padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
   color: ${COLORS.grey60};
 `
 
@@ -100,19 +100,28 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <LegacyStyledText paddingLeft={SPACING.spacing24}>
+            <StyledText
+              oddStyle="smallBodyTextSemiBold"
+              paddingLeft={SPACING.spacing24}
+            >
               {i18n.format(t('name'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText paddingLeft={SPACING.spacing24}>
+            <StyledText
+              oddStyle="smallBodyTextSemiBold"
+              paddingLeft={SPACING.spacing24}
+            >
               {i18n.format(t('default_value'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText paddingLeft={SPACING.spacing24}>
+            <StyledText
+              oddStyle="smallBodyTextSemiBold"
+              paddingLeft={SPACING.spacing24}
+            >
               {i18n.format(t('range'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>

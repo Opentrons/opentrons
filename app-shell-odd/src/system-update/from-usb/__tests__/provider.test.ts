@@ -34,7 +34,7 @@ describe('system-update/from-usb/provider', () => {
       releaseNotes: expect.any(String),
       downloadProgress: 100,
     }
-    return expect(provider.refreshUpdateCache(progress))
+    return expect(provider.scanUpdate(progress))
       .resolves.toEqual(expectedUpdate)
       .then(() => {
         expect(progress).toHaveBeenLastCalledWith(expectedUpdate)
@@ -52,11 +52,11 @@ describe('system-update/from-usb/provider', () => {
     })
     const expectedUpdate = {
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     }
-    return expect(provider.refreshUpdateCache(progress))
+    return expect(provider.scanUpdate(progress))
       .resolves.toEqual(expectedUpdate)
       .then(() => {
         expect(progress).toHaveBeenLastCalledWith(expectedUpdate)
@@ -74,11 +74,11 @@ describe('system-update/from-usb/provider', () => {
     })
     const expectedUpdate = {
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     }
-    return expect(provider.refreshUpdateCache(progress))
+    return expect(provider.scanUpdate(progress))
       .resolves.toEqual(expectedUpdate)
       .then(() => {
         expect(progress).toHaveBeenLastCalledWith(expectedUpdate)
@@ -96,11 +96,11 @@ describe('system-update/from-usb/provider', () => {
     })
     const expectedUpdate = {
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     }
-    return expect(provider.refreshUpdateCache(progress))
+    return expect(provider.scanUpdate(progress))
       .resolves.toEqual(expectedUpdate)
       .then(() => {
         expect(progress).toHaveBeenLastCalledWith(expectedUpdate)
@@ -115,13 +115,11 @@ describe('system-update/from-usb/provider', () => {
     const progress = vi.fn()
     return provider
       .teardown()
-      .then(() =>
-        expect(provider.refreshUpdateCache(progress)).rejects.toThrow()
-      )
+      .then(() => expect(provider.scanUpdate(progress)).rejects.toThrow())
       .then(() =>
         expect(progress).toHaveBeenLastCalledWith({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
@@ -144,13 +142,11 @@ describe('system-update/from-usb/provider', () => {
       )
     return provider
       .teardown()
-      .then(() =>
-        expect(provider.refreshUpdateCache(progress)).rejects.toThrow()
-      )
+      .then(() => expect(provider.scanUpdate(progress)).rejects.toThrow())
       .then(() =>
         expect(progress).toHaveBeenLastCalledWith({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
@@ -168,12 +164,12 @@ describe('system-update/from-usb/provider', () => {
     })
     const expectedUpdate = {
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     }
-    const first = provider.refreshUpdateCache(progress)
-    const second = provider.refreshUpdateCache(progress)
+    const first = provider.scanUpdate(progress)
+    const second = provider.scanUpdate(progress)
     return Promise.all([
       expect(first).resolves.toEqual(expectedUpdate),
       expect(second).rejects.toThrow(),
@@ -191,16 +187,14 @@ describe('system-update/from-usb/provider', () => {
     })
     const expectedUpdate = {
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     }
-    return expect(provider.refreshUpdateCache(progress))
+    return expect(provider.scanUpdate(progress))
       .resolves.toEqual(expectedUpdate)
       .then(() =>
-        expect(provider.refreshUpdateCache(progress)).resolves.toEqual(
-          expectedUpdate
-        )
+        expect(provider.scanUpdate(progress)).resolves.toEqual(expectedUpdate)
       )
   })
 })

@@ -94,12 +94,13 @@ export const UnmountGripper = (
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
   return showGripperStillDetected ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}

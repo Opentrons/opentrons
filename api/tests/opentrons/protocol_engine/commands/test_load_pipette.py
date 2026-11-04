@@ -93,7 +93,7 @@ async def test_load_pipette_implementation(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
     decoy.when(
@@ -175,7 +175,7 @@ async def test_load_pipette_implementation_96_channel(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
     decoy.when(

@@ -55,7 +55,7 @@ async def thread_manager_ot3(
 
 async def test_estop_ignored_ot2(thread_manager_ot2: ThreadManagedHardware) -> None:
     """Test that we can use the dependency on OT-2."""
-    assert await require_estop_in_good_state(thread_manager=thread_manager_ot2)
+    assert await require_estop_in_good_state(hardware_resource=thread_manager_ot2)
 
 
 @pytest.mark.ot3_only
@@ -86,10 +86,10 @@ async def test_estop_ot3(
     )
 
     if error_code is None:
-        assert await require_estop_in_good_state(thread_manager=thread_manager_ot3)
+        assert await require_estop_in_good_state(hardware_resource=thread_manager_ot3)
     else:
         with pytest.raises(ApiError) as details:
-            await require_estop_in_good_state(thread_manager=thread_manager_ot3)
+            await require_estop_in_good_state(hardware_resource=thread_manager_ot3)
         err = details.value
 
         assert err.status_code == status.HTTP_403_FORBIDDEN

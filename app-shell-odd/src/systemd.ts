@@ -44,7 +44,7 @@ interface SystemD {
   ready: () => Promise<string>
   sendStatus: (text: string) => Promise<string>
   setRemoteDevToolsEnabled: (enabled: boolean) => Promise<string>
-  getisRobotServerReady: () => Promise<boolean>
+  getIsBackendReady: () => Promise<boolean>
   restartApp: () => Promise<string>
   updateBrightness: (text: string) => Promise<string>
 }
@@ -61,12 +61,23 @@ const provideExports = (): SystemD => {
             enabled
           )} opentrons-robot-app-devtools.socket`
         ),
-      getisRobotServerReady: () => {
-        return promisifyProcess(
-          '/bin/systemctl is-active opentrons-robot-server',
-          true
-          // trimming string because stdout returns a new line
-        ).then(state => state.trim() === 'active')
+      getIsBackendReady: async () => {
+        // trimming string because stdout returns a new line
+        const isRobotServerReady =
+          (
+            await promisifyProcess(
+              '/bin/systemctl is-active opentrons-robot-server',
+              true
+            )
+          ).trim() === 'active'
+        const isAuthServerReady =
+          (
+            await promisifyProcess(
+              '/bin/systemctl is-active opentrons-auth-server',
+              true
+            )
+          ).trim() === 'active'
+        return isRobotServerReady && isAuthServerReady
       },
       restartApp: () =>
         promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
@@ -86,7 +97,7 @@ const provideExports = (): SystemD => {
         new Promise<string>(resolve => {
           resolve(`dev tools set to ${enabled}`)
         }),
-      getisRobotServerReady: () =>
+      getIsBackendReady: () =>
         new Promise<boolean>(resolve => {
           resolve(true)
         }),

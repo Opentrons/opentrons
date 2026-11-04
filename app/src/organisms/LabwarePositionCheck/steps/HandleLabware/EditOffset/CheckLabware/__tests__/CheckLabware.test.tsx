@@ -181,10 +181,7 @@ describe('CheckLabware', () => {
     expect(header).toHaveTextContent('Test Content Header')
 
     const primaryButton = screen.getByTestId('primary-button')
-    expect(primaryButton).toHaveAttribute(
-      'data-button-text',
-      'Confirm placement'
-    )
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Confirm offset')
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
@@ -196,10 +193,7 @@ describe('CheckLabware', () => {
     expect(header).toHaveTextContent('Test Content Header')
 
     const primaryButton = screen.getByTestId('primary-button')
-    expect(primaryButton).toHaveAttribute(
-      'data-button-text',
-      'Confirm placement'
-    )
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Confirm offset')
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 

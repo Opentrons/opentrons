@@ -37,6 +37,7 @@
   "robot_settings": "Robot settings",
   "run_a_protocol": "Run a protocol",
   "running": "running",
+  "search_robots": "Search robots",
   "see_how_to_setup_new_robot": "See how to set up a new robot",
   "setting_up_new_robot": "Learn about setting up a new robot",
   "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}",

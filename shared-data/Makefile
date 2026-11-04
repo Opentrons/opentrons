@@ -39,26 +39,26 @@ lint: lint-js lint-py
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
 lib-js:
-	yarn vite build
+	pnpm vite build
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build --emitDeclarationOnly
+	pnpm tsc --build --emitDeclarationOnly
 
 .PHONY: format-js
 format-js:
-	yarn prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
 lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --ignore-path ../.eslintignore --quiet=$(quiet) "**/*.@(js|ts|tsx)"
+	pnpm eslint --ignore-path ../.eslintignore --quiet=$(quiet) "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	yarn prettier --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 # Python targets
@@ -130,4 +130,4 @@ test-cov:
 
 .PHONY: pack
 pack: build-ts lib-js
-	yarn pack
+	pnpm pack

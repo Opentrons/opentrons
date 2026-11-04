@@ -3,8 +3,7 @@ from datetime import datetime
 import enum
 from pathlib import Path
 from time import time
-from typing import Any, List, Union, Optional
-
+from typing import Any, List, Union, Optional, overload
 from hardware_testing import data as data_io
 
 
@@ -124,7 +123,7 @@ class CSVLine:
         else:
             return None
 
-    def store(self, *data: Any, print_results: bool = True) -> None:
+    def store(self, data: List[Any], print_results: bool = True) -> None:
         """Line store data."""
         if len(data) != len(self._data_types):
             raise ValueError(
@@ -345,22 +344,30 @@ class CSVReport:
         self(META_DATA_TITLE, META_DATA_TEST_TIME_UTC, [_now])
         self._dont_write_to_disk = dont_write_to_disk
 
-    def __call__(self, *args: Any) -> None:
+    @overload
+    def __call__(self, section: str, tag: str, line_data: List[Any]) -> None:
+        ...
+
+    @overload
+    def __call__(self, section: str, tag: str, line_data: List[Any], ind: int) -> None:
+        ...
+
+    def __call__(
+        self, section: str, tag: str, line_data: List[Any], ind: int = -1
+    ) -> None:
         """CSV Report call."""
-        if len(args) == 3:
-            line = self[args[0]][args[1]]
+        if ind == -1:
+            line = self[section][tag]
             if isinstance(line, CSVLineRepeating):
-                raise ValueError(f'line "{args[1]}" is repeating, and must be indexed')
-            line.store(*args[2])
-        elif len(args) == 4:
-            r_line = self[args[0]][args[1]]
+                raise ValueError(f'line "{tag}" is repeating, and must be indexed')
+            line.store(line_data)
+        else:
+            r_line = self[section][tag]
             if not isinstance(r_line, CSVLineRepeating):
                 raise ValueError(
-                    f'line "{args[1]}" is not a repeating line and cannot be indexed'
+                    f'line "{tag}" is not a repeating line and cannot be indexed'
                 )
-            r_line[args[2]].store(*args[3])
-        else:
-            raise ValueError(f"unexpected arguments to Report(): {args}")
+            r_line[ind].store(line_data)
         # set the results of each section based on current
         self._refresh_results_overview_values()
         # save to disk after storing new values
@@ -382,11 +389,11 @@ class CSVReport:
             line = results_section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
             if s.result_passed:
-                line.store(CSVResult.PASS, print_results=False)
+                line.store([CSVResult.PASS], print_results=False)
             elif s.result_passed is False:
-                line.store(CSVResult.FAIL, print_results=False)
+                line.store([CSVResult.FAIL], print_results=False)
             else:
-                line.store(None, print_results=False)
+                line.store([None], print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""
@@ -489,6 +496,13 @@ class CSVReport:
         return data_io.dump_data_to_file(
             self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
+
+    def all_succeded(self) -> bool:
+        """Return True if all results are pass or None."""
+        results = [
+            line.result_passed or True for line in self[RESULTS_OVERVIEW_TITLE].lines
+        ]
+        return all(results)
 
     def print_results(self) -> None:
         """Print overall results."""

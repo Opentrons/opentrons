@@ -30,6 +30,7 @@ interface DeviceDetailsComponentProps {
   robotName: string
 }
 
+// TODO(jh, 05-21-2026): Containers utilized in this tree do not match designs. Update to match.
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {

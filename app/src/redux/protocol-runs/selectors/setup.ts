@@ -102,7 +102,7 @@ export const getCameraImageSettings = (
   cameraId: CameraId
 ): CameraImageSettings | null => {
   const cameraStep =
-    state.protocolRuns[runId]?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+    state.protocolRuns[runId]?.setup?.[Constants.CAMERA_SETUP_STEP_KEY]
   if (cameraStep == null) {
     return null
   } else {

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -17,7 +17,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import {
+  isValidNumericalInput,
+  StatelessNumericalKeyboard,
+} from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
@@ -43,11 +46,13 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
-  const keyboardRef = useRef(null)
 
-  const [flowRate, setFlowRate] = useState<number>(
+  const initialFlowRate =
     kind === 'aspirate' ? state.aspirateFlowRate : state.dispenseFlowRate
+  const [flowRate, setFlowRate] = useState<string>(
+    String(initialFlowRate ?? '')
   )
+  const flowRateAsNumber = flowRate !== '' ? Number(flowRate) : null
 
   // TODO (ba, 2024-07-02): use the pipette name once we add it to the v2 spec
   let pipetteName = state.pipette.model
@@ -88,10 +93,10 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
 
   const handleClickSave = (): void => {
     // the button will be disabled if this values is null
-    if (flowRate != null) {
+    if (flowRateAsNumber != null && !Number.isNaN(flowRateAsNumber)) {
       dispatch({
         type: flowRateAction,
-        rate: flowRate,
+        rate: flowRateAsNumber,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -104,12 +109,23 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   }
 
   const error =
-    flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
+    flowRateAsNumber != null &&
+    (Number.isNaN(flowRateAsNumber) ||
+      flowRateAsNumber < minFlowRate ||
+      flowRateAsNumber > maxFlowRate)
       ? t(`value_out_of_range`, {
           min: minFlowRate,
           max: maxFlowRate,
         })
       : null
+
+  const handleFlowRateChange = (input: string): void => {
+    const isValidInput = isValidNumericalInput(input, { allowDecimal: true })
+    if (isValidInput === false) {
+      return
+    }
+    setFlowRate(input)
+  }
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -119,7 +135,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || flowRate == null}
+        buttonIsDisabled={error != null || flowRate === ''}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -139,7 +155,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
         >
           <TouchInputField
             autoFocus
-            type="number"
+            type="text"
             value={flowRate}
             label={textEntryCopy}
             error={error}
@@ -147,7 +163,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
               e.target.focus()
             }}
             onChange={e => {
-              setFlowRate(Number(e.target.value))
+              handleFlowRateChange(e.target.value as string)
             }}
           />
         </Flex>
@@ -157,12 +173,10 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop="7.75rem"
           borderRadius="0"
         >
-          <NumericalKeyboard
-            keyboardRef={keyboardRef}
-            initialValue={String(flowRate ?? '')}
-            onChange={e => {
-              setFlowRate(Number(e))
-            }}
+          <StatelessNumericalKeyboard
+            value={flowRate}
+            isDecimal
+            onChange={handleFlowRateChange}
           />
         </Flex>
       </Flex>

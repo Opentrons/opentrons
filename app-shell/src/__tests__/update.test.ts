@@ -1,6 +1,7 @@
 // app-shell self-update tests
-import * as ElectronUpdater from 'electron-updater'
+import { EventEmitter } from 'events'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 
@@ -9,36 +10,94 @@ import { registerUpdate } from '../update'
 
 import type { Dispatch } from '../types'
 
-vi.unmock('electron-updater')
-vi.mock('electron-updater')
-vi.mock('../log')
-vi.mock('../config')
+type MockedAutoUpdater = EventEmitter & {
+  channel: string
+  currentVersion: { version: string }
+  checkForUpdates: ReturnType<typeof vi.fn>
+  downloadUpdate: ReturnType<typeof vi.fn>
+  quitAndInstall: ReturnType<typeof vi.fn>
+}
+
+vi.mock('electron', () => {
+  const app = {
+    getPath: () => '',
+    whenReady: () => Promise.resolve(undefined),
+    on: () => {},
+  }
+
+  const shell = {
+    openPath: vi.fn(),
+    trashItem: vi.fn(),
+  }
+
+  const dialog = {
+    showOpenDialog: vi.fn(),
+  }
+
+  return { app, shell, dialog }
+})
+
+let autoUpdater: MockedAutoUpdater
+vi.mock('electron-updater', () => {
+  const emitter = new EventEmitter() as MockedAutoUpdater
+  emitter.channel = 'dev'
+  emitter.currentVersion = { version: '0.0.0-mock' }
+  emitter.checkForUpdates = vi.fn()
+  emitter.downloadUpdate = vi.fn()
+  emitter.quitAndInstall = vi.fn()
+
+  return {
+    default: { autoUpdater: emitter },
+  }
+})
+
+vi.mock('../log', () => {
+  const fakeLogger = {
+    debug: vi.fn(),
+    silly: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }
+
+  return {
+    createLogger: () => fakeLogger,
+  }
+})
+
+vi.mock('../config', () => ({
+  getConfig: vi.fn(),
+}))
 
 describe('update', () => {
   let dispatch: Dispatch
   let handleAction: Dispatch
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const updaterMod = await import('electron-updater')
+    autoUpdater = (updaterMod as any).default.autoUpdater as MockedAutoUpdater
     dispatch = vi.fn()
     handleAction = registerUpdate(dispatch)
   })
 
   afterEach(() => {
     vi.resetAllMocks()
-    ;(ElectronUpdater as any).__mockReset()
+    vi.resetAllMocks()
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    vi.mocked(Cfg.getConfig).mockReturnValue('dev' as any)
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
-    expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update.channel')
-    expect(vi.mocked(ElectronUpdater.autoUpdater).channel).toEqual('dev')
-    expect(
-      vi.mocked(ElectronUpdater.autoUpdater).checkForUpdates
-    ).toHaveBeenCalledTimes(1)
+    expect(autoUpdater.channel).toEqual('dev')
+    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
 
-    vi.mocked(ElectronUpdater.autoUpdater).emit('update-available', {
+    autoUpdater.emit('update-available', {
       version: '1.0.0',
     } as any)
 
@@ -47,10 +106,41 @@ describe('update', () => {
       payload: { available: true, info: { version: '1.0.0' } },
     })
   })
+  it('automatically downloads updates if enabled', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: true,
+      } as any as Cfg.Config['update'])
+    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+
+    expect(autoUpdater.channel).toEqual('dev')
+    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
+
+    autoUpdater.emit('update-available', {
+      version: '1.0.0',
+    } as any)
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'shell:CHECK_UPDATE_RESULT',
+      payload: { available: true, info: { version: '1.0.0' } },
+    })
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'shell:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    })
+  })
 
   it('handles shell:CHECK_UPDATE with no available update', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    vi.mocked(ElectronUpdater.autoUpdater).emit('update-not-available', {
+    vi.mocked(autoUpdater).emit('update-not-available', {
       version: '1.0.0',
     } as any)
 
@@ -61,8 +151,14 @@ describe('update', () => {
   })
 
   it('handles shell:CHECK_UPDATE with error', () => {
+    when(Cfg.getConfig)
+      .calledWith('update')
+      .thenReturn({
+        channel: 'dev',
+        automaticallyDownloadUpdates: false,
+      } as any as Cfg.Config['update'])
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    vi.mocked(ElectronUpdater.autoUpdater).emit('error', new Error('AH'))
+    vi.mocked(autoUpdater).emit('error', new Error('AH'))
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -80,15 +176,13 @@ describe('update', () => {
       meta: { shell: true },
     })
 
-    expect(
-      vi.mocked(ElectronUpdater.autoUpdater).downloadUpdate
-    ).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(autoUpdater).downloadUpdate).toHaveBeenCalledTimes(1)
 
     const progress: any = {
       percent: 20,
     }
 
-    vi.mocked(ElectronUpdater.autoUpdater).emit('download-progress', progress)
+    vi.mocked(autoUpdater).emit('download-progress', progress)
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_PERCENTAGE',
@@ -97,7 +191,7 @@ describe('update', () => {
       },
     })
 
-    vi.mocked(ElectronUpdater.autoUpdater).emit('update-downloaded', {
+    vi.mocked(autoUpdater).emit('update-downloaded', {
       version: '1.0.0',
     } as any)
 
@@ -117,7 +211,7 @@ describe('update', () => {
       type: 'shell:DOWNLOAD_UPDATE',
       meta: { shell: true },
     })
-    vi.mocked(ElectronUpdater.autoUpdater).emit('error', new Error('AH'))
+    vi.mocked(autoUpdater).emit('error', new Error('AH'))
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_UPDATE_RESULT',
@@ -127,8 +221,6 @@ describe('update', () => {
 
   it('handles shell:APPLY_UPDATE', () => {
     handleAction({ type: 'shell:APPLY_UPDATE', meta: { shell: true } })
-    expect(
-      vi.mocked(ElectronUpdater.autoUpdater).quitAndInstall
-    ).toHaveBeenCalledTimes(1)
+    expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(1)
   })
 })

@@ -55,8 +55,8 @@ export const deleteMultipleSteps =
     const stepIdsSet = new Set(stepIds)
     const stepHierarchy = getSavedStepHierarchy(getState())
 
-    // If the user is trying to delete a Thermocycler profile step, we need to also
-    // delete the internal "wait for profile to complete" step that's paired with it.
+    // If the user is trying to delete a Thermocycler or Vacuum profile step, we need to also
+    // delete the internal "wait for profile to complete" pause step that's paired with it.
     const expandedStepIds = getUnionOfSets(
       stepIdsSet,
       getPairedSteps(stepHierarchy, stepIdsSet)
@@ -94,10 +94,19 @@ export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null
 }
-export const cancelStepForm = (): CancelStepFormAction => ({
-  type: 'CANCEL_STEP_FORM',
-  payload: null,
-})
+
+export const cancelStepForm = () => (dispatch: any) => {
+  const clearSelectedItemAction: ClearSelectedItemAction = {
+    type: 'CLEAR_SELECTED_ITEM',
+  }
+
+  dispatch(clearSelectedItemAction)
+
+  dispatch({
+    type: 'CANCEL_STEP_FORM',
+    payload: null,
+  })
+}
 
 export interface ReorderStepsAction {
   type: 'REORDER_STEPS'

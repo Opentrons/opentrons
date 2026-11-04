@@ -22,6 +22,8 @@ import { protocolStorageReducer } from './protocol-storage/reducer'
 import { robotAdminReducer } from './robot-admin/reducer'
 // api state
 import { robotApiReducer } from './robot-api/reducer'
+// robot auth state
+import { robotAuthReducer } from './robot-auth/slice'
 // robot controls state
 import { robotControlsReducer } from './robot-controls/reducer'
 // robot settings state
@@ -43,8 +45,9 @@ export const rootReducer: Reducer<State, Action> = (
   action: Action
 ): State => {
   const combinedReducer = combineReducers({
-    robotApi: robotApiReducer,
     robotAdmin: robotAdminReducer,
+    robotApi: robotApiReducer,
+    robotAuth: robotAuthReducer,
     robotControls: robotControlsReducer,
     robotSettings: robotSettingsReducer,
     robotUpdate: robotUpdateReducer,

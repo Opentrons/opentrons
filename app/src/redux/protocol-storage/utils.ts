@@ -23,7 +23,7 @@ export const getGroupedCommands = (
   } else {
     const annotationsV2 = annotations as CommandAnnotationV2[]
     const annotationMap = new Map(
-      annotationsV2.map(annotation => [annotation.annotationId, annotation])
+      annotationsV2.map(annotation => [annotation.id, annotation])
     )
 
     return mostRecentAnalysis.commands.reduce<GroupedCommands>(

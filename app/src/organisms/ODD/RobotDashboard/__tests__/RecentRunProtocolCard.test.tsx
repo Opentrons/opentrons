@@ -125,6 +125,7 @@ describe('RecentRunProtocolCard', () => {
   beforeEach(() => {
     props = {
       runData: mockRunData,
+      onCardResolved: vi.fn(),
     }
 
     vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)
@@ -228,7 +229,7 @@ describe('RecentRunProtocolCard', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
-    const propsWithBadRun = { runData: mockBadRunData }
+    const propsWithBadRun = { runData: mockBadRunData, onCardResolved: vi.fn() }
     vi.mocked(useRerunnableStatusText).mockReturnValue(
       'Run could not be loaded'
     )

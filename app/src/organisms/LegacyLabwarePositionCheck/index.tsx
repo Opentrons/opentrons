@@ -91,7 +91,7 @@ class ErrorBoundary extends Component<
     const { ErrorComponent, children, shouldUseMetalProbe, isOnDevice } =
       this.props
     const { error } = this.state
-    if (error != null)
+    if (error != null) {
       return (
         <ErrorComponent
           errorMessage={error.message}
@@ -100,6 +100,7 @@ class ErrorBoundary extends Component<
           isOnDevice={isOnDevice}
         />
       )
+    }
     // Normally, just render children
     return children
   }

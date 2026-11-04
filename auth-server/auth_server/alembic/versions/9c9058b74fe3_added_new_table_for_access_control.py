@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.create_table(
         "access_control_enabled",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("enabled", sa.Boolean()),
+        sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###

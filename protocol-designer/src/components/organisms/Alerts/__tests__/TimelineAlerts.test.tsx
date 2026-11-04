@@ -30,9 +30,9 @@ describe('TimelineAlerts', () => {
 
   it('renders the insufficient tips timeline error and clicking on the button turns it into the starting deck state terminal id ', () => {
     render()
-    screen.getByText('Not enough tips to complete action')
+    screen.getByText('Not enough accessible tips')
     screen.getByText(
-      'Add another tip rack to your deck or change your tip management during transfer and mix steps.'
+      'Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.'
     )
     fireEvent.click(screen.getByText('Edit starting deck'))
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()

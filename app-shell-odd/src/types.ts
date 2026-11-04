@@ -13,7 +13,7 @@ export type Dispatch = (action: Action) => void
 export type { Logger }
 
 export interface Manifest {
-  production: {
+  productionV2: {
     [version: string]: {
       fullImage: [url: string]
       system: [url: string]

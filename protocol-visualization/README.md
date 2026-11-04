@@ -21,7 +21,7 @@ Workspace dependencies **`@opentrons/components`**, **`@opentrons/shared-data`**
 
 ```bash
 # from monorepo root
-yarn install
+pnpm install
 make -C protocol-visualization lint
 make -C protocol-visualization check-ts
 make -C protocol-visualization test

@@ -15,7 +15,8 @@ from opentrons.hardware_control.types import InstrumentProbeType
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,

@@ -2,6 +2,7 @@ import type { FC } from 'react'
 import type {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  ModuleType,
   NozzleConfigurationStyle,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -73,3 +74,7 @@ export type OT2ModuleType =
   | typeof TEMPERATURE_MODULE_TYPE
   | typeof THERMOCYCLER_MODULE_TYPE
   | typeof HEATERSHAKER_MODULE_TYPE
+
+export type ModuleLabwareCompatibilityKey =
+  | ModuleType
+  | 'VACUUM_MODULE_TYPE_WITH_LABWARE'

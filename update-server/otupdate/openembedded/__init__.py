@@ -63,6 +63,7 @@ async def get_app(
 
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.SHUTDOWN_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
 
     rfs = RootFSInterface()
@@ -85,6 +86,7 @@ async def get_app(
             web.post("/server/update/{session}/file", update.file_upload),
             web.post("/server/update/{session}/commit", update.commit),
             web.post("/server/restart", control.restart),
+            web.post("/server/shutdown", control.shutdown),
             web.get("/server/ssh_keys", ssh_key_management.list_keys),
             web.post("/server/ssh_keys", ssh_key_management.add),
             web.post("/server/ssh_keys/from_local", ssh_key_management.add_from_local),
@@ -125,6 +127,7 @@ def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
         "capabilities": {
             "systemUpdate": "/server/update/begin",
             "restart": "/server/restart",
+            "shutdown": "/server/shutdown",
         },
         "robotModel": constants.MODEL_OT3,
     }

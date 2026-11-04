@@ -18,6 +18,7 @@ import {
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '../../../constants'
@@ -124,6 +125,16 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
     )
 
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
+  })
+
+  it('Should return SINGLE_RIGHT_SLOT_FIXTURE when removing vacuum module from A3', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      VACUUM_MODULE_V1_FIXTURE,
+      'cutoutA3',
+      'vacuumModuleV1A3'
+    )
+
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
 })
 

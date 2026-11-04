@@ -1,0 +1,52 @@
+{
+    "ordering": [["A1"]],
+    "brand": {
+        "brand": "Millipore",
+        "brandId": []
+    },
+    "metadata": {
+        "displayName": "Millipore Vacuum Manifold Holder",
+        "displayCategory": "adapter",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 143,
+        "yDimension": 101.5,
+        "zDimension": 49
+    },
+    "wells": {
+        "A1": {
+            "depth": 39.55,
+            "shape": "rectangular",
+            "xDimension": 106.8,
+            "yDimension": 71.2,
+            "totalLiquidVolume": 290000,
+            "x": 63.88,
+            "y": 42.74,
+            "z": 4.85
+          }
+    },
+    "groups": [
+        {
+            "metadata": {},
+            "wells": ["A1"]
+        }
+    ],
+    "parameters": {
+        "format": "96Standard",
+        "quirks": ["stackingMaxFive"],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "millipore_vacuum_manifold_holder"
+    },
+    "namespace": "custom_beta",
+    "version": 1,
+    "schemaVersion": 2,
+    "allowedRoles": [],
+    "cornerOffsetFromSlot": {
+        "x": -7.5,
+        "y": -7.75,
+        "z": 0
+    }
+}

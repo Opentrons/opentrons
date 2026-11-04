@@ -11,7 +11,7 @@ hide: toc
 ![Module cover image](images/temp-mod-hero.png){style="width: 60%"}
 
 **Opentrons Labworks Inc.**<br>
-December 2024
+April 2026
 
 </div>
 

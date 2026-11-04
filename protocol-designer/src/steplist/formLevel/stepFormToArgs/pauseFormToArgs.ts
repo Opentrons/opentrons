@@ -3,6 +3,8 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
 } from '../../../constants'
 import { getTimeFromForm } from '../../utils/getTimeFromForm'
 
@@ -71,6 +73,25 @@ export const pauseFormToArgs = (
         waitCondition: 'thermocyclerProfileComplete',
         moduleId: castFormData.moduleId ?? '',
       }
+
+    case PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE: {
+      // Step-generation `WaitForModuleTaskArgs` and `waitForModuleTask` vacuum branches land in a follow-up PR.
+      const vacuumProfileWait = {
+        commandCreatorFnName: 'waitForModuleTask' as const,
+        waitCondition: 'vacuumProfileComplete' as const,
+        moduleId: castFormData.moduleId ?? '',
+      }
+      return vacuumProfileWait as unknown as WaitForModuleTaskArgs
+    }
+
+    case PAUSE_UNTIL_VACUUM_STATE_COMPLETE: {
+      const vacuumStateWait = {
+        commandCreatorFnName: 'waitForModuleTask' as const,
+        waitCondition: 'vacuumStateComplete' as const,
+        moduleId: castFormData.moduleId ?? '',
+      }
+      return vacuumStateWait as unknown as WaitForModuleTaskArgs
+    }
 
     default:
       return null

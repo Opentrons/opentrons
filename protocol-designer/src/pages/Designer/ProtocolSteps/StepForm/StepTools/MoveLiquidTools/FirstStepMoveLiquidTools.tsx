@@ -97,6 +97,7 @@ export function FirstStepMoveLiquidTools({
           <VolumeField
             fieldProps={propsForFields.volume}
             path={formData.path}
+            stepType={formData.stepType}
           />
         </>
       ) : null}

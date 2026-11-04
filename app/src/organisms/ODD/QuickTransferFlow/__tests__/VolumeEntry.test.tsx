@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 
 import { getVolumeRange } from '../utils'
@@ -64,7 +64,7 @@ describe('VolumeEntry', () => {
     fireEvent.click(exitBtn)
     expect(props.exitButtonProps.onClick).toHaveBeenCalled()
     expect(vi.mocked(TouchInputField)).toHaveBeenCalled()
-    expect(vi.mocked(NumericalKeyboard)).toHaveBeenCalled()
+    expect(vi.mocked(StatelessNumericalKeyboard)).toHaveBeenCalled()
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeDisabled()
   })

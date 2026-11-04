@@ -337,11 +337,15 @@ class SubsystemManager:
     async def _probe_network_and_cache_fw_updates(
         self, targets: Set[FirmwareTarget], broadcast: bool = True
     ) -> None:
-        checked_targets = {
-            target
-            for target in targets
-            if target_to_subsystem(target) not in self._updates_ongoing
-        }
+        def _ok_to_check(target: FirmwareTarget) -> bool:
+            # the tool detection notification can happen before the updater removes it from ongoing, but it will be marked as done.
+            subsystem = target_to_subsystem(target)
+            return not (
+                subsystem in self._updates_ongoing
+                and self._updates_ongoing[subsystem].state != UpdateState.done
+            )
+
+        checked_targets = {target for target in targets if _ok_to_check(target)}
         if broadcast:
             await self._network_info.probe(checked_targets)
         else:

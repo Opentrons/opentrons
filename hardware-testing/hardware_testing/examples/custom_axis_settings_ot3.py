@@ -2,11 +2,11 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis
 from hardware_testing.opentrons_api import helpers_ot3
 
 CUSTOM_AXIS_SETTINGS = {
-    types.Axis.X: helpers_ot3.GantryLoadSettings(
+    Axis.X: helpers_ot3.GantryLoadSettings(
         max_speed=300,
         acceleration=500,
         max_start_stop_speed=1,
@@ -14,7 +14,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.Axis.Y: helpers_ot3.GantryLoadSettings(
+    Axis.Y: helpers_ot3.GantryLoadSettings(
         max_speed=300,
         acceleration=500,
         max_start_stop_speed=1,
@@ -22,7 +22,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.Axis.Z_L: helpers_ot3.GantryLoadSettings(
+    Axis.Z_L: helpers_ot3.GantryLoadSettings(
         max_speed=60,
         acceleration=200,
         max_start_stop_speed=1,
@@ -30,7 +30,7 @@ CUSTOM_AXIS_SETTINGS = {
         hold_current=0.1,
         run_current=1.4,
     ),
-    types.Axis.Z_R: helpers_ot3.GantryLoadSettings(
+    Axis.Z_R: helpers_ot3.GantryLoadSettings(
         max_speed=60,
         acceleration=200,
         max_start_stop_speed=1,

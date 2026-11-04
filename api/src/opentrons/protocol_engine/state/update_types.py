@@ -26,6 +26,8 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     OnLabwareLocation,
+    PeripheralDefinition,
+    PeripheralModel,
     PreconditionTypes,
     StackerStoredLabwareGroup,
     TipGeometry,
@@ -395,6 +397,7 @@ class VacuumModuleStateUpdate:
     """An update to the Vacuum Module state."""
 
     module_id: str
+    pump_engaged: bool | NoChangeType = NO_CHANGE
 
     @classmethod
     def create_or_override(
@@ -405,6 +408,25 @@ class VacuumModuleStateUpdate:
         """Build or default a state update."""
         if maybe_inst == NO_CHANGE:
             return VacuumModuleStateUpdate(module_id=module_id)
+        else:
+            return maybe_inst
+
+
+@dataclasses.dataclass
+class BarcodeScannerPeripheralStateUpdate:
+    """An update to the Barcode Scanner Peripheral state."""
+
+    peripheral_id: str
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: BarcodeScannerPeripheralStateUpdate | NoChangeType,
+        peripheral_id: str,
+    ) -> BarcodeScannerPeripheralStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return BarcodeScannerPeripheralStateUpdate(peripheral_id=peripheral_id)
         else:
             return maybe_inst
 
@@ -458,6 +480,16 @@ class LoadModuleUpdate:
 
 
 @dataclasses.dataclass
+class LoadPeripheralUpdate:
+    """An update that loads a module."""
+
+    peripheral_id: str
+    definition: PeripheralDefinition
+    requested_model: PeripheralModel
+    serial_number: typing.Optional[str]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -466,6 +498,8 @@ class StateUpdate:
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
 
     loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
+
+    loaded_peripheral: LoadPeripheralUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
@@ -506,6 +540,8 @@ class StateUpdate:
     )
 
     flex_stacker_state_update: FlexStackerStateUpdate | NoChangeType = NO_CHANGE
+
+    vacuum_module_state_update: VacuumModuleStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 

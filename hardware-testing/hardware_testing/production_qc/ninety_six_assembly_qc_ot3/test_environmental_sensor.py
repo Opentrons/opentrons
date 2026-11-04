@@ -8,7 +8,7 @@ from opentrons_hardware.firmware_bindings.constants import SensorId
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVLine,

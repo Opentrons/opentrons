@@ -140,11 +140,14 @@ const ADDITIONAL_EQUIPMENT_TYPES = ['wasteChute', 'trashBin']
 
 export const getMigratedLabwareId = (
   // labware or trash-like entity ID
-  oldEntityId: string,
+  oldEntityId: string | null,
   labware: Labware,
   allLabwareDefs: Record<string, LabwareDefinition2>,
   latestDefs: LabwareDefByDefURI
-): string => {
+): string | null => {
+  if (oldEntityId == null) {
+    return null
+  }
   // Check if this is an additional equipment ID (e.g., waste chute, trash bin)
   // These are stored in additionalEquipmentOnDeck, not in labware, so return unchanged
   const isAdditionalEquipment = ADDITIONAL_EQUIPMENT_TYPES.some(type =>

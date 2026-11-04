@@ -71,6 +71,7 @@ export function LabwareSlotContainer(
   const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = commands.find(
     command =>
+      command.result != null &&
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
   )
@@ -114,10 +115,16 @@ export function LabwareSlotContainer(
     pipetteTemporalProperties != null
       ? pipetteTemporalProperties[1].wellName
       : null
-  const selectedWellName =
+  const rawSelectedWellName =
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
       : activeWellName
+
+  const selectedWellName =
+    rawSelectedWellName != null && labwareDef.wells[rawSelectedWellName] != null
+      ? rawSelectedWellName
+      : null
+
   const shouldShowWellContainer =
     selectedWellName != null &&
     !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)

@@ -16,7 +16,7 @@ import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
@@ -59,7 +59,9 @@ export function SendProtocolToFlexSlideout(
       ? {
           hostname: selectedRobot.ip,
           requestor:
-            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+            selectedRobot?.ip === OPENTRONS_USB
+              ? appShellUSBRequestor
+              : undefined,
         }
       : null
   )

@@ -22,7 +22,7 @@ from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
-from opentrons.protocol_engine.types import ModuleDefinition
+from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
 from opentrons.protocols.api_support.deck_type import (
     SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
@@ -275,6 +275,20 @@ def flex_stacker_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 Flex Stacker."""
     definition = load_shared_data("module/definitions/3/flexStackerModuleV1.json")
     return ModuleDefinition.model_validate_json(definition)
+
+
+@pytest.fixture(scope="session")
+def vacuum_module_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 Vacuum Module."""
+    definition = load_shared_data("module/definitions/3/vacuumModuleV1.json")
+    return ModuleDefinition.model_validate_json(definition)
+
+
+@pytest.fixture(scope="session")
+def barcode_scanner_def() -> PeripheralDefinition:
+    """Get the definition of a barcode scanner."""
+    definition = load_shared_data("peripheral/definitions/1/barcodeScannerV1.json")
+    return PeripheralDefinition.model_validate_json(definition)
 
 
 @pytest.fixture(scope="session")

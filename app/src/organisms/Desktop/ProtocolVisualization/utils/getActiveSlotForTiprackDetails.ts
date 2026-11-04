@@ -21,10 +21,11 @@ const getSlotFromPipetteLocation = (
     return trashBinEntities[entityUnderPipette].location.split('cutout')[1]
   } else if (wasteChuteEntities[entityUnderPipette] != null) {
     return wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
-  } else
+  } else {
     console.warn(
       `expected to find slot assosciated with piette location ${entityUnderPipette} but could not`
     )
+  }
   return null
 }
 

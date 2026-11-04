@@ -1,0 +1,31 @@
+.module_details_status_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding-top: var(--spacing-16);
+  background-color: var(--white);
+  gap: var(--spacing-4);
+}
+
+.module_details_status {
+  display: flex;
+  justify-content: space-between;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  gap: var(--spacing-16);
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}

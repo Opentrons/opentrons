@@ -17,7 +17,7 @@ from hardware_testing.data.csv_report import (
     CSVSection,
     CSVLine,
 )
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis, OT3Mount, OT3AxisKind, CriticalPoint
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
@@ -25,18 +25,18 @@ DEFAULT_TRIALS = 5
 STALL_THRESHOLD_MM = 0.1
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
-DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
-DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
-DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
+DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.P]
+DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.P]
+DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P]
 MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
 TEST_SPEEDS = [
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
+    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] - 20,
+    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P],
+    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] + 10,
+    DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P] + 20,
 ]
 PLUNGER_CURRENTS_SPEED = {
     MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
@@ -96,9 +96,9 @@ def _build_csv_report(trials: int) -> CSVReport:
     return _report
 
 
-async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
+async def _home_plunger(api: OT3API, mount: OT3Mount) -> None:
     # restore default current/speed before homing
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=1.0
     )
@@ -113,14 +113,14 @@ async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
 
 async def _move_plunger(
     api: OT3API,
-    mount: types.OT3Mount,
+    mount: OT3Mount,
     p: float,
     s: float,
     c: float,
     a: float,
 ) -> None:
     # set max currents/speeds, to make sure we're not accidentally limiting ourselves
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=c
     )
@@ -138,7 +138,7 @@ async def _move_plunger(
 
 async def _record_plunger_alignment(
     api: OT3API,
-    mount: types.OT3Mount,
+    mount: OT3Mount,
     report: CSVReport,
     trial: int,
     current: float,
@@ -146,7 +146,7 @@ async def _record_plunger_alignment(
     direction: str,
     position: str,
 ) -> bool:
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
     _current_pos = await api.current_position_ot3(mount)
     est = _current_pos[pipette_ax]
     if not api.is_simulator:
@@ -171,7 +171,7 @@ async def _record_plunger_alignment(
 
 async def _test_direction(
     api: OT3API,
-    mount: types.OT3Mount,
+    mount: OT3Mount,
     report: CSVReport,
     trial: int,
     current: float,
@@ -205,7 +205,7 @@ async def _test_direction(
 
 async def _test_plunger(
     api: OT3API,
-    mount: types.OT3Mount,
+    mount: OT3Mount,
     report: CSVReport,
     trials: int,
     continue_after_stall: bool,
@@ -252,14 +252,12 @@ async def _test_plunger(
     return max_failed_current
 
 
-async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
+async def _get_next_pipette_mount(api: OT3API) -> OT3Mount:
     if not api.is_simulator:
         ui.get_user_ready("attach a pipette")
     await helpers_ot3.update_firmware(api)
     await api.cache_instruments()
-    found = [
-        types.OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p
-    ]
+    found = [OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p]
     if not found:
         return await _get_next_pipette_mount(api)
     return found[0]
@@ -268,20 +266,16 @@ async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
 async def _reset_gantry(api: OT3API) -> None:
     await api.home(
         [
-            types.Axis.Z_L,
-            types.Axis.Z_R,
-            types.Axis.X,
-            types.Axis.Y,
+            Axis.Z_L,
+            Axis.Z_R,
+            Axis.X,
+            Axis.Y,
         ]
     )
-    home_pos = await api.gantry_position(
-        types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
-    )
+    home_pos = await api.gantry_position(OT3Mount.RIGHT, CriticalPoint.MOUNT)
     test_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     test_pos = test_pos._replace(z=home_pos.z)
-    await api.move_to(
-        types.OT3Mount.RIGHT, test_pos, critical_point=types.CriticalPoint.MOUNT
-    )
+    await api.move_to(OT3Mount.RIGHT, test_pos, critical_point=CriticalPoint.MOUNT)
 
 
 async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) -> None:
@@ -294,7 +288,7 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
         # home and move to a safe position
         await _reset_gantry(api)
         pipptype = api.attached_pipettes
-        left_mount_inst = pipptype[types.OT3Mount.LEFT.to_mount()]
+        left_mount_inst = pipptype[OT3Mount.LEFT.to_mount()]
         assert left_mount_inst is not None
         pip_name = left_mount_inst["name"]
         print(f"pipette type: {pip_name}")
@@ -321,7 +315,12 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
 
             report = _build_csv_report(trials=trials)
 
-            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            operator = (
+                "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+            )
+            helpers_ot3.set_csv_report_meta_data_ot3(
+                api, report, operator=operator, dut=dut
+            )
 
             await _test_plunger(
                 api,

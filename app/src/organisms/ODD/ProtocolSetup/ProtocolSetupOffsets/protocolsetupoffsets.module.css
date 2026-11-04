@@ -1,0 +1,5 @@
+.setup_offset_container {
+  display: flex;
+  width: 98vw;
+  flex-direction: column;
+}

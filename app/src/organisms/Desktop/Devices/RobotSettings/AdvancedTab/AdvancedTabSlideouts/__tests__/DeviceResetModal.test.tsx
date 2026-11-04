@@ -48,7 +48,7 @@ describe('RobotSettings DeviceResetModal', () => {
     screen.getByText(
       'Resetting will erase all saved data and restart the robot. This action is permanent and cannot be undone.'
     )
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
     screen.getByRole('button', { name: 'Confirm' })
   })
 
@@ -82,7 +82,7 @@ describe('RobotSettings DeviceResetModal', () => {
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
-    const cancelButton = screen.getByRole('button', { name: 'cancel' })
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' })
     fireEvent.click(cancelButton)
     expect(mockCloseModal).toHaveBeenCalled()
   })

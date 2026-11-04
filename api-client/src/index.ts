@@ -1,4 +1,5 @@
 // api client entry point
+export * from './auth'
 export * from './calibration'
 export * from './client_data'
 export * from './camera'
@@ -7,6 +8,7 @@ export * from './deck_configuration'
 export * from './errorRecovery'
 export * from './health'
 export * from './instruments'
+export * from './keys'
 export * from './labwareOffsets'
 export * from './maintenance_runs'
 export * from './modules'

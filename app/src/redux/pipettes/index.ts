@@ -1,6 +1,6 @@
 // pipettes constants, actions, and selectors
 
-// TODO: this entire branch of the redux store is not deprecated and
+// TODO: this entire branch of the redux store is now deprecated and
 // the react-api-client's usePipettesQuery should be used instead
 // THIS IS DEPRECATED AND SLATED FOR IMMEDIATE REMOVAL
 

@@ -28,6 +28,8 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.protocols.protocol_models import ProtocolKind
+from robot_server.runs.dependencies import get_run_process_pyro_provider
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
 
@@ -109,13 +111,18 @@ async def get_analyses_manager(
     app_state: Annotated[AppState, Depends(get_app_state)],
     analysis_store: Annotated[AnalysisStore, Depends(get_analysis_store)],
     task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
+    run_process_pyro_provider: Annotated[
+        RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
+    ],
 ) -> AnalysesManager:
     """Get a singleton AnalysesManager to keep track of analyzers."""
     analyses_manager = _analyses_manager_accessor.get_from(app_state)
 
     if analyses_manager is None:
         analyses_manager = AnalysesManager(
-            analysis_store=analysis_store, task_runner=task_runner
+            analysis_store=analysis_store,
+            task_runner=task_runner,
+            run_process_pyro_provider=run_process_pyro_provider,
         )
         _analyses_manager_accessor.set_on(app_state, analyses_manager)
 

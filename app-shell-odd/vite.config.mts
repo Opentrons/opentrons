@@ -83,6 +83,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
       _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
       _PKG_VERSION_: JSON.stringify(version),
+      _ODD_IP_: JSON.stringify(process.env.ODD_IP ?? 'localhost'),
     },
     resolve: {
       alias: {

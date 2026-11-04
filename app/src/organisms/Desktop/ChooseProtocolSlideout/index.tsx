@@ -56,7 +56,8 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -105,6 +106,7 @@ export function ChooseProtocolSlideoutComponent(
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
+  const token = useAccessTokenForRobot(name)
   const robotType = useRobotType(name)
   const isFlex = robotType === FLEX_ROBOT_TYPE
 
@@ -183,7 +185,7 @@ export function ChooseProtocolSlideoutComponent(
       ? {
           hostname: robot.ip,
           requestor:
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
         }
       : null
   )
@@ -676,8 +678,9 @@ export function ChooseProtocolSlideoutComponent(
         <ApiHostProvider
           hostname={robot.ip}
           requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
           }
+          token={token}
         >
           {currentPage === 1
             ? !isFlex && (

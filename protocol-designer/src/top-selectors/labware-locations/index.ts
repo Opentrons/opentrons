@@ -19,6 +19,8 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
+  getAllLargestStacks,
+  getProvidedAddressableAreasExposed,
   getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
@@ -44,7 +46,11 @@ import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
 
-import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  LoadedLabwareLocation,
+} from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   RobotState,
@@ -344,13 +350,14 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
     getLabwareEntities,
 
     (robotState, initialDeckSetup, labwareEntities) => {
-      if (robotState == null)
+      if (robotState == null) {
         return {
           pipettes: {},
           labware: {},
           modules: {},
           additionalEquipmentOnDeck: {},
         }
+      }
       const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
       return {
         pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
@@ -374,3 +381,38 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
       }
     }
   )
+
+/**
+ * Largest stacks at the active timeline item.
+ * Expects `robotState` from simulation to already carry `stackedOnNode` / `contains` (initial deck
+ * from {@link getInitialRobotState}, then per-command updaters such as `forMoveLabware`).
+ */
+export const getAllLargestStacksAtActiveItem: Selector<
+  LoadedLabwareLocation[][]
+> = createSelector(getRobotStateAtActiveItem, robotState => {
+  if (robotState == null) {
+    return []
+  }
+  return getAllLargestStacks(robotState)
+})
+
+/** Provided addressable areas not covered by a labware stack at the timeline’s active item. */
+export const getProvidedAddressableAreasExposedAtActiveItem: Selector<
+  Set<AddressableAreaName>
+> = createSelector(
+  getRobotStateAtActiveItem,
+  getRobotType,
+  stepFormSelectors.getDeckConfiguration,
+  getModuleEntities,
+  (robotState, robotType, deckConfigurationState, moduleEntities) => {
+    if (robotState == null) {
+      return new Set<AddressableAreaName>()
+    }
+    return getProvidedAddressableAreasExposed({
+      robotState,
+      deckConfiguration: deckConfigurationState.deckConfig,
+      deckDefinition: getDeckDefFromRobotType(robotType),
+      moduleEntities,
+    })
+  }
+)

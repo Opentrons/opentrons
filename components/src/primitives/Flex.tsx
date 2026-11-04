@@ -5,11 +5,6 @@ import { isntStyleProp, styleProps } from './style-props'
 import type { ComponentProps, FC } from 'react'
 import type { StyleProps } from './types'
 
-/**
- * Flex primitive
- *
- * @component
- */
 const FlexComponent = forwardRef<
   HTMLDivElement,
   ComponentProps<'div'> & StyleProps
@@ -38,5 +33,16 @@ const FlexComponent = forwardRef<
 
 FlexComponent.displayName = 'Flex'
 
+/**
+ * Flex primitive
+ *
+ * @component
+ *
+ * @deprecated Layout/style primitives are deprecated. If there is a preexisting
+ *   higher-level component that does what you want (e.g. from the Helix design system,
+ *   or from your project's shared components), use that instead. If not, implement your
+ *   own layout+styling with CSS modules and the semantically appropriate native HTML
+ *   element (`<li>`, `<menu>`, `<p>`, `<div>`, etc).
+ */
 export const Flex: FC<ComponentProps<'div'> & StyleProps> =
   FlexComponent as unknown as FC<ComponentProps<'div'> & StyleProps>

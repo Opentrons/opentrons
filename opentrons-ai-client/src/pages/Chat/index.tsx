@@ -58,12 +58,13 @@ export function Chat(): JSX.Element | null {
   )
 
   useEffect(() => {
-    if (scrollRef.current != null)
+    if (scrollRef.current != null) {
       scrollRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'nearest',
       })
+    }
   }, [chatData.length, scrollToBottom])
 
   return (

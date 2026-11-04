@@ -9,8 +9,8 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  getIsSafePipetteMovement,
   getLabwareSlot,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   indentPyLines,
   modulePipetteCollision,
@@ -27,8 +27,7 @@ import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
   tipRack: string
@@ -121,24 +120,26 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
-  if (
-    isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      wellLocationOffset: (wellLocation?.offset as Point) ?? {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      wellTargetName: wellName,
-      primaryNozzle,
-      nozzleConfiguration: nozzles,
-    })
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset: (wellLocation?.offset as Point) ?? {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    wellTargetName: wellName,
+    primaryNozzle,
+    nozzleConfiguration: nozzles,
+  })
+  if (isMultiChannelPipette && !pipetteMovementSafetyStatus.isSafe) {
+    errors.push(
+      errorCreators.possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
 
   if (

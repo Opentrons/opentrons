@@ -168,8 +168,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         !dropDownMenuWrapperRef.current ||
         !showDropdownMenu ||
         !menuItemsContainerRef.current
-      )
+      ) {
         return
+      }
       const currentTriggerRect =
         dropDownMenuWrapperRef.current.getBoundingClientRect()
       const currentMenuHeight = menuItemsContainerRef.current.scrollHeight
@@ -181,11 +182,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       if (menuPlacement === 'auto') {
         const currentFitsBelow = currentSpaceBelow >= currentMenuHeight
         const currentFitsAbove = currentSpaceAbove >= currentMenuHeight
-        if (currentFitsBelow) determinedPosition = 'bottom'
-        else if (currentFitsAbove) determinedPosition = 'top'
-        else
+        if (currentFitsBelow) {
+          determinedPosition = 'bottom'
+        } else if (currentFitsAbove) {
+          determinedPosition = 'top'
+        } else {
           determinedPosition =
             currentSpaceBelow >= currentSpaceAbove ? 'bottom' : 'top'
+        }
       } else {
         determinedPosition = menuPlacement
       }

@@ -11,7 +11,7 @@ hide: toc
 ![Stacker hero image](images/stacker-hero.png)
 
 **Opentrons Labworks Inc.**<br>
-August 2025
+November 2025
 
 </div>
 

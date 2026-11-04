@@ -8,8 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
     build_authorization_checker,
+    handle_authorization_error,
     install_authorization_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
@@ -60,6 +62,8 @@ app.add_middleware(
 )
 
 app.middleware("http")(server_timing_middleware())
+
+app.exception_handler(AuthorizationError)(handle_authorization_error)
 
 # main router
 app.include_router(router=router)

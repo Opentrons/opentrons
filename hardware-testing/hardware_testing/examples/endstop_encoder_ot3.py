@@ -2,21 +2,22 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 
 async def _main(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
-    mount = types.OT3Mount.LEFT
-    z_ax = types.Axis.by_mount(mount)
+    mount = OT3Mount.LEFT
+    z_ax = Axis.by_mount(mount)
 
     # home the gantry
     await helpers_ot3.home_ot3(api)
 
     # use the Encoder to check how far we move
     encoder_start = await api.encoder_current_position(mount, refresh=True)
-    await api.move_rel(mount, types.Point(z=-100))
+    await api.move_rel(mount, Point(z=-100))
     encoder_end = await api.encoder_current_position(mount, refresh=True)
     print(
         f"Encoder tracked the Z moved "
@@ -28,9 +29,9 @@ async def _main(is_simulating: bool) -> None:
     switch_pos = helpers_ot3.get_endstop_position_ot3(api, mount)
     await api.move_to(
         mount,
-        types.Point(
-            x=switch_pos[types.Axis.X],
-            y=switch_pos[types.Axis.Y],
+        Point(
+            x=switch_pos[Axis.X],
+            y=switch_pos[Axis.Y],
             z=switch_pos[z_ax],
         ),
     )
@@ -39,7 +40,7 @@ async def _main(is_simulating: bool) -> None:
         raise RuntimeError("Limit switch is NOT pressed when it should be")
 
     # disengage the XY motors when done
-    await api.disengage_axes([types.Axis.X, types.Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
 
 
 if __name__ == "__main__":

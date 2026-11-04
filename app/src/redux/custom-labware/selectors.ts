@@ -35,8 +35,8 @@ export const getCustomLabwareDirectory: (state: State) => string =
 //  @ts-expect-error(sa, 2021-05-11): TODO filesByName[name] might be undefined because filesByName is typed as a partial type
 export const getCustomLabware: (state: State) => CheckedLabwareFile[] =
   createSelector(
-    state => state.labware.filenames,
-    state => state.labware.filesByName,
+    (state: State) => state.labware.filenames,
+    (state: State) => state.labware.filesByName,
     (filenames, filesByName) =>
       sortBy(
         filenames.map(name => filesByName[name]),

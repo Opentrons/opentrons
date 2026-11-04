@@ -75,3 +75,8 @@
   display: flex;
   width: 10rem;
 }
+
+.base_deck_tip_selection {
+  width: auto;
+  height: 31.063rem;
+}

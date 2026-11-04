@@ -157,8 +157,9 @@ export const getFilteredDeckConfigFixtureCompatibility = (
           if (
             compatabilityItem.cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE &&
             compatabilityItem.cutoutFixtureId !== SINGLE_RIGHT_SLOT_FIXTURE
-          )
+          ) {
             acc.push(rightSlotRequirement)
+          }
           return acc
         } else {
           acc.push(compatabilityItem)

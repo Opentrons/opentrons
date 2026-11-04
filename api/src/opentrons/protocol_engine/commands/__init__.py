@@ -23,6 +23,7 @@ from . import (
     temperature_module,
     thermocycler,
     unsafe,
+    vacuum_module,
 )
 from .air_gap_in_place import (
     AirGapInPlace,
@@ -686,6 +687,7 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    "vacuum_module",
     # calibration command bundle
     "calibration",
     # unsafe command bundle

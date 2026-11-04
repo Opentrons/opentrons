@@ -26,6 +26,10 @@ from ..pipette_fixtures import (
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
+from opentrons.protocol_engine.errors import (
+    PipetteNotLoadedError,
+    VolumeModeDoesNotExistError,
+)
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
@@ -89,7 +93,7 @@ def test_handle_pipette_config_action(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         ),
     )
     subject.handle_action(
@@ -206,7 +210,7 @@ def test_active_channels(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         ),
     )
     subject.handle_action(
@@ -294,3 +298,146 @@ def test_last_tip_rack_well() -> None:
         PipetteView(subject.state).get_tip_rack_well_picked_up_from("pipette-id")
         is None
     )
+
+
+def test_get_max_volume_for_volume_mode(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
+    """Should return the max volume for the given volume mode."""
+    subject = PipetteStore()
+    config_update = update_types.PipetteConfigUpdate(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=NozzleMap.build(
+                physical_nozzles=EIGHT_CHANNEL_MAP,
+                physical_rows=EIGHT_CHANNEL_ROWS,
+                physical_columns=EIGHT_CHANNEL_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="H1",
+                valid_nozzle_maps=pipette_definition.ValidNozzleMaps(
+                    maps={"Full": EIGHT_CHANNEL_COLS["1"]}
+                ),
+            ),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
+            plunger_positions={
+                "top": 0.0,
+                "bottom": 5.0,
+                "blow_out": 19.0,
+                "drop_tip": 20.0,
+            },
+            shaft_ul_per_mm=5.0,
+            available_sensors=pipette_definition.AvailableSensorDefinition(
+                sensors=["pressure", "capacitive", "environment"]
+            ),
+            volume_mode=VolumeModes.default,
+            available_volume_modes_min_and_max_vol={
+                VolumeModes.default: {"min_volume": 50, "max_volume": 100},
+                VolumeModes.lowVolumeDefault: {"min_volume": 35, "max_volume": 55},
+            },
+        ),
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            state_update=update_types.StateUpdate(pipette_config=config_update),
+            command=_dummy_command(),
+        )
+    )
+    assert (
+        PipetteView(subject.state).get_max_volume_for_volume_mode(
+            "pipette-id", VolumeModes.default
+        )
+        == 100
+    )
+    assert (
+        PipetteView(subject.state).get_max_volume_for_volume_mode(
+            "pipette-id", VolumeModes.lowVolumeDefault
+        )
+        == 55
+    )
+    with pytest.raises(PipetteNotLoadedError):
+        PipetteView(subject.state).get_max_volume_for_volume_mode(
+            "mia-pipette", VolumeModes.lowVolumeDefault
+        )
+
+
+def test_get_max_volume_for_invalid_volume_mode_(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
+    """Should raise an error if the volume mode is invalid."""
+    subject = PipetteStore()
+    config_update = update_types.PipetteConfigUpdate(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=NozzleMap.build(
+                physical_nozzles=EIGHT_CHANNEL_MAP,
+                physical_rows=EIGHT_CHANNEL_ROWS,
+                physical_columns=EIGHT_CHANNEL_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="H1",
+                valid_nozzle_maps=pipette_definition.ValidNozzleMaps(
+                    maps={"Full": EIGHT_CHANNEL_COLS["1"]}
+                ),
+            ),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
+            pipette_lld_settings={},
+            plunger_positions={
+                "top": 0.0,
+                "bottom": 5.0,
+                "blow_out": 19.0,
+                "drop_tip": 20.0,
+            },
+            shaft_ul_per_mm=5.0,
+            available_sensors=pipette_definition.AvailableSensorDefinition(
+                sensors=["pressure", "capacitive", "environment"]
+            ),
+            volume_mode=VolumeModes.default,
+            available_volume_modes_min_and_max_vol={
+                VolumeModes.lowVolumeDefault: {"min_volume": 35, "max_volume": 55},
+            },
+        ),
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            state_update=update_types.StateUpdate(pipette_config=config_update),
+            command=_dummy_command(),
+        )
+    )
+    with pytest.raises(VolumeModeDoesNotExistError):
+        PipetteView(subject.state).get_max_volume_for_volume_mode(
+            "pipette-id", VolumeModes.default
+        )

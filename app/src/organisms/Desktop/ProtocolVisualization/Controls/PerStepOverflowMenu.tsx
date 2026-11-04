@@ -9,7 +9,7 @@ interface PerStepOverflowMenuProps {
   setMilliSecondsPerFrame: (secondsPerFrame: number) => void
 }
 
-const PER_STEP_OPTIONS = [2, 3, 4]
+const PER_STEP_OPTIONS = [0.25, 0.5, 1, 2, 3]
 
 export function PerStepOverflowMenu(
   props: PerStepOverflowMenuProps
@@ -30,27 +30,16 @@ export function PerStepOverflowMenu(
   return (
     <div ref={perStepOverflowWrapperRef} className={styles.container}>
       <MenuList>
-        <MenuItem
-          onClick={() => {
-            handleClick(PER_STEP_OPTIONS[0])
-          }}
-        >
-          {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[0] })}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClick(PER_STEP_OPTIONS[1])
-          }}
-        >
-          {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[1] })}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClick(PER_STEP_OPTIONS[2])
-          }}
-        >
-          {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[2] })}
-        </MenuItem>
+        {PER_STEP_OPTIONS.map(seconds => (
+          <MenuItem
+            key={seconds}
+            onClick={() => {
+              handleClick(seconds)
+            }}
+          >
+            {t('seconds_per_step', { seconds })}
+          </MenuItem>
+        ))}
       </MenuList>
     </div>
   )

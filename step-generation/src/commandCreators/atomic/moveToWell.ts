@@ -10,8 +10,8 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  getIsSafePipetteMovement,
   getLabwareSlot,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
@@ -22,8 +22,7 @@ import {
 } from '../../utils'
 
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<MoveToWellParams> = (
@@ -186,25 +185,32 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   }
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+  const pipetteSpecs = invariantContext.pipetteEntities[pipetteId]?.spec
 
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset: (wellLocation?.offset as Point) ?? {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    wellTargetName: wellName,
+    nozzleConfiguration,
+    primaryNozzle,
+  })
   if (
     isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      wellLocationOffset: (wellLocation?.offset as Point) ?? {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      wellTargetName: wellName,
-      nozzleConfiguration,
-      primaryNozzle,
-    })
+    pipetteSpecs &&
+    !pipetteMovementSafetyStatus.isSafe
   ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+    errors.push(
+      errorCreators.possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
   if (errors.length > 0) {
     return {

@@ -4,8 +4,25 @@
 const eblib = require('builder-util')
 const installPython = require('./python-install')
 const path = require('path')
+const fs = require('fs-extra')
 
-module.exports = function afterPack(context) {
+// copy Assets.car
+async function copyAssetCar(appOutDir, productFilename) {
+  const source = path.join(__dirname, '..', 'build', 'Assets.car')
+  if (!(await fs.pathExists(source))) return
+
+  const target = path.join(
+    appOutDir,
+    `${productFilename}.app`,
+    'Contents',
+    'Resources',
+    'Assets.car'
+  )
+  await fs.ensureDir(path.dirname(target))
+  await fs.copy(source, target)
+}
+
+module.exports = async function afterPack(context) {
   const { platform, arch, electronPlatformName, outDir, appOutDir, packager } =
     context
   const archStr = eblib.Arch[arch]
@@ -16,6 +33,10 @@ module.exports = function afterPack(context) {
   const platformName = electronPlatformName ?? platform.nodeName
   // arch 4 is universal. sorry. it's not in the arch enum of the builder-util we have for some reason.
   if (platformName === 'darwin') {
+    const productFilename = packager.appInfo.productFilename
+
+    await copyAssetCar(appOutDir, productFilename)
+
     if (arch !== 4) {
       console.log(
         `After-pack: on darwin we only pack python on final universal app creation, not intermediate ${archStr} app creation`

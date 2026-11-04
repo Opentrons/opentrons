@@ -4,12 +4,14 @@ import type {
   CameraStreamOpenAction,
   NotifySubscribeAction,
   NotifyTopic,
+  OT2AppOpenAction,
   ReloadUiAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
   SendLogAction,
   StepDetailViewerCloseAction,
+  StepDetailViewerClosedAction,
   StepDetailViewerOpenAction,
   StepDetailViewerUpdateAction,
   UiInitializedAction,
@@ -24,6 +26,7 @@ export const USB_HTTP_REQUESTS_STOP: 'shell:USB_HTTP_REQUESTS_STOP' =
   'shell:USB_HTTP_REQUESTS_STOP'
 export const APP_RESTART: 'shell:APP_RESTART' = 'shell:APP_RESTART'
 export const RELOAD_UI: 'shell:RELOAD_UI' = 'shell:RELOAD_UI'
+export const OT2_APP_OPEN: 'shell:OT2_APP_OPEN' = 'shell:OT2_APP_OPEN'
 export const SEND_LOG: 'shell:SEND_LOG' = 'shell:SEND_LOG'
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'
@@ -43,6 +46,8 @@ export const STEP_DETAIL_VIEWER_UPDATE =
   'shell:STEP_DETAIL_VIEWER_UPDATE' as const
 export const STEP_DETAIL_VIEWER_CLOSE =
   'shell:STEP_DETAIL_VIEWER_CLOSE' as const
+export const STEP_DETAIL_VIEWER_CLOSED =
+  'shell:STEP_DETAIL_VIEWER_CLOSED' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -72,6 +77,14 @@ export const reloadUi = (message: string): ReloadUiAction => ({
   payload: {
     message: message,
   },
+  meta: { shell: true },
+})
+
+export const openOT2App = (
+  payload?: OT2AppOpenAction['payload']
+): OT2AppOpenAction => ({
+  type: OT2_APP_OPEN,
+  payload,
   meta: { shell: true },
 })
 
@@ -175,4 +188,11 @@ export const stepDetailViewerCloseAction = (
   type: STEP_DETAIL_VIEWER_CLOSE,
   payload,
   meta: { shell: true },
+})
+
+export const stepDetailViewerClosedAction = (
+  protocolKey: string
+): StepDetailViewerClosedAction => ({
+  type: STEP_DETAIL_VIEWER_CLOSED,
+  payload: { protocolKey },
 })

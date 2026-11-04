@@ -123,7 +123,7 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
             new_assignments = [stmt for stmt in node.body if is_valid_protocol_assign(stmt, file_stem_set)]
             # Add new missing assignments
             for stem, ext in sorted(missing):
-                robot = "Flex" if stem.startswith("Flex") else "OT2"
+                robot = "Flex"
                 prop_name = make_valid_identifier(stem)
                 folder_value = get_folder_value(prop_name, ext)
                 assign = ast.AnnAssign(

@@ -429,6 +429,32 @@ export const mockFlexStackerMissingShuttle: Types.FlexStackerModule = {
   },
 }
 
+export const mockVacuumModule: Types.VacuumModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'vacuumModuleV1',
+  moduleType: 'vacuumModuleType',
+  serialNumber: 'vac123',
+  hardwareRevision: 'vacuum_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    currentPressure: null,
+    targetPressure: null,
+    currentPower: null,
+    targetPower: null,
+    ventStatus: 'closed',
+    modeType: 'pressure',
+    status: 'idle',
+  },
+  usbPort: {
+    path: '/dev/ot_module_flexstacker0',
+    port: 1,
+    hub: true,
+    hubPort: 1,
+    portGroup: 'unknown',
+  },
+}
+
 export const mockMagneticBlock = {
   id: 'magneticBlock_id',
   moduleModel: 'magneticBlockV1',

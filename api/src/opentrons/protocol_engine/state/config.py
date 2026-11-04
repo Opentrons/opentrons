@@ -35,6 +35,7 @@ class Config:
     ignore_pause: bool = False
     use_virtual_pipettes: bool = False
     use_virtual_modules: bool = False
+    use_virtual_peripherals: bool = False
     use_virtual_gripper: bool = False
     use_simulated_deck_config: bool = False
     block_on_door_open: bool = False

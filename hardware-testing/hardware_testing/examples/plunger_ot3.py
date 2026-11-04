@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 
 
@@ -10,7 +10,7 @@ async def _main(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
     )
-    mount = types.OT3Mount.LEFT
+    mount = OT3Mount.LEFT
     pipette = api.hardware_pipettes[mount.to_mount()]
     if not pipette:
         raise RuntimeError("No pipette on the left mount")

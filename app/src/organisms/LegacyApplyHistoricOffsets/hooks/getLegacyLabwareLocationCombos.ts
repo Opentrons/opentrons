@@ -35,8 +35,9 @@ export function getLegacyLabwareLocationCombos(
         if (
           command.result?.definition == null ||
           command.result.definition.parameters.format === 'trash'
-        )
+        ) {
           return acc
+        }
         const definitionUri = getLabwareDefURI(command.result.definition)
         if (locationIsOffDeck(command.params.location)) {
           return acc

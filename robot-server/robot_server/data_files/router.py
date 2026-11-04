@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (

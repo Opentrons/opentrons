@@ -83,27 +83,29 @@ async def test_module_caching() -> None:
     # Check that we can add and remove modules and the caching keeps up
     found_mods = api.attached_modules
     assert found_mods[0].name() == "tempdeck"
-    await api._backend.module_controls.register_modules(
-        new_mods_at_ports=[
+    await api._backend.module_controls.register_devices(
+        new_devices_at_ports=[
             ModuleAtPort(port="/dev/ot_module_sim_magdeck1", name="magdeck")
         ]
     )
     with_magdeck = api.attached_modules.copy()
     assert len(with_magdeck) == 2
     assert with_magdeck[0] is found_mods[0]
-    await api._backend.module_controls.register_modules(
-        removed_mods_at_ports=[
+    await api._backend.module_controls.register_devices(
+        removed_devices_at_ports=[
             ModuleAtPort(port="/dev/ot_module_sim_tempdeck111", name="tempdeck")
         ]
     )
+    # give the remove module call time
+    await asyncio.sleep(0.2)
     only_magdeck = api.attached_modules.copy()
 
     assert only_magdeck[0] is with_magdeck[1]
 
     # Check that two modules of the same kind on different ports are
     # distinct
-    await api._backend.module_controls.register_modules(
-        new_mods_at_ports=[
+    await api._backend.module_controls.register_devices(
+        new_devices_at_ports=[
             ModuleAtPort(port="/dev/ot_module_sim_magdeck2", name="magdeck")
         ]
     )

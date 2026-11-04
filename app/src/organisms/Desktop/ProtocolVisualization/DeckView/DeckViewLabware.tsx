@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 
 import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
@@ -33,6 +33,7 @@ interface DeckViewLabwareProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
 
@@ -47,21 +48,20 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     setSelectedSlot,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     selectedRunTimeCommand,
   } = props
   const { labware, modules, pipettes } = robotState
 
-  return (
-    <>
-      {Object.entries(labware).map(([id, lw]) => {
+  const labwareEntries = useMemo(
+    () =>
+      Object.entries(labware).flatMap(([id, lw]) => {
         if (
           Object.keys(modules).some(moduleId => lw.stack.includes(moduleId)) ||
-          //  filter out the fake PE lid stack definition!
-          //  we shouldn't be exposing it to users at all
           labwareEntitiesExtended[id].def.parameters.loadName ===
             PROTOCOL_ENGINE_LID_STACK_LOADNAME
         ) {
-          return null
+          return []
         }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
@@ -70,11 +70,9 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
           deckDef
         )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
-          console.warn(
-            `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
-          )
-          return null
+          return []
         }
+
         const { isActiveLayerVisible } = getActiveLayer(
           id,
           pipettes,
@@ -82,52 +80,70 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         )
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
-        return (
-          <Fragment key={id}>
-            <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
-              <CenterLabwareInSlot definition={labwareEntitiesExtended[id].def}>
-                <LabwareOnDeck
-                  x={0}
-                  y={0}
-                  robotState={robotState}
-                  labwareDef={labwareEntitiesExtended[id].def}
-                  liquids={liquids}
-                  labwareId={id}
-                  setSelectedSlot={setSelectedSlot}
-                  setHoveredSlot={setHoveredSlot}
-                />
-              </CenterLabwareInSlot>
-            </g>
-            <DeckViewOverlay
-              key={`${slot}_hoveredSlot_labware`}
-              slotId={slot}
-              slotPosition={slotPosition}
-              slotFillColor={COLORS.purple50}
-              robotType={robotType}
-              invariantContext={invariantContext}
-              robotState={robotState}
-              setSelectedSlot={setSelectedSlot}
-              setHoveredSlot={setHoveredSlot}
-              hover={hoveredSlot}
-            >
-              {showCommandSummary ? null : (
-                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
-                  {labwareEntitiesExtended[id]?.nickName ??
-                    labwareEntitiesExtended[id].def.metadata.displayName}
-                </StyledText>
-              )}
-            </DeckViewOverlay>
-            {showCommandSummary ? (
-              <LabwareCommandSummary
-                commandType={selectedRunTimeCommand.commandType}
-                position={slotPosition}
+
+        return [{ id, lw, slot, slotPosition, showCommandSummary }]
+      }),
+    [
+      labware,
+      modules,
+      labwareEntitiesExtended,
+      deckDef,
+      pipettes,
+      selectedRunTimeCommand,
+    ]
+  )
+  return (
+    <>
+      {labwareEntries.map(({ id, slot, slotPosition, showCommandSummary }) => (
+        <Fragment key={id}>
+          <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
+            <CenterLabwareInSlot definition={labwareEntitiesExtended[id].def}>
+              <LabwareOnDeck
+                x={0}
+                y={0}
+                robotState={robotState}
                 labwareDef={labwareEntitiesExtended[id].def}
-                showModuleIcon={false}
+                liquids={liquids}
+                labwareId={id}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
               />
-            ) : null}
-          </Fragment>
-        )
-      })}
+            </CenterLabwareInSlot>
+          </g>
+          <DeckViewOverlay
+            key={`${slot}_hoveredSlot_labware`}
+            slotId={slot}
+            slotPosition={slotPosition}
+            slotFillColor={COLORS.purple50}
+            robotType={robotType}
+            invariantContext={invariantContext}
+            robotState={robotState}
+            setSelectedSlot={setSelectedSlot}
+            setHoveredSlot={setHoveredSlot}
+            hover={hoveredSlot}
+            selectedSlot={selectedSlot}
+          >
+            {showCommandSummary ? null : (
+              <StyledText desktopStyle="captionRegular" color={COLORS.white}>
+                {labwareEntitiesExtended[id]?.nickName ??
+                  labwareEntitiesExtended[id].def.metadata.displayName}
+              </StyledText>
+            )}
+          </DeckViewOverlay>
+        </Fragment>
+      ))}
+
+      {labwareEntries.map(({ id, slotPosition, showCommandSummary }) =>
+        showCommandSummary && selectedRunTimeCommand != null ? (
+          <LabwareCommandSummary
+            key={`${id}_summary`}
+            commandType={selectedRunTimeCommand.commandType}
+            position={slotPosition}
+            labwareDef={labwareEntitiesExtended[id].def}
+            showModuleIcon={false}
+          />
+        ) : null
+      )}
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,7 +11,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import {
+  isValidNumericalInput,
+  StatelessNumericalKeyboard,
+} from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -31,24 +34,7 @@ export function ChooseNumber({
   const { makeSnackbar } = useToaster()
 
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
-  const keyboardRef = useRef(null)
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
-
-  // We need to arbitrarily set the value of the keyboard to a string the
-  // same length as the initial parameter value (as string) when the component mounts
-  // so that the delete button operates properly on the exisiting input field value.
-  const [prevKeyboardValue, setPrevKeyboardValue] = useState<string>('')
-  useEffect(
-    () => {
-      const arbitraryInput = new Array(paramValue).join('*')
-      // @ts-expect-error keyboard should expose for `setInput` method
-      keyboardRef.current?.setInput(arbitraryInput)
-      setPrevKeyboardValue(arbitraryInput)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
     console.log(`Incorrect parameter type: ${parameter.type as string}`)
@@ -63,22 +49,6 @@ export function ChooseNumber({
     }
   }
 
-  const handleKeyboardInput = (e: string): void => {
-    if (prevKeyboardValue.length < e.length) {
-      const lastDigit = e.slice(-1)
-      if (
-        !'.-'.includes(lastDigit) ||
-        (lastDigit === '.' && !paramValue.includes('.')) ||
-        (lastDigit === '-' && paramValue.length === 0)
-      ) {
-        setParamValue(paramValue + lastDigit)
-      }
-    } else {
-      setParamValue(paramValue.slice(0, paramValue.length - 1))
-    }
-    setPrevKeyboardValue(e)
-  }
-
   const paramValueAsNumber = paramValue !== '' ? Number(paramValue) : null
   const resetValueDisabled = parameter.default === paramValueAsNumber
   const { min, max } = parameter
@@ -91,6 +61,18 @@ export function ChooseNumber({
           max: parameter.type === 'int' ? max : max.toFixed(1),
         })
       : null
+
+  const handleInputChange = (inputValue: string): void => {
+    const isValidInput = isValidNumericalInput(inputValue, {
+      allowDecimal: parameter.type === 'float',
+      allowNegative: min < 0,
+    })
+    if (isValidInput === false) {
+      return
+    }
+    setParamValue(inputValue)
+  }
+
   return (
     <>
       <ChildNavigation
@@ -101,9 +83,11 @@ export function ChooseNumber({
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
-          resetValueDisabled
-            ? makeSnackbar(t('no_custom_values') as string)
-            : setParamValue(String(parameter.default))
+          if (resetValueDisabled) {
+            makeSnackbar(t('no_custom_values') as string)
+            return
+          }
+          setParamValue(String(parameter.default))
         }}
       />
       <Flex
@@ -145,12 +129,8 @@ export function ChooseNumber({
               e.target.focus()
             }}
             onChange={e => {
-              const inputValue = Number(e.target.value as string)
-              const modifiedValue =
-                parameter.type === 'int' ? Math.round(inputValue) : inputValue
-              setParamValue(
-                Number.isNaN(modifiedValue) ? '' : String(modifiedValue)
-              )
+              const inputValue = e.target.value
+              handleInputChange(inputValue)
             }}
           />
         </Flex>
@@ -159,13 +139,11 @@ export function ChooseNumber({
           height="21.25rem"
           marginTop="7.75rem"
         >
-          <NumericalKeyboard
-            keyboardRef={keyboardRef}
+          <StatelessNumericalKeyboard
+            value={paramValue}
             isDecimal={parameter.type === 'float'}
             hasHyphen={min < 0 || max < min}
-            onChange={e => {
-              handleKeyboardInput(e)
-            }}
+            onChange={handleInputChange}
           />
         </Flex>
       </Flex>

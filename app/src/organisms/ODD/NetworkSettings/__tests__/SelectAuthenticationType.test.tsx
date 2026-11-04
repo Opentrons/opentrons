@@ -9,7 +9,7 @@ import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
 
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
-import { SetWifiCred } from '../SetWifiCred'
+import { WifiPasswordInput } from '../WifiPasswordInput'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -17,7 +17,7 @@ import type { NavigateFunction } from 'react-router-dom'
 const mockNavigate = vi.fn()
 const mockSetSelectedAuthType = vi.fn()
 
-vi.mock('../SetWifiCred')
+vi.mock('../WifiPasswordInput')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
@@ -59,7 +59,9 @@ describe('SelectAuthenticationType', () => {
       wifi: initialMockWifi,
       ethernet: null,
     })
-    vi.mocked(SetWifiCred).mockReturnValue(<div>Mock SetWifiCred</div>)
+    vi.mocked(WifiPasswordInput).mockReturnValue(
+      <div>Mock WifiPasswordInput</div>
+    )
     vi.mocked(AlternativeSecurityTypeModal).mockReturnValue(
       <div>mock AlternativeSecurityTypeModal</div>
     )

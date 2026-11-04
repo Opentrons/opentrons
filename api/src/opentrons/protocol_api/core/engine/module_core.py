@@ -1157,3 +1157,53 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
     """Vacuum Module core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.VacuumModule]
+
+    def start_set_vacuum_pressure(
+        self,
+        gauge_pressure_mbar: float,
+        duration: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        """Set vacuum pressure."""
+        self._engine_client.execute_command(
+            cmd.vacuum_module.StartSetVacuumPressureParams(
+                moduleId=self.module_id,
+                gaugePressure=gauge_pressure_mbar,
+                duration=duration,
+                rate=ramp_rate,
+                timeout=timeout_s,
+                ventAfter=vent_after if vent_after is not None else False,
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def start_set_vacuum_power(
+        self,
+        percent_power: int,
+        duration: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        """Set vacuum power."""
+        self._engine_client.execute_command(
+            cmd.vacuum_module.StartSetVacuumPowerParams(
+                moduleId=self.module_id,
+                percentPower=percent_power,
+                duration=duration,
+                rate=ramp_rate,
+                timeout=timeout_s,
+                ventAfter=vent_after if vent_after is not None else False,
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def stop_vacuum(
+        self,
+    ) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.StopVacuumParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )

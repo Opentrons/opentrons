@@ -72,7 +72,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       onClick={handleSelectedValue}
       width="10.3rem"
       minHeight={FLEX_MAX_CONTENT}
-      data-testid="LiquidDetailCard_box"
     >
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
         <Flex

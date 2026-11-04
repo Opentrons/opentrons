@@ -5,7 +5,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import { SetWifiSsid } from '../../NetworkSettings'
+import { WifiSsidInput } from '../../NetworkSettings'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SetSettingOption } from '../types'
@@ -46,7 +46,7 @@ export function RobotSettingsJoinOtherNetwork({
         }}
         onClickButton={handleContinue}
       />
-      <SetWifiSsid
+      <WifiSsidInput
         errorMessage={errorMessage}
         inputSsid={inputSsid}
         setInputSsid={setInputSsid}

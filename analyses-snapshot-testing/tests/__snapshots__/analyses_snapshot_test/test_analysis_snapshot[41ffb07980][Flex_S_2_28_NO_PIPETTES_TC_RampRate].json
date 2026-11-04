@@ -1,0 +1,245 @@
+{
+  "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
+  "commands": [
+    {
+      "commandAnnotationIds": [],
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "B1"
+        },
+        "model": "thermocyclerModuleV2"
+      },
+      "result": {
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "948953cf0ab38f7dc4e96ad423601c1a",
+      "notes": [],
+      "params": {
+        "message": "Pre-heating TC to 80°C..."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/setTargetBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8815f119077df14dacde520fa79ae19d",
+      "notes": [],
+      "params": {
+        "blockMaxVolumeUl": 100.0,
+        "celsius": 80.0,
+        "moduleId": "UUID",
+        "ramp_rate": 1.0
+      },
+      "result": {
+        "targetBlockTemperature": 80.0,
+        "taskId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3b792337f967b1423cfd6d06111e045c",
+      "notes": [],
+      "params": {
+        "message": "Simulating work while TC heats up",
+        "seconds": 10.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f58be29e163a194e5f449fd2c90b7317",
+      "notes": [],
+      "params": {
+        "message": "Cooling TC to 4°C and waiting for completion..."
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/setTargetBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "35ffb758fe47701426a7c074fe8a1f01",
+      "notes": [],
+      "params": {
+        "celsius": 95.0,
+        "holdTimeSeconds": 0.0,
+        "moduleId": "UUID",
+        "ramp_rate": 4.25
+      },
+      "result": {
+        "targetBlockTemperature": 95.0,
+        "taskId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9f14076a82960700f84e1d0a1c2fc72d",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/setTargetBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a20b0e47619f8cac277a2bee547a99a8",
+      "notes": [],
+      "params": {
+        "celsius": 80.0,
+        "holdTimeSeconds": 0.0,
+        "moduleId": "UUID",
+        "ramp_rate": 0.5
+      },
+      "result": {
+        "targetBlockTemperature": 80.0,
+        "taskId": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0d4e7b2201d21a943a402681218a2c12",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/deactivateBlock",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "477d23febbcefa30431cceed893fce22",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandAnnotationIds": [],
+      "commandType": "thermocycler/openLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5ed161d4e9ddfbb6b5aff8d37f8a1a42",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      28
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [],
+  "files": [],
+  "labware": [],
+  "labwareOffsets": [],
+  "liquidClasses": [],
+  "liquids": [],
+  "metadata": {
+    "author": "QA",
+    "description": "start_set_block_temperature + set_block_temperature ramp_rate.",
+    "protocolName": "Thermocycler ramp rate"
+  },
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "B1"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
+  "pipettes": [],
+  "result": "ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

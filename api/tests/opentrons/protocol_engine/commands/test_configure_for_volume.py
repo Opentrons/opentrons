@@ -85,7 +85,7 @@ async def test_configure_for_volume_implementation(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
     decoy.when(

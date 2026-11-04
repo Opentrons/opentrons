@@ -1,0 +1,118 @@
+test_name: Test the /accessControl/settings endpoints
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Get default settings
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/accessControl/settings'
+    response:
+      status_code: 200
+      json: &initial_get_settings_response
+        data:
+          requireSignoffForProtocolLog: true
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true
+
+  - name: Change settings
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/accessControl/settings'
+      json:
+        data:
+          requireSignoffForProtocolLog: false
+          requireLogsToBeSavedInApp: false
+    response:
+      status_code: 200
+      json: &patch_settings_response
+        data:
+          requireSignoffForProtocolLog: false
+          requireLogsToBeSavedInApp: false
+          deleteOverMaxOnDiskProtocols: true
+
+  - name: Get the settings again and make sure they're still changed
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/accessControl/settings'
+    response:
+      status_code: 200
+      json: *patch_settings_response
+
+  - name: Restore defaults
+    request:
+      method: DELETE
+      url: '{ot3_server_base_url}/accessControl/settings'
+    response:
+      status_code: 200
+      json: *initial_get_settings_response
+
+  - name: Get the settings again and make sure they're still the defaults
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/accessControl/settings'
+    response:
+      status_code: 200
+      json: *initial_get_settings_response
+
+---
+test_name: Test no-op PATCH does not change existing settings
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Send a no-op PATCH and make sure defaults don't change
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/accessControl/settings'
+      json:
+        data: {}
+    response:
+      status_code: 200
+      json:
+        data:
+          requireSignoffForProtocolLog: true
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true
+
+---
+test_name: Test PATCH with null reverts setting to default
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Change a setting away from its default
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/accessControl/settings'
+      json:
+        data:
+          requireSignoffForProtocolLog: false
+    response:
+      status_code: 200
+      json:
+        data:
+          requireSignoffForProtocolLog: false
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true
+
+  - name: Revert it by sending null
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/accessControl/settings'
+      json:
+        data:
+          requireSignoffForProtocolLog: null
+    response:
+      status_code: 200
+      json:
+        data:
+          requireSignoffForProtocolLog: true
+          requireLogsToBeSavedInApp: true
+          deleteOverMaxOnDiskProtocols: true

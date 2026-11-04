@@ -1,5 +1,7 @@
+import { isConcurrentGroup } from './stepHierarchy'
+
 import type { StepIdType } from '/protocol-designer/form-types'
-import type { StepHierarchy } from './stepHierarchy'
+import type { StandaloneStep, StepHierarchy } from './stepHierarchy'
 
 interface StepVisibilities {
   [key: StepIdType]: {
@@ -9,8 +11,9 @@ interface StepVisibilities {
 
 /**
  * Certain steps exist internally in state but are never shown to the user;
- * they're managed implicitly by the system. e.g. Thermocycler profile steps are
- * permanently paired with implicit "wait for profile" steps.
+ * they're managed implicitly by the system. e.g. Thermocycler and Vacuum profile
+ * steps are permanently paired with implicit "wait for profile" pause steps, and
+ * timed Vacuum state steps with implicit "wait for vacuum state" pause steps.
  *
  * This returns which steps are visible and which ones are invisible.
  *
@@ -22,22 +25,32 @@ export function getStepVisibilities(
   return Object.fromEntries([...yieldStepVisibilities(stepHierarchy)])
 }
 
+/** Thermocycler profile, vacuum profile, and timed vacuum-state groups share visibility rules. */
+function* yieldVisibilitiesForProfileLikeGroup(group: {
+  startStepId: StepIdType
+  waitStepId: StepIdType
+  concurrentSteps: StandaloneStep[]
+}): Generator<[StepIdType, StepVisibilities[StepIdType]]> {
+  yield [group.startStepId, { isVisibleToUser: true }]
+  for (const concurrentStep of group.concurrentSteps) {
+    concurrentStep.type satisfies 'standaloneStep'
+    yield [concurrentStep.stepId, { isVisibleToUser: true }]
+  }
+  yield [group.waitStepId, { isVisibleToUser: false }]
+}
+
 function* yieldStepVisibilities(
   stepHierarchy: StepHierarchy
 ): Generator<[StepIdType, StepVisibilities[StepIdType]]> {
   for (const topLevelItem of stepHierarchy.topLevelItems) {
     if (topLevelItem.type === 'standaloneStep') {
       yield [topLevelItem.stepId, { isVisibleToUser: true }]
-    } else if (topLevelItem.type === 'thermocyclerProfileGroup') {
-      yield [topLevelItem.thermocyclerProfileStepId, { isVisibleToUser: true }]
-      for (const concurrentStep of topLevelItem.concurrentSteps) {
-        concurrentStep.type satisfies 'standaloneStep'
-        yield [concurrentStep.stepId, { isVisibleToUser: true }]
-      }
-      yield [
-        topLevelItem.waitForThermocyclerProfileStepId,
-        { isVisibleToUser: false },
-      ]
+    } else if (isConcurrentGroup(topLevelItem)) {
+      yield* yieldVisibilitiesForProfileLikeGroup({
+        startStepId: topLevelItem.startStepId,
+        waitStepId: topLevelItem.waitStepId,
+        concurrentSteps: topLevelItem.concurrentSteps,
+      })
     } else {
       topLevelItem satisfies never
     }

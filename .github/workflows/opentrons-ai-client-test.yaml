@@ -24,7 +24,7 @@ jobs:
     name: 'opentrons ai frontend unit tests'
     timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v6'
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/js/setup
       - name: 'build frontend packages'
         run: make -C opentrons-ai-client build
@@ -32,7 +32,7 @@ jobs:
         run: |
           make -C opentrons-ai-client test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./coverage/lcov.info
           flags: opentrons-ai-client

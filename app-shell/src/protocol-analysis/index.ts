@@ -26,7 +26,7 @@ export function registerProtocolAnalysis(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): (action: Action) => void {
-  const pathToPythonOverride = getConfig().python.pathToPythonOverride
+  const pathToPythonOverride = getConfig('python').pathToPythonOverride
   selectPythonPath(pathToPythonOverride)
 
   handleConfigChange(CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE, newValue => {
@@ -36,7 +36,7 @@ export function registerProtocolAnalysis(
   return function handleIncomingAction(action: Action): void {
     switch (action.type) {
       case OPEN_PYTHON_DIRECTORY: {
-        const dir = getConfig().python.pathToPythonOverride
+        const dir = getConfig('python').pathToPythonOverride
         openDirectoryInFileExplorer(dir).catch(err => {
           log.debug('Error opening python directory', err.message)
         })

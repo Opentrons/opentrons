@@ -39,7 +39,7 @@ prior to shaking.
 
 ### Thermal adapters
 
-A compatible thermal adapter is required for adding labware to the Heater-Shaker. Currently available Thermal Adapters include:
+A compatible *thermal adapter* is required for adding labware to the Heater-Shaker. Currently available Thermal Adapters include:
 
 <div class="parts-list" markdown>
 <figure markdown>

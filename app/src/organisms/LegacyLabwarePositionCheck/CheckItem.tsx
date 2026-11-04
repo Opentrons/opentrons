@@ -166,8 +166,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     [moduleId]
   )
 
-  if (pipetteName == null || labwareDef == null || pipetteMount == null)
+  if (pipetteName == null || labwareDef == null || pipetteMount == null) {
     return null
+  }
 
   const labwareDefs = getLabwareDefinitionsFromCommands(protocolData.commands)
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
@@ -477,10 +478,11 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} minHeight="29.5rem">
       {initialPosition != null ? (

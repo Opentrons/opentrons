@@ -229,7 +229,7 @@ def test_handles_load_pipette(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
     config_update = update_types.PipetteConfigUpdate(
         pipette_id="pipette-id",
@@ -672,7 +672,9 @@ def test_add_pipette_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={VolumeModes.default: 133.7},
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 133.7, "max_volume": 331.7}
+        },
     )
 
     subject.handle_action(
@@ -720,7 +722,9 @@ def test_add_pipette_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={VolumeModes.default: 133.7},
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 133.7, "max_volume": 331.7}
+        },
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}

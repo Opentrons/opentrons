@@ -3,7 +3,7 @@ title: "Protocol Designer Instruction Manual"
 description: "No-code, web-based tool for creating protocols for Flex and OT-2."
 ---
 
-<img src="images/tm-opentrons-full-blackcolor.png" height=350 width=350>
+![Opentrons Logo](../images/tm-opentrons-full-blackcolor.svg){ width="75%" }
 
 # Protocol Designer Instruction Manual
 

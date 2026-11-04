@@ -2,6 +2,7 @@
 import path from 'path'
 import { ensureDir, readFile } from 'fs-extra'
 
+import { getConfig } from '../config'
 import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { CURRENT_VERSION } from '../update'
@@ -15,7 +16,11 @@ import {
   getReleaseFiles,
   readUpdateFileInfo,
 } from './release-files'
-import { downloadManifest, getReleaseSet } from './release-manifest'
+import {
+  downloadManifest,
+  downloadNotes,
+  getReleaseSet,
+} from './release-manifest'
 import { startPremigration, uploadSystemFile } from './update'
 
 import type {
@@ -65,7 +70,26 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         if (!checkingForUpdates) {
           checkingForUpdates = true
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          checkForRobotUpdate(dispatch).then(() => (checkingForUpdates = false))
+          checkForRobotUpdate(dispatch)
+            .finally(() => {
+              checkingForUpdates = false
+            })
+            .then(() => {
+              if (getConfig('update').automaticallyDownloadUpdates) {
+                dispatch({
+                  type: 'robotUpdate:DOWNLOAD_UPDATE',
+                  meta: { shell: true },
+                })
+              }
+            })
+        }
+        break
+      case 'robotUpdate:DOWNLOAD_UPDATE':
+        if (!checkingForUpdates) {
+          checkingForUpdates = true
+          downloadRobotUpdate(dispatch).finally(() => {
+            checkingForUpdates = false
+          })
         }
         break
 
@@ -198,6 +222,23 @@ export function getRobotSystemUpdateUrls(
     })
 }
 
+export function getRobotSystemUpdateNotes(
+  notesUrl: string,
+  robot: RobotUpdateTarget
+): Promise<string | null> {
+  return ensureDir(cacheDirForMachine(robot))
+    .then(() =>
+      downloadNotes(
+        notesUrl,
+        path.join(cacheDirForMachine(robot), 'release-notes.md')
+      )
+    )
+    .catch((error: Error) => {
+      log.warn(`Error retrieving release notes: ${error}`)
+      return null
+    })
+}
+
 // check for a robot update matching the current app version
 //   1. Ensure the robot update directory exists
 //   2. Download the manifest file from S3
@@ -205,71 +246,80 @@ export function getRobotSystemUpdateUrls(
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForRobotUpdate(
-  dispatch: Dispatch
-): Promise<[unknown, unknown]> {
-  const fetchFilesFromManifest = (
-    urls: ReleaseSetUrls,
-    target: RobotUpdateTarget
-  ): Promise<unknown> => {
-    dispatch({
-      type: 'robotUpdate:UPDATE_VERSION',
-      payload: { version: CURRENT_VERSION, target },
-    })
-    let prevPercentDone = 0
-    const handleProgress = (progress: DownloadProgress): void => {
-      const { downloaded, size } = progress
-      if (size !== null) {
-        const percentDone = Math.round((downloaded / size) * 100)
-        if (percentDone - prevPercentDone > 0) {
-          dispatch({
-            type: 'robotUpdate:DOWNLOAD_PROGRESS',
-            payload: { progress: percentDone, target },
-          })
-        }
-        prevPercentDone = percentDone
-      }
+export function checkForRobotUpdate(dispatch: Dispatch): Promise<void> {
+  return getRobotSystemUpdateUrls('flex').then(urls => {
+    if (urls === null) {
+      dispatch({
+        type: 'robotUpdate:UPDATE_VERSION',
+        payload: { version: null, target: 'flex' },
+      })
+      return
     }
-
-    const targetDownloadDir = cacheDirForMachineFiles(target)
-
-    return ensureDir(targetDownloadDir)
-      .then(() =>
-        getReleaseFiles(
-          urls,
-          targetDownloadDir,
-          dispatch,
-          target,
-          handleProgress
-        )
-      )
-      .then(filepaths => cacheUpdateSet(filepaths, target))
-      .then(updateInfo => {
-        dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
+    if (urls?.releaseNotes == null) {
+      // release without notes, which shouldn't happen but we handle it
+      dispatch({
+        type: 'robotUpdate:UPDATE_VERSION',
+        payload: { version: CURRENT_VERSION, target: 'flex' },
       })
-      .catch((error: Error) => {
+      return
+    }
+    getRobotSystemUpdateNotes(urls.releaseNotes, 'flex').then(notesContent => {
+      dispatch({
+        type: 'robotUpdate:UPDATE_INFO',
+        payload: {
+          target: 'flex',
+          version: CURRENT_VERSION,
+          force: false,
+          releaseNotes: notesContent,
+        },
+      })
+    })
+  })
+}
+
+export function downloadRobotUpdate(dispatch: Dispatch): Promise<void> {
+  let prevPercentDone = 0
+  const handleProgress = (progress: DownloadProgress): void => {
+    const { downloaded, size } = progress
+    if (size !== null) {
+      const percentDone = Math.round((downloaded / size) * 100)
+      if (percentDone - prevPercentDone > 0) {
         dispatch({
-          type: 'robotUpdate:DOWNLOAD_ERROR',
-          payload: { error: error.message, target: target },
+          type: 'robotUpdate:DOWNLOAD_PROGRESS',
+          payload: { progress: percentDone, target: 'flex' },
         })
-      })
-      .then(() =>
-        cleanupReleaseFiles(cacheDirForMachine(target), CURRENT_VERSION)
-      )
+      }
+      prevPercentDone = percentDone
+    }
   }
 
-  return Promise.all([
-    getRobotSystemUpdateUrls('ot2').then(urls =>
-      urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'ot2')
-    ),
-    getRobotSystemUpdateUrls('flex').then(urls =>
-      urls === null ? Promise.resolve() : fetchFilesFromManifest(urls, 'flex')
-    ),
-  ])
-    .catch((error: Error) => {
-      log.warn('Failure during release file download', { error })
+  const targetDownloadDir = cacheDirForMachineFiles('flex')
+  return ensureDir(targetDownloadDir)
+    .then(() => getRobotSystemUpdateUrls('flex'))
+    .then(urls =>
+      urls == null
+        ? Promise.reject(new Error('nothing to download'))
+        : getReleaseFiles(
+            urls,
+            targetDownloadDir,
+            dispatch,
+            'flex',
+            handleProgress
+          )
+    )
+    .then(filepaths => cacheUpdateSet(filepaths, 'flex'))
+    .then(updateInfo => {
+      dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
     })
-    .then()
+    .catch((error: Error) => {
+      dispatch({
+        type: 'robotUpdate:DOWNLOAD_ERROR',
+        payload: { error: error.message, target: 'flex' },
+      })
+    })
+    .then(() =>
+      cleanupReleaseFiles(cacheDirForMachine('flex'), CURRENT_VERSION)
+    )
 }
 
 function cacheUpdateSet(

@@ -41,6 +41,7 @@ describe('RecentRunProtocolCarousel', () => {
   beforeEach(() => {
     props = {
       recentRunsOfUniqueProtocols: [mockRun as RunData],
+      onCardResolved: vi.fn(),
     }
     vi.mocked(RecentRunProtocolCard).mockReturnValue(
       <div>mock RecentRunProtocolCard</div>

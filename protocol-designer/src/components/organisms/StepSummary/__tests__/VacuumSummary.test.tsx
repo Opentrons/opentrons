@@ -6,7 +6,8 @@ import {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
   VACUUM_VENT_SET_CLOSED,
   VACUUM_VENT_SET_OPEN,
 } from '@opentrons/step-generation'
@@ -29,12 +30,12 @@ const baseStep: FormData = {
   stateType: null,
   modeType: null,
   pressureMbar: null,
-  powerPercent: null,
+  percentPower: null,
   pumpDurationCheckbox: null,
   pumpDurationTime: null,
   endingHoldVentCheckbox: false,
-  orderedProfileIds: [],
-  profileItemsById: {},
+  vacuumOrderedProfileIds: [],
+  vacuumProfileItemsById: {},
 }
 
 const render = (currentStep: FormData) => {
@@ -71,9 +72,9 @@ describe('VacuumSummary', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_STATE,
-        stateType: VACUUM_STATE_PUMP,
+        stateType: VACUUM_STATE_PUMP_ON,
         modeType: VACUUM_MODE_POWER,
-        powerPercent: 75,
+        percentPower: 75,
         pumpDurationCheckbox: false,
       })
       expect(screen.getByText('Set pump power to')).toBeInTheDocument()
@@ -84,7 +85,7 @@ describe('VacuumSummary', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_STATE,
-        stateType: VACUUM_STATE_PUMP,
+        stateType: VACUUM_STATE_PUMP_ON,
         modeType: VACUUM_MODE_PRESSURE,
         pressureMbar: 200,
         pumpDurationCheckbox: false,
@@ -99,9 +100,9 @@ describe('VacuumSummary', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_STATE,
-        stateType: VACUUM_STATE_PUMP,
+        stateType: VACUUM_STATE_PUMP_ON,
         modeType: VACUUM_MODE_POWER,
-        powerPercent: 50,
+        percentPower: 50,
         pumpDurationCheckbox: true,
         pumpDurationTime: '05:30',
         endingHoldVentCheckbox: true,
@@ -117,9 +118,9 @@ describe('VacuumSummary', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_STATE,
-        stateType: VACUUM_STATE_PUMP,
+        stateType: VACUUM_STATE_PUMP_ON,
         modeType: VACUUM_MODE_POWER,
-        powerPercent: 80,
+        percentPower: 80,
         pumpDurationCheckbox: true,
         pumpDurationTime: '01:00',
         endingHoldVentCheckbox: false,
@@ -135,7 +136,7 @@ describe('VacuumSummary', () => {
       render({
         ...baseStep,
         programType: VACUUM_PROGRAM_STATE,
-        stateType: VACUUM_STATE_PUMP,
+        stateType: VACUUM_STATE_PUMP_ON,
         modeType: VACUUM_MODE_PRESSURE,
         pressureMbar: 100,
         pumpDurationCheckbox: true,
@@ -156,7 +157,7 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1', 'p2', 'p3'],
+        vacuumOrderedProfileIds: ['p1', 'p2', 'p3'],
         endingHoldVentCheckbox: true,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
@@ -170,7 +171,7 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1'],
+        vacuumOrderedProfileIds: ['p1'],
         endingHoldVentCheckbox: false,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
@@ -184,13 +185,23 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1', 'p2', 'p3'],
+        vacuumOrderedProfileIds: ['p1', 'p2', 'p3'],
         endingHoldVentCheckbox: false,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
       const tagElements = screen.getAllByTestId('Tag_default')
       expect(tagElements[0]).toHaveTextContent('3 steps')
       expect(tagElements[1]).toHaveTextContent('Closed')
+    })
+  })
+  describe('pump state off', () => {
+    it('renders pump off summary', () => {
+      render({
+        ...baseStep,
+        programType: VACUUM_PROGRAM_STATE,
+        stateType: VACUUM_STATE_PUMP_OFF,
+      })
+      expect(screen.getByText('Stop pump')).toBeInTheDocument()
     })
   })
 })

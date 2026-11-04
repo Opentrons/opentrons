@@ -93,3 +93,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "llama_index.llms.openai"
 ignore_missing_imports = true
+
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"

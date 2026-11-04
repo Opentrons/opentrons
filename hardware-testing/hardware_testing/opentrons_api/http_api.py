@@ -3,7 +3,7 @@ from time import sleep
 from typing import Optional, List, Dict, Any
 import requests
 
-from hardware_testing.opentrons_api.types import Point
+from opentrons.types import Point
 
 
 CALIBRATION_ADAPTER = {

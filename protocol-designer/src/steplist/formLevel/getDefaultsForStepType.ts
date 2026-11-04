@@ -269,12 +269,12 @@ export function getDefaultsForStepType(
         stateType: null, // vent | pump
         modeType: null, // pressure | power
         pressureMbar: null,
-        powerPercent: null,
+        percentPower: null,
         pumpDurationCheckbox: null,
         pumpDurationTime: null,
         endingHoldVentCheckbox: null,
-        orderedProfileIds: [],
-        profileItemsById: {},
+        vacuumOrderedProfileIds: [],
+        vacuumProfileItemsById: {},
       }
     default:
       return {}

@@ -3,7 +3,7 @@ title: "Opentrons Flex: Quick Transfer"
 description: "Run a simple liquid transfer from the touchscreen without a full protocol."
 ---
 
-Quick transfer is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
+*Quick transfer* is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
 
 - Provision well plates with a reagent, buffer, or other liquid.
 
@@ -13,21 +13,16 @@ Quick transfer is a touchscreen-only feature that lets you create, save, and run
 
 - Move culture to growth media or to prepare it for long-term storage.
 
-There are two sections of the quick transfer screen:
-
-- **Pinned transfers**: Large cards on a horizontal carousel. You can pin 8 cards, maximum.
-
-- **Saved transfers**: A vertical list at the bottom of the screen. Flex can save a maximum of 20 quick transfers. You have to delete older quick transfers to maintain this limit.
+To get started, tap **+Quick transfer** in the Protocols tab.
 
 <figure class="screenshot" markdown>
-![Quick transfer screen with two pinned quick transfers at the top and a longer list of quick transfers at the bottom.](../images/quick-transfer-list.png "Quick transfers")
+![Protocols screen with purple button to add a quick transfer.](../images/touchscreen_all_protocols.png)
 </figure>
+
+Tapping **+Quick transfer** starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 The remainder of this section goes through quick transfer features in detail.
 
-## Creating a quick transfer
-
-From the Quick Transfer tab on the touchscreen, tap **+ Quick transfer.** This starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 ## Deck slots and hardware requirements
 
@@ -96,13 +91,17 @@ If your quick transfer will apply liquid class settings, values for your chosen 
 
 Click **Create Transfer** when you're satisfied with your transfer settings. After creating a quick transfer, you can run, save, or delete it.
 
-- Flex saves a maximum of 20 transfers in a vertical list under the Quick Transfer tab.
+You can find all your quick transfer protocols in the Protocols tab. 
 
-- Long press a saved transfer to run it, pin it, or delete it. Flex pins a maximum of 8 quick transfers.
+!!! note
+    Flex can store a maximum of 20 unique protocols, including quick transfers. It automatically deletes older protocols to maintain this limit.  
+
+
+- Long press a saved quick transfer to run it, pin it, or delete it. Flex pins a maximum of 8 protocols, including quick transfers.
 
 - Long press a pinned transfer to run it, un-pin it (returns it to the saved list), or delete it.
 
 <figure class="screenshot" markdown>
-![Menu with options to run, pin, or delete a quick transfer.](../images/quick-transfer-menu.png "Quick transfer menu")
+![Menu with options to run, pin, or delete a quick transfer.](../images/touchscreen-protocol-menu.png "Quick transfer menu")
 </figure>
 

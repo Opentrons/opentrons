@@ -20,7 +20,7 @@ When you install a pipette, you will be guided through the following steps on th
 
 1. Choose pipette type
 
-    Choose between **1- or 8-Channel Pipette** and **96-Channel Pipette**. Attaching the 96-Channel Pipette requires a few additional steps because it attaches to a special mounting plate that spans both pipette mounts.
+    Choose between **1- or 8-Channel Pipette** and **96-Channel Pipette**. Attaching the 96-Channel Pipette requires a few additional steps because it attaches to a special *mounting plate* that spans both pipette mounts.
 
 2. Prepare for installation
 

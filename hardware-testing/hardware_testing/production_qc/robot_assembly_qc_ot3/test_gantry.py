@@ -10,12 +10,13 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api import types, helpers_ot3
-from hardware_testing.opentrons_api.types import Axis
+from hardware_testing.opentrons_api import helpers_ot3
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.data import ui
 
 
-GANTRY_AXES = [types.Axis.X, types.Axis.Y, types.Axis.Z_L, types.Axis.Z_R]
+GANTRY_AXES = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
 
 # NOTE: max travel distances are from EVT robot extents document
 MAX_TRAVEL = {Axis.X: 537.49, Axis.Y: 405.815, Axis.Z_L: 215, Axis.Z_R: 215}
@@ -111,13 +112,13 @@ async def _record_test_status(
     report(section, f"{test}-aligned", [status.result])
 
 
-def _move_rel_point_for_axis(axis: Axis, distance: float) -> types.Point:
+def _move_rel_point_for_axis(axis: Axis, distance: float) -> Point:
     if axis == Axis.X:
-        return types.Point(x=distance)
+        return Point(x=distance)
     elif axis == Axis.Y:
-        return types.Point(y=distance)
+        return Point(y=distance)
     elif axis == Axis.Z_L or axis == Axis.Z_R:
-        return types.Point(z=distance)
+        return Point(z=distance)
     else:
         raise ValueError(f"unexpected axis: {axis}")
 
@@ -125,7 +126,7 @@ def _move_rel_point_for_axis(axis: Axis, distance: float) -> types.Point:
 async def _move_along_axis_and_record_test_results(
     axis: Axis, api: OT3API, report: CSVReport, section: str
 ) -> None:
-    mount = types.OT3Mount.RIGHT if axis == Axis.Z_R else types.OT3Mount.LEFT
+    mount = OT3Mount.RIGHT if axis == Axis.Z_R else OT3Mount.LEFT
     ax_str = str(axis.name).lower().replace("_", "")
     safety_mm = COLLISION_AVOID_MARGIN[axis]
     rel_distance = MAX_TRAVEL[axis] - (safety_mm * 2)

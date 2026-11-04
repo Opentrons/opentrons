@@ -300,8 +300,9 @@ const clampAspirateAirGapVolume = (
       minAirGapVolume,
       maxAirGapVolume
     )
-    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume))
+    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume)) {
       return patch
+    }
     return { ...patch, aspirate_airGap_volume: String(clampedAirGapVolume) }
   }
 

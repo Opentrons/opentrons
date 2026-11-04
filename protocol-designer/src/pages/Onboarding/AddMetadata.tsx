@@ -26,9 +26,7 @@ interface AddMetadataProps extends WizardTileProps {
 export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   const { goBack, proceed, watch, register, analyticsStartTime } = props
   const { t } = useTranslation(['onboarding', 'shared'])
-  const fields = watch('fields')
   const dispatch = useDispatch()
-  const robotType = fields.robotType
 
   const handleProceed = (): void => {
     const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -42,7 +40,6 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   return (
     <HandleEnter onEnter={handleProceed}>
       <WizardBody
-        robotType={robotType}
         subStepNumber={6}
         stepNumber={3}
         header={t('tell_us')}

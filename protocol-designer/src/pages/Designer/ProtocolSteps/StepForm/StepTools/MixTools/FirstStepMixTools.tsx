@@ -62,11 +62,14 @@ export function FirstStepMixTools({
       {completedSteps ? (
         <>
           <Divider marginY="0" />
-          <VolumeField fieldProps={propsForFields.volume} />
+          <VolumeField
+            fieldProps={propsForFields.volume}
+            stepType={formData.stepType}
+          />
           <Divider marginY="0" />
           <InputStepFormField
             {...propsForFields.times}
-            units={t('units.times')}
+            units={t('units.repetitions')}
             title={t('protocol_steps:mix_repetitions')}
             showTooltip={false}
           />

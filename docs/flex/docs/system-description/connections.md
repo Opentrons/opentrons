@@ -18,9 +18,9 @@ There is also a CR1220 coin cell battery to power the robot's real-time clock wh
 
 ## USB and auxiliary connections
 
-Opentrons Flex has 10 total USB ports located in different areas of the robot, which serve different purposes.
+Opentrons Flex has 10 total *USB ports* located in different areas of the robot, which serve different purposes.
 
-The 8 rear USB-A ports (numbered USB-1 through USB-8) and 2 auxiliary ports (M12 connectors numbered AUX-1 and AUX-2) are for connecting Opentrons modules and accessories. See the [Modules chapter](../modules/index.md) for more information on connecting these devices and using them in your protocols.
+The 8 rear USB-A ports (numbered USB-1 through USB-8) and 2 *auxiliary ports* (M12 connectors numbered AUX-1 and AUX-2) are for connecting Opentrons modules and accessories. See the [Modules chapter](../modules/index.md) for more information on connecting these devices and using them in your protocols.
 
 The rear USB-B port is for connecting the robot to a laptop or desktop computer, to establish communication with the Opentrons App running on the connected computer. The front USB-A port (USB-9), located below the touchscreen display, has the same functionality as the rear USB-A ports.
 

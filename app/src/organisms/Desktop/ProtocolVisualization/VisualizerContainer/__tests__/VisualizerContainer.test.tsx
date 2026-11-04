@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
@@ -10,6 +11,7 @@ import { VisualizerContainer } from '../../../../../organisms/Desktop/ProtocolVi
 import { StepDetailContainer } from '../../StepDetailContainer'
 
 import type { ComponentProps } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/organisms/Desktop/ProtocolVisualization/Controls')
 vi.mock('/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer')
@@ -17,7 +19,14 @@ vi.mock('/app/organisms/Desktop/ProtocolVisualization/CommandSteps')
 vi.mock('/app/organisms/Desktop/ProtocolVisualization/DeckView')
 
 const render = (props: ComponentProps<typeof VisualizerContainer>) => {
-  return renderWithProviders(<VisualizerContainer {...props} />)[0]
+  return renderWithProviders<State>(<VisualizerContainer {...props} />, {
+    initialState: {
+      shell: {
+        stepDetailViewerClosed: null,
+      },
+    } as State,
+    i18nInstance: i18n,
+  })[0]
 }
 
 const mockProtocolKey = 'mockProtocolKey'

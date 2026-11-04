@@ -13,6 +13,8 @@ import asyncio
 import logging
 from typing import Dict, Optional
 
+from serial import PortNotOpenError  # type: ignore[import-untyped]
+
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers import utils
@@ -192,7 +194,13 @@ class TempDeckDriver(AbstractTempDeckDriver):
         Returns:
             command response
         """
-        response = await self._connection.send_command(
-            command=command, retries=DEFAULT_COMMAND_RETRIES
-        )
-        return response
+        try:
+            return await self._connection.send_command(
+                command=command, retries=DEFAULT_COMMAND_RETRIES
+            )
+        except PortNotOpenError:
+            log.warning("Temp-Deck port was closed; reopening and retrying once.")
+            await self._connection.open()
+            return await self._connection.send_command(
+                command=command, retries=DEFAULT_COMMAND_RETRIES
+            )

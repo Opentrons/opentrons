@@ -14,6 +14,7 @@ from ..types import (
     LiquidClassRecordWithId,
     LoadedLabware,
     LoadedModule,
+    LoadedPeripheral,
     LoadedPipette,
     TaskSummary,
     WellInfoSummary,
@@ -31,6 +32,7 @@ class StateSummary(BaseModel):
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
+    peripherals: List[LoadedPeripheral] = Field(default_factory=list)
     labwareOffsets: List[LabwareOffset]
     startedAt: Optional[datetime] = None
     completedAt: Optional[datetime] = None

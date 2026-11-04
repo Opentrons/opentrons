@@ -14,7 +14,7 @@ export function getReleaseSet(
   manifest: ReleaseManifest,
   version: string
 ): ReleaseSetUrls | null {
-  return manifest.production[version] ?? null
+  return manifest.productionV2[version] ?? null
 }
 
 export const getCachedReleaseManifest = (

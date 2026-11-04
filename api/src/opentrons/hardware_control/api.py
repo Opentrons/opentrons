@@ -1329,7 +1329,7 @@ class API(  # type: ignore[misc]
     ) -> modules.AbstractModule:
         """Get a simulating module hardware API interface for the given model."""
 
-        return await self._backend.module_controls.register_simulated_module(
+        module = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.MAIN
             ),
@@ -1337,6 +1337,8 @@ class API(  # type: ignore[misc]
             sim_model=model.value,
             sim_serial=sim_serial,
         )
+        assert isinstance(module, modules.AbstractModule)
+        return module
 
     def get_instrument_max_height(
         self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None

@@ -2,10 +2,9 @@ import { useRef, useState } from 'react'
 
 import {
   DIRECTION_COLUMN,
-  Flex,
-  InputField,
   POSITION_ABSOLUTE,
   SPACING,
+  TouchInputField,
   VIEWPORT,
 } from '@opentrons/components'
 
@@ -43,22 +42,33 @@ const Keyboard = (args): JSX.Element => {
   const [value, setValue] = useState<string>('')
   const keyboardRef = useRef(null)
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+    <div
+      style={{
+        flexDirection: DIRECTION_COLUMN,
+        gridGap: SPACING.spacing16,
+      }}
+    >
       <form id="test_form">
-        <InputField
+        <TouchInputField
           value={value}
           type="text"
+          label="Numerical keyboard input"
           placeholder="When focusing, the numpad shows up"
           onFocus={() => {
             setShowKeyboard(true)
           }}
+          onChange={e => {
+            setValue(e.target.value)
+          }}
         />
       </form>
-      <Flex
-        position={POSITION_ABSOLUTE}
-        top="20%"
-        width="22.5rem"
-        height="max-content"
+      <div
+        style={{
+          position: POSITION_ABSOLUTE,
+          top: '20%',
+          width: '22.5rem',
+          height: 'max-content',
+        }}
       >
         {showKeyboard && (
           <NumericalKeyboard
@@ -69,8 +79,8 @@ const Keyboard = (args): JSX.Element => {
             hasHyphen={hasHyphen}
           />
         )}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 }
 

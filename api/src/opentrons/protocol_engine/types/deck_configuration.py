@@ -45,6 +45,7 @@ class AreaType(Enum):
     MAGNETICBLOCK = "magneticBlock"
     ABSORBANCE_READER = "absorbanceReader"
     FLEX_STACKER = "flexStacker"
+    VACUUM_MODULE = "vacuumModule"
     LID_DOCK = "lidDock"
 
 

@@ -70,8 +70,9 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
     }
   }, [slotFillOpacity])
 
-  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId)))
+  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId))) {
     return null
+  }
 
   const { width, height, x, y } =
     robotType === FLEX_ROBOT_TYPE
@@ -82,7 +83,7 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
           hasTCOnSlot != null,
           slotPosition
         )
-      : getOT2HoverDimensions(hasTCOnSlot != null, slotPosition)
+      : getOT2HoverDimensions(hasTCOnSlot != null, slotPosition, false)
 
   return (
     <RobotCoordsForeignObject

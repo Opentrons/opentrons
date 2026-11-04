@@ -30,7 +30,8 @@ async def _main(cfg: TestConfig) -> None:
 
     # CSV REPORT
     report = build_report(test_name)
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator)
     sku_code: str | None = None
     if cfg.use_sku:
         sku_code = input("SCAN device SKU barcode: ").strip()

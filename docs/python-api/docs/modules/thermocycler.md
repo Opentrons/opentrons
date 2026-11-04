@@ -117,7 +117,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 === "Concurrent"
     ```python
     # set block temperature
-    cool_task = tc_mod.start_set_block_temperature(celsius=4)
+    cool_task = tc_mod.start_set_block_temperature(temperature=4)
     # complete pipetting actions while the block cools
     pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
@@ -126,7 +126,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     # wait for the block to reach the target temperature
     protocol.wait_for_tasks([cool_task])
     # hold samples on the block at target temperature
-    block_timer = create_timer(seconds=255)
+    block_timer = protocol.create_timer(seconds=255)
     protocol.wait_for_tasks([block_timer])
     ```
 

@@ -124,7 +124,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: RIGHT,
-            maintenancePosition: 'attachPlate',
+            motionModifier: 'lowerZAxesSequentially',
           },
         },
       ],
@@ -192,8 +192,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     )
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody

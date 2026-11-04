@@ -24,8 +24,9 @@ const getMoveLabwareError = (
     newLocation == null ||
     locationIsOffDeck(newLocation) ||
     !getLabwareDefIsStandard(labware?.def)
-  )
+  ) {
     return null
+  }
   if ('moduleId' in newLocation) {
     const moduleType =
       invariantContext.moduleEntities[newLocation.moduleId].type

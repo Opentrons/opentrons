@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
-
 import { FloatingActionButton } from '/app/atoms/buttons'
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import styles from './protocolsetupoffsets.module.css'
 import { SetupOffsetsHeader } from './SetupOffsetsHeader'
 import { SetupOffsetsTable } from './SetupOffsetsTable'
 
@@ -44,7 +43,7 @@ export function ProtocolSetupOffsets(
       {showLPC ? (
         <LPCFlows {...lpcProps} />
       ) : (
-        <Flex flexDirection={DIRECTION_COLUMN} width="98vw">
+        <div className={styles.setup_offset_container}>
           <SetupOffsetsHeader {...props} />
           <SetupOffsetsTable {...props} />
           <FloatingActionButton
@@ -52,7 +51,7 @@ export function ProtocolSetupOffsets(
             iconName="reticle"
             onClick={onLPCLaunchClick}
           />
-        </Flex>
+        </div>
       )}
     </>
   )

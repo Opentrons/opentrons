@@ -267,10 +267,10 @@ pyenv local 3.12.12
 python --version
 ```
 
-Once you've confirmed you're running the correct versions of Node.js and Python, you must install [yarn][] to manage JavaScript dependencies.
+Once you've confirmed you're running the correct versions of Node.js and Python, you must install [pnpm][] to manage JavaScript dependencies.
 
 ```shell
-npm install --global yarn@1
+npm install --global pnpm@10
 ```
 
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
@@ -292,6 +292,6 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [nvs]: https://github.com/jasongin/nvs
 [visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
-[yarn]: https://classic.yarnpkg.com/
+[pnpm]: https://pnpm.io/
 [uv]: https://github.com/astral-sh/uv
 [contributing guide]: ./CONTRIBUTING.md

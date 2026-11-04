@@ -2,17 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as persist from '../persist'
 
-import type { MockInstance } from 'vitest'
-
 describe('persist', () => {
-  let getItemSpy: MockInstance<(key: string) => string | null>
-  let setItemSpy: MockInstance<(key: string, value: string) => void>
+  let getItemSpy: ReturnType<typeof vi.spyOn>
+  let setItemSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     const LocalStorageProto = Object.getPrototypeOf(global.localStorage)
-    getItemSpy = vi.spyOn(LocalStorageProto, 'getItem') as MockInstance<
-      (key: string) => string | null
-    >
+    getItemSpy = vi.spyOn(LocalStorageProto, 'getItem')
     setItemSpy = vi.spyOn(LocalStorageProto, 'setItem')
   })
 

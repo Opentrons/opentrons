@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -33,7 +33,6 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
-  getOffDeckRenderInfo,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
@@ -43,6 +42,7 @@ import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -99,30 +99,58 @@ export function ProtocolSetupLabware({
         mostRecentAnalysis?.labware ?? [],
         mostRecentAnalysis?.modules ?? []
       ),
-    [mostRecentAnalysis]
+    [
+      mostRecentAnalysis?.commands,
+      mostRecentAnalysis?.labware,
+      mostRecentAnalysis?.modules,
+    ]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
-  const offDeckItems = getOffDeckRenderInfo(stacksWithLaware)
+  const sortedStartingDeckEntries = useMemo(
+    () =>
+      Object.entries(getStacksWithLabware(startingDeck))
+        .filter(([location]) => location !== 'offDeck')
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
+    [startingDeck]
+  )
+  const offDeckItems = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getOffDeckRenderGroups(
+            startingDeck,
+            mostRecentAnalysis,
+            labwareByLiquidId
+          )
+        : [],
+    [startingDeck, mostRecentAnalysis, labwareByLiquidId]
+  )
 
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (
@@ -193,9 +221,9 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(([key, value], index) => (
+                {sortedStartingDeckEntries.map(([key, value]) => (
                   <RowLabware
-                    key={index}
+                    key={key}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={key}
@@ -204,14 +232,14 @@ export function ProtocolSetupLabware({
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.map((item, index) => (
+                {offDeckItems.map(item => (
                   <RowLabware
-                    key={index}
+                    key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
-                    stackedItems={[item]}
+                    stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />
@@ -486,7 +514,7 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => {
             const quantityTag = offDeckQuantity ?? labware.quantity
             return (
-              <>
+              <Fragment key={labware.labwareId}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -542,7 +570,7 @@ function RowLabware({
                     />
                   ) : null}
                 </Flex>
-              </>
+              </Fragment>
             )
           })}
         </Flex>

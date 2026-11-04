@@ -273,8 +273,9 @@ function _getSelectedWellsForSubstep(
             activeTips &&
             activeTips.labwareId === labwareId &&
             activeTips.wellName
-          )
+          ) {
             tipWellSet = [activeTips.wellName]
+          }
         }
       } else {
         // single-channel
@@ -283,8 +284,9 @@ function _getSelectedWellsForSubstep(
           activeTips &&
           activeTips.labwareId === labwareId &&
           activeTips.wellName
-        )
+        ) {
           tipWellSet = [activeTips.wellName]
+        }
       }
     }
     wells.push(...tipWellSet)

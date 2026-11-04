@@ -1,13 +1,12 @@
-import isIp from 'is-ip'
+import { isIPv6 } from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import orderBy from 'lodash/orderBy'
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
-import { getFeatureFlags } from '../config/selectors'
 import {
   CONNECTABLE,
   HEALTH_STATUS_OK,
@@ -43,9 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
-
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
 const isLocal = (ip: string): boolean => {
@@ -58,7 +54,7 @@ const isLocal = (ip: string): boolean => {
   )
 }
 
-const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIPv6(ip) ? `[${ip}]` : ip)
 
 const makeRobotModel = (
   healthModel: string | null,
@@ -99,9 +95,8 @@ const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
 
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
-    state => getFeatureFlags(state).ignoreOT2App ?? false,
-    (robotsMap, ignoreOT2App) => {
+    (state: State) => state.discovery.robotsByName,
+    robotsMap => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
@@ -164,9 +159,7 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         }
       })
 
-      return ignoreOT2App
-        ? robots.filter(robot => isNotOT2Robot(robot))
-        : robots
+      return robots.filter(robot => isNotOT2Robot(robot))
     }
   )
 
@@ -225,7 +218,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
 
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: 'localhost' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
@@ -238,10 +231,16 @@ export const getRobotByName = (
 export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-) => DiscoveredRobot | null = createDeepEqualSelector(
+) => DiscoveredRobot | null = createSelector(
   getAllRobots,
   (state: State, robotName: string | null) => robotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null,
+  {
+    memoize: lruMemoize,
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>

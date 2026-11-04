@@ -17,11 +17,12 @@ import {
 import {
   DEV_INTERNAL_FLAGS,
   getAppLanguage,
+  getConfig,
   getDevtoolsEnabled,
   getFeatureFlags,
+  toggleConfigValue,
   toggleDevInternalFlag,
   toggleDevtools,
-  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
@@ -77,11 +78,12 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
-
+  const automaticSoftwareUpdateDownloadsEnabled =
+    useSelector(getConfig)?.update?.automaticallyDownloadUpdates
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
-  const enableExternalKeyboardTest = useFeatureFlag('externalKeyboardTest')
+  const devInternalFlags = useSelector(getFeatureFlags)
 
   return (
     <div className={styles.main_content}>
@@ -155,6 +157,20 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={toggleLights}
         />
         <RobotSettingButton
+          settingName={t('app_settings:automatically_download_updates')}
+          dataTestId="RobotSettingButton_automatically_download_updates"
+          settingInfo={t('app_settings:if_on_fetch_updates_in_the_background')}
+          iconName="download"
+          rightElement={
+            <OnOffToggle
+              isOn={automaticSoftwareUpdateDownloadsEnabled === true}
+            />
+          }
+          onClick={() => {
+            dispatch(toggleConfigValue('update.automaticallyDownloadUpdates'))
+          }}
+        />
+        <RobotSettingButton
           settingName={t('touchscreen_sleep')}
           dataTestId="RobotSettingButton_touchscreen_sleep"
           onClick={() => {
@@ -196,6 +212,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
+        {devInternalFlags?.accessControlMode ? (
+          <RobotSettingButton
+            settingName={t('robot_encryption_key')}
+            dataTestId="RobotSettingButton_encryption"
+            onClick={() => {
+              setCurrentOption('RobotEncryptionKey')
+            }}
+            iconName="verified"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={i18n.format(
             t('app_settings:error_recovery_mode'),
@@ -243,15 +269,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="update-channel"
         />
-        {enableExternalKeyboardTest ? (
-          <RobotSettingButton
-            settingName={t('documentation_required')}
-            onClick={() => {
-              setCurrentOption('ExternalKeyboardTest')
-            }}
-            iconName="acm"
-          />
-        ) : null}
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"

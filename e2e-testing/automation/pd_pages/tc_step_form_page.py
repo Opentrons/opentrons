@@ -186,7 +186,7 @@ class ThermocyclerProfileModal(BasePage):
             count: The cycle count as a string (e.g., "2").
         """
         # Find the cycle container and locate the "Number of cycles" input
-        cycle_container = self.page.get_by_test_id("thermocyclerCycle").nth(cycle_index)
+        cycle_container = self.page.locator(f'[aria-label="Thermocycler cycle {cycle_index + 1}"]')
 
         # Click on the "Number of cycles" area
         num_cycles_div = cycle_container.locator("div").filter(has_text="Number of cycles").nth(3)
@@ -224,7 +224,7 @@ class ThermocyclerProfileModal(BasePage):
             temperature: The temperature (e.g., "40").
             time: The time in M:SS format (e.g., "1:00").
         """
-        step_container = self.page.get_by_test_id(f"cycleStep-{step_index}")
+        step_container = self.page.locator(f'[aria-label="Thermocycler cycle step {step_index + 1}"]')
         self.wait_for_visible(step_container)
 
         # Fill step name
@@ -255,8 +255,9 @@ class ThermocyclerProfileModal(BasePage):
             cycle_index: The index of the cycle (0-based).
             step_index: The index of the step within the cycle (0-based).
         """
-        step_container = self.page.get_by_test_id(f"cycleStep-{step_index}")
-        delete_button = step_container.get_by_role("button", name="Delete")
+        step_container = self.page.locator(f'[aria-label="Thermocycler cycle step {step_index + 1}"]')
+        self.wait_for_visible(step_container)
+        delete_button = self.page.locator(f'[aria-label="Delete thermocycler cycle step {step_index + 1}"]')
         delete_button.click()
 
     def save_cycle(self, cycle_index: int) -> None:
@@ -266,7 +267,7 @@ class ThermocyclerProfileModal(BasePage):
         Args:
             cycle_index: The index of the cycle (0-based).
         """
-        cycle_container = self.page.get_by_test_id("thermocyclerCycle").nth(cycle_index)
+        cycle_container = self.page.locator(f'[aria-label="Thermocycler cycle {cycle_index + 1}"]')
         save_button = cycle_container.get_by_role("button", name="Save")
         save_button.click()
 
@@ -324,7 +325,7 @@ class ThermocyclerProfileModal(BasePage):
         Args:
             step_index: The index of the thermocycler step (0-based).
         """
-        delete_button = self.page.get_by_test_id("cycleStep-0").locator("path")
+        delete_button = self.page.get_by_label(f"Delete thermocycler cycle step {step_index + 1}")
         delete_button.click()
 
     def save_thermocycler_step(self, step_index: int) -> None:

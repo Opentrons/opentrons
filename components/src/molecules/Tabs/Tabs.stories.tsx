@@ -1,4 +1,4 @@
-import { useArgs } from '@storybook/preview-api'
+import { useArgs } from 'storybook/preview-api'
 
 import { Tabs as TabsComponent } from '.'
 import { VIEWPORT } from '../../ui-style-constants'

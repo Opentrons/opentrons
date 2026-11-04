@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import Keyboard from 'react-simple-keyboard'
 
@@ -21,15 +21,23 @@ import './index.css'
 interface AlphanumericKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: MutableRefObject<KeyboardReactInterface | null>
+  value?: string
   debug?: boolean
 }
 
 export function AlphanumericKeyboard({
   onChange,
   keyboardRef,
+  value,
   debug = false, // If true, <ENTER> will input a \n
 }: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
+
+  useEffect(() => {
+    if (value !== undefined && keyboardRef.current != null) {
+      keyboardRef.current.setInput(value)
+    }
+  }, [value, keyboardRef])
   const appLanguage = useSelector(getAppLanguage)
 
   const onKeyPress = (button: string): void => {

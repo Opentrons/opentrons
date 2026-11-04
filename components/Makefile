@@ -17,30 +17,31 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	cd .. && yarn shx rm -rf storybook-static
+	cd .. && pnpm shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
 dist:
-	cd .. && yarn sb build
+	cd .. && pnpm storybook build
 
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	yarn vite build
+	pnpm vite build
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build --emitDeclarationOnly
+	pnpm tsc --build --emitDeclarationOnly
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	cd .. && yarn sb dev --port $(port)
+	# Run the storybook development server using pnpm
+	cd .. && pnpm storybook dev --port $(port)
 
 .PHONY: test
 test:
@@ -48,8 +49,8 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 .PHONY: pack
 pack: build-ts lib
-	yarn pack
+	pnpm pack

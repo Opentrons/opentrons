@@ -58,7 +58,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
 
   it('should the link has the correct attribute', () => {
     render()
-    const targetLink = 'https://opentrons.com/ot-app/'
+    const targetLink = 'https://opentrons.com/app'
     const link = screen.getByText('Launch Opentrons software update page')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })

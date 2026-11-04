@@ -182,7 +182,7 @@ async def test_get_vacuum_state(
 ) -> None:
     """It should send a get pressure command"""
     connection.send_command.return_value = (
-        "M121 T:400.0 C:988.0 A:989.3 B:988.6 H:992.5 E:1 V:0"
+        "M121 T:400.0 C:988.0 A:989.3 B:988.6 H:992.5 E:1 D:10 V:0"
     )
 
     pressure_state = await subject.get_vacuum_state()
@@ -192,12 +192,12 @@ async def test_get_vacuum_state(
     connection.reset_mock()
 
     assert pressure_state == types.VacuumState(
-        400, 988, 989.3, 988.6, 992.5, True, types.VentState.CLOSED
+        400, 988, 989.3, 988.6, 992.5, True, 10, types.VentState.CLOSED
     )
 
     # test idle
     connection.send_command.return_value = (
-        "M121 T:0.0 C:0.0 A:989.3 B:988.6 H:992.5 E:0 V:1"
+        "M121 T:0.0 C:0.0 A:989.3 B:988.6 H:992.5 E:0 D:0 V:1"
     )
 
     pressure_state = await subject.get_vacuum_state()
@@ -207,7 +207,7 @@ async def test_get_vacuum_state(
     connection.reset_mock()
 
     assert pressure_state == types.VacuumState(
-        0, 0, 989.3, 988.6, 992.5, False, types.VentState.OPENED
+        0, 0, 989.3, 988.6, 992.5, False, 0, types.VentState.OPENED
     )
 
 

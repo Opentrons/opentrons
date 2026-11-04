@@ -48,7 +48,6 @@ export function ProtocolMetadata({
               setShowEditMetadataModal(true)
             }}
             css={LINK_BUTTON_STYLE}
-            data-testid="ProtocolOverview_MetadataEditButton"
           >
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('edit')}

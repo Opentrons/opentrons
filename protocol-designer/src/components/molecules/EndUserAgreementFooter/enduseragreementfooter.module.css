@@ -1,0 +1,27 @@
+.footer_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-24);
+  background-color: var(--grey-10);
+  gap: var(--spacing-8);
+}
+
+.link_button {
+  color: var(--black-90);
+
+  &:hover {
+    color: var(--blue-50);
+  }
+
+  &:focus-visible {
+    color: var(--blue-50);
+    outline: 2px solid var(--blue-50);
+    outline-offset: 0.25rem;
+  }
+
+  &:disabled {
+    color: var(--grey40);
+  }
+}

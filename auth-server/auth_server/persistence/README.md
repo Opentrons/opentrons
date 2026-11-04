@@ -39,6 +39,12 @@ On first boot, this creates the database from scratch. On subsequent boots, only
    `OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \`
    `uv run alembic upgrade head`
 
+> **Important:** Do not leave `OT_AUTH_SERVER_persistence_directory` exported in
+> your shell or in a `.env` file when running tests. The server only reads a
+> `.env` file when `OT_AUTH_SERVER_dot_env_path` is explicitly set. Without it,
+> `persistence_directory` defaults to `automatically_make_temporary` so each
+> test gets a fresh database.
+
 ### When to bump the folder version
 
 Bump the version subdirectory (e.g., "1" to "2") when a migration is made.
@@ -46,12 +52,15 @@ Bump the version subdirectory (e.g., "1" to "2") when a migration is made.
 ### Useful commands
 
 ```
-export OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic
-uv run alembic upgrade head       # run all pending migrations
-uv run alembic current            # check database revision
-uv run alembic history            # view migration history
-uv run alembic downgrade -1       # roll back one step
-uv run alembic downgrade base     # roll back everything
+OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \
+  uv run alembic upgrade head       # run all pending migrations
+OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \
+  uv run alembic current            # check database revision
+uv run alembic history              # view migration history (no DB needed)
+OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \
+  uv run alembic downgrade -1       # roll back one step
+OT_AUTH_SERVER_persistence_directory=/tmp/auth-server-alembic \
+  uv run alembic downgrade base     # roll back everything
 ```
 
 # SQLite Notes

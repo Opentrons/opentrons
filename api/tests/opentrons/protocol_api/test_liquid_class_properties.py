@@ -479,6 +479,10 @@ def test_liquid_handling_property_by_volume() -> None:
     assert subject.get_for_volume(1) == 50.0
     assert subject.get_for_volume(1000) == 250.0
 
+    # Test that negative volumes close to zero are rounded to zero
+    subject.set_for_volume(0, 111)
+    assert subject.get_for_volume(-1e-10) == 111
+
     # Test fixed overrides
     subject.set_for_all_volumes(4321)
     for volume in (0, 1, 7, 100):

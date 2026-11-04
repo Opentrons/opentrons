@@ -13,7 +13,8 @@
   },
   "inaccessible": {
     "collision": "Selection will cause a collision",
-    "partial_tip": "Blocked by existing selection"
+    "partial_tip": "Blocked by existing selection",
+    "labware_well_spacing": "Incompatible nozzle configuration for this labware"
   },
   "all_pickups_selected": "All wells selected"
 }

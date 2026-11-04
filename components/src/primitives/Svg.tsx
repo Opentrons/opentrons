@@ -14,11 +14,6 @@ export interface SvgProps extends StyleProps {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
 
-/**
- * SVG primitive component that supports style props
- *
- * @component
- */
 const SvgComponent = forwardRef<
   SVGSVGElement,
   SvgProps & ComponentProps<'svg'>
@@ -48,6 +43,12 @@ SvgComponent.displayName = 'Svg'
  * SVG primitive with style props support
  *
  * @component
+ *
+ * @deprecated Layout/style primitives are deprecated. If there is a preexisting
+ *   higher-level component that does what you want (e.g. from the Helix design system,
+ *   or from your project's shared components), use that instead. If not, implement your
+ *   own layout+styling with CSS modules and the semantically appropriate native HTML
+ *   element (`<li>`, `<menu>`, `<p>`, `<div>`, etc).
  */
 export const Svg: FC<ComponentProps<'svg'> & SvgProps> = withStyleProps(
   SvgComponent

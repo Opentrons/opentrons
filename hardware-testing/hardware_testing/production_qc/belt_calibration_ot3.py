@@ -34,7 +34,8 @@ from hardware_testing.data.csv_report import (
     CSVResult,
     CSVLine,
 )
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 MAX_ERROR_DISTANCE_MM = 0.5
@@ -44,11 +45,11 @@ TEST_SLOTS = [1, 3, 9, 10]
 
 @dataclass
 class _TestBeltCalibrationData:
-    pipette_offset: types.Point
-    deck_offsets: Dict[int, types.Point]
+    pipette_offset: Point
+    deck_offsets: Dict[int, Point]
 
 
-async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> types.Point:
+async def _calibrate_pipette(api: OT3API, mount: OT3Mount) -> Point:
     ui.print_header("CALIBRATE PIPETTE")
     await api.home()
     try:
@@ -56,16 +57,14 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> types.Point:
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
-        offset = types.Point(x=0, y=0, z=0)
+        offset = Point(x=0, y=0, z=0)
     finally:
         await api.retract(mount)
     print(f"pipette offset: {offset}")
     return offset
 
 
-async def _check_belt_accuracy(
-    api: OT3API, mount: types.OT3Mount
-) -> Dict[int, types.Point]:
+async def _check_belt_accuracy(api: OT3API, mount: OT3Mount) -> Dict[int, Point]:
     ui.print_header("CHECK BELT ACCURACY")
     ret = {}
     for slot in TEST_SLOTS:
@@ -78,7 +77,7 @@ async def _check_belt_accuracy(
             print(f"Slot #{slot}: {slot_offset}")
         except CalibrationStructureNotFoundError as e:
             if api.is_simulator:
-                ret[slot] = types.Point(x=0, y=0, z=0)
+                ret[slot] = Point(x=0, y=0, z=0)
             else:
                 raise e
         await api.home_z(mount)
@@ -102,7 +101,7 @@ async def _check_belt_accuracy(
 
 
 async def _calibrate_belts(
-    api: OT3API, mount: types.OT3Mount
+    api: OT3API, mount: OT3Mount
 ) -> Tuple[AttitudeMatrix, Dict[str, Any]]:
     ui.print_header("PROBE the DECK")
     pip = api.hardware_pipettes[mount.to_mount()]
@@ -124,7 +123,7 @@ async def _calibrate_belts(
 
 
 async def run_belt_calibration(
-    api: OT3API, mount: types.OT3Mount, calibrate: bool, test: bool
+    api: OT3API, mount: OT3Mount, calibrate: bool, test: bool
 ) -> Tuple[
     Optional[_TestBeltCalibrationData],
     Optional[AttitudeMatrix],
@@ -140,7 +139,7 @@ async def run_belt_calibration(
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(4)
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, attach_pos._replace(z=current_pos.z))
-    await api.move_rel(mount, types.Point(x=0, y=0, z=-20))
+    await api.move_rel(mount, Point(x=0, y=0, z=-20))
     has_pipette = await helpers_ot3.wait_for_instrument_presence(
         api, mount, presence=True
     )
@@ -251,7 +250,8 @@ async def run(is_simulating: bool, skip_calibration: bool, skip_test: bool) -> N
 
     # CREATE REPORT
     report = _create_csv_report()
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator)
 
     # RUN TEST
     before: Optional[_TestBeltCalibrationData] = None
@@ -260,7 +260,7 @@ async def run(is_simulating: bool, skip_calibration: bool, skip_test: bool) -> N
     details: Optional[Dict[str, Any]] = None
     try:
         before, attitude, details, after = await run_belt_calibration(
-            api, types.OT3Mount.LEFT, calibrate=not skip_calibration, test=not skip_test
+            api, OT3Mount.LEFT, calibrate=not skip_calibration, test=not skip_test
         )
     except (
         EarlyCapacitiveSenseTrigger,
@@ -326,7 +326,7 @@ async def run(is_simulating: bool, skip_calibration: bool, skip_test: bool) -> N
 
         # STORE TEST-SLOT OFFSETS
         report("SLOT-DISTANCES", "distance-after-max-spec-mm", [MAX_ERROR_DISTANCE_MM])
-        zero = types.Point(x=0, y=0, z=0)
+        zero = Point(x=0, y=0, z=0)
         for slot in TEST_SLOTS:
             ob = before.deck_offsets[slot]
             oa = after.deck_offsets[slot]

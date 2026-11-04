@@ -96,6 +96,35 @@ def axis_pad(positions: Dict[Axis, float], default_value: float) -> Dict[Axis, f
     return {ax: positions.get(ax, default_value) for ax in Axis.node_axes()}
 
 
+def _sanitize_attached_instrument(
+    mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
+) -> Union[PipetteSpec, GripperSpec]:
+    if mount is OT3Mount.GRIPPER:
+        gripper_spec: GripperSpec = {"model": None, "id": None}
+        if passed_ai and passed_ai.get("model"):
+            gripper_spec["model"] = GripperModel.v1
+            gripper_spec["id"] = passed_ai.get("id")
+        return gripper_spec
+
+    # TODO (lc 12-5-2022) need to not always pass in defaults here
+    # but doing it to satisfy linter errors for now.
+    pipette_spec: PipetteSpec = {"model": None, "id": None}
+    if not passed_ai or not passed_ai.get("model"):
+        return pipette_spec
+
+    if pipette_load_name.supported_pipette(cast(PipetteModel, passed_ai["model"])):
+        pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
+        pipette_spec["id"] = passed_ai.get("id")
+        return pipette_spec
+    # TODO (lc 12-05-2022) When the time comes we should properly
+    # support backwards compatibility
+    raise KeyError(
+        "If you specify attached_instruments, the model "
+        "should be pipette names or pipette models, but "
+        f"{passed_ai['model']} is not"
+    )
+
+
 class OT3Simulator(FlexBackend):
     """OT3 Hardware Controller Backend."""
 
@@ -156,36 +185,6 @@ class OT3Simulator(FlexBackend):
         self._gear_motor_position: Dict[Axis, float] = {}
         self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
-
-        def _sanitize_attached_instrument(
-            mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> Union[PipetteSpec, GripperSpec]:
-            if mount is OT3Mount.GRIPPER:
-                gripper_spec: GripperSpec = {"model": None, "id": None}
-                if passed_ai and passed_ai.get("model"):
-                    gripper_spec["model"] = GripperModel.v1
-                    gripper_spec["id"] = passed_ai.get("id")
-                return gripper_spec
-
-            # TODO (lc 12-5-2022) need to not always pass in defaults here
-            # but doing it to satisfy linter errors for now.
-            pipette_spec: PipetteSpec = {"model": None, "id": None}
-            if not passed_ai or not passed_ai.get("model"):
-                return pipette_spec
-
-            if pipette_load_name.supported_pipette(
-                cast(PipetteModel, passed_ai["model"])
-            ):
-                pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
-                pipette_spec["id"] = passed_ai.get("id")
-                return pipette_spec
-            # TODO (lc 12-05-2022) When the time comes we should properly
-            # support backwards compatibility
-            raise KeyError(
-                "If you specify attached_instruments, the model "
-                "should be pipette names or pipette models, but "
-                f"{passed_ai['model']} is not"
-            )
 
         self._attached_instruments = {
             m: _sanitize_attached_instrument(m, attached_instruments.get(m))
@@ -463,18 +462,26 @@ class OT3Simulator(FlexBackend):
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
-        return self._attached_pipette_to_mount(
+        pipette = self._attached_pipette_to_mount(
             mount, cast(PipetteSpec, init_instr), expected_instr
         )
+        if pipette["config"]:
+            self._present_axes.update([Axis.of_plunger(mount.to_mount())])
+        else:
+            self._present_axes.discard(Axis.of_plunger(mount.to_mount()))
+        return pipette
 
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
         found_model = init_instr["model"]
         if found_model:
+            self._present_axes.update((Axis.G, Axis.Z_G))
             return {
                 "config": gripper_config.load(GripperModel.v1),
                 "id": init_instr["id"],
             }
         else:
+            self._present_axes.discard(Axis.G)
+            self._present_axes.discard(Axis.Z_G)
             return {"config": None, "id": None}
 
     def _attached_pipette_to_mount(
@@ -623,7 +630,9 @@ class OT3Simulator(FlexBackend):
                         model=module_details.model,
                     )
                 )
-        await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
+        await self.module_controls.register_devices(
+            new_devices_at_ports=new_mods_at_ports
+        )
 
     @property
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
@@ -898,7 +907,7 @@ class OT3Simulator(FlexBackend):
         return 0.0
 
     async def read_capacitive_sensor(
-        self, mount: OT3Mount, primary: bool
+        self, mount: OT3Mount, primary: bool, timeout: int = 1
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         return 0.0

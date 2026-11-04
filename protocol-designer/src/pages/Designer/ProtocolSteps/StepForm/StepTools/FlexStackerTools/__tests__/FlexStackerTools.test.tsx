@@ -53,9 +53,25 @@ const mockRobotState = makeInitialRobotState({
 
 describe('FlexStackerTools', () => {
   let props: ComponentProps<typeof FlexStackerTools>
+  const makeField = (value: any = null) => ({
+    value,
+    updateValue: vi.fn(),
+    name: '',
+    disabled: false,
+    errorToShow: null,
+    onFieldBlur: vi.fn(),
+    onFieldFocus: vi.fn(),
+  })
+
   beforeEach(() => {
     props = {
-      propsForFields: {} as any,
+      propsForFields: {
+        fillLabwareUri: makeField(),
+        fillLabwareIds: makeField(),
+        flexStackerFormType: makeField('fill'),
+        interventionMessage: makeField(),
+        moduleId: makeField(mockStackerId),
+      } as any,
       formData: { moduleId: mockStackerId } as any,
       toolboxStep: 0,
       showFormErrors: false,

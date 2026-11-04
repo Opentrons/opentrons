@@ -20,6 +20,9 @@ stages:
           minLengthOfReasonForInteraction: null
           passwordComplexitySpecialCharacters: null
           passwordComplexityMinimumLength: null
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
 
 
@@ -47,6 +50,9 @@ stages:
           idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
   - name: PATCH more settings
     request:
@@ -62,6 +68,7 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           requireReasonForInteraction: false
+          requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
       json:
@@ -73,6 +80,9 @@ stages:
           idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
   - name: GET settings after PATCH returns updated value
     request:
@@ -89,6 +99,9 @@ stages:
           idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
   - name: GET settings unchanged after rejected PATCH
     request:
@@ -105,6 +118,9 @@ stages:
           idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
 ---
 test_name: DELETE resets to defaults
@@ -130,6 +146,7 @@ stages:
           idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: 10
+          requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
       json:
@@ -141,6 +158,9 @@ stages:
           idleLogout: 60.0
           requireReasonForInteraction: false
           minLengthOfReasonForInteraction: 10
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
 
   - name: DELETE resets everything except accessControlEnabled to its default
@@ -160,7 +180,9 @@ stages:
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
           requireReasonForInteraction: true
-
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
 
 test_name: DELETE resets to defaults except including accessControlEnabled when not in db
@@ -191,6 +213,9 @@ stages:
           idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null          
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 
   - name: DELETE returns the newly reset settings
     request:
@@ -209,7 +234,9 @@ stages:
           idleLogout: 180.0
           requireReasonForInteraction: true
           minLengthOfReasonForInteraction: null
-
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
 ---
 test_name: enable access control enabled
 

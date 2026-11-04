@@ -18,7 +18,7 @@ from .state.config import Config
 from .state.state import StateStore
 from .types import DeckConfigurationType, PostRunHardwareState
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.types import DoorState, HardwareEventHandler
 from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
     ErrorRecoveryHardwareStateSynchronizer,
 )
@@ -40,6 +40,9 @@ async def create_protocol_engine(
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    proxy_of_callback_for_handling_door_events: typing.Optional[
+        HardwareEventHandler
+    ] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -53,6 +56,7 @@ async def create_protocol_engine(
         file_provider: Provides access to robot server file writing procedures for protocol output.
         camera_provider: Provides access to camera interface with image capture and callbacks.
         notify_publishers: Notifies robot server publishers of internal state change.
+        proxy_of_callback_for_handling_door_events: Optional remote callback for door events, used when in subprocess mode.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
@@ -82,7 +86,12 @@ async def create_protocol_engine(
     plugin_starter = PluginStarter(state_store, action_dispatcher)
     model_utils = ModelUtils()
     hardware_stopper = HardwareStopper(hardware_api, state_store)
-    door_watcher = DoorWatcher(state_store, hardware_api, action_dispatcher)
+    door_watcher = DoorWatcher(
+        state_store,
+        hardware_api,
+        action_dispatcher,
+        proxy_of_callback_for_handling_door_events,
+    )
     module_data_provider = ModuleDataProvider()
     file_provider = file_provider or FileProvider()
     camera_provider = camera_provider or CameraProvider()

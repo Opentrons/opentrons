@@ -34,6 +34,8 @@ describe('RobotSystemVersion', () => {
   beforeEach(() => {
     props = {
       currentVersion: 'mock7.0.0',
+      gitCommitHash: 'mock123456',
+      gitBranchName: 'mock-branch',
       isUpdateAvailable: false,
       setCurrentOption: mockBack,
       robotUpdateInfo: null,

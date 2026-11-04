@@ -108,6 +108,7 @@ describe('UpdateAppModal', () => {
       downloadPercentage: 50,
     } as ShellUpdateState)
     render(props)
+    fireEvent.click(screen.getByText('Update and restart'))
     expect(screen.getByText('Downloading update...')).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
   })
@@ -117,6 +118,7 @@ describe('UpdateAppModal', () => {
       downloaded: true,
     } as ShellUpdateState)
     render(props)
+    fireEvent.click(screen.getByText('Update and restart'))
     expect(
       screen.getByText('Download complete, restarting the app...')
     ).toBeInTheDocument()

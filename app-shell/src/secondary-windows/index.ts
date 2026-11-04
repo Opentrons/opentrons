@@ -12,6 +12,7 @@ import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
   STEP_DETAIL_VIEWER_CLOSE,
+  STEP_DETAIL_VIEWER_CLOSED,
   STEP_DETAIL_VIEWER_OPEN,
   STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
@@ -19,31 +20,76 @@ import { createLogger } from '../log'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 import {
-  getWindowIdStepDetailViewer,
+  clearStepDetailViewerData,
   openStepDetailViewer,
   updateStepDetailViewerData,
 } from './step-detail-viewer'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
-import type { SecondaryWindowDetails } from './types'
+import type { SecondaryWindowDetails, SecondaryWindowType } from './types'
 
 const log = createLogger('camera-stream')
 
-// Cache of all BrowserWindows by unique window id.
-const secondaryWindows = new Map<string, BrowserWindow>()
+let mainWindow: BrowserWindow | null = null
+
+export function setMainWindow(window: BrowserWindow): void {
+  mainWindow = window
+}
+
+export function clearMainWindow(): void {
+  mainWindow = null
+}
+
+function dispatchActionToMainWindow(action: Action): void {
+  if (mainWindow != null && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('dispatch', action)
+  }
+}
+
+const secondaryWindows = new Map<
+  SecondaryWindowType,
+  Map<string, BrowserWindow>
+>()
+
+function getWindow(
+  type: SecondaryWindowType,
+  key: string
+): BrowserWindow | undefined {
+  return secondaryWindows.get(type)?.get(key)
+}
+
+function setWindow(
+  type: SecondaryWindowType,
+  key: string,
+  window: BrowserWindow
+): void {
+  const windowsForType =
+    secondaryWindows.get(type) ?? new Map<string, BrowserWindow>()
+  windowsForType.set(key, window)
+  secondaryWindows.set(type, windowsForType)
+}
+
+function deleteWindow(type: SecondaryWindowType, key: string): void {
+  secondaryWindows.get(type)?.delete(key)
+}
 
 export function closeSecondaryWindows(): void {
-  secondaryWindows.forEach(window => {
-    if (!window.isDestroyed()) {
-      window.close()
-    }
+  secondaryWindows.forEach(windowsForType => {
+    windowsForType.forEach(window => {
+      if (!window.isDestroyed()) {
+        window.close()
+      }
+    })
   })
   secondaryWindows.clear()
 }
 
-export function isSecondaryWindowOpen(windowId: string): boolean {
-  const window = secondaryWindows.get(windowId)
+export function isSecondaryWindowOpen(
+  type: SecondaryWindowType,
+  key: string
+): boolean {
+  const window = getWindow(type, key)
   return window != null && !window.isDestroyed()
 }
 
@@ -76,8 +122,10 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         log,
       })
     case STEP_DETAIL_VIEWER_OPEN: {
-      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
-      const existingWindow = secondaryWindows.get(windowId)
+      const existingWindow = getWindow(
+        'step-detail-viewer',
+        action.payload.protocolKey
+      )
 
       if (existingWindow == null || existingWindow.isDestroyed()) {
         // Window doesn't exist or was destroyed, create new one
@@ -116,12 +164,14 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
       return null
 
     case STEP_DETAIL_VIEWER_CLOSE: {
-      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
-      const existingWindow = secondaryWindows.get(windowId)
+      const existingWindow = getWindow(
+        'step-detail-viewer',
+        action.payload.protocolKey
+      )
       if (existingWindow != null && !existingWindow.isDestroyed()) {
         existingWindow.close()
       }
-      secondaryWindows.delete(windowId)
+      deleteWindow('step-detail-viewer', action.payload.protocolKey)
       return null
     }
 
@@ -132,8 +182,8 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
 
 // Open a window, refocusing the window if it is already open.
 function openWindow(details: SecondaryWindowDetails): void {
-  const { windowId, type, createUi } = details
-  const existingWindow = secondaryWindows.get(windowId)
+  const { key, type, createUi } = details
+  const existingWindow = getWindow(type, key)
 
   if (existingWindow != null) {
     if (!existingWindow.isDestroyed()) {
@@ -142,19 +192,29 @@ function openWindow(details: SecondaryWindowDetails): void {
       return
     }
     // If the window exists but is destroyed, remove it from the cache.
-    secondaryWindows.delete(windowId)
+    deleteWindow(type, key)
   }
 
-  log.info(`Opening ${type} window: ${windowId}`)
+  log.info(`Opening ${type} window: ${key}`)
   const newWindow = createUi()
-  secondaryWindows.set(windowId, newWindow)
+  setWindow(type, key, newWindow)
 
   newWindow.webContents.on('did-finish-load', () => {
     log.debug(`Did finish load for ${type}`)
     newWindow.webContents.send('window-type', 'secondary')
   })
   newWindow.once('closed', () => {
-    log.debug('Camera stream window closed')
-    secondaryWindows.delete(windowId)
+    log.debug(`${type} window closed`)
+    deleteWindow(type, key)
+
+    if (type === 'step-detail-viewer') {
+      // `key` is the protocolKey for step-detail-viewer windows.
+      clearStepDetailViewerData(key)
+
+      dispatchActionToMainWindow({
+        type: STEP_DETAIL_VIEWER_CLOSED,
+        payload: { protocolKey: key },
+      })
+    }
   })
 }

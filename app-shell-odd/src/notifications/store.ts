@@ -10,7 +10,7 @@ type FailedConnStatus = (typeof FAILURE_STATUSES)[keyof typeof FAILURE_STATUSES]
  * @description Manages the internal state of MQTT connections to various robot hosts.
  */
 class ConnectionStore {
-  public readonly ip = '127.0.0.1'
+  public readonly ip = _ODD_IP_ ?? 'localhost'
 
   public readonly robotName = 'LOCALHOST'
 

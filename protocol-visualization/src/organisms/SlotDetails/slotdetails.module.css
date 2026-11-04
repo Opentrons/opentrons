@@ -1,0 +1,40 @@
+.slot_detail_container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16) var(--spacing-20);
+  background-color: var(--white);
+}
+
+.slot_container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.slot_details {
+  height: 100%;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  overflow-y: auto;
+}
+
+.slot_details::-webkit-scrollbar {
+  display: none;
+}
+
+.command_step_header {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-16);
+}
+
+.slot_detail_header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}

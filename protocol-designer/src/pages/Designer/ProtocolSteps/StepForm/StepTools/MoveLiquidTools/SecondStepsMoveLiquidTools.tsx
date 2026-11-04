@@ -113,8 +113,9 @@ export const SecondStepsMoveLiquidTools = ({
         ? formData.liquidClass
         : WATER_LIQUID_CLASS_NAME
     ]
-  if (!liquidClassDef)
+  if (!liquidClassDef) {
     throw new Error(`Liquid class '${formData.liquidClass}' does not exist`)
+  }
   const stubbedByTipValues = liquidClassDef.byPipette
     .find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)

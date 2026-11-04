@@ -270,7 +270,7 @@ describe('FullKeyboard', () => {
     expect(globeKey).toBeDefined()
     fireEvent.click(globeKey!)
 
-    expect(screen.getByRole('button', { name: 'english (us)' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'English (US)' })).toBeDefined()
     expect(
       screen.getAllByRole('button', { name: 'return' }).length
     ).toBeGreaterThan(0)

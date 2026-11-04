@@ -57,7 +57,7 @@ export const getRobotUpdateInfo: (
   robotName: string
 ) => RobotUpdateInfo | null = createSelector(
   getRobotUpdateTarget,
-  state => state,
+  (state: State) => state,
   (target, state) =>
     target ? getRobotUpdateInfoForTarget(state, target) : null
 )
@@ -198,8 +198,8 @@ export const getRobotUpdateDisplayInfo: (
   updateFromFileDisabledReason: string | null
 } = createSelector(
   getRobotByName,
-  state => getRobotUpdateRobot(state),
-  (state, robotName) => getRobotUpdateVersion(state, robotName),
+  (state: State) => getRobotUpdateRobot(state),
+  (state: State, robotName: string) => getRobotUpdateVersion(state, robotName),
   (robot, currentUpdatingRobot, updateVersion) => {
     const robotVersion = robot ? getRobotApiVersion(robot) : null
     const autoUpdateType = getRobotUpdateType(robotVersion, updateVersion)

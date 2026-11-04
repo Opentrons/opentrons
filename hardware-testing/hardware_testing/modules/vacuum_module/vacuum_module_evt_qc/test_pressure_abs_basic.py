@@ -47,7 +47,7 @@ async def test_abs_sensors_for_comms(
         section,
         f"pressure-abs-{sensor}-basic",
         [
-            CSVResult.from_bool(all(data) or expect_pass),
+            CSVResult.from_bool(all(data) or not expect_pass),
             *data,
         ],
     )

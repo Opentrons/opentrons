@@ -173,6 +173,13 @@ class NozzleMap(BaseModel):
         )
 
     @property
+    def x_center_offset(self) -> Point:
+        """The position in the center of the primary row of the map."""
+        back_right = next(reversed(list(self.columns.values())))[0]
+        difference = self.map_store[back_right] - self.map_store[self.back_left]
+        return self.map_store[self.back_left] + Point(difference[0] / 2, 0, 0)
+
+    @property
     def y_center_offset(self) -> Point:
         """The position in the center of the primary column of the map."""
         front_left = next(reversed(list(self.rows.values())))[0]
@@ -417,6 +424,8 @@ class NozzleConfigurationManager:
             )
         elif cp_override == CriticalPoint.XY_CENTER:
             current_nozzle = self._current_nozzle_configuration.xy_center_offset
+        elif cp_override == CriticalPoint.X_CENTER:
+            current_nozzle = self._current_nozzle_configuration.x_center_offset
         elif cp_override == CriticalPoint.Y_CENTER:
             current_nozzle = self._current_nozzle_configuration.y_center_offset
         elif cp_override == CriticalPoint.FRONT_NOZZLE:

@@ -6,8 +6,9 @@ See our migration code for details.
 
 import sqlalchemy
 
+from server_utils.sql_utils import UTCDateTime
+
 from robot_server.persistence import _legacy_pickle
-from robot_server.persistence._utc_datetime import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
 

@@ -42,13 +42,18 @@ interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
   handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
+  invalidRobotType?: boolean
 }
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const { storedProtocolData, handleRunProtocol, handleSendProtocolToFlex } =
-    props
+  const {
+    storedProtocolData,
+    handleRunProtocol,
+    handleSendProtocolToFlex,
+    invalidRobotType,
+  } = props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
@@ -131,23 +136,26 @@ export function ProtocolOverflowMenu(
           right="0"
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem
-            onClick={handleClickRun}
-            data-testid="ProtocolOverflowMenu_run"
-            css={css`
-              border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0
-                0;
-            `}
-          >
-            {t('start_setup')}
-          </MenuItem>
+          {!invalidRobotType ? (
+            <MenuItem
+              onClick={handleClickRun}
+              data-testid="ProtocolOverflowMenu_run"
+              css={css`
+                border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8}
+                  0 0;
+              `}
+            >
+              {t('start_setup')}
+            </MenuItem>
+          ) : null}
+
           <MenuItem
             onClick={handleClickReanalyze}
             data-testid="ProtocolOverflowMenu_reanalyze"
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          {robotType !== 'OT-2 Standard' ? (
+          {robotType !== 'OT-2 Standard' && !invalidRobotType ? (
             <MenuItem
               onClick={handleClickSendToOT3}
               data-testid="ProtocolOverflowMenu_sendToOT3"

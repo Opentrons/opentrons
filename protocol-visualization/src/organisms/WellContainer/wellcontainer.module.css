@@ -1,0 +1,151 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  container-name: well-view-slot-container;
+  container-type: inline-size;
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.well_details_caption_bottom {
+  position: absolute;
+  bottom: 0;
+  left: 35%;
+  width: 100%;
+}
+
+.well_details_caption_side {
+  position: absolute;
+  top: 50%;
+  right: 10%;
+}
+
+.well_details_volume {
+  position: absolute;
+  top: 4.6rem;
+  left: 0.2rem;
+  pointer-events: none;
+}
+
+.tip_details_volume {
+  position: absolute;
+  top: 0.3rem;
+  right: 2rem;
+  pointer-events: none;
+}
+
+.well_detail_svg_container {
+  position: relative;
+  overflow: hidden;
+  width: 13.5rem;
+  height: 100%;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.well_detail_svg_positioning {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+}
+
+.svg_container {
+  padding-top: 1rem;
+}
+
+.well_and_tip_svg {
+  display: block;
+  overflow: visible;
+  width: 100%;
+  height: auto;
+}
+
+/* Width 172px up to 299px */
+@container well-view-slot-container (min-width: 172px) and (max-width: 299px) {
+  .main_content {
+    padding: var(--spacing-12);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 50%;
+    right: 10%;
+  }
+}
+
+/* Width 300px up to 449px */
+@container well-view-slot-container (min-width: 300px) and (max-width: 449px) {
+  .main_content {
+    padding: var(--spacing-20);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 50%;
+    right: 10%;
+  }
+}
+
+/* Width 450px up to 599px */
+@container well-view-slot-container (min-width: 450px) and (max-width: 599px) {
+  .main_content {
+    padding: var(--spacing-32);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 45%;
+    right: 10%;
+  }
+}
+
+/* Width 600px and up */
+@container well-view-slot-container (min-width: 600px) {
+  .main_content {
+    padding: var(--spacing-40);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 45%;
+    right: 10%;
+  }
+}

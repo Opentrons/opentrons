@@ -13,6 +13,7 @@ import type { RunData } from '@opentrons/api-client'
 
 interface RecentRunProtocolCarouselProps {
   recentRunsOfUniqueProtocols: RunData[]
+  onCardResolved: (runId: string, isStandard: boolean) => void
 }
 
 const CarouselWrapper = styled.div`
@@ -30,6 +31,7 @@ const CarouselWrapper = styled.div`
 
 export function RecentRunProtocolCarousel({
   recentRunsOfUniqueProtocols,
+  onCardResolved,
 }: RecentRunProtocolCarouselProps): JSX.Element {
   return (
     <CarouselWrapper>
@@ -39,7 +41,11 @@ export function RecentRunProtocolCarousel({
         marginX={SPACING.spacing40}
       >
         {recentRunsOfUniqueProtocols.map(runData => (
-          <RecentRunProtocolCard key={runData.id} runData={runData} />
+          <RecentRunProtocolCard
+            key={runData.id}
+            runData={runData}
+            onCardResolved={onCardResolved}
+          />
         ))}
       </Flex>
     </CarouselWrapper>

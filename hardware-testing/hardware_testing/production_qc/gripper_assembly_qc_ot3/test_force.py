@@ -16,8 +16,8 @@ from hardware_testing.data.csv_report import (
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
-
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 
 SLOT_FORCE_GAUGE = 4
 

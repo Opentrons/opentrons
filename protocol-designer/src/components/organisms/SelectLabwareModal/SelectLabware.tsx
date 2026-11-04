@@ -9,7 +9,11 @@ import {
   ListButtonAccordionContainer,
   SPACING,
 } from '@opentrons/components'
-import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_V1,
+  getMaxPoolCount,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
@@ -29,7 +33,7 @@ import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareInfo } from './index'
@@ -43,6 +47,7 @@ interface SelectLabwareProps {
   searchFilter: (termToCheck: string) => boolean
   getIsLabwareFiltered: (labwareDef: LabwareDefinition2) => boolean
   universalLid?: [string, LabwareDefinition2]
+  moduleType: ModuleType | null
 }
 export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   const {
@@ -54,6 +59,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
     universalLid,
     getIsLabwareFiltered,
     searchFilter,
+    moduleType,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation(['starting_deck_state', 'shared'])
@@ -103,6 +109,12 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
           labwareDefURI: null,
         })
       )
+      // Clear adapter selection when selecting standalone labware
+      dispatch(
+        selectAdapter({
+          adapterDefURI: null,
+        })
+      )
     }
   }
 
@@ -130,6 +142,8 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                     const { loadName, isTiprack } = parameters
 
                     const isAdapter = def.allowedRoles?.includes('adapter')
+                    const isVacuumModule = moduleType === VACUUM_MODULE_TYPE
+                    // Don't offer lids for vacuum module labware
                     const stackingLabwareDefUris = getStackerDefinitions(
                       {
                         ...defs,
@@ -151,6 +165,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                     const stackingProps: StackingProps | null =
                       isOnHopper ||
                       (stackingLabwareDefUris.length === 1 &&
+                        !isVacuumModule &&
                         slot !== 'offDeck')
                         ? {
                             inputTitle: t('labware_quantity'),
@@ -211,7 +226,8 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           isSelected={
                             (isAdapter && uri === selectedAdapterDefURI) ||
                             (!isAdapter &&
-                              uri === selectedTopLabware.labwareDefURI)
+                              uri === selectedTopLabware.labwareDefURI &&
+                              selectedAdapterDefURI == null)
                           }
                         />
                         <SelectLabwareOnAdapter
@@ -229,7 +245,11 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           isAdapter={isAdapter ?? false}
                           category={category}
                           loadName={loadName}
-                          lidURIs={isOnHopper ? [] : stackingLabwareDefUris}
+                          lidURIs={
+                            isOnHopper || isVacuumModule
+                              ? []
+                              : stackingLabwareDefUris
+                          }
                         />
                       </Fragment>
                     ) : null

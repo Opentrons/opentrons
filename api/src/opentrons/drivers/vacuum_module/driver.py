@@ -32,7 +32,7 @@ MAX_DURATION_MS = 10000  # 10s
 MAX_REPS = 10
 
 MAX_PUMP_RPM = 3500
-MAX_PUMP_DUTY = 90
+MAX_PUMP_DUTY = 100
 MAX_RAMP_RATE = -10.0  # mbar/s
 MAX_PRESSURE_MBAR = -1013.25
 
@@ -68,7 +68,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> VacuumState:
         """Parse the get pressure state."""
-        pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
+        pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) D:(?P<D>\d+) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -80,6 +80,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("B")),
             float(match.group("H")),
             bool(int(match.group("E"))),
+            int(match.group("D")),
             VentState(int(match.group("V"))),
         )
 
@@ -272,7 +273,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
+        gauge_pressure_mbar: Optional[float] = None,
         duration_s: Optional[int] = None,
         timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
@@ -284,10 +285,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             "S", int(enable_vacuum)
         )
 
-        if guage_pressure_mbar is not None:
+        if gauge_pressure_mbar is not None:
             command.add_float(
                 "P",
-                min(max(guage_pressure_mbar, MAX_PRESSURE_MBAR), 0),
+                min(max(gauge_pressure_mbar, MAX_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
         if duration_s is not None:
@@ -315,13 +316,17 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         if target_rpm and duty_cycle:
             raise ValueError(
                 "You cannot set the target rpm and duty cycle at the same time."
             )
-
+        # TODO: incorporate duration, timeout, rate, vent_after into SetPumpState gcode message
         command = GCODE.SET_PUMP_STATE.build_command().add_int("S", int(start_pump))
         if target_rpm is not None:
             command.add_int("R", max(0, min(target_rpm, MAX_PUMP_RPM)))

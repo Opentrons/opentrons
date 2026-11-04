@@ -4,24 +4,21 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_FLEX_END,
-  DIRECTION_COLUMN,
-  Flex,
   FLEX_MAX_CONTENT,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
-  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 
+import styles from './newrobotsetuphelp.module.css'
+
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'
-const NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF =
-  'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
 
 export function NewRobotSetupHelp(): JSX.Element {
   const { t } = useTranslation(['devices_landing', 'shared', 'branded'])
@@ -46,25 +43,18 @@ export function NewRobotSetupHelp(): JSX.Element {
                 setShowNewRobotHelpModal(false)
               }}
             >
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <LegacyStyledText
-                  forwardedAs="p"
-                  marginBottom={SPACING.spacing16}
-                >
-                  {t('branded:new_robot_instructions')}
-                </LegacyStyledText>
-                <ExternalLink
-                  href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
-                  width={FLEX_MAX_CONTENT}
-                >
-                  {t('branded:opentrons_flex_quickstart_guide')}
-                </ExternalLink>
-                <ExternalLink
-                  href={NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF}
-                  width={FLEX_MAX_CONTENT}
-                >
-                  {t('ot2_quickstart_guide')}
-                </ExternalLink>
+              <div className={styles.container}>
+                <div className={styles.content}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('branded:new_robot_instructions')}
+                  </StyledText>
+                  <ExternalLink
+                    href={NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF}
+                    width={FLEX_MAX_CONTENT}
+                  >
+                    {t('branded:opentrons_flex_quickstart_guide')}
+                  </ExternalLink>
+                </div>
                 <PrimaryButton
                   onClick={() => {
                     setShowNewRobotHelpModal(false)
@@ -74,7 +64,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                 >
                   {t('shared:close')}
                 </PrimaryButton>
-              </Flex>
+              </div>
             </Modal>,
             getTopPortalEl()
           )

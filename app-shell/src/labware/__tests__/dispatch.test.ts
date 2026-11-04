@@ -1,4 +1,3 @@
-import electron from 'electron'
 import fse from 'fs-extra'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -12,16 +11,49 @@ import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 
+import type { BrowserWindow } from 'electron'
 import type { Mock } from 'vitest'
 import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Dispatch } from '../../types'
 
 vi.mock('fs-extra')
-vi.mock('electron')
-vi.mock('../../config')
-vi.mock('../../dialogs')
-vi.mock('../definitions')
+vi.mock('../../config', () => ({
+  getFullConfig: vi.fn(),
+  handleConfigChange: vi.fn(),
+}))
+
+vi.mock('../../dialogs', () => ({
+  showOpenDirectoryDialog: vi.fn(),
+  showOpenFileDialog: vi.fn(),
+}))
+
+vi.mock('../definitions', () => ({
+  readLabwareDirectory: vi.fn(),
+  parseLabwareFiles: vi.fn(),
+  addLabwareFile: vi.fn(),
+  removeLabwareFile: vi.fn(),
+}))
+
 vi.mock('../validation')
+
+vi.mock('electron', () => {
+  const app = {
+    getPath: vi.fn(),
+    whenReady: () => Promise.resolve(undefined),
+    on: () => {},
+  }
+
+  const shell = {
+    openPath: vi.fn(),
+    trashItem: vi.fn(),
+  }
+
+  const dialog = {
+    showOpenDialog: vi.fn(),
+  }
+
+  return { app, shell, dialog }
+})
 
 // wait a few ticks to let the mock Promises clear
 const flush = (): Promise<void> =>
@@ -31,7 +63,7 @@ describe('labware module dispatches', () => {
   const labwareDir = '/path/to/somewhere'
   const mockMainWindow = {
     browserWindow: true,
-  } as unknown as electron.BrowserWindow
+  } as unknown as BrowserWindow
   let dispatch: Mock
   let handleAction: Dispatch
 
@@ -209,8 +241,7 @@ describe('labware module dispatches', () => {
     return flush().then(() => {
       expect(vi.mocked(Dialogs.showOpenFileDialog)).toHaveBeenCalledWith(
         mockMainWindow,
-        {
-          defaultPath: '__mock-app-path__',
+        expect.objectContaining({
           filters: [
             {
               name: 'JSON Labware Definitions',
@@ -218,7 +249,7 @@ describe('labware module dispatches', () => {
             },
           ],
           properties: ['multiSelections'],
-        }
+        })
       )
       expect(dispatch).not.toHaveBeenCalled()
     })
@@ -368,11 +399,10 @@ describe('labware module dispatches', () => {
     })
   })
 
-  it('opens custom labware directory on OPEN_CUSTOM_LABWARE_DIRECTORY', () => {
+  it('opens custom labware directory on OPEN_CUSTOM_LABWARE_DIRECTORY', async () => {
     handleAction(CustomLabware.openCustomLabwareDirectory())
-
-    return flush().then(() => {
-      expect(electron.shell.openPath).toHaveBeenCalledWith(labwareDir)
-    })
+    await flush()
+    const electron = await import('electron')
+    expect((electron as any).shell.openPath).toHaveBeenCalledWith(labwareDir)
   })
 })

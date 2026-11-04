@@ -24,13 +24,8 @@ export function openCameraStream(
   params: OpenCameraStreamParams
 ): CameraStreamDetails {
   const createUi = (): BrowserWindow => createCameraStreamUi(params)
-  const windowId = getWindowIdCameraStream(params.robotIp)
 
-  return { createUi, windowId, type: 'camera-stream' }
-}
-
-function getWindowIdCameraStream(robotIp: string): string {
-  return `camera-stream-${robotIp}`
+  return { createUi, key: params.robotIp, type: 'camera-stream' }
 }
 
 const STREAM_URL = (robotName: string): string =>

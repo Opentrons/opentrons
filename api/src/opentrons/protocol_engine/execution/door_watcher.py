@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     DoorState,
     DoorStateNotification,
     HardwareEvent,
+    HardwareEventHandler,
     PauseType,
 )
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
@@ -26,6 +27,9 @@ class DoorWatcher:
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
+        proxy_of_callback_for_handling_door_events: Optional[
+            HardwareEventHandler
+        ] = None,
     ) -> None:
         """Initialize the DoorWatcher.
 
@@ -36,19 +40,29 @@ class DoorWatcher:
             action_dispatcher: The ActionDispatcher to dispatch actions into.
                 Assumed to be owned by the same event loop that this
                 DoorWatcher was constructed in.
+            proxy_of_callback_for_handling_door_events: The Optional remote proxy of
+                the callback to used when handling door events, subprocess mode only.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._action_dispatcher = action_dispatcher
         self._loop = get_running_loop()
         self._unsubscribe_callback: Optional[_UnsubscribeCallback] = None
+        self._proxy_of_callback_for_handling_door_events = (
+            proxy_of_callback_for_handling_door_events
+        )
 
     def start(self) -> None:
         """Subscribe to hardware events and start forwarding them as PE actions."""
         if self._unsubscribe_callback is None:
-            self._unsubscribe_callback = self._hardware_api.register_callback(
-                self._handle_hardware_door_event
-            )
+            if self._proxy_of_callback_for_handling_door_events is not None:
+                self._unsubscribe_callback = self._hardware_api.register_callback(
+                    self._proxy_of_callback_for_handling_door_events
+                )
+            else:
+                self._unsubscribe_callback = self._hardware_api.register_callback(
+                    self._handle_hardware_door_event
+                )
 
     def stop(self) -> None:
         """Unsubscribe from hardware events.
@@ -112,5 +126,49 @@ class DoorWatcher:
             and self._state_store.config.block_on_door_open
         ):
             self._hardware_api.pause(PauseType.PAUSE)
+
+        self._action_dispatcher.dispatch(action)
+
+    def _handle_proxy_hardware_door_event(self, event: HardwareEvent) -> None:
+        """Handle a proxy request of a door state hardware event, ensuring loop safe calling.
+
+        This is used as a callback for HardwareControlAPI.register_callback(),
+        and it's run inside the run process when called from the hardware process.
+
+        This method will return after the queueing up `call_soon` references to prepare
+        requests to the hardware process for a pause and to dispatch an action to the Protocol
+        Engine's action handler.
+
+        This prevents blocking the individual processes from proceeding and avoids deadlocking.
+        """
+        if isinstance(event, DoorStateNotification):
+            # Execute a call soon on the Run Process event loop to handle dispatching actions and hardware requests
+            self._loop.call_soon(
+                self._handle_proxy_hardware_door_event_call_safe, event
+            )
+
+    def _handle_proxy_hardware_door_event_call_safe(
+        self, event: DoorStateNotification
+    ) -> None:
+        """Handle a door state hardware event.
+
+        This handles calling the OT3API hardware pause via an event loop safe `call_soon`.
+        The function then proceeds to dispatch a DoorChangeAction to the action handler.
+        """
+        # Throw away this event if this instance has already been stop()'d.
+        already_stopped = self._unsubscribe_callback is None
+        if already_stopped:
+            return
+
+        action = DoorChangeAction(
+            door_state=event.new_state, module_serial=event.module_serial
+        )
+        if (
+            self._state_store.commands.get_is_running()
+            and action.door_state == DoorState.OPEN
+            and self._state_store.config.block_on_door_open
+        ):
+            # Execute a call soon to ensure a pause is requested of the hardware process
+            self._loop.call_soon(self._hardware_api.pause, PauseType.PAUSE)
 
         self._action_dispatcher.dispatch(action)

@@ -1,3 +1,6 @@
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+
 import {
   FLEX_STACKER_MODULE_TYPE,
   getIsLid,
@@ -8,10 +11,12 @@ import {
 import { BOTTOM_UP_LABWARE_POOL_KEYS } from '../constants'
 import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
 import {
+  getFlexStackerShuttleAddressableArea,
   getFullStackFromLabwares,
   getLargestStackInSlot,
   getSlotInLocationStack,
 } from '../utils'
+import { assignContainsAmongSiblings } from '../utils/traversals'
 
 import type {
   FlexStackerStoredLabwareGroup,
@@ -32,6 +37,9 @@ export function forMoveLabware(
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const { modules, labware } = robotState
+  if (labware[labwareId] == null) {
+    return
+  }
   const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
   const fullStackFromLabwares = getFullStackFromLabwares(
     labware,
@@ -209,4 +217,33 @@ export function forMoveLabware(
       }
     }
   })
+
+  // duplicative, but we will remove the above stack logic, so keep it here for now
+  const isNewParentPipettableLabware =
+    typeof newLocation === 'object' &&
+    'labwareId' in newLocation &&
+    getIsPipettableLabware(labwareEntities[newLocation.labwareId].def)
+  let stackedOnNodeForMovedPrimary = newLocation
+  if (
+    typeof newLocation === 'object' &&
+    newLocation !== null &&
+    'moduleId' in newLocation &&
+    modules[newLocation.moduleId].moduleState.type === FLEX_STACKER_MODULE_TYPE
+  ) {
+    const shuttleAa = getFlexStackerShuttleAddressableArea(
+      modules[newLocation.moduleId].slot
+    )
+    if (shuttleAa != null) {
+      stackedOnNodeForMovedPrimary = { addressableAreaName: shuttleAa }
+    }
+  }
+  robotState.labware[labwareId].stackedOnNode = stackedOnNodeForMovedPrimary
+  if (isNewParentPipettableLabware) {
+    robotState.labware[labwareId].sterility = TOUCHED_PIPETTABLE_LABWARE
+  }
+  // Sibling `contains` depends on shared `stackedOnNode`; clear existing 'contains' and re-derive after the move.
+  robotState.labware = assignContainsAmongSiblings(
+    mapValues(robotState.labware, lw => omit(lw, 'contains')),
+    labwareEntities
+  )
 }

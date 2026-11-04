@@ -7,7 +7,7 @@ import { from, of } from 'rxjs'
 import { catchError, map, switchMap } from 'rxjs/operators'
 
 import { OPENTRONS_USB } from '../discovery'
-import { appShellRequestor } from '../shell/remote'
+import { appShellUSBRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
 import type { AxiosError } from 'axios'
@@ -57,7 +57,7 @@ export function fetchRobotApi(
 
   return host.ip === OPENTRONS_USB
     ? from(
-        appShellRequestor({
+        appShellUSBRequestor({
           headers: options.headers,
           method,
           url,
@@ -80,7 +80,7 @@ export function fetchRobotApi(
           // FIXME(sf) this doesn't seem right, but also the type interface isn't written to allow for request
           // failures that don't come from valid connections
           status: result?.response?.status ?? 444,
-          // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
+          // appShellUSBRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
           ok: result.isError
             ? false
             : inRange(result?.response?.status, 200, 300),

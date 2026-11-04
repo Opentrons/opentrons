@@ -4,8 +4,8 @@ const plotConfigs = [
   {
     divId: 'plotly1',
     xColumn: 'Time(s)',
-    yColumns: ['current_guage_pressure', 
-      'target_guage_pressure', 
+    yColumns: ['current_gauge_pressure', 
+      'target_gauge_pressure', 
       'pressure_abs_a', 
       'pressure_abs_b', 
       'pressure_atm'],

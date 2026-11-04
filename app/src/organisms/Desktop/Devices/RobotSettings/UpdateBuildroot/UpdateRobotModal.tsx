@@ -25,6 +25,7 @@ import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
   REINSTALL,
@@ -89,9 +90,11 @@ export function UpdateRobotModal({
   const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
 
   let disabledReason: string = ''
-  if (updateFromFileDisabledReason)
+  if (updateFromFileDisabledReason) {
     disabledReason = t(updateFromFileDisabledReason)
-  else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
+  } else if (isRobotBusy) {
+    disabledReason = t('robot_busy_protocol')
+  }
 
   useEffect(
     () => {
@@ -137,6 +140,7 @@ export function UpdateRobotModal({
         </SecondaryButton>
         <PrimaryButton
           onClick={() => {
+            dispatch(downloadRobotUpdate())
             dispatchStartRobotUpdate(robotName)
           }}
           css={FOOTER_BUTTON_STYLE}

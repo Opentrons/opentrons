@@ -34,18 +34,6 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
         "test_analysis_snapshot[0ea9d4ab9b][Flex_S_2_16_MPL_sample_dilution_with_96_channel_pipette].json",
         "test_analysis_snapshot[0161fbd0a6][Flex_S_2_15_MPL_langone_ribo_pt1_ramp].json",
         "test_analysis_snapshot[2791b57a2c][Flex_S_v2_24_P50_P1000_HappyPath_alter_lc].json",
-        "test_analysis_snapshot[0330dc472b][OT2_S_v2_20_P50_touch_tip].json",
-        # PL protocols ------------------------------------------------------
-        # TODO: Audit these
-        # Some may need CSV file(s) to run successfully.
-        # Add this capability to the analysis flow.
-        "test_analysis_snapshot[aee7ffcf1d][OT2_S_v2_13_PL_HDQ_DNA_OT2-Saliva].json",
-        "test_analysis_snapshot[7d4f5e2cfb][OT2_S_v2_13_PL_HDQ_DNA_OT2-Cells].json",
-        "test_analysis_snapshot[47faf6c3ae][OT2_S_v2_12_PL_6d901d].json",
-        "test_analysis_snapshot[21eaee0bbe][OT2_S_v2_13_PL_Magazorb_DNA_OT2].json",
-        "test_analysis_snapshot[79ef0c5304][OT2_S_v2_13_PL_Quick-RNA_OT2].json",
-        "test_analysis_snapshot[d50ea72948][OT2_S_v2_2_PL_omega_biotek_magbind_totalpure_ngs].json",
-        "test_analysis_snapshot[ff4a494935][OT2_S_v2_4_PL_nucleic_acid_purification_with_magnetic_beads].json",
         # TODO: These protocols require RTP CSV files and succeed manually.
         # Add this capability to the analysis flow.
         "test_analysis_snapshot[13c4a34603][Flex_S_v2_20_PL_cherry].json",
@@ -64,7 +52,7 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                 # Check for error key at the top level of the JSON
                 # This happens when things are not found
                 has_error_key = "error" in data
-                if "Flex_S" in file_path_str or "OT2_S" in file_path_str:
+                if "Flex_S" in file_path_str:
                     if errors_present or has_error_key:
                         console.print(f"Error in {file_path}")
                         for e in data.get("errors", []):
@@ -73,7 +61,8 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                                     console.print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)
                 else:
-                    if not errors_present:
+                    # Flex_X and other failure-case protocols are expected to have errors
+                    if not errors_present and not has_error_key:
                         files_missing_expected_errors.append(file_path)
 
             except json.JSONDecodeError:

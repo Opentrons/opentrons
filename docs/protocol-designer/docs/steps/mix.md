@@ -5,7 +5,7 @@ description: "Mix liquids in a well: volume, repetitions, and flow rate."
 
 In a mix step, the robot mixes liquid by repeatedly aspirating and dispensing. Mixing occurs in each well you select, one after the other, without moving any liquid between wells. 
 
-You can customize settings for your mix step in a four-part form. Just like in a transfer step, start by selecting a pipette, tip rack, and labware. 
+You can customize settings for your mix step in a four-part form. Just like in a transfer step, start by selecting a pipette, tip rack, and labware. Then, choose source and destination labware, pipette nozzles, and wells. 
 
 <figure class="screenshot" markdown>
   ![Mix step](../images/mix_step.png)

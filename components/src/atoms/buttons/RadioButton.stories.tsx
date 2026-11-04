@@ -1,4 +1,4 @@
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 
 import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { VIEWPORT } from '../../ui-style-constants'

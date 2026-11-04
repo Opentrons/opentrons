@@ -9,9 +9,9 @@ All commands run from the **monorepo root** unless noted otherwise.
 
 ## Node.js Version Management
 
-**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), Yarn 1.22.19 (Classic).
+**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), pnpm 10.32.1.
 
-Before running any `node`, `yarn`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
+Before running any `node`, `pnpm`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
 
 ```bash
 # nvm (most common)
@@ -41,7 +41,7 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 | Target | Description |
 | --- | --- |
 | `make setup` | Install all JS and Python dependencies |
-| `make setup-js` | Setup all JS projects (yarn install) |
+| `make setup-js` | Setup all JS projects (pnpm install) |
 | `make setup-py` | Setup all robot Python packages (pipenv/uv per project) |
 
 ### Teardown (uninstall dependencies)
@@ -67,7 +67,7 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 
 ```bash
 # Best: run tests for just the files near your changes
-yarn vitest protocol-designer/src/step-forms/
+pnpm vitest protocol-designer/src/step-forms/
 make test-js-protocol-designer tests="src/step-forms/"
 
 # For Python, run from the project directory
@@ -135,7 +135,7 @@ These projects have their **own** `Makefile` and use **uv** (not pipenv). They a
 | --- | --- | --- |
 | AI Server | `opentrons-ai-server/` | `make setup` (runs `uv sync`) |
 | E2E Testing | `e2e-testing/` | `make setup` (runs `uv sync`) |
-| Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script) |
+| Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script; Python 3.12) |
 | Static Deploy | `scripts/static-deploy/` | `make setup` (runs `uv sync`) |
 
 Run their setup from within their own directory.
@@ -148,10 +148,10 @@ Run their setup from within their own directory.
 make teardown-js && make setup-js
 ```
 
-### Yarn Cache Corruption
+### Pnpm Cache Corruption
 
 ```bash
-yarn cache clean && make setup-js
+pnpm cache delete && make setup-js
 ```
 
 ### TypeScript Build Artifacts Out of Sync
@@ -187,7 +187,7 @@ asdf install nodejs
 
 ### "Module not found" Errors in JS
 
-Usually means `yarn` hasn't been run:
+Usually means `pnpm` hasn't been run:
 
 ```bash
 make setup-js

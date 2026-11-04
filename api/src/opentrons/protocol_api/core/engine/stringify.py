@@ -7,6 +7,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
 )
+from opentrons.types import ModuleFixtureLocation
 
 
 def well(engine_client: SyncClient, well_name: str, labware_id: str) -> str:
@@ -27,7 +28,7 @@ def _module_in_location_string(module_id: str, engine_client: SyncClient) -> str
     return f"{module_name} on {module_on_string}"
 
 
-def _labware_location_string(
+def _labware_location_string(  # noqa: C901
     engine_client: SyncClient, location: LabwareLocation
 ) -> str:
     if isinstance(location, DeckSlotLocation):
@@ -49,6 +50,10 @@ def _labware_location_string(
     elif isinstance(location, AddressableAreaLocation):
         # In practice this will always be a deck slot or staging slot
         return f"slot {location.addressableAreaName}"
+
+    elif isinstance(location, ModuleFixtureLocation):
+        # In practice this will always be a deck slot or staging slot
+        return f"slot {location.addressable_area_name}"
 
     elif location == "offDeck":
         return "[off-deck]"

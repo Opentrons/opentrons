@@ -11,7 +11,9 @@ interface RobotCoordinateSpaceProps {
   viewBox?: string
 }
 
-const AnimatedSvg = animated.svg as ComponentType<SVGProps<SVGSVGElement>>
+const AnimatedSvg = animated.svg as any as ComponentType<
+  SVGProps<SVGSVGElement>
+>
 
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps

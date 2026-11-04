@@ -85,7 +85,7 @@ describe('DisconnectModal', () => {
 
     screen.getByText('Disconnect from foo')
     screen.getByText('Are you sure you want to disconnect from foo?')
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
     screen.getByRole('button', { name: 'Disconnect' })
   })
 
@@ -97,7 +97,7 @@ describe('DisconnectModal', () => {
 
     screen.getByText('Disconnect from foo')
     screen.getByText('Disconnecting from Wi-Fi network foo')
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
     expect(clearWifiStatus).not.toHaveBeenCalled()
   })
 
@@ -164,7 +164,7 @@ describe('DisconnectModal', () => {
     screen.getByText(
       'If you keep getting this message, try restarting your app and robot. If this does not resolve the issue, contact Opentrons Support.'
     )
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
     screen.getByRole('button', { name: 'Disconnect' })
   })
 
@@ -181,7 +181,7 @@ describe('DisconnectModal', () => {
 
     expect(dismissRequest).not.toHaveBeenCalled()
     expect(mockOnCancel).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(dismissRequest).toHaveBeenCalledWith(LAST_ID)
     expect(mockOnCancel).toHaveBeenCalledWith()
   })

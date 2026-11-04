@@ -83,17 +83,19 @@ export const getSelectedWellsCommonValues = createSelector(
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWells, labwareId, allIngreds): CommonWellValues => {
-    if (!labwareId)
+    if (!labwareId) {
       return {
         ingredientId: null,
         volume: null,
       }
+    }
     const ingredsInLabware = allIngreds[labwareId]
-    if (!ingredsInLabware || isEmpty(selectedWells))
+    if (!ingredsInLabware || isEmpty(selectedWells)) {
       return {
         ingredientId: null,
         volume: null,
       }
+    }
     const initialWellContents:
       | StepGeneration.LocationLiquidState
       | null

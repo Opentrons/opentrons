@@ -33,7 +33,7 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
-from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 import opentrons
 from .util import entrypoint_util
@@ -566,6 +566,14 @@ def simulate(
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
+
+    if RobotTypeEnum.robot_literal_to_enum(protocol.robot_type) == RobotTypeEnum.OT2:
+        raise RuntimeError(
+            "This protocol is designed for an OT-2 robot. "
+            "To utilize this protocol, please download the "
+            "most recent version of the Opentrons-OT2 app from "
+            "https://github.com/Opentrons/opentrons-ot2/releases"
+        )
 
     _validate_can_simulate_for_robot_type(protocol.robot_type)
 

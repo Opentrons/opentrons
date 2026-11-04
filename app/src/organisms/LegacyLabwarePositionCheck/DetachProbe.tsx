@@ -136,10 +136,11 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
 
   return (
     <GenericWizardTile

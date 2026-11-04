@@ -9,12 +9,8 @@ import tty
 from opentrons.hardware_control.ot3api import OT3API
 import serial.tools.list_ports  # type: ignore[import-untyped]
 
-from hardware_testing.opentrons_api.types import (
-    OT3Mount,
-    Axis,
-    Point,
-    CriticalPoint,
-)
+from opentrons.hardware_control.types import OT3Mount, Axis, CriticalPoint
+from opentrons.types import Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )

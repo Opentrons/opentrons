@@ -214,6 +214,7 @@ describe('generateSubstepItem', () => {
         stepArgs: {
           commandCreatorFnName: 'distribute',
           sourceWell: 'A1',
+          primaryNozzle: 'A1',
           destWells: ['A1', 'A2'],
           disposalVolume: null,
           disposalLabware: null,
@@ -278,6 +279,7 @@ describe('generateSubstepItem', () => {
         testName: 'transfer command returns substep data',
         stepArgs: {
           commandCreatorFnName: 'transfer',
+          primaryNozzle: 'A1',
           sourceWells: ['A1', 'A2'],
           destWells: ['A1', 'A2'],
           blowoutLocation: null,

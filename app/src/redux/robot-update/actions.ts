@@ -120,3 +120,7 @@ export function unexpectedRobotUpdateError(message: string): RobotUpdateAction {
 export function setRobotUpdateSeen(robotName: string): RobotUpdateAction {
   return { type: Constants.ROBOTUPDATE_SET_UPDATE_SEEN, meta: { robotName } }
 }
+
+export function downloadRobotUpdate(): RobotUpdateAction {
+  return { type: Constants.ROBOTUPDATE_DOWNLOAD_UPDATE, meta: { shell: true } }
+}

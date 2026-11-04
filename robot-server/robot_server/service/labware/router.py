@@ -10,7 +10,7 @@ from fastapi import Depends, status
 from typing_extensions import Literal, NoReturn
 
 from opentrons_shared_data.errors import ErrorCodes
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 

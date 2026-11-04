@@ -102,7 +102,7 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
 
   const makeHandleCloseWarning = (dismissId?: string | null) => () => {
     console.assert(
-      dismissId,
+      dismissId != null,
       'expected dismissId, Alert cannot dismiss warning'
     )
     if (dismissId) {

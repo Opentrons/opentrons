@@ -12,11 +12,8 @@ from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
     PythonException,
 )
-from hardware_testing.opentrons_api.types import (
-    OT3Mount,
-    Axis,
-    Point,
-)
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )

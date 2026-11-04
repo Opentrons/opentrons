@@ -16,9 +16,9 @@ import * as RobotApi from '/app/redux/robot-api'
 import { useWifiList } from '/app/resources/networking/hooks'
 
 import { JoinOtherNetwork } from './JoinOtherNetwork'
-import { SelectAuthenticationType } from './SelectAuthenticationType'
-import { SetWifiCred } from './SetWifiCred'
+import { WifiAuthenticationSelector } from './WifiAuthenticationSelector'
 import { WifiConnectStatus } from './WifiConnectStatus'
+import { WifiCredentialForm } from './WifiCredentialForm'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
@@ -94,7 +94,7 @@ export function ConnectViaWifi(): JSX.Element {
     )
   } else if (currentOption === 'SelectAuthType') {
     currentScreen = (
-      <SelectAuthenticationType
+      <WifiAuthenticationSelector
         selectedAuthType={selectedAuthType}
         setSelectedAuthType={setSelectedAuthType}
         handleWifiConnect={handleConnect}
@@ -103,7 +103,7 @@ export function ConnectViaWifi(): JSX.Element {
     )
   } else if (currentOption === 'SetWifiCred') {
     currentScreen = (
-      <SetWifiCred
+      <WifiCredentialForm
         password={password}
         setPassword={setPassword}
         setCurrentOption={setCurrentOption}

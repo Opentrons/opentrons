@@ -25,7 +25,7 @@ ruff-check:
 format: 
 	@echo "Running ruff"
 	$(MAKE) ruff
-	@echo "Formatting the readme with yarn prettier"
+	@echo "Formatting the readme with pnpm exec prettier"
 	$(MAKE) format-readme
 
 .PHONY: audit
@@ -53,7 +53,7 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
+	cd .. && pnpm exec prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
 
 .PHONY: snapshot-test
@@ -67,6 +67,14 @@ snapshot-test:
 snapshot-audit-test:
 	@echo "validate that analysis outcome matches the test intention"
 	uv run python -m pytest -k audit_snapshot_test -v --tb=line
+
+.PHONY: ot2-compatibility-test
+ot2-compatibility-test:
+	@echo "verify OT-2 protocols are rejected with a compatibility error"
+	uv run python -m pytest tests/test_ot2_compatibility.py -v --tb=line
+
+.PHONY: snapshot-validation
+snapshot-validation: snapshot-audit-test ot2-compatibility-test
 
 .PHONY: snapshot-test-update
 snapshot-test-update:
@@ -112,12 +120,6 @@ run-flex:
 	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
 	@echo "If you want to run a different version, run 'make run-flex OPENTRONS_VERSION=chore_release-8.0.0'"
 	docker run -p 31950:31950 --env-file ../robot-server/dev-flex.env opentrons-robot-server:$(OPENTRONS_VERSION)
-
-.PHONY: run-ot2
-run-ot2:
-	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
-	@echo "If you want to run a different version, run 'make run-ot2 OPENTRONS_VERSION=chore_release-8.0.0'"
-	docker run -p 31950:31950 --env-file ../robot-server/dev.env opentrons-robot-server:$(OPENTRONS_VERSION)
 
 LIMIT ?= 10
 .PHONY: analyze

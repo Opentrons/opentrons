@@ -56,7 +56,7 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
+def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
@@ -85,8 +85,6 @@ def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> N
 
 
 def _dismiss_migration_modal(page: Page) -> None:
-    """Dismiss the migration modal if it appears during import."""
-
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
     overlay.wait_for(state="visible", timeout=5000)
     if overlay.is_visible():

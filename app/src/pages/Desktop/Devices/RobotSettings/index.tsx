@@ -23,6 +23,7 @@ import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSetti
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useIsRobotBusy, useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
@@ -32,8 +33,9 @@ import {
   REACHABLE,
   UNREACHABLE,
 } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -43,14 +45,18 @@ export function RobotSettings(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
 
   return (
     <ApiHostProvider
       hostname={robot?.ip ?? null}
       port={robot?.port ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
-      <RobotSettingsComponent robot={robot} />
+      <RobotCertRotator>
+        <RobotSettingsComponent robot={robot} />
+      </RobotCertRotator>
     </ApiHostProvider>
   )
 }

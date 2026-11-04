@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react'
+
 import {
   ABSORBANCE_READER_V1,
   fixture96Plate,
@@ -18,7 +21,7 @@ import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
@@ -51,16 +54,16 @@ export default {
   title: 'Library/Molecules/Simulation/Module',
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   model: ModuleModel
   orientation: 'left' | 'right'
   hasLabware: boolean
-  innerProps: {}
+  innerProps: Record<string, unknown>
 }> = args => {
   // Add null check and default to first module model if undefined
-  const moduleModel = args.model || moduleModels[0]
+  const moduleModel: ModuleModel = args.model ?? moduleModels[0]
   const moduleDef = getModuleDef(moduleModel)
-  const labwareDef = args.hasLabware
+  const labwareDef: LabwareDefinition | null = args.hasLabware
     ? (fixture96Plate as LabwareDefinition)
     : null
 

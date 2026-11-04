@@ -67,10 +67,11 @@ export function CalibrationTaskList({
   }
 
   const runHasStarted = useRunHasStarted(runId)
-  if (runHasStarted)
+  if (runHasStarted) {
     generalTaskDisabledReason = t(
       'device_settings:some_robot_controls_are_not_available'
     )
+  }
 
   useEffect(() => {
     if (

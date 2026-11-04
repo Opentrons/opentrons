@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -47,6 +47,7 @@ import {
   useLPCFlows,
 } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
@@ -261,10 +262,13 @@ function PrepareToRun({
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -404,7 +408,16 @@ function PrepareToRun({
     areFixturesReady &&
     !isAnyNecessaryDefaultOffsetMissing &&
     isCameraReadyToRun
-  const onPlay = (): void => {
+
+  const actionsToDocument = useMemo(
+    () => [{ kind: 'PROTOCOL_PLAY' as const }],
+    []
+  )
+  const checkAccessControl = useGuardedAction(actionsToDocument)
+
+  const onPlay = async (): Promise<void> => {
+    if (!(await checkAccessControl())) return
+
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&
@@ -544,9 +557,11 @@ function PrepareToRun({
   }
 
   // Labware information
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    mostRecentAnalysis?.commands ?? []
+  const { offDeckItems, onDeckItems } = useMemo(
+    () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
+
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
 
@@ -819,10 +834,13 @@ export function ProtocolSetup(): JSX.Element {
   }, [mostRecentAnalysis?.status])
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -1077,6 +1095,8 @@ const buildSetupScreenStyle = (
     switch (setupScreen) {
       case 'prepare to run':
         return `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+      case 'view only parameters':
+        return `0 ${SPACING.spacing40} ${SPACING.spacing40}`
       case 'offsets':
       case 'camera':
         return ''

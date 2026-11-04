@@ -30,6 +30,8 @@ interface TipSelectionModalProps {
   showErrorBanner: boolean
   numPickupsRemaining: number
   showReusingTipsBanner: boolean
+  showNoAvailableTipracksBanner: boolean
+  showSelectedTiprackNotValidBanner: boolean
   errorReason: TipSelectionBannerReason | null
 }
 
@@ -46,6 +48,8 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     showErrorBanner,
     numPickupsRemaining,
     showReusingTipsBanner,
+    showNoAvailableTipracksBanner,
+    showSelectedTiprackNotValidBanner,
     errorReason,
   } = props
   const { t } = useTranslation('tip_selection')
@@ -73,6 +77,24 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
           hug
         />
       ) : null}
+      {showNoAvailableTipracksBanner && currentStepIndex === 0 ? (
+        <InlineNotification
+          type="error"
+          heading={t('no_valid_tips_available.title')}
+          message={t('no_valid_tips_available.body')}
+          hug
+        />
+      ) : null}
+      {!showNoAvailableTipracksBanner &&
+      showSelectedTiprackNotValidBanner &&
+      currentStepIndex === 0 ? (
+        <InlineNotification
+          type="alert"
+          heading={t('selected_tiprack_not_valid.title')}
+          message={t('selected_tiprack_not_valid.body')}
+          hug
+        />
+      ) : null}
       {(errorReason == null || !showErrorBanner) &&
       showReusingTipsBanner &&
       currentStepIndex === 1 ? (
@@ -85,7 +107,9 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
       {showBackButton ? (
         <SecondaryButton onClick={onBack}>{t('go_back')}</SecondaryButton>
       ) : null}
-      <PrimaryButton onClick={onContinue}>{continueText}</PrimaryButton>
+      <div className={styles.modal_footer_continue}>
+        <PrimaryButton onClick={onContinue}>{continueText}</PrimaryButton>
+      </div>
     </div>
   )
 

@@ -19,21 +19,36 @@ import type { TipType } from '../types'
 interface TipStatusProps {
   type: TipType
   wellMap: LabwareWellMap
-  size?: string
+  wellName: string
+  size: string
   text?: string
 }
 
 export function TipStatus(props: TipStatusProps): JSX.Element {
-  const { type, size, text, wellMap } = props
+  const { type, size, text, wellMap, wellName } = props
   switch (type) {
     case NEW:
-      return <NewTip size={size} />
+      return <NewTip size={size} wellName={wellName} />
     case USED:
-      return <UsedTip size={size} />
+      return <UsedTip size={size} wellName={wellName} />
     case SELECTED:
-      return <SelectedWell size={size} textInsideTip={text} wellMap={wellMap} />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          wellMap={wellMap}
+          wellName={wellName}
+        />
+      )
     case NO:
-      return <EmptyWell size={size} wellMap={wellMap} parentType={LABWARE} />
+      return (
+        <EmptyWell
+          size={size}
+          wellMap={wellMap}
+          parentType={LABWARE}
+          wellName={wellName}
+        />
+      )
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
@@ -43,6 +58,7 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
           textInsideTip={text}
           isUsed
           wellMap={wellMap}
+          wellName={wellName}
         />
       )
     case SELECTED_ERROR:
@@ -52,6 +68,7 @@ export function TipStatus(props: TipStatusProps): JSX.Element {
           textInsideTip={text}
           isError
           wellMap={wellMap}
+          wellName={wellName}
         />
       )
   }
