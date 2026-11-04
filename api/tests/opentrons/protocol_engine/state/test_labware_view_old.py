@@ -862,11 +862,11 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV6) -> None:
+def test_get_deck_definition(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should get the deck definition from the state."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
+    subject = get_labware_view(deck_definition=ot3_standard_deck_def)
 
-    assert subject.get_deck_definition() == ot2_standard_deck_def
+    assert subject.get_deck_definition() == ot3_standard_deck_def
 
 
 def test_get_labware_offset_vector() -> None:

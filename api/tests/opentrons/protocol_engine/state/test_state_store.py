@@ -47,7 +47,7 @@ def engine_config() -> Config:
 @pytest.fixture
 def subject(
     change_notifier: ChangeNotifier,
-    ot2_standard_deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
@@ -57,7 +57,7 @@ def subject(
 
     return StateStore(
         config=engine_config,
-        deck_definition=ot2_standard_deck_def,
+        deck_definition=ot3_standard_deck_def,
         robot_definition={
             "displayName": "OT-2",
             "robotType": "OT-2 Standard",

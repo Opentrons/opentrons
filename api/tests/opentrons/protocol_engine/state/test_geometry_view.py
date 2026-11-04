@@ -493,7 +493,6 @@ def test_module_calibration_offset_rotation(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
-    ot2_standard_deck_def: DeckDefinitionV6,
     subject: GeometryView,
 ) -> None:
     """Return the rotated module calibration offset if the module was moved from one side of the deck to the other."""
@@ -651,7 +650,7 @@ def test_get_module_labware_highest_z(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -687,7 +686,7 @@ def test_get_module_labware_highest_z(
         sentinel.module_definition
     )
     decoy.when(mock_labware_view.get_deck_definition()).then_return(
-        ot2_standard_deck_def
+        ot3_standard_deck_def
     )
     decoy.when(mock_module_view.get_height_over_labware("module-id")).then_return(0.5)
     decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
@@ -1008,7 +1007,7 @@ def test_get_highest_z_in_slot_with_single_module(
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    ot2_standard_deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the highest Z in slot with just a single module."""
     # Case: Slot has a module that doesn't have any labware on it. Highest z is equal to module height.
@@ -1025,7 +1024,7 @@ def test_get_highest_z_in_slot_with_single_module(
         errors.LabwareNotLoadedOnModuleError("only module")
     )
     decoy.when(mock_labware_view.get_deck_definition()).then_return(
-        ot2_standard_deck_def
+        ot3_standard_deck_def
     )
     decoy.when(
         mock_module_view.get_module_highest_z(
@@ -1122,7 +1121,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV6,
     subject: GeometryView,
 ) -> None:
     """It should get the highest z in slot of labware on module.
@@ -1364,7 +1362,6 @@ def test_get_module_labware_base_well_position(
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV6,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""

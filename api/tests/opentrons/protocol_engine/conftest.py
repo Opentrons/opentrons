@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5, DeckDefinitionV6
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -23,10 +21,7 @@ from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 
 
 @pytest.fixture
@@ -43,12 +38,6 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
     api = decoy.mock(cls=OT3API)
     decoy.when(api.get_robot_type()).then_return(FlexRobotType)
     return api
-
-
-@pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
 
 
 @pytest.fixture(scope="session")
