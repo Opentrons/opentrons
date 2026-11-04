@@ -370,9 +370,21 @@ export function RunSummary(): ReactNode {
     }
   }
 
+  const startWithTipCheck = (
+    cb: (pipette: PipetteWithTip | null) => void
+  ): void => {
+    if (isPromptDismissed) {
+      cb(null)
+      return
+    }
+    void determineTipStatus().then(pipettes => {
+      cb(pipettes[0] ?? null)
+    })
+  }
+
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
     setShowReturnToSpinner(true)
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         onTipsHandled: probeThenRoute(handleReturnToDash),
         robotName,
@@ -391,7 +403,7 @@ export function RunSummary(): ReactNode {
   }
 
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         onTipsHandled: probeThenRoute(handleRunAgain),
         robotName,
@@ -582,7 +594,7 @@ export function RunSummary(): ReactNode {
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
-                handleReturnToDash(aPipetteWithTip)
+                startWithTipCheck(handleReturnToDash)
               }}
               buttonText={
                 showReturnToSpinner
@@ -594,7 +606,7 @@ export function RunSummary(): ReactNode {
             <EqualWidthButton
               iconName="play-round-corners"
               onClick={() => {
-                handleRunAgain(aPipetteWithTip)
+                startWithTipCheck(handleRunAgain)
               }}
               buttonText={
                 showRunAgainSpinner
