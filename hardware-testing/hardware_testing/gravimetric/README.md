@@ -1,5 +1,10 @@
 #Running Pipette accuracy tests
 
+## Gripper stacker offset calibration
+
+For keyboard calibration of all 80 stacker/deck routes, see the
+[offset calibration guide](offset_calibration/README.md).
+
 ## Before pushing to the robot
 
 These tests need some special patches applied to the main source code in order to work as intended.

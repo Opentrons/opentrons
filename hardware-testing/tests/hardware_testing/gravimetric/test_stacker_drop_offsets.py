@@ -49,6 +49,7 @@ def offset_loader(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Loader:
 
     files = {
         "env": tmp_path / "custom" / _FILENAME,
+        "calibration": tmp_path / "data" / "gravimetric" / _FILENAME,
         "protocol": tmp_path / "uploaded" / _FILENAME,
         "package": tmp_path / "installed" / "protocol_replacement" / _FILENAME,
         "legacy": tmp_path
@@ -91,7 +92,25 @@ def _write_offsets(path: Path, value: float) -> None:
     "available,protocol_file,env_file,selected",
     [
         pytest.param(
-            ["env", "protocol", "package", "legacy"], True, True, "env", id="explicit"
+            ["env", "calibration", "protocol", "package", "legacy"],
+            True,
+            True,
+            "env",
+            id="explicit",
+        ),
+        pytest.param(
+            ["calibration", "protocol", "package", "legacy"],
+            True,
+            False,
+            "calibration",
+            id="persistent-calibration",
+        ),
+        pytest.param(
+            ["calibration", "package", "legacy"],
+            False,
+            False,
+            "calibration",
+            id="calibration-without-protocol-file",
         ),
         pytest.param(
             ["protocol", "package", "legacy"], True, False, "protocol", id="sibling"

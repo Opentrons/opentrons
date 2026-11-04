@@ -2360,9 +2360,10 @@ DECK_TO_STACKER_DROP_OFFSET_SOURCES = [
 # Robot-specific tuning can be provided by gravimetric_stacker_drop_offsets.json.
 # Search order:
 # 1. GRAVIMETRIC_STACKER_DROP_OFFSETS_CONFIG environment variable.
-# 2. A file next to this protocol when __file__ is available.
-# 3. The protocol_replacement directory in the imported gravimetric package.
-# 4. infer_config_base_dir()/hardware_testing/gravimetric/protocol_replacement.
+# 2. infer_config_base_dir()/gravimetric (persistent machine calibration).
+# 3. A file next to this protocol when __file__ is available.
+# 4. The protocol_replacement directory in the imported gravimetric package.
+# 5. infer_config_base_dir()/hardware_testing/gravimetric/protocol_replacement.
 #
 # Expected JSON shape:
 # {
@@ -2432,6 +2433,13 @@ def _stacker_drop_offsets_config_paths() -> List[str]:
     env_path = os.environ.get("GRAVIMETRIC_STACKER_DROP_OFFSETS_CONFIG")
     if env_path:
         paths.append(env_path)
+    paths.append(
+        os.path.join(
+            str(infer_config_base_dir()),
+            "gravimetric",
+            STACKER_DROP_OFFSETS_CONFIG_FILE,
+        )
+    )
     protocol_file = globals().get("__file__")
     if protocol_file:
         paths.append(
