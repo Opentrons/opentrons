@@ -50,7 +50,6 @@ packages = ["hardware_testing"]
 exclude = [
     "abr_tools",
     "examples",
-    "gravimetric",
     "labware",
     "legacy_tests",
     "modules",
