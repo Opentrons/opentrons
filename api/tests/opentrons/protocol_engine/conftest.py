@@ -24,7 +24,6 @@ from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
 from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
@@ -53,12 +52,6 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 def ot2_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
     return load_deck(STANDARD_OT2_DECK, 5)
-
-
-@pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 short-trash deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 5)
 
 
 @pytest.fixture(scope="session")

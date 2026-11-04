@@ -40,8 +40,8 @@ def engine_config() -> Config:
     """Get a ProtocolEngine config value object."""
     return Config(
         # Choice of robot and deck type is arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 

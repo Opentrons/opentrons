@@ -1,12 +1,12 @@
 """Test deck configuration provider."""
 
-from typing import List, Set
+from typing import Set
 
 import pytest
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5, DeckDefinitionV6
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
 )
@@ -30,12 +30,10 @@ from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName
 
 
-
 @pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-2 standard deck definition."""
     return load_deck(STANDARD_OT3_DECK, 6)
-
 
 
 def test_get_cutout_position(
@@ -55,13 +53,14 @@ def test_get_cutout_position_raises(
         subject.get_cutout_position("theFunCutout", ot3_standard_deck_def)
 
 
-
 def test_get_cutout_fixture(
     ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the cutout fixture given the cutout fixture id."""
     expected_display_name = "Standard Slot Right"
-    cutout_fixture = subject.get_cutout_fixture("singleRightSlot", ot3_standard_deck_def)
+    cutout_fixture = subject.get_cutout_fixture(
+        "singleRightSlot", ot3_standard_deck_def
+    )
     assert cutout_fixture["displayName"] == expected_display_name
 
 
