@@ -3,7 +3,7 @@ from .types import APIVersion
 MAX_SUPPORTED_VERSION = APIVersion(2, 31)
 """The maximum supported protocol API version in this release."""
 
-MIN_SUPPORTED_VERSION = APIVersion(2, 0)
+MIN_SUPPORTED_VERSION = APIVersion(2, 15)
 """The minimum supported protocol API version in this release, across all robot types."""
 
 MIN_SUPPORTED_VERSION_FOR_FLEX = APIVersion(2, 15)

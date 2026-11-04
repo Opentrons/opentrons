@@ -31,7 +31,10 @@ from opentrons.protocol_engine.clients import ChildThreadTransport, SyncClient
 from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash_area_for_python_protocol,
 )
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.definitions import (
+    MAX_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.util.broker import Broker
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
@@ -44,7 +47,7 @@ class ProtocolEngineCoreRequiredError(Exception):
     """
 
 
-def create_protocol_context(
+def create_protocol_context(  # noqa: C901
     api_version: APIVersion,
     *,
     hardware_api: Union[HardwareControlAPI, ThreadManager[HardwareControlAPI]],
@@ -90,6 +93,13 @@ def create_protocol_context(
             f"API version {api_version} is not supported by this robot software."
             f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"
             f" or update your robot."
+        )
+
+    if api_version < MIN_SUPPORTED_VERSION:
+        raise ValueError(
+            f"API version {api_version} is not supported by this robot software."
+            f" Please increase your API version to {MIN_SUPPORTED_VERSION} or above"
+            f" or downgrade your robot."
         )
 
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
