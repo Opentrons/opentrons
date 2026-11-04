@@ -1029,26 +1029,13 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
         module_addressable_area = self.get_provided_addressable_area(module_id)
         module_addressable_area_position = (
             addressable_areas.get_addressable_area_offsets_from_cutout(
                 module_addressable_area
             )
         )
-        return base + module_addressable_area_position
-
-    def get_nominal_offset_to_child_from_addressable_area(
-        self, module_id: str
-    ) -> Point:
-        """Get the position offset for a child of this module from the nearest AA.
-
-        On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
-        of addressable areas rather than providing addressable areas, the offset is
-        the labwareOffset from the module definition, rotated by the module's
-        slotTransform if appropriate.
-        """
-        return Point(0, 0, 0)
+        return module_addressable_area_position
 
     def get_module_calibration_offset(
         self, module_id: str

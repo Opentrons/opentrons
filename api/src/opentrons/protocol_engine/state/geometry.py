@@ -437,12 +437,7 @@ class GeometryView:
 
         while True:
             if isinstance(current_location, ModuleLocation):
-                module_parent_to_child_offset = (
-                    self._modules.get_nominal_offset_to_child_from_addressable_area(
-                        module_id=current_location.moduleId,
-                    )
-                )
-                return module_parent_to_child_offset
+                return Point(0, 0, 0)
 
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId

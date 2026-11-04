@@ -695,11 +695,6 @@ def test_get_module_labware_highest_z(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
     )
-    decoy.when(
-        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
-            module_id="module-id"
-        )
-    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
     )
@@ -1164,11 +1159,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     decoy.when(mock_labware_view.get_id_by_labware("top-labware-id")).then_raise(
         errors.LabwareNotLoadedOnLabwareError("top labware")
     )
-    decoy.when(
-        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
-            module_id="module-id"
-        )
-    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
         "magneticModuleV2Slot3"
     )
@@ -1397,11 +1387,6 @@ def test_get_module_labware_base_well_position(
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(
-        mock_module_view.get_nominal_offset_to_child_from_addressable_area(
-            module_id="module-id"
-        )
-    ).then_return(Point(x=0, y=0, z=0))
     decoy.when(mock_module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetData(
             moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
