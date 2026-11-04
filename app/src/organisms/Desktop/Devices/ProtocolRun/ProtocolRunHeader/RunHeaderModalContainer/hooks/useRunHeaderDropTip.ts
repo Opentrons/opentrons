@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -59,23 +59,41 @@ export function useRunHeaderDropTip({
     aPipetteWithTip,
   } = useTipAttachmentStatus()
 
+  const [isCheckingTips, setIsCheckingTips] = useState(false)
+  const [wizardPipette, setWizardPipette] = useState<PipetteWithTip | null>(
+    null
+  )
+
   const dismissDropTipPrompt = useCallback((): void => {
     dispatch(setDropTipPromptDismissed(runId))
   }, [dispatch, runId])
 
   const checkTipStatus = useCallback((): void => {
     void determineTipStatus().then(pipettesWithTip => {
+      setIsCheckingTips(false)
       if (pipettesWithTip.length === 0) {
         dismissDropTipPrompt()
       }
     })
   }, [determineTipStatus, dismissDropTipPrompt])
 
+  const openWizard = (): void => {
+    if (aPipetteWithTip == null) {
+      return
+    }
+    setWizardPipette(aPipetteWithTip)
+    enableDTWiz()
+  }
+
   const dropTipModalUtils = useProtocolDropTipModal({
     hasPipetteWithTip:
-      aPipetteWithTip != null && isMostRecentRun && !isPromptDismissed,
+      aPipetteWithTip != null &&
+      isMostRecentRun &&
+      !isPromptDismissed &&
+      !isCheckingTips,
     isPromptDismissed,
-    enableDTWiz,
+    isWizardActive: showDTWiz || wizardPipette != null,
+    enableDTWiz: openWizard,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
     is96Channel: aPipetteWithTip?.specs.channels === 96,
     onSkipAndHome: () => {
@@ -86,17 +104,19 @@ export function useRunHeaderDropTip({
 
   const onCloseFlow = (): void => {
     disableDTWiz()
+    setWizardPipette(null)
+    setIsCheckingTips(true)
     checkTipStatus()
   }
 
   const buildDTWizUtils = (): RunHeaderDropTipWizProps => {
-    return showDTWiz && aPipetteWithTip != null
+    return showDTWiz && wizardPipette != null
       ? {
           showDTWiz: true,
           dtWizProps: {
             robotType,
-            mount: aPipetteWithTip.mount,
-            instrumentModelSpecs: aPipetteWithTip.specs,
+            mount: wizardPipette.mount,
+            instrumentModelSpecs: wizardPipette.specs,
             closeFlow: onCloseFlow,
             modalStyle: 'simple',
           },
@@ -112,7 +132,8 @@ export function useRunHeaderDropTip({
     } else if (
       isMostRecentRun &&
       !isPromptDismissed &&
-      isRunTerminatingOrTerminal
+      isRunTerminatingOrTerminal &&
+      !showDTWiz
     ) {
       checkTipStatus()
     }
@@ -121,6 +142,7 @@ export function useRunHeaderDropTip({
     isMostRecentRun,
     isPromptDismissed,
     isRunTerminatingOrTerminal,
+    showDTWiz,
     checkTipStatus,
     resetTipStatus,
   ])

@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import { useHomePipettes } from '/app/local-resources/instruments'
 
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
@@ -11,6 +9,7 @@ type UseProtocolDropTipModalProps = Pick<
 > & {
   hasPipetteWithTip: boolean
   isPromptDismissed: boolean
+  isWizardActive: boolean
   enableDTWiz: () => void
   onSkipAndHome: () => void
   is96Channel?: boolean
@@ -27,32 +26,19 @@ export type UseProtocolDropTipModalResult =
 export function useProtocolDropTipModal({
   hasPipetteWithTip,
   isPromptDismissed,
+  isWizardActive,
   enableDTWiz,
   onSkipAndHome,
   pipetteInfo,
   is96Channel = false,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
-  const [showModal, setShowModal] = useState(
-    hasPipetteWithTip && !isPromptDismissed
-  )
-
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
-    onSuccess: () => {
-      setShowModal(false)
-      onSkipAndHome()
-    },
+    onSuccess: onSkipAndHome,
   })
 
-  useEffect(() => {
-    if (isPromptDismissed) {
-      setShowModal(false)
-      return
-    }
-    if (!isHoming) {
-      setShowModal(hasPipetteWithTip)
-    }
-  }, [hasPipetteWithTip, isPromptDismissed, isHoming])
+  const showModal =
+    hasPipetteWithTip && !isPromptDismissed && !isWizardActive
 
   const onSkip = (): void => {
     void homePipettes()
@@ -60,7 +46,6 @@ export function useProtocolDropTipModal({
 
   const onBeginRemoval = (): void => {
     enableDTWiz()
-    setShowModal(false)
   }
 
   return showModal

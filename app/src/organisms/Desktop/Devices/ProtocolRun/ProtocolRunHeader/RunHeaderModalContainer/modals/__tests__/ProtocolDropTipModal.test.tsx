@@ -21,6 +21,7 @@ describe('useProtocolDropTipModal', () => {
     props = {
       hasPipetteWithTip: true,
       isPromptDismissed: false,
+      isWizardActive: false,
       enableDTWiz: vi.fn(),
       onSkipAndHome: vi.fn(),
       pipetteInfo: {
@@ -101,7 +102,7 @@ describe('useProtocolDropTipModal', () => {
     expect(mockHomePipettes).toHaveBeenCalled()
   })
 
-  it('should dismiss the modal and call onSkipAndHome on home success', () => {
+  it('should call onSkipAndHome on home success', () => {
     let onSuccess: (() => void) | undefined
     vi.mocked(useHomePipettes).mockImplementation(homeProps => {
       onSuccess = homeProps.onSuccess
@@ -111,16 +112,29 @@ describe('useProtocolDropTipModal', () => {
       }
     })
 
-    const { result } = renderHook(() => useProtocolDropTipModal(props))
-
-    expect(result.current.showModal).toBe(true)
+    renderHook(() => useProtocolDropTipModal(props))
 
     act(() => {
       onSuccess?.()
     })
 
-    expect(result.current.showModal).toBe(false)
     expect(props.onSkipAndHome).toHaveBeenCalled()
+  })
+
+  it('should hide the modal while the drop tip wizard is open and show it again after', () => {
+    const { result, rerender } = renderHook(
+      ({ isWizardActive }) =>
+        useProtocolDropTipModal({ ...props, isWizardActive }),
+      { initialProps: { isWizardActive: false } }
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    rerender({ isWizardActive: true })
+    expect(result.current.showModal).toBe(false)
+
+    rerender({ isWizardActive: false })
+    expect(result.current.showModal).toBe(true)
   })
 
   it('should call toggleDTWiz when onDTModalRemoval is called', () => {
