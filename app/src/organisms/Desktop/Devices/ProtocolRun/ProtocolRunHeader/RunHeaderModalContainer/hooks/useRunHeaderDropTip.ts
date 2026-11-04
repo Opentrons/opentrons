@@ -2,9 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminatingOrTerminal } from '/app/local-resources/runs/utils'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import {
@@ -12,7 +10,7 @@ import {
   setDropTipPromptDismissed,
 } from '/app/redux/protocol-runs'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
-import { useMostRecentRunId, useRunCommands } from '/app/resources/runs'
+import { useMostRecentRunId } from '/app/resources/runs'
 
 import { useProtocolDropTipModal } from '../modals'
 
@@ -99,19 +97,6 @@ export function useRunHeaderDropTip({
   }
 
   const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
-  const { data } = useErrorRecoverySettings()
-  const isEREnabled = data?.data.enabled ?? true
-  const runSummaryNoFixit = useRunCommands(
-    runId,
-    {
-      includeFixitCommands: false,
-      pageLength: 1,
-    },
-    { enabled: isRunTerminatingOrTerminal }
-  )
-  const tipCheckSkippedBecauseER =
-    runSummaryNoFixit != null &&
-    lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
 
   useEffect(() => {
     if (runStatus === RUN_STATUS_IDLE) {
@@ -119,8 +104,6 @@ export function useRunHeaderDropTip({
     } else if (
       isMostRecentRun &&
       !isPromptDismissed &&
-      runSummaryNoFixit != null &&
-      !tipCheckSkippedBecauseER &&
       isRunTerminatingOrTerminal
     ) {
       checkTipStatus()
@@ -130,8 +113,6 @@ export function useRunHeaderDropTip({
     isMostRecentRun,
     isPromptDismissed,
     isRunTerminatingOrTerminal,
-    runSummaryNoFixit,
-    tipCheckSkippedBecauseER,
     checkTipStatus,
     resetTipStatus,
   ])

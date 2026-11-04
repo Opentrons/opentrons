@@ -35,7 +35,6 @@ import {
 } from '@opentrons/components'
 import {
   useAccessControlEnabledQuery,
-  useErrorRecoverySettings,
   useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
@@ -43,7 +42,6 @@ import {
 
 import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
@@ -65,6 +63,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { selectDropTipPromptDismissed } from '/app/redux/protocol-runs'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
@@ -72,7 +71,6 @@ import {
   EMPTY_TIMESTAMP,
   formatTimeWithUtcLabel,
   useCloseCurrentRun,
-  useCurrentRunCommands,
   useIsRunCurrent,
   useNotifyRunQuery,
   useRunCreatedAtTimestamp,
@@ -286,28 +284,19 @@ export function RunSummary(): ReactNode {
   }
 
   const { determineTipStatus, aPipetteWithTip } = useTipAttachmentStatus()
-  const { data } = useErrorRecoverySettings()
-  const isEREnabled = data?.data.enabled ?? true
-  const runSummaryNoFixit = useCurrentRunCommands({
-    includeFixitCommands: false,
-    pageLength: 1,
-  })
-  const tipCheckSkippedBecauseER =
-    runSummaryNoFixit != null &&
-    lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
+  const isPromptDismissed = useSelector(selectDropTipPromptDismissed(runId))
 
   useEffect(
     () => {
-      // Only run tip checking if it wasn't *just* handled during Error Recovery.
-      if (runSummaryNoFixit != null && !tipCheckSkippedBecauseER) {
-        void determineTipStatus().then(() => {
-          setHasCheckedTips(true)
-        })
+      if (isPromptDismissed) {
+        setHasCheckedTips(true)
+        return
       }
+      void determineTipStatus().then(() => {
+        setHasCheckedTips(true)
+      })
     },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isRunCurrent, runSummaryNoFixit, isEREnabled]
+    [isPromptDismissed]
   )
 
   // After splash tap, dim while network requests are in flight. Close if no
@@ -319,21 +308,25 @@ export function RunSummary(): ReactNode {
       if (!splashClicked) {
         return
       }
+
       if (!isRunCurrent) {
         setShowSplash(false)
         setSplashClicked(false)
         return
       }
-      if (!hasCheckedTips && !tipCheckSkippedBecauseER) {
+
+      if (!hasCheckedTips && !isPromptDismissed) {
         return
       }
-      if (aPipetteWithTip == null || tipCheckSkippedBecauseER) {
+
+      if (aPipetteWithTip == null || isPromptDismissed) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
           setSplashClicked(false)
         })
         return
       }
+      
       setShowSplash(false)
       setSplashClicked(false)
     },
@@ -343,7 +336,7 @@ export function RunSummary(): ReactNode {
       isRunCurrent,
       hasCheckedTips,
       aPipetteWithTip,
-      tipCheckSkippedBecauseER,
+      isPromptDismissed,
     ]
   )
 
