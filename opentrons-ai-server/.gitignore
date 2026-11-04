@@ -18,3 +18,5 @@ api/storage/api_docs/.api-level
 api/storage/api_docs/scripts/
 ai-server/
 .venv/
+tmp/
+*.tar.zst
