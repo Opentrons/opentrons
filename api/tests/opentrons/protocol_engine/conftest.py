@@ -28,9 +28,6 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
@@ -58,22 +55,6 @@ def ot2_standard_deck_def() -> DeckDefinitionV5:
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-3 standard deck definition."""
     return load_deck(STANDARD_OT3_DECK, 6)
-
-
-@pytest.fixture(scope="session")
-def ot2_fixed_trash_def() -> LabwareDefinition:
-    """Get the definition of the OT-2 standard fixed trash."""
-    return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_1_trash_1100ml_fixed", 1)
-    )
-
-
-@pytest.fixture(scope="session")
-def ot2_short_fixed_trash_def() -> LabwareDefinition:
-    """Get the definition of the OT-2 short fixed trash."""
-    return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_1_trash_850ml_fixed", 1)
-    )
 
 
 @pytest.fixture(scope="session")
