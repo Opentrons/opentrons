@@ -283,21 +283,19 @@ export function RunSummary(): ReactNode {
     ) : null
   }
 
-  const { determineTipStatus, aPipetteWithTip } = useTipAttachmentStatus()
+  const { determineTipStatus, skipCurrentPipette, aPipetteWithTip } =
+    useTipAttachmentStatus()
   const isPromptDismissed = useSelector(selectDropTipPromptDismissed(runId))
 
-  useEffect(
-    () => {
-      if (isPromptDismissed) {
-        setHasCheckedTips(true)
-        return
-      }
-      void determineTipStatus().then(() => {
-        setHasCheckedTips(true)
-      })
-    },
-    [isPromptDismissed]
-  )
+  useEffect(() => {
+    if (isPromptDismissed) {
+      setHasCheckedTips(true)
+      return
+    }
+    void determineTipStatus().then(() => {
+      setHasCheckedTips(true)
+    })
+  }, [isPromptDismissed])
 
   // After splash tap, dim while network requests are in flight. Close if no
   // tips need handling so desktop does not auto-document a second dismiss.
@@ -326,7 +324,7 @@ export function RunSummary(): ReactNode {
         })
         return
       }
-      
+
       setShowSplash(false)
       setSplashClicked(false)
     },
@@ -367,8 +365,11 @@ export function RunSummary(): ReactNode {
 
   const probeThenRoute = (
     routeCb: (aPipetteWithTip: PipetteWithTip | null) => void
-  ): (() => void) => {
-    return () => {
+  ): ((didSkip: boolean) => void) => {
+    return didSkip => {
+      if (didSkip) {
+        skipCurrentPipette()
+      }
       void determineTipStatus().then(pipettes => {
         routeCb(pipettes[0] ?? null)
       })

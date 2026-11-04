@@ -144,4 +144,24 @@ describe('useTipAttachmentStatus', () => {
 
     expect(result.current.aPipetteWithTip?.mount).toBe('left')
   })
+
+  it('should advance to the next pipette after skipCurrentPipette', async () => {
+    const { result } = renderTipAttachmentStatus()
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.aPipetteWithTip?.mount).toBe('left')
+
+    act(() => {
+      result.current.skipCurrentPipette()
+    })
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.aPipetteWithTip?.mount).toBe('right')
+  })
 })

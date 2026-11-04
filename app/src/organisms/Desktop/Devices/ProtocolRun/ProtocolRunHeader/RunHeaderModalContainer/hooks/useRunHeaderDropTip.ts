@@ -52,8 +52,12 @@ export function useRunHeaderDropTip({
 
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
 
-  const { determineTipStatus, resetTipStatus, aPipetteWithTip } =
-    useTipAttachmentStatus()
+  const {
+    determineTipStatus,
+    resetTipStatus,
+    skipCurrentPipette,
+    aPipetteWithTip,
+  } = useTipAttachmentStatus()
 
   const dismissDropTipPrompt = useCallback((): void => {
     dispatch(setDropTipPromptDismissed(runId))
@@ -73,7 +77,10 @@ export function useRunHeaderDropTip({
     isPromptDismissed,
     enableDTWiz,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
-    onSkipAndHome: dismissDropTipPrompt,
+    onSkipAndHome: () => {
+      skipCurrentPipette()
+      checkTipStatus()
+    },
   })
 
   const onCloseFlow = (): void => {

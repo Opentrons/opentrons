@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import head from 'lodash/head'
 
 import { getInstruments } from '@opentrons/api-client'
@@ -27,6 +27,8 @@ export interface TipAttachmentStatusResult {
   determineTipStatus: () => Promise<PipetteWithTip[]>
   /* Resets the cached pipettes with tip statuses to null.  */
   resetTipStatus: () => void
+  /* Ignore the current pipette on the next probe so skip can advance to another mount. */
+  skipCurrentPipette: () => void
   /* Relevant pipette information for a pipette with a tip attached. If both pipettes have tips attached, return the left pipette. */
   aPipetteWithTip: PipetteWithTip | null
 }
@@ -37,8 +39,18 @@ const MOUNT_ORDER: Record<Mount, number> = { left: 0, right: 1 }
 export function useTipAttachmentStatus(): TipAttachmentStatusResult {
   const host = useHost()
   const [pipettesWithTip, setPipettesWithTip] = useState<PipetteWithTip[]>([])
+  const skippedMountsRef = useRef<Mount[]>([])
+  const currentPipetteRef = useRef<PipetteWithTip | null>(null)
 
   const aPipetteWithTip = head(pipettesWithTip) ?? null
+  currentPipetteRef.current = aPipetteWithTip
+
+  const skipCurrentPipette = (): void => {
+    const mount = currentPipetteRef.current?.mount
+    if (mount != null && !skippedMountsRef.current.includes(mount)) {
+      skippedMountsRef.current = [...skippedMountsRef.current, mount]
+    }
+  }
 
   const determineTipStatus = useCallback((): Promise<PipetteWithTip[]> => {
     return getInstruments(host!)
@@ -50,13 +62,13 @@ export function useTipAttachmentStatus(): TipAttachmentStatusResult {
           mount: pipetteInfo.mount,
           hasTip: pipetteInfo.state?.tipDetected === true,
         }))
-        const pipettesWithTipAndSpecs = filterPipettesWithTips(
-          pipettesWithTipsData
-        ).sort((a, b) => MOUNT_ORDER[a.mount] - MOUNT_ORDER[b.mount])
+        const remaining = filterPipettesWithTips(pipettesWithTipsData)
+          .sort((a, b) => MOUNT_ORDER[a.mount] - MOUNT_ORDER[b.mount])
+          .filter(pipette => !skippedMountsRef.current.includes(pipette.mount))
 
-        setPipettesWithTip(pipettesWithTipAndSpecs)
+        setPipettesWithTip(remaining)
 
-        return Promise.resolve(pipettesWithTipAndSpecs)
+        return Promise.resolve(remaining)
       })
       .catch(e => {
         console.error(`Error during tip status check: ${e.message}`)
@@ -66,11 +78,13 @@ export function useTipAttachmentStatus(): TipAttachmentStatusResult {
 
   const resetTipStatus = (): void => {
     setPipettesWithTip([])
+    skippedMountsRef.current = []
   }
 
   return {
     determineTipStatus,
     resetTipStatus,
+    skipCurrentPipette,
     aPipetteWithTip,
   }
 }

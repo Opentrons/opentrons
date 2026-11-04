@@ -26,7 +26,7 @@ import type { PipetteDetails } from '/app/resources/maintenance_runs'
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
   aPipetteWithTip: PipetteWithTip
   robotName: string | null
-  onTipsHandled: () => void
+  onTipsHandled: (didSkip: boolean) => void
 }
 
 export const handleTipsAttachedModal = (
@@ -53,7 +53,7 @@ const TipsAttachedModal = NiceModal.create(
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
       onSuccess: () => {
         modal.remove()
-        onTipsHandled()
+        onTipsHandled(true)
       },
     })
 
@@ -72,7 +72,7 @@ const TipsAttachedModal = NiceModal.create(
 
       if (!isTakeover) {
         modal.remove()
-        onTipsHandled()
+        onTipsHandled(false)
       }
     }
 
