@@ -7,18 +7,18 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { usePipetteModelSpecs } from '/app/local-resources/instruments'
-import { OddModal } from '/app/molecules/OddModal'
 
 import type { ReactNode } from 'react'
 import type { InstrumentData, PipetteData } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
@@ -53,9 +53,9 @@ export function UpdateResultsModal(props: UpdateResultsModalProps): ReactNode {
       {!isSuccess ? (
         <OddModal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
+            <StyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
               {t('branded:firmware_update_download_logs')}
-            </LegacyStyledText>
+            </StyledText>
             <SmallButton
               onClick={onClose}
               buttonText={
@@ -92,14 +92,14 @@ export function UpdateResultsModal(props: UpdateResultsModalProps): ReactNode {
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 forwardedAs="p"
                 textAlign={TYPOGRAPHY.textAlignCenter}
               >
@@ -113,7 +113,7 @@ export function UpdateResultsModal(props: UpdateResultsModalProps): ReactNode {
                     bold: <strong />,
                   }}
                 />
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             <SmallButton
               onClick={onClose}

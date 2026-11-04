@@ -14,14 +14,14 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { ACTIONS } from './constants'
 
 import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { CutoutConfig } from '@opentrons/shared-data'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,

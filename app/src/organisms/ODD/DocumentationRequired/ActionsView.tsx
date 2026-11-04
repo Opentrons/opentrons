@@ -3,7 +3,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { COLORS, Z_INDEX } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'

@@ -22,10 +22,11 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 
 def _get_all_liquid_classes() -> List[str]:
     return [
-        deffile.stem
-        for deffile in (
+        liquid_class_dir.stem
+        for liquid_class_dir in (
             get_shared_data_root() / "liquid-class" / "definitions" / "1"
         ).iterdir()
+        if liquid_class_dir.is_dir()
     ]
 
 

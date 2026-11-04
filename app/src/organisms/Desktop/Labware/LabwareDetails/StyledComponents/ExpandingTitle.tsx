@@ -7,12 +7,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { ReactNode } from 'react'
 
@@ -35,12 +35,9 @@ export function ExpandingTitle(props: ExpandingTitleProps): ReactNode {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {label}
-        </LegacyStyledText>
+        </StyledText>
         {diagram != null && (
           <Link role="button" onClick={toggleDiagramVisible}>
             <Icon

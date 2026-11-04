@@ -8,13 +8,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
@@ -51,13 +51,13 @@ export function UpdateInProgressModal(
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
-        </LegacyStyledText>
+        </StyledText>
         <Icon
           name="ot-spinner"
           aria-label="spinner"

@@ -1,5 +1,6 @@
 """Tests for robot_server.commands.router."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -7,7 +8,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import (
     CommandPointer,
-    CommandSlice,
+    JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -151,7 +152,14 @@ async def test_get_commands_list(
             cursor=1337, length=42, include_fixit_commands=True
         )
     ).then_return(
-        CommandSlice(commands=[command_1, command_2], cursor=0, total_length=2)
+        JsonCommandSlice(
+            commands=[
+                command_1.model_dump_json(by_alias=True, exclude_none=True),
+                command_2.model_dump_json(by_alias=True, exclude_none=True),
+            ],
+            cursor=0,
+            total_length=2,
+        )
     )
 
     result = await get_commands_list(
@@ -160,7 +168,12 @@ async def test_get_commands_list(
         pageLength=42,
     )
 
-    assert result.content.data == [command_1, command_2]
+    expected_data = [
+        command_1.model_dump_json(by_alias=True, exclude_none=True),
+        command_2.model_dump_json(by_alias=True, exclude_none=True),
+    ]
+
+    assert result.content.data == [json.loads(command) for command in expected_data]
     assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 

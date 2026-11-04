@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 
@@ -26,7 +25,7 @@ let wrapper: FunctionComponent<{ children: ReactNode }>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {
-    when(vi.mocked(useRunPipetteInfoByMount)).calledWith('1').thenReturn({
+    vi.when(vi.mocked(useRunPipetteInfoByMount)).calledWith('1').thenReturn({
       left: null,
       right: null,
     })
@@ -45,7 +44,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
 
   it('should ignore tip rack calibration ', () => {
-    when(vi.mocked(useRunPipetteInfoByMount))
+    vi.when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
       .thenReturn({
         left: {
@@ -71,7 +70,7 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should return complete if everything is calibrated', () => {
-    when(vi.mocked(useRunPipetteInfoByMount))
+    vi.when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
       .thenReturn({
         left: {

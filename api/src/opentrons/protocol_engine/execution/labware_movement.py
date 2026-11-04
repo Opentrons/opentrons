@@ -44,9 +44,9 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 _GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
-# Extra opening beyond labware Y, mm total. Fully homed open (92 mm) hits a
-# vacuum-module collar on an adjacent slot.
-_LABWARE_JAW_OPEN_CLEARANCE_MM = -1.5
+# Extra opening beyond labware Y, mm total, used only when a vacuum-module
+# collar is a north/south neighbor. Fully homed open (92 mm) hits that collar.
+_LABWARE_JAW_OPEN_CLEARANCE_MM = 2.5
 
 
 def _jaw_open_width_mm(
@@ -56,6 +56,24 @@ def _jaw_open_width_mm(
     lo = math.ceil(min_jaw_width)
     hi = math.floor(max_jaw_width)
     return int(min(hi, max(lo, round(desired))))
+
+
+def _limit_jaw_open(
+    *,
+    dropping: bool,
+    after_drop: bool,
+    restrict_pickup_approach: bool,
+    restrict_drop_retract: bool,
+) -> bool:
+    """Limit jaw width only for the phase next to a vacuum collar.
+
+    Pickup opens are limited when the labware being picked up has a collar to
+    the north or south. Drop and post-drop slide opens are limited only when
+    the drop location does. Every other open homes the jaw fully.
+    """
+    if dropping or after_drop:
+        return restrict_drop_retract
+    return restrict_pickup_approach
 
 
 # Collar Z speeds when moving a vacuum-module collar off the module (A3).
@@ -243,7 +261,7 @@ class LabwareMovementHandler:
                 else None
             )
             labware_height_above_grip = 0.0
-            if restrict_pickup_approach or restrict_drop_retract:
+            if restrict_pickup_approach:
                 grip_z = self._state_store.labware.get_grip_z(labware_definition)
                 extents = self._state_store.labware.get_extents_around_lw_origin(
                     labware_definition
@@ -258,7 +276,6 @@ class LabwareMovementHandler:
                 pickup_speed=pickup_speed,
                 labware_height_above_grip=labware_height_above_grip,
                 restrict_pickup_approach=restrict_pickup_approach,
-                restrict_drop_retract=restrict_drop_retract,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(
                 labware_definition
@@ -273,19 +290,32 @@ class LabwareMovementHandler:
                 grip_specs.targetY, jaw_limits["min"], jaw_limits["max"]
             )
             holding_labware = False
+            after_drop = False
             gripper_home_z = gripper_homed_position.z
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
-                    await ot3api.hold_jaw_width(open_width_mm)
-                    # Pickup opens then grips; drop opens then is empty.
-                    holding_labware = not waypoint_data.dropping
-                    if (
+                    limit_open = _limit_jaw_open(
+                        dropping=waypoint_data.dropping,
+                        after_drop=after_drop,
+                        restrict_pickup_approach=restrict_pickup_approach,
+                        restrict_drop_retract=restrict_drop_retract,
+                    )
+                    at_travel_height_drop = (
                         waypoint_data.dropping
                         and waypoint_data.position.z >= gripper_home_z
-                    ):
-                        # Default drop: ungrip and home Z in one step (jaws already
-                        # at travel height). Restricted drop homes after closing.
+                    )
+                    if at_travel_height_drop:
+                        # Brake Z before releasing the labware so the mount cannot
+                        # drop when a falling edge catches a paddle.
                         await ot3api.disengage_axes([Axis.Z_G])
+                    if limit_open:
+                        await ot3api.hold_jaw_width(open_width_mm)
+                    else:
+                        await ot3api.ungrip()
+                    # Pickup opens then grips; drop opens then is empty.
+                    holding_labware = not waypoint_data.dropping
+                    if at_travel_height_drop:
+                        # Open, fully or to the collar-safe width, then home Z.
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
@@ -308,17 +338,20 @@ class LabwareMovementHandler:
                             grip_width_uncertainty_narrower=grip_specs.uncertaintyNarrower,
                             disable_geometry_grip_check=disable_geometry_grip_check,
                         )
-                    if waypoint_data.dropping:
-                        # Restricted drop: close above the labware, then brake and home.
-                        await ot3api.disengage_axes([Axis.Z_G])
-                        await ot3api.home_z(OT3Mount.GRIPPER)
+                if waypoint_data.dropping:
+                    after_drop = True
                 await ot3api.move_to(
                     mount=gripper_mount,
                     abs_position=waypoint_data.position,
                     speed=waypoint_data.speed,
                 )
 
-            await ot3api.hold_jaw_width(open_width_mm)
+            # If the drop was next to a collar, stay at the collar-safe width
+            # instead of homing the jaw fully open. Otherwise close to idle.
+            if restrict_drop_retract:
+                await ot3api.hold_jaw_width(open_width_mm)
+            else:
+                await ot3api.idle_gripper()
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
 import { i18n } from '/app/i18n'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
@@ -165,7 +165,7 @@ describe('ProtocolRunDetails', () => {
 
     screen.getByText('Setup')
     screen.getByText('Module Controls')
-    screen.getByText('Run Preview')
+    screen.getByText('Run Log')
     screen.getByText('Camera')
   })
 
@@ -179,7 +179,7 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     // Setup stays mounted (hidden) on other tabs.
@@ -190,7 +190,7 @@ describe('ProtocolRunDetails', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const setupTab = screen.getByText('Setup')
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     screen.getByText('Mock ProtocolRunSetup')
@@ -286,14 +286,14 @@ describe('ProtocolRunDetails', () => {
     screen.getByText('Setup')
     screen.getByText('Parameters')
     screen.getByText('Module Controls')
-    screen.getByText('Run Preview')
+    screen.getByText('Run Log')
   })
 
   it('renders protocol run parameters when the parameters tab is clicked', () => {
     render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
     const parametersTab = screen.getByText('Parameters')
-    const runTab = screen.getByText('Run Preview')
+    const runTab = screen.getByText('Run Log')
     fireEvent.click(runTab)
     screen.getByText('Mock RunPreview')
     expect(screen.queryByText('Mock ProtocolRunRuntimeParameters')).toBeFalsy()

@@ -27,14 +27,14 @@ vi.mock('/app/redux/protocol-runs', () => ({
   clearSelectedLabwareWorkingOffsets: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
 }))
-vi.mock('/app/molecules/OddModal', () => ({
+vi.mock('/app/components/ODD/modals/OddModal', () => ({
   OddModal: vi.fn(({ header, children }) => (
     <div data-testid="mock-odd-modal" data-title={header.title}>
       <div data-testid="modal-content">{children}</div>
     </div>
   )),
 }))
-vi.mock('/app/atoms/buttons', () => ({
+vi.mock('/app/components/ODD/buttons', () => ({
   SmallButton: vi.fn(({ buttonText, onClick, buttonType }) => (
     <button
       data-testid={`mock-button-${buttonType || 'default'}`}

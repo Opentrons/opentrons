@@ -8,7 +8,7 @@
   "types": "lib/main.d.ts",
   "scripts": {
     "start": "make dev",
-    "rebuild": "electron-rebuild --force-abi=3.71.0"
+    "rebuild": "electron-rebuild --force-abi=150"
   },
   "repository": {
     "type": "git",

@@ -9,11 +9,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InProgressModal } from '/app/components/adhoc/shared/InProgressModal'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
-// import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { BeforeBeginning } from '../BeforeBeginning'
@@ -21,12 +20,8 @@ import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
-//  TODO(jr, 11/3/22): uncomment out the get help link when we have
-//  the correct URL to link it to
-vi.mock('/app/molecules/InProgressModal/InProgressModal')
+vi.mock('/app/components/adhoc/shared/InProgressModal')
 vi.mock('../utils')
 
 const render = (props: ComponentProps<typeof BeforeBeginning>) => {
@@ -36,16 +31,6 @@ const render = (props: ComponentProps<typeof BeforeBeginning>) => {
 }
 
 describe('BeforeBeginning', () => {
-  const mockDeckConfig = {
-    data: [
-      {
-        cutoutId: 'cutoutD3',
-      } as any,
-    ],
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
@@ -65,10 +50,8 @@ describe('BeforeBeginning', () => {
       isOnDevice: false,
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
-      deckConfig: mockDeckConfig,
       documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }
-    // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
     vi.mocked(getIsGantryEmpty).mockReturnValue(false)
   })

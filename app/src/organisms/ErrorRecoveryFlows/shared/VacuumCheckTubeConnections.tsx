@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'

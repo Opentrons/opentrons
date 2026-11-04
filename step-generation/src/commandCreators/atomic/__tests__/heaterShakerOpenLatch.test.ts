@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
@@ -67,7 +66,7 @@ describe('heaterShakerOpenLatch', () => {
     vi.resetAllMocks()
   })
   it('should return an error when there is labware east/west that is above 53 mm', () => {
-    when(getIsTallLabwareEastWestOfHeaterShaker)
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
@@ -112,7 +111,7 @@ describe('heaterShakerOpenLatch', () => {
     })
   })
   it('should return an open latch command when there is no labware that is too tall east/west of the heater shaker', () => {
-    when(getIsTallLabwareEastWestOfHeaterShaker)
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
@@ -138,7 +137,7 @@ describe('heaterShakerOpenLatch', () => {
     })
   })
   it('resolves moduleId when it is a string runtime parameter', () => {
-    when(getIsTallLabwareEastWestOfHeaterShaker)
+    vi.when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,

@@ -12,7 +12,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 
@@ -57,7 +57,7 @@ class CalibratePipetteImplementation(
         )
 
         pipette_offset = await calibration.find_pipette_offset(
-            hcapi=ot3_api, mount=ot3_mount, slot=5
+            hcapi=ot3_api, mount=ot3_mount, slot=DeckSlotName.SLOT_B2.as_int()
         )
 
         await ot3_api.save_instrument_offset(mount=ot3_mount, delta=pipette_offset)

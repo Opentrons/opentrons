@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   selectActivePipette,

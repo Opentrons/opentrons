@@ -6,13 +6,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { Slideout } from '/app/atoms/Slideout'
-import { UploadInput } from '/app/molecules/UploadInput'
+import { Slideout } from '/app/components/desktop/Slideout'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import {
   ANALYTICS_ADD_CUSTOM_LABWARE,
   useTrackEvent,
@@ -64,7 +64,7 @@ export function AddCustomLabwareSlideout(
           }}
           uploadText={t('choose_file_to_upload')}
           dragAndDropText={
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="shared:drag_and_drop"
@@ -78,7 +78,7 @@ export function AddCustomLabwareSlideout(
                   ),
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
           }
         />
       </Flex>

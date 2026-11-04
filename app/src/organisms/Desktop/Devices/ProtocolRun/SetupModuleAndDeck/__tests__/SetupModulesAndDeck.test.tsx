@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockTemperatureModule } from '@opentrons/api-client'
 
@@ -61,16 +60,16 @@ describe('SetupModuleAndDeck', () => {
       <div>Mock setup modules map</div>
     )
     vi.mocked(useRunHasStarted).mockReturnValue(false)
-    when(useUnmatchedModulesForProtocol)
+    vi.when(useUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    when(useModuleCalibrationStatus)
+    vi.when(useModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({ complete: true })
-    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(false)
+    vi.when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(false)
     vi.mocked(getRequiredDeckConfig).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
   })
@@ -90,7 +89,7 @@ describe('SetupModuleAndDeck', () => {
   })
 
   it('should render a disabled Proceed to labware offsets setup CTA if the protocol requests modules and they are not all attached to the robot', () => {
-    when(useUnmatchedModulesForProtocol)
+    vi.when(useUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({
         missingModuleIds: ['foo'],
@@ -104,7 +103,7 @@ describe('SetupModuleAndDeck', () => {
   })
 
   it('should render a disabled Proceed to labware offsets setup CTA if the protocol requests modules they are not all calibrated', () => {
-    when(useModuleCalibrationStatus)
+    vi.when(useModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .thenReturn({ complete: false })
     render(props)
@@ -122,7 +121,7 @@ describe('SetupModuleAndDeck', () => {
   })
 
   it('should render the SetupModulesList and SetupFixtureList component when clicking List View for Flex', () => {
-    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
     vi.mocked(getRequiredDeckConfig).mockReturnValue([
       {
         cutoutId: 'cutoutA1',
@@ -139,7 +138,7 @@ describe('SetupModuleAndDeck', () => {
   })
 
   it('should not render the SetupFixtureList component when there are no required fixtures', () => {
-    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
     render(props)
     const button = screen.getByRole('button', { name: 'List View' })
     fireEvent.click(button)

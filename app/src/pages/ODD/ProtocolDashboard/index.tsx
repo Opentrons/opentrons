@@ -20,8 +20,12 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
-import { Navigation } from '/app/organisms/ODD/Navigation'
+import {
+  SmallButton,
+  TouchFloatingActionButton,
+} from '/app/components/ODD/buttons'
+import { ProtocolCard } from '/app/components/ODD/cards/ProtocolCard'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
 import {
@@ -35,7 +39,6 @@ import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationMod
 import { NoProtocols } from './NoProtocols'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
-import { ProtocolCard } from './ProtocolCard'
 import { sortProtocols } from './utils'
 
 import type { PipetteData } from '@opentrons/api-client'

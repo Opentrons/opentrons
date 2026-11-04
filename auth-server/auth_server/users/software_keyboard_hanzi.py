@@ -4,7 +4,7 @@ Hanzi supported by the ODD software keyboard (simple-keyboard-layouts
 Chinese pinyin candidates).
 
 If the software keyboard or simple-keyboard-layouts changes, rerun from app/:
-  node src/atoms/SoftwareKeyboard/generateSoftwareKeyboardHanzi.mjs
+  node src/components/ODD/keyboard/generateSoftwareKeyboardHanzi.mjs
 and commit this file.
 """
 

@@ -15,9 +15,9 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   OnOffToggle,
   RobotSettingButton,

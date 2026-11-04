@@ -3,7 +3,7 @@
 */
 
 @import url('../../node_modules/react-simple-keyboard/build/css/index.css');
-@import url('./atoms/SoftwareKeyboard/AlphanumericKeyboard/index.css');
-@import url('./atoms/SoftwareKeyboard/FullKeyboard/index.css');
-@import url('./atoms/SoftwareKeyboard/NumericalKeyboard/index.css');
-@import url('./atoms/SoftwareKeyboard/IndividualKey/index.css');
+@import url('./components/ODD/keyboard/AlphanumericKeyboard/index.css');
+@import url('./components/ODD/keyboard/FullKeyboard/index.css');
+@import url('./components/ODD/keyboard/NumericalKeyboard/index.css');
+@import url('./components/ODD/keyboard/IndividualKey/index.css');

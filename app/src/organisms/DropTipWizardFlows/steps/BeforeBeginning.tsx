@@ -15,13 +15,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { MediumButton } from '../../../atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
+
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
@@ -178,7 +178,7 @@ function DropTipOption({
       >
         <source src={videoSrc} />
       </AnimationVideo>
-      <LegacyStyledText forwardedAs="h3">{text}</LegacyStyledText>
+      <StyledText forwardedAs="h3">{text}</StyledText>
     </Flex>
   )
 }

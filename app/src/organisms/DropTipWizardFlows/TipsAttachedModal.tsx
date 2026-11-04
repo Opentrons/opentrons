@@ -5,21 +5,21 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useHomePipettes } from '/app/local-resources/instruments'
-import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
@@ -87,7 +87,7 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider robotName={robotName}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="liquid_damages_this_pipette"
@@ -98,7 +98,7 @@ const TipsAttachedModal = NiceModal.create(
                   mount: <strong />,
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
             <Flex gridGap={SPACING.spacing8}>
               <SmallButton
                 flex="1"

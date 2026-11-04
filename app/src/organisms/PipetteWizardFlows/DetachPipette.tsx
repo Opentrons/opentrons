@@ -10,25 +10,26 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { Skeleton } from '/app/atoms/Skeleton'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -174,9 +175,7 @@ export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
   } else {
     bodyText = (
       <>
-        <LegacyStyledText css={BODY_STYLE}>
-          {t('hold_and_loosen')}
-        </LegacyStyledText>
+        <WizardBodyText>{t('hold_and_loosen')}</WizardBodyText>
         {is96ChannelPipette && (
           <Banner
             type="warning"
@@ -211,10 +210,14 @@ export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
               setShowPipetteStillAttached(false)
             }}
             marginLeft={SPACING.spacing32}
+            css={GO_BACK_BUTTON_TEXT_STYLE}
           >
-            <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('shared:go_back')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
           {Boolean(isOnDevice) ? (
             <SmallButton

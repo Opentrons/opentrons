@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { formatTimestamp } from '/app/transformations/runs'
 

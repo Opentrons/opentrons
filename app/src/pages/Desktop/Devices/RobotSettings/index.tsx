@@ -6,13 +6,13 @@ import { Navigate, useParams } from 'react-router-dom'
 import {
   Banner,
   FLEX_MAX_CONTENT,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
@@ -153,9 +153,9 @@ export function RobotSettingsComponent({
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
-              <LegacyStyledText forwardedAs="p">
+              <StyledText forwardedAs="p">
                 {t('some_robot_controls_are_not_available')}
-              </LegacyStyledText>
+              </StyledText>
             </Banner>
           )}
         </div>

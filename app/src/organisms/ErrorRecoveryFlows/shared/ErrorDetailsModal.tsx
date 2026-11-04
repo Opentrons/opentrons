@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import { ERROR_KINDS } from '../constants'
 import { useErrorName } from '../hooks'
@@ -27,7 +27,7 @@ import { StepInfo } from './StepInfo'
 import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { DesktopSizeType, ErrorKind } from '../types'

@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -19,7 +18,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
@@ -115,7 +113,7 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
-    when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
+    vi.when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -130,7 +128,6 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(useHardwareStatusText).mockReturnValue(
       'mock missing hardware chip text'
     )
-    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
     vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
@@ -149,7 +146,7 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: MOCK_COMPLETED_ANALYSIS,
     } as any)
-    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(getProtocol).mockResolvedValue({
       data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
     } as any)
@@ -203,7 +200,7 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('renders the delete protocol button', async () => {
-    when(vi.mocked(getProtocol))
+    vi.when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
       .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
@@ -261,7 +258,7 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('renders the parameters screen', () => {
-    when(useRunTimeParameters)
+    vi.when(useRunTimeParameters)
       .calledWith('fakeProtocolId')
       .thenReturn(mockRunTimeParameterData)
     render()

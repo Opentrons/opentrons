@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   mockHeaterShaker,
@@ -787,10 +786,10 @@ describe('useIsHeaterShakerInProtocol', () => {
   const store: Store<State> = legacy_createStore(vi.fn(), {})
 
   beforeEach(() => {
-    when(useCurrentRunId).calledWith().thenReturn('1')
+    vi.when(useCurrentRunId).calledWith().thenReturn('1')
     store.dispatch = vi.fn()
 
-    when(useMostRecentCompletedAnalysis)
+    vi.when(useMostRecentCompletedAnalysis)
       .calledWith('1')
       .thenReturn({
         ...heater_shaker_commands_with_results_key,
@@ -830,7 +829,7 @@ describe('useIsHeaterShakerInProtocol', () => {
   })
 
   it('should return false when a heater shaker is NOT in the protocol', () => {
-    when(useMostRecentCompletedAnalysis)
+    vi.when(useMostRecentCompletedAnalysis)
       .calledWith('1')
       .thenReturn({
         ...heater_shaker_commands_with_results_key,

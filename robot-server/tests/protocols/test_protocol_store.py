@@ -538,6 +538,7 @@ def get_completed_analysis_resource(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
 
@@ -579,6 +580,7 @@ async def test_get_referenced_data_files(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
     analysis_resource2 = CompletedAnalysisResource(
         "analysis-id-2",
@@ -596,6 +598,7 @@ async def test_get_referenced_data_files(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
     subject.insert(protocol_resource_1)

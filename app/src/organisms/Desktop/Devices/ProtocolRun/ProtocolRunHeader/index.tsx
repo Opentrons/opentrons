@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'

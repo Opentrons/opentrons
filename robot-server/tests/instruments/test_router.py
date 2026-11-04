@@ -49,13 +49,18 @@ from robot_server.subsystems.models import SubSystem
 
 
 def get_sample_pipette_dict(
-    name: PipetteName, model: PipetteModel, pipette_id: str, subsystem: SubSystem
+    name: PipetteName,
+    model: PipetteModel,
+    pipette_id: str,
+    subsystem: SubSystem,
+    display_name: str = "Sample Pipette",
 ) -> PipetteDict:
     """Return a sample PipetteDict."""
     pipette_dict: PipetteDict = {  # type: ignore [typeddict-item]
         "name": name,
         "model": model,
         "pipette_id": pipette_id,
+        "display_name": display_name,
         "back_compat_names": ["p10_single"],
         "min_volume": 1,
         "max_volume": 1,
@@ -99,12 +104,14 @@ async def test_get_all_attached_instruments(
         model=PipetteModel("abc"),
         pipette_id="my-pipette-id",
         subsystem=SubSystem.pipette_left,
+        display_name="P10 Multi-Channel GEN1",
     )
     right_pipette_dict = get_sample_pipette_dict(
         name="p20_multi_gen2",
         model=PipetteModel("xyz"),
         pipette_id="my-other-pipette-id",
         subsystem=SubSystem.pipette_right,
+        display_name="P20 8-Channel GEN2",
     )
 
     async def rehearse_instrument_retrievals(skip_if_would_block: bool = False) -> None:
@@ -209,6 +216,7 @@ async def test_get_all_attached_instruments(
             instrumentType="pipette",
             instrumentName="p10_multi",
             instrumentModel=PipetteModel("abc"),
+            displayName="P10 Multi-Channel GEN1",
             serialNumber="my-pipette-id",
             subsystem=SubSystem.pipette_left,
             firmwareVersion="10",
@@ -232,6 +240,7 @@ async def test_get_all_attached_instruments(
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
+            displayName="P20 8-Channel GEN2",
             serialNumber="my-other-pipette-id",
             subsystem=SubSystem.pipette_right,
             data=PipetteData(
@@ -253,6 +262,7 @@ async def test_get_all_attached_instruments(
             firmwareVersion="11",
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
+            displayName="my-special-gripper",
             serialNumber="GripperID321",
             subsystem=SubSystem.gripper,
             data=GripperData(
@@ -281,6 +291,7 @@ async def test_get_96_channel_instruments(
                     "name": "p1000_96",
                     "model": PipetteModel("xyz"),
                     "pipette_id": "pipette-id",
+                    "display_name": "Flex 96-Channel 1000 µL",
                     "back_compat_names": [],
                     "min_volume": 1,
                     "max_volume": 1000,
@@ -304,6 +315,7 @@ async def test_get_96_channel_instruments(
             instrumentType="pipette",
             instrumentName="p1000_96",
             instrumentModel=PipetteModel("xyz"),
+            displayName="Flex 96-Channel 1000 µL",
             serialNumber="pipette-id",
             data=PipetteData(
                 channels=96,

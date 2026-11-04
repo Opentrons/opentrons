@@ -25,8 +25,8 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
-import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { LabwareStackContents } from '/app/components/adhoc/shared/LabwareStackContents'
+import { LiquidCardList } from '/app/components/adhoc/shared/LiquidDetailCard'
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,

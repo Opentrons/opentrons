@@ -5,8 +5,8 @@ import {
   AnimationVideo,
   COLORS,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
@@ -16,11 +16,11 @@ import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_R
 import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -266,9 +266,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <StyledText forwardedAs="p" />,
             bold: (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               />
@@ -281,7 +281,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}
-      bodyText={<LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>}
+      bodyText={<StyledText forwardedAs="p">{body}</StyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

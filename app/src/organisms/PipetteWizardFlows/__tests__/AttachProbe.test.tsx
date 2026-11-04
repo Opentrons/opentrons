@@ -16,27 +16,14 @@ import { AttachProbe } from '../AttachProbe'
 import { FLOWS } from '../constants'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
-  const mockDeckConfig = {
-    data: [
-      {
-        cutoutId: 'cutoutD3',
-      } as any,
-    ],
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
@@ -56,7 +43,6 @@ describe('AttachProbe', () => {
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
-      deckConfig: mockDeckConfig,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
@@ -141,7 +127,7 @@ describe('AttachProbe', () => {
     render(props)
     screen.getByText('Stand back, Flex 1-Channel 1000 µL is calibrating')
     screen.getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+      'The calibration probe will touch the sides of the calibration square in slot B2 to determine its exact position.'
     )
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
@@ -160,7 +146,7 @@ describe('AttachProbe', () => {
     render(props)
     screen.getByText('Stand back, Flex 96-Channel 1000 µL is calibrating')
     screen.getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+      'The calibration probe will touch the sides of the calibration square in slot B2 to determine its exact position.'
     )
     screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
@@ -177,7 +163,7 @@ describe('AttachProbe', () => {
     screen.getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
-        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
+        'The calibration probe will touch the sides of the calibration square in slot B2 to determine its exact position.'
       )
     ).not.toBeInTheDocument()
   })

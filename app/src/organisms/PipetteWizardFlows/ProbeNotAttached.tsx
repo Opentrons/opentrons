@@ -9,15 +9,15 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void
@@ -53,10 +53,14 @@ export const ProbeNotAttached = (
           onClick={() => {
             dismissError()
           }}
+          css={GO_BACK_BUTTON_STYLE}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton

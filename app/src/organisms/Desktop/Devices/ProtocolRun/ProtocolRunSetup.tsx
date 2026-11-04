@@ -12,7 +12,6 @@ import {
   FLEX_MAX_CONTENT,
   Icon,
   InfoScreen,
-  LegacyStyledText,
   NO_WRAP,
   SPACING,
   StyledText,
@@ -29,7 +28,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
-import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
@@ -70,6 +68,7 @@ import {
 import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
+import { InfoMessage } from './InfoMessage'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
@@ -411,8 +410,9 @@ export function ProtocolRunSetup({
         incompleteText: null,
         incompleteElement: (
           <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.black90}
-            css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
             whiteSpace={NO_WRAP}
           >
@@ -473,9 +473,9 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
               {t('protocol_analysis_failed')}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             orderedSteps.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)

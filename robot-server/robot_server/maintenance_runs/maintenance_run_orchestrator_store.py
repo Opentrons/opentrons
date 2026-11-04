@@ -17,8 +17,8 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     CommandPointer,
-    CommandSlice,
     DeckType,
+    JsonCommandSlice,
     LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
@@ -230,14 +230,13 @@ class MaintenanceRunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = await self.run_orchestrator.get_state_summary()
-        commands = await self.run_orchestrator.get_all_commands()
         preconditions = await self.run_orchestrator.get_preconditions()
         self._run_orchestrator = None
         self._created_at = None
 
         return RunResult(
             state_summary=run_data,
-            commands=commands,
+            commands=[],
             parameters=[],
             command_annotations=[],
             command_preconditions=preconditions,
@@ -247,7 +246,7 @@ class MaintenanceRunOrchestratorStore:
         self,
         cursor: Optional[int],
         length: int,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:

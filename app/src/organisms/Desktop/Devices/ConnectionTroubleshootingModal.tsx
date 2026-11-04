@@ -6,11 +6,11 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -29,9 +29,9 @@ export function ConnectionTroubleshootingModal(props: Props): ReactNode {
   return (
     <Modal title={t('why_is_this_robot_unavailable')} onClose={props.onClose}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('connection_troubleshooting_intro')}
-        </LegacyStyledText>
+        </StyledText>
         <TroubleshootingSteps
           label={t('if_connecting_via_usb')}
           steps={[
@@ -47,11 +47,11 @@ export function ConnectionTroubleshootingModal(props: Props): ReactNode {
           label={t('if_still_having_issues')}
           steps={[t('restart_the_robot'), t('restart_the_app')]}
         />
-        <LegacyStyledText forwardedAs="p" marginTop={SPACING.spacing16}>
+        <StyledText forwardedAs="p" marginTop={SPACING.spacing16}>
           {t('branded:contact_support_for_connection_help', {
             support_email: SUPPORT_EMAIL,
           })}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           external
           css={TYPOGRAPHY.linkPSemiBold}
@@ -83,12 +83,9 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): ReactNode {
   const { label, steps } = props
   return (
     <Box marginTop={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {label}:
-      </LegacyStyledText>
+      </StyledText>
       <ul>
         {steps.map(step => (
           <li
@@ -97,7 +94,7 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): ReactNode {
             `}
             key={step}
           >
-            <LegacyStyledText forwardedAs="p">{step}</LegacyStyledText>
+            <StyledText forwardedAs="p">{step}</StyledText>
           </li>
         ))}
       </ul>

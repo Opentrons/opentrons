@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -98,10 +97,10 @@ describe('RobotOverviewOverflowMenu', () => {
       <div>choose protocol slideout</div>
     )
     vi.mocked(DisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    when(useCanDisconnect)
+    vi.when(useCanDisconnect)
       .calledWith(mockConnectableRobot.name)
       .thenReturn(true)
-    when(useIsEstopNotDisengaged)
+    vi.when(useIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
       .thenReturn(false)
   })
@@ -240,7 +239,7 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
-    when(useCanDisconnect)
+    vi.when(useCanDisconnect)
       .calledWith(mockConnectableRobot.name)
       .thenReturn(false)
 
@@ -315,7 +314,7 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled menu items except restart robot and robot settings when e-stop is pressed', () => {
-    when(useIsEstopNotDisengaged)
+    vi.when(useIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
       .thenReturn(true)
     render(props)

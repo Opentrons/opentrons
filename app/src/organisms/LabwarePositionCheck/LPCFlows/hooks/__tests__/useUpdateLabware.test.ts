@@ -27,7 +27,7 @@ describe('useUpdateLabware', () => {
   })
 
   it('should dispatch updateLPCLabware when runId is provided and maintenanceRunId is null', () => {
-    renderHook(() => useUpdateLabware(true, RUN_ID, null, MOCK_LABWARE_INFO))
+    renderHook(() => useUpdateLabware(RUN_ID, null, MOCK_LABWARE_INFO))
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
     expect(updateLPCLabware).toHaveBeenCalledWith(
@@ -40,7 +40,7 @@ describe('useUpdateLabware', () => {
   })
 
   it('should not dispatch when runId is null', () => {
-    renderHook(() => useUpdateLabware(true, null, null, MOCK_LABWARE_INFO))
+    renderHook(() => useUpdateLabware(null, null, MOCK_LABWARE_INFO))
 
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(updateLPCLabware).not.toHaveBeenCalled()
@@ -48,7 +48,7 @@ describe('useUpdateLabware', () => {
 
   it('should not dispatch when maintenanceRunId is provided', () => {
     renderHook(() =>
-      useUpdateLabware(true, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
+      useUpdateLabware(RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
     )
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -59,14 +59,12 @@ describe('useUpdateLabware', () => {
     const { rerender } = renderHook(
       props =>
         useUpdateLabware(
-          props.isFlex,
           props.runId,
           props.maintenanceRunId,
           props.labwareInfo
         ),
       {
         initialProps: {
-          isFlex: true,
           runId: RUN_ID,
           maintenanceRunId: null,
           labwareInfo: MOCK_LABWARE_INFO,
@@ -79,7 +77,6 @@ describe('useUpdateLabware', () => {
 
     const NEW_LABWARE_INFO = { areOffsetsApplied: false } as LPCLabwareInfo
     rerender({
-      isFlex: true,
       runId: RUN_ID,
       maintenanceRunId: null,
       labwareInfo: NEW_LABWARE_INFO,
@@ -98,16 +95,10 @@ describe('useUpdateLabware', () => {
   it('should re-dispatch when maintenanceRunId changes from value to null', () => {
     const { rerender } = renderHook(
       props => {
-        useUpdateLabware(
-          props.isFlex,
-          props.runId,
-          props.maintenanceRunId,
-          props.labwareInfo
-        )
+        useUpdateLabware(props.runId, props.maintenanceRunId, props.labwareInfo)
       },
       {
         initialProps: {
-          isFlex: true,
           runId: RUN_ID,
           maintenanceRunId: MAINTENANCE_RUN_ID,
           labwareInfo: MOCK_LABWARE_INFO,
@@ -118,7 +109,6 @@ describe('useUpdateLabware', () => {
     expect(mockDispatch).not.toHaveBeenCalled()
 
     rerender({
-      isFlex: true,
       runId: RUN_ID,
       maintenanceRunId: null,
       labwareInfo: MOCK_LABWARE_INFO,
@@ -129,13 +119,5 @@ describe('useUpdateLabware', () => {
       RUN_ID,
       MOCK_LABWARE_INFO.labware
     )
-  })
-
-  it('should not dispatch if the robot is not a flex', () => {
-    renderHook(() =>
-      useUpdateLabware(false, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
-    )
-
-    expect(mockDispatch).not.toHaveBeenCalled()
   })
 })
