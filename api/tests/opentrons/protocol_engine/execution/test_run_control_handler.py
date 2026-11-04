@@ -20,9 +20,8 @@ from opentrons.protocol_engine.types import DeckType
 def _make_config(ignore_pause: bool) -> Config:
     return Config(
         ignore_pause=ignore_pause,
-        # Robot and deck type are arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 

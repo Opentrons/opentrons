@@ -824,8 +824,8 @@ def test_door_initially_open(
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
