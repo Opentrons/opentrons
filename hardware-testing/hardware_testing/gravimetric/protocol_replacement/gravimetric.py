@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V3"}
+metadata = {"protocolName": "Gravimetric QC V4"}
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -501,7 +501,8 @@ class FixtureSettings(CSVSettings):
         scale_serial = scale.read_serial_number()
         if simulating:
             recorder.set_simulation_mass(10)
-        recorder.record(in_thread=True)
+        # record() waits until the scale thread emits a sample. During analysis
+        # that wait never finishes, so start it only for a real test run.
         env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
         use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
@@ -1610,8 +1611,10 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             remove_tip(fixture_settings)
 
         volumes_to_tests = fixture_settings.volumes[tip]
+        testing_extra = False
         if tip in tip_sizes_done or len(fixture_settings.volumes[tip]) == 0:
             volumes_to_tests = fixture_settings.extra_volumes[tip]
+            testing_extra = True
         for volume in volumes_to_tests:
             trial_asp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
@@ -1623,6 +1626,17 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             actual_disp_list_all = []
             measurements[volume] = []
             for channel in fixture_settings.channels:
+                # Extra volumes on an 8-channel pipette only run on channel 1
+                # (index 0). The other channels stay on the standard volume list.
+                if (
+                    testing_extra
+                    and fixture_settings.pipette_channels == 8
+                    and channel != 0
+                ):
+                    print_info(
+                        f"skipping channel {channel + 1} for extra volume {volume}ul"
+                    )
+                    continue
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
@@ -1867,6 +1881,7 @@ def run(ctx: ProtocolContext) -> None:
         print_info("Simulating. Not running actual tests and stopping analysis.")
         return
     try:
+        fixture_settings.recorder.record(in_thread=True)
         _store_config_as_old_style(fixture_settings)
         if _should_alter_discontinuity(fixture_settings):
             print_info("Adjusting z discontinuity for this pipette.")
