@@ -71,6 +71,8 @@ python3 tof_analysis.py plot --baseline <baseline_path_json> [--dataframe <dataf
 
 ### Baseline Validator
 
+Reads every labware in the CSV unless `--labwares` is set. A `baseline` capture passes when nothing is detected. Any other labware passes when it is detected. X extend is printed and left out of the pass/fail result. Pass `--platform-x extend` to score it. Pass `--enable-validation-plot` to open the histograms. The report is printed either way.
+
 ```bash
 python3 tof_analysis.py validate --baseline <baseline_path_json> --dataframe <dataframe_path_csv> [options]
 ```

@@ -125,10 +125,21 @@ def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) ->
 
 def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
     """Parses common arguments."""
+    # Generate and plot default to the empty-deck rows. Validate scores every
+    # labware in the file unless a list is passed. "all" disables the filter.
+    labwares = list(args.labwares or [])
+    if "all" in labwares:
+        labware_list: List[str] = []
+    elif labwares:
+        labware_list = labwares
+    elif getattr(args, "action", "") == "validate":
+        labware_list = []
+    else:
+        labware_list = ["baseline"]
     return {
         "axis_list": args.axis,
         "stacker_list": args.stackers or [],
-        "labware_list": [] if "all" in args.labwares else args.labwares or ["baseline"],
+        "labware_list": labware_list,
         "platform_list_x": args.platform_x,
         "platform_list_z": args.platform_z,
         "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
@@ -200,6 +211,9 @@ def read_filtered_data(
     """Parses the dataframe CSV files into a defaultdict of measurements."""
     samples = 0
     bin_count = len(config["bins_list"])
+    # Same stacker, date, and sample number can be both an empty capture and a
+    # labware capture. A repeated zone on that key is another histogram.
+    capture_index: Dict[Any, int] = {}
     measurements = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(dict))))  # type: ignore
     for filepath in dataframes:
         if not os.path.exists(filepath):
@@ -224,12 +238,16 @@ def read_filtered_data(
                     continue
 
                 bins = list(row[start_index : start_index + bin_count])
-                # Date + sample is one capture. Sample numbers restart every
-                # run, so keying on sample alone keeps only the last run.
-                capture = (row.Date, sample)
-                measurements[axis][platform][stacker][capture].update(
-                    {zone: bins, "lw": labware}
-                )
+                identity = (axis, platform, stacker, row.Date, sample, labware)
+                index = capture_index.get(identity, 0)
+                capture = (row.Date, sample, labware, index)
+                bucket = measurements[axis][platform][stacker][capture]
+                if zone in bucket:
+                    index += 1
+                    capture_index[identity] = index
+                    capture = (row.Date, sample, labware, index)
+                    bucket = measurements[axis][platform][stacker][capture]
+                bucket.update({zone: bins, "lw": labware})
 
                 samples += 1
                 if samples > config["max_samples"]:
@@ -535,6 +553,93 @@ def generate_baseline(args: argparse.Namespace) -> None:
             print(baseline, "\n")
 
 
+def _sample_label(sample: Tuple[Any, ...]) -> str:
+    """Format a capture id. Repeat is omitted for the first histogram."""
+    date, number = sample[0], sample[1]
+    repeat = sample[3] if len(sample) > 3 else 0
+    if repeat:
+        return f"{date} sample {number} repeat {repeat + 1}"
+    return f"{date} sample {number}"
+
+
+def _summarize_validation(
+    captures: List[Dict[str, Any]],
+    skipped: List[Dict[str, Any]],
+    score_x_extend: bool,
+) -> None:
+    """Score each capture against its labware name.
+
+    Rows named baseline are the empty deck and pass only when nothing is
+    detected. Every other labware passes only when it is detected. X extend
+    is reported and left out of the result unless it was the only X platform
+    requested. Dispense and store do not read that position.
+    """
+    grouped: DefaultDict[Tuple[str, str, str], List[Dict[str, Any]]] = defaultdict(list)
+    for capture in captures:
+        grouped[(capture["labware"], capture["axis"], capture["platform"])].append(
+            capture
+        )
+
+    print("\n---------------- RESULT --------------\n")
+    if not captures:
+        print("FAILED: no samples matched the baseline zones.\n")
+        return
+
+    holds_x_extend = any(
+        axis == "x" and platform == "extend" for _, axis, platform in grouped
+    )
+    if holds_x_extend and not score_x_extend:
+        print(
+            "X extend is not scored. Dispense and store do not read the X sensor there.\n"
+        )
+
+    failures = 0
+    for key in sorted(grouped):
+        rows = grouped[key]
+        labware, axis, platform = key
+        detected = sum(1 for row in rows if row["detected"])
+        total = len(rows)
+        if axis == "x" and platform == "extend" and not score_x_extend:
+            print(f"{labware} {axis} {platform}: {detected}/{total} detected (not scored)")
+            continue
+        expect_detection = labware != "baseline"
+        missed = [row for row in rows if row["detected"] != expect_detection]
+        expect = "detection" if expect_detection else "none"
+        print(
+            f"{labware} {axis} {platform}: {detected}/{total} detected (expect {expect})"
+        )
+        if not missed or len(missed) == total:
+            failures += len(missed)
+            continue
+        failures += len(missed)
+        for row in sorted(missed, key=lambda row: (row["stacker"], row["sample"])):
+            state = "DETECTED" if row["detected"] else "NOT DETECTED"
+            print(f"  {row['stacker']} {state} {_sample_label(row['sample'])}")
+
+    if skipped:
+        label = "capture" if len(skipped) == 1 else "captures"
+        print(f"\nSkipped {len(skipped)} {label} with no rows in the baseline zones.")
+        for row in sorted(
+            skipped,
+            key=lambda row: (
+                row["labware"],
+                row["axis"],
+                row["platform"],
+                row["stacker"],
+                row["sample"],
+            ),
+        ):
+            print(
+                f"  {row['stacker']} {row['labware']} {row['axis']} {row['platform']} {_sample_label(row['sample'])}"
+            )
+
+    print()
+    if failures:
+        print(f"❌ FAILED: {failures} scored captures did not match their labware.\n")
+    else:
+        print("✅ SUCCESS: every scored capture matched its labware.\n")
+
+
 def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
     """Validates the baseline and dataframe and determines if the labware is detected."""
     config = parse_common_args(args)
@@ -546,9 +651,11 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
             " cant be more than 4."
         )
 
-    detected_labware = defaultdict(list)  # type: ignore
-    undetected_labware = defaultdict(set)  # type: ignore
-    labware_names = set()
+    if config["labware_list"]:
+        print(f"Labware filter: {', '.join(config['labware_list'])}")
+    else:
+        print("Labware filter: all")
+
     measurements, samples_count = read_filtered_data(args.dataframe, config)
     for baseline_path in args.baseline:
         if not os.path.exists(baseline_path):
@@ -561,12 +668,18 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
             baseline["version"] = baseline.get("version", 1)
             baseline = {k.lower(): v for k, v in baseline.items()}
             figures = {}
+            captures: List[Dict[str, Any]] = []
+            skipped: List[Dict[str, Any]] = []
+            plot = args.enable_validation_plot
 
             # The baseline is stored as string, so convert to dict
             for axis, platform in product(["x", "z"], ["extend", "retract"]):
-                figures.update({axis: go.Figure()})
+                if plot:
+                    figures.update({axis: go.Figure()})
                 data = literal_eval(baseline[axis][platform])
                 baseline[axis][platform] = data
+                if not plot:
+                    continue
                 for zone, bins in data.items():
                     figures[axis].add_trace(
                         go.Scatter(
@@ -592,18 +705,19 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                         measurements.get(axis, {}).get(platform, {}).items()
                     ):
                         for sample, data in samples.items():
-                            labware_names.add(data["lw"])
+                            labware = data["lw"]
                             detected = False
+                            evaluated = False
                             for zone in set(
                                 config["zone_list_x"] + config["zone_list_z"]
                             ):
                                 if not is_valid_row(axis, platform, zone, config):
                                     continue
-                                if zone not in baseline[axis][platform]:
+                                if zone not in baseline[axis][platform] or zone not in data:
                                     continue
+                                evaluated = True
                                 baseline_data = baseline[axis][platform][zone]
                                 raw_data = data[zone]
-                                labware = data["lw"]
                                 bin_range = _get_tuple_from_index(
                                     bin_ranges, axis, platform
                                 )
@@ -616,35 +730,20 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                     delta = _truncate(raw_data_value - baseline_value)
                                     if raw_data_value > threshold and delta > 0:
                                         detected = True
-                                        mark = "+++" if labware == "baseline" else ""
-                                        figures[axis].add_trace(
-                                            go.Scatter(
-                                                x=list(range(NUMBER_OF_BINS)),
-                                                y=raw_data,
-                                                mode="lines",
-                                                name=f"zone {zone} {mark}",
-                                                visible=True,
-                                                line=dict(color="green", width=1),
+                                        if plot:
+                                            mark = "+++" if labware == "baseline" else ""
+                                            figures[axis].add_trace(
+                                                go.Scatter(
+                                                    x=list(range(NUMBER_OF_BINS)),
+                                                    y=raw_data,
+                                                    mode="lines",
+                                                    name=f"zone {zone} {mark}",
+                                                    visible=True,
+                                                    line=dict(color="green", width=1),
+                                                )
                                             )
-                                        )
-                                        detected_labware[stacker].append(
-                                            dict(
-                                                labware=labware,
-                                                stacker=stacker,
-                                                axis=axis,
-                                                platform=platform,
-                                                zone=zone,
-                                                bin=bin,
-                                                raw_data=raw_data,
-                                                raw_data_value=raw_data_value,
-                                                baseline_value=baseline_value,
-                                                delta=delta,
-                                                threshold=threshold,
-                                            )
-                                        )
                                         break
-                                if not detected:
-                                    detected = False
+                                if not detected and plot:
                                     figures[axis].add_trace(
                                         go.Scatter(
                                             x=list(range(NUMBER_OF_BINS)),
@@ -655,66 +754,30 @@ def validate_baseline(args: argparse.Namespace) -> None:  # noqa: C901
                                             line=dict(color="red", width=2),
                                         )
                                     )
-                                    undetected_labware[stacker].add(
-                                        (labware, axis, platform, zone)
-                                    )
-                figures[axis].update_layout(
-                    title=f"Validate Baseline {axis}",
-                    xaxis_title="Bins",
-                    yaxis_title="Photon Count",
-                    template="plotly_white",
-                )
-                if not args.disable_validation_plot:
+                            record = {
+                                "stacker": stacker,
+                                "labware": labware,
+                                "axis": axis,
+                                "platform": platform,
+                                "sample": sample,
+                                "detected": detected,
+                            }
+                            if evaluated:
+                                captures.append(record)
+                            else:
+                                skipped.append(record)
+                if plot:
+                    figures[axis].update_layout(
+                        title=f"Validate Baseline {axis}",
+                        xaxis_title="Bins",
+                        yaxis_title="Photon Count",
+                        template="plotly_white",
+                    )
                     figures[axis].show()
 
-    print("\n---------------- RESULT -------------- \n")
-    if detected_labware:
-        print("ZONES DETECTED\n")
-        for stacker, samples in detected_labware.items():
-            for sample in samples:
-                axis = sample["axis"]
-                platform = sample["platform"]
-                zone = sample["zone"]
-                bin = sample["bin"]
-                value = sample["raw_data_value"]
-                base = sample["baseline_value"]
-                delta = sample["delta"]
-                lw = sample["labware"]
-                print(
-                    f"{stacker} DETECTED {lw} {axis} {platform} zn:{zone} bin:{bin} photon:{value} base:{base} delta:{delta}"
-                )
-
-    # Empty captures are named "baseline". Not detecting them is the correct state.
-    if labware_names == {"baseline"}:
-        detections = sum(len(hits) for hits in detected_labware.values())
-        if detections == 0:
-            print(
-                f"\nSUCCESS: all {samples_count} samples are baseline and none were detected.\n"
-            )
-        else:
-            print(
-                f"\nFAILED: {detections} baseline samples were detected as labware.\n"
-            )
-        return
-
-    print("\nZONES NOT DETECTED\n")
-    for stacker, samples in undetected_labware.items():
-        for sample in samples:
-            lw, axis, dir, zn = sample
-            print(f"{stacker} NOT DETECT {lw} {axis} {dir} zn={zn}")
-
-    # Check if any stackers failed to detect ANY labware
-    print("\n\n")
-    all_detected = True
-    for stacker in undetected_labware:
-        if stacker not in detected_labware:
-            print(f"WARNING NO DETECTION ACROSS ZONES {stacker}")
-            all_detected = False
-
-    if all_detected:
-        print("\nSUCCESS: ALL SAMPLES DETECTED!\n")
-    else:
-        print("\nFAILED: SOME SAMPLES NOT DETECTED!\n")
+            # Score X extend only when that is the platform the user asked for.
+            score_x_extend = set(config["platform_list_x"]) == {"extend"}
+            _summarize_validation(captures, skipped, score_x_extend)
 
 
 def main(args: argparse.Namespace) -> None:
@@ -837,7 +900,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "-l",
         "--labwares",
-        help="The list of labware to use, set to 'all' for all labware. Uses 'baseline' by default.",
+        help=(
+            "Labware names to include. Pass 'all' to keep every labware.\n"
+            "Generate and plot default to 'baseline'. Validate defaults to all labware."
+        ),
         default=[],
         nargs="+",
     )
@@ -860,8 +926,8 @@ if __name__ == "__main__":
         default="",
     )
     parser.add_argument(
-        "--disable-validation-plot",
-        help="Disables grapping the validation plots.",
+        "--enable-validation-plot",
+        help="Open the validation plots. The pass/fail report is printed either way.",
         action="store_true",
         default=False,
     )
