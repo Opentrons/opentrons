@@ -23,17 +23,17 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     AreaType,
     DeckPoint,
+    DeckType,
     Dimensions,
     PotentialCutoutFixture,
 )
-from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 def test_get_cutout_position(

@@ -70,14 +70,13 @@ from opentrons.protocol_engine.types import (
     ModuleOffsetData,
     PotentialCutoutFixture,
 )
-from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName, MountType
 
 
 @pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-3 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 def get_addressable_area_view(

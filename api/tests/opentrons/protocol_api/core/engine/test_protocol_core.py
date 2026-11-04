@@ -88,13 +88,11 @@ from opentrons.protocol_engine.state.labware import (
 )
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
+    DeckType,
     FlowRates,
     HexColor,
 )
-from opentrons.protocol_engine.types import (
-    Liquid as PE_Liquid,
-)
-from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
+from opentrons.protocol_engine.types import Liquid as PE_Liquid
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, Mount, MountType, Point, StagingSlotName
 
@@ -102,7 +100,7 @@ from opentrons.types import DeckSlotName, Mount, MountType, Point, StagingSlotNa
 @pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 @pytest.fixture(autouse=True)

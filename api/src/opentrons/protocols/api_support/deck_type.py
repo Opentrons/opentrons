@@ -10,13 +10,13 @@ from opentrons.protocol_reader.protocol_source import (
     ProtocolConfig,
     PythonProtocolConfig,
 )
+from opentrons.protocol_engine.types import DeckType
 from opentrons.protocols.api_support.types import APIVersion
 
-# TODO(mm, 2023-05-10): Deduplicate these constants with
-# opentrons.protocol_engine.types.DeckType and consider moving to shared-data.
+# TODO(jbl, 2026-11-04) These should be removed once the relevant areas of legacy code is removed
+#   Do not under any circumstances add back in STANDARD_OT3_DECK
 SHORT_TRASH_DECK = "ot2_short_trash"
 STANDARD_OT2_DECK = "ot2_standard"
-STANDARD_OT3_DECK = "ot3_standard"
 
 
 LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
@@ -85,7 +85,7 @@ def guess_from_global_config() -> str:
     not match the protocol's declared robot type. Use `for_analysis` instead.
     """
     if feature_flags.enable_ot3_hardware_controller():
-        return STANDARD_OT3_DECK
+        return DeckType.OT3_STANDARD
     elif feature_flags.short_fixed_trash():
         return SHORT_TRASH_DECK
     else:
@@ -105,4 +105,4 @@ def for_simulation(robot_type: RobotType) -> str:
         return STANDARD_OT2_DECK
     elif robot_type == "OT-3 Standard":
         # OT-3s currently only have a single deck type.
-        return STANDARD_OT3_DECK
+        return DeckType.OT3_STANDARD

@@ -20,8 +20,11 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
-from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
-from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
+from opentrons.protocol_engine.types import (
+    DeckType,
+    ModuleDefinition,
+    PeripheralDefinition,
+)
 
 
 @pytest.fixture
@@ -43,7 +46,7 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 @pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-3 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 @pytest.fixture(scope="session")
