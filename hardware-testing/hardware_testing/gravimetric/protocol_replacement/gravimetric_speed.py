@@ -2361,7 +2361,8 @@ DECK_TO_STACKER_DROP_OFFSET_SOURCES = [
 # Search order:
 # 1. GRAVIMETRIC_STACKER_DROP_OFFSETS_CONFIG environment variable.
 # 2. A file next to this protocol when __file__ is available.
-# 3. infer_config_base_dir()/hardware_testing/gravimetric/protocol_replacement.
+# 3. The protocol_replacement directory in the imported gravimetric package.
+# 4. infer_config_base_dir()/hardware_testing/gravimetric/protocol_replacement.
 #
 # Expected JSON shape:
 # {
@@ -2441,6 +2442,13 @@ def _stacker_drop_offsets_config_paths() -> List[str]:
         )
     paths.append(
         os.path.join(
+            os.path.dirname(os.path.abspath(str(config.__file__))),
+            "protocol_replacement",
+            STACKER_DROP_OFFSETS_CONFIG_FILE,
+        )
+    )
+    paths.append(
+        os.path.join(
             str(infer_config_base_dir()),
             "hardware_testing",
             "gravimetric",
@@ -2496,6 +2504,9 @@ def _load_stacker_drop_offsets_config(
     Dict[Tuple[str, str], Dict[str, float]],
     Dict[Tuple[str, str], Dict[str, float]],
 ]:
+    print_info(
+        f"Gravimetric config module loaded from: {os.path.abspath(str(config.__file__))}"
+    )
     stacker_to_deck_offsets = _default_stacker_to_deck_drop_offsets()
     deck_to_stacker_offsets = _default_deck_to_stacker_drop_offsets()
     for path in _stacker_drop_offsets_config_paths():
@@ -2515,7 +2526,10 @@ def _load_stacker_drop_offsets_config(
                 "deck_to_stacker", raw_config.get("deck_to_stacker", {})
             )
         )
+        print_info(f"Stacker drop offsets loaded from: {os.path.abspath(path)}")
         break
+    else:
+        print_warning("No stacker drop-offset JSON found; using built-in defaults.")
     return stacker_to_deck_offsets, deck_to_stacker_offsets
 
 
