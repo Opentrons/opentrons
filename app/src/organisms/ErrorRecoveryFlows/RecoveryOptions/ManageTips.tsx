@@ -362,13 +362,30 @@ function resolveTipsAndContinue(
     }
 
     dispatch(setDropTipPromptDismissed(tipStatusUtils.runId))
-    continueAfterTipsHandled(props, afterDropComplete)
+    routeWhenNoPipetteWithTip(props, {
+      afterDropComplete,
+      ifNoSpecialRoute: 'cancel',
+    })
   })
 }
 
-function continueAfterTipsHandled(
+// Handle cases in which there is no pipette that could be used for drop tip wizard by routing
+// to the next step or to option selection, if no special routing is provided.
+function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
+  if (props.tipStatusUtils.aPipetteWithTip == null) {
+    routeWhenNoPipetteWithTip(props, { ifNoSpecialRoute: 'optionSelection' })
+  }
+}
+
+function routeWhenNoPipetteWithTip(
   props: RecoveryContentProps,
-  afterDropComplete: boolean
+  {
+    afterDropComplete = false,
+    ifNoSpecialRoute,
+  }: {
+    afterDropComplete?: boolean
+    ifNoSpecialRoute: 'cancel' | 'optionSelection'
+  }
 ): void {
   const { routeUpdateActions, recoveryCommands, currentRecoveryOptionUtils } =
     props
@@ -381,6 +398,7 @@ function continueAfterTipsHandled(
     SKIP_STEP_WITH_NEW_TIPS,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
+    OPTION_SELECTION,
   } = RECOVERY_MAP
 
   switch (selectedRecoveryOption) {
@@ -411,60 +429,12 @@ function continueAfterTipsHandled(
       )
       break
     default:
-      void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
-        cancelRun()
-      })
-  }
-}
-
-// Handle cases in which there is no pipette that could be used for drop tip wizard by routing
-// to the next step or to option selection, if no special routing is provided.
-function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
-  const { routeUpdateActions, currentRecoveryOptionUtils, tipStatusUtils } =
-    props
-  const { proceedToRouteAndStep } = routeUpdateActions
-  const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    RETRY_NEW_TIPS,
-    SKIP_STEP_WITH_NEW_TIPS,
-    OPTION_SELECTION,
-    HOME_AND_RETRY,
-    MANUAL_FILL_AND_RETRY_NEW_TIPS,
-  } = RECOVERY_MAP
-
-  if (tipStatusUtils.aPipetteWithTip == null) {
-    switch (selectedRecoveryOption) {
-      case RETRY_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
+      if (ifNoSpecialRoute === 'cancel') {
+        void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
+          cancelRun()
+        })
+      } else {
+        void proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
       }
-      case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
-      }
-      case HOME_AND_RETRY.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
-        )
-        break
-      }
-      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
-      }
-      default: {
-        proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
-      }
-    }
   }
 }

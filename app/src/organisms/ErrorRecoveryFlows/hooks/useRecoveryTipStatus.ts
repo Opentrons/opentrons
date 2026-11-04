@@ -8,12 +8,7 @@ import { ERROR_KINDS } from '/app/organisms/ErrorRecoveryFlows/constants'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 
-import type {
-  Instruments,
-  Mount,
-  PipetteData,
-  Run,
-} from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { ERUtilsProps } from '/app/organisms/ErrorRecoveryFlows/hooks/useERUtils'
 import type {
   PipetteWithTip,
@@ -24,8 +19,6 @@ interface UseRecoveryTipStatusProps {
   runId: string
   failedCommand: ERUtilsProps['failedCommand']
   failedPipetteInfo: PipetteData | null
-  attachedInstruments?: Instruments
-  runRecord?: Run
 }
 
 export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
@@ -33,8 +26,6 @@ export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
   isLoadingTipStatus: boolean
   runId: string
   gripperErrorFirstPipetteWithTip: string | null
-  /* Ignore the current pipette on the next probe so skip can advance to another mount. */
-  skipCurrentPipette: () => void
 }
 
 // Wraps the tip attachment status utils with Error Recovery specific states and values.

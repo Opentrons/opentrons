@@ -313,11 +313,11 @@ export function RunSummary(): ReactNode {
         return
       }
 
-      if (!hasCheckedTips && !isPromptDismissed) {
+      if (!hasCheckedTips) {
         return
       }
 
-      if (aPipetteWithTip == null || isPromptDismissed) {
+      if (aPipetteWithTip == null) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
           setSplashClicked(false)
@@ -329,13 +329,7 @@ export function RunSummary(): ReactNode {
       setSplashClicked(false)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      splashClicked,
-      isRunCurrent,
-      hasCheckedTips,
-      aPipetteWithTip,
-      isPromptDismissed,
-    ]
+    [splashClicked, isRunCurrent, hasCheckedTips, aPipetteWithTip]
   )
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
