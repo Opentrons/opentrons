@@ -13,6 +13,7 @@ type UseProtocolDropTipModalProps = Pick<
   isPromptDismissed: boolean
   enableDTWiz: () => void
   onSkipAndHome: () => void
+  is96Channel?: boolean
 }
 
 export type UseProtocolDropTipModalResult =
@@ -29,6 +30,7 @@ export function useProtocolDropTipModal({
   enableDTWiz,
   onSkipAndHome,
   pipetteInfo,
+  is96Channel = false,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showModal, setShowModal] = useState(
     hasPipetteWithTip && !isPromptDismissed
@@ -68,6 +70,8 @@ export function useProtocolDropTipModal({
           onSkip,
           onBeginRemoval,
           isPressed: isHoming,
+          mount: pipetteInfo?.mount,
+          is96Channel,
         },
       }
     : { showModal: false, modalProps: null }

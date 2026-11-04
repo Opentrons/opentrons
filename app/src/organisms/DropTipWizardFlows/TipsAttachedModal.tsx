@@ -77,7 +77,6 @@ const TipsAttachedModal = NiceModal.create(
     }
 
     const is96Channel = specs.channels === 96
-    const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
       <ApiHostProvider robotName={robotName}>
@@ -86,9 +85,13 @@ const TipsAttachedModal = NiceModal.create(
             <StyledText forwardedAs="p">
               <Trans
                 t={t}
-                i18nKey="liquid_damages_this_pipette"
+                i18nKey={
+                  is96Channel
+                    ? 'liquid_damages_pipette'
+                    : 'liquid_damages_this_pipette'
+                }
                 values={{
-                  mount: displayMountText,
+                  mount,
                 }}
                 components={{
                   mount: <strong />,

@@ -77,6 +77,7 @@ export function useRunHeaderDropTip({
     isPromptDismissed,
     enableDTWiz,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
+    is96Channel: aPipetteWithTip?.specs.channels === 96,
     onSkipAndHome: () => {
       skipCurrentPipette()
       checkTipStatus()

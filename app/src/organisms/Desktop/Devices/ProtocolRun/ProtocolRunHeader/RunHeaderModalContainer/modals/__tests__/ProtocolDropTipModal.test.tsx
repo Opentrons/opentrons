@@ -46,6 +46,8 @@ describe('useProtocolDropTipModal', () => {
         onSkip: expect.any(Function),
         onBeginRemoval: expect.any(Function),
         isPressed: false,
+        mount: 'left',
+        is96Channel: false,
       },
     })
   })
@@ -165,11 +167,21 @@ describe('ProtocolDropTipModal', () => {
     render(props)
 
     screen.getByText('Remove any attached tips')
-    screen.queryByText(
-      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    screen.getByText('left pipette')
+    screen.getByText(
+      /with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
     screen.getByText('Begin removal')
     screen.getByText('Skip and home pipette')
+  })
+
+  it('does not name a mount for a 96-Channel pipette', () => {
+    render({ ...props, is96Channel: true })
+
+    expect(screen.queryByText('left pipette', { exact: false })).toBeNull()
+    screen.getByText(
+      'Homing the pipette with liquid in the tips may damage it. You must remove all tips before using the pipette again.'
+    )
   })
 
   it('renders a spinner and pressed loading state on Begin removal while homing', () => {
