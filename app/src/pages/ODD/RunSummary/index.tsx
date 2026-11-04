@@ -128,6 +128,7 @@ export function RunSummary(): ReactNode {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
+  const [hasCheckedTips, setHasCheckedTips] = useState(false)
   const [showSplash, setShowSplash] = useState(
     runStatus === RUN_STATUS_FAILED ||
       runStatus === RUN_STATUS_SUCCEEDED ||
@@ -284,12 +285,7 @@ export function RunSummary(): ReactNode {
     ) : null
   }
 
-  const {
-    determineTipStatus,
-    setTipStatusResolved,
-    aPipetteWithTip,
-    initialPipettesWithTipsCount,
-  } = useTipAttachmentStatus()
+  const { determineTipStatus, aPipetteWithTip } = useTipAttachmentStatus()
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({
@@ -304,7 +300,9 @@ export function RunSummary(): ReactNode {
     () => {
       // Only run tip checking if it wasn't *just* handled during Error Recovery.
       if (runSummaryNoFixit != null && !tipCheckSkippedBecauseER) {
-        void determineTipStatus()
+        void determineTipStatus().then(() => {
+          setHasCheckedTips(true)
+        })
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -326,23 +324,25 @@ export function RunSummary(): ReactNode {
         setSplashClicked(false)
         return
       }
-      if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
+      if (!hasCheckedTips && !tipCheckSkippedBecauseER) {
+        return
+      }
+      if (aPipetteWithTip == null || tipCheckSkippedBecauseER) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
           setSplashClicked(false)
         })
         return
       }
-      if (initialPipettesWithTipsCount != null) {
-        setShowSplash(false)
-        setSplashClicked(false)
-      }
+      setShowSplash(false)
+      setSplashClicked(false)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       splashClicked,
       isRunCurrent,
-      initialPipettesWithTipsCount,
+      hasCheckedTips,
+      aPipetteWithTip,
       tipCheckSkippedBecauseER,
     ]
   )
@@ -372,21 +372,21 @@ export function RunSummary(): ReactNode {
     }
   }
 
-  // If no pipettes have tips attached, execute the routing callback.
-  const setTipStatusResolvedAndRoute = (
-    routeCb: (aPipetteWithTip: PipetteWithTip) => void
-  ): (() => Promise<void>) => {
-    return () =>
-      setTipStatusResolved().then(newPipettesWithTip => {
-        routeCb(newPipettesWithTip)
+  const probeThenRoute = (
+    routeCb: (aPipetteWithTip: PipetteWithTip | null) => void
+  ): (() => void) => {
+    return () => {
+      void determineTipStatus().then(pipettes => {
+        routeCb(pipettes[0] ?? null)
       })
+    }
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
     setShowReturnToSpinner(true)
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
-        setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
+        onTipsHandled: probeThenRoute(handleReturnToDash),
         robotName,
         aPipetteWithTip,
         onSuccess: () => {
@@ -405,7 +405,7 @@ export function RunSummary(): ReactNode {
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
-        setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
+        onTipsHandled: probeThenRoute(handleRunAgain),
         robotName,
         aPipetteWithTip,
         onSuccess: () => {

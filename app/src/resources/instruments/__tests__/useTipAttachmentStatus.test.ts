@@ -69,9 +69,7 @@ describe('useTipAttachmentStatus', () => {
       expect(result.current).toBeDefined()
     })
 
-    expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toEqual(null)
-    expect(result.current.initialPipettesWithTipsCount).toEqual(null)
   })
 
   it('should determine tip status from tipDetected', async () => {
@@ -81,12 +79,10 @@ describe('useTipAttachmentStatus', () => {
       await result.current.determineTipStatus()
     })
 
-    expect(result.current.areTipsAttached).toBe(true)
     expect(result.current.aPipetteWithTip).toMatchObject({
       mount: 'left',
       specs: MOCK_ACTUAL_PIPETTE,
     })
-    expect(result.current.initialPipettesWithTipsCount).toBe(2)
   })
 
   it('should treat tipDetected false or missing as no tip', async () => {
@@ -105,9 +101,7 @@ describe('useTipAttachmentStatus', () => {
       await result.current.determineTipStatus()
     })
 
-    expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toBeNull()
-    expect(result.current.initialPipettesWithTipsCount).toBe(0)
   })
 
   it('should handle network errors', async () => {
@@ -118,9 +112,7 @@ describe('useTipAttachmentStatus', () => {
       await result.current.determineTipStatus()
     })
 
-    expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toBeNull()
-    expect(result.current.initialPipettesWithTipsCount).toBe(0)
   })
 
   it('should reset tip status', async () => {
@@ -134,107 +126,7 @@ describe('useTipAttachmentStatus', () => {
       result.current.resetTipStatus()
     })
 
-    expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toEqual(null)
-    expect(result.current.initialPipettesWithTipsCount).toEqual(null)
-  })
-
-  it('should resolve all tips without resetting the settled tip-check count', async () => {
-    const { result } = renderTipAttachmentStatus()
-
-    await act(async () => {
-      await result.current.determineTipStatus()
-    })
-
-    expect(result.current.areTipsAttached).toBe(true)
-    expect(result.current.initialPipettesWithTipsCount).toBe(2)
-
-    act(() => {
-      result.current.resolveAllTips()
-    })
-
-    expect(result.current.areTipsAttached).toBe(false)
-    expect(result.current.aPipetteWithTip).toEqual(null)
-    expect(result.current.initialPipettesWithTipsCount).toBe(2)
-  })
-
-  it('should set tip status resolved and advance to the next pipette', async () => {
-    const { result } = renderTipAttachmentStatus()
-
-    await act(async () => {
-      await result.current.determineTipStatus()
-    })
-
-    expect(result.current.aPipetteWithTip).toMatchObject({
-      mount: 'left',
-      specs: MOCK_ACTUAL_PIPETTE,
-    })
-
-    act(() => {
-      result.current.setTipStatusResolved()
-    })
-
-    await waitFor(() =>
-      expect(result.current.aPipetteWithTip?.mount).toBe('right')
-    )
-  })
-
-  it('should call onEmptyCache callback when cache becomes empty', async () => {
-    vi.mocked(getInstruments).mockResolvedValueOnce({
-      data: {
-        data: [
-          mockPipetteData,
-          { ...mockSecondPipetteData, state: { tipDetected: false } },
-        ],
-      },
-    } as any)
-
-    const onEmptyCacheMock = vi.fn()
-    const { result } = renderTipAttachmentStatus()
-
-    await act(async () => {
-      await result.current.determineTipStatus()
-    })
-
-    expect(result.current.aPipetteWithTip).toMatchObject({
-      mount: 'left',
-      specs: MOCK_ACTUAL_PIPETTE,
-    })
-
-    act(() => {
-      result.current.setTipStatusResolved(onEmptyCacheMock)
-    })
-
-    await waitFor(() => {
-      expect(onEmptyCacheMock).toHaveBeenCalled()
-    })
-  })
-
-  it('should call onTipsDetected callback when tips remain after resolution', async () => {
-    const onTipsDetectedMock = vi.fn()
-    const { result } = renderTipAttachmentStatus()
-
-    await act(async () => {
-      await result.current.determineTipStatus()
-    })
-
-    expect(result.current.aPipetteWithTip).toMatchObject({
-      mount: 'left',
-      specs: MOCK_ACTUAL_PIPETTE,
-    })
-
-    act(() => {
-      result.current.setTipStatusResolved(undefined, onTipsDetectedMock)
-    })
-
-    await waitFor(() => {
-      expect(onTipsDetectedMock).toHaveBeenCalled()
-    })
-
-    expect(result.current.aPipetteWithTip).toMatchObject({
-      mount: 'right',
-      specs: MOCK_ACTUAL_PIPETTE,
-    })
   })
 
   it('should return the left pipette first when both have tips', async () => {

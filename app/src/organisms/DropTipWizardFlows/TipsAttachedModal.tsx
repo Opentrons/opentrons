@@ -26,7 +26,7 @@ import type { PipetteDetails } from '/app/resources/maintenance_runs'
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
   aPipetteWithTip: PipetteWithTip
   robotName: string | null
-  setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
+  onTipsHandled: () => void
 }
 
 export const handleTipsAttachedModal = (
@@ -39,12 +39,8 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): ReactNode => {
-    const {
-      aPipetteWithTip,
-      robotName,
-      setTipStatusResolved,
-      ...homePipetteProps
-    } = props
+    const { aPipetteWithTip, robotName, onTipsHandled, ...homePipetteProps } =
+      props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
@@ -57,7 +53,7 @@ const TipsAttachedModal = NiceModal.create(
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
       onSuccess: () => {
         modal.remove()
-        void setTipStatusResolved()
+        onTipsHandled()
       },
     })
 
@@ -76,7 +72,7 @@ const TipsAttachedModal = NiceModal.create(
 
       if (!isTakeover) {
         modal.remove()
-        void setTipStatusResolved()
+        onTipsHandled()
       }
     }
 

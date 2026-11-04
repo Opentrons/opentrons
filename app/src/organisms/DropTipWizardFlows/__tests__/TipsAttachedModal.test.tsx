@@ -48,7 +48,7 @@ const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
 
 const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
-const mockSetTipStatusResolved = vi.fn()
+const mockOnTipsHandled = vi.fn()
 const MOCK_ROBOT_NAME = 'MOCK_ROBOT'
 
 const render = (aPipetteWithTip: PipetteWithTip) => {
@@ -59,7 +59,7 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
           handleTipsAttachedModal({
             robotName: MOCK_ROBOT_NAME,
             aPipetteWithTip,
-            setTipStatusResolved: mockSetTipStatusResolved,
+            onTipsHandled: mockOnTipsHandled,
             onSuccess: vi.fn(),
           })
         }

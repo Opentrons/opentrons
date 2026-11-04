@@ -185,7 +185,7 @@ function DropTipFlowsContainer(
   } = RECOVERY_MAP
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { setTipStatusResolved } = tipStatusUtils
+  const { determineTipStatus } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
   const { mount, specs } = tipStatusUtils.aPipetteWithTip! // Safe as we have to have tips to get to this point in the flow.
@@ -209,7 +209,13 @@ function DropTipFlowsContainer(
         MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
       )
     } else {
-      void setTipStatusResolved(onEmptyCache, onTipsDetected)
+      void determineTipStatus().then(pipettes => {
+        if (pipettes.length === 0) {
+          onEmptyCache()
+        } else {
+          onTipsDetected()
+        }
+      })
     }
   }
 
