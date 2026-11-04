@@ -26,24 +26,9 @@ from opentrons.protocol_engine.types import (
     Dimensions,
     PotentialCutoutFixture,
 )
-from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
 from opentrons.types import DeckSlotName
 
-
-@pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
-
-
-@pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 5)
 
 
 @pytest.fixture(scope="session")
@@ -52,33 +37,13 @@ def ot3_standard_deck_def() -> DeckDefinitionV6:
     return load_deck(STANDARD_OT3_DECK, 6)
 
 
-@pytest.mark.parametrize(
-    ("cutout_id", "expected_deck_point", "deck_def"),
-    [
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "cutoutC2",
-            DeckPoint(x=164.0, y=107, z=0.0),
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
+
 def test_get_cutout_position(
-    cutout_id: str,
-    expected_deck_point: DeckPoint,
-    deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the deck position for the requested cutout id."""
-    cutout_position = subject.get_cutout_position(cutout_id, deck_def)
+    expected_deck_point = DeckPoint(x=164.0, y=107, z=0.0)
+    cutout_position = subject.get_cutout_position("cutoutC2", ot3_standard_deck_def)
     assert cutout_position == expected_deck_point
 
 
@@ -90,29 +55,13 @@ def test_get_cutout_position_raises(
         subject.get_cutout_position("theFunCutout", ot3_standard_deck_def)
 
 
-@pytest.mark.parametrize(
-    ("cutout_fixture_id", "expected_display_name", "deck_def"),
-    [
-        ("singleStandardSlot", "Standard Slot", lazy_fixture("ot2_standard_deck_def")),
-        (
-            "singleStandardSlot",
-            "Standard Slot",
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "singleRightSlot",
-            "Standard Slot Right",
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
+
 def test_get_cutout_fixture(
-    cutout_fixture_id: str,
-    expected_display_name: str,
-    deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the cutout fixture given the cutout fixture id."""
-    cutout_fixture = subject.get_cutout_fixture(cutout_fixture_id, deck_def)
+    expected_display_name = "Standard Slot Right"
+    cutout_fixture = subject.get_cutout_fixture("singleRightSlot", ot3_standard_deck_def)
     assert cutout_fixture["displayName"] == expected_display_name
 
 
@@ -124,38 +73,13 @@ def test_get_cutout_fixture_raises(
         subject.get_cutout_fixture("theFunFixture", ot3_standard_deck_def)
 
 
-@pytest.mark.parametrize(
-    ("cutout_fixture_id", "cutout_id", "expected_areas", "deck_def"),
-    [
-        (
-            "singleStandardSlot",
-            "cutout1",
-            ["1"],
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "singleStandardSlot",
-            "cutout1",
-            ["1"],
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "stagingAreaRightSlot",
-            "cutoutD3",
-            ["D3", "D4"],
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 def test_get_provided_addressable_area_names(
-    cutout_fixture_id: str,
-    cutout_id: str,
-    expected_areas: List[str],
-    deck_def: DeckDefinitionV6,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the provided addressable area for the cutout fixture and cutout."""
+    expected_areas = ["D3", "D4"]
     provided_addressable_areas = subject.get_provided_addressable_area_names(
-        cutout_fixture_id, cutout_id, deck_def
+        "stagingAreaRightSlot", "cutoutD3", ot3_standard_deck_def
     )
     assert provided_addressable_areas == expected_areas
 
@@ -168,30 +92,6 @@ def test_get_provided_addressable_area_names(
         "deck_def",
     ),
     [
-        (
-            "3",
-            "cutout3",
-            {
-                PotentialCutoutFixture(
-                    cutout_id="cutout3",
-                    cutout_fixture_id="singleStandardSlot",
-                    provided_addressable_areas=frozenset({"3"}),
-                )
-            },
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "3",
-            "cutout3",
-            {
-                PotentialCutoutFixture(
-                    cutout_id="cutout3",
-                    cutout_fixture_id="singleStandardSlot",
-                    provided_addressable_areas=frozenset({"3"}),
-                )
-            },
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
         (
             "D3",
             "cutoutD3",
@@ -285,7 +185,6 @@ def test_get_potential_cutout_fixtures_raises(
         subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 
-# TODO put in fixed trash for OT2 decks
 @pytest.mark.parametrize(
     ("addressable_area_name", "expected_addressable_area", "deck_def"),
     [
