@@ -8,13 +8,7 @@ from Pyro5.api import Proxy
 from opentrons_shared_data.labware.types import LabwareDefinition
 
 from .core.common import ProtocolCore as AbstractProtocolCore
-from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
-from .core.legacy.deck import Deck as LegacyDeck
-from .core.legacy.labware_offset_provider import (
-    AbstractLabwareOffsetProvider,
-    LabwareOffsetProvider,
-    NullLabwareOffsetProvider,
-)
+from .core.engine import ProtocolCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
 from .deck import Deck
@@ -52,8 +46,8 @@ def create_protocol_context(  # noqa: C901
     *,
     hardware_api: Union[HardwareControlAPI, ThreadManager[HardwareControlAPI]],
     deck_type: str,
-    protocol_engine: Optional[ProtocolEngine] = None,
-    protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
+    protocol_engine: ProtocolEngine,
+    protocol_engine_loop: asyncio.AbstractEventLoop,
     broker: Optional[LegacyBroker] = None,
     equipment_broker: Optional[Broker[Any]] = None,
     use_simulating_core: bool = False,
@@ -103,7 +97,6 @@ def create_protocol_context(  # noqa: C901
         )
 
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
-    labware_offset_provider: AbstractLabwareOffsetProvider
     core: Union[ProtocolCore, LegacyProtocolCoreSimulator, LegacyProtocolCore]
 
     if isinstance(hardware_api, ThreadManager):
@@ -117,52 +110,15 @@ def create_protocol_context(  # noqa: C901
     else:
         sync_hardware = SynchronousAdapter(hardware_api)
 
-    if protocol_engine is not None:
-        assert deck_type == protocol_engine.state_view.config.deck_type.value
-        labware_offset_provider = LabwareOffsetProvider(engine=protocol_engine)
-    else:
-        labware_offset_provider = NullLabwareOffsetProvider()
-
-    if api_version >= ENGINE_CORE_API_VERSION:
-        # TODO(mc, 2022-8-22): replace raise with strict typing
-        if protocol_engine is None or protocol_engine_loop is None:
-            raise ProtocolEngineCoreRequiredError(
-                "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
-            )
-
-        engine_client_transport = ChildThreadTransport(
-            engine=protocol_engine, loop=protocol_engine_loop
-        )
-        engine_client = SyncClient(transport=engine_client_transport)
-        core = ProtocolCore(
-            engine_client=engine_client,
-            api_version=api_version,
-            sync_hardware=sync_hardware,
-        )
-
-    elif use_simulating_core:
-        legacy_deck = LegacyDeck(deck_type=deck_type)
-        core = LegacyProtocolCoreSimulator(
-            sync_hardware=sync_hardware,
-            labware_offset_provider=labware_offset_provider,
-            deck_layout=legacy_deck,
-            equipment_broker=equipment_broker,
-            api_version=api_version,
-            bundled_labware=bundled_labware,
-            extra_labware=extra_labware,
-        )
-
-    else:
-        legacy_deck = LegacyDeck(deck_type=deck_type)
-        core = LegacyProtocolCore(
-            sync_hardware=sync_hardware,
-            labware_offset_provider=labware_offset_provider,
-            deck_layout=legacy_deck,
-            equipment_broker=equipment_broker,
-            api_version=api_version,
-            bundled_labware=bundled_labware,
-            extra_labware=extra_labware,
-        )
+    engine_client_transport = ChildThreadTransport(
+        engine=protocol_engine, loop=protocol_engine_loop
+    )
+    engine_client = SyncClient(transport=engine_client_transport)
+    core = ProtocolCore(
+        engine_client=engine_client,
+        api_version=api_version,
+        sync_hardware=sync_hardware,
+    )
 
     # TODO(mc, 2022-12-06): add API version guard in addition to instance check
     # this swap may happen once `ctx.move_labware` off-deck is implemented
@@ -183,9 +139,8 @@ def create_protocol_context(  # noqa: C901
     # knowing what addressable areas have been loaded (and any checks involving trash geometry). Because the method
     # that uses this in the core relies on the sync client and this code will run in the main thread (which if called
     # will cause a deadlock), we're directly calling the protocol engine method here where we have access to it.
-    if protocol_engine is not None and should_load_fixed_trash_area_for_python_protocol(
-        api_version=api_version,
-        robot_type=protocol_engine.state_view.config.robot_type,
+    if should_load_fixed_trash_area_for_python_protocol(
+        api_version=api_version, robot_type=protocol_engine.state_view.config.robot_type
     ):
         assert isinstance(context.fixed_trash, TrashBin)
         protocol_engine.add_addressable_area(context.fixed_trash.area_name)

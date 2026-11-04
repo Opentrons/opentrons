@@ -69,9 +69,9 @@ from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
+from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.duration import DurationEstimator
-from opentrons.protocols.execution import execute
 from opentrons.protocols.types import (
     ApiDeprecationError,
     BundleContents,
@@ -308,34 +308,29 @@ def get_protocol_api(
         override=hardware_simulator, robot_type=parsed_robot_type
     )
 
-    if checked_version < ENGINE_CORE_API_VERSION:
-        context = _create_live_context_non_pe(
-            api_version=checked_version,
-            deck_type=deck_type,
-            hardware_api=checked_hardware,
-            bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
-            clean_up_hardware=(hardware_simulator is None),
+    if checked_version < MIN_SUPPORTED_VERSION:
+        raise NotImplementedError(
+            f"This protocol requests API level {checked_version}, but this simulator "
+            f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
         )
-    else:
-        if bundled_labware is not None:
-            # Protocol Engine has a deep assumption that standard labware definitions are always
-            # implicitly loadable.
-            raise NotImplementedError(
-                f"The bundled_labware argument is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-            )
-        context = _create_live_context_pe(
-            api_version=checked_version,
-            robot_type=parsed_robot_type,
-            deck_type=deck_type,
-            hardware_api=checked_hardware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
-            use_pe_virtual_hardware=use_virtual_hardware,
-            clean_up_hardware=(hardware_simulator is None),
+
+    if bundled_labware is not None:
+        # Protocol Engine has a deep assumption that standard labware definitions are always
+        # implicitly loadable.
+        raise NotImplementedError(
+            f"The bundled_labware argument is not currently supported for Python protocols"
+            f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
         )
+    context = _create_live_context_pe(
+        api_version=checked_version,
+        robot_type=parsed_robot_type,
+        deck_type=deck_type,
+        hardware_api=checked_hardware,
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
+        use_pe_virtual_hardware=use_virtual_hardware,
+        clean_up_hardware=(hardware_simulator is None),
+    )
 
     # Intentional difference from execute.get_protocol_api():
     # For the caller's convenience, we home the virtual hardware so they don't get MustHomeErrors.
@@ -580,30 +575,27 @@ def simulate(
         ),
         robot_type=protocol.robot_type,
     ) as hardware_simulator:
-        if protocol.api_level < ENGINE_CORE_API_VERSION:
-            return _run_file_non_pe(
-                protocol=protocol,
-                hardware_api=hardware_simulator,
-                logger=stack_logger,
-                level=log_level,
-                duration_estimator=duration_estimator,
+        if protocol.api_level < MIN_SUPPORTED_VERSION:
+            raise NotImplementedError(
+                f"This protocol requests API level {protocol.api_level}, but this simulator "
+                f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
             )
-        else:
-            # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
-            # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
-            if custom_data_paths:
-                raise NotImplementedError(
-                    f"The custom_data_paths argument is not currently supported for Python protocols"
-                    f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-                )
-            protocol_file.seek(0)
-            return _run_file_pe(
-                protocol=protocol,
-                robot_type=protocol.robot_type,
-                hardware_api=hardware_simulator,
-                stack_logger=stack_logger,
-                log_level=log_level,
+
+        # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
+        # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
+        if custom_data_paths:
+            raise NotImplementedError(
+                f"The custom_data_paths argument is not currently supported for Python protocols"
+                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
             )
+        protocol_file.seek(0)
+        return _run_file_pe(
+            protocol=protocol,
+            robot_type=protocol.robot_type,
+            hardware_api=hardware_simulator,
+            stack_logger=stack_logger,
+            log_level=log_level,
+        )
 
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
@@ -798,42 +790,6 @@ def _get_bundle_dest(
         return None
 
 
-def _create_live_context_non_pe(
-    api_version: APIVersion,
-    hardware_api: ThreadManagedHardware,
-    deck_type: str,
-    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_data: Optional[Dict[str, bytes]],
-    clean_up_hardware: bool,
-) -> ProtocolContext:
-    """Return a live ProtocolContext.
-
-    This controls the robot through the older infrastructure, instead of through Protocol Engine.
-    """
-    assert api_version < ENGINE_CORE_API_VERSION
-
-    ctx = protocol_api.create_protocol_context(
-        api_version=api_version,
-        deck_type=deck_type,
-        hardware_api=hardware_api,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-    )
-    # Hack: we need to hook the protocol context cleanup in a way that isn't safe to put
-    # in the context generally, so we can do it like this and feel sad
-    original_cleanup = ctx.cleanup
-
-    def _cleanup_hook() -> None:
-        if clean_up_hardware:
-            ctx._hw_manager.hardware.clean_up()
-        original_cleanup()
-
-    ctx.cleanup = _cleanup_hook  # type: ignore[method-assign]
-    return ctx
-
-
 def _create_live_context_pe(
     api_version: APIVersion,
     hardware_api: ThreadManagedHardware,
@@ -900,65 +856,6 @@ def _create_live_context_pe(
         protocol_engine_loop=loop,
         bundled_data=bundled_data,
     )
-
-
-def _run_file_non_pe(
-    protocol: Protocol,
-    hardware_api: ThreadManagedHardware,
-    logger: logging.Logger,
-    level: str,
-    duration_estimator: Optional[DurationEstimator],
-) -> _SimulateResult:
-    """Run a protocol file without Protocol Engine, with the older infrastructure instead."""
-    if isinstance(protocol, PythonProtocol):
-        extra_labware = protocol.extra_labware
-        bundled_labware = protocol.bundled_labware
-        bundled_data = protocol.bundled_data
-    else:
-        # JSON protocols do have "bundled labware" embedded in them, but those aren't represented in
-        # the parsed Protocol object and we don't need to create the ProtocolContext with them.
-        # execute_apiv2.run_protocol() will pull them out of the JSON and load them into the
-        # ProtocolContext.
-        extra_labware = None
-        bundled_labware = None
-        bundled_data = None
-
-    context = _create_live_context_non_pe(
-        api_version=protocol.api_level,
-        hardware_api=hardware_api,
-        deck_type=deck_type_for_simulation(protocol.robot_type),
-        extra_labware=extra_labware,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        clean_up_hardware=False,
-    )
-
-    scraper = _CommandScraper(logger=logger, level=level, broker=context.broker)
-    if duration_estimator:
-        context.broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
-
-    context.home()
-    with scraper.scrape():
-        try:
-            execute.run_protocol(
-                protocol, context, run_time_parameters_with_overrides=None
-            )
-            if (
-                isinstance(protocol, PythonProtocol)
-                and protocol.api_level >= APIVersion(2, 0)
-                and protocol.bundled_labware is None
-                and allow_bundle()
-            ):
-                bundle_contents: Optional[BundleContents] = bundle_from_sim(
-                    protocol, context
-                )
-            else:
-                bundle_contents = None
-
-        finally:
-            context.cleanup()
-
-    return scraper.commands, bundle_contents
 
 
 def _run_file_pe(
