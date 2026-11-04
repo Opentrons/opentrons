@@ -78,8 +78,6 @@ DeckConfigurationType = List[
 class DeckType(StrEnum):
     """Types of deck available."""
 
-    OT2_STANDARD = "ot2_standard"
-    OT2_SHORT_TRASH = "ot2_short_trash"
     OT3_STANDARD = "ot3_standard"
 
 
