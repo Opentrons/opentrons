@@ -48,6 +48,7 @@ export function InputSetting({
         <InputField
           id={inputId}
           type="number"
+          size="small"
           value={inputValue}
           placeholder={placeholder}
           min={min}

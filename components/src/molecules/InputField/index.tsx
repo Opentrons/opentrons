@@ -78,7 +78,7 @@ export interface InputFieldProps {
   textAlign?:
     typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
-  size?: 'medium' | 'small'
+  size?: 'medium' | 'xsmall' | 'small'
   /** optional element to display aligned to the left of the input field */
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
@@ -111,7 +111,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       onClick,
       isIndeterminate = false,
       textAlign = TYPOGRAPHY.textAlignLeft,
-      size = 'small',
+      size = 'xsmall',
       leftElement,
       rightElement,
       borderRadius,
@@ -143,7 +143,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
-      height: ${size === 'small' ? '2rem' : '2.75rem'};
+      height: ${size === 'xsmall' ? '2rem' : size === 'small' ? '2.25rem' : '2.75rem'};
 
       & input {
         border-radius: inherit;
