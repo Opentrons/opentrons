@@ -61,6 +61,7 @@ describe('HomeAndRetry', () => {
         ...props.tipStatusUtils,
         aPipetteWithTip: {
           mount: 'left',
+          specs: { channels: 1 },
         } as any,
       },
     }

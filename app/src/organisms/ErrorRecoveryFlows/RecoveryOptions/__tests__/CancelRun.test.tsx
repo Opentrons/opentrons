@@ -47,7 +47,7 @@ describe('RecoveryFooterButtons', () => {
       },
       tipStatusUtils: {
         isLoadingTipStatus: false,
-        areTipsAttached: false,
+        aPipetteWithTip: null,
       } as any,
       recoveryCommands: { cancelRun: vi.fn() } as any,
     }
@@ -123,7 +123,7 @@ describe('RecoveryFooterButtons', () => {
       ...props,
       tipStatusUtils: {
         isLoadingTipStatus: false,
-        areTipsAttached: true,
+        aPipetteWithTip: { mount: 'left' },
       } as any,
     }
 
@@ -138,7 +138,7 @@ describe('RecoveryFooterButtons', () => {
       ...props,
       tipStatusUtils: {
         isLoadingTipStatus: true,
-        areTipsAttached: false,
+        aPipetteWithTip: null,
       } as any,
     }
 
@@ -154,7 +154,7 @@ describe('RecoveryFooterButtons', () => {
       ...props,
       tipStatusUtils: {
         isLoadingTipStatus: false,
-        areTipsAttached: false,
+        aPipetteWithTip: null,
       } as any,
     }
 

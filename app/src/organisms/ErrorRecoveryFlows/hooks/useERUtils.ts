@@ -143,9 +143,7 @@ export function useERUtils({
 
   const tipStatusUtils = useRecoveryTipStatus({
     runId,
-    runRecord,
     failedCommand,
-    attachedInstruments,
     failedPipetteInfo,
   })
 
