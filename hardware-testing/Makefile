@@ -171,6 +171,22 @@ push-labware-ot3:
 	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
 	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
+# The wheel build excludes gravimetric, so push the whole tree (py, csv, protocols).
+.PHONY: push-gravimetric-ot3
+push-gravimetric-ot3:
+	COPYFILE_DISABLE=1 tar \
+		--exclude='__pycache__' \
+		--exclude='*.pyc' \
+		--exclude='._*' \
+		--exclude='.DS_Store' \
+		-czf - -C hardware_testing gravimetric | \
+	ssh $(ssh_helper_ot3) root@$(host) "\
+	function cleanup () { mount -o remount,ro / ; } ; \
+	mount -o remount,rw / && \
+	rm -rf /opt/opentrons-robot-server/hardware_testing/gravimetric && \
+	tar -xzf - -C /opt/opentrons-robot-server/hardware_testing && \
+	cleanup || cleanup"
+
 .PHONY: restart
 restart:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
@@ -193,6 +209,7 @@ push-no-restart-ot3: wheel
 .PHONY: push-ot3
 push-ot3:
 	$(MAKE) push-no-restart-ot3
+	$(MAKE) push-gravimetric-ot3
 	$(MAKE) restart-ot3
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
