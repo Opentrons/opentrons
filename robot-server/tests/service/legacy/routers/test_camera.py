@@ -10,6 +10,7 @@ from mock import patch
 from opentrons.system import camera
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
+from robot_server.app import app
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
     RunDataManager,
@@ -196,6 +197,7 @@ async def test_camera_stream_settings_flex(api_client_camera_overrides, decoy: D
         decoy.when(camera.get_stream_configuration_filepath()).then_return(
             Path(conf.name)
         )
+
         post_settings = api_client_camera_overrides.post(
             "/camera/stream/settings",
             json={
