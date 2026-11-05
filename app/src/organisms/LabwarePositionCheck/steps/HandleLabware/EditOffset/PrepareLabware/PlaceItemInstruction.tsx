@@ -23,7 +23,6 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -31,15 +30,10 @@ import type {
   LabwareStackupDetail,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
-import type { State } from '/app/redux/types'
 
 export function PlaceItemInstruction(props: EditOffsetContentProps): ReactNode {
   const { runId } = props
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
-  )
   const isActivePipette96ch =
     useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
@@ -53,11 +47,7 @@ export function PlaceItemInstruction(props: EditOffsetContentProps): ReactNode {
       location: slotOnlyDisplayLocation,
     })
 
-  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
-    offsetLocationDetails,
-    protocolData,
-    commandTextT as TFunction
-  )
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(offsetLocationDetails)
 
   // The "clear deck" copy handles the module case.
   const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(

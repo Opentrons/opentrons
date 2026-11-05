@@ -40,12 +40,10 @@ import {
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
 
-import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type { State } from '/app/redux/types'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
@@ -61,13 +59,9 @@ export function CheckLabware(props: CheckLabwareProps): ReactNode {
     flushJogAudit,
   } = commandUtils
   const { t } = useTranslation('labware_position_check')
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const dispatch = useDispatch()
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
-  )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
   )?.initialPosition!
@@ -108,9 +102,7 @@ export function CheckLabware(props: CheckLabwareProps): ReactNode {
   )
 
   const slotOnlyDisplayLocation = getFlexSlotNameOnly(
-    selectedLwInfo.offsetLocationDetails,
-    protocolData,
-    commandTextT as TFunction
+    selectedLwInfo.offsetLocationDetails
   )
 
   const buildSectionHeader = (): string =>
