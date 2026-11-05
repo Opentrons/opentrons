@@ -8,7 +8,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 10.2.0
 
-Welcome to the v10.2.0 release of the Opentrons Flex robot software! This release introduces the Opentrons Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
+Welcome to the v10.2.0 release of the Opentrons Flex robot software! This release introduces the Opentrons Flex Automated Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
 
 ### New Features
 
@@ -22,7 +22,6 @@ Welcome to the v10.2.0 release of the Opentrons Flex robot software! This releas
 ## Opentrons Robot Software Changes in 10.1.0
 
 Welcome to the v10.1.0 release of the Opentrons Flex robot software! This release includes feature improvements and bug fixes for the Opentrons App.
-
 
 ## Opentrons Robot Software Changes in 10.0.0
 
