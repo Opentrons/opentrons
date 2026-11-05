@@ -23,7 +23,10 @@ import type { UseHomePipettesProps } from '/app/local-resources/instruments'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
-type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
+type TipsAttachedModalProps = Pick<
+  UseHomePipettesProps,
+  'onSuccess' | 'onError'
+> & {
   aPipetteWithTip: PipetteWithTip
   robotName: string | null
   onTipsHandled: (didSkip: boolean) => void

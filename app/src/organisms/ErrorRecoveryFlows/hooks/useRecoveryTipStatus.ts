@@ -33,20 +33,20 @@ export function useRecoveryTipStatus(
   props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
   const [isLoadingTipStatus, setIsLoadingTipStatus] = useState(false)
-  const [failedCommandPipette, setFailedCommandPipette] =
+  const [currentPipette, setCurrentPipetteState] =
     useState<PipetteWithTip | null>(null)
-  const failedCommandPipetteRef = useRef<PipetteWithTip | null>(null)
+  const currentPipetteRef = useRef<PipetteWithTip | null>(null)
   const skippedMountsRef = useRef<Mount[]>([])
 
   const tipAttachmentStatusUtils = useTipAttachmentStatus()
 
   const setCurrentPipette = (pipette: PipetteWithTip | null): void => {
-    failedCommandPipetteRef.current = pipette
-    setFailedCommandPipette(pipette)
+    currentPipetteRef.current = pipette
+    setCurrentPipetteState(pipette)
   }
 
   const skipCurrentPipette = (): void => {
-    const mount = failedCommandPipetteRef.current?.mount
+    const mount = currentPipetteRef.current?.mount
     if (mount != null && !skippedMountsRef.current.includes(mount)) {
       skippedMountsRef.current = [...skippedMountsRef.current, mount]
     }
@@ -110,7 +110,7 @@ export function useRecoveryTipStatus(
 
   return {
     ...tipAttachmentStatusUtils,
-    aPipetteWithTip: failedCommandPipette,
+    aPipetteWithTip: currentPipette,
     determineTipStatus: determineTipStatusWithLoading,
     skipCurrentPipette,
     isLoadingTipStatus,

@@ -165,19 +165,20 @@ export function RunSummary(): ReactNode {
   const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
   const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
   const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(false)
-  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
-  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
-  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+  // Close the current run only if it's active, then run the callback on success or error.
+  // Prefer this wrapper over closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSettled?: () => void): void => {
     if (isRunCurrent) {
       closeCurrentRun({
-        onSuccess,
+        onSuccess: onSettled,
         onError: () => {
           setShowReturnToSpinner(false)
           setShowRunAgainSpinner(false)
+          onSettled?.()
         },
       })
     } else {
-      onSuccess?.()
+      onSettled?.()
     }
   }
 
@@ -393,6 +394,9 @@ export function RunSummary(): ReactNode {
           closeCurrentRunIfValid(() => {
             navigate('/dashboard')
           })
+        },
+        onError: () => {
+          setShowReturnToSpinner(false)
         },
       })
     } else {
