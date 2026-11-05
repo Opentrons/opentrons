@@ -176,9 +176,9 @@ Vacuum profiles consist of multiple sub-steps. They're ideal when you need to ru
 
 ### Understanding last module state
 
-When configuring vacuum steps, you may notice the "Last module state" section in a step profile is grayed out. This is a read-only status indicator that does not change until the end state of a vacuum step changes. For example, the first step in a vacuum procedure the module state is **pump: off** and **vent: open**. If the steps ends with the pump on and the vent closed, the next sequential vacuum state step will show **pump: on** and **vent: closed**.
+The "Last module state" is a read-only status indicator. It changes when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next sequential vacuum step will show the state as **pump: on** and **vent: closed**.
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
-<figcaption>Module status from a vacuum step.</figcaption>
+<figcaption>Shows module status from a previous step.</figcaption>
 </figure>
