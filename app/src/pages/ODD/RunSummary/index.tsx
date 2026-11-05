@@ -295,7 +295,7 @@ export function RunSummary(): ReactNode {
     void determineTipStatus().then(() => {
       setHasCheckedTips(true)
     })
-  }, [isPromptDismissed])
+  }, [isPromptDismissed, determineTipStatus])
 
   // After splash tap, dim while network requests are in flight. Close if no
   // tips need handling so desktop does not auto-document a second dismiss.

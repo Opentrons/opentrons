@@ -42,8 +42,6 @@ export const InstrumentDetail = (): ReactNode => {
     ) ?? null
 
   const displayName = useAttachedInstrumentDisplayName(instrument)
-  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
   const pipetteModelSpecs =
     instrument != null && instrument.instrumentType === 'pipette'

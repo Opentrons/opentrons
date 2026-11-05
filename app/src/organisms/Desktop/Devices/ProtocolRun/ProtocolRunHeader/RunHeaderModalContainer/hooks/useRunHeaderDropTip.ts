@@ -101,7 +101,7 @@ export function useRunHeaderDropTip({
     isWizardActive: showDTWiz || wizardPipette != null,
     enableDTWiz: openWizard,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
-    is96Channel: aPipetteWithTip?.specs.channels === 96,
+    is96Channel: aPipetteWithTip?.specs?.channels === 96,
     onSkipAndHome: () => {
       skipCurrentPipette()
       checkTipStatus()

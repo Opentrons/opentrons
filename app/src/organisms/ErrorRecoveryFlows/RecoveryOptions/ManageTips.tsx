@@ -71,7 +71,7 @@ export function BeginRemoval(props: RecoveryContentProps): JSX.Element | null {
   const dispatch = useDispatch()
   const { HOME_AND_RETRY, DROP_TIP_FLOWS } = RECOVERY_MAP
   const mount = aPipetteWithTip?.mount
-  const is96Channel = aPipetteWithTip?.specs.channels === 96
+  const is96Channel = aPipetteWithTip?.specs?.channels === 96
 
   const primaryOnClick = (): void => {
     if (selectedRecoveryOption === HOME_AND_RETRY.ROUTE) {
