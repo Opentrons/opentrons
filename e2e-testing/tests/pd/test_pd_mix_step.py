@@ -23,8 +23,6 @@ def test_mix_step_configuration_workflow(page: Page) -> None:
     mix_form = MixStepForm(page)
     protocol_editor.add_step("Mix")
 
-    mix_form.select_pipette(PIPETTE_OPTION)
-    mix_form.select_tiprack(TIPRACK_OPTION)
     mix_form.select_labware(LABWARE_OPTION)
 
     mix_form.open_nozzle_and_well_selector()
