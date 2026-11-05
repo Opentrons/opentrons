@@ -148,3 +148,9 @@ Click **Add step** to create a step, like an initial denaturation, that only nee
 Cycles are made up of steps that are repeated a set number of times in your experiment. Click **Add cycle** to add steps to a cycle. At the bottom of the menu, enter the number of times the cycle should repeat before saving your work.
 
 Running Thermocycler profiles is time-consuming, so you can choose to run other protocols steps [in parallel](../steps/parallel.md) with your profiles.
+
+## Vacuum Module steps
+
+Adding a Vacuum Module step to your protocol displays any labware, collars, and spacers currently on the module, which uses a deck adapter that occupies 2 slots, A3 (the vacuum base) and A4 (the dock). See the [Vacuum Module section](../starting-deck.md#vacuum-module) in Protocol starting deck page for more information.
+
+Automating a Vacuum Module workflow also requires a Flex Gripper. The gripper moves manifold collars, filter plates, and collection plates on and off the module during a protocol run. However, the gripper cannot pick up or manipulate spacers; spacers must be placed in the vacuum base manually during starting deck setup.
