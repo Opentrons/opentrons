@@ -175,7 +175,7 @@ describe('ManageTips', () => {
 
   it('offers the next pipette when skip still leaves another tip attached', async () => {
     props.tipStatusUtils.determineTipStatus = vi.fn(() =>
-      Promise.resolve([{ mount: 'right', specs: MOCK_ACTUAL_PIPETTE }])
+      Promise.resolve([{ mount: 'right' as const, specs: MOCK_ACTUAL_PIPETTE }])
     )
     render(props)
 

@@ -101,8 +101,9 @@ const getAttachedPipettes = (
 const filterPipettesWithTips = (
   pipettesWithTipsData: PipetteTipState[]
 ): PipetteWithTip[] => {
-  return pipettesWithTipsData.filter(
-    (pipette): pipette is PipetteWithTip =>
-      pipette.specs != null && pipette.hasTip
+  return pipettesWithTipsData.flatMap(pipette =>
+    pipette.specs != null && pipette.hasTip
+      ? [{ mount: pipette.mount, specs: pipette.specs }]
+      : []
   )
 }

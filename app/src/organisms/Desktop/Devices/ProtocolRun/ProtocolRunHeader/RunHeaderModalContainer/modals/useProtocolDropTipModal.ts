@@ -37,8 +37,7 @@ export function useProtocolDropTipModal({
     onSuccess: onSkipAndHome,
   })
 
-  const showModal =
-    hasPipetteWithTip && !isPromptDismissed && !isWizardActive
+  const showModal = hasPipetteWithTip && !isPromptDismissed && !isWizardActive
 
   const onSkip = (): void => {
     void homePipettes()
