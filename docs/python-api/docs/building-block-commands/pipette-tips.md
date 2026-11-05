@@ -15,7 +15,7 @@ To pick up a tip, call the [`pick_up_tip()`][opentrons.protocol_api.InstrumentCo
 pipette.pick_up_tip()
 ```
 
-When added to the protocol template, this simple statement works because the API knows which tip rack is associated with `pipette`, as indicated by `tip_racks=[tiprack_1]` in the [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] call. And it knows the on-deck location of the tip rack (slot D3 on Flex, slot 3 on OT-2) from the `location` argument of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to `pick_up_tip()`, the robot will use the next available tip. For example:
+When added to the protocol template, this simple statement works because the API knows which tip rack is associated with `pipette`, as indicated by `tip_racks=[tiprack]` in the [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] call. And it knows the on-deck location of the tip rack (slot D3 on Flex, slot 3 on OT-2) from the `location` argument of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to `pick_up_tip()`, the robot will use the next available tip. For example:
 
 ```python
 pipette.pick_up_tip()  # picks up tip from rack location A1
@@ -27,9 +27,9 @@ pipette.drop_tip()     # drops tip in trash bin
 If you omit the `tip_rack` argument from the `pipette` variable, the API will raise an error. In that case, you must pass the tip rack's location to `pick_up_tip` like this:
 
 ```python
-pipette.pick_up_tip(tiprack_1["A1"])
+pipette.pick_up_tip(tiprack["A1"])
 pipette.drop_tip()
-pipette.pick_up_tip(tiprack_1["B1"])
+pipette.pick_up_tip(tiprack["B1"])
 ```
 
 In most cases, it's best to associate tip racks with a pipette and let the API automatically track pickup location for you. This also makes it easy to pick up tips when iterating over a loop, as shown in the next section.
@@ -64,7 +64,7 @@ Next, change the pipette's `tip_rack` property to include the additional rack:
 pipette = protocol.load_instrument(
     instrument_name="flex_1channel_1000",
     mount="left",
-    tip_racks=[tiprack_1, tiprack_2],
+    tip_racks=[tiprack, tiprack_2],
 )
 ```
 
@@ -112,7 +112,7 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 The API automatically varies the tip drop location in the default trash container, or when you haven't specified a `location`, to help keep tips from piling up. Beginning with API version 2.28, you can add the optional `alternate_drop_location` argument to control the tip drop location in a specified `location`:
 
 ```python
-trash = protocol_context.load_trash_bin("A3")
+secondary_trash = protocol.load_trash_bin("A3")
 pipette.pick_up_tip() #picks up the next tip
 
 # alternate drop tip location in the specified trash
@@ -149,19 +149,19 @@ To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol
 Start by specifying and placing an empty tip rack on the deck:
 
 ```python
-# set tiprack_1 as empty
-tiprack_1.set_empty()
+# set tiprack as empty
+tiprack.set_empty()
 
 # pick up a tip from the pipette's assigned tip rack
 pipette.pick_up_tip()
 
-# return attached tips to the empty tiprack_1
-pipette.drop_tip(tiprack_1["A1"])
+# return attached tips to the empty tiprack
+pipette.drop_tip(tiprack["A1"])
 ```
 
 *New in version 2.28*
 
-In the example above, the pipette uses automatic tip tracking to pick up the next available tip in its assigned tip rack. Then, it drops the attached tip in well A1 of the empty `tiprack_1`.
+In the example above, the pipette uses automatic tip tracking to pick up the next available tip in its assigned tip rack. Then, it drops the attached tip in well A1 of the empty `tiprack`.
 
 ## Working with used tips
 
@@ -172,7 +172,7 @@ pipette.pick_up_tip()                # picks up tip from rack location A1
 pipette.return_tip()                 # drops tip in rack location A1
 pipette.pick_up_tip()                # picks up tip from rack location B1
 pipette.drop_tip()                   # drops tip in trash bin
-pipette.pick_up_tip(tiprack_1["A1"]) # picks up tip from rack location A1
+pipette.pick_up_tip(tiprack["A1"]) # picks up tip from rack location A1
 ```
 
 Early API versions treated returned tips as unused items. They could be picked up again without an explicit argument. For example:
