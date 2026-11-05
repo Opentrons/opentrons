@@ -12,7 +12,7 @@ Welcome to the v10.2.0 release of the Opentrons App! This release adds support f
 
 ### Bug Fixes
 
-- You can open the Flex door after completing labware position check and while waiting for the gantry to home. Doing so no longer results in an invalid labware offset.
+- The Flex door should stay closed after a labware position check and while the gantry homes. If you open the door, this no longer results in an invalid labware offset.
 - Choose between Flex deck slot B2 and C2 when calibrating the 96-channel pipette, and avoid needing to remove an attached waste chute.
 
 ---
