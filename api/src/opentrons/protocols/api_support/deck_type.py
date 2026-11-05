@@ -5,12 +5,12 @@ from opentrons_shared_data.errors.exceptions import EnumeratedError
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.config import feature_flags
+from opentrons.protocol_engine.types import DeckType
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
     PythonProtocolConfig,
 )
-from opentrons.protocol_engine.types import DeckType
 from opentrons.protocols.api_support.types import APIVersion
 
 # TODO(jbl, 2026-11-04) These should be removed once the relevant areas of legacy code is removed
