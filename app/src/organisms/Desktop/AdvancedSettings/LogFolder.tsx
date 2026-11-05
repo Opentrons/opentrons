@@ -7,13 +7,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
 import type { ReactNode } from 'react'
@@ -31,27 +31,28 @@ export function LogFolder(): ReactNode {
       gridGap={SPACING.spacing40}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('log_folder_title')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('log_folder_description')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('log_folder_location')}
-        </LegacyStyledText>
+        </StyledText>
 
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {logDirectory ?? t('no_log_folder')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
 
       <TertiaryButton

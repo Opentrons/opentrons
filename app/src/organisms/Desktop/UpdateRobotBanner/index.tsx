@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -55,9 +55,9 @@ export function UpdateRobotBanner(
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing8}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('branded:robot_software_update_required')}
-          </LegacyStyledText>
+          </StyledText>
           <Btn
             onClick={() => {
               handleUpdateBuildroot(robot)

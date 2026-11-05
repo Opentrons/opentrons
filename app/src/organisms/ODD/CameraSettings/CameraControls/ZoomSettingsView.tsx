@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 

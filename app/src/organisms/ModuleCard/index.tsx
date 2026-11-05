@@ -43,7 +43,6 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -54,11 +53,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import {
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
-  MODULE_INFO_SUB_CONTAINER_STYLE,
-} from './constants'
+import { MODULE_INFO_SUB_CONTAINER_STYLE } from './constants'
 import { ErrorInfo } from './ErrorInfo'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from './FlexStackerModuleData'
@@ -73,6 +68,7 @@ import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { UpdateBanner } from './UpdateBanner'
 import {
   getModuleCalibrationRequired,
   getModuleCardImage,
@@ -428,8 +424,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : (
               <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
                 <StyledText
+                  forwardedAs="h3"
+                  color={COLORS.grey60}
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  css={MODULE_INFO_HEADER_TEXT_STYLE}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -449,7 +446,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                       color={COLORS.grey60}
                     />
                   </Flex>
-                  <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+                  <StyledText forwardedAs="h3">
                     {getModuleDisplayName(module.moduleModel)}
                   </StyledText>
                 </Flex>

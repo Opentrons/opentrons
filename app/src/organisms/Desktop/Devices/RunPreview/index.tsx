@@ -14,18 +14,19 @@ import {
   Flex,
   getLabwareDefinitionsFromCommands,
   InfoScreen,
-  LegacyStyledText,
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
+  StyledText,
+  Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { NAV_BAR_WIDTH } from '/app/App/constants'
-import { Divider } from '/app/atoms/structure'
+import { CommandIcon } from '/app/components/adhoc/shared/Command'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import { CommandIcon } from '/app/molecules/Command'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
@@ -145,24 +146,29 @@ export const RunPreviewComponent = (
       height="65vh"
       width="100%"
       overflowY={OVERFLOW_SCROLL}
-      gridGap={SPACING.spacing8}
+      gridGap={SPACING.spacing4}
       padding={SPACING.spacing16}
     >
       <>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('run_preview')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+          </StyledText>
+          <Tag
+            type="default"
+            text={t('steps_total', { count: commands.length })}
+            shrinkToContent
+          />
+          <StyledText forwardedAs="label" color={COLORS.grey50}>
             {t('steps_total', { count: commands.length })}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
-        </LegacyStyledText>
+        </StyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
         <ViewportList
           viewportRef={viewPortRef}
@@ -191,12 +197,12 @@ export const RunPreviewComponent = (
                 alignItems={ALIGN_CENTER}
                 gridGap={SPACING.spacing8}
               >
-                <LegacyStyledText
+                <StyledText
                   minWidth={SPACING.spacing16}
                   fontSize={TYPOGRAPHY.fontSizeCaption}
                 >
                   {index + 1}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -242,9 +248,9 @@ export const RunPreviewComponent = (
           </PrimaryButton>
         ) : null}
         {currentRunCommandIndex === commands.length - 1 ? (
-          <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
+          <StyledText forwardedAs="h6" color={COLORS.grey60}>
             {t('end_of_protocol')}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
       </>
     </Flex>

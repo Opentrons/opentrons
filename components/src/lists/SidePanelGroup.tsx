@@ -1,11 +1,11 @@
 // SidePanelGroup component
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './lists.module.css'
 
 import type { ReactNode } from 'react'
-import type { IconName } from '../icons'
+import type { IconName } from '../helix/icons'
 
 // TODO(bc, 2021-03-31): this component is only used in one place
 // reconsider whether it belongs in components library

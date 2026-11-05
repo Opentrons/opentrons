@@ -21,8 +21,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { useScrollRef } from '/app/App/hooks/useModuleAttachedToast'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getRunTimeParameterFilesForRun,

@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,8 +16,8 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ToggleButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
@@ -308,13 +308,14 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
         >
           {title}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{description}</StyledText>
       </Box>
       <ToggleButton
         label={title}

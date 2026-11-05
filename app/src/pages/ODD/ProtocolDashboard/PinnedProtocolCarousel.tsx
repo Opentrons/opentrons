@@ -7,13 +7,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { PinnedProtocol } from '/app/components/ODD/cards/PinnedProtocol'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-
-import { PinnedProtocol } from './PinnedProtocol'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { CardSizeType } from './PinnedProtocol'
+import type { CardSizeType } from '/app/components/ODD/cards/PinnedProtocol'
 
 interface PinnedProtocolCarouselProps {
   pinnedProtocols: ProtocolResource[]

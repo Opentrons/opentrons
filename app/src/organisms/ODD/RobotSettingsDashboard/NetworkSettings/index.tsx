@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type { ChipType, IconName } from '@opentrons/components'

@@ -10,8 +10,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { mockRobotSideAnalysis } from '/app/components/adhoc/shared/Command/__fixtures__'
 import { i18n } from '/app/i18n'
-import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'

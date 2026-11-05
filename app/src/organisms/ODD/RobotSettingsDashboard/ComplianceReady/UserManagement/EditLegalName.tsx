@@ -2,12 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
-import { TouchInputField } from '@opentrons/components'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
+import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-
-import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
 import type { ReactNode } from 'react'

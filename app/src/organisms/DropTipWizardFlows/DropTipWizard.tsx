@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { InProgressModal } from '/app/molecules/InProgressModal'
+import { InProgressModal } from '/app/components/adhoc/shared/InProgressModal'
 import { getIsOnDevice } from '/app/redux/config'
 
 import {

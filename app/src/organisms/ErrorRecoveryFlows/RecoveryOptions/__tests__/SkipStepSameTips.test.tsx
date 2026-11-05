@@ -12,7 +12,6 @@ import { SkipStepSameTips } from '../SkipStepSameTips'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/Command')
 vi.mock('/app/organisms/ErrorRecoveryFlows/shared')
 vi.mock('../SelectRecoveryOption')
 

@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { getShellUpdateDataFiles } from '/app/redux/shell'
 
 import { EmptyFile } from './EmptyFile'

@@ -20,15 +20,14 @@ import {
 } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 
+import { GripperCard } from '/app/components/desktop/cards/GripperCard'
+import { FlexPipetteCard } from '/app/components/desktop/cards/PipetteCard/FlexPipetteCard'
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
-
-import { GripperCard } from './GripperCard'
-import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
-import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 
 import type {
   BadGripper,

@@ -217,7 +217,7 @@ describe('ProtocolRunSetup', () => {
       lpcProps: null,
       showLPC: false,
       isLaunchingLPC: false,
-      isFlexLPCInitializing: false,
+      isLPCInitializing: false,
     })
     vi.mocked(useUpdateClientLPC).mockReturnValue({
       updateWithRunId: vi.fn(),
@@ -313,7 +313,7 @@ describe('ProtocolRunSetup', () => {
       lpcProps: null,
       showLPC: false,
       isLaunchingLPC: false,
-      isFlexLPCInitializing: true,
+      isLPCInitializing: true,
     })
     render(FLEX_LPC_READY_STATE)
     expect(screen.queryByText('Setup loading')).toBeNull()

@@ -9,14 +9,14 @@ import {
 } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
-import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'

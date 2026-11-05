@@ -1,0 +1,13 @@
+.parameter_name {
+  display: inline;
+  padding-right: var(--spacing-8);
+}
+
+.parameter_value {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}

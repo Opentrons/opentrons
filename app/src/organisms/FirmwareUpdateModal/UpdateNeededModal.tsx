@@ -7,8 +7,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Z_INDEX,
 } from '@opentrons/components'
 import {
@@ -19,10 +19,10 @@ import {
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
-import { OddModal } from '/app/molecules/OddModal'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
@@ -30,7 +30,7 @@ import { UpdateResultsModal } from './UpdateResultsModal'
 
 import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -88,7 +88,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
   const modalContent = (
     <OddModal header={updateNeededHeader} modalZIndex={Z_INDEX.BLOCKING_MODALS}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"
@@ -100,7 +100,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
               bold: <strong />,
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
         <SmallButton
           onClick={() => {
             if (!ensureCanUpdate()) {

@@ -15,7 +15,7 @@ import {
   OneColumn,
   OneColumnOrTwoColumn,
   TwoColumn,
-} from '/app/molecules/InterventionModal'
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 

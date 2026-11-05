@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { RoundTab } from '/app/molecules/RoundTab'
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { Peripherals } from '/app/organisms/Desktop/Devices/Peripherals'

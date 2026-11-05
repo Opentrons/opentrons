@@ -14,19 +14,19 @@ import {
   Icon,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
+import { RobotCard } from '/app/components/desktop/cards/RobotCard'
+import { CollapsibleSection } from '/app/components/desktop/CollapsibleSection'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
-import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useFeatureFlag } from '/app/redux/config'
 import {
@@ -105,7 +105,7 @@ export function DevicesLanding(): ReactNode {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText forwardedAs="h1">{t('devices')}</LegacyStyledText>
+        <StyledText forwardedAs="h1">{t('devices')}</StyledText>
         <NewRobotSetupHelp />
       </Flex>
       {showSearchBar ? (
@@ -183,9 +183,7 @@ function DevicesLoadingState(): ReactNode {
       marginTop="10vh"
       marginBottom="10vh"
     >
-      <LegacyStyledText forwardedAs="h1">
-        {t('looking_for_robots')}
-      </LegacyStyledText>
+      <StyledText forwardedAs="h1">{t('looking_for_robots')}</StyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"

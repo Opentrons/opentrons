@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux'
 
 import { RobotInfoLabel, StyledText } from '@opentrons/components'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { getUsbDeviceDisplayRows } from '/app/redux/system-info/selectors'
 
 import styles from './devices.module.css'

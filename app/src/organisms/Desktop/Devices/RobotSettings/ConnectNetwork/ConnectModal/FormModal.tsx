@@ -5,9 +5,8 @@ import styled, { css } from 'styled-components'
 import { SECURITY_WPA_EAP, SECURITY_WPA_PSK } from '@opentrons/api-client'
 import { BUTTON_TYPE_SUBMIT, FONT_SIZE_BODY_1 } from '@opentrons/components'
 
-import { ScrollableAlertModal } from '/app/molecules/modals'
-
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
+import { ScrollableAlertModal } from '../modals'
 import { KeyFileField } from './KeyFileField'
 import { SecurityField } from './SecurityField'
 import { TextField } from './TextField'

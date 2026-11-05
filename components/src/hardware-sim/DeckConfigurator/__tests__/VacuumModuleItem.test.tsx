@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Icon } from '../../../icons'
+import { Icon } from '../../../helix/icons'
 import { renderWithProviders } from '../../../testing/utils'
 import { RobotCoordsForeignObject } from '../../Deck/RobotCoordsForeignObject'
 import {
@@ -21,7 +21,7 @@ vi.mock('react-i18next', () => ({
   }),
 }))
 
-vi.mock('../../../icons', () => ({
+vi.mock('../../../helix/icons', () => ({
   Icon: vi.fn(),
 }))
 

@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './forms.module.css'
 
 import type {

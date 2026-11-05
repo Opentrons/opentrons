@@ -2,8 +2,8 @@ import { Fragment } from 'react'
 import { RemoveScroll } from 'react-remove-scroll'
 import cx from 'classnames'
 
+import { Overlay } from '../helix/modals'
 import styles from './modals.module.css'
-import { Overlay } from './Overlay'
 
 import type { MouseEventHandler, ReactNode, Ref } from 'react'
 

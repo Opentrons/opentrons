@@ -163,7 +163,7 @@
   "run_failed_modal_title": "Run failed",
   "run_failed_splash": "Run failed",
   "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
-  "run_preview": "Run Preview",
+  "run_preview": "Run Log",
   "run_preview_loading": "Run Preview loading",
   "run_protocol": "Run Protocol",
   "run_status": "Status: {{status}}",

@@ -1,10 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
 import type { ReactNode } from 'react'
@@ -52,7 +55,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): ReactNode {
             <Trans
               t={t}
               i18nKey="labware_position_check_description"
-              components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+              components={{ block: <StyledText forwardedAs="p" /> }}
             />
           }
         />

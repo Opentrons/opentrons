@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { getStackerLocationFromSlotName } from '@opentrons/shared-data'
 
-import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
+import { InterventionContent } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import type { ComponentProps, ReactNode } from 'react'

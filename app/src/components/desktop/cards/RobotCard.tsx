@@ -1,0 +1,267 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
+import {
+  ALIGN_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  StyledText,
+  WRAP,
+} from '@opentrons/components'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+
+import FLEX_PNG from '/app/assets/images/FLEX.png'
+import { InstrumentContainer } from '/app/components/adhoc/desktop/InstrumentContainer'
+import { useAttachedInstrumentDisplayName } from '/app/local-resources/instruments'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
+
+import {
+  ErrorRecoveryBanner,
+  useErrorRecoveryBanner,
+} from '../../../organisms/Desktop/Devices/ErrorRecoveryBanner'
+import styles from '../../../organisms/Desktop/Devices/notificationstack.module.css'
+import { ReachableBanner } from '../../../organisms/Desktop/Devices/ReachableBanner'
+import { RobotOutOfStorageNotification } from '../../../organisms/Desktop/Devices/RobotOutOfStorageNotification'
+import { RobotOverflowMenu } from '../../../organisms/Desktop/Devices/RobotOverflowMenu'
+import { RobotStatusHeader } from '../../../organisms/Desktop/Devices/RobotStatusHeader'
+import { SignAndDownloadRunBanner } from '../../../organisms/Desktop/Devices/SignAndDownloadRunBanner/SignAndDownloadRunBanner'
+import { UpdateRobotBanner } from '../../../organisms/Desktop/UpdateRobotBanner'
+import { ModuleIcon } from '../icons/ModuleIcon'
+
+import type { ReactNode } from 'react'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { State } from '/app/redux/types'
+
+const CAMERA_REFETCH_MS = 5000
+
+interface RobotCardProps {
+  robot: DiscoveredRobot
+}
+
+export function RobotCard(props: RobotCardProps): JSX.Element | null {
+  const { robot } = props
+  const { name: robotName, local } = robot
+  const navigate = useNavigate()
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robotName)
+  )
+
+  const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [
+    showRobotOutOfStorageNotification,
+    setShowRobotOutOfStorageNotification,
+  ] = useState<boolean>(isRobotOutOfStorage)
+
+  return robot != null ? (
+    <Flex
+      alignItems={ALIGN_START}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
+      cursor="pointer"
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing16}
+      minWidth="36rem"
+      padding={SPACING.spacing16}
+      position={POSITION_RELATIVE}
+      onClick={() => {
+        navigate(`/devices/${robotName}`)
+      }}
+    >
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing12}
+        justifyContent={JUSTIFY_FLEX_START}
+        width="100%"
+      >
+        <Flex
+          className={styles.notification_stack}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing12}
+          paddingRight={SPACING.spacing24}
+        >
+          <UpdateRobotBanner robot={robot} />
+          <ReachableBanner robot={robot} />
+          {showRecoveryBanner ? (
+            <ErrorRecoveryBanner recoveryIntent={recoveryIntent} />
+          ) : null}
+          <SignAndDownloadRunBanner robotName={robotName} />
+          {showRobotOutOfStorageNotification ? (
+            <RobotOutOfStorageNotification
+              robotName={robotName}
+              onCloseClick={e => {
+                e?.stopPropagation()
+                setShowRobotOutOfStorageNotification(false)
+              }}
+            />
+          ) : null}
+        </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex gap={SPACING.spacing16}>
+            <img
+              src={FLEX_PNG}
+              width="52.9px"
+              height="50.14px"
+              alt="Flex image"
+            />
+            <RobotStatusHeader
+              local={local}
+              name={robotName}
+              robotModel={robotModel}
+              alignItems={ALIGN_START}
+              paddingRight={SPACING.spacing24}
+            />
+          </Flex>
+
+          {robot.status === CONNECTABLE ? (
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              flexWrap={WRAP}
+              gridGap={SPACING.spacing16}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <AttachedInstruments robotName={robotName} />
+              <Flex
+                gridGap={SPACING.spacing4}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
+                <AttachedModules robotName={robotName} />
+                <AttachedDevices robotName={robotName} />
+              </Flex>
+            </Flex>
+          ) : null}
+        </Flex>
+      </Flex>
+      <Box
+        position={POSITION_ABSOLUTE}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
+      >
+        <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
+      </Box>
+    </Flex>
+  ) : null
+}
+
+function AttachedModules(props: { robotName: string }): JSX.Element | null {
+  const { robotName } = props
+  const { t } = useTranslation('devices_landing')
+  const { data: modulesData, isLoading: isModulesQueryLoading } =
+    useModulesQuery()
+  const attachedModules = modulesData?.data ?? []
+
+  return !isModulesQueryLoading && attachedModules.length > 0 ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="100%"
+    >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {t('modules')}
+      </StyledText>
+      <Flex>
+        {attachedModules.map((module, i) => (
+          <ModuleIcon
+            key={`${String(module.moduleModel)}_${i}_${robotName}`}
+            tooltipText={t('this_robot_has_connected_and_power_on_module', {
+              moduleName: getModuleDisplayName(module.moduleModel),
+            })}
+            module={module}
+          />
+        ))}
+      </Flex>
+    </Flex>
+  ) : null
+}
+
+function AttachedDevices(props: { robotName: string }): JSX.Element | null {
+  const { robotName } = props
+  const { t } = useTranslation('devices_landing')
+  const { data } = useNotifyCamera({ refetchInterval: CAMERA_REFETCH_MS })
+
+  return data?.cameraEnabled ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="85px"
+    >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {t('peripherals')}
+      </StyledText>
+      <Icon
+        key={`${String('camera')}_${robotName}`}
+        name="camera"
+        color={COLORS.grey50}
+        size={SPACING.spacing16}
+      ></Icon>
+    </Flex>
+  ) : null
+}
+
+function AttachedInstruments(props: { robotName: string }): ReactNode {
+  const { t, i18n } = useTranslation('devices_landing')
+  const isFlex = useIsFlex(props.robotName)
+
+  const { data: attachedInstruments, isLoading: isInstrumentsQueryLoading } =
+    useInstrumentsQuery({ enabled: isFlex })
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper'
+    ) ?? null
+  const leftPipette =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const rightPipette =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
+
+  const leftDisplayName = useAttachedInstrumentDisplayName(leftPipette)
+  const rightDisplayName = useAttachedInstrumentDisplayName(rightPipette)
+  const gripperDisplayName = useAttachedInstrumentDisplayName(attachedGripper)
+
+  return (
+    <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {i18n.format(t('shared:instruments'), 'capitalize')}
+      </StyledText>
+
+      {isInstrumentsQueryLoading ? null : (
+        <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+          {leftDisplayName != null ? (
+            <InstrumentContainer displayName={leftDisplayName} />
+          ) : null}
+          {rightDisplayName != null ? (
+            <InstrumentContainer displayName={rightDisplayName} />
+          ) : null}
+          {gripperDisplayName != null ? (
+            <InstrumentContainer displayName={gripperDisplayName} />
+          ) : null}
+        </Flex>
+      )}
+    </Flex>
+  )
+}

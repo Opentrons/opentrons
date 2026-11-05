@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { BORDERS, PrimaryButton, StyledText } from '@opentrons/components'
 
+import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
-import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
 

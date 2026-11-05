@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { DIRECTION_ROW, Flex, SPACING } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import {
   CheckUpdates,

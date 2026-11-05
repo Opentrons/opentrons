@@ -1,0 +1,183 @@
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  MenuItem,
+  Modal,
+  NO_WRAP,
+  OverflowBtn,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  useConditionalConfirm,
+  useOnClickOutside,
+  Z_INDEX,
+} from '@opentrons/components'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { Divider } from '/app/components/adhoc/shared/structure'
+import {
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import {
+  deleteCustomLabwareFile,
+  openCustomLabwareDirectory,
+} from '/app/redux/custom-labware'
+
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { Dispatch } from '/app/redux/types'
+
+const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
+
+interface CustomLabwareOverflowMenuProps {
+  filename: string
+  onDelete?: () => void
+}
+
+export function CustomLabwareOverflowMenu(
+  props: CustomLabwareOverflowMenuProps
+): ReactNode {
+  const { filename, onDelete } = props
+  const { t } = useTranslation(['labware_landing', 'shared'])
+  const dispatch = useDispatch<Dispatch>()
+  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
+  const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => {
+      setShowOverflowMenu(false)
+    },
+  })
+  const trackEvent = useTrackEvent()
+
+  const {
+    confirm: confirmDeleteLabware,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDeleteLabware,
+  } = useConditionalConfirm(() => {
+    dispatch(deleteCustomLabwareFile(filename))
+    onDelete?.()
+  }, true)
+  const handleOpenInFolder: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowOverflowMenu(false)
+    dispatch(openCustomLabwareDirectory())
+  }
+  const handleClickDelete: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowOverflowMenu(false)
+    confirmDeleteLabware()
+  }
+  const handleOverflowClick: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+  }
+  const handleClickLabwareCreator: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    trackEvent({
+      name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
+      properties: {},
+    })
+    setShowOverflowMenu(false)
+    window.open(LABWARE_CREATOR_HREF, '_blank')
+  }
+
+  const handleCancelModal: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    cancelDeleteLabware()
+  }
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+      <OverflowBtn
+        aria-label="CustomLabwareOverflowMenu_button"
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+      />
+      {showOverflowMenu && (
+        <Flex
+          ref={overflowMenuRef}
+          zIndex={Z_INDEX.MODALS}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.white}
+          top={SPACING.spacing32}
+          right={0}
+          flexDirection={DIRECTION_COLUMN}
+          whiteSpace={NO_WRAP}
+        >
+          <MenuItem onClick={handleOpenInFolder}>
+            {t('show_in_folder')}
+          </MenuItem>
+          <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
+          <Divider />
+          <MenuItem onClick={handleClickLabwareCreator}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.blue50}
+            >
+              {t('open_labware_creator')}
+              <Icon
+                name="open-in-new"
+                height="10px"
+                marginLeft={SPACING.spacing6}
+              />
+            </StyledText>
+          </MenuItem>
+        </Flex>
+      )}
+      {showDeleteConfirmation &&
+        createPortal(
+          <Modal
+            type="warning"
+            title={t('delete_this_labware')}
+            onClose={handleCancelModal}
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText forwardedAs="p">{t('def_moved_to_trash')}</StyledText>
+              <StyledText forwardedAs="p" paddingTop={SPACING.spacing8}>
+                {t('cannot-run-python-missing-labware')}
+              </StyledText>
+              <Flex
+                justifyContent={JUSTIFY_FLEX_END}
+                alignItems={ALIGN_CENTER}
+                marginTop={SPACING.spacing24}
+              >
+                <Btn
+                  onClick={handleCancelModal}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginRight={SPACING.spacing24}
+                  css={TYPOGRAPHY.linkPSemiBold}
+                >
+                  {t('shared:cancel')}
+                </Btn>
+                <PrimaryButton variant="warning" onClick={handleClickDelete}>
+                  {t('yes_delete_def')}
+                </PrimaryButton>
+              </Flex>
+            </Flex>
+          </Modal>,
+          getTopPortalEl()
+        )}
+    </Flex>
+  )
+}

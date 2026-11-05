@@ -15,11 +15,11 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -28,9 +28,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
@@ -39,7 +39,7 @@ import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
   OddModalHeaderBaseProps,
-} from '/app/molecules/OddModal/types'
+} from '/app/components/ODD/modals/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -124,12 +124,9 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
@@ -137,12 +134,12 @@ function TouchscreenModal({
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('estop')}
-          </LegacyStyledText>
+          </StyledText>
           <Chip
             type={isEngaged ? 'error' : 'success'}
             text={isEngaged ? t('engaged') : t('disengaged')}
@@ -218,9 +215,9 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+        <StyledText forwardedAs="p" color={COLORS.grey60}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}

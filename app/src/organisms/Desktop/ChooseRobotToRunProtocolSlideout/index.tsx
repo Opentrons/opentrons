@@ -19,15 +19,11 @@ import {
   isDocumentedMutationError,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
-import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRobotType } from '/app/redux-resources/robots'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import {
@@ -71,8 +67,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     setSelectedRobot,
   } = props
   const navigate = useNavigate()
-  const isFlex = useRobotType(selectedRobot?.name ?? '') === FLEX_ROBOT_TYPE
-  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
   const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
     storedProtocolData
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -99,12 +93,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   }, [protocolKey, runTimeParameters])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-
-  const offsetCandidates = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis,
-    isFlex,
-    null
-  )
 
   const documentationState = useDocumentationState()
   const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
@@ -138,13 +126,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       },
     },
     null,
-    shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
-      : [],
+    [],
     runTimeParameters?.length > 0 ? ['confirm_parameters'] : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
@@ -257,23 +239,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
-  const offsetsComponent = isFlex ? null : (
-    <LegacyApplyHistoricOffsets
-      offsetCandidates={offsetCandidates}
-      shouldApplyOffsets={shouldApplyOffsets}
-      setShouldApplyOffsets={setShouldApplyOffsets}
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      modules={mostRecentAnalysis?.modules ?? []}
-    />
-  )
-
   const footer = (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {hasRunTimeParameters ? (
         currentPage === 1 ? (
           <>
-            {offsetsComponent}
             <PrimaryButton
               onClick={handleProceedToRTP}
               width="100%"
@@ -319,10 +289,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           </Flex>
         )
       ) : (
-        <>
-          {offsetsComponent}
-          {singlePageButton}
-        </>
+        <>{singlePageButton}</>
       )}
     </Flex>
   )

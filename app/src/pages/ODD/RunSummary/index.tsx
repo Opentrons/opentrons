@@ -41,10 +41,10 @@ import {
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -582,7 +582,6 @@ export function RunSummary(): ReactNode {
                     stoppedAt,
                     completedAt,
                   }}
-                  style={DURATION_TEXT_STYLE}
                 />
               </SummaryDatum>
               <SummaryDatum>
@@ -705,12 +704,6 @@ const SummaryDatum = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   width: max-content;
 `
-const DURATION_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-`
-
 const RETURN_TO_CLICKED_STYLE = css`
   background-color: ${COLORS.blue40};
   &:focus {

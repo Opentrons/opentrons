@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   AnimationVideo,
@@ -10,11 +9,8 @@ import {
   InlineNotification,
   JUSTIFY_FLEX_END,
   PrimaryButton,
-  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
@@ -23,12 +19,13 @@ import {
 
 import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
 import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
-import { SmallButton } from '/app/atoms/buttons'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import { VERIFY_VACUUM_GAUGE_PRESSURE_MBAR } from './constants'
 import {
@@ -248,15 +245,6 @@ function verificationCommandsSucceeded(results: unknown): boolean {
   })
 }
 
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
-
 interface VacuumInstructionScreenProps {
   onBack: () => void
   onContinue: () => void
@@ -278,7 +266,7 @@ function VacuumCheckTubeConnectionsScreen({
       }
       bodyText={
         <>
-          <StyledText css={BODY_STYLE}>{t('tubes_must_be_secured')}</StyledText>
+          <WizardBodyText>{t('tubes_must_be_secured')}</WizardBodyText>
           <InlineNotification type="alert" heading={t('push_tube')} />
         </>
       }
@@ -304,9 +292,7 @@ function VacuumCheckCollarScreen({
         </AnimationVideo>
       }
       bodyText={
-        <StyledText css={BODY_STYLE}>
-          {t('collar_block_description')}
-        </StyledText>
+        <WizardBodyText>{t('collar_block_description')}</WizardBodyText>
       }
       back={onBack}
       proceed={onContinue}

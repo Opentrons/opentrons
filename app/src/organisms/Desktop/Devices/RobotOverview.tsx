@@ -10,16 +10,16 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useIsRobotViewable, useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { useIsRobotOutOfStorage, useLights } from '/app/resources/devices'
@@ -124,7 +124,7 @@ export function RobotOverview({
                     flexDirection={DIRECTION_COLUMN}
                     paddingRight={SPACING.spacing16}
                   >
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="h6"
                       color={COLORS.grey60}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -132,7 +132,7 @@ export function RobotOverview({
                       textTransform={TYPOGRAPHY.textTransformUppercase}
                     >
                       {t('controls')}
-                    </LegacyStyledText>
+                    </StyledText>
                     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                       <Flex paddingBottom={SPACING.spacing4}>
                         <ToggleButton
@@ -145,12 +145,12 @@ export function RobotOverview({
                           height="0.813rem"
                         />
                       </Flex>
-                      <LegacyStyledText
+                      <StyledText
                         forwardedAs="p"
                         color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                       >
                         {t('lights')}
-                      </LegacyStyledText>
+                      </StyledText>
                     </Flex>
                   </Flex>
                 </Flex>

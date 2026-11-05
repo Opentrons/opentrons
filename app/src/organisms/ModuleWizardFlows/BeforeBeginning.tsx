@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_MODELS,
@@ -8,8 +8,8 @@ import {
   THERMOCYCLER_MODULE_MODELS,
 } from '@opentrons/shared-data'
 
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -76,7 +76,7 @@ export function BeforeBeginning(props: BeforeBeginningProps): ReactNode {
           t={t}
           i18nKey="branded:module_calibration_get_started"
           values={{ module: moduleDisplayName }}
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{ block: <StyledText forwardedAs="p" /> }}
         />
       }
       proceedButtonText={t('start_setup')}

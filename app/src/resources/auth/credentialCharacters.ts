@@ -9,4 +9,4 @@ export {
   hasOnlyAllowedPasswordCharacters,
   hasOnlyAllowedPasswordCharacters as hasOnlyAllowedCredentialCharacters,
   hasOnlyAllowedUsernameCharacters,
-} from '/app/atoms/SoftwareKeyboard/softwareKeyboardCharacters'
+} from '/app/components/ODD/keyboard/softwareKeyboardCharacters'

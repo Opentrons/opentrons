@@ -4,8 +4,8 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { SPACING } from '@opentrons/components'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
 import type { ReactNode } from 'react'

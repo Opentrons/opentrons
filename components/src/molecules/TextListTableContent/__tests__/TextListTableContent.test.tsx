@@ -2,12 +2,12 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { TextListTableContent } from '..'
-import { ListTable } from '../../../atoms/ListTable'
+import { ListTable } from '../../../helix/ListTable'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../atoms/ListTable')
+vi.mock('../../../helix/ListTable')
 
 const render = (props: ComponentProps<typeof TextListTableContent>) => {
   return renderWithProviders(

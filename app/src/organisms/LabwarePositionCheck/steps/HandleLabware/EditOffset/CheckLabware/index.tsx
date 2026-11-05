@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -22,8 +21,9 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
-import { JogControls } from '/app/molecules/JogControls'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
@@ -219,7 +219,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText forwardedAs="p" />,
+                  block: <StyledText forwardedAs="p" />,
                   bold: <strong />,
                 }}
               />
@@ -311,7 +311,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

@@ -2,16 +2,15 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  LegacyStyledText,
-  StyledText,
-} from '@opentrons/components'
+import { AnimationVideo, StyledText } from '@opentrons/components'
 
 import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   selectActivePipette,
@@ -108,7 +107,7 @@ export function DetachProbe(props: LPCWizardContentProps): ReactNode {
               <Trans
                 t={t}
                 i18nKey="store_probe"
-                components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+                components={{ block: <StyledText forwardedAs="p" /> }}
               />
             </StyledText>
           }

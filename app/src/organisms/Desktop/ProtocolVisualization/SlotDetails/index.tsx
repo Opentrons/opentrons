@@ -4,15 +4,12 @@ import {
   HOPPER_FAKE_LOCATIONS,
 } from '@opentrons/step-generation'
 
-import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
-
-import { getLabwareStackForSlot } from '../utils/getLabwareStackForSlot'
-
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
 import styles from './slotdetails.module.css'
+import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
 
 import type { ReactNode } from 'react'
 import type {

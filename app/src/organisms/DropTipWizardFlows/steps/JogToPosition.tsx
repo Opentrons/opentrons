@@ -4,13 +4,12 @@ import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { JogControls } from '/app/molecules/JogControls'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
 
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
@@ -56,11 +55,11 @@ export const JogToPosition = ({
           >
             {t('position_the_pipette')}
           </StyledText>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {currentRoute === DT_ROUTES.BLOWOUT
               ? t('position_and_blowout')
               : t('position_and_drop_tip')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
       <Flex

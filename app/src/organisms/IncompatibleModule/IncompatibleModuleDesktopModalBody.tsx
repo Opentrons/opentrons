@@ -8,14 +8,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
   OVERFLOW_SCROLL,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { InterventionModal } from '/app/molecules/InterventionModal'
+import { InterventionModal } from '/app/components/ODD/modals/InterventionModal'
 import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { ReactNode } from 'react'
@@ -68,7 +68,7 @@ export function IncompatibleModuleDesktopModalBody({
                   size={SPACING.spacing32}
                   color={COLORS.red50}
                 />
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="p"
                   key={module.id}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -82,14 +82,14 @@ export function IncompatibleModuleDesktopModalBody({
                     }}
                     t={t}
                   />
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
             </li>
           ))}
         </Flex>
-        <LegacyStyledText forwardedAs="p" paddingTop={SPACING.spacing12}>
+        <StyledText forwardedAs="p" paddingTop={SPACING.spacing12}>
           <Trans t={t} i18nKey="remove_before_using" />
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </InterventionModal>
   )

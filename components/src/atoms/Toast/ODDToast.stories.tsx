@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { Toast } from '.'
+import { PrimaryButton } from '../../helix/buttons'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   DIRECTION_COLUMN,
@@ -10,7 +11,6 @@ import {
   Z_INDEX,
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { PrimaryButton } from '../buttons'
 import { StyledText } from '../StyledText'
 
 import type { Meta, Story } from '@storybook/react'

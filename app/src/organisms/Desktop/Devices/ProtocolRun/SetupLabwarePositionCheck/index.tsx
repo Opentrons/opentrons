@@ -1,7 +1,4 @@
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { FlexSetupLPC } from './FlexSetupLPC'
-import { OT2SetupLPC } from './OT2SetupLPC'
 
 import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -21,9 +18,5 @@ export interface SetupLabwarePositionCheckProps {
 export function SetupLabwarePositionCheck(
   props: SetupLabwarePositionCheckProps
 ): ReactNode {
-  return props.robotType === FLEX_ROBOT_TYPE ? (
-    <FlexSetupLPC {...props} />
-  ) : (
-    <OT2SetupLPC {...props} />
-  )
+  return <FlexSetupLPC {...props} />
 }

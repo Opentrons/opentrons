@@ -17,7 +17,7 @@ import {
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

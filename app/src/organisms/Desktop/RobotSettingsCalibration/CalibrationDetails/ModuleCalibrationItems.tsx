@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -54,23 +54,23 @@ export function ModuleCalibrationItems({
           return (
             <StyledTableRow key={attachedModule.id}>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {getModuleDisplayName(attachedModule.moduleModel)}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {attachedModule.serialNumber}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
+                <StyledText forwardedAs="p">
                   {attachedModule.moduleOffset?.last_modified != null
                     ? formatLastCalibrated(
                         attachedModule.moduleOffset?.last_modified
                       )
                     : noCalibrationCopy}
-                </LegacyStyledText>
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell>
                 {attachedModule.moduleType !== ABSORBANCE_READER_TYPE ? (
