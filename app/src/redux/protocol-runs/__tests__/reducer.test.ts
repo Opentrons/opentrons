@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  setDropTipPromptDismissed,
   updateCameraSpecificSettings,
   updateCameraStreamEnablement,
   updateRunSetupStepsComplete,
@@ -136,5 +137,28 @@ describe('protocol runs reducer', () => {
     ).toEqual({
       ot_system_camera: imageSettings,
     })
+  })
+
+  it('marks drop tip prompt dismissed for a run', () => {
+    const nextState = protocolRunReducer(
+      {
+        'some-run-id': {
+          setup: SETUP_INITIAL,
+        },
+      },
+      setDropTipPromptDismissed('some-run-id')
+    )
+
+    expect(nextState['some-run-id']?.dropTipPromptDismissed).toBe(true)
+    expect(nextState['some-run-id']?.setup).toEqual(SETUP_INITIAL)
+  })
+
+  it('creates a run slot when dismissing drop tip with no existing state', () => {
+    const nextState = protocolRunReducer(
+      undefined,
+      setDropTipPromptDismissed('some-run-id')
+    )
+
+    expect(nextState['some-run-id']?.dropTipPromptDismissed).toBe(true)
   })
 })

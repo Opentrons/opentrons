@@ -35,7 +35,6 @@ import {
 } from '@opentrons/components'
 import {
   useAccessControlEnabledQuery,
-  useErrorRecoverySettings,
   useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
@@ -43,7 +42,6 @@ import {
 
 import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
@@ -65,6 +63,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { selectDropTipPromptDismissed } from '/app/redux/protocol-runs'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
@@ -72,7 +71,6 @@ import {
   EMPTY_TIMESTAMP,
   formatTimeWithUtcLabel,
   useCloseCurrentRun,
-  useCurrentRunCommands,
   useIsRunCurrent,
   useNotifyRunQuery,
   useRunCreatedAtTimestamp,
@@ -128,6 +126,7 @@ export function RunSummary(): ReactNode {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
+  const [hasCheckedTips, setHasCheckedTips] = useState(false)
   const [showSplash, setShowSplash] = useState(
     runStatus === RUN_STATUS_FAILED ||
       runStatus === RUN_STATUS_SUCCEEDED ||
@@ -166,19 +165,20 @@ export function RunSummary(): ReactNode {
   const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
   const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
   const [showReturnToSpinner, setShowReturnToSpinner] = useState<boolean>(false)
-  // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
-  // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
-  const closeCurrentRunIfValid = (onSuccess?: () => void): void => {
+  // Close the current run only if it's active, then run the callback on success or error.
+  // Prefer this wrapper over closeCurrentRun directly, since the callback is swallowed if currentRun is null.
+  const closeCurrentRunIfValid = (onSettled?: () => void): void => {
     if (isRunCurrent) {
       closeCurrentRun({
-        onSuccess,
+        onSuccess: onSettled,
         onError: () => {
           setShowReturnToSpinner(false)
           setShowRunAgainSpinner(false)
+          onSettled?.()
         },
       })
     } else {
-      onSuccess?.()
+      onSettled?.()
     }
   }
 
@@ -284,36 +284,19 @@ export function RunSummary(): ReactNode {
     ) : null
   }
 
-  const {
-    determineTipStatus,
-    setTipStatusResolved,
-    aPipetteWithTip,
-    initialPipettesWithTipsCount,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-  })
-  const { data } = useErrorRecoverySettings()
-  const isEREnabled = data?.data.enabled ?? true
-  const runSummaryNoFixit = useCurrentRunCommands({
-    includeFixitCommands: false,
-    pageLength: 1,
-  })
-  const tipCheckSkippedBecauseER =
-    runSummaryNoFixit != null &&
-    lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)
+  const { determineTipStatus, skipCurrentPipette, aPipetteWithTip } =
+    useTipAttachmentStatus()
+  const isPromptDismissed = useSelector(selectDropTipPromptDismissed(runId))
 
-  useEffect(
-    () => {
-      // Only run tip checking if it wasn't *just* handled during Error Recovery.
-      if (runSummaryNoFixit != null && !tipCheckSkippedBecauseER) {
-        void determineTipStatus()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isRunCurrent, runSummaryNoFixit, isEREnabled]
-  )
+  useEffect(() => {
+    if (isPromptDismissed) {
+      setHasCheckedTips(true)
+      return
+    }
+    void determineTipStatus().then(() => {
+      setHasCheckedTips(true)
+    })
+  }, [isPromptDismissed, determineTipStatus])
 
   // After splash tap, dim while network requests are in flight. Close if no
   // tips need handling so desktop does not auto-document a second dismiss.
@@ -324,30 +307,30 @@ export function RunSummary(): ReactNode {
       if (!splashClicked) {
         return
       }
+
       if (!isRunCurrent) {
         setShowSplash(false)
         setSplashClicked(false)
         return
       }
-      if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
+
+      if (!hasCheckedTips) {
+        return
+      }
+
+      if (aPipetteWithTip == null) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
           setSplashClicked(false)
         })
         return
       }
-      if (initialPipettesWithTipsCount != null) {
-        setShowSplash(false)
-        setSplashClicked(false)
-      }
+
+      setShowSplash(false)
+      setSplashClicked(false)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      splashClicked,
-      isRunCurrent,
-      initialPipettesWithTipsCount,
-      tipCheckSkippedBecauseER,
-    ]
+    [splashClicked, isRunCurrent, hasCheckedTips, aPipetteWithTip]
   )
 
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
@@ -375,27 +358,45 @@ export function RunSummary(): ReactNode {
     }
   }
 
-  // If no pipettes have tips attached, execute the routing callback.
-  const setTipStatusResolvedAndRoute = (
-    routeCb: (aPipetteWithTip: PipetteWithTip) => void
-  ): (() => Promise<void>) => {
-    return () =>
-      setTipStatusResolved().then(newPipettesWithTip => {
-        routeCb(newPipettesWithTip)
+  const probeThenRoute = (
+    routeCb: (aPipetteWithTip: PipetteWithTip | null) => void
+  ): ((didSkip: boolean) => void) => {
+    return didSkip => {
+      if (didSkip) {
+        skipCurrentPipette()
+      }
+      void determineTipStatus().then(pipettes => {
+        routeCb(pipettes[0] ?? null)
       })
+    }
+  }
+
+  const startWithTipCheck = (
+    cb: (pipette: PipetteWithTip | null) => void
+  ): void => {
+    if (isPromptDismissed) {
+      cb(null)
+      return
+    }
+    void determineTipStatus().then(pipettes => {
+      cb(pipettes[0] ?? null)
+    })
   }
 
   const handleReturnToDash = (aPipetteWithTip: PipetteWithTip | null): void => {
     setShowReturnToSpinner(true)
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
-        setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
+        onTipsHandled: probeThenRoute(handleReturnToDash),
         robotName,
         aPipetteWithTip,
         onSuccess: () => {
           closeCurrentRunIfValid(() => {
             navigate('/dashboard')
           })
+        },
+        onError: () => {
+          setShowReturnToSpinner(false)
         },
       })
     } else {
@@ -406,9 +407,9 @@ export function RunSummary(): ReactNode {
   }
 
   const handleRunAgain = (aPipetteWithTip: PipetteWithTip | null): void => {
-    if (isRunCurrent && aPipetteWithTip != null) {
+    if (aPipetteWithTip != null) {
       void handleTipsAttachedModal({
-        setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
+        onTipsHandled: probeThenRoute(handleRunAgain),
         robotName,
         aPipetteWithTip,
         onSuccess: () => {
@@ -597,7 +598,7 @@ export function RunSummary(): ReactNode {
               iconName="arrow-left"
               buttonType="secondary"
               onClick={() => {
-                handleReturnToDash(aPipetteWithTip)
+                startWithTipCheck(handleReturnToDash)
               }}
               buttonText={
                 showReturnToSpinner
@@ -609,7 +610,7 @@ export function RunSummary(): ReactNode {
             <EqualWidthButton
               iconName="play-round-corners"
               onClick={() => {
-                handleRunAgain(aPipetteWithTip)
+                startWithTipCheck(handleRunAgain)
               }}
               buttonText={
                 showRunAgainSpinner

@@ -19,11 +19,11 @@ describe('useProtocolDropTipModal', () => {
 
   beforeEach(() => {
     props = {
-      areTipsAttached: true,
+      hasPipetteWithTip: true,
+      isPromptDismissed: false,
+      isWizardActive: false,
       enableDTWiz: vi.fn(),
-      isRunCurrent: true,
       onSkipAndHome: vi.fn(),
-      currentRunId: 'MOCK_ID',
       pipetteInfo: {
         pipetteId: '123',
         pipetteName: 'MOCK_NAME',
@@ -47,26 +47,47 @@ describe('useProtocolDropTipModal', () => {
         onSkip: expect.any(Function),
         onBeginRemoval: expect.any(Function),
         isPressed: false,
+        mount: 'left',
+        is96Channel: false,
       },
     })
   })
 
-  it('should update showDTModal when areTipsAttached changes', () => {
+  it('should update showDTModal when hasPipetteWithTip changes', () => {
     const { result, rerender } = renderHook(() =>
       useProtocolDropTipModal(props)
     )
 
     expect(result.current.showModal).toBe(true)
 
-    props.areTipsAttached = false
+    props.hasPipetteWithTip = false
     rerender()
 
     expect(result.current.showModal).toBe(false)
   })
 
-  it('should not show modal when isRunCurrent is false', () => {
-    props.isRunCurrent = false
+  it('should show modal when the run is no longer current if a pipette still has a tip', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(true)
+  })
+
+  it('should not show modal when the drop tip prompt is dismissed', () => {
+    props.isPromptDismissed = true
+    const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(false)
+  })
+
+  it('should hide an open modal when the prompt is later dismissed', () => {
+    const { result, rerender } = renderHook(() =>
+      useProtocolDropTipModal(props)
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    props.isPromptDismissed = true
+    rerender()
 
     expect(result.current.showModal).toBe(false)
   })
@@ -81,7 +102,7 @@ describe('useProtocolDropTipModal', () => {
     expect(mockHomePipettes).toHaveBeenCalled()
   })
 
-  it('should dismiss the modal and call onSkipAndHome on home success', () => {
+  it('should call onSkipAndHome on home success', () => {
     let onSuccess: (() => void) | undefined
     vi.mocked(useHomePipettes).mockImplementation(homeProps => {
       onSuccess = homeProps.onSuccess
@@ -91,16 +112,29 @@ describe('useProtocolDropTipModal', () => {
       }
     })
 
-    const { result } = renderHook(() => useProtocolDropTipModal(props))
-
-    expect(result.current.showModal).toBe(true)
+    renderHook(() => useProtocolDropTipModal(props))
 
     act(() => {
       onSuccess?.()
     })
 
-    expect(result.current.showModal).toBe(false)
     expect(props.onSkipAndHome).toHaveBeenCalled()
+  })
+
+  it('should hide the modal while the drop tip wizard is open and show it again after', () => {
+    const { result, rerender } = renderHook(
+      ({ isWizardActive }) =>
+        useProtocolDropTipModal({ ...props, isWizardActive }),
+      { initialProps: { isWizardActive: false } }
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    rerender({ isWizardActive: true })
+    expect(result.current.showModal).toBe(false)
+
+    rerender({ isWizardActive: false })
+    expect(result.current.showModal).toBe(true)
   })
 
   it('should call toggleDTWiz when onDTModalRemoval is called', () => {
@@ -147,11 +181,21 @@ describe('ProtocolDropTipModal', () => {
     render(props)
 
     screen.getByText('Remove any attached tips')
-    screen.queryByText(
-      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    screen.getByText('left pipette')
+    screen.getByText(
+      /with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
     screen.getByText('Begin removal')
     screen.getByText('Skip and home pipette')
+  })
+
+  it('does not name a mount for a 96-Channel pipette', () => {
+    render({ ...props, is96Channel: true })
+
+    expect(screen.queryByText('left pipette', { exact: false })).toBeNull()
+    screen.getByText(
+      'Homing the pipette with liquid in the tips may damage it. You must remove all tips before using the pipette again.'
+    )
   })
 
   it('renders a spinner and pressed loading state on Begin removal while homing', () => {

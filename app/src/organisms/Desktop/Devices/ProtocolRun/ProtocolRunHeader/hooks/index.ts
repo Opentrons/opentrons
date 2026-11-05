@@ -1,4 +1,5 @@
 export * from '../../../../../DoorOpenControl/useIsDoorOpen'
+export * from './useCloseTerminalRun'
 export * from './useRunAnalytics'
 export * from './useRunHeaderRunControls'
 export * from './useRunErrors'
