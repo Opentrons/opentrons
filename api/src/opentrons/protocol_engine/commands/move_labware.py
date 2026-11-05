@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -26,10 +26,12 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..errors import (
+    InvalidLabwarePositionError,
     LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
     LabwareNotOnDeckError,
     LabwareOffsetDoesNotExistError,
+    LocationIsLidDockSlotError,
     NotSupportedOnRobotType,
     VacuumModuleStillUnderVacuumError,
 )
@@ -64,6 +66,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_staging_slots,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.types.labware import LoadedLabware
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 if TYPE_CHECKING:
@@ -82,41 +85,49 @@ def _remove_default(s: dict[str, Any]) -> None:
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
-def _has_vacuum_neighbor(location: LabwareLocation, state_view: StateView) -> bool:
-    """Return True if a north/south neighbor holds a vacuum module."""
+def _move_slot_label(location: LabwareLocation) -> str:
+    if isinstance(location, DeckSlotLocation):
+        return location.slotName.id
+    if isinstance(location, AddressableAreaLocation):
+        return location.addressableAreaName
+    return str(location)
+
+
+def _gripper_move_grazes_collar_neighbor(
+    location: LabwareLocation, state_view: StateView
+) -> Tuple[LoadedLabware, str] | None:
+    """Return the collar and its slot when a north/south neighbor would graze this move."""
     try:
         parent = state_view.geometry.get_parent_from_location(location)
-        slot = fixture_validation.get_slot_name_from_addressable_area(parent)
+        parent_slot = fixture_validation.get_slot_name_from_addressable_area(parent)
     except (LabwareNotOnDeckError, ValueError, TypeError):
-        return False
+        return None
 
-    if isinstance(slot, StagingSlotName):
-        neighbors: list[DeckSlotName | StagingSlotName] = list(
-            get_north_south_staging_slots(slot)
+    neighbors: List[StagingSlotName | DeckSlotName] = []
+    if isinstance(parent_slot, StagingSlotName):
+        neighbors.extend(get_north_south_staging_slots(parent_slot))
+    elif isinstance(parent_slot, DeckSlotName):
+        neighbors.extend(
+            [
+                DeckSlotName.from_primitive(slot_id).to_ot3_equivalent()
+                for slot_id in get_north_south_slots(parent_slot.as_int())
+            ]
         )
-    elif isinstance(slot, DeckSlotName):
-        neighbors = [
-            DeckSlotName.from_primitive(slot_id).to_ot3_equivalent()
-            for slot_id in get_north_south_slots(slot.as_int())
-        ]
-    else:
-        return False
 
-    for neighbor in neighbors:
-        if isinstance(neighbor, StagingSlotName):
-            deck_slot = (
-                state_view.addressable_areas.get_potential_addressable_area_base_slot(
-                    neighbor.id
-                )
-            )
-            if deck_slot is None:
-                continue
-        else:
-            deck_slot = neighbor
-        module = state_view.modules.get_by_slot(deck_slot)
-        if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
-            return True
-    return False
+    for labware in state_view.labware.get_all():
+        try:
+            slot = state_view.geometry.get_ancestor_slot_name(labware.id)
+        except (
+            LabwareNotOnDeckError,
+            InvalidLabwarePositionError,
+            LocationIsLidDockSlotError,
+        ):
+            continue
+        if slot in neighbors and state_view.labware.get_has_quirk(
+            labware.id, "vacuumModuleDock"
+        ):
+            return labware, slot.id
+    return None
 
 
 class MoveLabwareParams(BaseModel):
@@ -485,6 +496,21 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 available_new_location,
             )
 
+            for location, relation in (
+                (validated_cur_loc, "from"),
+                (validated_new_loc, "to"),
+            ):
+                neighbor = _gripper_move_grazes_collar_neighbor(
+                    location, self._state_view
+                )
+                if neighbor is not None:
+                    collar, slot = neighbor
+                    raise LabwareMovementNotAllowedError(
+                        f"Cannot move {current_labware.loadName} {relation}"
+                        f" {_move_slot_label(location)} with the gripper"
+                        f" while {collar.loadName} is on {slot}."
+                    )
+
             user_pick_up_offset = (
                 Point.from_xyz_attrs(params.pickUpOffset)
                 if params.pickUpOffset is not None
@@ -509,10 +535,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     immediate_destination_location_sequence
                 )
 
-            # Narrow the jaws when a vacuum module is north or south of the labware,
-            # including the staging column. B4's north is the dock on A4.
-            restrict_pick = _has_vacuum_neighbor(validated_cur_loc, self._state_view)
-            restrict_drop = _has_vacuum_neighbor(validated_new_loc, self._state_view)
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
@@ -522,8 +544,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     user_pick_up_offset=user_pick_up_offset,
                     user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
-                    restrict_pickup_approach=restrict_pick,
-                    restrict_drop_retract=restrict_drop,
                 )
             except (
                 FailedGripperPickupError,

@@ -368,8 +368,6 @@ async def test_gripper_move_labware_implementation(
             ),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
-            restrict_pickup_approach=False,
-            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -466,8 +464,6 @@ async def test_gripper_error(
             user_pick_up_offset=Point(),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
-            restrict_pickup_approach=False,
-            restrict_drop_retract=False,
         )
     ).then_raise(underlying_exception)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
@@ -666,8 +662,6 @@ async def test_gripper_move_to_waste_chute_implementation(
             user_pick_up_offset=Point(1, 2, 3),
             user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
-            restrict_pickup_approach=False,
-            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(

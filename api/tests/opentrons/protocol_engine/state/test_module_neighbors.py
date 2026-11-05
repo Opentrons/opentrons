@@ -1,65 +1,27 @@
-"""Tests for vacuum-module neighbor lookup used by gripper jaw limits."""
+"""Tests for gripper moves that graze a north/south vacuum collar."""
 
+from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
-from opentrons.protocol_engine.commands.move_labware import _has_vacuum_neighbor
-from opentrons.protocol_engine.errors import LabwareNotOnDeckError
-from opentrons.protocol_engine.resources import deck_configuration_provider
-from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
-from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.modules import (
-    HardwareModule,
-    ModuleState,
-    ModuleView,
+from opentrons.protocol_engine.commands.move_labware import (
+    _gripper_move_grazes_collar_neighbor,
 )
+from opentrons.protocol_engine.errors import LabwareNotOnDeckError
+from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     AddressableAreaLocation,
     DeckSlotLocation,
-    DeckType,
     LabwareLocation,
-    ModuleDefinition,
+    LoadedLabware,
+    ModuleLocation,
 )
-from opentrons.types import DeckSlotName
-
-
-class _NeighborState:
-    """The slices of StateView that the neighbor lookup reads."""
-
-    def __init__(
-        self,
-        modules: ModuleView,
-        geometry: GeometryView,
-        addressable_areas: AddressableAreaView,
-    ) -> None:
-        self.modules = modules
-        self.geometry = geometry
-        self.addressable_areas = addressable_areas
-
-
-def _view_with_module_on_a3(definition: ModuleDefinition) -> ModuleView:
-    module_id = "module-id"
-    cutout_id = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-        DeckSlotName.SLOT_A3
-    )
-    return ModuleView(
-        state=ModuleState(
-            load_location_by_module_id={module_id: cutout_id},
-            additional_slots_occupied_by_module_id={},
-            requested_model_by_id={module_id: definition.model},
-            hardware_by_module_id={
-                module_id: HardwareModule(serial_number=None, definition=definition)
-            },
-            substate_by_module_id={},
-            module_offset_by_serial={},
-            deck_type=DeckType.OT3_STANDARD,
-            deck_fixed_labware=[],
-        )
-    )
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 def _location_for_area(area: str) -> DeckSlotLocation | AddressableAreaLocation:
@@ -69,73 +31,136 @@ def _location_for_area(area: str) -> DeckSlotLocation | AddressableAreaLocation:
         return AddressableAreaLocation(addressableAreaName=area)
 
 
-def _state_for(
-    decoy: Decoy, modules: ModuleView, parent: str | Exception
-) -> tuple[LabwareLocation, StateView]:
-    geometry = decoy.mock(cls=GeometryView)
-    addressable_areas = decoy.mock(cls=AddressableAreaView)
-    decoy.when(
-        addressable_areas.get_potential_addressable_area_base_slot(matchers.Anything())
-    ).then_do(
-        lambda area_name: {
-            "A4": DeckSlotName.SLOT_A3,
-            "B4": DeckSlotName.SLOT_B3,
-            "C4": DeckSlotName.SLOT_C3,
-            "D4": DeckSlotName.SLOT_D3,
-        }.get(area_name)
-    )
-    location: LabwareLocation
-    if isinstance(parent, Exception):
-        location = OFF_DECK_LOCATION
-        decoy.when(geometry.get_parent_from_location(location)).then_raise(parent)
+def _slot_name(slot_id: str) -> DeckSlotName | StagingSlotName:
+    try:
+        return DeckSlotName.from_primitive(slot_id)
+    except ValueError:
+        return StagingSlotName.from_primitive(slot_id)
+
+
+def _collar(slot: DeckSlotName | StagingSlotName) -> LoadedLabware:
+    if isinstance(slot, StagingSlotName):
+        location: LabwareLocation = AddressableAreaLocation(addressableAreaName=slot.id)
     else:
-        location = _location_for_area(parent)
-        decoy.when(geometry.get_parent_from_location(location)).then_return(parent)
-    state = _NeighborState(modules, geometry, addressable_areas)
-    return location, cast(StateView, state)
+        location = DeckSlotLocation(slotName=slot)
+    return LoadedLabware(
+        id=f"collar-{slot.id}",
+        loadName="opentrons_vacuum_manifold_collar_tall",
+        definitionUri="opentrons/opentrons_vacuum_manifold_collar_tall/1",
+        location=location,
+    )
 
 
 @pytest.mark.parametrize(
-    ("area", "expected"),
+    ("move_slot", "collar_slot", "has_quirk", "expect_hit"),
     [
-        ("B3", True),  # A3 is directly north of B3
-        ("B4", True),  # A4 is north of B4; the dock's base slot is A3
-        ("B2", False),  # A3 is the corner of B2, not north or south
-        ("A2", False),  # A3 is east of A2, and only north/south count
-        ("A3", False),  # the module's own slot is not a neighbor
-        ("A4", False),  # the dock's north/south neighbor is B4
-        ("C4", False),
-        ("D1", False),
+        ("B3", "A3", True, True),  # A3 is directly north of B3
+        ("B4", "A4", True, True),  # A4 is directly north of B4
+        ("B3", "C3", True, True),  # C3 is directly south of B3
+        ("B4", "C4", True, True),  # C4 is directly south of B4
+        ("B3", "A4", True, False),  # A4 is not a north/south neighbor of B3
+        ("B4", "A3", True, False),  # A3 is not a north/south neighbor of B4
+        ("B2", "A3", True, False),  # A3 is the corner of B2, not north or south
+        ("A3", "A3", True, False),  # the collar's own slot is not a neighbor
+        ("C3", "A3", True, False),  # A3 is two slots north of C3
+        ("B3", "A3", False, False),  # labware without the collar quirk
     ],
 )
-def test_vacuum_module_on_a3_north_south(
+def test_gripper_move_grazes_north_south_collar(
     decoy: Decoy,
-    vacuum_module_v1_def: ModuleDefinition,
-    area: str,
-    expected: bool,
+    move_slot: str,
+    collar_slot: str,
+    has_quirk: bool,
+    expect_hit: bool,
 ) -> None:
-    """A vacuum module is found on north/south slots, including staging."""
-    modules = _view_with_module_on_a3(vacuum_module_v1_def)
-    location, state = _state_for(decoy, modules, area)
+    """A vacuum collar on a north or south slot blocks a gripper pickup or drop."""
+    geometry = decoy.mock(cls=GeometryView)
+    labware = decoy.mock(cls=LabwareView)
+    collar_name = _slot_name(collar_slot)
+    collar = _collar(collar_name)
+    location = _location_for_area(move_slot)
+    decoy.when(geometry.get_parent_from_location(location)).then_return(move_slot)
+    decoy.when(labware.get_all()).then_return([collar])
+    decoy.when(geometry.get_ancestor_slot_name(collar.id)).then_return(collar_name)
+    decoy.when(labware.get_has_quirk(collar.id, "vacuumModuleDock")).then_return(
+        has_quirk
+    )
+    state = cast(
+        StateView,
+        SimpleNamespace(geometry=geometry, labware=labware),
+    )
 
-    assert _has_vacuum_neighbor(location, state) is expected
+    result = _gripper_move_grazes_collar_neighbor(location, state)
+
+    if expect_hit:
+        assert result == (collar, collar_slot)
+    else:
+        assert result is None
 
 
-def test_non_vacuum_module_does_not_count(
-    decoy: Decoy, heater_shaker_v1_def: ModuleDefinition
-) -> None:
-    """A heater-shaker directly north does not narrow the jaws."""
-    modules = _view_with_module_on_a3(heater_shaker_v1_def)
-    location, state = _state_for(decoy, modules, "B3")
+def test_collar_loaded_on_module_blocks_neighbor(decoy: Decoy) -> None:
+    """A collar loaded on the vacuum module in A3 blocks a gripper move at B3."""
+    geometry = decoy.mock(cls=GeometryView)
+    labware = decoy.mock(cls=LabwareView)
+    collar = LoadedLabware(
+        id="collar-id",
+        loadName="opentrons_vacuum_manifold_collar_tall",
+        definitionUri="opentrons/opentrons_vacuum_manifold_collar_tall/1",
+        location=ModuleLocation(moduleId="vacuum-id"),
+    )
+    location = _location_for_area("B3")
+    decoy.when(geometry.get_parent_from_location(location)).then_return("B3")
+    decoy.when(labware.get_all()).then_return([collar])
+    decoy.when(geometry.get_ancestor_slot_name("collar-id")).then_return(
+        DeckSlotName.SLOT_A3
+    )
+    decoy.when(labware.get_has_quirk("collar-id", "vacuumModuleDock")).then_return(True)
+    state = cast(
+        StateView,
+        SimpleNamespace(geometry=geometry, labware=labware),
+    )
 
-    assert _has_vacuum_neighbor(location, state) is False
+    assert _gripper_move_grazes_collar_neighbor(location, state) == (collar, "A3")
 
 
-def test_off_deck_location_has_no_vacuum_neighbor(
-    decoy: Decoy, vacuum_module_v1_def: ModuleDefinition
-) -> None:
-    """Locations that are not on a deck slot have no vacuum neighbor."""
-    modules = _view_with_module_on_a3(vacuum_module_v1_def)
-    location, state = _state_for(decoy, modules, LabwareNotOnDeckError())
+def test_waste_chute_labware_does_not_stop_the_check(decoy: Decoy) -> None:
+    """A tiprack in the waste chute is skipped, and a collar neighbor still blocks."""
+    geometry = decoy.mock(cls=GeometryView)
+    labware = decoy.mock(cls=LabwareView)
+    chute = LoadedLabware(
+        id="tiprack-id",
+        loadName="opentrons_flex_96_tiprack_200ul",
+        definitionUri="opentrons/opentrons_flex_96_tiprack_200ul/1",
+        location=OFF_DECK_LOCATION,
+    )
+    collar = _collar(DeckSlotName.SLOT_A3)
+    location = _location_for_area("B3")
+    decoy.when(geometry.get_parent_from_location(location)).then_return("B3")
+    decoy.when(labware.get_all()).then_return([chute, collar])
+    decoy.when(geometry.get_ancestor_slot_name(chute.id)).then_raise(
+        LabwareNotOnDeckError()
+    )
+    decoy.when(geometry.get_ancestor_slot_name(collar.id)).then_return(
+        DeckSlotName.SLOT_A3
+    )
+    decoy.when(labware.get_has_quirk(collar.id, "vacuumModuleDock")).then_return(True)
+    state = cast(
+        StateView,
+        SimpleNamespace(geometry=geometry, labware=labware),
+    )
 
-    assert _has_vacuum_neighbor(location, state) is False
+    assert _gripper_move_grazes_collar_neighbor(location, state) == (collar, "A3")
+
+
+def test_off_deck_location_does_not_graze(decoy: Decoy) -> None:
+    """Locations that are not on a deck slot have no collar neighbor."""
+    geometry = decoy.mock(cls=GeometryView)
+    decoy.when(geometry.get_parent_from_location(OFF_DECK_LOCATION)).then_raise(
+        LabwareNotOnDeckError()
+    )
+    state = cast(
+        StateView,
+        SimpleNamespace(geometry=geometry, labware=decoy.mock(cls=LabwareView)),
+    )
+
+    assert _gripper_move_grazes_collar_neighbor(OFF_DECK_LOCATION, state) is None
