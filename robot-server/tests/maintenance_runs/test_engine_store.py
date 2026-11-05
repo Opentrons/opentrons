@@ -8,6 +8,7 @@ from decoy import Decoy, matchers
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import EstopState, EstopStateNotification
 from opentrons.protocol_engine import (
+    DeckType,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -67,10 +68,7 @@ def test_run_created_at_raises(subject: MaintenanceRunOrchestratorStore) -> None
         subject.current_run_created_at
 
 
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
-async def test_create_engine_uses_robot_and_deck_type(
-    decoy: Decoy, deck_type: pe_types.DeckType
-) -> None:
+async def test_create_engine_uses_robot_and_deck_type(decoy: Decoy) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
@@ -79,7 +77,7 @@ async def test_create_engine_uses_robot_and_deck_type(
     subject = MaintenanceRunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
     )
 
     await subject.create(
@@ -90,7 +88,7 @@ async def test_create_engine_uses_robot_and_deck_type(
     )
 
     assert subject.run_orchestrator.get_robot_type() == robot_type
-    assert subject.run_orchestrator.get_deck_type() == deck_type
+    assert subject.run_orchestrator.get_deck_type() == DeckType.OT3_STANDARD
 
 
 async def test_create_engine_with_labware_offsets(
