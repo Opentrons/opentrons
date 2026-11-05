@@ -40,7 +40,6 @@ Follow the instructions to add a total of six Absorbance Plate Reader steps to y
     
     !!! Note
         To initialize the Absorbance Plate Reader, the module must be empty with the lid closed. Remove any labware and use a Plate Reader step to close the lid.
-    
 
     <figure class="screenshot" markdown>
     ![Plate Reader step](../images/plate_reader.png)
@@ -146,9 +145,6 @@ Click **Program a Thermocycler profile** to choose parameters for your experimen
 
 Click **Add step** to create a step, like an initial denaturation, that only needs to happen once. Choose a block temperature, time, and name for your step.
 
-Cycles are made up of steps that are repeated a set number of times
-in your experiment. Click **Add cycle** to add steps to a cycle. At the
-bottom of the menu, enter the number of times the cycle should
-repeat before saving your work.
+Cycles are made up of steps that are repeated a set number of times in your experiment. Click **Add cycle** to add steps to a cycle. At the bottom of the menu, enter the number of times the cycle should repeat before saving your work.
 
 Running Thermocycler profiles is time-consuming, so you can choose to run other protocols steps [in parallel](../steps/parallel.md) with your profiles.
