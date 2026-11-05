@@ -20,7 +20,7 @@ if TYPE_CHECKING:
         DeckSchemaVersion3,
         DeckSchemaVersion4,
         DeckSchemaVersion5,
-        DeckSchemaVersion6
+        DeckSchemaVersion6,
     )
 
 DEFAULT_DECK_DEFINITION_VERSION: Final = 6
@@ -42,6 +42,7 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
     "top": Offset(y=CALIBRATION_SQUARE_SIZE * 0.5),
     "bottom": Offset(y=-CALIBRATION_SQUARE_SIZE * 0.5),
 }
+
 
 @overload
 def load(name: str, version: "DeckSchemaVersion6") -> "DeckDefinitionV6": ...
